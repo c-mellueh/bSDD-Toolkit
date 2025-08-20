@@ -6,7 +6,7 @@ import logging
 from PySide6.QtCore import QModelIndex,QObject,Signal,Qt
 
 import bsdd_gui
-from bsdd_parser.models import BsddClassProperty
+from bsdd_parser.models import BsddClassProperty,BsddClass
 from bsdd_gui.module.property_table import ui,models
 if TYPE_CHECKING:
     from bsdd_gui.module.property_table.prop import PropertyTableProperties
@@ -55,3 +55,7 @@ class PropertyTable:
         source_model = view.model().sourceModel()
         source_model.beginResetModel()
         source_model.endResetModel()
+        
+    @classmethod
+    def filter_properties_by_pset(cls,bsdd_class:BsddClass,pset_name:str):
+        return [p for p in BsddClass.ClassProperties if p.PropertySet == pset_name]

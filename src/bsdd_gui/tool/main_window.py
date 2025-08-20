@@ -53,6 +53,10 @@ class MainWindow:
         return cls.get_properties().active_class
 
     @classmethod
+    def get_active_pset(cls) -> str:
+        return cls.get_properties().active_pset
+
+    @classmethod
     def set_active_class(cls,value:BsddClass):
         cls.get_properties().active_class = value
         cls.signaller.active_class_changed.emit(cls.get_properties().active_class)

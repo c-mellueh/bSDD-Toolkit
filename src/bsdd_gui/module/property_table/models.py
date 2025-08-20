@@ -9,7 +9,7 @@ from PySide6.QtCore import (
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_parser.models import BsddDictionary, BsddClass
+from bsdd_parser.models import BsddDictionary, BsddClass,BsddClassProperty
 from bsdd_gui import tool
 
 
@@ -26,12 +26,19 @@ class PropertyTableModel(QAbstractItemModel):
     def active_class(self):
         return tool.MainWindow.get_active_class()
 
+    @property
+    def active_pset(self):
+        return tool.MainWindow.get_active_pset()
 
     def rowCount(self, parent=QModelIndex()):
         if not self.active_class:
             return 0
-        if not parent.isValid():
-            return len(tool.PropertySetList.get_pset_list(self.active_class))
+        if not self.active_pset:
+            return 0
+        if parent.isValid():
+            return 0
+        
+        len(tool.PropertyTable.filter_properties_by_pset(self.active_class,self.active_pset))
 
     def columnCount(self, /, parent = ...):
         return 5
@@ -42,9 +49,9 @@ class PropertyTableModel(QAbstractItemModel):
 
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
-
-        pset_name  = tool.PropertySetList.get_pset_list(self.active_class)[row]
-        index = self.createIndex(row, column, pset_name)
+        bsdd_properties = tool.PropertyTable.filter_properties_by_pset(self.active_class,self.active_pset)
+        bsdd_property = bsdd_properties[row]
+        index = self.createIndex(row, column, bsdd_property)
         return index
 
     def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
@@ -53,8 +60,15 @@ class PropertyTableModel(QAbstractItemModel):
 
         if role != Qt.ItemDataRole.DisplayRole:
             return None
-        pset_name  = tool.PropertySetList.get_pset_list(self.active_class)[index.row()]
-        return pset_name
+        
+        col = index.column()
+        bsdd_property:BsddClassProperty = index.internalPointer()
+        if col == 0:
+            return bsdd_property.Code
+        if col == 1:
+            return bsdd_property.IsRequired
+        if col == 2:
+            return bsdd_property.PropertyCode
 
     def setData(self, index, value, /, role = ...):
         return False
