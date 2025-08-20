@@ -61,9 +61,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from som_gui.module.class_tree.ui import ClassView
-from som_gui.module.property_set.ui import PsetTableWidget
-from som_gui.module.property_table.ui import PropertyTable
+from bsdd_gui.module.class_tree.ui import ClassView
+from bsdd_gui.module.property_set.ui import PsetTableWidget
+from bsdd_gui.module.property_table.ui import PropertyTable
 
 
 class Ui_MainWindow(object):
