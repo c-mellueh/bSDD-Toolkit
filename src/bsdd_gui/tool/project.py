@@ -16,9 +16,17 @@ class Project:
 
     @classmethod
     def create_project(cls):
-        cls.get_properties().project_dictionary = bsdd_parser.models.BsddDictionary()
+        cls.get_properties().project_dictionary = bsdd_parser.models.BsddDictionary(
+            OrganizationCode="default",
+            DictionaryCode="default",
+            DictionaryName="default",
+            DictionaryVersion="0.0.1",
+            LanguageIsoCode="de-DE",
+            LanguageOnly=False,
+            UseOwnUri=False,
+        )
         bsdd_gui.on_new_project()
-        
+
     @classmethod
     def load_project(cls,path:os.PathLike):
         prop = cls.get_properties()

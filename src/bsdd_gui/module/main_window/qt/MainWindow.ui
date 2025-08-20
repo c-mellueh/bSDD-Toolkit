@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1510</width>
-    <height>754</height>
+    <width>1514</width>
+    <height>762</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -318,8 +318,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1510</width>
-     <height>33</height>
+     <width>1514</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -364,17 +364,17 @@
   <customwidget>
    <class>PropertyTable</class>
    <extends>QTableWidget</extends>
-   <header>som_gui.module.property_table.ui</header>
+   <header>bsdd_gui.module.property_table.ui</header>
   </customwidget>
   <customwidget>
    <class>ClassView</class>
    <extends>QTreeView</extends>
-   <header>som_gui.module.class_tree.ui</header>
+   <header>bsdd_gui.module.class_tree.ui</header>
   </customwidget>
   <customwidget>
    <class>PsetTableWidget</class>
    <extends>QTableWidget</extends>
-   <header>som_gui.module.property_set.ui</header>
+   <header>bsdd_gui.module.property_set_table.ui</header>
   </customwidget>
  </customwidgets>
  <tabstops>

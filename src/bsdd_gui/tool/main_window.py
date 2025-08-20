@@ -34,6 +34,7 @@ class MainWindow:
         hide Console Window (Works only for Windows so far)
         :return:
         """
+        return
         hWnd = ctypes.windll.kernel32.GetConsoleWindow()
         if hWnd != 0:
             ctypes.windll.user32.ShowWindow(hWnd, 0)
