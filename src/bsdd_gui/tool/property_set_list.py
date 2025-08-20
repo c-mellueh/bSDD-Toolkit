@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class Signaller(QObject):
     model_refresh_requested = Signal()
-    active_pset_changed = Signal(str)
+    selection_changed = Signal(ui.PsetListView,str)
 
 
 class PropertySetList:
@@ -45,7 +45,7 @@ class PropertySetList:
         if not curr.isValid():
             return
         index = proxy_model.mapToSource(curr)
-        cls.signaller.active_pset_changed.emit(index.data(Qt.ItemDataRole.DisplayRole))
+        cls.signaller.selection_changed.emit(view,index.data(Qt.ItemDataRole.DisplayRole))
 
     @classmethod
     def reset_view(cls, view: ui.PsetListView):

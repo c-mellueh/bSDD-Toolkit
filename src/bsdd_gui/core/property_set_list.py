@@ -7,6 +7,11 @@ from bsdd_gui.module.property_set_list import ui
 from PySide6.QtWidgets import QApplication,QListView
 
 def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], project: Type[tool.Project],main_window:Type[tool.MainWindow]):
+
+    def test_for_mw(view: ui.PsetListView, name: str):
+        if view == main_window.get_pset_view():
+            main_window.set_active_pset(name)
+
     pset_list.register_view(view)
     bsdd_dictionary = project.get()
     model = pset_list.create_model(bsdd_dictionary)
@@ -18,7 +23,7 @@ def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], p
     # sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
     sel_model.currentChanged.connect(lambda s,d: pset_list.on_current_changed(view,s,d))
     main_window.signaller.active_class_changed.connect(lambda c: pset_list.reset_view(view))
-
+    pset_list.signaller.selection_changed.connect(test_for_mw)
 
 def reset_views(pset_list: Type[tool.PropertySetList], project: Type[tool.Project]):
     for view in pset_list.get_views():
