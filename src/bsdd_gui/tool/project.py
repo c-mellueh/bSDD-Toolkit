@@ -33,3 +33,7 @@ class Project:
         prop.project_dictionary = bsdd_parser.models.BsddDictionary.load(path)
         bsdd_gui.on_new_project()
         return prop.project_dictionary
+    
+    @classmethod
+    def get(cls) -> bsdd_parser.models.BsddDictionary:
+        return cls.get_properties().project_dictionary

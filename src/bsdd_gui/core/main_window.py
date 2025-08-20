@@ -3,7 +3,6 @@ from PySide6.QtWidgets import QApplication
 from typing import Type,TYPE_CHECKING
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    
 
 def create_main_window(
     application: QApplication,
@@ -18,3 +17,4 @@ def create_main_window(
     mw = main_window.create(application)
     mw.show()
     main_window.hide_console()
+    
