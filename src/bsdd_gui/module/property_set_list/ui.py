@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .models import SortModel
 from PySide6.QtCore import QModelIndex, Qt, Signal
-from PySide6.QtWidgets import QStyledItemDelegate, QTableWidget, QWidget
+from PySide6.QtWidgets import QStyledItemDelegate, QTableWidget, QWidget,QListView
 from . import trigger
 
-class PsetListView(QTableWidget):
+class PsetListView(QListView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         trigger.list_view_created(self)

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class Signaller(QObject):
     model_refresh_requested = Signal()
-    active_class_changed = Signal(BsddClass)
+    class_selection_changed = Signal(ui.ClassView,BsddClass)
 
 class ClassTree:
     signaller = Signaller()
@@ -78,7 +78,7 @@ class ClassTree:
         picked = [ix for ix in proxy_indexes if ix.column() == 0]
         for p_ix in picked:
             s_ix = proxy_model.mapToSource(p_ix)
-            cls.signaller.active_class_changed.emit(s_ix.internalPointer())
+            cls.signaller.class_selection_changed.emit(view,s_ix.internalPointer())
 
     @classmethod
     def on_current_changed(cls,view:ui.ClassView,curr, prev):
@@ -86,4 +86,4 @@ class ClassTree:
         if not curr.isValid():
             return
         index = proxy_model.mapToSource(curr)
-        cls.signaller.active_class_changed.emit(index.internalPointer())
+        cls.signaller.class_selection_changed.emit(view,index.internalPointer())

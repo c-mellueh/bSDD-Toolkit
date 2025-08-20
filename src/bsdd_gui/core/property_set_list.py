@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 from bsdd_gui.module.property_set_list import ui
 from PySide6.QtWidgets import QApplication,QListView
 
-def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], project: Type[tool.Project]):
+def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], project: Type[tool.Project],main_window:Type[tool.MainWindow]):
     pset_list.register_view(view)
     bsdd_dictionary = project.get()
     model = pset_list.create_model(bsdd_dictionary)
@@ -18,8 +18,10 @@ def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], p
     sel_model = view.selectionModel()    
     # sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
     sel_model.currentChanged.connect(lambda s,d: pset_list.on_current_changed(view,s,d))
-
+    main_window.signaller.active_class_changed.connect(lambda c:pset_list.refresh_model(view,c))
+    
 
 def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
     for tree_view in class_tree.get_views():
         connect_view(tree_view, class_tree, project)
+

@@ -18,3 +18,6 @@ def create_main_window(
     mw.show()
     main_window.hide_console()
     
+
+def connect_main_window(    main_window: Type[tool.MainWindow],pset_list:Type[tool.PropertySetList]):
+    pass

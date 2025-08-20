@@ -15,83 +15,61 @@ from bsdd_gui import tool
 class PsetListModel(QAbstractItemModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
-        self.bsdd_dictionary = bsdd_dictionary
         super().__init__(*args, **kwargs)
 
+    @property
+    def bsdd_dictionary(self):
+        return tool.Project.get()
+    
+    @property
+    def active_class(self):
+        return tool.MainWindow.get_active_class()
+
     def headerData(self, section, orientation, /, role=...):
-        if orientation == Qt.Orientation.Horizontal:
-            if role == Qt.ItemDataRole.DisplayRole:
-                if section == 0:
-                    return QCoreApplication.translate("PropertySetTable", "Name")
-                if section == 1:
-                    return QCoreApplication.translate("ClassTree", "Code")
-                if section == 2:
-                    return QCoreApplication.translate("ClassTree", "Status")
+        if role == Qt.ItemDataRole.DisplayRole:
+            return QCoreApplication.translate("PropertySetTable", "Name")
         return None
 
     def rowCount(self, parent=QModelIndex()):
+        if not self.active_class:
+            return 0
         if not parent.isValid():
-            return len(tool.ClassTree.get_root_classes(self.bsdd_dictionary))
-        else:
-            bsdd_class: BsddClass = parent.internalPointer()
-            return len(tool.ClassTree.get_children(bsdd_class))
+            return len(tool.PropertySetList.get_pset_list(self.active_class))
 
     def columnCount(self, parent=QModelIndex()):
-        return 3
+        return 1
 
     def index(self, row: int, column: int, parent=QModelIndex()):
-        if not parent.isValid():
-            if 0 > row >= len(self.bsdd_dictionary.Classes):
-                return QModelIndex()
-            bsdd_class = tool.ClassTree.get_root_classes(self.bsdd_dictionary)[row]
-            index = self.createIndex(row, column, bsdd_class)
-            return index
-        parent = parent.siblingAtColumn(0)
-        parent_class: BsddClass = parent.internalPointer()
-        children = tool.ClassTree.get_children(parent_class)
-        if row >= len(children) or row <0:
+        if parent.isValid():
             return QModelIndex()
-        bsdd_class = children[row]
-        index = self.createIndex(row, column, bsdd_class)
+        
+        if 0 > row >= len(self.rowCount()):
+            return QModelIndex()
+        
+        pset_name  = tool.PropertySetList.get_pset_list(self.active_class)[row]
+        index = self.createIndex(row, column, pset_name)
         return index
 
     def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid():
             return None
 
-        if role not in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.CheckStateRole):
+        if role != Qt.ItemDataRole.DisplayRole:
             return None
-        if Qt.ItemDataRole.DisplayRole != role:
-            return None
-        data:BsddClass = index.internalPointer()
-
-        if index.column() == 0:
-            return data.Name
-        elif index.column()== 1:
-            return data.Code
-        elif index.column() == 2:
-            return data.Status
-        return None
+        pset_name  = tool.PropertySetList.get_pset_list(self.active_class)[index.row()]
+        return pset_name
 
     def setData(self, index, value, /, role = ...):
         return False
 
     def parent(self, index: QModelIndex):
-        if not index.isValid():
-            return QModelIndex()
-        bsdd_class:BsddClass = index.internalPointer()
-        if not bsdd_class.ParentClassCode:
-            return QModelIndex()
-        parent_class = tool.ClassTree.get_class_by_code(self.bsdd_dictionary,bsdd_class.ParentClassCode)
-        row = tool.ClassTree.get_row_index(parent_class)
-
-        return self.createIndex(row,0,parent_class)
+        return QModelIndex()
 
 
 #typing
 class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):
-        self.super(*args, **kwargs)
+        super().__init__(*args, **kwargs)
     
-    def sourceModel(self) -> ClassTreeModel:
+    def sourceModel(self) -> PsetListModel:
         return super().sourceModel()

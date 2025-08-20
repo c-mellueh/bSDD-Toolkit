@@ -91,7 +91,7 @@ class ClassTreeModel(QAbstractItemModel):
 #typing
 class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):
-        self.super(*args, **kwargs)
+        super().__init__(*args, **kwargs)
     
     def sourceModel(self) -> ClassTreeModel:
         return super().sourceModel()

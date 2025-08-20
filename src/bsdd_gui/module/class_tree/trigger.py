@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from . import ui
 
 def connect():
-    core.connect_signals(tool.ClassTree)
+    core.connect_signals(tool.ClassTree,tool.MainWindow)
 
 def on_new_project():
     core.reset_views(tool.ClassTree, tool.Project)

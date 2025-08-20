@@ -4,11 +4,18 @@ from typing import Type,TYPE_CHECKING
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.class_tree import ui
+    from bsdd_parser.models import BsddClass
 
 
-def connect_signals(class_tree: Type[tool.ClassTree]):
+def connect_signals(class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow]):
+    def test_for_mw(view:ui.ClassView,bsdd_class:BsddClass):
+        if view == main_window.get_class_view():
+            main_window.set_active_class(bsdd_class)
+        
     class_tree.connect_signals()
-    class_tree.signaller.active_class_changed.connect(lambda c:print(c.Name))
+    
+    
+    class_tree.signaller.class_selection_changed.connect(test_for_mw)
 
 
 def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: Type[tool.Project]):

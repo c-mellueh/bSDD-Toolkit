@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
@@ -15,7 +14,6 @@ class Signaller(QObject):
     active_pset_changed = Signal(str)
 
 
-
 class PropertySetList:
     signaller = Signaller()
     @classmethod
@@ -29,18 +27,18 @@ class PropertySetList:
     @classmethod
     def unregister_view(cls, view: ui.PsetListView):
         cls.get_properties().views.pop(view)
-    
+
     @classmethod
     def get_views(cls) -> set[ui.PsetListView]:
         return cls.get_properties().views
-    
+
     @classmethod
     def create_model(cls,bsdd_dictionary:BsddDictionary):
         model = models.PsetListModel(bsdd_dictionary)
         sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
         return sort_filter_model
-    
+
     @classmethod
     def on_current_changed(cls,view:ui.PsetListView,curr:QModelIndex, prev):
         proxy_model = view.model()
@@ -48,3 +46,14 @@ class PropertySetList:
             return
         index = proxy_model.mapToSource(curr)
         cls.signaller.active_pset_changed.emit(index.data(Qt.ItemDataRole.DisplayRole))
+
+    @classmethod
+    def refresh_model(cls, view: ui.PsetListView, bsdd_class: BsddClass):
+        logging.info(f"Refresh PsetListView : {bsdd_class.Name}")
+        source_model = view.model().sourceModel()
+        source_model.beginResetModel()
+        source_model.endResetModel()
+
+    @classmethod
+    def get_pset_list(cls, bsdd_class: BsddClass) -> list[str]:
+        return list({cp.PropertySet for cp in bsdd_class.ClassProperties})

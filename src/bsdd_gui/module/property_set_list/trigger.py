@@ -9,7 +9,6 @@ if TYPE_CHECKING:
 
 def connect():
     pass
-
 def retranslate_ui():
     pass
 
@@ -17,4 +16,4 @@ def on_new_project():
     pass
 
 def list_view_created(view:ui.PsetListView):
-    core.connect_view(view,tool.PropertySetList,tool.Project)
+    core.connect_view(view,tool.PropertySetList,tool.Project,tool.MainWindow)

@@ -5,11 +5,18 @@ import ctypes
 from PySide6.QtWidgets import QApplication
 import bsdd_gui
 from bsdd_gui.module.main_window import ui
+from bsdd_parser.models import BsddClass
+from PySide6.QtCore import QObject, Signal,QSortFilterProxyModel
 
 if TYPE_CHECKING:
     from bsdd_gui.module.main_window.prop import MainWindowProperties
 
+class Signaller(QObject):
+    active_class_changed = Signal(BsddClass)
+
+
 class MainWindow:
+    signaller = Signaller()
     @classmethod
     def get_properties(cls) -> MainWindowProperties:
         return bsdd_gui.MainWindowProperties
@@ -38,3 +45,16 @@ class MainWindow:
         hWnd = ctypes.windll.kernel32.GetConsoleWindow()
         if hWnd != 0:
             ctypes.windll.user32.ShowWindow(hWnd, 0)
+        
+    @classmethod
+    def get_active_class(cls) -> BsddClass|None:
+        return cls.get_properties().active_class
+
+    @classmethod
+    def set_active_class(cls,value:BsddClass):
+        cls.get_properties().active_class = value
+        cls.signaller.active_class_changed.emit(cls.get_properties().active_class)
+    
+    @classmethod
+    def get_class_view(cls):
+        return cls.get_properties().ui.tree_class
