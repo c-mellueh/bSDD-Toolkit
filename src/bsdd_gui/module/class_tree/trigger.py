@@ -10,10 +10,10 @@ if TYPE_CHECKING:
     from . import ui
 
 def connect():
-    pass
+    core.connect_signals(tool.ClassTree)
 
 def on_new_project():
-    pass
+    core.reset_class_views(tool.ClassTree, tool.Project)
 
 def retranslate_ui():
     pass
@@ -23,3 +23,7 @@ def close_event(event):
 
 def class_view_created(class_view:ui.ClassView):
     core.connect_class_view(class_view,tool.ClassTree,tool.Project)
+
+
+def reset_class_views():
+    core.reset_class_views(tool.ClassTree, tool.Project)
