@@ -1,5 +1,5 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication,QTreeView
 from typing import Type,TYPE_CHECKING
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -8,17 +8,21 @@ if TYPE_CHECKING:
 
 def connect_signals(class_tree: Type[tool.ClassTree]):
     class_tree.connect_signals()
+    class_tree.signaller.active_class_changed.connect(lambda c:print(c.Name))
 
-
-def connect_class_view(class_view:ui.ClassView,class_tree:Type[tool.ClassTree],project: Type[tool.Project]):
-    class_tree.register_class_view(class_view)
+def connect_class_view(view:ui.ClassView,class_tree:Type[tool.ClassTree],project: Type[tool.Project]):
+    class_tree.register_class_view(view)
     bsdd_dictionary = project.get()
     model = class_tree.create_model(bsdd_dictionary)
-    class_view.setModel(model)
+    view.setModel(model)
+    view.setSelectionBehavior(QTreeView.SelectRows)
+    view.setSelectionMode(QTreeView.ExtendedSelection)
+    view.setAlternatingRowColors(True)
 
-
+    sel_model = view.selectionModel()    
+    #sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
+    sel_model.currentChanged.connect(lambda s,d: class_tree.on_current_changed(view,s,d))
+    
 def reset_class_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
-    bsdd_dictionary = project.get()
     for tree_view in class_tree.get_tree_views():
-        model = class_tree.create_model(bsdd_dictionary)
-        tree_view.setModel(model)
+        connect_class_view(tree_view,class_tree,project)

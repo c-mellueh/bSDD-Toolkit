@@ -1,20 +1,20 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import ctypes
+import logging
 
 from PySide6.QtCore import QObject, Signal,QSortFilterProxyModel
 import bsdd_gui
 
+from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_gui.module.class_tree import ui, models, trigger
-
 if TYPE_CHECKING:
     from bsdd_gui.module.class_tree.prop import ClassTreeProperties
-    from bsdd_parser.models import BsddDictionary, BsddClass
 
 
 class Signaller(QObject):
     model_refresh_requested = Signal()
-
+    active_class_changed = Signal(BsddClass)
 
 class ClassTree:
     signaller = Signaller()
@@ -67,3 +67,23 @@ class ClassTree:
             return bsdd_dictionary.Classes.index(bsdd_class)
         parent_class = cls.get_class_by_code(bsdd_dictionary, bsdd_class.ParentClassCode)
         return cls.get_children(parent_class).index(bsdd_class)
+    
+    @classmethod
+    def on_selection_changed(cls,view:ui.ClassView,selected,deselected):
+        proxy_model = view.model()
+        proxy_indexes = selected.indexes()
+        if not proxy_indexes:
+            logging.debug("Selection cleared")
+            return
+        picked = [ix for ix in proxy_indexes if ix.column() == 0]
+        for p_ix in picked:
+            s_ix = proxy_model.mapToSource(p_ix)
+            cls.signaller.active_class_changed.emit(s_ix.internalPointer())
+    
+    @classmethod
+    def on_current_changed(cls,view:ui.ClassView,curr, prev):
+        proxy_model = view.model()
+        if not curr.isValid():
+            return
+        index = proxy_model.mapToSource(curr)
+        cls.signaller.active_class_changed.emit(index.internalPointer())

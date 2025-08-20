@@ -1,6 +1,12 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QTreeView, QTreeWidget, QWidget
-from PySide6.QtCore import QAbstractItemModel, Qt, QCoreApplication, QModelIndex
+from PySide6.QtCore import (
+    QAbstractItemModel,
+    Qt,
+    QCoreApplication,
+    QModelIndex,
+    QSortFilterProxyModel,
+)
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_parser.models import BsddDictionary, BsddClass
@@ -32,7 +38,7 @@ class ClassTreeModel(QAbstractItemModel):
 
     def columnCount(self, parent=QModelIndex()):
         return 3
-    
+
     def index(self, row: int, column: int, parent=QModelIndex()):
         if not parent.isValid():
             if 0 > row >= len(self.bsdd_dictionary.Classes):
@@ -66,10 +72,10 @@ class ClassTreeModel(QAbstractItemModel):
         elif index.column() == 2:
             return data.Status
         return None
-    
+
     def setData(self, index, value, /, role = ...):
         return False
-    
+
     def parent(self, index: QModelIndex):
         if not index.isValid():
             return QModelIndex()
@@ -78,6 +84,14 @@ class ClassTreeModel(QAbstractItemModel):
             return QModelIndex()
         parent_class = tool.ClassTree.get_class_by_code(self.bsdd_dictionary,bsdd_class.ParentClassCode)
         row = tool.ClassTree.get_row_index(parent_class)
-        
-        
+
         return self.createIndex(row,0,parent_class)
+
+
+#typing
+class SortModel(QSortFilterProxyModel):
+    def __init__(self, *args, **kwargs):
+        self.super(*args, **kwargs)
+    
+    def sourceModel(self) -> ClassTreeModel:
+        return super().sourceModel()
