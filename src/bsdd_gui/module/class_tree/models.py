@@ -15,9 +15,12 @@ from bsdd_gui import tool
 class ClassTreeModel(QAbstractItemModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
-        self.bsdd_dictionary = bsdd_dictionary
         super().__init__(*args, **kwargs)
 
+    @property
+    def bsdd_dictionary(self):
+        return tool.Project.get()
+    
     def headerData(self, section, orientation, /, role=...):
         if orientation == Qt.Orientation.Horizontal:
             if role == Qt.ItemDataRole.DisplayRole:

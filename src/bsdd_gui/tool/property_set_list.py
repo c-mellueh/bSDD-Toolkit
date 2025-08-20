@@ -48,8 +48,7 @@ class PropertySetList:
         cls.signaller.active_pset_changed.emit(index.data(Qt.ItemDataRole.DisplayRole))
 
     @classmethod
-    def refresh_model(cls, view: ui.PsetListView, bsdd_class: BsddClass):
-        logging.info(f"Refresh PsetListView : {bsdd_class.Name}")
+    def reset_view(cls, view: ui.PsetListView):
         source_model = view.model().sourceModel()
         source_model.beginResetModel()
         source_model.endResetModel()

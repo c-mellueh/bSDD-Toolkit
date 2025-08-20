@@ -33,5 +33,5 @@ def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: 
 
 
 def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
-    for tree_view in class_tree.get_views():
-        connect_view(tree_view, class_tree, project)
+    for view in class_tree.get_views():
+        class_tree.reset_view(view)

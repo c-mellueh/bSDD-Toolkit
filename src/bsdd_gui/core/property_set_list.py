@@ -17,10 +17,9 @@ def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], p
     sel_model = view.selectionModel()    
     # sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
     sel_model.currentChanged.connect(lambda s,d: pset_list.on_current_changed(view,s,d))
-    main_window.signaller.active_class_changed.connect(lambda c:pset_list.refresh_model(view,c))
-    
+    main_window.signaller.active_class_changed.connect(lambda c: pset_list.reset_view(view))
 
-def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
-    for tree_view in class_tree.get_views():
-        connect_view(tree_view, class_tree, project)
 
+def reset_views(pset_list: Type[tool.PropertySetList], project: Type[tool.Project]):
+    for view in pset_list.get_views():
+        pset_list.reset_view(view)
