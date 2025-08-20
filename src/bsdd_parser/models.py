@@ -195,14 +195,3 @@ class BsddClassRelation(BaseModel):
     RelatedClassName: Optional[str] = None
     Fraction: Optional[float] = None
     OwnedUri: Optional[str] = None
-
-
-
-
-
-
-
-t = BsddDictionary.load(r"./som-0.2.0.json")
-out = t.model_dump_json(by_alias=True,exclude_none=True)
-with open ("output.json","w") as file:
-    file.write(out)
