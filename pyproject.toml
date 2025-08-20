@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bsdd-tools"
+version = "0.1.0"
+description = "BSDD JSON parser & GUI"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Your Name" }]
+license = { text = "MIT" }
+dependencies = [
+  "pydantic>=2.7",
+  "typer>=0.12",
+  "rich>=13",
+  "PySide6>=6.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-qt", "mypy", "ruff", "black"]
+
+[project.scripts]
+bsdd = "bsdd_parser.cli:app"          # CLI: `bsdd ...`
+bsdd-gui = "bsdd_gui.app:main"        # GUI: `bsdd-gui`
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.black]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
