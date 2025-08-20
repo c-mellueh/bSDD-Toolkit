@@ -14,7 +14,6 @@ def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], p
     view.setSelectionBehavior(QListView.SelectionBehavior.SelectRows)
     view.setSelectionMode(QListView.SelectionMode.SingleSelection)
     view.setAlternatingRowColors(True)
-
     sel_model = view.selectionModel()    
     # sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
     sel_model.currentChanged.connect(lambda s,d: pset_list.on_current_changed(view,s,d))
