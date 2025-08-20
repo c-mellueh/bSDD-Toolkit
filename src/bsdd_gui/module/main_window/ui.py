@@ -19,4 +19,3 @@ class MainWindow(QMainWindow):
 
     def paintEvent(self, event):
         super().paintEvent(event)
-        trigger.paint_event()
