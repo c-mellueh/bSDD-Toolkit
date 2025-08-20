@@ -28,17 +28,17 @@ class ClassTree:
         cls.signaller.model_refresh_requested.connect(trigger.reset_class_views)
 
     @classmethod
-    def register_class_view(cls, class_view: ui.ClassView):
-        cls.get_properties().class_views.add(class_view)
+    def register_view(cls, view: ui.ClassView):
+        cls.get_properties().views.add(view)
 
     @classmethod
-    def unregister_class_view(cls, class_view: ui.ClassView):
-        cls.get_properties().class_views.pop(class_view)
+    def unregister_view(cls, view: ui.ClassView):
+        cls.get_properties().views.pop(view)
 
     @classmethod
     def create_model(cls,bsdd_dictionary:BsddDictionary):
         model = models.ClassTreeModel(bsdd_dictionary)
-        sort_filter_model = QSortFilterProxyModel()
+        sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
         return sort_filter_model
 
@@ -53,8 +53,8 @@ class ClassTree:
         return [c for c in bsdd_dictionary.Classes if c.ParentClassCode == code]
 
     @classmethod
-    def get_tree_views(cls) -> set[ui.ClassView]:
-        return cls.get_properties().class_views
+    def get_views(cls) -> set[ui.ClassView]:
+        return cls.get_properties().views
 
     @classmethod
     def get_class_by_code(cls, bsdd_dictionary: BsddDictionary, code: str):
@@ -67,7 +67,7 @@ class ClassTree:
             return bsdd_dictionary.Classes.index(bsdd_class)
         parent_class = cls.get_class_by_code(bsdd_dictionary, bsdd_class.ParentClassCode)
         return cls.get_children(parent_class).index(bsdd_class)
-    
+
     @classmethod
     def on_selection_changed(cls,view:ui.ClassView,selected,deselected):
         proxy_model = view.model()
@@ -79,7 +79,7 @@ class ClassTree:
         for p_ix in picked:
             s_ix = proxy_model.mapToSource(p_ix)
             cls.signaller.active_class_changed.emit(s_ix.internalPointer())
-    
+
     @classmethod
     def on_current_changed(cls,view:ui.ClassView,curr, prev):
         proxy_model = view.model()

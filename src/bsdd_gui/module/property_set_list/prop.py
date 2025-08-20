@@ -1,5 +1,5 @@
 from __future__ import annotations
 
-class PropertySetTableProperties:
+class PropertySetListProperties:
     pass
 

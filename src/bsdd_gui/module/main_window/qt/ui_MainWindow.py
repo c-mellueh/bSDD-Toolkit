@@ -23,14 +23,14 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHB
     QWidget)
 
 from bsdd_gui.module.class_tree.ui import ClassView
-from bsdd_gui.module.property_set_table.ui import PsetTableWidget
+from bsdd_gui.module.property_set_list.ui import PsetListView
 from bsdd_gui.module.property_table.ui import PropertyTable
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1514, 762)
+        MainWindow.resize(1514, 776)
         MainWindow.setMinimumSize(QSize(0, 0))
         self.actiondqwd = QAction(MainWindow)
         self.actiondqwd.setObjectName(u"actiondqwd")
@@ -142,15 +142,7 @@ class Ui_MainWindow(object):
 
         self.vertical_layout_pset.addLayout(self.horizontalLayout_pSet_button)
 
-        self.table_pset = PsetTableWidget(self.verticalLayoutWidget)
-        if (self.table_pset.columnCount() < 3):
-            self.table_pset.setColumnCount(3)
-        __qtablewidgetitem = QTableWidgetItem()
-        self.table_pset.setHorizontalHeaderItem(0, __qtablewidgetitem)
-        __qtablewidgetitem1 = QTableWidgetItem()
-        self.table_pset.setHorizontalHeaderItem(1, __qtablewidgetitem1)
-        __qtablewidgetitem2 = QTableWidgetItem()
-        self.table_pset.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        self.table_pset = PsetListView(self.verticalLayoutWidget)
         self.table_pset.setObjectName(u"table_pset")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         sizePolicy3.setHorizontalStretch(0)
@@ -162,9 +154,6 @@ class Ui_MainWindow(object):
         self.table_pset.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_pset.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.table_pset.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table_pset.horizontalHeader().setStretchLastSection(True)
-        self.table_pset.verticalHeader().setVisible(False)
-        self.table_pset.verticalHeader().setCascadingSectionResizes(False)
 
         self.vertical_layout_pset.addWidget(self.table_pset)
 
@@ -252,12 +241,6 @@ class Ui_MainWindow(object):
         self.label_pset.setText(QCoreApplication.translate("MainWindow", u"PropertySet:", None))
         self.label_pset_name.setText("")
         self.button_Pset_add.setText(QCoreApplication.translate("MainWindow", u"New", None))
-        ___qtablewidgetitem = self.table_pset.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"PropertySet", None));
-        ___qtablewidgetitem1 = self.table_pset.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"Inherited By", None));
-        ___qtablewidgetitem2 = self.table_pset.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"Optional", None));
         self.label.setText(QCoreApplication.translate("MainWindow", u"Property:", None))
         self.button_property_add.setText(QCoreApplication.translate("MainWindow", u"New", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))

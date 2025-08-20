@@ -6,4 +6,4 @@ if TYPE_CHECKING:
     from . import ui
 
 class ClassTreeProperties:
-    class_views:set[ui.ClassView] = set()
+    views: set[ui.ClassView] = set()
