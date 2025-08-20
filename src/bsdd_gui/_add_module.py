@@ -19,12 +19,12 @@ def create_module(name: str):
         logging.warning("__init__.py already exists")
     with open(init_path, "w") as f:
         f.write(
-            f"""import som_gui
+            f"""import bsdd_gui
 from . import ui, prop, trigger
 
 
 def register():
-    som_gui.{to_camel_case(name)}Properties = prop.{to_camel_case(name)}Properties()
+    bsdd_gui.{to_camel_case(name)}Properties = prop.{to_camel_case(name)}Properties()
 
 def retranslate_ui():
     trigger.retranslate_ui()
@@ -57,9 +57,9 @@ class {to_camel_case(name)}Properties:
     with open(trigger_path, "w") as f:
         f.write(
             f"""from __future__ import annotations
-import som_gui
-from som_gui import tool
-from som_gui.core import {name} as core
+import bsdd_gui
+from bsdd_gui import tool
+from bsdd_gui.core import {name} as core
 from typing import TYPE_CHECKING
 
 
@@ -94,7 +94,7 @@ def create_core(name: str):
 
 from typing import TYPE_CHECKING, Type
 if TYPE_CHECKING:
-    from som_gui import tool
+    from bsdd_gui import tool
 """
         )
 
@@ -110,34 +110,24 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 
-import som_gui.core.tool
-import som_gui
+import bsdd_gui
 
 if TYPE_CHECKING:
-    from som_gui.module.{name}.prop import {to_camel_case(name)}Properties
+    from bsdd_gui.module.{name}.prop import {to_camel_case(name)}Properties
 
 
-class {to_camel_case(name)}(som_gui.core.tool.{to_camel_case(name)}):
+class {to_camel_case(name)}:
     @classmethod
     def get_properties(cls) -> {to_camel_case(name)}Properties:
-        return som_gui.{to_camel_case(name)}Properties
+        return bsdd_gui.{to_camel_case(name)}Properties
 """
         )
 
-
-def update_tools():
-    file_path = "core/tool.py"
-    from som_gui import _update_tools
-
-    with open(file_path, "w") as f:
-        _update_tools.main(f)
-
-
 def main(name: str):
+    os.chdir("bsdd_gui")
     create_core(name)
     create_tool(name)
     create_module(name)
-    update_tools()
 
 
 # Create the parser
