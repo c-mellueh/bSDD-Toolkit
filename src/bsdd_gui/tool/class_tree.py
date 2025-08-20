@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import ctypes
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal,QSortFilterProxyModel
 import bsdd_gui
 
 from bsdd_gui.module.class_tree import ui, models, trigger
@@ -38,7 +38,9 @@ class ClassTree:
     @classmethod
     def create_model(cls,bsdd_dictionary:BsddDictionary):
         model = models.ClassTreeModel(bsdd_dictionary)
-        return model
+        sort_filter_model = QSortFilterProxyModel()
+        sort_filter_model.setSourceModel(model)
+        return sort_filter_model
 
     @classmethod
     def get_root_classes(cls, bsdd_dictionary: BsddDictionary):
