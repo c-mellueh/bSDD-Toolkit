@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, Field,PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr, computed_field
 import json
 import weakref
 
@@ -59,7 +59,9 @@ class BsddDictionary(BaseModel):
     def model_post_init(self, context):
         for c in self.Classes:
             c._set_parent(self)
-    
+        for p in self.Properties:
+            p._set_parent(self)
+
 
 class BsddClass(BaseModel):
     Code: str
@@ -97,9 +99,10 @@ class BsddClass(BaseModel):
     def _set_parent(self, parent: "BsddDictionary") -> None:
         self._parent_ref = weakref.ref(parent)
 
+    def model_post_init(self, context):
+        for c in self.ClassProperties:
+            c._set_parent(self)
 
-    def uri(self, dictionary: BsddDictionary) -> str:
-        return "/".join([dictionary.uri(), "class", self.Code])
 
 class BsddAllowedValue(BaseModel):
     Code: str
@@ -137,6 +140,10 @@ class BsddClassProperty(BaseModel):
     SortNumber: Optional[int] = None
     Symbol: Optional[str] = None
     AllowedValues: List[BsddAllowedValue] = Field(default_factory=list)
+    _parent_ref: Optional[weakref.ReferenceType["BsddClass"]] = PrivateAttr(default=None)
+
+    def _set_parent(self, parent: "BsddClass") -> None:
+        self._parent_ref = weakref.ref(parent)
 
 
 class BsddProperty(BaseModel):
@@ -187,6 +194,10 @@ class BsddProperty(BaseModel):
     VisualRepresentationUri: Optional[str] = None
     PropertyRelations: List[BsddPropertyRelation] = Field(default_factory=list)
     AllowedValues: List[BsddAllowedValue] = Field(default_factory=list)
+    _parent_ref: Optional[weakref.ReferenceType["BsddDictionary"]] = PrivateAttr(default=None)
+
+    def _set_parent(self, parent: "BsddDictionary") -> None:
+        self._parent_ref = weakref.ref(parent)
 
 
 class BsddClassRelation(BaseModel):
