@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
@@ -17,7 +16,7 @@ class Signaller(QObject):
 
 class PropertyTable:
     signaller = Signaller()
-    
+
     @classmethod
     def get_properties(cls) -> PropertyTableProperties:
         return bsdd_gui.PropertyTableProperties
@@ -33,14 +32,13 @@ class PropertyTable:
     @classmethod
     def get_views(cls) -> set[ui.PropertyTable]:
         return cls.get_properties().views
-    
+
     @classmethod
     def create_model(cls):
         model = models.PropertyTableModel()
         sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
         return sort_filter_model
-    
 
     @classmethod
     def on_current_changed(cls,view:ui.PropertyTable,curr:QModelIndex, prev):
@@ -55,7 +53,7 @@ class PropertyTable:
         source_model = view.model().sourceModel()
         source_model.beginResetModel()
         source_model.endResetModel()
-        
+
     @classmethod
-    def filter_properties_by_pset(cls,bsdd_class:BsddClass,pset_name:str):
-        return [p for p in BsddClass.ClassProperties if p.PropertySet == pset_name]
+    def filter_properties_by_pset(cls, bsdd_class: BsddClass, pset_name: str):
+        return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]

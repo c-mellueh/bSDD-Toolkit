@@ -37,9 +37,9 @@ class PropertyTableModel(QAbstractItemModel):
             return 0
         if parent.isValid():
             return 0
-        
-        len(tool.PropertyTable.filter_properties_by_pset(self.active_class,self.active_pset))
-
+        rc = len(tool.PropertyTable.filter_properties_by_pset(self.active_class,self.active_pset))
+        print(rc)
+        return  rc
     def columnCount(self, /, parent = ...):
         return 5
 
