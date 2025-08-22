@@ -252,7 +252,7 @@ class Ui_MainWindow(object):
         self.label_pset_name.setText("")
         self.button_Pset_add.setText(QCoreApplication.translate("MainWindow", u"New", None))
         self.label_property.setText(QCoreApplication.translate("MainWindow", u"Property:", None))
-        self.label_property_name.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
+        self.label_property_name.setText("")
         self.button_property_add.setText(QCoreApplication.translate("MainWindow", u"New", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuExport.setTitle(QCoreApplication.translate("MainWindow", u"Export", None))

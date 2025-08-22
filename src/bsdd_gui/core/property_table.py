@@ -18,6 +18,10 @@ def connect_view(
     main_window: Type[tool.MainWindow],
 ):
 
+    def test_for_mw(view: ui.PropertyTable, value):
+        if view == main_window.get_property_view():
+            main_window.set_active_property(value)
+    
     property_table.add_column_to_table("Name", lambda a: a.Code)
     property_table.add_column_to_table("Datatype", property_table.get_datatype)
     property_table.add_column_to_table("Unit", property_table.get_units)
@@ -35,6 +39,7 @@ def connect_view(
     # sel_model.selectionChanged.connect(lambda s,d: property_table.on_selection_changed(view,s,d))
     sel_model.currentChanged.connect(lambda s, d: property_table.on_current_changed(view, s, d))
     main_window.signaller.active_pset_changed.connect(lambda c: property_table.reset_view(view))
+    property_table.signaller.selection_changed.connect(test_for_mw)
 
 
 def reset_views(property_table: Type[tool.PropertyTable], project: Type[tool.Project]):

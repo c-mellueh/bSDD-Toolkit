@@ -24,4 +24,4 @@ def create_main_window(
 def connect_main_window(main_window: Type[tool.MainWindow], pset_list: Type[tool.PropertySetTable]):
     main_window.signaller.active_class_changed.connect(lambda c:main_window.set_class_text(c.Name))
     main_window.signaller.active_pset_changed.connect(main_window.set_pset_text)
-    main_window.signaller.active_property_changed.connect(lambda p:main_window.set_property_text(p.Name))
+    main_window.signaller.active_property_changed.connect(lambda p:main_window.set_property_text(p.Code))
