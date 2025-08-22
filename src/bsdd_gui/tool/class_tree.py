@@ -1,22 +1,25 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 import ctypes
 import logging
 
 from PySide6.QtCore import QObject, Signal,QSortFilterProxyModel
+from PySide6.QtWidgets import QWidget
+
 import bsdd_gui
 
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_gui.module.class_tree import ui, models, trigger
+from bsdd_gui.presets.tool_presets import ViewHandler,ViewSignaller
+
 if TYPE_CHECKING:
     from bsdd_gui.module.class_tree.prop import ClassTreeProperties
 
 
-class Signaller(QObject):
-    model_refresh_requested = Signal()
-    class_selection_changed = Signal(ui.ClassView,BsddClass)
+class Signaller(ViewSignaller):
+    pass
 
-class ClassTree:
+class ClassTree(ViewHandler):
     signaller = Signaller()
 
     @classmethod
@@ -26,14 +29,6 @@ class ClassTree:
     @classmethod
     def connect_signals(cls):
         cls.signaller.model_refresh_requested.connect(trigger.reset_class_views)
-
-    @classmethod
-    def register_view(cls, view: ui.ClassView):
-        cls.get_properties().views.add(view)
-
-    @classmethod
-    def unregister_view(cls, view: ui.ClassView):
-        cls.get_properties().views.pop(view)
 
     @classmethod
     def create_model(cls,bsdd_dictionary:BsddDictionary):
@@ -53,10 +48,6 @@ class ClassTree:
         code = bsdd_class.Code
         bsdd_dictionary = bsdd_class._parent_ref()
         return [c for c in bsdd_dictionary.Classes if c.ParentClassCode == code]
-
-    @classmethod
-    def get_views(cls) -> set[ui.ClassView]:
-        return cls.get_properties().views
 
     @classmethod
     def get_class_by_code(cls, bsdd_dictionary: BsddDictionary, code: str):
@@ -80,7 +71,7 @@ class ClassTree:
         picked = [ix for ix in proxy_indexes if ix.column() == 0]
         for p_ix in picked:
             s_ix = proxy_model.mapToSource(p_ix)
-            cls.signaller.class_selection_changed.emit(view,s_ix.internalPointer())
+            cls.signaller.selection_changed.emit(view, s_ix.internalPointer())
 
     @classmethod
     def on_current_changed(cls,view:ui.ClassView,curr, prev):
@@ -88,10 +79,9 @@ class ClassTree:
         if not curr.isValid():
             return
         index = proxy_model.mapToSource(curr)
-        cls.signaller.class_selection_changed.emit(view,index.internalPointer())
+        cls.signaller.selection_changed.emit(view, index.internalPointer())
 
     @classmethod
     def reset_view(cls,view:ui.ClassView):
         view.model().sourceModel().beginResetModel()
         view.model().sourceModel().endResetModel()
-        

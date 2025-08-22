@@ -5,34 +5,20 @@ import logging
 import bsdd_gui
 from PySide6.QtCore import QModelIndex,QObject,Signal,Qt
 from bsdd_gui.module.property_set_table import ui,models
-from bsdd_gui.presets.tool_presets import ColumnHandler
+from bsdd_gui.presets.tool_presets import ColumnHandler,ViewSignaller,ViewHandler
 from bsdd_parser.models import BsddDictionary, BsddClass
 
 if TYPE_CHECKING:
     from bsdd_gui.module.property_set_table.prop import PropertySetTableProperties
 
-class Signaller(QObject):
-    model_refresh_requested = Signal()
-    selection_changed = Signal(ui.PsetTableView,str)
+class Signaller(ViewSignaller):
+    pass
 
-
-class PropertySetTable(ColumnHandler):
+class PropertySetTable(ColumnHandler,ViewHandler):
     signaller = Signaller()
     @classmethod
     def get_properties(cls) -> PropertySetTableProperties:
         return bsdd_gui.PropertySetTableProperties
-
-    @classmethod
-    def register_view(cls, view: ui.PsetTableView):
-        cls.get_properties().views.add(view)
-
-    @classmethod
-    def unregister_view(cls, view: ui.PsetTableView):
-        cls.get_properties().views.pop(view)
-
-    @classmethod
-    def get_views(cls) -> set[ui.PsetTableView]:
-        return cls.get_properties().views
 
     @classmethod
     def create_model(cls,bsdd_dictionary:BsddDictionary):

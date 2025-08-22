@@ -9,33 +9,20 @@ from bsdd_parser.models import BsddClassProperty,BsddClass
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 from bsdd_gui.module.property_table import ui,models,data
-from bsdd_gui.presets.tool_presets import ColumnHandler
+from bsdd_gui.presets.tool_presets import ColumnHandler,ViewHandler,ViewSignaller
 
 if TYPE_CHECKING:
     from bsdd_gui.module.property_table.prop import PropertyTableProperties
 
-class Signaller(QObject):
-    model_refresh_requested = Signal()
-    selection_changed = Signal(ui.PropertyTable,BsddClassProperty)
+class Signaller(ViewSignaller):
+    pass
 
-class PropertyTable(ColumnHandler):
+class PropertyTable(ColumnHandler,ViewHandler):
     signaller = Signaller()
 
     @classmethod
     def get_properties(cls) -> PropertyTableProperties:
         return bsdd_gui.PropertyTableProperties
-
-    @classmethod
-    def register_view(cls, view: ui.PropertyTable):
-        cls.get_properties().views.add(view)
-
-    @classmethod
-    def unregister_view(cls, view: ui.PropertyTable):
-        cls.get_properties().views.pop(view)
-
-    @classmethod
-    def get_views(cls) -> set[ui.PropertyTable]:
-        return cls.get_properties().views
 
     @classmethod
     def create_model(cls):
