@@ -3,3 +3,4 @@ from .class_tree import ClassTree
 from .project import Project
 from .property_set_table import PropertySetTable
 from .property_table import PropertyTable
+from .class_editor import ClassEditor
