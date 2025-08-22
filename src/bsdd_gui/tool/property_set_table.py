@@ -39,15 +39,5 @@ class PropertySetTable(ColumnHandler, ViewHandler):
         cls.signaller.selection_changed.emit(view, index.data(Qt.ItemDataRole.DisplayRole))
 
     @classmethod
-    def reset_view(cls, view: ui.PsetTableView):
-        super().reset_view(view)
-        model = view.model()
-        rc = model.rowCount()
-        if not rc:
-            return
-        index = model.index(0, 0)
-        view.setCurrentIndex(index)
-
-    @classmethod
     def get_pset_list(cls, bsdd_class: BsddClass) -> list[str]:
         return list({cp.PropertySet for cp in bsdd_class.ClassProperties})

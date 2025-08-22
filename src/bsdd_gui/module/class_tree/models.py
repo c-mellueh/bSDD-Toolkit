@@ -10,6 +10,7 @@ from PySide6.QtCore import (
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_parser.models import BsddDictionary, BsddClass
+from bsdd_parser.utils import bsdd_class as cl_utils
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import TableModel
 
@@ -17,7 +18,7 @@ from bsdd_gui.presets.models_presets import TableModel
 class ClassTreeModel(TableModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
-        super().__init__(tool.ClassTree,*args, **kwargs)
+        super().__init__(tool.ClassTree, *args, **kwargs)
 
     @property
     def bsdd_dictionary(self):
@@ -25,21 +26,21 @@ class ClassTreeModel(TableModel):
 
     def rowCount(self, parent=QModelIndex()):
         if not parent.isValid():
-            return len(tool.ClassTree.get_root_classes(self.bsdd_dictionary))
+            return len(cl_utils.get_root_classes(self.bsdd_dictionary))
         else:
             bsdd_class: BsddClass = parent.internalPointer()
-            return len(tool.ClassTree.get_children(bsdd_class))
+            return len(cl_utils.get_children(bsdd_class))
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if not parent.isValid():
             if 0 > row >= len(self.bsdd_dictionary.Classes):
                 return QModelIndex()
-            bsdd_class = tool.ClassTree.get_root_classes(self.bsdd_dictionary)[row]
+            bsdd_class = cl_utils.get_root_classes(self.bsdd_dictionary)[row]
             index = self.createIndex(row, column, bsdd_class)
             return index
         parent = parent.siblingAtColumn(0)
         parent_class: BsddClass = parent.internalPointer()
-        children = tool.ClassTree.get_children(parent_class)
+        children = cl_utils.get_children(parent_class)
         if row >= len(children) or row < 0:
             return QModelIndex()
         bsdd_class = children[row]
@@ -55,10 +56,8 @@ class ClassTreeModel(TableModel):
         bsdd_class: BsddClass = index.internalPointer()
         if not bsdd_class.ParentClassCode:
             return QModelIndex()
-        parent_class = tool.ClassTree.get_class_by_code(
-            self.bsdd_dictionary, bsdd_class.ParentClassCode
-        )
-        row = tool.ClassTree.get_row_index(parent_class)
+        parent_class = cl_utils.get_class_by_code(self.bsdd_dictionary, bsdd_class.ParentClassCode)
+        row = cl_utils.get_row_index(parent_class)
 
         return self.createIndex(row, 0, parent_class)
 

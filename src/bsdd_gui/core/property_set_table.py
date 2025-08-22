@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
 from bsdd_gui.module.property_set_table import ui
 from PySide6.QtWidgets import QApplication, QListView
+from bsdd_parser.models import BsddClass
 
 
 def connect_view(
@@ -37,3 +38,12 @@ def connect_view(
 def reset_views(pset_list: Type[tool.PropertySetTable], project: Type[tool.Project]):
     for view in pset_list.get_views():
         pset_list.reset_view(view)
+
+
+def connect_to_main_window(
+    cls, property_set_table: Type[tool.PropertySetTable], main_window: Type[tool.MainWindow]
+):
+    def reset_pset(new_class: BsddClass):
+        pset = main_window.get_active_pset()
+
+    main_window.signaller.active_class_changed.connect(reset_pset)

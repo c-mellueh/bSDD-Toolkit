@@ -21,7 +21,7 @@ def connect_view(
     def test_for_mw(view: ui.PropertyTable, value):
         if view == main_window.get_property_view():
             main_window.set_active_property(value)
-    
+
     property_table.add_column_to_table("Name", lambda a: a.Code)
     property_table.add_column_to_table("Datatype", property_table.get_datatype)
     property_table.add_column_to_table("Unit", property_table.get_units)

@@ -10,7 +10,7 @@ import bsdd_gui
 
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_gui.module.class_tree import ui, models, trigger
-from bsdd_gui.presets.tool_presets import ColumnHandler,ViewHandler, ViewSignaller
+from bsdd_gui.presets.tool_presets import ColumnHandler, ViewHandler, ViewSignaller
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_tree.prop import ClassTreeProperties
@@ -20,7 +20,7 @@ class Signaller(ViewSignaller):
     pass
 
 
-class ClassTree(ColumnHandler,ViewHandler):
+class ClassTree(ColumnHandler, ViewHandler):
     signaller = Signaller()
 
     @classmethod
@@ -37,30 +37,6 @@ class ClassTree(ColumnHandler,ViewHandler):
         sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
         return sort_filter_model
-
-    @classmethod
-    def get_root_classes(cls, bsdd_dictionary: BsddDictionary):
-        if bsdd_dictionary is None:
-            return []
-        return [c for c in bsdd_dictionary.Classes if not c.ParentClassCode]
-
-    @classmethod
-    def get_children(cls, bsdd_class: BsddClass):
-        code = bsdd_class.Code
-        bsdd_dictionary = bsdd_class._parent_ref()
-        return [c for c in bsdd_dictionary.Classes if c.ParentClassCode == code]
-
-    @classmethod
-    def get_class_by_code(cls, bsdd_dictionary: BsddDictionary, code: str):
-        return {c.Code: c for c in bsdd_dictionary.Classes}.get(code)
-
-    @classmethod
-    def get_row_index(cls, bsdd_class: BsddClass):
-        bsdd_dictionary = bsdd_class._parent_ref()
-        if not bsdd_class.ParentClassCode:
-            return bsdd_dictionary.Classes.index(bsdd_class)
-        parent_class = cls.get_class_by_code(bsdd_dictionary, bsdd_class.ParentClassCode)
-        return cls.get_children(parent_class).index(bsdd_class)
 
     @classmethod
     def on_selection_changed(cls, view: ui.ClassView, selected, deselected):
