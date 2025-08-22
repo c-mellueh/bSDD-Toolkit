@@ -34,11 +34,14 @@ class MainWindow:
         """
         if cls.get_properties().window is None:
             window = ui.MainWindow(application)
-            cls.get_properties().window = window
-            cls.get_properties().ui = window.ui
+            cls.get_properties().ui = window
             cls.get_properties().application = application
-        return cls.get_properties().window
+        return cls.get_properties().ui
 
+    @classmethod
+    def get(cls) -> ui.MainWindow:
+        return cls.get_properties().ui
+    
     @classmethod
     def hide_console(cls):
         """
@@ -74,13 +77,26 @@ class MainWindow:
         cls.signaller.active_property_changed.emit(value)
 
     @classmethod
+    @classmethod
     def get_class_view(cls):
-        return cls.get_properties().ui.tree_class
+        return cls.get().tree_class
 
     @classmethod
     def get_pset_view(cls):
-        return cls.get_properties().ui.table_pset
+        return cls.get().table_pset
 
     @classmethod
     def get_property_view(cls):
-        return cls.get_properties().ui.table_property
+        return cls.get().table_property
+
+    @classmethod
+    def set_class_text(cls, text: str):
+        cls.get().label_class_name.setText(text)
+    
+    @classmethod
+    def set_pset_text(cls, text: str):
+        cls.get().label_pset_name.setText(text)
+
+    @classmethod
+    def set_property_text(cls, text: str):
+        cls.get().label_property_name.setText(text)

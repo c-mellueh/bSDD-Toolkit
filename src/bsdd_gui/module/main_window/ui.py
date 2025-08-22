@@ -5,11 +5,10 @@ from . import trigger
 from .qt import ui_MainWindow
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, ui_MainWindow.Ui_MainWindow):
     def __init__(self, application: QApplication):
         super(MainWindow, self).__init__()
-        self.ui = ui_MainWindow.Ui_MainWindow()
-        self.ui.setupUi(self)
+        self.setupUi(self)
         self.app: QApplication = application
         self.setWindowIcon(get_icon())
 

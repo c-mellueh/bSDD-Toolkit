@@ -245,9 +245,16 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_properties">
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="label_property">
             <property name="text">
              <string>Property:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_property_name">
+            <property name="text">
+             <string>TextLabel</string>
             </property>
            </widget>
           </item>

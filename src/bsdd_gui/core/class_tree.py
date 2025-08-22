@@ -22,14 +22,13 @@ def connect_signals(class_tree: Type[tool.ClassTree], main_window: Type[tool.Mai
 def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
     class_tree.register_view(view)
     bsdd_dictionary = project.get()
-    model = class_tree.create_model(bsdd_dictionary)
-    view.setModel(model)
+
+    view.setModel(class_tree.create_model(bsdd_dictionary))
     view.setSelectionBehavior(QTreeView.SelectRows)
     view.setSelectionMode(QTreeView.ExtendedSelection)
     view.setAlternatingRowColors(True)
 
     sel_model = view.selectionModel()
-    # sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
     sel_model.currentChanged.connect(lambda s, d: class_tree.on_current_changed(view, s, d))
 
 
