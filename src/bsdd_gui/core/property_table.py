@@ -17,7 +17,7 @@ def connect_view(
     property_table: Type[tool.PropertyTable],
     main_window: Type[tool.MainWindow],
 ):
-    property_table.register_view(view)
+    property_table.register_widget(view)
     model = property_table.create_model()
     view.setModel(model)
     sel_model = view.selectionModel()
@@ -25,7 +25,7 @@ def connect_view(
 
 
 def reset_views(property_table: Type[tool.PropertyTable], project: Type[tool.Project]):
-    for view in property_table.get_views():
+    for view in property_table.get_widgets():
         property_table.reset_view(view)
 
 

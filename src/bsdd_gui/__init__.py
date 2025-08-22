@@ -4,6 +4,7 @@ __version__ = "0.0.1"  # needs to be on top of bsdd_gui import statements else I
 
 import logging
 from typing import TYPE_CHECKING
+import bsdd_gui
 from bsdd_gui import core, tool
 from bsdd_gui.resources.icons import get_icon
 import importlib
@@ -43,6 +44,7 @@ def register():
     for name, module in modules:
         if name not in preregister:
             module.register()
+    print("register Done!")
 
 
 def load_ui_triggers():

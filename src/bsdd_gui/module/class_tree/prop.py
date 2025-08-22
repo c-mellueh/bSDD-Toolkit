@@ -9,10 +9,7 @@ if TYPE_CHECKING:
 
 
 class ClassTreeProperties(
-    ColumnHandlerProperties,
     ViewHandlerProperties,
+    ColumnHandlerProperties,
 ):
-    # typing
-    def __init__(self):
-        super().__init__()
-        self.views: set[ui.ClassView] = set()
+    pass

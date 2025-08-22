@@ -13,7 +13,7 @@ def connect_signals(class_tree: Type[tool.ClassTree], main_window: Type[tool.Mai
 
 
 def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
-    class_tree.register_view(view)
+    class_tree.register_widget(view)
     bsdd_dictionary = project.get()
 
     view.setModel(class_tree.create_model(bsdd_dictionary))
@@ -26,7 +26,7 @@ def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: 
 
 
 def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
-    for view in class_tree.get_views():
+    for view in class_tree.get_widgets():
         class_tree.reset_view(view)
 
 

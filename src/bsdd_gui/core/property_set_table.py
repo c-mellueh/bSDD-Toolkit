@@ -15,7 +15,7 @@ def connect_view(
     project: Type[tool.Project],
     main_window: Type[tool.MainWindow],
 ):
-    property_set_table.register_view(view)
+    property_set_table.register_widget(view)
     bsdd_dictionary = project.get()
     model = property_set_table.create_model(bsdd_dictionary)
     view.setModel(model)
@@ -31,7 +31,7 @@ def connect_view(
 
 
 def reset_views(pset_list: Type[tool.PropertySetTable], project: Type[tool.Project]):
-    for view in pset_list.get_views():
+    for view in pset_list.get_widgets():
         pset_list.reset_view(view)
 
 

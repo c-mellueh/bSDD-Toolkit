@@ -48,26 +48,26 @@ class ViewSignaller(QObject):
 
 
 class WidgetHandler(ABC):
-    pass
 
-
-class ViewHandler(ABC):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> ViewHandlerProperties:
         return None
 
     @classmethod
-    def register_view(cls, view: QAbstractItemView):
-        cls.get_properties().views.add(view)
+    def register_widget(cls, view: QAbstractItemView):
+        cls.get_properties().widgets.add(view)
 
     @classmethod
-    def unregister_view(cls, view: QWidget):
-        cls.get_properties().views.pop(view)
+    def unregister_widget(cls, view: QWidget):
+        cls.get_properties().widgets.pop(view)
 
     @classmethod
-    def get_views(cls):
-        return cls.get_properties().views
+    def get_widgets(cls):
+        return cls.get_properties().widgets
+
+
+class ViewHandler(WidgetHandler):
 
     @classmethod
     def reset_view(cls, view: QAbstractItemView):
