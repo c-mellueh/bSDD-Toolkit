@@ -9,6 +9,8 @@ from bsdd_parser.models import BsddClassProperty,BsddClass
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 from bsdd_gui.module.property_table import ui,models,data
+from bsdd_gui.presets.tool_presets import ColumnHandler
+
 if TYPE_CHECKING:
     from bsdd_gui.module.property_table.prop import PropertyTableProperties
 
@@ -16,7 +18,7 @@ class Signaller(QObject):
     model_refresh_requested = Signal()
     selection_changed = Signal(ui.PropertyTable,BsddClassProperty)
 
-class PropertyTable:
+class PropertyTable(ColumnHandler):
     signaller = Signaller()
 
     @classmethod
@@ -70,3 +72,19 @@ class PropertyTable:
         if external_property is None:
             return ""
         return external_property.get("dataType") or ''
+    
+    @classmethod
+    def get_units(cls,class_property:BsddClassProperty):
+        if not cp_utils.is_external_ref(class_property):
+            bsdd_property = cp_utils.get_internal_property(class_property)
+            return bsdd_property.Units
+        
+        external_property = data.PropertyData.get_external_property(class_property)
+        if external_property is None:
+            return []
+        return external_property.get("Units") or []
+    
+    @classmethod
+    def get_allowed_values(cls,class_property:BsddClassProperty):
+        return [v.Code for v in class_property.AllowedValues]
+    

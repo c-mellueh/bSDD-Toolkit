@@ -1,0 +1,3 @@
+
+class ColumnHandlerProperties:
+    columns = list()

@@ -12,7 +12,7 @@
             "module": "bsdd_gui",
             "cwd": "${workspaceFolder}/src",
             "args": [
-                "/home/christoph/Github/bsdd-creator/som-0.2.0.json"
+                "/home/christoph/Schreibtisch/test_bsdd.json"
             ],
         }
     ]

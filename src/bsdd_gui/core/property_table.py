@@ -11,6 +11,13 @@ def connect_signals(property_table: Type[tool.PropertyTable], main_window: Type[
     pass
 
 def connect_view(view: ui.PropertyTable, property_table: Type[tool.PropertyTable],main_window:Type[tool.MainWindow]):
+
+    property_table.add_column_to_table("Name", lambda a: a.Code)
+    property_table.add_column_to_table("Datatype", property_table.get_datatype)
+    property_table.add_column_to_table("Unit", property_table.get_units)
+    property_table.add_column_to_table("Value", property_table.get_allowed_values)
+    property_table.add_column_to_table("Optional", lambda a: a.IsRequired)
+
     property_table.register_view(view)
     model = property_table.create_model()
     view.setModel(model)

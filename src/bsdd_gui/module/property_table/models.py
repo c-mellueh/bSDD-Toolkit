@@ -9,14 +9,15 @@ from PySide6.QtCore import (
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_parser.models import BsddDictionary, BsddClass,BsddClassProperty
+from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty
 from bsdd_gui import tool
+from bsdd_gui.presets.models_presets import TableModel
 
 
-class PropertyTableModel(QAbstractItemModel):
+class PropertyTableModel(TableModel):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(tool.PropertyTable, *args, **kwargs)
 
     @property
     def bsdd_dictionary(self):
@@ -37,11 +38,8 @@ class PropertyTableModel(QAbstractItemModel):
             return 0
         if parent.isValid():
             return 0
-        rc = len(tool.PropertyTable.filter_properties_by_pset(self.active_class,self.active_pset))
-        print(rc)
-        return  rc
-    def columnCount(self, /, parent = ...):
-        return 5
+        rc = len(tool.PropertyTable.filter_properties_by_pset(self.active_class, self.active_pset))
+        return rc
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if parent.isValid():
@@ -49,38 +47,21 @@ class PropertyTableModel(QAbstractItemModel):
 
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
-        bsdd_properties = tool.PropertyTable.filter_properties_by_pset(self.active_class,self.active_pset)
+        bsdd_properties = tool.PropertyTable.filter_properties_by_pset(
+            self.active_class, self.active_pset
+        )
         bsdd_property = bsdd_properties[row]
         index = self.createIndex(row, column, bsdd_property)
         return index
 
-    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
-        if not index.isValid():
-            return None
-
-        if role != Qt.ItemDataRole.DisplayRole:
-            return None
-        
-        col = index.column()
-        bsdd_property:BsddClassProperty = index.internalPointer()
-        if col == 0:
-            return bsdd_property.Code
-        if col == 1:
-            return bsdd_property.IsRequired
-        if col == 2:
-            return tool.PropertyTable.get_datatype(bsdd_property)
-
-    def setData(self, index, value, /, role = ...):
+    def setData(self, index, value, /, role=...):
         return False
-
-    def parent(self, index: QModelIndex):
-        return QModelIndex()
 
 
 # typing
 class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
+
     def sourceModel(self) -> PropertyTableModel:
         return super().sourceModel()
