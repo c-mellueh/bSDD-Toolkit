@@ -37,9 +37,7 @@ class PropertySetTable(ColumnHandler,ViewHandler):
 
     @classmethod
     def reset_view(cls, view: ui.PsetTableView):
-        source_model = view.model().sourceModel()
-        source_model.beginResetModel()
-        source_model.endResetModel()
+        super().reset_view(view)
         model = view.model()
         rc = model.rowCount()
         if not rc:

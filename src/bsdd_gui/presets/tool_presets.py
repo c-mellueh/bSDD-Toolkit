@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable, TYPE_CHECKING, Any
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget,QAbstractItemView
 from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
 
 if TYPE_CHECKING:
@@ -49,7 +49,7 @@ class ViewHandler(ABC):
         return None
 
     @classmethod
-    def register_view(cls, view: QWidget):
+    def register_view(cls, view: QAbstractItemView):
         cls.get_properties().views.add(view)
 
     @classmethod
@@ -59,3 +59,9 @@ class ViewHandler(ABC):
     @classmethod
     def get_views(cls):
         return cls.get_properties().views
+
+    @classmethod
+    def reset_view(cls, view: QAbstractItemView):
+        source_model = view.model().sourceModel()
+        source_model.beginResetModel()
+        source_model.endResetModel()

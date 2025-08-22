@@ -40,12 +40,6 @@ class PropertyTable(ColumnHandler,ViewHandler):
         cls.signaller.selection_changed.emit(view,index.internalPointer())
 
     @classmethod
-    def reset_view(cls, view: ui.PropertyTable):
-        source_model = view.model().sourceModel()
-        source_model.beginResetModel()
-        source_model.endResetModel()
-
-    @classmethod
     def filter_properties_by_pset(cls, bsdd_class: BsddClass, pset_name: str):
         return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]
 

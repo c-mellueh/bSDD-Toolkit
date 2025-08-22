@@ -80,8 +80,4 @@ class ClassTree(ViewHandler):
             return
         index = proxy_model.mapToSource(curr)
         cls.signaller.selection_changed.emit(view, index.internalPointer())
-
-    @classmethod
-    def reset_view(cls,view:ui.ClassView):
-        view.model().sourceModel().beginResetModel()
-        view.model().sourceModel().endResetModel()
+        
