@@ -47,6 +47,9 @@ class PsetTableModel(TableModel):
     def setData(self, index, value, /, role = ...):
         return False
 
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        test = 0
+        return super().data(index, role)
 
 # typing
 class SortModel(QSortFilterProxyModel):

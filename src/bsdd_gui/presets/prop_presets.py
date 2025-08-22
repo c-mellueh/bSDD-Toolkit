@@ -1,3 +1,4 @@
 
 class ColumnHandlerProperties:
-    columns = list()
+    def __init__(self):
+        self.columns = list()
