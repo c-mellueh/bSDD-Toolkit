@@ -9,15 +9,7 @@ if TYPE_CHECKING:
 
 
 def connect_signals(class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow]):
-    def test_for_mw(view: ui.ClassView, bsdd_class: BsddClass):
-        if view == main_window.get_class_view():
-            main_window.set_active_class(bsdd_class)
-
-    class_tree.add_column_to_table("Name", lambda a: a.Name)
-    class_tree.add_column_to_table("Code", lambda a: a.Code)
-    class_tree.add_column_to_table("Status", lambda a: a.Status)
     class_tree.connect_signals()
-    class_tree.signaller.selection_changed.connect(test_for_mw)
 
 
 def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
@@ -36,3 +28,15 @@ def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: 
 def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
     for view in class_tree.get_views():
         class_tree.reset_view(view)
+
+
+def connect_to_main_window(class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow]):
+    model = main_window.get_class_view().model().sourceModel()
+    class_tree.add_column_to_table(model, "Name", lambda a: a.Name)
+    class_tree.add_column_to_table(model, "Code", lambda a: a.Code)
+    class_tree.add_column_to_table(model, "Status", lambda a: a.Status)
+    class_tree.signaller.selection_changed.connect(
+        lambda v, n: (
+            main_window.set_active_class(n) if v == main_window.get_class_view() else None
+        )
+    )

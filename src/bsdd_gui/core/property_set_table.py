@@ -11,22 +11,23 @@ from bsdd_parser.models import BsddClass
 
 def connect_view(
     view: ui.PsetTableView,
-    pset_table: Type[tool.PropertySetTable],
+    property_set_table: Type[tool.PropertySetTable],
     project: Type[tool.Project],
     main_window: Type[tool.MainWindow],
 ):
-    pset_table.add_column_to_table("Name", lambda a: a)
-    pset_table.register_view(view)
+    property_set_table.register_view(view)
     bsdd_dictionary = project.get()
-    model = pset_table.create_model(bsdd_dictionary)
+    model = property_set_table.create_model(bsdd_dictionary)
     view.setModel(model)
     view.setSelectionBehavior(QListView.SelectionBehavior.SelectRows)
     view.setSelectionMode(QListView.SelectionMode.SingleSelection)
     view.setAlternatingRowColors(True)
     sel_model = view.selectionModel()
     # sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
-    sel_model.currentChanged.connect(lambda s, d: pset_table.on_current_changed(view, s, d))
-    main_window.signaller.active_class_changed.connect(lambda c: pset_table.reset_view(view))
+    sel_model.currentChanged.connect(lambda s, d: property_set_table.on_current_changed(view, s, d))
+    main_window.signaller.active_class_changed.connect(
+        lambda c: property_set_table.reset_view(view)
+    )
 
 
 def reset_views(pset_list: Type[tool.PropertySetTable], project: Type[tool.Project]):
@@ -52,6 +53,8 @@ def connect_to_main_window(
         property_set_table.select_row(pset_view, row_index)
 
     pset_view = main_window.get_pset_view()
+    model = pset_view.model().sourceModel()
+    property_set_table.add_column_to_table(model, "Name", lambda a: a)
     main_window.signaller.active_class_changed.connect(reset_pset)
     property_set_table.signaller.selection_changed.connect(
         lambda v, n: (main_window.set_active_pset(n) if v == main_window.get_pset_view() else None)

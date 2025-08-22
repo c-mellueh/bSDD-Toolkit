@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    pass
+    core.connect_to_main_window(tool.PropertyTable, tool.MainWindow)
 
 
 def retranslate_ui():

@@ -18,7 +18,7 @@ class TableModel(QAbstractItemModel):
         super().__init__(*args, **kwargs)
 
     def columnCount(self, /, parent=...):
-        return self.tool.get_column_count()
+        return self.tool.get_column_count(self)
 
     def parent(self, index: QModelIndex):
         return QModelIndex()
@@ -30,7 +30,7 @@ class TableModel(QAbstractItemModel):
         if role != Qt.ItemDataRole.DisplayRole:
             return None
 
-        getter_func = self.tool.get_value_functions()[index.column()]
+        getter_func = self.tool.get_value_functions(self)[index.column()]
         return getter_func(index.internalPointer())
 
     def headerData(self, section, orientation, /, role=...):
@@ -38,4 +38,4 @@ class TableModel(QAbstractItemModel):
             return None
         if orientation == Qt.Orientation.Vertical:
             return None
-        return self.tool.get_column_names()[section]
+        return self.tool.get_column_names(self)[section]
