@@ -12,9 +12,10 @@ def connect_signals(class_tree: Type[tool.ClassTree], main_window: Type[tool.Mai
     def test_for_mw(view: ui.ClassView, bsdd_class: BsddClass):
         if view == main_window.get_class_view():
             main_window.set_active_class(bsdd_class)
-
+    class_tree.add_column_to_table("Name", lambda a: a.Name)
+    class_tree.add_column_to_table("Code", lambda a: a.Code)
+    class_tree.add_column_to_table("Status", lambda a: a.Status)
     class_tree.connect_signals()
-
     class_tree.signaller.selection_changed.connect(test_for_mw)
 
 

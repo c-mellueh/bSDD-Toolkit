@@ -10,7 +10,7 @@ import bsdd_gui
 
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_gui.module.class_tree import ui, models, trigger
-from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller
+from bsdd_gui.presets.tool_presets import ColumnHandler,ViewHandler, ViewSignaller
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_tree.prop import ClassTreeProperties
@@ -20,7 +20,7 @@ class Signaller(ViewSignaller):
     pass
 
 
-class ClassTree(ViewHandler):
+class ClassTree(ColumnHandler,ViewHandler):
     signaller = Signaller()
 
     @classmethod
