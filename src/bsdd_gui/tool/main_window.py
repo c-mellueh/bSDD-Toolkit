@@ -41,7 +41,7 @@ class MainWindow:
     @classmethod
     def get(cls) -> ui.MainWindow:
         return cls.get_properties().ui
-    
+
     @classmethod
     def hide_console(cls):
         """
@@ -92,7 +92,7 @@ class MainWindow:
     @classmethod
     def set_class_text(cls, text: str):
         cls.get().label_class_name.setText(text)
-    
+
     @classmethod
     def set_pset_text(cls, text: str):
         cls.get().label_pset_name.setText(text)

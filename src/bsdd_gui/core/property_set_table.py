@@ -15,11 +15,6 @@ def connect_view(
     project: Type[tool.Project],
     main_window: Type[tool.MainWindow],
 ):
-
-    def test_for_mw(view: ui.PsetTableView, name: str):
-        if view == main_window.get_pset_view():
-            main_window.set_active_pset(name)
-
     pset_table.add_column_to_table("Name", lambda a: a)
     pset_table.register_view(view)
     bsdd_dictionary = project.get()
@@ -32,7 +27,6 @@ def connect_view(
     # sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
     sel_model.currentChanged.connect(lambda s, d: pset_table.on_current_changed(view, s, d))
     main_window.signaller.active_class_changed.connect(lambda c: pset_table.reset_view(view))
-    pset_table.signaller.selection_changed.connect(test_for_mw)
 
 
 def reset_views(pset_list: Type[tool.PropertySetTable], project: Type[tool.Project]):
@@ -41,9 +35,24 @@ def reset_views(pset_list: Type[tool.PropertySetTable], project: Type[tool.Proje
 
 
 def connect_to_main_window(
-    cls, property_set_table: Type[tool.PropertySetTable], main_window: Type[tool.MainWindow]
+    property_set_table: Type[tool.PropertySetTable], main_window: Type[tool.MainWindow]
 ):
     def reset_pset(new_class: BsddClass):
+        """
+        if the class changes this function checks if the new class has a propertySet with the same name as the old class and selects it
+        """
         pset = main_window.get_active_pset()
+        if pset is None:
+            return
+        pset_list = property_set_table.get_pset_list(new_class)
+        if pset in pset_list:
+            row_index = property_set_table.get_row_by_name(pset_view, pset)
+        else:
+            row_index = 0
+        property_set_table.select_row(pset_view, row_index)
 
+    pset_view = main_window.get_pset_view()
     main_window.signaller.active_class_changed.connect(reset_pset)
+    property_set_table.signaller.selection_changed.connect(
+        lambda v, n: (main_window.set_active_pset(n) if v == main_window.get_pset_view() else None)
+    )

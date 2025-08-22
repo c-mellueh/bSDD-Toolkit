@@ -41,3 +41,20 @@ class PropertySetTable(ColumnHandler, ViewHandler):
     @classmethod
     def get_pset_list(cls, bsdd_class: BsddClass) -> list[str]:
         return list({cp.PropertySet for cp in bsdd_class.ClassProperties})
+
+    @classmethod
+    def select_row(cls, view: ui.PsetTableView, row_index: int):
+        model = view.model()
+        index = model.index(row_index, 0)
+        if not index.isValid():
+            return
+        view.setCurrentIndex(index)
+
+    @classmethod
+    def get_row_by_name(cls, view: ui.PsetTableView, name: str):
+        model = view.model()
+        for row in range(model.rowCount()):
+            pset_name = model.index(row, 0).data(Qt.ItemDataRole.DisplayRole)
+            if name == pset_name:
+                return row
+        return None
