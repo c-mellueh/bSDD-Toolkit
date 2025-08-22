@@ -44,6 +44,8 @@ class ClassTree:
 
     @classmethod
     def get_root_classes(cls, bsdd_dictionary: BsddDictionary):
+        if bsdd_dictionary is None:
+            return []
         return [c for c in bsdd_dictionary.Classes if not c.ParentClassCode]
 
     @classmethod

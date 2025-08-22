@@ -1,7 +1,7 @@
 from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
-from bsdd_gui.core import property_set_list as core
+from bsdd_gui.core import property_set_table as core
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from . import ui

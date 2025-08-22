@@ -28,10 +28,8 @@ class TableModel(QAbstractItemModel):
         if role != Qt.ItemDataRole.DisplayRole:
             return None
 
-        bsdd_property: BsddClassProperty = index.internalPointer()
         getter_func = self.tool.get_value_functions()[index.column()]
-        
-        return getter_func(bsdd_property)
+        return getter_func(index.internalPointer())
     
     def headerData(self, section, orientation, /, role = ...):
         if orientation == Qt.Orientation.Vertical:

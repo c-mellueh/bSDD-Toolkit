@@ -11,12 +11,13 @@ from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_gui import tool
+from bsdd_gui.presets.models_presets import TableModel
 
 
-class PsetListModel(QAbstractListModel):
+class PsetTableModel(TableModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(tool.PropertySetTable, *args, **kwargs)
 
     @property
     def bsdd_dictionary(self):
@@ -43,26 +44,14 @@ class PsetListModel(QAbstractListModel):
         index = self.createIndex(row, column, pset_name)
         return index
 
-    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
-        if not index.isValid():
-            return None
-
-        if role != Qt.ItemDataRole.DisplayRole:
-            return None
-        pset_name = tool.PropertySetTable.get_pset_list(self.active_class)[index.row()]
-        return pset_name
-
     def setData(self, index, value, /, role = ...):
         return False
-
-    def parent(self, index: QModelIndex):
-        return QModelIndex()
 
 
 # typing
 class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
-    def sourceModel(self) -> PsetListModel:
+
+    def sourceModel(self) -> PsetTableModel:
         return super().sourceModel()

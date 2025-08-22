@@ -5,7 +5,9 @@ import logging
 import bsdd_gui
 from PySide6.QtCore import QModelIndex,QObject,Signal,Qt
 from bsdd_gui.module.property_set_table import ui,models
+from bsdd_gui.presets.tool_presets import ColumnHandler
 from bsdd_parser.models import BsddDictionary, BsddClass
+
 if TYPE_CHECKING:
     from bsdd_gui.module.property_set_table.prop import PropertySetTableProperties
 
@@ -14,7 +16,7 @@ class Signaller(QObject):
     selection_changed = Signal(ui.PsetTableView,str)
 
 
-class PropertySetTable:
+class PropertySetTable(ColumnHandler):
     signaller = Signaller()
     @classmethod
     def get_properties(cls) -> PropertySetTableProperties:
@@ -34,7 +36,7 @@ class PropertySetTable:
 
     @classmethod
     def create_model(cls,bsdd_dictionary:BsddDictionary):
-        model = models.PsetListModel(bsdd_dictionary)
+        model = models.PsetTableModel(bsdd_dictionary)
         sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
         return sort_filter_model
