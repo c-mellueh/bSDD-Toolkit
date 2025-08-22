@@ -42,7 +42,9 @@ class PropertyTable(ColumnHandler, ViewHandler):
         cls.signaller.selection_changed.emit(view, index.internalPointer())
 
     @classmethod
-    def filter_properties_by_pset(cls, bsdd_class: BsddClass, pset_name: str):
+    def filter_properties_by_pset(
+        cls, bsdd_class: BsddClass, pset_name: str
+    ) -> list[BsddClassProperty]:
         return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]
 
     @classmethod
@@ -70,3 +72,21 @@ class PropertyTable(ColumnHandler, ViewHandler):
     @classmethod
     def get_allowed_values(cls, class_property: BsddClassProperty):
         return [v.Code for v in class_property.AllowedValues]
+
+    @classmethod
+    def get_row_of_property(cls, view: ui.PropertyTable, class_property: BsddClassProperty):
+        model = view.model().sourceModel()
+
+        for row in range(model.rowCount()):
+            index = model.index(row, 0)
+            if index.internalPointer() == class_property:
+                return view.model().mapFromSource(index).row()
+        return None
+
+    @classmethod
+    def select_row(cls, view: ui.PropertyTable, row_index: int):
+        model = view.model()
+        index = model.index(row_index, 0)
+        if not index.isValid():
+            return
+        view.setCurrentIndex(index)

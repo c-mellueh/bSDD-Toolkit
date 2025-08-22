@@ -32,6 +32,24 @@ def reset_views(property_table: Type[tool.PropertyTable], project: Type[tool.Pro
 def connect_to_main_window(
     property_table: Type[tool.PropertyTable], main_window: Type[tool.MainWindow]
 ):
+
+    def reset_property(new_pset_name: str):
+        """
+        if the class changes this function checks if the new class has a propertySet with the same name as the old class and selects it
+        """
+        active_prop = main_window.get_active_property()
+        if active_prop is None:
+            return
+        active_class = main_window.get_active_class()
+        property_list = property_table.filter_properties_by_pset(active_class, new_pset_name)
+        code_dict = {p.Code: p for p in property_list}
+        if active_prop.Code in code_dict:
+            new_property = code_dict[active_prop.Code]
+            row_index = property_table.get_row_of_property(property_view, new_property)
+        else:
+            row_index = 0
+        property_table.select_row(property_view, row_index)
+
     model = main_window.get_property_view().model().sourceModel()
     property_view = main_window.get_property_view()
     property_table.add_column_to_table(model, "Name", lambda a: a.Code)
@@ -45,3 +63,4 @@ def connect_to_main_window(
     main_window.signaller.active_pset_changed.connect(
         lambda c: property_table.reset_view(property_view)
     )
+    main_window.signaller.active_pset_changed.connect(reset_property)
