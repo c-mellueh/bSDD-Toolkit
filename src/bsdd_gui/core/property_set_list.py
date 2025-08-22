@@ -3,12 +3,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 if TYPE_CHECKING:
     from bsdd_gui import tool
-from bsdd_gui.module.property_set_list import ui
+from bsdd_gui.module.property_set_table import ui
 from PySide6.QtWidgets import QApplication,QListView
 
-def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], project: Type[tool.Project],main_window:Type[tool.MainWindow]):
 
-    def test_for_mw(view: ui.PsetListView, name: str):
+def connect_view(
+    view: ui.PsetTableView,
+    pset_list: Type[tool.PropertySetTable],
+    project: Type[tool.Project],
+    main_window: Type[tool.MainWindow],
+):
+
+    def test_for_mw(view: ui.PsetTableView, name: str):
         if view == main_window.get_pset_view():
             main_window.set_active_pset(name)
 
@@ -25,6 +31,7 @@ def connect_view(view: ui.PsetListView, pset_list: Type[tool.PropertySetList], p
     main_window.signaller.active_class_changed.connect(lambda c: pset_list.reset_view(view))
     pset_list.signaller.selection_changed.connect(test_for_mw)
 
-def reset_views(pset_list: Type[tool.PropertySetList], project: Type[tool.Project]):
+
+def reset_views(pset_list: Type[tool.PropertySetTable], project: Type[tool.Project]):
     for view in pset_list.get_views():
         pset_list.reset_view(view)

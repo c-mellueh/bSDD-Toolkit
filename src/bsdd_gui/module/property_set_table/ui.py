@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .models import SortModel
 from PySide6.QtCore import QModelIndex, Qt, Signal
-from PySide6.QtWidgets import QStyledItemDelegate, QTableWidget, QWidget,QListView
+from PySide6.QtWidgets import QStyledItemDelegate, QTableView, QWidget,QListView
 from . import trigger
 
-class PsetListView(QListView):
+class PsetTableView(QTableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        trigger.list_view_created(self)
-        
+        trigger.table_view_created(self)
+        self.horizontalHeader().setStretchLastSection(True)
     def model(self) -> SortModel:
         return super().model()

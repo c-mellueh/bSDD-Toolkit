@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHB
     QWidget)
 
 from bsdd_gui.module.class_tree.ui import ClassView
-from bsdd_gui.module.property_set_list.ui import PsetListView
+from bsdd_gui.module.property_set_table.ui import PsetTableView
 from bsdd_gui.module.property_table.ui import PropertyTable
 
 class Ui_MainWindow(object):
@@ -91,7 +91,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout_classes.addWidget(self.label_class_name, 0, 2, 1, 1)
 
-
         self.verticalLayout_classes.addLayout(self.gridLayout_classes)
 
         self.tree_class = ClassView(self.layoutWidget)
@@ -139,10 +138,9 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_pSet_button.addWidget(self.button_Pset_add)
 
-
         self.vertical_layout_pset.addLayout(self.horizontalLayout_pSet_button)
 
-        self.table_pset = PsetListView(self.verticalLayoutWidget)
+        self.table_pset = PsetTableView(self.verticalLayoutWidget)
         self.table_pset.setObjectName(u"table_pset")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         sizePolicy3.setHorizontalStretch(0)
@@ -178,7 +176,6 @@ class Ui_MainWindow(object):
         self.button_property_add.setObjectName(u"button_property_add")
 
         self.horizontalLayout_properties.addWidget(self.button_property_add)
-
 
         self.vertical_layout_properties.addLayout(self.horizontalLayout_properties)
 
@@ -249,4 +246,3 @@ class Ui_MainWindow(object):
         self.menuDesite.setTitle(QCoreApplication.translate("MainWindow", u"Desite", None))
         self.menuModels.setTitle(QCoreApplication.translate("MainWindow", u"Models", None))
     # retranslateUi
-

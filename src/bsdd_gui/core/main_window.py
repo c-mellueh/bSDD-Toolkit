@@ -17,7 +17,7 @@ def create_main_window(
     mw = main_window.create(application)
     mw.show()
     main_window.hide_console()
-    
 
-def connect_main_window(    main_window: Type[tool.MainWindow],pset_list:Type[tool.PropertySetList]):
+
+def connect_main_window(main_window: Type[tool.MainWindow], pset_list: Type[tool.PropertySetTable]):
     pass

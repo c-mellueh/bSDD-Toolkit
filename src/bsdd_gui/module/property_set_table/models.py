@@ -26,13 +26,11 @@ class PsetListModel(QAbstractListModel):
     def active_class(self):
         return tool.MainWindow.get_active_class()
 
-
     def rowCount(self, parent=QModelIndex()):
         if not self.active_class:
             return 0
         if not parent.isValid():
-            return len(tool.PropertySetList.get_pset_list(self.active_class))
-
+            return len(tool.PropertySetTable.get_pset_list(self.active_class))
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if parent.isValid():
@@ -41,7 +39,7 @@ class PsetListModel(QAbstractListModel):
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
 
-        pset_name  = tool.PropertySetList.get_pset_list(self.active_class)[row]
+        pset_name = tool.PropertySetTable.get_pset_list(self.active_class)[row]
         index = self.createIndex(row, column, pset_name)
         return index
 
@@ -51,7 +49,7 @@ class PsetListModel(QAbstractListModel):
 
         if role != Qt.ItemDataRole.DisplayRole:
             return None
-        pset_name  = tool.PropertySetList.get_pset_list(self.active_class)[index.row()]
+        pset_name = tool.PropertySetTable.get_pset_list(self.active_class)[index.row()]
         return pset_name
 
     def setData(self, index, value, /, role = ...):

@@ -15,5 +15,5 @@ def retranslate_ui():
 def on_new_project():
     pass
 
-def list_view_created(view:ui.PsetListView):
-    core.connect_view(view,tool.PropertySetList,tool.Project,tool.MainWindow)
+def table_view_created(view:ui.PsetTableView):
+    core.connect_view(view, tool.PropertySetTable, tool.Project, tool.MainWindow)
