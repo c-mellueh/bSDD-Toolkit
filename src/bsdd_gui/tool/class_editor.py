@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import logging
 from PySide6.QtCore import Signal, QObject
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import ViewSignaller
+from bsdd_gui.presets.tool_presets import WidgetSignaller, WidgetHandler
 from bsdd_parser import BsddClass
 from bsdd_gui.module.class_editor import trigger, ui
 
@@ -11,11 +11,11 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_editor.prop import ClassEditorProperties
 
 
-class Signaller:
+class Signaller(WidgetSignaller):
     class_info_requested = Signal(BsddClass)
 
 
-class ClassEditor:
+class ClassEditor(WidgetHandler):
     signaller = Signaller()
 
     @classmethod

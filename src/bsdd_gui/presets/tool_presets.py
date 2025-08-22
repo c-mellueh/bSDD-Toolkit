@@ -42,9 +42,8 @@ class ColumnHandler(ABC):
         return [x[1] for x in cls.get_properties().columns.get(model) or []]
 
 
-class ViewSignaller(QObject):
-    model_refresh_requested = Signal()
-    selection_changed = Signal(QWidget, Any)
+class WidgetSignaller(QObject):
+    pass
 
 
 class WidgetHandler(ABC):
@@ -65,6 +64,11 @@ class WidgetHandler(ABC):
     @classmethod
     def get_widgets(cls):
         return cls.get_properties().widgets
+
+
+class ViewSignaller(QObject):
+    model_refresh_requested = Signal()
+    selection_changed = Signal(QWidget, Any)
 
 
 class ViewHandler(WidgetHandler):

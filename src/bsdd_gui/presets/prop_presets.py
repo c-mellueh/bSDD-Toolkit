@@ -8,10 +8,14 @@ class ColumnHandlerProperties:
         self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
 
 
-class ViewHandlerProperties:
+class WidgetHandlerProperties:
     def __init__(self):
         super().__init__()
         self.widgets = set()
+
+
+class ViewHandlerProperties(WidgetHandlerProperties):
+    pass
 
 
 class ClassTreeProperties(
