@@ -9,11 +9,14 @@ TOOGLE_CONSOLE_ACTION = "toggle_console"
 def connect():
     core.connect_main_window(tool.MainWindow, tool.PropertySetTable)
 
+
 def on_new_project():
     pass
 
+
 def retranslate_ui():
     pass
+
 
 def close_event(event):
     pass

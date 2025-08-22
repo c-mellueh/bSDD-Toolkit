@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, Any
 import ctypes
 import logging
 
-from PySide6.QtCore import QObject, Signal,QSortFilterProxyModel
+from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
 from PySide6.QtWidgets import QWidget
 
 import bsdd_gui
 
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_gui.module.class_tree import ui, models, trigger
-from bsdd_gui.presets.tool_presets import ViewHandler,ViewSignaller
+from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_tree.prop import ClassTreeProperties
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 class Signaller(ViewSignaller):
     pass
+
 
 class ClassTree(ViewHandler):
     signaller = Signaller()
@@ -31,7 +32,7 @@ class ClassTree(ViewHandler):
         cls.signaller.model_refresh_requested.connect(trigger.reset_class_views)
 
     @classmethod
-    def create_model(cls,bsdd_dictionary:BsddDictionary):
+    def create_model(cls, bsdd_dictionary: BsddDictionary):
         model = models.ClassTreeModel(bsdd_dictionary)
         sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
@@ -62,7 +63,7 @@ class ClassTree(ViewHandler):
         return cls.get_children(parent_class).index(bsdd_class)
 
     @classmethod
-    def on_selection_changed(cls,view:ui.ClassView,selected,deselected):
+    def on_selection_changed(cls, view: ui.ClassView, selected, deselected):
         proxy_model = view.model()
         proxy_indexes = selected.indexes()
         if not proxy_indexes:
@@ -74,10 +75,9 @@ class ClassTree(ViewHandler):
             cls.signaller.selection_changed.emit(view, s_ix.internalPointer())
 
     @classmethod
-    def on_current_changed(cls,view:ui.ClassView,curr, prev):
+    def on_current_changed(cls, view: ui.ClassView, curr, prev):
         proxy_model = view.model()
         if not curr.isValid():
             return
         index = proxy_model.mapToSource(curr)
         cls.signaller.selection_changed.emit(view, index.internalPointer())
-        

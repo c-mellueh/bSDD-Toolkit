@@ -123,6 +123,7 @@ class {to_camel_case(name)}:
 """
         )
 
+
 def main(name: str):
     os.chdir("bsdd_gui")
     create_core(name)
@@ -131,9 +132,7 @@ def main(name: str):
 
 
 # Create the parser
-parser = argparse.ArgumentParser(
-    description="Script to run a module with a name argument"
-)
+parser = argparse.ArgumentParser(description="Script to run a module with a name argument")
 
 # Add the "name" argument
 parser.add_argument("name", type=str, help="Name of the module to run")

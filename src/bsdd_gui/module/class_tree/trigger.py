@@ -9,19 +9,24 @@ TOOGLE_CONSOLE_ACTION = "toggle_console"
 if TYPE_CHECKING:
     from . import ui
 
+
 def connect():
-    core.connect_signals(tool.ClassTree,tool.MainWindow)
+    core.connect_signals(tool.ClassTree, tool.MainWindow)
+
 
 def on_new_project():
     core.reset_views(tool.ClassTree, tool.Project)
 
+
 def retranslate_ui():
     pass
+
 
 def close_event(event):
     pass
 
-def class_view_created(class_view:ui.ClassView):
+
+def class_view_created(class_view: ui.ClassView):
     core.connect_view(class_view, tool.ClassTree, tool.Project)
 
 

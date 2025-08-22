@@ -1,6 +1,7 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication,QTableView
-from typing import Type,TYPE_CHECKING
+from PySide6.QtWidgets import QApplication, QTableView
+from typing import Type, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_table import ui
@@ -10,7 +11,12 @@ if TYPE_CHECKING:
 def connect_signals(property_table: Type[tool.PropertyTable], main_window: Type[tool.MainWindow]):
     pass
 
-def connect_view(view: ui.PropertyTable, property_table: Type[tool.PropertyTable],main_window:Type[tool.MainWindow]):
+
+def connect_view(
+    view: ui.PropertyTable,
+    property_table: Type[tool.PropertyTable],
+    main_window: Type[tool.MainWindow],
+):
 
     property_table.add_column_to_table("Name", lambda a: a.Code)
     property_table.add_column_to_table("Datatype", property_table.get_datatype)
@@ -25,9 +31,9 @@ def connect_view(view: ui.PropertyTable, property_table: Type[tool.PropertyTable
     view.setSelectionMode(QTableView.SelectionMode.ExtendedSelection)
     view.setAlternatingRowColors(True)
 
-    sel_model = view.selectionModel()    
+    sel_model = view.selectionModel()
     # sel_model.selectionChanged.connect(lambda s,d: property_table.on_selection_changed(view,s,d))
-    sel_model.currentChanged.connect(lambda s,d: property_table.on_current_changed(view,s,d))
+    sel_model.currentChanged.connect(lambda s, d: property_table.on_current_changed(view, s, d))
     main_window.signaller.active_pset_changed.connect(lambda c: property_table.reset_view(view))
 
 

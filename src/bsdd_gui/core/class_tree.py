@@ -1,6 +1,7 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication,QTreeView
-from typing import Type,TYPE_CHECKING
+from PySide6.QtWidgets import QApplication, QTreeView
+from typing import Type, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.class_tree import ui
@@ -8,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def connect_signals(class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow]):
-    def test_for_mw(view:ui.ClassView,bsdd_class:BsddClass):
+    def test_for_mw(view: ui.ClassView, bsdd_class: BsddClass):
         if view == main_window.get_class_view():
             main_window.set_active_class(bsdd_class)
 
@@ -26,9 +27,9 @@ def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: 
     view.setSelectionMode(QTreeView.ExtendedSelection)
     view.setAlternatingRowColors(True)
 
-    sel_model = view.selectionModel()    
+    sel_model = view.selectionModel()
     # sel_model.selectionChanged.connect(lambda s,d: class_tree.on_selection_changed(view,s,d))
-    sel_model.currentChanged.connect(lambda s,d: class_tree.on_current_changed(view,s,d))
+    sel_model.currentChanged.connect(lambda s, d: class_tree.on_current_changed(view, s, d))
 
 
 def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):

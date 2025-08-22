@@ -7,20 +7,22 @@ from PySide6.QtCore import (
     QModelIndex,
     QSortFilterProxyModel,
 )
-from bsdd_parser.models import BsddDictionary, BsddClass,BsddClassProperty
+from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty
 from bsdd_gui import tool
 from bsdd_gui.presets.tool_presets import ColumnHandler
+
+
 class TableModel(QAbstractItemModel):
-    def __init__(self, tool:ColumnHandler,*args,**kwargs):
+    def __init__(self, tool: ColumnHandler, *args, **kwargs):
         self.tool = tool
-        super().__init__(*args,**kwargs)
-    
-    def columnCount(self, /, parent = ...):
+        super().__init__(*args, **kwargs)
+
+    def columnCount(self, /, parent=...):
         return self.tool.get_column_count()
-    
+
     def parent(self, index: QModelIndex):
         return QModelIndex()
-    
+
     def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid():
             return None
@@ -30,8 +32,8 @@ class TableModel(QAbstractItemModel):
 
         getter_func = self.tool.get_value_functions()[index.column()]
         return getter_func(index.internalPointer())
-    
-    def headerData(self, section, orientation, /, role = ...):
+
+    def headerData(self, section, orientation, /, role=...):
         if role != Qt.ItemDataRole.DisplayRole:
             return None
         if orientation == Qt.Orientation.Vertical:

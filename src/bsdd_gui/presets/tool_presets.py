@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable, TYPE_CHECKING, Any
-from PySide6.QtWidgets import QWidget,QAbstractItemView
+from PySide6.QtWidgets import QWidget, QAbstractItemView
 from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
 
 if TYPE_CHECKING:

@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, PrivateAttr, computed_field
 import json
 import weakref
 
+
 class BsddDictionary(BaseModel):
     OrganizationCode: str
     DictionaryCode: str
@@ -31,11 +32,7 @@ class BsddDictionary(BaseModel):
 
     @property
     def base(self) -> str:
-        return (
-            self.DictionaryUri
-            if self.UseOwnUri
-            else "https://identifier.buildingsmart.org"
-        )
+        return self.DictionaryUri if self.UseOwnUri else "https://identifier.buildingsmart.org"
 
     @property
     def uri(self) -> str:
@@ -48,6 +45,7 @@ class BsddDictionary(BaseModel):
                 str(self.DictionaryVersion),
             ]
         )
+
     @classmethod
     def load(cls, path) -> BsddDictionary:
         """Load from a JSON file and validate via the normalizer above."""

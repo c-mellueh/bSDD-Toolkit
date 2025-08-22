@@ -4,9 +4,10 @@ from pydantic import BaseModel
 
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, Field,PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr
 import json
 import weakref
+
 
 class BsddDictionary(BaseModel):
     OrganizationCode: str
@@ -31,11 +32,7 @@ class BsddDictionary(BaseModel):
 
     @property
     def base(self) -> str:
-        return (
-            self.DictionaryUri
-            if self.UseOwnUri
-            else "https://identifier.buildingsmart.org"
-        )
+        return self.DictionaryUri if self.UseOwnUri else "https://identifier.buildingsmart.org"
 
     @property
     def uri(self) -> str:
@@ -48,6 +45,7 @@ class BsddDictionary(BaseModel):
                 str(self.DictionaryVersion),
             ]
         )
+
     @classmethod
     def load(cls, path) -> BsddDictionary:
         """Load from a JSON file and validate via the normalizer above."""
@@ -59,7 +57,7 @@ class BsddDictionary(BaseModel):
     def model_post_init(self, context):
         for c in self.Classes:
             c._set_parent(self)
-    
+
 
 class BsddClass(BaseModel):
     Code: str
@@ -97,9 +95,9 @@ class BsddClass(BaseModel):
     def _set_parent(self, parent: "BsddDictionary") -> None:
         self._parent_ref = weakref.ref(parent)
 
-
     def uri(self, dictionary: BsddDictionary) -> str:
         return "/".join([dictionary.uri(), "class", self.Code])
+
 
 class BsddAllowedValue(BaseModel):
     Code: str
@@ -197,12 +195,7 @@ class BsddClassRelation(BaseModel):
     OwnedUri: Optional[str] = None
 
 
-
-
-
-
-
 t = BsddDictionary.load(r"./som-0.2.0.json")
-out = t.model_dump_json(by_alias=True,exclude_none=True)
-with open ("output.json","w") as file:
+out = t.model_dump_json(by_alias=True, exclude_none=True)
+with open("output.json", "w") as file:
     file.write(out)

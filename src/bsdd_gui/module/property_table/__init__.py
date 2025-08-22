@@ -5,8 +5,10 @@ from . import ui, prop, trigger
 def register():
     bsdd_gui.PropertyTableProperties = prop.PropertyTableProperties()
 
+
 def retranslate_ui():
     trigger.retranslate_ui()
+
 
 def load_ui_triggers():
     trigger.connect()
@@ -14,4 +16,3 @@ def load_ui_triggers():
 
 def on_new_project():
     trigger.on_new_project()
-

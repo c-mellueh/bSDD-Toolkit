@@ -28,12 +28,12 @@ class Project:
         bsdd_gui.on_new_project()
 
     @classmethod
-    def load_project(cls,path:os.PathLike):
+    def load_project(cls, path: os.PathLike):
         prop = cls.get_properties()
         prop.project_dictionary = bsdd_parser.models.BsddDictionary.load(path)
         bsdd_gui.on_new_project()
         return prop.project_dictionary
-    
+
     @classmethod
     def get(cls) -> bsdd_parser.models.BsddDictionary:
         return cls.get_properties().project_dictionary

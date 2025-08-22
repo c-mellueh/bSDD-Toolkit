@@ -12,6 +12,7 @@ from . import trigger
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_gui import tool
 
+
 class ClassTreeModel(QAbstractItemModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
@@ -20,7 +21,7 @@ class ClassTreeModel(QAbstractItemModel):
     @property
     def bsdd_dictionary(self):
         return tool.Project.get()
-    
+
     def headerData(self, section, orientation, /, role=...):
         if orientation == Qt.Orientation.Horizontal:
             if role == Qt.ItemDataRole.DisplayRole:
@@ -52,7 +53,7 @@ class ClassTreeModel(QAbstractItemModel):
         parent = parent.siblingAtColumn(0)
         parent_class: BsddClass = parent.internalPointer()
         children = tool.ClassTree.get_children(parent_class)
-        if row >= len(children) or row <0:
+        if row >= len(children) or row < 0:
             return QModelIndex()
         bsdd_class = children[row]
         index = self.createIndex(row, column, bsdd_class)
@@ -66,35 +67,37 @@ class ClassTreeModel(QAbstractItemModel):
             return None
         if Qt.ItemDataRole.DisplayRole != role:
             return None
-        data:BsddClass = index.internalPointer()
+        data: BsddClass = index.internalPointer()
 
         if index.column() == 0:
             return data.Name
-        elif index.column()== 1:
+        elif index.column() == 1:
             return data.Code
         elif index.column() == 2:
             return data.Status
         return None
 
-    def setData(self, index, value, /, role = ...):
+    def setData(self, index, value, /, role=...):
         return False
 
     def parent(self, index: QModelIndex):
         if not index.isValid():
             return QModelIndex()
-        bsdd_class:BsddClass = index.internalPointer()
+        bsdd_class: BsddClass = index.internalPointer()
         if not bsdd_class.ParentClassCode:
             return QModelIndex()
-        parent_class = tool.ClassTree.get_class_by_code(self.bsdd_dictionary,bsdd_class.ParentClassCode)
+        parent_class = tool.ClassTree.get_class_by_code(
+            self.bsdd_dictionary, bsdd_class.ParentClassCode
+        )
         row = tool.ClassTree.get_row_index(parent_class)
 
-        return self.createIndex(row,0,parent_class)
+        return self.createIndex(row, 0, parent_class)
 
 
-#typing
+# typing
 class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
+
     def sourceModel(self) -> ClassTreeModel:
         return super().sourceModel()

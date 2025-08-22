@@ -1,6 +1,7 @@
 # src/bsdd_gui/widgets/details_panel.py
 from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QPushButton
 
+
 class DetailsPanel(QWidget):
     def __init__(self):
         super().__init__()
@@ -16,8 +17,13 @@ class DetailsPanel(QWidget):
         lay.addRow("Code", self.code)
         lay.addRow(self.btn_apply)
 
-    def set_controller(self, ctrl): self.ctrl = ctrl
-    def clear(self): self.node = None; self.name.clear(); self.code.clear()
+    def set_controller(self, ctrl):
+        self.ctrl = ctrl
+
+    def clear(self):
+        self.node = None
+        self.name.clear()
+        self.code.clear()
 
     def show_node(self, node):
         self.node = node
@@ -25,6 +31,7 @@ class DetailsPanel(QWidget):
         self.code.setText(getattr(node.obj, "code", getattr(node.obj, "Code", "")) or "")
 
     def _apply(self):
-        if not self.ctrl or not self.node: return
+        if not self.ctrl or not self.node:
+            return
         self.ctrl.rename(self.node.obj, self.name.text())
         self.ctrl.set_code(self.node.obj, self.code.text())
