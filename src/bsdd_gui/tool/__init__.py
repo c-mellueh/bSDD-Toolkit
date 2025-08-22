@@ -4,3 +4,4 @@ from .project import Project
 from .property_set_table import PropertySetTable
 from .property_table import PropertyTable
 from .class_editor import ClassEditor
+from .ifc_helper import IfcHelper
