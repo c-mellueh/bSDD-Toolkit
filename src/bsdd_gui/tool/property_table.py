@@ -6,7 +6,9 @@ from PySide6.QtCore import QModelIndex,QObject,Signal,Qt
 
 import bsdd_gui
 from bsdd_parser.models import BsddClassProperty,BsddClass
-from bsdd_gui.module.property_table import ui,models
+from bsdd_parser.utils import bsdd_class_property as cp_utils
+
+from bsdd_gui.module.property_table import ui,models,data
 if TYPE_CHECKING:
     from bsdd_gui.module.property_table.prop import PropertyTableProperties
 
@@ -57,3 +59,14 @@ class PropertyTable:
     @classmethod
     def filter_properties_by_pset(cls, bsdd_class: BsddClass, pset_name: str):
         return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]
+
+    @classmethod
+    def get_datatype(cls,class_property:BsddClassProperty):
+        if not cp_utils.is_external_ref(class_property):
+            bsdd_property = cp_utils.get_internal_property(class_property)
+            return bsdd_property.DataType
+        
+        external_property = data.PropertyData.get_external_property(class_property)
+        if external_property is None:
+            return ""
+        return external_property.get("dataType") or ''

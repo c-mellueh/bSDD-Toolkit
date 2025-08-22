@@ -68,7 +68,7 @@ class PropertyTableModel(QAbstractItemModel):
         if col == 1:
             return bsdd_property.IsRequired
         if col == 2:
-            return bsdd_property.PropertyCode
+            return tool.PropertyTable.get_datatype(bsdd_property)
 
     def setData(self, index, value, /, role = ...):
         return False
