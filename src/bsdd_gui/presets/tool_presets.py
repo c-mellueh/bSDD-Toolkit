@@ -47,6 +47,10 @@ class ViewSignaller(QObject):
     selection_changed = Signal(QWidget, Any)
 
 
+class WidgetHandler(ABC):
+    pass
+
+
 class ViewHandler(ABC):
     @classmethod
     @abstractmethod
