@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
-from PySide6.QtCore import Signal, QObject
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetSignaller, WidgetHandler
 from bsdd_parser import BsddClass
@@ -30,3 +31,33 @@ class ClassEditor(WidgetHandler):
     def create_widget(cls, bsdd_class: BsddClass):
         widget = ui.ClassEditor(bsdd_class)
         return widget
+
+    @classmethod
+    def register_field_getter(
+        cls, class_editor: ui.ClassEditor, field: QWidget, getter_func: callable
+    ):
+        if not class_editor in cls.get_properties().field_getter:
+            cls.get_properties().field_getter[class_editor] = dict()
+        cls.get_properties().field_getter[class_editor][field] = getter_func
+
+    @classmethod
+    def register_field_setter(
+        cls, class_editor: ui.ClassEditor, field: QWidget, setter_func: callable
+    ):
+        if not class_editor in cls.get_properties().field_getter:
+            cls.get_properties().field_getter[class_editor] = dict()
+        cls.get_properties().field_getter[class_editor][field] = getter_func
+
+    @classmethod
+    def sync_from_model(cls, class_editor: ui.ClassEditor):
+        bsdd_class = class_editor.bsdd_class
+        for field, getter_func in cls.get_properties().field_getter[class_editor].items():
+            value = getter_func(bsdd_class)
+            if isinstance(field, QLineEdit):
+                field.setText(value)
+            if isinstance(field, QLabel):
+                field.setText(value)
+            if isinstance(field, QComboBox):
+                field.setCurrentText(value)
+            if isinstance(field, QTextEdit):
+                field.setPlainText(value)

@@ -11,6 +11,12 @@ if TYPE_CHECKING:
 
 def register_widget(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditor]):
     class_editor.register_widget(widget)
+    class_editor.register_field_getter(widget, widget.le_code, lambda c: c.Code)
+    class_editor.register_field_getter(widget, widget.le_name, lambda c: c.Name)
+    class_editor.register_field_getter(widget, widget.cb_class_type, lambda c: c.ClassType)
+    class_editor.register_field_getter(widget, widget.te_definition, lambda c: c.Definition)
+
+    widget.cb_class_type.addItems(["Class", "Material", "GroupOfProperties", "AlternativeUse"])
 
 
 def connect_signals(class_editor: Type[tool.ClassEditor]):
@@ -32,7 +38,7 @@ def connect_to_main_window(
 
 
 def open_class_editor(bsdd_class: BsddClass, class_editor: Type[tool.ClassEditor]):
-    logging.warning(f"Open Class Editor for {bsdd_class.Code}")
+    logging.info(f"Open Class Editor for {bsdd_class.Code}")
     widget = class_editor.create_widget(bsdd_class)
+    class_editor.sync_from_model(widget)
     widget.show()
-    print(widget)

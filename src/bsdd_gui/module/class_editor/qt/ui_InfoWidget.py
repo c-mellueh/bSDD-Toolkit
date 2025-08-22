@@ -102,7 +102,12 @@ class Ui_ClassEditor(object):
         self.gridLayout.addLayout(self.hl_name, 0, 1, 1, 1)
 
         self.cb_class_type = QComboBox(self.gb_required)
+        self.cb_class_type.addItem("")
+        self.cb_class_type.addItem("")
+        self.cb_class_type.addItem("")
+        self.cb_class_type.addItem("")
         self.cb_class_type.setObjectName("cb_class_type")
+        self.cb_class_type.setEditable(False)
 
         self.gridLayout.addWidget(self.cb_class_type, 1, 1, 1, 1)
 
@@ -157,6 +162,17 @@ class Ui_ClassEditor(object):
         self.lb_code.setText(QCoreApplication.translate("ClassEditor", "Code", None))
         self.lb_class_type.setText(QCoreApplication.translate("ClassEditor", "Class Type", None))
         self.lb_name.setText(QCoreApplication.translate("ClassEditor", "Name", None))
+        self.cb_class_type.setItemText(0, QCoreApplication.translate("ClassEditor", "Class", None))
+        self.cb_class_type.setItemText(
+            1, QCoreApplication.translate("ClassEditor", "Material", None)
+        )
+        self.cb_class_type.setItemText(
+            2, QCoreApplication.translate("ClassEditor", "GroupOfProperties", None)
+        )
+        self.cb_class_type.setItemText(
+            3, QCoreApplication.translate("ClassEditor", "AlternativeUse", None)
+        )
+
         self.gb_defintion.setTitle(QCoreApplication.translate("ClassEditor", "Definition", None))
         self.gb_relationship.setTitle(
             QCoreApplication.translate("ClassEditor", "Relationships", None)
