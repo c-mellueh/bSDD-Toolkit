@@ -11,12 +11,18 @@ if TYPE_CHECKING:
 
 def register_widget(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditor]):
     class_editor.register_widget(widget)
-    class_editor.register_field_getter(widget, widget.le_code, lambda c: c.Code)
-    class_editor.register_field_getter(widget, widget.le_name, lambda c: c.Name)
-    class_editor.register_field_getter(widget, widget.cb_class_type, lambda c: c.ClassType)
-    class_editor.register_field_getter(widget, widget.te_definition, lambda c: c.Definition)
 
-    widget.cb_class_type.addItems(["Class", "Material", "GroupOfProperties", "AlternativeUse"])
+    class_editor.register_basic_field(widget, widget.le_name, "Name")
+    class_editor.register_basic_field(widget, widget.le_code, "Code")
+    class_editor.register_basic_field(widget, widget.te_definition, "Definition")
+
+    combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
+    class_editor.register_field_getter(widget, widget.cb_class_type, lambda c: c.ClassType)
+    class_editor.register_field_setter(
+        widget.cb_class_type,
+        lambda v, w=widget: setattr(w.bsdd_class, "ClassType", combobox_items[v]),
+    )
+    widget.cb_class_type.addItems(combobox_items)
 
 
 def connect_signals(class_editor: Type[tool.ClassEditor]):

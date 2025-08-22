@@ -33,6 +33,13 @@ class ClassEditor(WidgetHandler):
         return widget
 
     @classmethod
+    def register_basic_field(cls, class_editor: ui.ClassEditor, field: QWidget, variable_name: str):
+        cls.register_field_getter(class_editor, field, lambda c, vn=variable_name: getattr(c, vn))
+        cls.register_field_setter(
+            field, lambda v, w=class_editor, vn=variable_name: setattr(w.bsdd_class, vn, v)
+        )
+
+    @classmethod
     def register_field_getter(
         cls, class_editor: ui.ClassEditor, field: QWidget, getter_func: callable
     ):
@@ -41,12 +48,13 @@ class ClassEditor(WidgetHandler):
         cls.get_properties().field_getter[class_editor][field] = getter_func
 
     @classmethod
-    def register_field_setter(
-        cls, class_editor: ui.ClassEditor, field: QWidget, setter_func: callable
-    ):
-        if not class_editor in cls.get_properties().field_getter:
-            cls.get_properties().field_getter[class_editor] = dict()
-        cls.get_properties().field_getter[class_editor][field] = getter_func
+    def register_field_setter(cls, field: QWidget, setter_func: callable):
+        if isinstance(field, QLineEdit):
+            field.textChanged.connect(setter_func)
+        if isinstance(field, QComboBox):
+            field.currentIndexChanged.connect(setter_func)
+        if isinstance(field, QTextEdit):
+            field.textChanged.connect(lambda f=field, sf=setter_func: sf(f.toPlainText()))
 
     @classmethod
     def sync_from_model(cls, class_editor: ui.ClassEditor):
