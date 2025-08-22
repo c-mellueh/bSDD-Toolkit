@@ -19,8 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHBoxLayout,
     QHeaderView, QLabel, QMainWindow, QMenu,
     QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
-    QSplitter, QStatusBar, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+    QSplitter, QStatusBar, QVBoxLayout, QWidget)
 
 from bsdd_gui.module.class_tree.ui import ClassView
 from bsdd_gui.module.property_set_table.ui import PsetTableView
@@ -91,6 +90,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_classes.addWidget(self.label_class_name, 0, 2, 1, 1)
 
+
         self.verticalLayout_classes.addLayout(self.gridLayout_classes)
 
         self.tree_class = ClassView(self.layoutWidget)
@@ -138,6 +138,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_pSet_button.addWidget(self.button_Pset_add)
 
+
         self.vertical_layout_pset.addLayout(self.horizontalLayout_pSet_button)
 
         self.table_pset = PsetTableView(self.verticalLayoutWidget)
@@ -152,6 +153,10 @@ class Ui_MainWindow(object):
         self.table_pset.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_pset.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.table_pset.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table_pset.setSortingEnabled(True)
+        self.table_pset.horizontalHeader().setProperty(u"showSortIndicator", True)
+        self.table_pset.horizontalHeader().setStretchLastSection(True)
+        self.table_pset.verticalHeader().setVisible(False)
 
         self.vertical_layout_pset.addWidget(self.table_pset)
 
@@ -177,6 +182,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_properties.addWidget(self.button_property_add)
 
+
         self.vertical_layout_properties.addLayout(self.horizontalLayout_properties)
 
         self.table_property = PropertyTable(self.verticalLayoutWidget_2)
@@ -187,6 +193,8 @@ class Ui_MainWindow(object):
         self.table_property.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
         self.table_property.setSortingEnabled(True)
         self.table_property.horizontalHeader().setStretchLastSection(True)
+        self.table_property.verticalHeader().setVisible(False)
+        self.table_property.verticalHeader().setCascadingSectionResizes(True)
 
         self.vertical_layout_properties.addWidget(self.table_property)
 
@@ -229,7 +237,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"SOMToolkit", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"bSDD-Toolkit", None))
         self.actiondqwd.setText(QCoreApplication.translate("MainWindow", u"dqwd", None))
         self.label_class.setText(QCoreApplication.translate("MainWindow", u"Class:", None))
         self.button_classes_add.setText(QCoreApplication.translate("MainWindow", u"New", None))
@@ -246,3 +254,4 @@ class Ui_MainWindow(object):
         self.menuDesite.setTitle(QCoreApplication.translate("MainWindow", u"Desite", None))
         self.menuModels.setTitle(QCoreApplication.translate("MainWindow", u"Models", None))
     # retranslateUi
+

@@ -32,6 +32,8 @@ class TableModel(QAbstractItemModel):
         return getter_func(index.internalPointer())
     
     def headerData(self, section, orientation, /, role = ...):
+        if role != Qt.ItemDataRole.DisplayRole:
+            return None
         if orientation == Qt.Orientation.Vertical:
             return None
         return self.tool.get_column_names()[section]
