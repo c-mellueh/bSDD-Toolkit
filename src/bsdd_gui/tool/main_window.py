@@ -44,6 +44,10 @@ class MainWindow:
         return cls.get_properties().ui
 
     @classmethod
+    def get_app(cls) -> QApplication:
+        return cls.get_properties().application
+
+    @classmethod
     def hide_console(cls):
         """
         hide Console Window (Works only for Windows so far)

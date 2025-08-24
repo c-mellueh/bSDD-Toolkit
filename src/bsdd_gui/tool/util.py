@@ -203,7 +203,7 @@ class Util:
         if not proj:
             status_text = ""
         else:
-            status_text = f"{proj.name} v{proj.version}"
+            status_text = f"{proj.DictionaryName} v{proj.DictionaryVersion}"
 
         return f"{window_name} | {status_text}"
 
