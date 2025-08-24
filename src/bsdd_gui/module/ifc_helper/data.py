@@ -22,5 +22,8 @@ class IfcHelperData:
     @classmethod
     def get_classes(cls):
         if not "ifc_classes" in cls.data:
-            cls.data["ifc_classes"] = bsdd.Client().get_classes(IFC_URI)
+            c = bsdd.Client()
+            c1 = c.get_classes(IFC_URI, use_nested_classes=False, limit=1000)["classes"]
+            c2 = c.get_classes(IFC_URI, use_nested_classes=False, offset=1000)["classes"]
+            cls.data["ifc_classes"] = c1 + c2
         return cls.data["ifc_classes"]

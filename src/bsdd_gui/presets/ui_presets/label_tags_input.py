@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Iterable, Optional, List
+from typing import Iterable, Optional
 
-from PySide6.QtCore import QPoint, QRect, QSize, Qt, Signal
+from PySide6.QtCore import QPoint, QRect, QSize, Qt, Signal, QRect, QSize, QPoint, Qt
 from PySide6.QtGui import QFontMetrics, QKeyEvent
 from PySide6.QtWidgets import (
     QApplication,
@@ -17,10 +17,12 @@ from PySide6.QtWidgets import (
     QLayout,
     QLayoutItem,
     QCompleter,
-    QVBoxLayout,
+    QLayout,
+    QLayoutItem,
+    QWidgetItem,
+    QSizePolicy,
+    QStylePainter,
 )
-from PySide6.QtWidgets import QLayout, QLayoutItem, QWidgetItem, QSizePolicy
-from PySide6.QtCore import QRect, QSize, QPoint, Qt
 
 
 # ---------------------------
@@ -309,37 +311,4 @@ class TagInput(QWidget):
         p.drawPrimitive(QStyle.PE_Widget, opt)
 
 
-def load_ifc():
-    import bsdd
-
-    uri = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/"
-    c = bsdd.Client()
-    c1 = c.get_classes(uri, use_nested_classes=False, limit=1000)["classes"]
-    c2 = c.get_classes(uri, use_nested_classes=False, offset=1000)["classes"]
-    ifc_classes = c1 + c2
-    return [c["referenceCode"] for c in ifc_classes]
-
-
 # QStylePainter import (placed after class to avoid circular import warnings in some linters)
-from PySide6.QtWidgets import QStylePainter
-
-# ---------------------------
-# Demo
-# ---------------------------
-if __name__ == "__main__":
-    import sys
-
-    app = QApplication(sys.argv)
-
-    allowed_tags = load_ifc()
-
-    w = QWidget()
-    layout = QVBoxLayout(w)
-
-    tag_input = TagInput(placeholder="Select allowed tag…", allowed=allowed_tags)
-    tag_input.tagsChanged.connect(lambda tags: print("tags:", tags))
-    layout.addWidget(tag_input)
-
-    w.resize(500, 200)
-    w.show()
-    sys.exit(app.exec())

@@ -56,12 +56,14 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from bsdd_gui.module.class_editor.ui import IfcTagInput
+
 
 class Ui_ClassEditor(object):
     def setupUi(self, ClassEditor):
         if not ClassEditor.objectName():
             ClassEditor.setObjectName("ClassEditor")
-        ClassEditor.resize(913, 395)
+        ClassEditor.resize(913, 442)
         self.verticalLayout = QVBoxLayout(ClassEditor)
         self.verticalLayout.setObjectName("verticalLayout")
         self.gb_required = QGroupBox(ClassEditor)
@@ -145,6 +147,17 @@ class Ui_ClassEditor(object):
 
         self.verticalLayout.addWidget(self.gb_relationship)
 
+        self.groupBox = QGroupBox(ClassEditor)
+        self.groupBox.setObjectName("groupBox")
+        self.verticalLayout_4 = QVBoxLayout(self.groupBox)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.widget = IfcTagInput(self.groupBox)
+        self.widget.setObjectName("widget")
+
+        self.verticalLayout_4.addWidget(self.widget)
+
+        self.verticalLayout.addWidget(self.groupBox)
+
         self.retranslateUi(ClassEditor)
 
         QMetaObject.connectSlotsByName(ClassEditor)
@@ -162,5 +175,6 @@ class Ui_ClassEditor(object):
             QCoreApplication.translate("ClassEditor", "Relationships", None)
         )
         self.pushButton.setText(QCoreApplication.translate("ClassEditor", "Add", None))
+        self.groupBox.setTitle(QCoreApplication.translate("ClassEditor", "IfcEntities", None))
 
     # retranslateUi
