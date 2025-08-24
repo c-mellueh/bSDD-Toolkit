@@ -178,7 +178,11 @@ class TagInput(QWidget):
     tagsChanged = Signal(list)
 
     def __init__(
-        self, parent=None, placeholder: str = "Add tag…", allowed: list[str] | None = None
+        self,
+        parent=None,
+        placeholder: str = "Add tag…",
+        allowed: list[str] | None = None,
+        minimum_le_width: int = 250,
     ):
         super().__init__(parent)
         self._tags: list[str] = []
@@ -189,7 +193,7 @@ class TagInput(QWidget):
         self._edit = QLineEdit()
         self._edit.setPlaceholderText(placeholder)
         self._edit.setFrame(False)
-        self._edit.setMinimumWidth(250)
+        self._edit.setMinimumWidth(minimum_le_width)
         self._edit.returnPressed.connect(self._commit_from_edit)
         self._edit.textEdited.connect(self._maybe_split_text)
 
