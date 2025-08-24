@@ -8,3 +8,4 @@ from .ifc_helper import IfcHelper
 from .logging import Logging
 from .appdata import Appdata
 from .util import Util
+from .language import Language

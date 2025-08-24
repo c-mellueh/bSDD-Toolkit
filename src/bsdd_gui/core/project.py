@@ -2,6 +2,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QCoreApplication
 from typing import Type, TYPE_CHECKING
+import bsdd_gui
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -20,6 +21,8 @@ def create_project(project: Type[tool.Project]):
 
 def open_project(path, project: Type[tool.Project]):
     proj = project.load_project(path)
+    bsdd_gui.on_new_project()
+    return proj
 
 
 def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool.MainWindow]):

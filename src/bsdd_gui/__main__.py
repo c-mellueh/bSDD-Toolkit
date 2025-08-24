@@ -12,6 +12,7 @@ import importlib
 from bsdd_gui.module.project.constants import OPEN_PATH
 import bsdd_gui.core.project
 import bsdd_gui.core.main_window
+from bsdd_gui.module.language.trigger import set_language
 
 
 def main(initial_file: PathLike | None = None, log_level=None, open_last_project=False):
@@ -44,9 +45,12 @@ def main(initial_file: PathLike | None = None, log_level=None, open_last_project
 
     elif open_last_project:
         pass
-        # bsdd_gui.core.project.open_project(
-        #     tool.Appdata.get_path(OPEN_PATH), tool.Project,)
+        bsdd_gui.core.project.open_project(
+            tool.Appdata.get_path(OPEN_PATH),
+            tool.Project,
+        )
 
+    set_language(None)
     sys.exit(app.exec())
 
 
