@@ -11,3 +11,4 @@ from .util import Util
 from .language import Language
 from .plugins import Plugins
 from .settings import Settings
+from .popups import Popups

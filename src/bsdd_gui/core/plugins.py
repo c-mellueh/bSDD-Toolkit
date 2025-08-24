@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.plugins import ui
 
 
-def settings_accepted(plugins: Type[tool.Plugins], popups: Type[tool.Popups]):
+def settings_accepted(plugins: Type[tool.Plugins]):
     layout: QFormLayout = plugins.get_settings_widget().layout()
     for index, plugin_name in enumerate(plugins.get_available_plugins()):
         cb: QCheckBox = layout.itemAt(index, QFormLayout.ItemRole.FieldRole).widget()
