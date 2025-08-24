@@ -2,12 +2,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 from PySide6.QtCore import Signal
+from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetSignaller, WidgetHandler
-from bsdd_parser import BsddClass
+from bsdd_parser import BsddClass, BsddDictionary
 from bsdd_gui.module.class_editor import trigger, ui
 from bsdd_gui.presets.ui_presets import label_tags_input
+from bsdd_parser.utils import bsdd_class as class_util
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_editor.prop import ClassEditorProperties
@@ -61,6 +63,7 @@ class ClassEditor(WidgetHandler):
 
     @classmethod
     def sync_from_model(cls, class_editor: ui.ClassEditor):
+
         bsdd_class = class_editor.bsdd_class
         for field, getter_func in cls.get_properties().field_getter[class_editor].items():
             value = getter_func(bsdd_class)
@@ -74,3 +77,22 @@ class ClassEditor(WidgetHandler):
                 field.setPlainText(value)
             if isinstance(field, label_tags_input.TagInput):
                 field.setTags(value)
+
+    @classmethod
+    def set_text_color(cls, widget: QLineEdit, color: str):
+        widget.setStyleSheet(f"QLineEdit {{color:{color};}}")
+
+    @classmethod
+    def handle_code_color(cls, code, widget: ui.ClassEditor, bsdd_dict):
+        if cls.is_code_allowed(code, widget, bsdd_dict):
+            cls.set_text_color(widget.le_code, QPalette().color(QPalette.Text).name())
+        else:
+            cls.set_text_color(widget.le_code, "red")
+
+    @classmethod
+    def is_code_allowed(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
+        bsdd_class = widget.bsdd_class
+        for c in bsdd_dict.Classes:
+            if c.Code == code and c != bsdd_class:
+                return False
+        return True

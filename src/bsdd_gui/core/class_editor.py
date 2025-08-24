@@ -9,21 +9,38 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_editor import ui
 
 
-def register_widget(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditor]):
+def register_widget(
+    widget: ui.ClassEditor, class_editor: Type[tool.ClassEditor], project: Type[tool.Project]
+):
     class_editor.register_widget(widget)
-
     class_editor.register_basic_field(widget, widget.le_name, "Name")
     class_editor.register_basic_field(widget, widget.le_code, "Code")
     class_editor.register_basic_field(widget, widget.te_definition, "Definition")
 
-    combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
+    widget.le_code.textChanged.connect(
+        lambda t, w=widget, d=project.get(): class_editor.handle_code_color(t, w, d)
+    )
+
+    ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
+    widget.cb_class_type.addItems(ct_combobox_items)
+
+    # Combo Boxes
     class_editor.register_field_getter(widget, widget.cb_class_type, lambda c: c.ClassType)
     class_editor.register_field_setter(
         widget.cb_class_type,
-        lambda v, w=widget: setattr(w.bsdd_class, "ClassType", combobox_items[v]),
+        lambda v, w=widget: setattr(w.bsdd_class, "ClassType", ct_combobox_items[v]),
     )
-    widget.cb_class_type.addItems(combobox_items)
 
+    st_combobox_items = ["Preview", "Active", "Inactive"]
+    widget.cb_status.addItems(st_combobox_items)
+
+    class_editor.register_field_getter(widget, widget.cb_status, lambda c: c.Status)
+    class_editor.register_field_setter(
+        widget.cb_status,
+        lambda v, w=widget: setattr(w.bsdd_class, "Status", st_combobox_items[v]),
+    )
+
+    # Tags
     class_editor.register_field_getter(
         widget, widget.ti_related_ifc_entity, lambda c: c.RelatedIfcEntityNamesList
     )

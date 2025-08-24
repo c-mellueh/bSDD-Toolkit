@@ -34,13 +34,6 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lb_class_type">
-        <property name="text">
-         <string>Class Type</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <layout class="QHBoxLayout" name="hl_name">
         <item>
@@ -55,8 +48,33 @@
         </item>
        </layout>
       </item>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="hl_class_type">
+        <item>
+         <widget class="QLabel" name="lb_class_type">
+          <property name="text">
+           <string>Class Type</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cb_class_type"/>
+        </item>
+       </layout>
+      </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="cb_class_type"/>
+       <layout class="QHBoxLayout" name="hl_status">
+        <item>
+         <widget class="QLabel" name="lb_status">
+          <property name="text">
+           <string>Status</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cb_status"/>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -69,6 +87,18 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QTextEdit" name="te_definition"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Related IFC Entities</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="IfcTagInput" name="ti_related_ifc_entity" native="true"/>
       </item>
      </layout>
     </widget>
@@ -105,18 +135,6 @@
          </spacer>
         </item>
        </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>IfcEntities</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
-       <widget class="IfcTagInput" name="ti_related_ifc_entity" native="true"/>
       </item>
      </layout>
     </widget>

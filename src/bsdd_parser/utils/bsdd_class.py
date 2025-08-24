@@ -26,4 +26,8 @@ def get_row_index(bsdd_class: BsddClass):
 
 
 def get_class_by_code(bsdd_dictionary: BsddDictionary, code: str):
-    return {c.Code: c for c in bsdd_dictionary.Classes}.get(code)
+    return get_all_class_codes(bsdd_dictionary).get(code)
+
+
+def get_all_class_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddClass]:
+    return {c.Code: c for c in bsdd_dictionary.Classes}

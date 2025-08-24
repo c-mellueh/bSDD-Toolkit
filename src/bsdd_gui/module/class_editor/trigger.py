@@ -27,4 +27,4 @@ def open_class_editor(bsdd_class: BsddClass):
 
 
 def class_editor_created(class_editor: ui.ClassEditor):
-    core.register_widget(class_editor, tool.ClassEditor)
+    core.register_widget(class_editor, tool.ClassEditor, tool.Project)
