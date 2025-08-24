@@ -24,6 +24,14 @@ def register_widget(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditor]
     )
     widget.cb_class_type.addItems(combobox_items)
 
+    class_editor.register_field_getter(
+        widget, widget.ti_related_ifc_entity, lambda c: c.RelatedIfcEntityNamesList
+    )
+    class_editor.register_field_setter(
+        widget.ti_related_ifc_entity,
+        lambda v, w=widget: setattr(w.bsdd_class, "RelatedIfcEntityNamesList", v),
+    )
+
 
 def connect_signals(class_editor: Type[tool.ClassEditor]):
     class_editor.connect_signaller()

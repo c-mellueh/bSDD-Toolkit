@@ -116,7 +116,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="IfcTagInput" name="widget" native="true"/>
+       <widget class="IfcTagInput" name="ti_related_ifc_entity" native="true"/>
       </item>
      </layout>
     </widget>

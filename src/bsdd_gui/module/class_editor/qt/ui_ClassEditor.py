@@ -151,10 +151,10 @@ class Ui_ClassEditor(object):
         self.groupBox.setObjectName("groupBox")
         self.verticalLayout_4 = QVBoxLayout(self.groupBox)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.widget = IfcTagInput(self.groupBox)
-        self.widget.setObjectName("widget")
+        self.ti_related_ifc_entity = IfcTagInput(self.groupBox)
+        self.ti_related_ifc_entity.setObjectName("ti_related_ifc_entity")
 
-        self.verticalLayout_4.addWidget(self.widget)
+        self.verticalLayout_4.addWidget(self.ti_related_ifc_entity)
 
         self.verticalLayout.addWidget(self.groupBox)
 

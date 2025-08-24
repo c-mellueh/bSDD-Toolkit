@@ -7,6 +7,7 @@ import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetSignaller, WidgetHandler
 from bsdd_parser import BsddClass
 from bsdd_gui.module.class_editor import trigger, ui
+from bsdd_gui.presets.ui_presets import label_tags_input
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_editor.prop import ClassEditorProperties
@@ -55,6 +56,8 @@ class ClassEditor(WidgetHandler):
             field.currentIndexChanged.connect(setter_func)
         if isinstance(field, QTextEdit):
             field.textChanged.connect(lambda f=field, sf=setter_func: sf(f.toPlainText()))
+        if isinstance(field, label_tags_input.TagInput):
+            field.tagsChanged.connect(setter_func)
 
     @classmethod
     def sync_from_model(cls, class_editor: ui.ClassEditor):
@@ -69,3 +72,5 @@ class ClassEditor(WidgetHandler):
                 field.setCurrentText(value)
             if isinstance(field, QTextEdit):
                 field.setPlainText(value)
+            if isinstance(field, label_tags_input.TagInput):
+                field.setTags(value)
