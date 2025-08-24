@@ -9,3 +9,5 @@ from .logging import Logging
 from .appdata import Appdata
 from .util import Util
 from .language import Language
+from .plugins import Plugins
+from .settings import Settings
