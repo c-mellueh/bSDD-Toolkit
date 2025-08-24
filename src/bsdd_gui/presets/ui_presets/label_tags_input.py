@@ -1,7 +1,19 @@
 from __future__ import annotations
 from typing import Iterable, Optional
 
-from PySide6.QtCore import QPoint, QRect, QSize, Qt, Signal, QRect, QSize, QPoint, Qt
+from PySide6.QtCore import (
+    QPoint,
+    QRect,
+    QSize,
+    Qt,
+    Signal,
+    QRect,
+    QSize,
+    QPoint,
+    Qt,
+    QEvent,
+    QTimer,
+)
 from PySide6.QtGui import QFontMetrics, QKeyEvent
 from PySide6.QtWidgets import (
     QApplication,
@@ -201,10 +213,13 @@ class TagInput(QWidget):
         self._edit.textEdited.connect(self._maybe_split_text)
 
         if allowed:
-            self._completer = QCompleter(sorted(allowed))
+            self._completer = QCompleter(sorted(allowed), self)
             self._completer.setCaseSensitivity(Qt.CaseInsensitive)
             self._edit.setCompleter(self._completer)
 
+        self._completer.activated[str].connect(
+            lambda text: QTimer.singleShot(0, lambda: self._complete_and_commit(text))
+        )
         # make line edit part of flow
         self._proxy = QWidget()
         pl = QHBoxLayout(self._proxy)
@@ -212,6 +227,22 @@ class TagInput(QWidget):
         pl.addWidget(self._edit)
         self._proxy.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self._flow.addWidget(self._proxy)
+
+    def _complete_and_commit(self, text: str) -> None:
+        self._edit.setText(text)
+        self._commit_from_edit()
+
+    def eventFilter(self, obj, ev):
+        if obj is self._edit and ev.type() == QEvent.KeyPress:
+            if ev.key() in (Qt.Key_Return, Qt.Key_Enter):
+                # If the completer popup is visible, let it finalize selection,
+                # then commit and clear *after* the popup writes into the line edit.
+                if getattr(self, "_completer", None):
+                    popup = self._completer.popup()
+                    if popup and popup.isVisible():
+                        QTimer.singleShot(0, self._commit_from_edit)
+                        return True  # consume
+        return super().eventFilter(obj, ev)
 
     # Public API
     def tags(self) -> list[str]:
@@ -267,7 +298,6 @@ class TagInput(QWidget):
             self.tagsChanged.emit(self.tags())
 
     def _commit_from_edit(self) -> None:
-        logging.debug("commit from edit")
         txt = self._edit.text()
         self._edit.clear()
         self._add_tag(txt)
@@ -284,8 +314,15 @@ class TagInput(QWidget):
             self._edit.setText(last)
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
-        # Backspace at start of line -> delete last chip
-        if e.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):
+        if getattr(self, "_completer", None) and self._completer.popup().isVisible():
+            if e.key() in (Qt.Key_Return, Qt.Key_Enter):
+                # commit the currently highlighted completion
+                txt = self._completer.currentCompletion() or self._edit.text()
+                self._complete_and_commit(txt)
+                e.accept()
+                return
+        # Backspace/Delete: remove last chip if caret at start
+        if e.key() in (Qt.Key_Backspace, Qt.Key_Delete):
             if (
                 self._edit.hasFocus()
                 and self._edit.cursorPosition() == 0
@@ -294,7 +331,7 @@ class TagInput(QWidget):
                 if self._tags:
                     self._remove_tag(self._tags[-1])
                     return
-        # Comma/space to commit current input quickly
+        # Comma/space quick-commit
         if e.text() in [",", " "] and self._edit.hasFocus():
             self._commit_from_edit()
             return
