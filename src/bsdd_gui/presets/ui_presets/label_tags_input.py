@@ -189,6 +189,7 @@ class TagInput(QWidget):
         self._edit = QLineEdit()
         self._edit.setPlaceholderText(placeholder)
         self._edit.setFrame(False)
+        self._edit.setMinimumWidth(250)
         self._edit.returnPressed.connect(self._commit_from_edit)
         self._edit.textEdited.connect(self._maybe_split_text)
 
@@ -326,7 +327,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    allowed_tags = load_ifc
+    allowed_tags = load_ifc()
 
     w = QWidget()
     layout = QVBoxLayout(w)
