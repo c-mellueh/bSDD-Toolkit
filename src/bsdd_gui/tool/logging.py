@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui import tool
 from bsdd_gui.module.logging.constants import LOG_PATH, LOG_SECTION, LOG_LEVEL
+import os
 
 
 class CustomFormatter(logging.Formatter):
@@ -28,7 +29,8 @@ class CustomFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord):
         # Combine module and function name
-        path_name = record.pathname.split("\\")[-2]
+        path = os.path.normpath(record.pathname).split(os.sep)
+        path_name = path[-2]
         module_func = f"{path_name}.{record.module}.{record.funcName}"
         # Ensure the combined string is 50 characters long
         if len(module_func) > 50:

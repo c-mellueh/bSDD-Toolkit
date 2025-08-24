@@ -12,7 +12,9 @@
             "module": "bsdd_gui",
             "cwd": "${workspaceFolder}/src",
             "args": [
-                "/home/christoph/Schreibtisch/test_bsdd.json"
+                "/home/christoph/Schreibtisch/test_bsdd.json",
+                "-l 10"
+
             ],
         }
     ]

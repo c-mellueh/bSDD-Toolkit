@@ -42,7 +42,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import QApplication, QComboBox, QFormLayout, QLabel, QSizePolicy, QWidget
 
-from som_gui.module.util.ui import FileSelector
+from bsdd_gui.module.util.ui import FileSelector
 
 
 class Ui_Logging(object):
