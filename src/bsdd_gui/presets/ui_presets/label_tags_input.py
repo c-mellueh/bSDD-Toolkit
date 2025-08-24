@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QStylePainter,
 )
+import logging
 
 
 # ---------------------------
@@ -266,6 +267,7 @@ class TagInput(QWidget):
             self.tagsChanged.emit(self.tags())
 
     def _commit_from_edit(self) -> None:
+        logging.debug("commit from edit")
         txt = self._edit.text()
         self._edit.clear()
         self._add_tag(txt)
