@@ -6,12 +6,37 @@ from typing import TYPE_CHECKING
 
 
 def connect():
-    pass
+    core.create_main_menu_actions(tool.Project, tool.MainWindow)
 
 
 def retranslate_ui():
-    pass
+    core.retranslate_ui(tool.Project, tool.MainWindow)
 
 
 def on_new_project():
+    pass
+
+
+def new_clicked():
+    # TODO
+    pass
+
+
+def open_clicked():
+    # TODO
+    pass
+
+
+def add_clicked():
+    # TODO
+    pass
+
+
+def save_clicked():
+    # TODO
+    pass
+
+
+def save_as_clicked():
+    # TODO
     pass

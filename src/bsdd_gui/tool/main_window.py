@@ -2,11 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import ctypes
 
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMenu, QMenuBar
 import bsdd_gui
 from bsdd_gui.module.main_window import ui
 from bsdd_parser.models import BsddClass, BsddClassProperty
 from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
+from PySide6.QtGui import QAction
 
 if TYPE_CHECKING:
     from bsdd_gui.module.main_window.prop import MainWindowProperties
@@ -104,3 +105,41 @@ class MainWindow:
     @classmethod
     def set_property_text(cls, text: str):
         cls.get().label_property_name.setText(text)
+
+    @classmethod
+    def add_action(cls, parent_name: str, name: str, function: callable) -> QAction:
+        if parent_name:
+            menu: QMenuBar | QMenu = getattr(cls.get(), parent_name)
+        else:
+            menu = cls.get_menu_bar()
+        action = menu.addAction(name)
+        action.triggered.connect(function)
+        return action
+
+    @classmethod
+    def remove_action(cls, parent_name: str, action: QAction):
+        if parent_name:
+            menu: QMenuBar | QMenu = getattr(cls.get(), parent_name)
+        else:
+            menu = cls.get_menu_bar()
+        menu.removeAction(action)
+
+    @classmethod
+    def get_menu_bar(cls) -> QMenuBar:
+        return cls.get().menubar
+
+    @classmethod
+    def add_submenu(cls, parent_name: str, name) -> QMenu:
+        if parent_name:
+            menu: QMenuBar | QMenu = getattr(cls.get(), parent_name)
+        else:
+            menu = cls.get_menu_bar()
+        return menu.addMenu(name)
+
+    @classmethod
+    def remove_submenu(cls, parent_name: str, sub_menu: QMenu):
+        if parent_name:
+            menu: QMenuBar | QMenu = getattr(cls.get(), parent_name)
+        else:
+            menu = cls.get_menu_bar()
+        menu.removeAction(sub_menu.menuAction())

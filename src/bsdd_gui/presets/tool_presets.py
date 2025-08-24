@@ -1,11 +1,16 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable, TYPE_CHECKING, Any
-from PySide6.QtWidgets import QWidget, QAbstractItemView
+from PySide6.QtWidgets import QWidget, QAbstractItemView, QMenu, QMenuBar
 from PySide6.QtCore import QObject, Signal, QAbstractItemModel
+from PySide6.QtGui import QAction
 
 if TYPE_CHECKING:
-    from .prop_presets import ColumnHandlerProperties, ViewHandlerProperties
+    from .prop_presets import (
+        ColumnHandlerProperties,
+        ViewHandlerProperties,
+        WidgetHandlerProperties,
+    )
 
 
 class ColumnHandler(ABC):
@@ -46,11 +51,36 @@ class WidgetSignaller(QObject):
     pass
 
 
+class ModuleHandler(ABC):
+    @classmethod
+    @abstractmethod
+    def get_properties(cls) -> WidgetHandlerProperties:
+        return None
+
+    @classmethod
+    def set_action(cls, widget, name: str, action: QAction):
+        """
+        save all actions so that the translation functions work
+        """
+        if not widget in cls.get_properties().actions:
+            cls.get_properties().actions[widget] = dict()
+        cls.get_properties().actions[widget][name] = action
+
+    @classmethod
+    def get_action(cls, widget, name):
+        return cls.get_properties().actions[widget][name]
+
+
 class WidgetHandler(ABC):
 
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> ViewHandlerProperties:
+    def get_properties(cls) -> WidgetHandlerProperties:
+        return None
+
+    @classmethod
+    @abstractmethod
+    def get(cls) -> QWidget:
         return None
 
     @classmethod
@@ -67,6 +97,12 @@ class WidgetHandler(ABC):
 
 
 class ViewSignaller(QObject):
+
+    @classmethod
+    @abstractmethod
+    def get_properties(cls) -> ViewHandlerProperties:
+        return None
+
     model_refresh_requested = Signal()
     selection_changed = Signal(QWidget, Any)
 

@@ -3,13 +3,14 @@ from typing import TYPE_CHECKING
 import logging
 import os
 import bsdd_gui
+from bsdd_gui.presets.tool_presets import ModuleHandler
 import bsdd_parser.models
 
 if TYPE_CHECKING:
     from bsdd_gui.module.project.prop import ProjectProperties
 
 
-class Project:
+class Project(ModuleHandler):
     @classmethod
     def get_properties(cls) -> ProjectProperties:
         return bsdd_gui.ProjectProperties
