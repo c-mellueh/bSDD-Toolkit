@@ -131,7 +131,7 @@ def create_new_class(
         if mode == 1:
             dd = active_class.model_dump()
         new_class = BsddClass(**dd)
-        new_class.ClassProperties = list()
+
     widget = class_editor.create_widget(new_class)
     class_editor.sync_from_model(widget)
     dialog = class_editor.create_new_class_dialog(main_window.get())

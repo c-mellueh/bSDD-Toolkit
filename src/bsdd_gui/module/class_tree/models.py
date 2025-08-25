@@ -78,6 +78,7 @@ class ClassTreeModel(TableModel):
         self.beginInsertRows(parent_index, insert_row, insert_row)
         # mutate your data
         self.bsdd_dictionary.Classes.append(bsdd_class)
+        bsdd_class._set_parent(self.bsdd_dictionary)
         self.endInsertRows()
 
     def _index_for_class(self, cls: BsddClass) -> QModelIndex:
