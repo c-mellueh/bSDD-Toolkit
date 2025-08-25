@@ -12,3 +12,4 @@ from .language import Language
 from .plugins import Plugins
 from .settings import Settings
 from .popups import Popups
+from .dictionary_editor import DictionaryEditor

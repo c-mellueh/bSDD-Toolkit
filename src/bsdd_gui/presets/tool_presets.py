@@ -79,11 +79,6 @@ class WidgetHandler(ABC):
         return None
 
     @classmethod
-    @abstractmethod
-    def get(cls) -> QWidget:
-        return None
-
-    @classmethod
     def register_widget(cls, view: QAbstractItemView):
         cls.get_properties().widgets.add(view)
 
