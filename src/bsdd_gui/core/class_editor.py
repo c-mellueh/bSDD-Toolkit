@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClass
 import logging
 from bsdd_parser.utils import bsdd_class as class_util
+from copy import copy as cp
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -99,14 +100,36 @@ def create_new_class(
     class_editor: Type[tool.ClassEditor],
     main_window: Type[tool.MainWindow],
     project: Type[tool.Project],
+    mode=0,
 ):
+    """_summary_
+    mode 0 = create new
+    mode 1 = copy selected
+    Args:
+        class_editor (Type[tool.ClassEditor]): _description_
+        main_window (Type[tool.MainWindow]): _description_
+        project (Type[tool.Project]): _description_
+        model (int, optional): _description_. Defaults to 0.
+    """
+
     def validate():
         if class_editor.all_inputs_are_valid(widget):
             dialog.accept()
         else:
             pass
 
-    new_class = BsddClass(Code="undef", Name="undef", ClassType="Class")
+    active_class = main_window.get_active_class()
+    if not active_class:
+        new_class = BsddClass(Code="undef", Name="undef", ClassType="Class")
+    else:
+        # new_class = active_class.model_copy(update={}, deep=True)
+        if mode == 0:
+            dd = active_class.model_dump(include=["Code", "Name", "ParentClassCode"])
+            dd["ClassType"] = "Class"
+        if mode == 1:
+            dd = active_class.model_dump()
+        new_class = BsddClass(**dd)
+        new_class.ClassProperties = list()
     widget = class_editor.create_widget(new_class)
     class_editor.sync_from_model(widget)
     dialog = class_editor.create_new_class_dialog(main_window.get())

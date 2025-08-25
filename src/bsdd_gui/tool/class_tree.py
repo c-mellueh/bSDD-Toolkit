@@ -35,9 +35,10 @@ class ClassTree(ColumnHandler, ViewHandler):
     @classmethod
     def create_model(cls, bsdd_dictionary: BsddDictionary):
         model = models.ClassTreeModel(bsdd_dictionary)
-        cls.get_properties().models.add(model)
+        cls.get_properties().model = model
         sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
+        sort_filter_model.setDynamicSortFilter(True)
         return sort_filter_model
 
     @classmethod
@@ -66,17 +67,4 @@ class ClassTree(ColumnHandler, ViewHandler):
 
     @classmethod
     def add_class_to_dictionary(cls, new_class: BsddClass, bsdd_dictionary: BsddDictionary):
-        model: models.ClassTreeModel
-        parent_class = class_utils.get_class_by_code(bsdd_dictionary, new_class.ParentClassCode)
-        # if parent_class is None:
-        # child_count = 0 if parent_class is None else len(class_utils.get_children(parent_class))
-        for model in cls.get_properties().models:
-            parent_index = QModelIndex()
-            if parent_class:
-                row = class_utils.get_row_index(parent_class)
-                parent_index = model.createIndex(row, 0, parent_class)
-            child_count = model.rowCount(parent_index)
-            model.beginInsertRows(parent_index, child_count, child_count)
-        bsdd_dictionary.Classes.append(new_class)
-        for model in cls.get_properties().models:
-            model.endInsertRows()
+        cls.get_properties().model.append_row(new_class)

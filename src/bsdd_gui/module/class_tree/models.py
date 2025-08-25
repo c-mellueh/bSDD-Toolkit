@@ -33,11 +33,11 @@ class ClassTreeModel(TableModel):
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if not parent.isValid():
-            if 0 > row >= len(self.bsdd_dictionary.Classes):
+            roots = cl_utils.get_root_classes(self.bsdd_dictionary)
+            if row < 0 or row >= len(roots):
                 return QModelIndex()
-            bsdd_class = cl_utils.get_root_classes(self.bsdd_dictionary)[row]
-            index = self.createIndex(row, column, bsdd_class)
-            return index
+            bsdd_class = roots[row]
+            return self.createIndex(row, column, bsdd_class)
         parent = parent.siblingAtColumn(0)
         parent_class: BsddClass = parent.internalPointer()
         children = cl_utils.get_children(parent_class)
@@ -60,6 +60,42 @@ class ClassTreeModel(TableModel):
         row = cl_utils.get_row_index(parent_class)
 
         return self.createIndex(row, 0, parent_class)
+
+    def append_row(self, bsdd_class: BsddClass):
+        # Determine the correct parent index in the CURRENT hierarchy
+        if bsdd_class.ParentClassCode:
+            parent_class = cl_utils.get_class_by_code(
+                self.bsdd_dictionary, bsdd_class.ParentClassCode
+            )
+            if parent_class is None:
+                parent_index = QModelIndex()
+            else:
+                parent_index = self._index_for_class(parent_class)
+        else:
+            parent_index = QModelIndex()
+
+        insert_row = self.rowCount(parent_index)  # current child count
+        self.beginInsertRows(parent_index, insert_row, insert_row)
+        # mutate your data
+        self.bsdd_dictionary.Classes.append(bsdd_class)
+        self.endInsertRows()
+
+    def _index_for_class(self, cls: BsddClass) -> QModelIndex:
+        """Return the QModelIndex for an existing class object."""
+        # find its parent chain to build the index properly
+        parent_code = cls.ParentClassCode
+        if parent_code:
+            parent_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, parent_code)
+            gp_idx = self._index_for_class(parent_cls)  # recurse to get parent's parent index
+            # children of the parent
+            children = cl_utils.get_children(parent_cls)
+            row = children.index(cls)
+            return self.index(row, 0, gp_idx)
+        else:
+            # root class
+            roots = cl_utils.get_root_classes(self.bsdd_dictionary)
+            row = roots.index(cls)
+            return self.index(row, 0, QModelIndex())
 
 
 # typing

@@ -68,7 +68,7 @@ class BsddClass(BaseModel):
     ClassType: str
     Definition: Optional[str] = None
     Description: Optional[str] = None
-    ParentClassCode: Optional[str] = None
+    ParentClassCode: Optional[str | None] = None
     RelatedIfcEntityNamesList: Optional[List[str]] = None
     Synonyms: Optional[List[str]] = None
     ActivationDateUtc: Optional[datetime] = None
@@ -118,13 +118,13 @@ class BsddClass(BaseModel):
         for child in class_utils.get_children(self):
             child.ParentClassCode = code
 
-    # validate the field value itself (runs on parse and assignment validation)
-    @field_validator("Code", mode="before")
-    @classmethod
-    def _normalize_code(cls, v: str):
-        if v is None:
-            return v
-        return v.strip()
+    # # validate the field value itself (runs on parse and assignment validation)
+    # @field_validator("Code", mode="before")
+    # @classmethod
+    # def _normalize_code(cls, v: str):
+    #     if v is None:
+    #         return v
+    #     return v.strip()
 
     @model_validator(mode="after")
     def _after_init(self):
