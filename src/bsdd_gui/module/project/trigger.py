@@ -14,11 +14,11 @@ def retranslate_ui():
 
 
 def on_new_project():
-    core.new_file_clicked(tool.Project, tool.Popups)
+    pass
 
 
 def new_clicked():
-    # TODO
+    core.new_file_clicked(tool.Project, tool.DictionaryEditor)
     pass
 
 

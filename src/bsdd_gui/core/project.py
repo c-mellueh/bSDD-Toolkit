@@ -73,5 +73,7 @@ def retranslate_ui(project: Type[tool.Project], main_window: Type[tool.MainWindo
     #     widget.ui.retranslateUi(widget)
 
 
-def new_file_clicked(project: Type[tool.Project], popups: Type[tool.Popups]):
+def new_file_clicked(project: Type[tool.Project], dictionary_editor: Type[tool.DictionaryEditor]):
+    widget = dictionary_editor.create_widget()
+    widget.show()
     pass

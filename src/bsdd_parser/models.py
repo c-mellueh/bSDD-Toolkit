@@ -20,7 +20,7 @@ class BsddDictionary(BaseModel):
     DictionaryUri: str = ""
     License: str = "MIT"
     LicenseUrl: Optional[str] = None
-    ChangeRequestEmailAddress: str = ""
+    ChangeRequestEmailAddress: Optional[str] = None
     ModelVersion: str = "2.0"
     MoreInfoUrl: Optional[str] = None
     QualityAssuranceProcedure: Optional[str] = None
