@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 def connect():
     core.connect_signals(tool.ClassTree, tool.ClassEditor, tool.Project)
-    core.connect_to_main_window(tool.ClassTree, tool.MainWindow)
+    core.connect_to_main_window(tool.ClassTree, tool.MainWindow, tool.Util)
 
 
 def on_new_project():
@@ -28,8 +28,12 @@ def close_event(event):
 
 
 def class_view_created(class_view: ui.ClassView):
-    core.connect_view(class_view, tool.ClassTree, tool.Project)
+    core.connect_view(class_view, tool.ClassTree, tool.Project, tool.Util)
 
 
 def reset_class_views():
     core.reset_views(tool.ClassTree, tool.Project)
+
+
+def copy_selected_class(view: ui.ClassView):
+    core.copy_selected_class(view, tool.ClassTree, tool.ClassEditor)

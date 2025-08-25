@@ -20,7 +20,12 @@ def connect_signals(
     class_editor.signaller.new_class_created.connect(insert_class)
 
 
-def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
+def connect_view(
+    view: ui.ClassView,
+    class_tree: Type[tool.ClassTree],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+):
     class_tree.register_widget(view)
     bsdd_dictionary = project.get()
 
@@ -38,13 +43,32 @@ def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
         class_tree.reset_view(view)
 
 
-def connect_to_main_window(class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow]):
-    model = main_window.get_class_view().model().sourceModel()
+def connect_to_main_window(
+    class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow], util: Type[tool.Util]
+):
+    view = main_window.get_class_view()
+    model = view.model().sourceModel()
     class_tree.add_column_to_table(model, "Name", lambda a: a.Name)
     class_tree.add_column_to_table(model, "Code", lambda a: a.Code)
     class_tree.add_column_to_table(model, "Status", lambda a: a.Status)
     class_tree.signaller.selection_changed.connect(
-        lambda v, n: (
-            main_window.set_active_class(n) if v == main_window.get_class_view() else None
-        )
+        lambda v, n: (main_window.set_active_class(n) if v == view else None)
     )
+    util.add_shortcut(
+        "Ctrl+X", view, lambda: class_tree.signaller.delete_selection_requested.emit(view)
+    )
+    util.add_shortcut(
+        "Ctrl+G", view, lambda: class_tree.signaller.group_selection_requested.emit(view)
+    )
+    util.add_shortcut("Ctrl+F", view, lambda: class_tree.signaller.search_requested.emit(view))
+    util.add_shortcut(
+        "Ctrl+C", view, lambda: main_window.signaller.copy_active_class_requested.emit()
+    )
+
+
+def copy_selected_class(
+    view: ui.ClassView, class_tree: Type[tool.ClassTree], class_editor: Type[tool.ClassEditor]
+):
+    selected_class = class_tree.get_selected_class(view)
+    dd = selected_class.model_dump()
+    new_class = BsddClass(**dd)

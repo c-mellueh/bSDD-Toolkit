@@ -29,6 +29,7 @@ def connect_main_window(main_window: Type[tool.MainWindow], pset_list: Type[tool
         lambda p: main_window.set_property_text(p.Code)
     )
     signaller = main_window.signaller
-    main_window.get().button_classes_add.clicked.connect(signaller.new_class_requested.emit)
-    main_window.get().button_Pset_add.clicked.connect(signaller.new_property_set_requested.emit)
-    main_window.get().button_property_add.clicked.connect(signaller.new_property_requested.emit)
+    ui = main_window.get()
+    ui.button_classes_add.clicked.connect(signaller.new_class_requested.emit)
+    ui.button_Pset_add.clicked.connect(signaller.new_property_set_requested.emit)
+    ui.button_property_add.clicked.connect(signaller.new_property_requested.emit)

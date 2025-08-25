@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QApplication,
 )
 
+import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.module.util import ui
 from bsdd_gui.module.util.constants import OPTION_SEPERATOR

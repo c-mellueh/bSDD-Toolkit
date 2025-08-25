@@ -18,7 +18,10 @@ if TYPE_CHECKING:
 
 
 class Signaller(ViewSignaller):
-    pass
+    delete_selection_requested = Signal(ui.ClassView)
+    group_selection_requested = Signal(ui.ClassView)
+    search_requested = Signal(ui.ClassView)
+    copy_requested = Signal(ui.ClassView)
 
 
 class ClassTree(ColumnHandler, ViewHandler):
@@ -31,6 +34,7 @@ class ClassTree(ColumnHandler, ViewHandler):
     @classmethod
     def connect_signals(cls):
         cls.signaller.model_refresh_requested.connect(trigger.reset_class_views)
+        cls.signaller.copy_requested.connect(trigger.copy_selected_class)
 
     @classmethod
     def create_model(cls, bsdd_dictionary: BsddDictionary):
@@ -68,3 +72,12 @@ class ClassTree(ColumnHandler, ViewHandler):
     @classmethod
     def add_class_to_dictionary(cls, new_class: BsddClass, bsdd_dictionary: BsddDictionary):
         cls.get_properties().model.append_row(new_class)
+
+    @classmethod
+    def get_selected_class(cls, view: ui.ClassView):
+        model = view.model().sourceModel()
+        if not view.selectedIndexes():
+            return None
+        selected_index = view.selectedIndexes()[-1]
+        index = view.model().mapToSource(selected_index)
+        return index.internalPointer()

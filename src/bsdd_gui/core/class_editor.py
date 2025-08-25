@@ -92,14 +92,16 @@ def connect_to_main_window(
     view = main_window.get_class_view()
     view.doubleClicked.connect(emit_class_info_requested)
     main_window.signaller.new_class_requested.connect(
-        lambda: create_new_class(class_editor, main_window, project)
+        lambda: create_new_class(class_editor, main_window)
+    )
+    main_window.signaller.copy_active_class_requested.connect(
+        lambda: create_new_class(class_editor, main_window, mode=1)
     )
 
 
 def create_new_class(
     class_editor: Type[tool.ClassEditor],
     main_window: Type[tool.MainWindow],
-    project: Type[tool.Project],
     mode=0,
 ):
     """_summary_
