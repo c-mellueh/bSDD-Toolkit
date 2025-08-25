@@ -1,6 +1,6 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication, Qt
 from typing import Type, TYPE_CHECKING
 from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH
 
@@ -81,20 +81,23 @@ def new_file_clicked(
     project: Type[tool.Project],
     dictionary_editor: Type[tool.DictionaryEditor],
     popups: Type[tool.Popups],
+    main_window: Type[tool.MainWindow],
 ):
     def validate():
         if dictionary_editor.all_inputs_are_valid(widget):
             dialog.accept()
         else:
             text = QCoreApplication.translate("Project", "Required Inputs are missing!")
-            missing_text = QCoreApplication.translate("Project", "is mssing")
+            missing_text = QCoreApplication.translate("Project", "is missing")
             missing_inputs = dictionary_editor.get_missing_inputs(widget)
             popups.create_warning_popup(
                 f" {missing_text}\n".join(missing_inputs) + f" {missing_text}", None, text
             )
 
-    dialog = project.create_new_project_widget()
+    dialog = project.create_new_project_widget(main_window.get())
     widget = dictionary_editor.create_widget()
+    name = QCoreApplication.translate("Project", "New Project")
+    dialog.setWindowTitle(name)
     dialog._layout.insertWidget(0, widget)
     dialog.new_button.clicked.connect(validate)
     if dialog.exec():

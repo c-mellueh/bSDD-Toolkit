@@ -18,7 +18,7 @@ def on_new_project():
 
 
 def new_clicked():
-    core.new_file_clicked(tool.Project, tool.DictionaryEditor, tool.Popups)
+    core.new_file_clicked(tool.Project, tool.DictionaryEditor, tool.Popups, tool.MainWindow)
     pass
 
 

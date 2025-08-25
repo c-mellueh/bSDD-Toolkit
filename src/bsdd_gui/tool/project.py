@@ -44,8 +44,8 @@ class Project(ModuleHandler):
         return cls.get_properties().project_dictionary
 
     @classmethod
-    def create_new_project_widget(cls) -> ui.NewDialog:
-        cls.get_properties().dialog = ui.NewDialog()
+    def create_new_project_widget(cls, parent) -> ui.NewDialog:
+        cls.get_properties().dialog = ui.NewDialog(parent)
         return cls.get_properties().dialog
 
     @classmethod
