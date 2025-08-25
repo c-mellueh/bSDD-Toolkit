@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_to_main_window(tool.ClassEditor, tool.MainWindow)
+    core.connect_to_main_window(tool.ClassEditor, tool.MainWindow, tool.Project)
     core.connect_signals(tool.ClassEditor)
 
 
@@ -27,4 +27,4 @@ def open_class_editor(bsdd_class: BsddClass):
 
 
 def class_editor_created(class_editor: ui.ClassEditor):
-    core.register_widget(class_editor, tool.ClassEditor, tool.Project)
+    core.register_widget(class_editor, tool.ClassEditor, tool.Project, tool.Util)

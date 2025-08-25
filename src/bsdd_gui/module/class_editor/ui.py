@@ -1,5 +1,6 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QApplication, QWidget, QDialog, QDialogButtonBox, QVBoxLayout
+from PySide6.QtCore import QCoreApplication, Qt
 
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
@@ -34,3 +35,18 @@ class ClassEditor(QWidget, ui_ClassEditor.Ui_ClassEditor):
 
     def paintEvent(self, event):
         super().paintEvent(event)
+
+
+class NewDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowIcon(get_icon())
+        # Create button box
+        self.button_box = QDialogButtonBox(Qt.Horizontal)
+        new_text = QCoreApplication.translate("ClassEditor", "Create New Class")
+        self.new_button = self.button_box.addButton(new_text, QDialogButtonBox.ActionRole)
+
+        # Layout
+        self._layout = QVBoxLayout(self)
+        self._layout.addWidget(self.button_box)
+        self.setLayout(self._layout)

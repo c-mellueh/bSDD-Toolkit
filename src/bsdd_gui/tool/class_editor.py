@@ -62,6 +62,24 @@ class ClassEditor(WidgetHandler):
             field.tagsChanged.connect(setter_func)
 
     @classmethod
+    def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
+        if not widget in cls.get_properties().validator_functions:
+            cls.get_properties().validator_functions[widget] = dict()
+        cls.get_properties().validator_functions[widget][field] = (
+            validator_function,
+            result_function,
+        )
+        rf, vf, f, w = result_function, validator_function, field, widget
+        if isinstance(f, QLineEdit):
+            f.textChanged.connect(lambda text: rf(f, vf(text, w)))
+        if isinstance(f, QComboBox):
+            f.currentTextChanged.connect(lambda text: rf(f, vf(text, w)))
+        if isinstance(f, QTextEdit):
+            f.textChanged.connect(lambda: rf(f, vf(f.toPlainText(), w)))
+        if isinstance(f, label_tags_input.TagInput):
+            f.tagsChanged.connect(lambda: rf(f, vf(f.tags(), w)))
+
+    @classmethod
     def sync_from_model(cls, class_editor: ui.ClassEditor):
 
         bsdd_class = class_editor.bsdd_class
@@ -76,20 +94,39 @@ class ClassEditor(WidgetHandler):
             if isinstance(field, QTextEdit):
                 field.setPlainText(value)
             if isinstance(field, label_tags_input.TagInput):
-                field.setTags(value)
+                field.setTags(value or [])
 
     @classmethod
     def validate_code(cls, code, widget: ui.ClassEditor, bsdd_dict):
         from bsdd_gui.tool import Util
 
-        if cls.is_code_allowed(code, widget.bsdd_class, bsdd_dict):
+        if cls.is_code_invalid(code, widget.bsdd_class, bsdd_dict):
             Util.set_invalid(widget.le_code, False)
         else:
             Util.set_invalid(widget.le_code, True)
 
     @classmethod
-    def is_code_allowed(cls, code: str, bsdd_class: BsddClass, bsdd_dict: BsddDictionary):
+    def all_inputs_are_valid(cls, widget: ui.ClassEditor):
+        if not cls.is_code_invalid(widget):
+            return False
+
+    @classmethod
+    def is_code_invalid(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
+        if not code:
+            return True
+        bsdd_class = widget.bsdd_class
         for c in bsdd_dict.Classes:
             if c.Code == code and c != bsdd_class:
-                return False
-        return True
+                return True
+
+        return False
+
+    @classmethod
+    def is_name_invalid(cls, name: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
+        if not name:
+            return True
+        return False
+
+    @classmethod
+    def create_new_class_dialog(cls, parent) -> ui.NewDialog:
+        return ui.NewDialog(parent)

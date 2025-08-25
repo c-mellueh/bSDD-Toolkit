@@ -8,6 +8,12 @@ if TYPE_CHECKING:
 
 
 class ClassEditorProperties(WidgetHandlerProperties):
-    field_getter: dict[ui.ClassEditor, dict[QWidget, callable]] = (
-        dict()
-    )  # getter function for widgets of Window
+
+    def __init__(self):
+        super().__init__()
+        self.field_getter: dict[ui.ClassEditor, dict[QWidget, callable]] = (
+            dict()
+        )  # getter function for widgets of Window
+        self.validator_functions: dict[ui.ClassEditor, dict[QWidget, tuple[callable, callable]]] = (
+            dict()
+        )

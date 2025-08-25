@@ -1,5 +1,5 @@
 from __future__ import annotations
-from PySide6.QtCore import QModelIndex
+from PySide6.QtCore import QModelIndex, QCoreApplication
 from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClass
 import logging
@@ -10,15 +10,27 @@ if TYPE_CHECKING:
 
 
 def register_widget(
-    widget: ui.ClassEditor, class_editor: Type[tool.ClassEditor], project: Type[tool.Project]
+    widget: ui.ClassEditor,
+    class_editor: Type[tool.ClassEditor],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
 ):
     class_editor.register_widget(widget)
     class_editor.register_basic_field(widget, widget.le_name, "Name")
     class_editor.register_basic_field(widget, widget.le_code, "Code")
     class_editor.register_basic_field(widget, widget.te_definition, "Definition")
 
-    widget.le_code.textChanged.connect(
-        lambda t, w=widget, d=project.get(): class_editor.validate_code(t, w, d)
+    class_editor.add_validator(
+        widget,
+        widget.le_code,
+        lambda v, w, p=project: class_editor.is_code_invalid(v, w, p.get()),
+        util.set_invalid,
+    )
+    class_editor.add_validator(
+        widget,
+        widget.le_name,
+        lambda v, w, p=project: class_editor.is_name_invalid(v, w, p.get()),
+        util.set_invalid,
     )
 
     ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
@@ -55,7 +67,9 @@ def connect_signals(class_editor: Type[tool.ClassEditor]):
 
 
 def connect_to_main_window(
-    class_editor: Type[tool.ClassEditor], main_window: Type[tool.MainWindow]
+    class_editor: Type[tool.ClassEditor],
+    main_window: Type[tool.MainWindow],
+    project: Type[tool.Project],
 ):
     def emit_class_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)
@@ -66,6 +80,31 @@ def connect_to_main_window(
 
     view = main_window.get_class_view()
     view.doubleClicked.connect(emit_class_info_requested)
+
+
+def create_new_class(
+    class_editor: Type[tool.ClassEditor],
+    main_window: Type[tool.MainWindow],
+    project: Type[tool.Project],
+):
+    def validate():
+        if class_editor.all_inputs_are_valid(widget):
+            dialog.accept()
+        else:
+            pass
+
+    new_class = BsddClass(Code="", Name="", ClassType="Class")
+    widget = class_editor.create_widget(new_class)
+    class_editor.sync_from_model(widget)
+    dialog = class_editor.create_new_class_dialog(main_window.get())
+    name = QCoreApplication.translate("ClassEditor", "New Class")
+    dialog.setWindowTitle(name)
+    dialog._layout.insertWidget(0, widget)
+    dialog.new_button.clicked.connect(validate)
+    if dialog.exec():
+        bsdd_dictionary = project.get()
+        bsdd_dictionary.Classes.append(new_class)
+    class_editor.unregister_widget(widget)
 
 
 def open_class_editor(bsdd_class: BsddClass, class_editor: Type[tool.ClassEditor]):

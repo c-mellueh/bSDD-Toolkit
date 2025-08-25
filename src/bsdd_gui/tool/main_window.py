@@ -17,6 +17,9 @@ class Signaller(QObject):
     active_class_changed = Signal(BsddClass)
     active_pset_changed = Signal(str)
     active_property_changed = Signal(BsddClassProperty)
+    new_class_requested = Signal()
+    new_property_set_requested = Signal()
+    new_property_requested = Signal()
 
 
 class MainWindow:
