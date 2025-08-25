@@ -31,6 +31,12 @@ class ClassEditor(WidgetHandler):
         cls.signaller.class_info_requested.connect(trigger.open_class_editor)
 
     @classmethod
+    def unregister_widget(cls, view):
+        cls.get_properties().field_getter.pop(view)
+        cls.get_properties().field_setter.pop(view)
+        return super().unregister_widget(view)
+
+    @classmethod
     def create_widget(cls, bsdd_class: BsddClass):
         widget = ui.ClassEditor(bsdd_class)
         return widget
@@ -39,7 +45,9 @@ class ClassEditor(WidgetHandler):
     def register_basic_field(cls, class_editor: ui.ClassEditor, field: QWidget, variable_name: str):
         cls.register_field_getter(class_editor, field, lambda c, vn=variable_name: getattr(c, vn))
         cls.register_field_setter(
-            field, lambda v, w=class_editor, vn=variable_name: setattr(w.bsdd_class, vn, v)
+            class_editor,
+            field,
+            lambda v, w=class_editor, vn=variable_name: setattr(w.bsdd_class, vn, v),
         )
 
     @classmethod
@@ -51,15 +59,12 @@ class ClassEditor(WidgetHandler):
         cls.get_properties().field_getter[class_editor][field] = getter_func
 
     @classmethod
-    def register_field_setter(cls, field: QWidget, setter_func: callable):
-        if isinstance(field, QLineEdit):
-            field.textChanged.connect(setter_func)
-        if isinstance(field, QComboBox):
-            field.currentIndexChanged.connect(setter_func)
-        if isinstance(field, QTextEdit):
-            field.textChanged.connect(lambda f=field, sf=setter_func: sf(f.toPlainText()))
-        if isinstance(field, label_tags_input.TagInput):
-            field.tagsChanged.connect(setter_func)
+    def register_field_setter(
+        cls, class_editor: ui.ClassEditor, field: QWidget, setter_func: callable
+    ):
+        if not class_editor in cls.get_properties().field_setter:
+            cls.get_properties().field_setter[class_editor] = dict()
+        cls.get_properties().field_setter[class_editor][field] = setter_func
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
@@ -128,13 +133,17 @@ class ClassEditor(WidgetHandler):
                 field.setTags(value or [])
 
     @classmethod
-    def validate_code(cls, code, widget: ui.ClassEditor, bsdd_dict):
-        from bsdd_gui.tool import Util
-
-        if cls.is_code_invalid(code, widget.bsdd_class, bsdd_dict):
-            Util.set_invalid(widget.le_code, False)
-        else:
-            Util.set_invalid(widget.le_code, True)
+    def sync_to_model(cls, class_editor: ui.ClassEditor):
+        field_dict = cls.get_properties().field_setter.get(class_editor) or dict()
+        for field, setter_func in field_dict.items():
+            if isinstance(field, QLineEdit):
+                setter_func(field.text())
+            if isinstance(field, QComboBox):
+                setter_func(field.currentIndex())
+            if isinstance(field, QTextEdit):
+                setter_func(field.toPlainText())
+            if isinstance(field, label_tags_input.TagInput):
+                setter_func(field.tags())
 
     @classmethod
     def all_inputs_are_valid(cls, widget: ui.ClassEditor):
@@ -174,3 +183,7 @@ class ClassEditor(WidgetHandler):
     @classmethod
     def create_new_class_dialog(cls, parent) -> ui.NewDialog:
         return ui.NewDialog(parent)
+
+    @classmethod
+    def create_edit_class_dialog(cls, parent) -> ui.NewDialog:
+        return ui.EditDialog(parent)

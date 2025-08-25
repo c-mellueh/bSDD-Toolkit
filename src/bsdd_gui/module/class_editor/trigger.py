@@ -23,7 +23,7 @@ def on_new_project():
 
 
 def open_class_editor(bsdd_class: BsddClass):
-    core.open_class_editor(bsdd_class, tool.ClassEditor)
+    core.open_class_editor(bsdd_class, tool.ClassEditor, tool.MainWindow)
 
 
 def class_editor_created(class_editor: ui.ClassEditor):

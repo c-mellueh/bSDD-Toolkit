@@ -3,6 +3,7 @@ from PySide6.QtCore import QModelIndex, QCoreApplication
 from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClass
 import logging
+from bsdd_parser.utils import bsdd_class as class_util
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -17,7 +18,6 @@ def register_widget(
 ):
     class_editor.register_widget(widget)
     class_editor.register_basic_field(widget, widget.le_name, "Name")
-    class_editor.register_basic_field(widget, widget.le_code, "Code")
     class_editor.register_basic_field(widget, widget.te_definition, "Definition")
 
     class_editor.add_validator(
@@ -33,12 +33,20 @@ def register_widget(
         lambda w, v: util.set_invalid(w, not v),
     )
 
+    class_editor.register_field_getter(widget, widget.le_code, lambda c: c.Code)
+    class_editor.register_field_setter(
+        widget,
+        widget.le_code,
+        lambda v, w=widget: w.bsdd_class.set_code(v),
+    )
+
     ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
     widget.cb_class_type.addItems(ct_combobox_items)
 
     # Combo Boxes
     class_editor.register_field_getter(widget, widget.cb_class_type, lambda c: c.ClassType)
     class_editor.register_field_setter(
+        widget,
         widget.cb_class_type,
         lambda v, w=widget: setattr(w.bsdd_class, "ClassType", ct_combobox_items[v]),
     )
@@ -48,6 +56,7 @@ def register_widget(
 
     class_editor.register_field_getter(widget, widget.cb_status, lambda c: c.Status)
     class_editor.register_field_setter(
+        widget,
         widget.cb_status,
         lambda v, w=widget: setattr(w.bsdd_class, "Status", st_combobox_items[v]),
     )
@@ -57,6 +66,7 @@ def register_widget(
         widget, widget.ti_related_ifc_entity, lambda c: c.RelatedIfcEntityNamesList
     )
     class_editor.register_field_setter(
+        widget,
         widget.ti_related_ifc_entity,
         lambda v, w=widget: setattr(w.bsdd_class, "RelatedIfcEntityNamesList", v),
     )
@@ -96,22 +106,35 @@ def create_new_class(
         else:
             pass
 
-    new_class = BsddClass(Code="", Name="", ClassType="Class")
+    new_class = BsddClass(Code="undef", Name="undef", ClassType="Class")
     widget = class_editor.create_widget(new_class)
     class_editor.sync_from_model(widget)
     dialog = class_editor.create_new_class_dialog(main_window.get())
-    name = QCoreApplication.translate("ClassEditor", "New Class")
-    dialog.setWindowTitle(name)
     dialog._layout.insertWidget(0, widget)
     dialog.new_button.clicked.connect(validate)
     if dialog.exec():
+        class_editor.sync_to_model(widget)
         bsdd_dictionary = project.get()
         bsdd_dictionary.Classes.append(new_class)
     class_editor.unregister_widget(widget)
 
 
-def open_class_editor(bsdd_class: BsddClass, class_editor: Type[tool.ClassEditor]):
+def open_class_editor(
+    bsdd_class: BsddClass, class_editor: Type[tool.ClassEditor], main_window: Type[tool.MainWindow]
+):
+    def validate():
+        if class_editor.all_inputs_are_valid(widget):
+            dialog.accept()
+        else:
+            pass
+
     logging.info(f"Open Class Editor for {bsdd_class.Code}")
+    dialog = class_editor.create_edit_class_dialog(main_window.get())
     widget = class_editor.create_widget(bsdd_class)
     class_editor.sync_from_model(widget)
-    widget.show()
+
+    dialog._layout.insertWidget(0, widget)
+    dialog.new_button.clicked.connect(validate)
+    if dialog.exec():
+        class_editor.sync_to_model(widget)
+    class_editor.unregister_widget(widget)

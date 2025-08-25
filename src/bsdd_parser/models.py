@@ -4,9 +4,10 @@ from pydantic import BaseModel
 
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, Field, PrivateAttr, computed_field
+from pydantic import BaseModel, Field, PrivateAttr, model_validator, field_validator
 import json
 import weakref
+import logging
 
 
 class BsddDictionary(BaseModel):
@@ -100,6 +101,44 @@ class BsddClass(BaseModel):
     def model_post_init(self, context):
         for c in self.ClassProperties:
             c._set_parent(self)
+
+    def _apply_code_side_effects(self, code: str) -> None:
+        from bsdd_parser.utils import bsdd_class as class_utils
+
+        if not code.strip():
+            logging.info("Empty Code is not allowed")
+            raise ValueError("Empty Code is not allowed")
+
+        parent = self._parent_ref() if self._parent_ref else None
+        if parent is not None and code in class_utils.get_all_class_codes(parent):
+            logging.info(f"Code '{code}' exists already")
+            raise ValueError(f"Code '{code}' exists already")
+
+        # propagate to children
+        for child in class_utils.get_children(self):
+            child.ParentClassCode = code
+
+    # validate the field value itself (runs on parse and assignment validation)
+    @field_validator("Code", mode="before")
+    @classmethod
+    def _normalize_code(cls, v: str):
+        if v is None:
+            return v
+        return v.strip()
+
+    @model_validator(mode="after")
+    def _after_init(self):
+        # run once after parsing so JSON -> model path also triggers side-effects
+        self._apply_code_side_effects(self.Code)
+        return self
+
+    # optional: a method to change Code at runtime with the same guarantees
+    def set_code(self, code: str) -> None:
+        if code == self.Code:
+            return
+        self._apply_code_side_effects(code)
+        # assign without recursion (no property involved)
+        object.__setattr__(self, "Code", code)
 
 
 class BsddAllowedValue(BaseModel):

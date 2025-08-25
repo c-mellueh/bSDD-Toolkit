@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import logging
 
 if TYPE_CHECKING:
     from bsdd_parser.models import BsddDictionary, BsddClass
@@ -12,6 +13,8 @@ def get_root_classes(bsdd_dictionary: BsddDictionary):
 
 
 def get_children(bsdd_class: BsddClass):
+    if bsdd_class._parent_ref is None:
+        return []
     code = bsdd_class.Code
     bsdd_dictionary = bsdd_class._parent_ref()
     return [c for c in bsdd_dictionary.Classes if c.ParentClassCode == code]
