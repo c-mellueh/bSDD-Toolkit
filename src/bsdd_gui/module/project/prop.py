@@ -10,3 +10,4 @@ class ProjectProperties(ModuleHandlerProperties):
     def __init__(self):
         super().__init__()
         self.project_dictionary: BsddDictionary = None
+        self.dialog = None

@@ -5,16 +5,18 @@ import logging
 
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetHandler
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QDateTime
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFormLayout,
     QWidget,
-    QToolBox,
+    QDateTimeEdit,
     QLineEdit,
     QLabel,
 )
+from datetime import datetime
+
 from bsdd_gui.module.dictionary_editor import constants, ui
 from bsdd_parser import BsddDictionary
 
@@ -78,16 +80,21 @@ class DictionaryEditor(WidgetHandler):
                     )
 
             # create checkbox
-            elif datatype == "bool":
+            elif datatype == bool:
                 w = QCheckBox()
                 w.checkStateChanged.connect(
                     lambda state, n=name: widget.value_changed.emit(n, state)
                 )
 
             # create input line
-            elif datatype == "datetime":
-                w = QLineEdit()
-                w.textChanged.connect(lambda text, n=name: widget.value_changed.emit(n, text))
+            elif datatype == datetime:
+                print("")
+                w = QDateTimeEdit()
+                w.setDisplayFormat("yyyy-MM-dd HH:mm:ss")
+                w.setCalendarPopup(True)
+                w.setTimeSpec(Qt.TimeSpec.LocalTime)  # or Qt.LocalTime
+                w.setDateTime(QDateTime.currentDateTime())
+                w.dateTimeChanged.connect(lambda time, n=name: widget.value_changed.emit(n, time))
 
             # handle exceptions
             else:
@@ -111,6 +118,8 @@ class DictionaryEditor(WidgetHandler):
                 value_dict[field_name] = field.currentText()
             elif isinstance(field, QCheckBox):
                 value_dict[field_name] = field.isChecked()
+            elif isinstance(field, QDateTimeEdit):
+                value_dict[field_name] = field.dateTime().toPython()
             else:
                 raise TypeError(f"Unsupported widget type: {type(widget)}")
         return value_dict
@@ -133,23 +142,25 @@ class DictionaryEditor(WidgetHandler):
         _run()
 
     @classmethod
+    def is_optional(cls, annotation) -> bool:
+        origin = get_origin(annotation)
+        if origin is Union:
+            args = get_args(annotation)
+            return NoneType in args
+        return False
+
+    @classmethod
     def color_required_fields(cls, widget: ui.DictionaryEditor):
-        def is_optional(annotation) -> bool:
-            origin = get_origin(annotation)
-            if origin is Union:
-                args = get_args(annotation)
-                return NoneType in args
-            return False
 
         for name, field in BsddDictionary.model_fields.items():
             if name in ["Classes", "Properties"]:
                 continue
-            if is_optional(field.annotation):
+            if cls.is_optional(field.annotation):
                 continue
             cls.attach_validation(widget.fields[name], checkbox_empty_if_unchecked=False)
 
     @classmethod
-    def is_empty(cls, widget: QWidget, *, checkbox_empty_if_unchecked=True) -> bool:
+    def is_empty(cls, widget: QWidget, *, checkbox_empty_if_unchecked=False) -> bool:
         if isinstance(widget, QLineEdit):
             return widget.text().strip() == ""
         if isinstance(widget, QComboBox):
@@ -174,3 +185,20 @@ class DictionaryEditor(WidgetHandler):
         empty = cls.is_empty(widget, checkbox_empty_if_unchecked=checkbox_empty_if_unchecked)
         tool.Util.set_invalid(widget, empty)
         return not empty
+
+    @classmethod
+    def all_inputs_are_valid(cls, widget: ui.DictionaryEditor):
+        return not bool(cls.get_missing_inputs(widget))
+
+    @classmethod
+    def get_missing_inputs(cls, widget: ui.DictionaryEditor):
+        missing_inputs = list()
+        for name, field in BsddDictionary.model_fields.items():
+            if name in ["Classes", "Properties"]:
+                continue
+            if cls.is_optional(field.annotation):
+                continue
+            field_widget = widget.fields[name]
+            if cls.is_empty(field_widget):
+                missing_inputs.append(name)
+        return missing_inputs

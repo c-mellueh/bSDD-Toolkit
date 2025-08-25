@@ -39,3 +39,18 @@ class Popups:
             return True
         else:
             return False
+
+    @classmethod
+    def create_warning_popup(cls, text, window_title: str = None, text_title: str = None):
+        if window_title is None:
+            window_title = QCoreApplication.translate("Popups", "Warning")
+        if text_title is None:
+            text_title = QCoreApplication.translate("Popups", "Warning")
+        icon = get_icon()
+        msg_box = QMessageBox()
+        msg_box.setText(text_title)
+        msg_box.setWindowTitle(window_title)
+        msg_box.setDetailedText(text)
+        msg_box.setIcon(QMessageBox.Icon.Warning)
+        msg_box.setWindowIcon(icon)
+        msg_box.exec()

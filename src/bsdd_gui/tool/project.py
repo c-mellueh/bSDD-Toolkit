@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 import logging
 import os
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ModuleHandler
-import bsdd_parser.models
+from bsdd_parser import BsddDictionary
+from bsdd_gui.module.project import ui
 
 if TYPE_CHECKING:
     from bsdd_gui.module.project.prop import ProjectProperties
@@ -16,8 +17,8 @@ class Project(ModuleHandler):
         return bsdd_gui.ProjectProperties
 
     @classmethod
-    def create_project(cls):
-        cls.get_properties().project_dictionary = bsdd_parser.models.BsddDictionary(
+    def create_project(cls, input_dict: dict[str, str | bool] = None):
+        new_dict = BsddDictionary(
             OrganizationCode="default",
             DictionaryCode="default",
             DictionaryName="default",
@@ -26,15 +27,24 @@ class Project(ModuleHandler):
             LanguageOnly=False,
             UseOwnUri=False,
         )
+        if input_dict:
+            new_dict = BsddDictionary(**input_dict)
+
+        cls.get_properties().project_dictionary = new_dict
         bsdd_gui.on_new_project()
 
     @classmethod
     def load_project(cls, path: os.PathLike):
         prop = cls.get_properties()
-        prop.project_dictionary = bsdd_parser.models.BsddDictionary.load(path)
+        prop.project_dictionary = BsddDictionary.load(path)
         bsdd_gui.on_new_project()
         return prop.project_dictionary
 
     @classmethod
-    def get(cls) -> bsdd_parser.models.BsddDictionary:
+    def get(cls) -> BsddDictionary:
         return cls.get_properties().project_dictionary
+
+    @classmethod
+    def create_new_project_widget(cls) -> ui.NewDialog:
+        cls.get_properties().dialog = ui.NewDialog()
+        return cls.get_properties().dialog

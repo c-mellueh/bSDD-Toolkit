@@ -73,7 +73,26 @@ def retranslate_ui(project: Type[tool.Project], main_window: Type[tool.MainWindo
     #     widget.ui.retranslateUi(widget)
 
 
-def new_file_clicked(project: Type[tool.Project], dictionary_editor: Type[tool.DictionaryEditor]):
+def new_file_clicked(
+    project: Type[tool.Project],
+    dictionary_editor: Type[tool.DictionaryEditor],
+    popups: Type[tool.Popups],
+):
+    def validate():
+        if dictionary_editor.all_inputs_are_valid(widget):
+            dialog.accept()
+        else:
+            text = QCoreApplication.translate("Project", "Required Inputs are missing!")
+            missing_text = QCoreApplication.translate("Project", "is mssing")
+            missing_inputs = dictionary_editor.get_missing_inputs(widget)
+            popups.create_warning_popup(
+                f" {missing_text}\n".join(missing_inputs) + f" {missing_text}", None, text
+            )
+
+    dialog = project.create_new_project_widget()
     widget = dictionary_editor.create_widget()
-    widget.show()
-    pass
+    dialog._layout.insertWidget(0, widget)
+    dialog.new_button.clicked.connect(validate)
+    if dialog.exec():
+        dv = dictionary_editor.get_dictionary_values(widget)
+        project.create_project(dv)
