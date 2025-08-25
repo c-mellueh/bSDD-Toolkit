@@ -79,15 +79,13 @@ class ClassEditor(WidgetHandler):
                 field.setTags(value)
 
     @classmethod
-    def set_text_color(cls, widget: QLineEdit, color: str):
-        widget.setStyleSheet(f"QLineEdit {{color:{color};}}")
+    def validate_code(cls, code, widget: ui.ClassEditor, bsdd_dict):
+        from bsdd_gui.tool import Util
 
-    @classmethod
-    def handle_code_color(cls, code, widget: ui.ClassEditor, bsdd_dict):
         if cls.is_code_allowed(code, widget, bsdd_dict):
-            cls.set_text_color(widget.le_code, QPalette().color(QPalette.Text).name())
+            Util.set_invalid(widget.le_code, False)
         else:
-            cls.set_text_color(widget.le_code, "red")
+            Util.set_invalid(widget.le_code, True)
 
     @classmethod
     def is_code_allowed(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):

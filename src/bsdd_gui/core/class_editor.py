@@ -18,7 +18,7 @@ def register_widget(
     class_editor.register_basic_field(widget, widget.te_definition, "Definition")
 
     widget.le_code.textChanged.connect(
-        lambda t, w=widget, d=project.get(): class_editor.handle_code_color(t, w, d)
+        lambda t, w=widget, d=project.get(): class_editor.validate_code(t, w, d)
     )
 
     ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
