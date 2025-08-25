@@ -82,14 +82,13 @@ class ClassEditor(WidgetHandler):
     def validate_code(cls, code, widget: ui.ClassEditor, bsdd_dict):
         from bsdd_gui.tool import Util
 
-        if cls.is_code_allowed(code, widget, bsdd_dict):
+        if cls.is_code_allowed(code, widget.bsdd_class, bsdd_dict):
             Util.set_invalid(widget.le_code, False)
         else:
             Util.set_invalid(widget.le_code, True)
 
     @classmethod
-    def is_code_allowed(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
-        bsdd_class = widget.bsdd_class
+    def is_code_allowed(cls, code: str, bsdd_class: BsddClass, bsdd_dict: BsddDictionary):
         for c in bsdd_dict.Classes:
             if c.Code == code and c != bsdd_class:
                 return False
