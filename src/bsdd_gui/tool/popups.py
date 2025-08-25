@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
     QMessageBox,
 )
-
+import os
 import bsdd_gui
 from bsdd_gui.resources.icons import get_icon
 
@@ -54,3 +54,41 @@ class Popups:
         msg_box.setIcon(QMessageBox.Icon.Warning)
         msg_box.setWindowIcon(icon)
         msg_box.exec()
+
+    @classmethod
+    def get_open_path(cls, file_format: str, window, path=None, title=None) -> str:
+        return cls._get_path(file_format, window, path, False, title)
+
+    @classmethod
+    def get_save_path(cls, file_format: str, window, path=None, title=None) -> str:
+        return cls._get_path(file_format, window, path, True, title)
+
+    @classmethod
+    def _get_path(cls, file_format: str, window, path=None, save: bool = False, title=None) -> str:
+        """File Open Dialog with modifiable file_format"""
+        if path:
+            basename = os.path.basename(path)
+            split = os.path.splitext(basename)[0]
+            filename_without_extension = os.path.splitext(split)[0]
+            dirname = os.path.dirname(path)
+            path = os.path.join(dirname, filename_without_extension)
+        if title is None:
+            title = f"Save {file_format}" if save else f"Open {file_format}"
+
+        if save:
+            path = QFileDialog.getSaveFileName(
+                window, title, path, f"{file_format} Files (*.{file_format})"
+            )[0]
+        else:
+            path = QFileDialog.getOpenFileName(
+                window, title, path, f"{file_format} Files (*.{file_format})"
+            )[0]
+        return path
+
+    @classmethod
+    def get_folder(cls, window, path: str) -> str:
+        """Folder Open Dialog"""
+        if path:
+            path = os.path.basename(path)
+        path = QFileDialog.getExistingDirectory(parent=window, dir=path)
+        return path

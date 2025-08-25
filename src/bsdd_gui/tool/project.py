@@ -37,7 +37,6 @@ class Project(ModuleHandler):
     def load_project(cls, path: os.PathLike):
         prop = cls.get_properties()
         prop.project_dictionary = BsddDictionary.load(path)
-        bsdd_gui.on_new_project()
         return prop.project_dictionary
 
     @classmethod

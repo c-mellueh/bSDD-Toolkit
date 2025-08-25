@@ -2,6 +2,8 @@ from __future__ import annotations
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QCoreApplication
 from typing import Type, TYPE_CHECKING
+from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH
+
 import bsdd_gui
 
 if TYPE_CHECKING:
@@ -96,3 +98,25 @@ def new_file_clicked(
     if dialog.exec():
         dv = dictionary_editor.get_dictionary_values(widget)
         project.create_project(dv)
+
+
+def open_file_clicked(
+    project_tool: Type[tool.Project],
+    appdata: Type[tool.Appdata],
+    main_window: Type[tool.MainWindow],
+    popups: Type[tool.Popups],
+    plugins: Type[tool.Plugins],
+):
+    path = appdata.get_path(OPEN_PATH)
+    title = QCoreApplication.translate("Project", "Open Project")
+    path = popups.get_open_path(FILETYPE, main_window.get(), path, title)
+    if not path:
+        return
+
+    logging.info("Load Project")
+    appdata.set_path(OPEN_PATH, path)
+    appdata.set_path(SAVE_PATH, path)
+    project_tool.load_project(path)
+    bsdd_gui.on_new_project()
+    for plugin in plugins.get_available_plugins():
+        plugins.on_new_project(plugin)
