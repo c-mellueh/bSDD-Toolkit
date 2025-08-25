@@ -14,7 +14,7 @@ def retranslate_ui():
 
 
 def on_new_project():
-    pass
+    core.new_file_clicked(tool.Project, tool.Popups)
 
 
 def new_clicked():

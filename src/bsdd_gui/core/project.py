@@ -71,3 +71,7 @@ def retranslate_ui(project: Type[tool.Project], main_window: Type[tool.MainWindo
     # widget = project.get_settings_general_widget()
     # if widget:
     #     widget.ui.retranslateUi(widget)
+
+
+def new_file_clicked(project: Type[tool.Project], popups: Type[tool.Popups]):
+    pass
