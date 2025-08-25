@@ -6,6 +6,7 @@ class ColumnHandlerProperties:
     def __init__(self):
         super().__init__()
         self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
+        self.models: set = set()
 
 
 class ModuleHandlerProperties:

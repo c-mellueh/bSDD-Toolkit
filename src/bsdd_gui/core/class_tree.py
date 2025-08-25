@@ -8,8 +8,16 @@ if TYPE_CHECKING:
     from bsdd_parser.models import BsddClass
 
 
-def connect_signals(class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow]):
+def connect_signals(
+    class_tree: Type[tool.ClassTree],
+    class_editor: Type[tool.ClassEditor],
+    project: Type[tool.Project],
+):
+    def insert_class(new_class: BsddClass):
+        class_tree.add_class_to_dictionary(new_class, project.get())
+
     class_tree.connect_signals()
+    class_editor.signaller.new_class_created.connect(insert_class)
 
 
 def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree], project: Type[tool.Project]):

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.ClassTree, tool.MainWindow)
+    core.connect_signals(tool.ClassTree, tool.ClassEditor, tool.Project)
     core.connect_to_main_window(tool.ClassTree, tool.MainWindow)
 
 

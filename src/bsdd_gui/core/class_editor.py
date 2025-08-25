@@ -114,8 +114,7 @@ def create_new_class(
     dialog.new_button.clicked.connect(validate)
     if dialog.exec():
         class_editor.sync_to_model(widget)
-        bsdd_dictionary = project.get()
-        bsdd_dictionary.Classes.append(new_class)
+        class_editor.signaller.new_class_created.emit(new_class)
     class_editor.unregister_widget(widget)
 
 

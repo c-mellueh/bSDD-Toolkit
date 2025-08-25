@@ -17,6 +17,9 @@ if TYPE_CHECKING:
 
 class Signaller(WidgetSignaller):
     class_info_requested = Signal(BsddClass)
+    new_class_created = Signal(
+        BsddClass
+    )  # the class is not added to the Dictionary So far, this gets handled by ClassTree
 
 
 class ClassEditor(WidgetHandler):
