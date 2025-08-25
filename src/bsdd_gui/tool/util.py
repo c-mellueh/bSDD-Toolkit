@@ -399,3 +399,10 @@ class Util:
         window = previous_widget.window()
         window.setTabOrder(previous_widget, inserted_widget)
         window.setTabOrder(inserted_widget, old_element)
+
+    @classmethod
+    def set_invalid(cls, widget: QWidget, invalid: bool) -> None:
+        widget.setProperty("invalid", invalid)
+        widget.style().unpolish(widget)
+        widget.style().polish(widget)
+        widget.update()

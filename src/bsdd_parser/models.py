@@ -17,11 +17,11 @@ class BsddDictionary(BaseModel):
     LanguageIsoCode: str
     LanguageOnly: bool
     UseOwnUri: bool
-    DictionaryUri: str = ""
-    License: str = "MIT"
+    DictionaryUri: Optional[str] = None
+    License: Optional[str] = "MIT"
     LicenseUrl: Optional[str] = None
     ChangeRequestEmailAddress: Optional[str] = None
-    ModelVersion: str = "2.0"
+    ModelVersion: Optional[str] = "2.0"
     MoreInfoUrl: Optional[str] = None
     QualityAssuranceProcedure: Optional[str] = None
     QualityAssuranceProcedureUrl: Optional[str] = None

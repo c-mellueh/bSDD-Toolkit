@@ -10,3 +10,4 @@ if TYPE_CHECKING:
 def connect_widget(widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditor]):
     dictionary_editor.register_widget(widget)
     dictionary_editor.fill_dictionary_widget(widget)
+    dictionary_editor.color_required_fields(widget)

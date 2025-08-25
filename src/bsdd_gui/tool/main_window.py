@@ -147,3 +147,20 @@ class MainWindow:
         else:
             menu = cls.get_menu_bar()
         menu.removeAction(sub_menu.menuAction())
+
+    @classmethod
+    def install_validation_styles(cls, app: QApplication) -> None:
+        app.setStyleSheet(
+            app.styleSheet()
+            + """
+            QLineEdit[invalid="true"],
+            QComboBox[invalid="true"] {
+                border: 1px solid red;
+                border-radius: 4px;
+            }
+            /* checkbox: highlight the indicator when invalid */
+            QCheckBox[invalid="true"]::indicator {
+                border: 1px solid red;
+            }
+        """
+        )

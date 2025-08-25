@@ -1,9 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, get_origin, Union, get_args
+from types import NoneType  # Python 3.10+
 import logging
 
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetHandler
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -112,3 +114,63 @@ class DictionaryEditor(WidgetHandler):
             else:
                 raise TypeError(f"Unsupported widget type: {type(widget)}")
         return value_dict
+
+    @classmethod
+    def attach_validation(cls, widget: QWidget, *, checkbox_empty_if_unchecked=True) -> None:
+        def _run():
+            cls.validate_widget(widget, checkbox_empty_if_unchecked=checkbox_empty_if_unchecked)
+
+        if isinstance(widget, QLineEdit):
+            widget.textChanged.connect(_run)
+        elif isinstance(widget, QComboBox):
+            # cover both editable and non-editable
+            widget.currentIndexChanged.connect(lambda *_: _run())
+            widget.currentTextChanged.connect(lambda *_: _run())
+        elif isinstance(widget, QCheckBox):
+            widget.stateChanged.connect(lambda *_: _run())
+
+        # initial pass
+        _run()
+
+    @classmethod
+    def color_required_fields(cls, widget: ui.DictionaryEditor):
+        def is_optional(annotation) -> bool:
+            origin = get_origin(annotation)
+            if origin is Union:
+                args = get_args(annotation)
+                return NoneType in args
+            return False
+
+        for name, field in BsddDictionary.model_fields.items():
+            if name in ["Classes", "Properties"]:
+                continue
+            if is_optional(field.annotation):
+                continue
+            cls.attach_validation(widget.fields[name], checkbox_empty_if_unchecked=False)
+
+    @classmethod
+    def is_empty(cls, widget: QWidget, *, checkbox_empty_if_unchecked=True) -> bool:
+        if isinstance(widget, QLineEdit):
+            return widget.text().strip() == ""
+        if isinstance(widget, QComboBox):
+            # Consider empty if no selection or the current text is empty
+            # (works for both editable and non-editable combos)
+            if widget.currentIndex() < 0:
+                return True
+            return widget.currentText().strip() == ""
+        if isinstance(widget, QCheckBox):
+            # Define what "empty" means for a checkbox.
+            # Most UIs treat "unchecked" as empty only for required booleans.
+            if widget.isTristate():
+                return widget.checkState() == Qt.PartiallyChecked  # treat indeterminate as empty
+            return (not widget.isChecked()) if checkbox_empty_if_unchecked else False
+        # Unsupported widgets are never "empty" here
+        return False
+
+    @classmethod
+    def validate_widget(cls, widget: QWidget, *, checkbox_empty_if_unchecked=True) -> bool:
+        from bsdd_gui import tool
+
+        empty = cls.is_empty(widget, checkbox_empty_if_unchecked=checkbox_empty_if_unchecked)
+        tool.Util.set_invalid(widget, empty)
+        return not empty
