@@ -63,6 +63,33 @@ class ClassEditor(WidgetHandler):
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
+        """
+        Register a validator for a given input field within a widget.
+
+        This method attaches a validator function and a result handler to a UI field.
+        Whenever the field's value changes, the validator is executed, and its result is passed
+        to the result function for further handling (e.g., marking a QLineEdit red if invalid).
+
+        Args:
+            widget (QWidget):
+                The parent widget the field belongs to. Used for grouping validators.
+            field (QLineEdit | QComboBox | QTextEdit | TagInput):
+                The UI element whose value will be validated.
+            validator_function (callable):
+                A function that takes the field’s current value and the widget as arguments,
+                and returns whether the value is valid (e.g., `True`/`False`, or a more detailed result).
+            result_function (callable):
+                A function that takes the field and the validator result as arguments,
+                and applies a reaction (e.g., updating styles, enabling/disabling buttons).
+
+        Example:
+            >>> def is_not_empty(value, widget):
+            ...     return bool(value.strip())
+            >>> def highlight_invalid(field, is_valid):
+            ...     field.setStyleSheet("" if is_valid else "background-color: red;")
+            >>> MyForm.add_validator(form, line_edit, is_not_empty, highlight_invalid)
+        """
+
         if not widget in cls.get_properties().validator_functions:
             cls.get_properties().validator_functions[widget] = dict()
         cls.get_properties().validator_functions[widget][field] = (
@@ -72,12 +99,16 @@ class ClassEditor(WidgetHandler):
         rf, vf, f, w = result_function, validator_function, field, widget
         if isinstance(f, QLineEdit):
             f.textChanged.connect(lambda text: rf(f, vf(text, w)))
+            rf(f, vf(f.text(), w))
         if isinstance(f, QComboBox):
             f.currentTextChanged.connect(lambda text: rf(f, vf(text, w)))
+            rf(f, vf(f.currentText(), w))
         if isinstance(f, QTextEdit):
             f.textChanged.connect(lambda: rf(f, vf(f.toPlainText(), w)))
+            rf(f, vf(f.toPlainText(), w))
         if isinstance(f, label_tags_input.TagInput):
             f.tagsChanged.connect(lambda: rf(f, vf(f.tags(), w)))
+            rf(f, vf(f.tags(), w))
 
     @classmethod
     def sync_from_model(cls, class_editor: ui.ClassEditor):
@@ -107,25 +138,38 @@ class ClassEditor(WidgetHandler):
 
     @classmethod
     def all_inputs_are_valid(cls, widget: ui.ClassEditor):
-        if not cls.is_code_invalid(widget):
-            return False
+        function_dict = cls.get_properties().validator_functions.get(widget)
+        if not function_dict:
+            return
+        for f, (validator_function, result_function) in function_dict.items():
+            if isinstance(f, QLineEdit):
+                is_valid = validator_function(f.text(), widget)
+            elif isinstance(f, QComboBox):
+                is_valid = validator_function(f.currentText(), widget)
+            elif isinstance(f, QTextEdit):
+                is_valid = validator_function(f.toPlainText(), widget)
+            elif isinstance(f, label_tags_input.TagInput):
+                is_valid = validator_function(f.tags(), widget)
+            if not is_valid:
+                return False
+        return True
 
     @classmethod
-    def is_code_invalid(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
+    def is_code_valid(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
         if not code:
-            return True
+            return False
         bsdd_class = widget.bsdd_class
         for c in bsdd_dict.Classes:
             if c.Code == code and c != bsdd_class:
-                return True
+                return False
 
-        return False
+        return True
 
     @classmethod
-    def is_name_invalid(cls, name: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
-        if not name:
-            return True
-        return False
+    def is_name_valid(cls, name: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
+        if not name.strip():
+            return False
+        return True
 
     @classmethod
     def create_new_class_dialog(cls, parent) -> ui.NewDialog:

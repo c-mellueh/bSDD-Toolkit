@@ -23,14 +23,14 @@ def register_widget(
     class_editor.add_validator(
         widget,
         widget.le_code,
-        lambda v, w, p=project: class_editor.is_code_invalid(v, w, p.get()),
-        util.set_invalid,
+        lambda v, w, p=project: class_editor.is_code_valid(v, w, p.get()),
+        lambda w, v: util.set_invalid(w, not v),
     )
     class_editor.add_validator(
         widget,
         widget.le_name,
-        lambda v, w, p=project: class_editor.is_name_invalid(v, w, p.get()),
-        util.set_invalid,
+        lambda v, w, p=project: class_editor.is_name_valid(v, w, p.get()),
+        lambda w, v: util.set_invalid(w, not v),
     )
 
     ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
@@ -80,6 +80,9 @@ def connect_to_main_window(
 
     view = main_window.get_class_view()
     view.doubleClicked.connect(emit_class_info_requested)
+    main_window.signaller.new_class_requested.connect(
+        lambda: create_new_class(class_editor, main_window, project)
+    )
 
 
 def create_new_class(
