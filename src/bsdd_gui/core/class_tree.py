@@ -64,11 +64,3 @@ def connect_to_main_window(
     util.add_shortcut(
         "Ctrl+C", view, lambda: main_window.signaller.copy_active_class_requested.emit()
     )
-
-
-def copy_selected_class(
-    view: ui.ClassView, class_tree: Type[tool.ClassTree], class_editor: Type[tool.ClassEditor]
-):
-    selected_class = class_tree.get_selected_class(view)
-    dd = selected_class.model_dump()
-    new_class = BsddClass(**dd)
