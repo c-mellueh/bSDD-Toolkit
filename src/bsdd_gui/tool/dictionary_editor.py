@@ -4,19 +4,18 @@ from types import NoneType  # Python 3.10+
 import logging
 
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import WidgetHandler
-from PySide6.QtCore import Qt, QDateTime
+from bsdd_gui.presets.tool_presets import WidgetHandler, ModuleHandler
+from PySide6.QtCore import Qt, QDateTime, QObject, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFormLayout,
     QWidget,
-    QDateTimeEdit,
     QLineEdit,
     QLabel,
 )
 from datetime import datetime
-
+from bsdd_gui import tool
 from bsdd_gui.module.dictionary_editor import constants, ui
 from bsdd_parser import BsddDictionary
 
@@ -24,7 +23,13 @@ if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor.prop import DictionaryEditorProperties
 
 
-class DictionaryEditor(WidgetHandler):
+class Signaller(QObject):
+    window_requested = Signal()
+
+
+class DictionaryEditor(WidgetHandler, ModuleHandler):
+    signaller = Signaller()
+
     @classmethod
     def get_properties(cls) -> DictionaryEditorProperties:
         return bsdd_gui.DictionaryEditorProperties
@@ -88,13 +93,10 @@ class DictionaryEditor(WidgetHandler):
 
             # create input line
             elif datatype == datetime:
-                print("")
-                w = QDateTimeEdit()
-                w.setDisplayFormat("yyyy-MM-dd HH:mm:ss")
-                w.setCalendarPopup(True)
-                w.setTimeSpec(Qt.TimeSpec.LocalTime)  # or Qt.LocalTime
-                w.setDateTime(QDateTime.currentDateTime())
-                w.dateTimeChanged.connect(lambda time, n=name: widget.value_changed.emit(n, time))
+                w = ui.DateTimeWithNow()
+                w.dt_edit.dateTimeChanged.connect(
+                    lambda time, n=name: widget.value_changed.emit(n, time)
+                )
 
             # handle exceptions
             else:
@@ -118,11 +120,31 @@ class DictionaryEditor(WidgetHandler):
                 value_dict[field_name] = field.currentText()
             elif isinstance(field, QCheckBox):
                 value_dict[field_name] = field.isChecked()
-            elif isinstance(field, QDateTimeEdit):
-                value_dict[field_name] = field.dateTime().toPython()
+            elif isinstance(field, ui.DateTimeWithNow):
+                value_dict[field_name] = field.dt_edit.dateTime().toPython()
             else:
                 raise TypeError(f"Unsupported widget type: {type(widget)}")
         return value_dict
+
+    @classmethod
+    def set_dictionary_values(
+        cls, widget: ui.DictionaryEditor, value_dict: dict[str, str | bool | datetime]
+    ):
+        for name, value in value_dict.items():
+            field = widget.fields.get(name)
+            if not field:
+                continue
+            if isinstance(field, QLineEdit):
+                field.setText(value)
+            elif isinstance(field, QComboBox):
+                field.setCurrentText(value)
+            elif isinstance(field, QCheckBox):
+                field.setChecked(value)
+            elif isinstance(field, ui.DateTimeWithNow):
+                value: datetime
+                field.dt_edit.setDateTime(
+                    QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC)
+                )
 
     @classmethod
     def attach_validation(cls, widget: QWidget, *, checkbox_empty_if_unchecked=True) -> None:
@@ -202,3 +224,15 @@ class DictionaryEditor(WidgetHandler):
             if cls.is_empty(field_widget):
                 missing_inputs.append(name)
         return missing_inputs
+
+    @classmethod
+    def update_dictionary_value(cls, bsdd_dictionary: BsddDictionary, name, value):
+        if name not in BsddDictionary.model_fields:
+            return
+        if isinstance(value, str):
+            pass
+        elif isinstance(value, Qt.CheckState):
+            value = tool.Util.checkstate_to_bool(value)
+        elif isinstance(value, QDateTime):
+            value = value.toPython()
+        setattr(bsdd_dictionary, name, value)

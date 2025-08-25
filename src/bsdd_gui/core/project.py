@@ -100,6 +100,7 @@ def new_file_clicked(
     if dialog.exec():
         dv = dictionary_editor.get_dictionary_values(widget)
         project.create_project(dv)
+    dictionary_editor.unregister_widget(widget)
 
 
 def open_file_clicked(

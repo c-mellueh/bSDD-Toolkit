@@ -44,7 +44,6 @@ def register():
     for name, module in modules:
         if name not in preregister:
             module.register()
-    print("register Done!")
 
 
 def load_ui_triggers():

@@ -4,6 +4,7 @@ from typing import Callable, TYPE_CHECKING, Any
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QMenu, QMenuBar
 from PySide6.QtCore import QObject, Signal, QAbstractItemModel
 from PySide6.QtGui import QAction
+import logging
 
 if TYPE_CHECKING:
     from .prop_presets import (
@@ -84,7 +85,10 @@ class WidgetHandler(ABC):
 
     @classmethod
     def unregister_widget(cls, view: QWidget):
-        cls.get_properties().widgets.pop(view)
+        logging.info(f"Unregister {view}")
+        if not view in cls.get_properties().widgets:
+            return
+        cls.get_properties().widgets.remove(view)
 
     @classmethod
     def get_widgets(cls):
