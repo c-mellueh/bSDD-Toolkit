@@ -5,6 +5,8 @@ from typing import Type, TYPE_CHECKING
 from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH
 
 import bsdd_gui
+import os
+import json
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -120,3 +122,44 @@ def open_file_clicked(
     bsdd_gui.on_new_project()
     for plugin in plugins.get_available_plugins():
         plugins.on_new_project(plugin)
+
+
+def save_clicked(
+    proejct: Type[tool.Project],
+    popups: Type[tool.Popups],
+    appdata: Type[tool.Appdata],
+    main_window: Type[tool.MainWindow],
+):
+    save_path = appdata.get_path(SAVE_PATH)
+    if not os.path.exists(save_path) or not save_path.endswith("json"):
+        save_as_clicked(proejct, popups, appdata, main_window)
+    else:
+        save_project(save_path, proejct, appdata)
+
+
+def save_as_clicked(
+    project: Type[tool.Project],
+    popups: Type[tool.Popups],
+    appdata: Type[tool.Appdata],
+    main_window: Type[tool.MainWindow],
+):
+    path = appdata.get_path(SAVE_PATH)
+    title = QCoreApplication.translate("Project", "Save Project")
+    path = popups.get_save_path(FILETYPE, main_window.get(), path, title)
+    if path:
+        save_project(path, project, appdata)
+
+
+def save_project(path: str, project: Type[tool.Project], appdata: Type[tool.Appdata]):
+    if not path.endswith(".json"):
+        path += ".json"
+    for plugin_function in project.get_plugin_save_functions():
+        if plugin_function is None:
+            continue
+        plugin_function()
+    bsdd_dictionary = project.get()
+    with open(path, "w") as file:
+        json.dump(bsdd_dictionary.model_dump(mode="json", exclude_none=True), file)
+    appdata.set_path(OPEN_PATH, path)
+    appdata.set_path(SAVE_PATH, path)
+    logging.info(f"Save Done!")

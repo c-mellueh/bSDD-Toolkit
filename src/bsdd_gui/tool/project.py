@@ -47,3 +47,19 @@ class Project(ModuleHandler):
     def create_new_project_widget(cls) -> ui.NewDialog:
         cls.get_properties().dialog = ui.NewDialog()
         return cls.get_properties().dialog
+
+    @classmethod
+    def add_plugin_save_function(cls, func: callable) -> int:
+        """
+        add Function that gets called before Project is saved to JSON
+        """
+        cls.get_properties().plugin_save_functions.append(func)
+        return len(cls.get_properties().plugin_save_functions) - 1
+
+    @classmethod
+    def remove_plugin_save_function(cls, index: int):
+        cls.get_properties().plugin_save_functions[index] = None
+
+    @classmethod
+    def get_plugin_save_functions(cls):
+        return cls.get_properties().plugin_save_functions

@@ -33,10 +33,10 @@ def add_clicked():
 
 
 def save_clicked():
-    # TODO
+    core.save_clicked(tool.Project, tool.Popups, tool.Appdata, tool.MainWindow)
     pass
 
 
 def save_as_clicked():
-    # TODO
+    core.save_as_clicked(tool.Project, tool.Popups, tool.Appdata, tool.MainWindow)
     pass

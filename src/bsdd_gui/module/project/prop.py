@@ -11,3 +11,4 @@ class ProjectProperties(ModuleHandlerProperties):
         super().__init__()
         self.project_dictionary: BsddDictionary = None
         self.dialog = None
+        self.plugin_save_functions = list()
