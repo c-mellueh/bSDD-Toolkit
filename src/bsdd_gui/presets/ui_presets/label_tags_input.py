@@ -37,6 +37,24 @@ from PySide6.QtWidgets import (
 )
 import logging
 
+STYLE_SHEET = """
+        #Chip {
+            border: 1px solid palette(mid);
+            border-radius: 10px;
+            background: palette(base);
+        }
+        #ChipLabel { padding: 0px; }
+        #ChipClose { padding: 0px; }
+        """
+STYLE_SHEET2 = """
+    QLineEdit {
+        border: 1px solid palette(mid);
+        border-radius: 10px;
+        background: palette(base);
+        padding: 2px 6px;
+    }
+    """
+
 
 # ---------------------------
 # FlowLayout (wraps children)
@@ -162,25 +180,22 @@ class Chip(QFrame):
         lay.addWidget(self._close)
 
         # Simple styling (override with your QSS if you want)
-        self.setStyleSheet(
-            """
-        #Chip {
-            border: 1px solid palette(mid);
-            border-radius: 10px;
-            background: palette(base);
-        }
-        #ChipLabel { padding: 0px; }
-        #ChipClose { padding: 0px; }
-        """
-        )
+        self.setStyleSheet(STYLE_SHEET)
 
     def text(self) -> str:
         return self._text
 
     def sizeHint(self) -> QSize:
         fm = QFontMetrics(self.font())
-        w = fm.horizontalAdvance(self._text) + 8 + 12 + 8  # label + paddings + close
-        h = max(24, fm.height() + 6)
+        m = self.layout().contentsMargins()
+        w = (
+            fm.horizontalAdvance(self._text)
+            + m.left()
+            + m.right()
+            + self.layout().spacing()
+            + self._close.sizeHint().width()
+        )
+        h = max(24, fm.height() + m.top() + m.bottom())
         return QSize(w, h)
 
 
@@ -206,11 +221,21 @@ class TagInput(QWidget):
         self._flow = FlowLayout(self, margin=6, hspacing=6, vspacing=6)
 
         self._edit = QLineEdit()
+        self._edit.setObjectName("LineEdit")
         self._edit.setPlaceholderText(placeholder)
         self._edit.setFrame(False)
         self._edit.setMinimumWidth(minimum_le_width)
         self._edit.returnPressed.connect(self._commit_from_edit)
         self._edit.textEdited.connect(self._maybe_split_text)
+        self._edit.setStyleSheet(STYLE_SHEET2)
+
+        left, top, right, bottom = 8, 2, 4, 2
+        self._edit.setTextMargins(left, top, right, bottom)
+        fm = QFontMetrics(self._edit.font())
+        target_h = (
+            max(24, fm.height() + top + bottom) + 4
+        )  # I don't know why but i need th +4 else the line edit is not high enough #TODO
+        self._edit.setFixedHeight(target_h)
 
         if allowed:
             self._completer = QCompleter(sorted(allowed), self)
