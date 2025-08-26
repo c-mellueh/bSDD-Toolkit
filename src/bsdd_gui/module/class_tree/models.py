@@ -13,18 +13,29 @@ from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_parser.utils import bsdd_class as cl_utils
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import TableModel
+from PySide6.QtTest import QAbstractItemModelTester
 
 
 class ClassTreeModel(TableModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
         super().__init__(tool.ClassTree, *args, **kwargs)
+        self.tester = QAbstractItemModelTester(
+            self, QAbstractItemModelTester.FailureReportingMode.Warning
+        )
 
     @property
     def bsdd_dictionary(self):
         return tool.Project.get()
 
+    def hasChildren(self, parent=QModelIndex()):
+        if parent.isValid() and parent.column() != 0:
+            return False
+        return super().hasChildren(parent)
+
     def rowCount(self, parent=QModelIndex()):
+        if parent.isValid() and parent.column() != 0:
+            return 0
         if not parent.isValid():
             return len(cl_utils.get_root_classes(self.bsdd_dictionary))
         else:
@@ -32,20 +43,22 @@ class ClassTreeModel(TableModel):
             return len(cl_utils.get_children(bsdd_class))
 
     def index(self, row: int, column: int, parent=QModelIndex()):
+        # Für Eltern in Spalte != 0 KEINE Kinder liefern
+        if parent.isValid() and parent.column() != 0:
+            return QModelIndex()
+
         if not parent.isValid():
             roots = cl_utils.get_root_classes(self.bsdd_dictionary)
-            if row < 0 or row >= len(roots):
-                return QModelIndex()
-            bsdd_class = roots[row]
-            return self.createIndex(row, column, bsdd_class)
-        parent = parent.siblingAtColumn(0)
+            if 0 <= row < len(roots):
+                return self.createIndex(row, column, roots[row])
+            return QModelIndex()
+
+        parent = parent.siblingAtColumn(0)  # optional, schadet nicht
         parent_class: BsddClass = parent.internalPointer()
         children = cl_utils.get_children(parent_class)
-        if row >= len(children) or row < 0:
-            return QModelIndex()
-        bsdd_class = children[row]
-        index = self.createIndex(row, column, bsdd_class)
-        return index
+        if 0 <= row < len(children):
+            return self.createIndex(row, column, children[row])
+        return QModelIndex()
 
     def setData(self, index, value, /, role=...):
         return False
@@ -97,12 +110,9 @@ class ClassTreeModel(TableModel):
         return QModelIndex(), cl_utils.get_root_classes(self.bsdd_dictionary)
 
     def remove_row(self, bsdd_class: BsddClass) -> bool:
+        old_index = self._index_for_class(bsdd_class)
         parent_index, siblings = self._parent_and_siblings(bsdd_class)
-        try:
-            row = siblings.index(bsdd_class)
-        except ValueError:
-            # Knoten ist schon weg oder Liste inkonsistent – defensiv abbrechen.
-            return False
+        row = old_index.row()
 
         self.beginRemoveRows(parent_index, row, row)
         cl_utils.remove_class(bsdd_class)  # entfernt das Objekt aus bsdd_dictionary.Classes
@@ -137,11 +147,24 @@ class ClassTreeModel(TableModel):
             row = roots.index(cls)
             return self.index(row, 0, QModelIndex())
 
+    def remove_subtree(self, root: BsddClass):
+        # Post-Order Traversal
+        to_delete = []
+        stack = [root]
+        while stack:
+            n = stack.pop()
+            to_delete.append(n)
+            stack.extend(cl_utils.get_children(n))
+
+        for node in reversed(to_delete):
+            self.remove_row(node)
+
 
 # typing
 class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.setSortLocaleAware(True)
 
     def sourceModel(self) -> ClassTreeModel:
         return super().sourceModel()
