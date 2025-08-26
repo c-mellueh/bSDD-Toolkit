@@ -11,8 +11,9 @@ from PySide6.QtCore import (
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_parser.models import BsddDictionary, BsddClass
+from bsdd_parser.models import BsddDictionary, BsddClass, BsddProperty
 from bsdd_parser.utils import bsdd_class as cl_utils
+from bsdd_parser.utils import bsdd_class_property as cl_prop_utils
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import TableModel
 from PySide6.QtTest import QAbstractItemModelTester
@@ -285,45 +286,55 @@ class ClassTreeModel(TableModel):
             return False
 
         raw_classes = payload["classes"]
+        raw_properties = payload["properties"]
         root_codes = set(payload.get("roots", []))
 
         # 1) build code -> raw map; compute depth to sort parents before children
-        by_code = {rc["Code"]: rc for rc in raw_classes if isinstance(rc, dict) and "Code" in rc}
+        class_code_dict = {
+            rc["Code"]: rc for rc in raw_classes if isinstance(rc, dict) and "Code" in rc
+        }
+        property_code_dict = {
+            rp["Code"]: rp for rp in raw_properties if isinstance(rp, dict) and "Code" in rp
+        }
 
         def depth_of(code: str) -> int:
             d = 0
             seen = set()
-            c = by_code.get(code)
+            c = class_code_dict.get(code)
             while (
-                c and c.get("ParentClassCode") in by_code and c.get("ParentClassCode") not in seen
+                c
+                and c.get("ParentClassCode") in class_code_dict
+                and c.get("ParentClassCode") not in seen
             ):
                 seen.add(c["Code"])
-                c = by_code.get(c.get("ParentClassCode"))
+                c = class_code_dict.get(c.get("ParentClassCode"))
                 d += 1
             return d
 
-        ordered_codes = sorted(by_code.keys(), key=depth_of)  # parents first
+        ordered_class_codes = sorted(class_code_dict.keys(), key=depth_of)  # parents first
 
         # 2) conflict-safe code mapping
-        existing = set(cl_utils.get_all_class_codes(self.bsdd_dictionary))
+        existing_classes = set(cl_utils.get_all_class_codes(self.bsdd_dictionary))
+        existing_properties = set(cl_prop_utils.get_all_property_codes(self.bsdd_dictionary))
+
         old2new = {}
 
         def unique_code(wish: str) -> str:
-            if wish not in existing and wish not in old2new.values():
-                existing.add(wish)
+            if wish not in existing_classes and wish not in old2new.values():
+                existing_classes.add(wish)
                 return wish
             base = wish
             i = 2
             while True:
                 cand = f"{base} ({i})"
-                if cand not in existing and cand not in old2new.values():
-                    existing.add(cand)
+                if cand not in existing_classes and cand not in old2new.values():
+                    existing_classes.add(cand)
                     return cand
                 i += 1
 
         # 3) create & insert classes (parents first), adjusting codes/parents
-        for code in ordered_codes:
-            rc = dict(by_code[code])  # copy
+        for class_code in ordered_class_codes:
+            rc = dict(class_code_dict[class_code])  # copy
             # new code (unique in target)
             new_code = unique_code(rc["Code"])
             old2new[rc["Code"]] = new_code
@@ -351,6 +362,19 @@ class ClassTreeModel(TableModel):
             # insert with proper signals (parent must exist now)
             self.append_row(node)  # your append_row sets _parent_ref and signals insert
 
+        # 4) Insert Properties
+        #
+        # that don't exist so far
+        for property_code, property_json in property_code_dict.items():
+
+            if property_code in existing_properties:
+                continue
+            try:
+                node = BsddProperty.model_validate(property_json)
+                self.bsdd_dictionary.Properties.append(node)
+            except Exception:
+                # if invalid, skip this one (or log)
+                continue
         return True
 
     def _move_row_to(
@@ -403,27 +427,40 @@ class ClassTreeModel(TableModel):
         # flat list of class dicts (optionally entire subtrees of each selection)
         export_list = []
         roots = []
-        seen_codes = set()
+        seen_class_code = set()
+        seen_property_code = set()
 
-        def add_one(c: BsddClass):
-            if c.Code in seen_codes:
+        dictionary_properties = list()
+
+        def add_property(p: BsddProperty):
+            if p.Code in seen_property_code:
                 return
-            seen_codes.add(c.Code)
+            dictionary_properties.append(p.model_dump(mode="json"))
+
+        def add_class(c: BsddClass):
+            if c.Code in seen_class_code:
+                return
+            seen_class_code.add(c.Code)
             export_list.append(c.model_dump(mode="json"))
+            for cp in c.ClassProperties:
+                if not cp.PropertyCode:
+                    continue
+                add_property(cl_prop_utils.get_internal_property(cp))
 
         for c in classes:
             roots.append(c.Code)
             if include_subtree:
                 for n in self._collect_subtree(c):
-                    add_one(n)
+                    add_class(n)
             else:
-                add_one(c)
+                add_class(c)
 
         payload = {
             "kind": "BsddClassTransfer",
             "version": 1,
             "roots": roots,  # which items were dragged
             "classes": export_list,  # flat list, parents by ParentClassCode
+            "properties": dictionary_properties,
         }
         return json.dumps(payload, ensure_ascii=False).encode("utf-8")
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from bsdd_parser import BsddClassProperty, BsddProperty
+    from bsdd_parser import BsddClassProperty, BsddProperty, BsddDictionary
 import bsdd
 from bsdd import Client
 from . import bsdd_dictionary
@@ -47,3 +47,7 @@ def get_external_property(class_property: BsddClassProperty, client=None) -> dic
     if "statusCode" in result and result["statusCode"] == 400:
         return None
     return result
+
+
+def get_all_property_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddProperty]:
+    return {p.Code: p for p in bsdd_dictionary.Properties}
