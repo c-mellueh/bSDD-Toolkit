@@ -158,7 +158,10 @@ def delete_selection(
     if not delete_request:
         return
     for bsdd_class in selected_classes:
-        class_tree.delete_class(bsdd_class, recursive_deletion)
+        if recursive_deletion:
+            class_tree.delete_class_with_children(bsdd_class)
+        else:
+            class_tree.delete_class(bsdd_class)
 
 
 def copy_selected_class(

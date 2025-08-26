@@ -18,11 +18,8 @@ from PySide6.QtTest import QAbstractItemModelTester
 
 class ClassTreeModel(TableModel):
 
-    def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(tool.ClassTree, *args, **kwargs)
-        self.tester = QAbstractItemModelTester(
-            self, QAbstractItemModelTester.FailureReportingMode.Warning
-        )
 
     @property
     def bsdd_dictionary(self):
@@ -63,16 +60,36 @@ class ClassTreeModel(TableModel):
     def setData(self, index, value, /, role=...):
         return False
 
-    def parent(self, index: QModelIndex):
+    def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():
             return QModelIndex()
-        bsdd_class: BsddClass = index.internalPointer()
-        if not bsdd_class.ParentClassCode:
-            return QModelIndex()
-        parent_class = cl_utils.get_class_by_code(self.bsdd_dictionary, bsdd_class.ParentClassCode)
-        row = cl_utils.get_row_index(parent_class)
 
-        return self.createIndex(row, 0, parent_class)
+        node: BsddClass = index.internalPointer()
+        if not node.ParentClassCode:
+            return QModelIndex()  # root hat keinen Parent
+
+        parent_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, node.ParentClassCode)
+        if parent_cls is None:
+            return QModelIndex()
+
+        # Geschwister des Elterns ermitteln – exakt wie in index():
+        gp_code = parent_cls.ParentClassCode
+        if gp_code:
+            gp_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, gp_code)
+            siblings = (
+                cl_utils.get_children(gp_cls)
+                if gp_cls is not None
+                else cl_utils.get_root_classes(self.bsdd_dictionary)
+            )
+        else:
+            siblings = cl_utils.get_root_classes(self.bsdd_dictionary)
+
+        try:
+            row = siblings.index(parent_cls)
+        except ValueError:
+            return QModelIndex()
+
+        return self.createIndex(row, 0, parent_cls)
 
     def _get_current_parent_index(self, bsdd_class: BsddClass):
         # Determine the correct parent index in the CURRENT hierarchy
@@ -146,18 +163,6 @@ class ClassTreeModel(TableModel):
             roots = cl_utils.get_root_classes(self.bsdd_dictionary)
             row = roots.index(cls)
             return self.index(row, 0, QModelIndex())
-
-    def remove_subtree(self, root: BsddClass):
-        # Post-Order Traversal
-        to_delete = []
-        stack = [root]
-        while stack:
-            n = stack.pop()
-            to_delete.append(n)
-            stack.extend(cl_utils.get_children(n))
-
-        for node in reversed(to_delete):
-            self.remove_row(node)
 
 
 # typing

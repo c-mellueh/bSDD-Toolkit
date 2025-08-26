@@ -115,19 +115,22 @@ class ClassTree(ColumnHandler, ViewHandler):
         return result
 
     @classmethod
-    def delete_class(cls, bsdd_class: BsddClass, recursive: bool):
+    def delete_class(cls, bsdd_class: BsddClass):
         model: ClassTreeModel = cls.get_properties().model
+        parent = class_utils.get_parent(bsdd_class)
+        for child in class_utils.get_children(bsdd_class):
+            model.move_row(child, parent)
+        model.remove_row(bsdd_class)
 
-        def iterate_deletion(c: BsddClass):
-            if recursive:
-                for child in list(class_utils.get_children(c)):
-                    iterate_deletion(child)
-            model.remove_row(c)
+    @classmethod
+    def delete_class_with_children(cls, bsdd_class: BsddClass):
+        model: ClassTreeModel = cls.get_properties().model
+        to_delete = []
+        stack = [bsdd_class]
+        while stack:
+            n = stack.pop()
+            to_delete.append(n)
+            stack.extend(class_utils.get_children(n))
 
-        if recursive:
-            iterate_deletion(bsdd_class)
-        else:
-            parent = class_utils.get_parent(bsdd_class)
-            for child in class_utils.get_children(bsdd_class):
-                model.move_row(child, parent)
-            model.remove_row(bsdd_class)
+        for node in reversed(to_delete):
+            model.remove_row(node)
