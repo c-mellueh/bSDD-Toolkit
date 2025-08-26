@@ -85,12 +85,29 @@ class ClassTreeModel(TableModel):
         bsdd_class._set_parent(self.bsdd_dictionary)
         self.endInsertRows()
 
-    def remove_row(self, bsdd_class: BsddClass):
-        parent_index = self._get_current_parent_index(bsdd_class)
-        row = cl_utils.get_row_index(bsdd_class)
+    def _parent_and_siblings(self, c: BsddClass) -> tuple[QModelIndex, list[BsddClass]]:
+        """Ermittle *aktuellen* Parent-Index und die *aktuelle* Geschwisterliste von c."""
+        if c.ParentClassCode:
+            parent_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, c.ParentClassCode)
+            if parent_cls is not None:
+                parent_index = self._index_for_class(parent_cls)
+                siblings = cl_utils.get_children(parent_cls)
+                return parent_index, siblings
+        # Root-Fall
+        return QModelIndex(), cl_utils.get_root_classes(self.bsdd_dictionary)
+
+    def remove_row(self, bsdd_class: BsddClass) -> bool:
+        parent_index, siblings = self._parent_and_siblings(bsdd_class)
+        try:
+            row = siblings.index(bsdd_class)
+        except ValueError:
+            # Knoten ist schon weg oder Liste inkonsistent – defensiv abbrechen.
+            return False
+
         self.beginRemoveRows(parent_index, row, row)
-        cl_utils.remove_class(bsdd_class)
+        cl_utils.remove_class(bsdd_class)  # entfernt das Objekt aus bsdd_dictionary.Classes
         self.endRemoveRows()
+        return True
 
     def move_row(self, bsdd_class: BsddClass, new_parent: BsddClass | None):
         old_parent_index = self._get_current_parent_index(bsdd_class)
