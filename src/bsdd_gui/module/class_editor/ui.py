@@ -38,7 +38,7 @@ class ClassEditor(QWidget, ui_ClassEditor.Ui_ClassEditor):
         super().paintEvent(event)
 
 
-class _ClassDialog(QDialog):
+class EditDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowIcon(get_icon())
@@ -49,22 +49,8 @@ class _ClassDialog(QDialog):
         self._layout.addWidget(self.button_box)
         self.setLayout(self._layout)
         self.resize(680, 750)
+        self._editor_widget: ClassEditor = None
+        self.new_button = self.button_box.addButton("Ok", QDialogButtonBox.ActionRole)
 
     def paintEvent(self, event):
         return super().paintEvent(event)
-
-
-class NewDialog(_ClassDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        new_text = QCoreApplication.translate("ClassEditor", "Create New Class")
-        self.setWindowTitle(new_text)
-        self.new_button = self.button_box.addButton(new_text, QDialogButtonBox.ActionRole)
-
-
-class EditDialog(_ClassDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        edit_text = QCoreApplication.translate("ClassEditor", "Edit Class")
-        self.setWindowTitle(edit_text)
-        self.new_button = self.button_box.addButton(edit_text, QDialogButtonBox.ActionRole)

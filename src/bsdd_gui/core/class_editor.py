@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClass
 import logging
 from bsdd_parser.utils import bsdd_class as class_util
-from copy import copy as cp
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -87,56 +86,49 @@ def connect_to_main_window(
         bsdd_class = index.internalPointer()
         if not bsdd_class:
             return
-        class_editor.signaller.class_info_requested.emit(bsdd_class)
+        class_editor.signaller.edit_class_requested.emit(bsdd_class)
 
     view = main_window.get_class_view()
     view.doubleClicked.connect(emit_class_info_requested)
+
     main_window.signaller.new_class_requested.connect(
-        lambda: create_new_class(class_editor, main_window)
+        lambda: class_editor.request_new_class(main_window.get_active_class())
     )
     main_window.signaller.copy_active_class_requested.connect(
-        lambda: create_new_class(class_editor, main_window, mode=1)
+        lambda: class_editor.request_class_copy(main_window.get_active_class())
     )
 
 
 def create_new_class(
+    parent: BsddClass | None,
     class_editor: Type[tool.ClassEditor],
     main_window: Type[tool.MainWindow],
-    mode=0,
 ):
-    """_summary_
-    mode 0 = create new
-    mode 1 = copy selected
-    Args:
-        class_editor (Type[tool.ClassEditor]): _description_
-        main_window (Type[tool.MainWindow]): _description_
-        project (Type[tool.Project]): _description_
-        model (int, optional): _description_. Defaults to 0.
-    """
 
-    def validate():
-        if class_editor.all_inputs_are_valid(widget):
-            dialog.accept()
-        else:
-            pass
+    new_class = BsddClass(Code="Code", Name="Name", ClassType="Class")
+    new_class.ParentClassCode = parent.Code if parent is not None else None
+    dialog = class_editor.create_class_editor_dialog(new_class, main_window.get())
+    widget = dialog._editor_widget
+    text = QCoreApplication.translate("ClassEditor", "Create New Class")
+    dialog.setWindowTitle(text)
+    if dialog.exec():
+        class_editor.sync_to_model(widget)
+        class_editor.signaller.new_class_created.emit(new_class)
+    class_editor.unregister_widget(widget)
 
-    active_class = main_window.get_active_class()
-    if not active_class:
-        new_class = BsddClass(Code="undef", Name="undef", ClassType="Class")
-    else:
-        # new_class = active_class.model_copy(update={}, deep=True)
-        if mode == 0:
-            dd = active_class.model_dump(include=["Code", "Name", "ParentClassCode"])
-            dd["ClassType"] = "Class"
-        if mode == 1:
-            dd = active_class.model_dump()
-        new_class = BsddClass(**dd)
 
-    widget = class_editor.create_widget(new_class)
-    class_editor.sync_from_model(widget)
-    dialog = class_editor.create_new_class_dialog(main_window.get())
-    dialog._layout.insertWidget(0, widget)
-    dialog.new_button.clicked.connect(validate)
+def copy_class(
+    old_class: BsddClass,
+    class_editor: Type[tool.ClassEditor],
+    main_window: Type[tool.MainWindow],
+):
+    if not old_class:
+        return
+    new_class = class_editor.copy_class(old_class)
+    dialog = class_editor.create_class_editor_dialog(new_class, main_window.get())
+    widget = dialog._editor_widget
+    text = QCoreApplication.translate("ClassEditor", "Copy Class")
+    dialog.setWindowTitle(text)
     if dialog.exec():
         class_editor.sync_to_model(widget)
         class_editor.signaller.new_class_created.emit(new_class)
@@ -146,19 +138,10 @@ def create_new_class(
 def open_class_editor(
     bsdd_class: BsddClass, class_editor: Type[tool.ClassEditor], main_window: Type[tool.MainWindow]
 ):
-    def validate():
-        if class_editor.all_inputs_are_valid(widget):
-            dialog.accept()
-        else:
-            pass
-
-    logging.info(f"Open Class Editor for {bsdd_class.Code}")
-    dialog = class_editor.create_edit_class_dialog(main_window.get())
-    widget = class_editor.create_widget(bsdd_class)
-    class_editor.sync_from_model(widget)
-
-    dialog._layout.insertWidget(0, widget)
-    dialog.new_button.clicked.connect(validate)
+    dialog = class_editor.create_class_editor_dialog(bsdd_class, main_window.get())
+    widget = dialog._editor_widget
+    text = QCoreApplication.translate("ClassEditor", "Edit Class")
+    dialog.setWindowTitle(text)
     if dialog.exec():
         class_editor.sync_to_model(widget)
     class_editor.unregister_widget(widget)

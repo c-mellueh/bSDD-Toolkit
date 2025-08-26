@@ -26,5 +26,13 @@ def open_class_editor(bsdd_class: BsddClass):
     core.open_class_editor(bsdd_class, tool.ClassEditor, tool.MainWindow)
 
 
+def copy_class(bsdd_class: BsddClass):
+    core.copy_class(bsdd_class, tool.ClassEditor, tool.MainWindow)
+
+
+def create_new_class(parent_class: BsddClass | None):
+    core.create_new_class(parent_class, tool.ClassEditor, tool.MainWindow)
+
+
 def class_editor_created(class_editor: ui.ClassEditor):
     core.register_widget(class_editor, tool.ClassEditor, tool.Project, tool.Util)
