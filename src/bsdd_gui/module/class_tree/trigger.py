@@ -38,3 +38,7 @@ def reset_class_views():
 
 def copy_selected_class(view: ui.ClassView):
     core.copy_selected_class(view, tool.ClassTree, tool.ClassEditor)
+
+
+def create_context_menu(view: ui.ClassView, pos):
+    core.create_context_menu(view, pos, tool.ClassTree)

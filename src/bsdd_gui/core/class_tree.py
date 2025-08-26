@@ -33,9 +33,9 @@ def connect_view(
     view.setSelectionBehavior(QTreeView.SelectRows)
     view.setSelectionMode(QTreeView.ExtendedSelection)
     view.setAlternatingRowColors(True)
-
     sel_model = view.selectionModel()
     sel_model.currentChanged.connect(lambda s, d: class_tree.on_current_changed(view, s, d))
+    class_tree.connect_view_signals(view)
 
 
 def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
@@ -92,7 +92,7 @@ def define_class_tree_context_menu(
     class_tree.add_context_menu_entry(
         tree,
         lambda: QCoreApplication.translate("Class", "Delete"),
-        lambda: class_tree.signaller.delete_selection_requested(tree),
+        lambda: class_tree.signaller.delete_selection_requested.emit(tree),
         True,
         True,
         True,
@@ -100,7 +100,7 @@ def define_class_tree_context_menu(
     class_tree.add_context_menu_entry(
         tree,
         lambda: QCoreApplication.translate("Class", "Extend"),
-        lambda: class_tree.signaller.expand_selection_requested(tree),
+        lambda: class_tree.signaller.expand_selection_requested.emit(tree),
         True,
         True,
         True,
@@ -108,7 +108,7 @@ def define_class_tree_context_menu(
     class_tree.add_context_menu_entry(
         tree,
         lambda: QCoreApplication.translate("Class", "Collapse"),
-        lambda: class_tree.signaller.collapse_selection_requested(tree),
+        lambda: class_tree.signaller.collapse_selection_requested.emit(tree),
         True,
         True,
         True,
@@ -116,7 +116,7 @@ def define_class_tree_context_menu(
     class_tree.add_context_menu_entry(
         tree,
         lambda: QCoreApplication.translate("Class", "Group"),
-        lambda: class_tree.signaller.group_selection_requested(tree),
+        lambda: class_tree.signaller.group_selection_requested.emit(tree),
         True,
         True,
         True,
@@ -141,7 +141,7 @@ def define_class_tree_context_menu(
 
 
 def create_context_menu(view: ui.ClassView, pos: QPoint, class_tree: Type[tool.ClassTree]):
-    bsdd_classes = class_tree.get_selected_classes()
+    bsdd_classes = class_tree.get_selected_classes(view)
     menu = class_tree.create_context_menu(view, bsdd_classes)
     menu_pos = view.viewport().mapToGlobal(pos)
     menu.exec(menu_pos)

@@ -39,6 +39,10 @@ class ClassTree(ColumnHandler, ViewHandler):
         cls.signaller.copy_selection_requested.connect(trigger.copy_selected_class)
 
     @classmethod
+    def connect_view_signals(cls, view: ui.ClassView):
+        view.customContextMenuRequested.connect(lambda p: trigger.create_context_menu(view, p))
+
+    @classmethod
     def create_model(cls, bsdd_dictionary: BsddDictionary):
         model = models.ClassTreeModel(bsdd_dictionary)
         cls.get_properties().model = model
