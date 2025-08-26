@@ -64,3 +64,5 @@ def connect_to_main_window(
     util.add_shortcut(
         "Ctrl+C", view, lambda: main_window.signaller.copy_active_class_requested.emit()
     )
+
+    util.add_shortcut("Ctrl+E", view, view.expandAll)

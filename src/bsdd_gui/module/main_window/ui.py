@@ -11,6 +11,7 @@ class MainWindow(QMainWindow, ui_MainWindow.Ui_MainWindow):
         self.setupUi(self)
         self.app: QApplication = application
         self.setWindowIcon(get_icon())
+        self.splitter.setOpaqueResize(False)
 
     # Open / Close windows
     def closeEvent(self, event):
