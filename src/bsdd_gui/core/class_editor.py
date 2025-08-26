@@ -3,7 +3,7 @@ from PySide6.QtCore import QModelIndex, QCoreApplication
 from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClass
 import logging
-from bsdd_parser.utils import bsdd_class as class_util
+from bsdd_parser.utils import bsdd_class as class_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -145,3 +145,25 @@ def open_class_editor(
     if dialog.exec():
         class_editor.sync_to_model(widget)
     class_editor.unregister_widget(widget)
+
+
+def group_classes(
+    bsdd_classes: list[BsddClass],
+    class_editor: Type[tool.ClassEditor],
+    main_window: Type[tool.MainWindow],
+    project: Type[tool.Project],
+    class_tree: Type[tool.ClassTree],
+):
+    new_class = BsddClass(Code="GroupCode", Name="GroupName", ClassType="Class")
+    parent = class_utils.shared_parent(bsdd_classes, dictionary=project.get(), mode="lowest")
+    parent_code = None if parent is None else parent.Code
+    new_class.ParentClassCode = parent_code
+    dialog = class_editor.create_class_editor_dialog(new_class, main_window.get())
+    widget = dialog._editor_widget
+    text = QCoreApplication.translate("ClassEditor", "Group Classes")
+    dialog.setWindowTitle(text)
+    if dialog.exec():
+        class_editor.sync_to_model(widget)
+        class_editor.signaller.new_class_created.emit(new_class)
+        for child_class in bsdd_classes:
+            class_tree.move_class(child_class, new_class)

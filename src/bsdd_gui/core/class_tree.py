@@ -2,6 +2,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import QTreeView
 from PySide6.QtCore import QPoint, QCoreApplication
 from typing import Type, TYPE_CHECKING
+from bsdd_parser.utils import bsdd_class as class_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -162,6 +163,19 @@ def delete_selection(
             class_tree.delete_class_with_children(bsdd_class)
         else:
             class_tree.delete_class(bsdd_class)
+
+
+def group_selection(
+    view: ui.ClassView,
+    class_tree: Type[tool.ClassTree],
+    class_editor: Type[tool.ClassEditor],
+):
+    bsdd_classes = class_tree.get_selected_classes(
+        view,
+    )
+    if not bsdd_classes:
+        return
+    class_editor.request_class_grouping(bsdd_classes)
 
 
 def copy_selected_class(

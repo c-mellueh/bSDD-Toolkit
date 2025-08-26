@@ -34,5 +34,11 @@ def create_new_class(parent_class: BsddClass | None):
     core.create_new_class(parent_class, tool.ClassEditor, tool.MainWindow)
 
 
+def group_classes(bsdd_classes: list[BsddClass]):
+    core.group_classes(
+        bsdd_classes, tool.ClassEditor, tool.MainWindow, tool.Project, tool.ClassTree
+    )
+
+
 def class_editor_created(class_editor: ui.ClassEditor):
     core.register_widget(class_editor, tool.ClassEditor, tool.Project, tool.Util)

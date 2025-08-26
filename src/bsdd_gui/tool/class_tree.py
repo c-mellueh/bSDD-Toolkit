@@ -39,6 +39,7 @@ class ClassTree(ColumnHandler, ViewHandler):
         cls.signaller.model_refresh_requested.connect(trigger.reset_class_views)
         cls.signaller.copy_selection_requested.connect(trigger.copy_selected_class)
         cls.signaller.delete_selection_requested.connect(trigger.delete_selection)
+        cls.signaller.group_selection_requested.connect(trigger.group_selection)
 
     @classmethod
     def connect_view_signals(cls, view: ui.ClassView):
@@ -121,6 +122,11 @@ class ClassTree(ColumnHandler, ViewHandler):
         for child in class_utils.get_children(bsdd_class):
             model.move_row(child, parent)
         model.remove_row(bsdd_class)
+
+    @classmethod
+    def move_class(cls, bsdd_class: BsddClass, new_parent: BsddClass | None):
+        model: ClassTreeModel = cls.get_properties().model
+        model.move_row(bsdd_class, new_parent)
 
     @classmethod
     def delete_class_with_children(cls, bsdd_class: BsddClass):

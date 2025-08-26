@@ -46,3 +46,7 @@ def create_context_menu(view: ui.ClassView, pos):
 
 def delete_selection(view: ui.ClassView):
     core.delete_selection(view, tool.ClassTree, tool.Popups)
+
+
+def group_selection(view: ui.ClassView):
+    core.group_selection(view, tool.ClassTree, tool.ClassEditor)
