@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 import os
 import bsdd_gui
 from bsdd_gui.resources.icons import get_icon
+from bsdd_gui.module.popups import ui
 
 if TYPE_CHECKING:
     from bsdd_gui.module.popups.prop import PopupsProperties
@@ -92,3 +93,35 @@ class Popups:
             path = os.path.basename(path)
         path = QFileDialog.getExistingDirectory(parent=window, dir=path)
         return path
+
+    @classmethod
+    def req_delete_items(cls, string_list, item_type=1) -> tuple[bool, bool]:
+        """
+        item_type 1= Class,2= Node, 3 = PropertySet, 4 = Property
+        """
+        dialog = ui.DeleteRequestDialog()
+        if len(string_list) <= 1:
+            if item_type == 1:
+                dialog.label.setText(QCoreApplication.translate("Popups", "Delete Class?"))
+            if item_type == 2:
+                dialog.label.setText(QCoreApplication.translate("Popups", "Delete Node?"))
+            if item_type == 3:
+                dialog.label.setText(QCoreApplication.translate("Popups", "Delete PropertySet?"))
+            if item_type == 4:
+                dialog.label.setText(QCoreApplication.translate("Popups", "Delete Property?"))
+        else:
+            if item_type == 1:
+                dialog.label.setText(QCoreApplication.translate("Popups", "Delete Classes?"))
+            if item_type == 2:
+                dialog.label.setText(QCoreApplication.translate("Popups", "Delete Nodes?"))
+            if item_type == 3:
+                dialog.label.setText(QCoreApplication.translate("Popups", "Delete PropertySets?"))
+            if item_type == 4:
+                dialog.label.setText(QCoreApplication.translate("Popups", "Delete Properties?"))
+        for text in string_list:
+            dialog.listWidget.addItem(QListWidgetItem(text))
+        result = dialog.exec()
+        check_box_state = (
+            True if dialog.check_box_recursion.checkState() == Qt.CheckState.Checked else False
+        )
+        return bool(result), check_box_state

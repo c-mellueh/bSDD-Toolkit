@@ -81,6 +81,23 @@ class ClassTreeModel(TableModel):
         bsdd_class._set_parent(self.bsdd_dictionary)
         self.endInsertRows()
 
+    def remove_row(self, bsdd_class: BsddClass):
+        if bsdd_class.ParentClassCode:
+            parent_class = cl_utils.get_class_by_code(
+                self.bsdd_dictionary, bsdd_class.ParentClassCode
+            )
+            if parent_class is None:
+                parent_index = QModelIndex()
+            else:
+                parent_index = self._index_for_class(parent_class)
+        else:
+            parent_index = QModelIndex()
+
+        row = cl_utils.get_row_index(bsdd_class)
+        self.beginRemoveRows(parent_index, row, row)
+        cl_utils.remove_class(bsdd_class)
+        self.endRemoveRows()
+
     def _index_for_class(self, cls: BsddClass) -> QModelIndex:
         """Return the QModelIndex for an existing class object."""
         # find its parent chain to build the index properly

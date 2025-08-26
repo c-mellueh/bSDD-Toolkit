@@ -147,6 +147,20 @@ def create_context_menu(view: ui.ClassView, pos: QPoint, class_tree: Type[tool.C
     menu.exec(menu_pos)
 
 
+def delete_selection(
+    view: ui.ClassView, class_tree: Type[tool.ClassTree], popups: Type[tool.Popups]
+):
+
+    selected_classes = class_tree.get_selected_classes(view)
+    delete_request, recursive_deletion = popups.req_delete_items(
+        [c.Name for c in selected_classes], item_type=1
+    )
+    if not delete_request:
+        return
+    for bsdd_class in selected_classes:
+        class_tree.delete_class(bsdd_class, recursive_deletion)
+
+
 def copy_selected_class(
     view: ui.ClassView,
 ):

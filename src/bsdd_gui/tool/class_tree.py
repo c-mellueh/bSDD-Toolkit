@@ -15,6 +15,7 @@ from bsdd_gui.presets.tool_presets import ColumnHandler, ViewHandler, ViewSignal
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_tree.prop import ClassTreeProperties
+    from bsdd_gui.module.class_tree.models import ClassTreeModel
 
 
 class Signaller(ViewSignaller):
@@ -37,6 +38,7 @@ class ClassTree(ColumnHandler, ViewHandler):
     def connect_signals(cls):
         cls.signaller.model_refresh_requested.connect(trigger.reset_class_views)
         cls.signaller.copy_selection_requested.connect(trigger.copy_selected_class)
+        cls.signaller.delete_selection_requested.connect(trigger.delete_selection)
 
     @classmethod
     def connect_view_signals(cls, view: ui.ClassView):
@@ -111,3 +113,15 @@ class ClassTree(ColumnHandler, ViewHandler):
                 result.append(obj)
 
         return result
+
+    @classmethod
+    def delete_class(cls, bsdd_class: BsddClass, recursive: bool):
+        model: ClassTreeModel = cls.get_properties().model
+
+        def iterate_deletion(c: BsddClass):
+            if recursive:
+                for child in list(class_utils.get_children(c)):
+                    iterate_deletion(child)
+            model.remove_row(c)
+
+        iterate_deletion(bsdd_class)
