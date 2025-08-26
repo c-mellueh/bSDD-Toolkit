@@ -4,8 +4,10 @@ from typing import TYPE_CHECKING, Type
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
+    from bsdd_gui.module.property_set_table.models import PsetTableModel
+
 from bsdd_gui.module.property_set_table import ui
-from PySide6.QtCore import QCoreApplication, QPoint
+from PySide6.QtCore import QCoreApplication, QPoint, QModelIndex
 from PySide6.QtWidgets import QApplication, QListView
 from bsdd_parser.models import BsddClass
 
@@ -49,10 +51,28 @@ def connect_to_main_window(
             row_index = 0
         property_set_table.select_row(pset_view, row_index)
 
+    def rename_pset(model: PsetTableModel, index: QModelIndex, new_name: str):
+        old_name = index.data()
+        bsdd_class = model.active_class
+        if property_set_table.is_temporary_pset(bsdd_class, old_name):
+            property_set_table.rename_temporary_pset(bsdd_class, old_name, new_name)
+        else:
+            property_set_table.rename_property_set(bsdd_class, old_name, new_name)
+        if (
+            main_window.get_active_class() == bsdd_class
+            and main_window.get_active_pset() == old_name
+        ):
+            main_window.set_active_pset(new_name)
+
     property_set_table.connect_signals()
     pset_view = main_window.get_pset_view()
     model = pset_view.model().sourceModel()
-    property_set_table.add_column_to_table(model, "Name", lambda a: a)
+    pset_view.setEditTriggers(
+        pset_view.EditTrigger.DoubleClicked | pset_view.EditTrigger.SelectedClicked
+    )
+
+    property_set_table.add_column_to_table(model, "Name", lambda a: a, rename_pset)
+
     main_window.signaller.active_class_changed.connect(reset_pset)
     property_set_table.signaller.selection_changed.connect(
         lambda v, n: (main_window.set_active_pset(n) if v == main_window.get_pset_view() else None)
@@ -90,6 +110,15 @@ def define_context_menu(
         lambda: property_set_table.signaller.delete_selection_requested.emit(view),
         True,
         True,
+        True,
+    )
+
+    property_set_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("PropertySet", "Rename"),
+        lambda: property_set_table.signaller.rename_selection_requested.emit(view),
+        True,
+        True,
         False,
     )
 
@@ -124,3 +153,13 @@ def delete_selection(
 
     property_table.signaller.model_refresh_requested.emit()
     property_set_table.signaller.model_refresh_requested.emit()
+
+
+def rename_selection(
+    view: ui.PsetTableView,
+    property_set_table: Type[tool.PropertySetTable],
+    property_table: Type[tool.PropertyTable],
+    main_window: Type[tool.MainWindow],
+):
+    selected_psets = [i for i in view.selectedIndexes() if i.column() == 0][0]
+    view.edit(selected_psets)

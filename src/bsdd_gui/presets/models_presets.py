@@ -33,6 +33,19 @@ class TableModel(QAbstractItemModel):
         getter_func = self.tool.get_value_functions(self)[index.column()]
         return getter_func(index.internalPointer())
 
+    def setData(self, index, value, /, role=...):
+        if not index.isValid():
+            return False
+        if role == Qt.ItemDataRole.EditRole:
+            setter_func = self.tool.set_value_functions(self)[index.column()]
+            if setter_func is None:
+                return False
+            setter_func(self, index, value)
+            self.dataChanged.emit(index, index, [Qt.DisplayRole, Qt.EditRole])
+            return True
+        return False
+        return super().setData(index, value, role)
+
     def headerData(self, section, orientation, /, role=...):
         if role != Qt.ItemDataRole.DisplayRole:
             return None

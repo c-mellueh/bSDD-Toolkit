@@ -16,6 +16,7 @@ class Signaller(ViewSignaller):
     new_property_set_requested = Signal(BsddClass)
     delete_selection_requested = Signal(ui.PsetTableView)
     property_set_deleted = Signal(BsddClass, str)
+    rename_selection_requested = Signal(ui.PsetTableView)
 
 
 class PropertySetTable(ColumnHandler, ViewHandler):
@@ -30,6 +31,7 @@ class PropertySetTable(ColumnHandler, ViewHandler):
         cls.signaller.new_property_set_requested.connect(trigger.create_new_property_set)
         cls.signaller.model_refresh_requested.connect(trigger.reset_views)
         cls.signaller.delete_selection_requested.connect(trigger.delete_selection)
+        cls.signaller.rename_selection_requested.connect(trigger.rename_selection)
 
     @classmethod
     def connect_view_signals(cls, view: ui.PsetTableView):
@@ -106,5 +108,21 @@ class PropertySetTable(ColumnHandler, ViewHandler):
         return True
 
     @classmethod
+    def rename_temporary_pset(cls, bsdd_class: BsddClass, old_name, new_name):
+        class_code = bsdd_class.Code
+        if class_code not in cls.get_properties().temporary_pset:
+            return
+        if not old_name in cls.get_properties().temporary_pset[class_code]:
+            return
+        index = cls.get_properties().temporary_pset[class_code].index(old_name)
+        cls.get_properties().temporary_pset[class_code][index] = new_name
+
+    @classmethod
     def get_selected(cls, view: ui.PsetTableView):
         return list({index.data() for index in view.selectedIndexes()})
+
+    @classmethod
+    def rename_property_set(cls, bsdd_class: BsddClass, old_name, new_name):
+        for class_property in bsdd_class.ClassProperties:
+            if class_property.PropertySet == old_name:
+                class_property.PropertySet = new_name

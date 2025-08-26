@@ -23,17 +23,18 @@ class ColumnHandler(ABC):
 
     @classmethod
     def add_column_to_table(
-        cls, model: QAbstractItemModel, name: str, get_function: Callable
+        cls, model: QAbstractItemModel, name: str, get_function: Callable, set_function=None
     ) -> None:
         """
         Define Column which should be shown in Table
         :param name: Name of Column
         :param get_function: getter function for cell value. SOMcreator.SOMProperty will be passed as argument
+        set_function: function(model,index,new_value)
         :return:
         """
         if not model in cls.get_properties().columns:
             cls.get_properties().columns[model] = list()
-        cls.get_properties().columns[model].append((name, get_function))
+        cls.get_properties().columns[model].append((name, get_function, set_function))
 
     @classmethod
     def get_column_count(cls, model: QAbstractItemModel):
@@ -47,6 +48,18 @@ class ColumnHandler(ABC):
     @classmethod
     def get_value_functions(cls, model: QAbstractItemModel):
         return [x[1] for x in cls.get_properties().columns.get(model) or []]
+
+    @classmethod
+    def set_value_functions(cls, model: QAbstractItemModel):
+        """_summary_
+        model,index,new_value
+        Args:
+            model (QAbstractItemModel): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        return [x[2] for x in cls.get_properties().columns.get(model) or []]
 
     @classmethod
     def get_model(cls):

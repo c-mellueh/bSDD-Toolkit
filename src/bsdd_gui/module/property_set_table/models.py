@@ -44,8 +44,11 @@ class PsetTableModel(TableModel):
         index = self.createIndex(row, column, pset_name)
         return index
 
-    def setData(self, index, value, /, role=...):
-        return False
+    def flags(self, index):
+        return super().flags(index) | Qt.ItemFlag.ItemIsEditable
+
+    # def setData(self, index: QModelIndex, value, role=Qt.EditRole):
+    #     return super().setData(index,value,role)
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         test = 0
