@@ -174,10 +174,15 @@ class ClassTreeModel(TableModel):
     def flags(self, index: QModelIndex):
         base = super().flags(index)
         if not index.isValid():
-            return base | Qt.ItemIsDropEnabled
+            return base | Qt.ItemIsDropEnabled & ~Qt.ItemIsEditable
         if index.column() == 0:
-            return base | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsEditable
-        return base
+            return (
+                base
+                | Qt.ItemIsDragEnabled
+                | Qt.ItemIsDropEnabled
+                | Qt.ItemIsEditable & ~Qt.ItemIsEditable
+            )
+        return base & ~Qt.ItemIsEditable
 
     def supportedDropActions(self):
         # allow both move (internal) and copy (external)

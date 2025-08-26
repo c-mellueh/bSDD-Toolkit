@@ -44,7 +44,6 @@ class TableModel(QAbstractItemModel):
             self.dataChanged.emit(index, index, [Qt.DisplayRole, Qt.EditRole])
             return True
         return False
-        return super().setData(index, value, role)
 
     def headerData(self, section, orientation, /, role=...):
         if role != Qt.ItemDataRole.DisplayRole:
