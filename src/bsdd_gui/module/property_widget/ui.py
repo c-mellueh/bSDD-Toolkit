@@ -36,28 +36,3 @@ class PropertyWindow(QWidget, Ui_PropertyWindow):
     def closeEvent(self, event):
         self.closed.emit()
         return super().closeEvent(event)
-
-
-class ValueView(QTableView):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.som_property: BsddClassProperty = None
-
-    def model(self) -> SortModel:
-        return super().model()
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key.Key_V and (event.modifiers() & Qt.ControlModifier):
-            trigger.paste_clipboard(self)
-        elif event.key() == Qt.Key.Key_C and (event.modifiers() & Qt.ControlModifier):
-            trigger.copy_table_content(self)
-        else:
-            return super().keyPressEvent(event)
-
-
-class SplitterSettings(QWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.ui = Ui_SplitterSettings()
-        self.ui.setupUi(self)
-        trigger.splitter_settings_created(self)

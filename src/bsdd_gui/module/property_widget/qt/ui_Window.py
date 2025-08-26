@@ -58,8 +58,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from som_gui.module.property_window.ui import ValueView
-from som_gui.module.units.ui import UnitComboBox
+from bsdd_gui.module.property_widget.views import ValueView
 
 
 class Ui_PropertyWindow(object):
@@ -125,7 +124,7 @@ class Ui_PropertyWindow(object):
 
         self.gridLayout_2.addWidget(self.combo_value_type, 1, 1, 1, 1)
 
-        self.combo_unit = UnitComboBox(PropertyWindow)
+        self.combo_unit = QComboBox(PropertyWindow)
         self.combo_unit.setObjectName("combo_unit")
         self.combo_unit.setEditable(True)
 

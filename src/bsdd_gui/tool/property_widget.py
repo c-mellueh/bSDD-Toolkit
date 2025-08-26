@@ -28,7 +28,7 @@ class PropertyWidget(ViewHandler):
     @classmethod
     def create_window(cls, bsdd_property: BsddClassProperty) -> ui.PropertyWindow:
         prop = cls.get_properties()
-        prop.windows[bsdd_property] = ui.PropertyWindow(bsdd_property)
+        prop.windows[bsdd_property.Code] = ui.PropertyWindow(bsdd_property)
         for plugin in prop.plugin_widget_list:
             layout: QLayout = getattr(cls.get_window(), plugin.layout_name)
             layout.insertWidget(plugin.index, plugin.widget())
@@ -39,7 +39,7 @@ class PropertyWidget(ViewHandler):
 
     @classmethod
     def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.PropertyWindow:
-        return cls.get_properties().windows.get(bsdd_class_property)
+        return cls.get_properties().windows.get(bsdd_class_property.Code)
 
     @classmethod
     def create_window_title(cls, bsdd_class_property: BsddClassProperty):

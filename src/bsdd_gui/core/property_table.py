@@ -1,6 +1,7 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QApplication, QTableView
 from typing import Type, TYPE_CHECKING
+from PySide6.QtCore import QModelIndex
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -22,11 +23,19 @@ def connect_view(
     property_table: Type[tool.PropertyTable],
     main_window: Type[tool.MainWindow],
 ):
+    def emit_info_requested(index: QModelIndex):
+        index = view.model().mapToSource(index)
+        bsdd_class_property = index.internalPointer()
+        if not bsdd_class_property:
+            return
+        property_table.signaller.property_info_requested.emit(bsdd_class_property)
+
     property_table.register_widget(view)
     model = property_table.create_model()
     view.setModel(model)
     sel_model = view.selectionModel()
     sel_model.currentChanged.connect(lambda s, d: property_table.on_current_changed(view, s, d))
+    view.doubleClicked.connect(emit_info_requested)
 
 
 def reset_views(property_table: Type[tool.PropertyTable], project: Type[tool.Project]):

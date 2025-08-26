@@ -6,17 +6,17 @@ from typing import TYPE_CHECKING
 from bsdd_parser import BsddClassProperty
 from PySide6.QtGui import QKeySequence
 from .constants import SEPERATOR_SECTION, SEPERATOR_STATUS
-from . import ui
+from . import ui, views
 
 
 def connect():
     tool.Settings.add_page_to_toolbox(
-        ui.SplitterSettings,
+        views.SplitterSettings,
         "pageSplitter",
-        lambda: core.splitter_settings_accepted(tool.PropertyWindow, tool.Appdata),
+        lambda: core.splitter_settings_accepted(tool.PropertyWidget, tool.Appdata),
     )
-    core.connect_signals(tool.PropertyWindow, tool.PropertyTable)
-    core.create_context_menu_builders(tool.PropertyWindow)
+    core.connect_signals(tool.PropertyWidget, tool.PropertyTable)
+    # core.create_context_menu_builders(tool.PropertyWidget)
 
 
 def retranslate_ui():
@@ -29,7 +29,7 @@ def on_new_project():
 
 
 def property_info_requested(som_property: BsddClassProperty):
-    core.open_property_info(som_property, tool.PropertyWindow, tool.Util)
+    core.open_property_info(som_property, tool.PropertyWidget, tool.Util)
 
 
 def window_created(window: ui.PropertyWindow):
