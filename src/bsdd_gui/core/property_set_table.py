@@ -35,7 +35,9 @@ def connect_view(
 
 
 def connect_to_main_window(
-    property_set_table: Type[tool.PropertySetTable], main_window: Type[tool.MainWindow]
+    property_set_table: Type[tool.PropertySetTable],
+    main_window: Type[tool.MainWindow],
+    util: Type[tool.Util],
 ):
     def reset_pset(new_class: BsddClass):
         """
@@ -52,8 +54,12 @@ def connect_to_main_window(
         property_set_table.select_row(pset_view, row_index)
 
     def rename_pset(model: PsetTableModel, index: QModelIndex, new_name: str):
+
         old_name = index.data()
+        if old_name == new_name:
+            return
         bsdd_class = model.active_class
+        new_name = util.get_unique_name(new_name, property_set_table.get_pset_list(bsdd_class))
         if property_set_table.is_temporary_pset(bsdd_class, old_name):
             property_set_table.rename_temporary_pset(bsdd_class, old_name, new_name)
         else:

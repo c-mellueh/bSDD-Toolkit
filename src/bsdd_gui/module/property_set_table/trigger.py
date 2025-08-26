@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_to_main_window(tool.PropertySetTable, tool.MainWindow)
+    core.connect_to_main_window(tool.PropertySetTable, tool.MainWindow, tool.Util)
     core.define_context_menu(tool.MainWindow, tool.PropertySetTable)
 
 
