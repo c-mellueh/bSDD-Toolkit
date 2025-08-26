@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import ctypes
 
-from PySide6.QtWidgets import QApplication, QMenu, QMenuBar
+from PySide6.QtWidgets import QApplication, QMenu, QMenuBar, QStatusBar
 import bsdd_gui
 from bsdd_gui.module.main_window import ui
 from bsdd_parser.models import BsddClass, BsddClassProperty
@@ -168,3 +168,7 @@ class MainWindow:
             }
         """
         )
+
+    @classmethod
+    def get_statusbar(cls) -> QStatusBar:
+        return cls.get().statusbar
