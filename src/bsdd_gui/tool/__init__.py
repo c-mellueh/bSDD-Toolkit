@@ -14,3 +14,4 @@ from .settings import Settings
 from .popups import Popups
 from .dictionary_editor import DictionaryEditor
 from .console import Console
+from .property_widget import PropertyWidget
