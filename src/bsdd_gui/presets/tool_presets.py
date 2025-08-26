@@ -48,6 +48,10 @@ class ColumnHandler(ABC):
     def get_value_functions(cls, model: QAbstractItemModel):
         return [x[1] for x in cls.get_properties().columns.get(model) or []]
 
+    @classmethod
+    def get_model(cls):
+        return cls.get_properties().model
+
 
 class WidgetSignaller(QObject):
     pass

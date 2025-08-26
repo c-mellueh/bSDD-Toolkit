@@ -3,9 +3,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from . import ui
-
+from bsdd_parser import BsddClass
 from bsdd_gui.presets.prop_presets import ColumnHandlerProperties, ViewHandlerProperties
 
 
 class PropertySetTableProperties(ColumnHandlerProperties, ViewHandlerProperties):
     views: set[ui.PsetTableView] = set()
+    temporary_pset: dict[BsddClass, list[str]] = dict()

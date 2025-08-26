@@ -4,7 +4,7 @@ import logging
 
 import bsdd_gui
 from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
-from bsdd_gui.module.property_set_table import ui, models
+from bsdd_gui.module.property_set_table import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ColumnHandler, ViewSignaller, ViewHandler
 from bsdd_parser.models import BsddDictionary, BsddClass
 
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class Signaller(ViewSignaller):
-    pass
+    new_property_set_requested = Signal(BsddClass)
 
 
 class PropertySetTable(ColumnHandler, ViewHandler):
@@ -22,6 +22,11 @@ class PropertySetTable(ColumnHandler, ViewHandler):
     @classmethod
     def get_properties(cls) -> PropertySetTableProperties:
         return bsdd_gui.PropertySetTableProperties
+
+    @classmethod
+    def connect_signals(cls):
+        cls.signaller.new_property_set_requested.connect(trigger.create_new_property_set)
+        cls.signaller.model_refresh_requested.connect(trigger.reset_views)
 
     @classmethod
     def create_model(cls, bsdd_dictionary: BsddDictionary):
@@ -40,7 +45,15 @@ class PropertySetTable(ColumnHandler, ViewHandler):
 
     @classmethod
     def get_pset_list(cls, bsdd_class: BsddClass) -> list[str]:
-        return list({cp.PropertySet for cp in bsdd_class.ClassProperties})
+        bsdd_properties = list()
+        for cp in bsdd_class.ClassProperties:
+            if cp.PropertySet not in bsdd_properties:
+                bsdd_properties.append(cp.PropertySet)
+
+        if bsdd_class.Code in cls.get_properties().temporary_pset:
+            for property_set in cls.get_properties().temporary_pset[bsdd_class.Code]:
+                bsdd_properties.append(property_set)
+        return bsdd_properties
 
     @classmethod
     def select_row(cls, view: ui.PsetTableView, row_index: int):
@@ -58,3 +71,14 @@ class PropertySetTable(ColumnHandler, ViewHandler):
             if name == pset_name:
                 return row
         return None
+
+    @classmethod
+    def request_new_property_set(cls, bsdd_class: BsddClass):
+        cls.signaller.new_property_set_requested.emit(bsdd_class)
+
+    @classmethod
+    def add_temporary_pset(cls, bsdd_class: BsddClass, name: str):
+        class_code = bsdd_class.Code
+        if not class_code in cls.get_properties().temporary_pset:
+            cls.get_properties().temporary_pset[class_code] = list()
+        cls.get_properties().temporary_pset[class_code].append(name)

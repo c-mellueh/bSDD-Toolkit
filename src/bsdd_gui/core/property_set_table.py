@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Type
 if TYPE_CHECKING:
     from bsdd_gui import tool
 from bsdd_gui.module.property_set_table import ui
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication, QListView
 from bsdd_parser.models import BsddClass
 
@@ -52,6 +53,7 @@ def connect_to_main_window(
             row_index = 0
         property_set_table.select_row(pset_view, row_index)
 
+    property_set_table.connect_signals()
     pset_view = main_window.get_pset_view()
     model = pset_view.model().sourceModel()
     property_set_table.add_column_to_table(model, "Name", lambda a: a)
@@ -59,3 +61,22 @@ def connect_to_main_window(
     property_set_table.signaller.selection_changed.connect(
         lambda v, n: (main_window.set_active_pset(n) if v == main_window.get_pset_view() else None)
     )
+    main_window.signaller.new_property_set_requested.connect(
+        lambda: property_set_table.request_new_property_set(main_window.get_active_class())
+    )
+
+
+def create_new_property_set(
+    bsdd_class: BsddClass, property_set_table: Type[tool.PropertySetTable], util: Type[tool.Util]
+):
+    existings_psets = property_set_table.get_pset_list(bsdd_class)
+    new_name = util.get_unique_name(
+        QCoreApplication.translate("PropertySetTable", "New PropertySet"), existings_psets
+    )
+    property_set_table.add_temporary_pset(bsdd_class, new_name)
+    property_set_table.signaller.model_refresh_requested.emit()
+
+
+def reset_views(property_set_table: Type[tool.PropertySetTable]):
+    for view in property_set_table.get_widgets():
+        property_set_table.reset_view(view)

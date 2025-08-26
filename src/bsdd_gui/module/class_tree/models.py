@@ -319,7 +319,7 @@ class ClassTreeModel(TableModel):
 
         old2new = {}
 
-        def unique_code(wish: str) -> str:
+        def unique_code(wish: str, existing_classes) -> str:
             if wish not in existing_classes and wish not in old2new.values():
                 existing_classes.add(wish)
                 return wish
