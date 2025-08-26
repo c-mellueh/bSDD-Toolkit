@@ -1,6 +1,6 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QTreeView
-from PySide6.QtCore import QPoint, QCoreApplication
+from PySide6.QtCore import QPoint, QCoreApplication, Qt
 from typing import Type, TYPE_CHECKING
 from bsdd_parser.utils import bsdd_class as class_utils
 
@@ -69,6 +69,12 @@ def connect_to_main_window(
     util.add_shortcut("Ctrl+N", view, lambda: main_window.signaller.new_class_requested.emit())
 
     util.add_shortcut("Ctrl+E", view, view.expandAll)
+
+    view.setDragEnabled(True)
+    view.setAcceptDrops(True)
+    view.setDropIndicatorShown(True)
+    view.setDefaultDropAction(Qt.MoveAction)
+    view.setDragDropMode(QTreeView.DragDropMode.DragDrop)  # internal DnD
 
 
 def define_class_tree_context_menu(

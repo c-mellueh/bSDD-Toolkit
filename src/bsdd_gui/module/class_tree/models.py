@@ -6,6 +6,8 @@ from PySide6.QtCore import (
     QCoreApplication,
     QModelIndex,
     QSortFilterProxyModel,
+    QMimeData,
+    QByteArray,
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
@@ -14,6 +16,10 @@ from bsdd_parser.utils import bsdd_class as cl_utils
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import TableModel
 from PySide6.QtTest import QAbstractItemModelTester
+import json
+
+JSON_MIME = "application/bsdd-class+json;v=1"
+CODES_MIME = "application/x-bsdd-classcode"  # for fast internal moves
 
 
 class ClassTreeModel(TableModel):
@@ -164,8 +170,264 @@ class ClassTreeModel(TableModel):
             row = roots.index(cls)
             return self.index(row, 0, QModelIndex())
 
+    def flags(self, index: QModelIndex):
+        base = super().flags(index)
+        if not index.isValid():
+            return base | Qt.ItemIsDropEnabled
+        if index.column() == 0:
+            return base | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsEditable
+        return base
 
-# typing
+    def supportedDropActions(self):
+        # allow both move (internal) and copy (external)
+        return Qt.MoveAction | Qt.CopyAction
+
+    def mimeTypes(self):
+        # include JSON for cross-instance, and an internal code-list for fast moves
+        return [JSON_MIME, "application/json", CODES_MIME, "text/plain"]
+
+    def mimeData(self, indexes):
+        sel = []
+        seen_codes: set[str] = set()
+
+        for idx in indexes:
+            if not idx.isValid() or idx.column() != 0:
+                continue
+            node: BsddClass = idx.internalPointer()
+            code = node.Code
+            if code in seen_codes:
+                continue
+            seen_codes.add(code)
+            sel.append(node)
+
+        md = QMimeData()
+        md.setData(JSON_MIME, QByteArray(self._classes_to_json_bytes(sel, include_subtree=True)))
+        md.setData(CODES_MIME, QByteArray(json.dumps([c.Code for c in sel]).encode("utf-8")))
+        md.setText(json.dumps([c.Code for c in sel], ensure_ascii=False))
+        return md
+
+    def canDropMimeData(self, data, action, row, column, parent: QModelIndex) -> bool:
+        if parent.isValid() and parent.column() != 0:
+            return False
+        if action not in (Qt.MoveAction, Qt.CopyAction):
+            return False
+        if (
+            data.hasFormat(JSON_MIME)
+            or data.hasFormat("application/json")
+            or data.hasFormat(CODES_MIME)
+        ):
+            return True
+        return False
+
+    def dropMimeData(self, data, action, row, column, parent: QModelIndex) -> bool:
+        # destination parent
+        dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
+        dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
+
+        if action == Qt.MoveAction and data.hasFormat(CODES_MIME):
+            # internal MOVE within this dictionary
+            codes = json.loads(bytes(data.data(CODES_MIME)).decode("utf-8"))
+            if not codes:
+                return False
+            # one-at-a-time move (extend to multi later if needed)
+            code = codes[0]
+            node = cl_utils.get_class_by_code(self.bsdd_dictionary, code)
+            if node is None:
+                return False
+            # destination row (append)
+            dest_parent_index = (
+                QModelIndex()
+                if dest_parent_node is None
+                else self._index_for_class(dest_parent_node)
+            )
+            dest_row = self.rowCount(dest_parent_index) if row == -1 else row
+            return self._move_row_to(node, dest_parent_node, dest_row)
+
+        # COPY: external (or internal copy via Ctrl)
+        if action in (
+            Qt.CopyAction,
+            Qt.IgnoreAction,
+        ):  # some platforms give Ignore before acceptProposedAction
+            payload = None
+            for fmt in (JSON_MIME, "application/json", "text/plain"):
+                if data.hasFormat(fmt):
+                    try:
+                        b = bytes(data.data(fmt))
+                        if fmt == "text/plain":
+                            b = b.strip()
+                        payload = json.loads(b.decode("utf-8"))
+                        break
+                    except Exception:
+                        pass
+            if payload is None:
+                return False
+            return self._import_classes_payload(payload, dest_parent_node, row)
+        return False
+
+    def _is_descendant(self, maybe_ancestor: BsddClass, node: BsddClass) -> bool:
+        cur = node
+        while cur and cur.ParentClassCode:
+            if cur.ParentClassCode == maybe_ancestor.Code:
+                return True
+            cur = cl_utils.get_class_by_code(self.bsdd_dictionary, cur.ParentClassCode)
+        return False
+
+    def _import_classes_payload(
+        self, payload: dict, dest_parent: BsddClass | None, row_hint: int
+    ) -> bool:
+        """
+        Import a flat list of classes (with ParentClassCode links) into *this* dictionary.
+        - Fix code conflicts by renaming.
+        - Rewire ParentClassCode for imported roots to dest_parent.
+        - Insert in topological order; signal inserts incrementally.
+        """
+        if payload.get("kind") != "BsddClassTransfer" or "classes" not in payload:
+            return False
+
+        raw_classes = payload["classes"]
+        root_codes = set(payload.get("roots", []))
+
+        # 1) build code -> raw map; compute depth to sort parents before children
+        by_code = {rc["Code"]: rc for rc in raw_classes if isinstance(rc, dict) and "Code" in rc}
+
+        def depth_of(code: str) -> int:
+            d = 0
+            seen = set()
+            c = by_code.get(code)
+            while (
+                c and c.get("ParentClassCode") in by_code and c.get("ParentClassCode") not in seen
+            ):
+                seen.add(c["Code"])
+                c = by_code.get(c.get("ParentClassCode"))
+                d += 1
+            return d
+
+        ordered_codes = sorted(by_code.keys(), key=depth_of)  # parents first
+
+        # 2) conflict-safe code mapping
+        existing = set(cl_utils.get_all_class_codes(self.bsdd_dictionary))
+        old2new = {}
+
+        def unique_code(wish: str) -> str:
+            if wish not in existing and wish not in old2new.values():
+                existing.add(wish)
+                return wish
+            base = wish
+            i = 2
+            while True:
+                cand = f"{base} ({i})"
+                if cand not in existing and cand not in old2new.values():
+                    existing.add(cand)
+                    return cand
+                i += 1
+
+        # 3) create & insert classes (parents first), adjusting codes/parents
+        for code in ordered_codes:
+            rc = dict(by_code[code])  # copy
+            # new code (unique in target)
+            new_code = unique_code(rc["Code"])
+            old2new[rc["Code"]] = new_code
+            rc["Code"] = new_code
+
+            # fix ParentClassCode:
+            p = rc.get("ParentClassCode")
+            if p in old2new:
+                rc["ParentClassCode"] = old2new[p]
+            else:
+                # imported root -> attach to dest_parent in this dictionary (or stay root)
+                if rc["Code"] in (old2new[c] for c in root_codes):
+                    rc["ParentClassCode"] = dest_parent.Code if dest_parent is not None else None
+                else:
+                    # parent outside import and not destination: make it root
+                    rc["ParentClassCode"] = None
+
+            # build model instance
+            try:
+                node = BsddClass.model_validate(rc)
+            except Exception:
+                # if invalid, skip this one (or log)
+                continue
+
+            # insert with proper signals (parent must exist now)
+            self.append_row(node)  # your append_row sets _parent_ref and signals insert
+
+        return True
+
+    def _move_row_to(
+        self, bsdd_class: BsddClass, new_parent: BsddClass | None, dest_row: int
+    ) -> bool:
+        """Move one row (with subtree) to new_parent at dest_row using beginMoveRows/endMoveRows."""
+        old_parent_index = self._get_current_parent_index(bsdd_class)
+        new_parent_index = (
+            QModelIndex() if new_parent is None else self._index_for_class(new_parent)
+        )
+
+        # current position of the node among its siblings
+        siblings_src = (
+            cl_utils.get_root_classes(self.bsdd_dictionary)
+            if not bsdd_class.ParentClassCode
+            else cl_utils.get_children(
+                cl_utils.get_class_by_code(self.bsdd_dictionary, bsdd_class.ParentClassCode)
+            )
+        )
+        try:
+            src_row = siblings_src.index(bsdd_class)
+        except ValueError:
+            return False
+
+        # Clamp destination
+        dest_row = max(0, min(dest_row, self.rowCount(new_parent_index)))
+
+        if not self.beginMoveRows(old_parent_index, src_row, src_row, new_parent_index, dest_row):
+            return False
+
+        # Mutate data model: reparent
+        bsdd_class.ParentClassCode = None if new_parent is None else new_parent.Code
+
+        self.endMoveRows()
+        return True
+
+    def _collect_subtree(self, root: BsddClass) -> list[BsddClass]:
+        out, stack = [], [root]
+        seen_codes: set[str] = set()
+        while stack:
+            n = stack.pop()
+            if n.Code in seen_codes:
+                continue
+            seen_codes.add(n.Code)
+            out.append(n)
+            stack.extend(cl_utils.get_children(n))
+        return out
+
+    def _classes_to_json_bytes(self, classes: list[BsddClass], *, include_subtree: bool) -> bytes:
+        # flat list of class dicts (optionally entire subtrees of each selection)
+        export_list = []
+        roots = []
+        seen_codes = set()
+
+        def add_one(c: BsddClass):
+            if c.Code in seen_codes:
+                return
+            seen_codes.add(c.Code)
+            export_list.append(c.model_dump(mode="json"))
+
+        for c in classes:
+            roots.append(c.Code)
+            if include_subtree:
+                for n in self._collect_subtree(c):
+                    add_one(n)
+            else:
+                add_one(c)
+
+        payload = {
+            "kind": "BsddClassTransfer",
+            "version": 1,
+            "roots": roots,  # which items were dragged
+            "classes": export_list,  # flat list, parents by ParentClassCode
+        }
+        return json.dumps(payload, ensure_ascii=False).encode("utf-8")
+
+
 class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
