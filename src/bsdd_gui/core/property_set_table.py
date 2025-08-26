@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Type
 if TYPE_CHECKING:
     from bsdd_gui import tool
 from bsdd_gui.module.property_set_table import ui
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication, QPoint
 from PySide6.QtWidgets import QApplication, QListView
 from bsdd_parser.models import BsddClass
 
@@ -29,11 +29,7 @@ def connect_view(
     main_window.signaller.active_class_changed.connect(
         lambda c: property_set_table.reset_view(view)
     )
-
-
-def reset_views(pset_list: Type[tool.PropertySetTable], project: Type[tool.Project]):
-    for view in pset_list.get_widgets():
-        pset_list.reset_view(view)
+    property_set_table.connect_view_signals(view)
 
 
 def connect_to_main_window(
@@ -80,3 +76,51 @@ def create_new_property_set(
 def reset_views(property_set_table: Type[tool.PropertySetTable]):
     for view in property_set_table.get_widgets():
         property_set_table.reset_view(view)
+
+
+def define_context_menu(
+    main_window: Type[tool.MainWindow], property_set_table: Type[tool.PropertySetTable]
+):
+
+    view = main_window.get_pset_view()
+    property_set_table.clear_context_menu_list(view)
+    property_set_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("PropertySet", "Delete"),
+        lambda: property_set_table.signaller.delete_selection_requested.emit(view),
+        True,
+        True,
+        False,
+    )
+
+
+def create_context_menu(
+    view: ui.PsetTableView, pos: QPoint, property_set_table: Type[tool.PropertySetTable]
+):
+    selected_psets = property_set_table.get_selected(view)
+    menu = property_set_table.create_context_menu(view, selected_psets)
+    menu_pos = view.viewport().mapToGlobal(pos)
+    menu.exec(menu_pos)
+
+
+def delete_selection(
+    view: ui.PsetTableView,
+    property_set_table: Type[tool.PropertySetTable],
+    property_table: Type[tool.PropertyTable],
+    main_window: Type[tool.MainWindow],
+):
+    bsdd_class = view.model().sourceModel().active_class
+    selected_psets = property_set_table.get_selected(view)
+    for prop in list(bsdd_class.ClassProperties):
+        if prop.PropertySet in selected_psets:
+            property_table.remove_property(bsdd_class, prop)
+    for pset in selected_psets:
+        if property_set_table.is_temporary_pset(bsdd_class, pset):
+            property_set_table.remove_temporary_pset(bsdd_class, pset)
+        property_set_table.signaller.property_set_deleted.emit(bsdd_class, pset)
+        if bsdd_class == main_window.get_active_class() and pset == main_window.get_active_pset():
+            main_window.set_active_pset(None)
+            main_window.set_active_property(None)
+
+    property_table.signaller.model_refresh_requested.emit()
+    property_set_table.signaller.model_refresh_requested.emit()

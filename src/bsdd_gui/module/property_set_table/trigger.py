@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 def connect():
     core.connect_to_main_window(tool.PropertySetTable, tool.MainWindow)
+    core.define_context_menu(tool.MainWindow, tool.PropertySetTable)
 
 
 def retranslate_ui():
@@ -31,3 +32,11 @@ def create_new_property_set(bsdd_class: BsddClass):
 
 def reset_views():
     core.reset_views(tool.PropertySetTable)
+
+
+def create_context_menu(view: ui.PsetTableView, pos):
+    core.create_context_menu(view, pos, tool.PropertySetTable)
+
+
+def delete_selection(view: ui.PsetTableView):
+    core.delete_selection(view, tool.PropertySetTable, tool.PropertyTable, tool.MainWindow)

@@ -8,7 +8,12 @@ if TYPE_CHECKING:
     from bsdd_parser.models import BsddClass
 
 
-def connect_signals(property_table: Type[tool.PropertyTable], main_window: Type[tool.MainWindow]):
+def connect_signals(
+    property_table: Type[tool.PropertyTable],
+    main_window: Type[tool.MainWindow],
+    property_set_table: Type[tool.PropertySetTable],
+):
+
     pass
 
 

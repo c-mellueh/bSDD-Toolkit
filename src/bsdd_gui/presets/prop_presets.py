@@ -33,7 +33,6 @@ class WidgetHandlerProperties:
 
 
 class ViewHandlerProperties(WidgetHandlerProperties):
-
     def __init__(self):
         super().__init__()
         self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()

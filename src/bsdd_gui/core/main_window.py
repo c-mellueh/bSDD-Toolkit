@@ -28,7 +28,7 @@ def connect_main_window(main_window: Type[tool.MainWindow], pset_list: Type[tool
     )
     main_window.signaller.active_pset_changed.connect(main_window.set_pset_text)
     main_window.signaller.active_property_changed.connect(
-        lambda p: main_window.set_property_text(p.Code)
+        lambda p: main_window.set_property_text(p.Code if p is not None else "")
     )
     signaller = main_window.signaller
     ui = main_window.get()

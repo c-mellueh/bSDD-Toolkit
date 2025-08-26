@@ -90,3 +90,10 @@ class PropertyTable(ColumnHandler, ViewHandler):
         if not index.isValid():
             return
         view.setCurrentIndex(index)
+
+    @classmethod
+    def remove_property(cls, bsdd_class: BsddClass, class_property: BsddClassProperty):
+        if class_property in bsdd_class.ClassProperties:
+            bsdd_class.ClassProperties.remove(class_property)
+        else:
+            logging.info(f"class_property '{class_property.Code}' not in class '{bsdd_class.Code}'")

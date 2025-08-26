@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 
 class Signaller(ViewSignaller):
     new_property_set_requested = Signal(BsddClass)
+    delete_selection_requested = Signal(ui.PsetTableView)
+    property_set_deleted = Signal(BsddClass, str)
 
 
 class PropertySetTable(ColumnHandler, ViewHandler):
@@ -27,6 +29,11 @@ class PropertySetTable(ColumnHandler, ViewHandler):
     def connect_signals(cls):
         cls.signaller.new_property_set_requested.connect(trigger.create_new_property_set)
         cls.signaller.model_refresh_requested.connect(trigger.reset_views)
+        cls.signaller.delete_selection_requested.connect(trigger.delete_selection)
+
+    @classmethod
+    def connect_view_signals(cls, view: ui.PsetTableView):
+        view.customContextMenuRequested.connect(lambda p, v=view: trigger.create_context_menu(v, p))
 
     @classmethod
     def create_model(cls, bsdd_dictionary: BsddDictionary):
@@ -82,3 +89,22 @@ class PropertySetTable(ColumnHandler, ViewHandler):
         if not class_code in cls.get_properties().temporary_pset:
             cls.get_properties().temporary_pset[class_code] = list()
         cls.get_properties().temporary_pset[class_code].append(name)
+
+    @classmethod
+    def remove_temporary_pset(cls, bsdd_class: BsddClass, name: str):
+        class_code = bsdd_class.Code
+        if not class_code in cls.get_properties().temporary_pset:
+            cls.get_properties().temporary_pset[class_code] = list()
+        if name in cls.get_properties().temporary_pset[class_code]:
+            cls.get_properties().temporary_pset[class_code].remove(name)
+
+    @classmethod
+    def is_temporary_pset(cls, bsdd_class: BsddClass, name: str) -> bool:
+        for prop in bsdd_class.ClassProperties:
+            if prop.PropertySet == name:
+                return False
+        return True
+
+    @classmethod
+    def get_selected(cls, view: ui.PsetTableView):
+        return list({index.data() for index in view.selectedIndexes()})
