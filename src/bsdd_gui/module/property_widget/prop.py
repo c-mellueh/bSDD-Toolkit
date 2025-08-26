@@ -18,7 +18,7 @@ class PluginProperty:
     value_test: Callable
 
 
-class PropertyWindowProperties:
+class PropertyWidgetProperties:
     plugin_widget_list: list[PluginProperty] = list()
     windows: dict[BsddClassProperty, ui.PropertyWindow] = dict()
     context_menu_builders = list()

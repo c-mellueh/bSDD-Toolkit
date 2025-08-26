@@ -15,19 +15,17 @@ from bsdd_parser import BsddClassProperty
 from . import trigger
 from bsdd_gui import tool
 from .qt.ui_SplitterSettings import Ui_SplitterSettings
+from .qt.ui_Window import Ui_PropertyWindow
 
 
-class PropertyWindow(QWidget):
+class PropertyWindow(QWidget, Ui_PropertyWindow):
     closed = Signal()
 
-    def __init__(self, som_property: BsddClassProperty, *args, **kwargs):
-        from .qt.ui_Window import Ui_PropertyWindow
-
+    def __init__(self, bsdd_class_property: BsddClassProperty, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setWindowIcon(get_icon())
-        self.ui = Ui_PropertyWindow()
-        self.ui.setupUi(self)
-        self.som_property = som_property
+        self.setupUi(self)
+        self.bsdd_class_property = bsdd_class_property
         self.initial_fill = True
         trigger.window_created(self)
 

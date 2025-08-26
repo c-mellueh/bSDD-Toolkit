@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class Signaller(ViewSignaller):
-    pass
+    property_info_requested = Signal(BsddClassProperty)
 
 
 class PropertyTable(ColumnHandler, ViewHandler):
