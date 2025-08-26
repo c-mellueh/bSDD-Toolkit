@@ -14,4 +14,4 @@ class MenuDict(TypedDict):
 
 
 class UtilProperties:
-    shortcut = list()
+    shortcuts = list()

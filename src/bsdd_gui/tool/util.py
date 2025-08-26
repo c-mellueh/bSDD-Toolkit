@@ -97,9 +97,8 @@ class Util:
     def add_shortcut(cls, sequence: str, window: QWidget, function: Callable):
         prop = cls.get_properties()
         shortcut = QShortcut(QKeySequence(sequence), window)
-        if not hasattr(prop, "shortcuts"):
-            prop.shourtcuts = list()
-        prop.shourtcuts.append(shortcut)
+        shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
+        prop.shortcuts.append(shortcut)
         shortcut.activated.connect(function)
 
     @classmethod

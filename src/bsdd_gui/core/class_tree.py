@@ -56,7 +56,7 @@ def connect_to_main_window(
         lambda v, n: (main_window.set_active_class(n) if v == view else None)
     )
     util.add_shortcut(
-        "Ctrl+X", view, lambda: class_tree.signaller.delete_selection_requested.emit(view)
+        "Del", view, lambda: class_tree.signaller.delete_selection_requested.emit(view)
     )
     util.add_shortcut(
         "Ctrl+G", view, lambda: class_tree.signaller.group_selection_requested.emit(view)
