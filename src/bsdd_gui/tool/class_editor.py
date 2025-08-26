@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QCoreApplication
 from PySide6.QtGui import QPalette
-from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit
+from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit, QDialogButtonBox
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetSignaller, WidgetHandler
 from bsdd_parser import BsddClass, BsddDictionary
@@ -16,7 +16,9 @@ if TYPE_CHECKING:
 
 
 class Signaller(WidgetSignaller):
-    class_info_requested = Signal(BsddClass)
+    edit_class_requested = Signal(BsddClass)
+    copy_class_requested = Signal(BsddClass)  # Class To Copy
+    new_class_requested = Signal(BsddClass)  # Parent Class
     new_class_created = Signal(
         BsddClass
     )  # the class is not added to the Dictionary So far, this gets handled by ClassTree
@@ -31,7 +33,21 @@ class ClassEditor(WidgetHandler):
 
     @classmethod
     def connect_signaller(cls):
-        cls.signaller.class_info_requested.connect(trigger.open_class_editor)
+        cls.signaller.edit_class_requested.connect(trigger.open_class_editor)
+        cls.signaller.copy_class_requested.connect(trigger.copy_class)
+        cls.signaller.new_class_requested.connect(trigger.create_new_class)
+
+    @classmethod
+    def request_class_editor(cls, bsdd_class: BsddClass):
+        cls.signaller.edit_class_requested.emit(bsdd_class)
+
+    @classmethod
+    def request_class_copy(cls, bsdd_class: BsddClass):
+        cls.signaller.copy_class_requested.emit(bsdd_class)
+
+    @classmethod
+    def request_new_class(cls, parent=None):
+        cls.signaller.new_class_requested.emit(parent)
 
     @classmethod
     def unregister_widget(cls, view):
@@ -184,9 +200,28 @@ class ClassEditor(WidgetHandler):
         return True
 
     @classmethod
-    def create_new_class_dialog(cls, parent) -> ui.NewDialog:
-        return ui.NewDialog(parent)
+    def copy_class(cls, bsdd_class: BsddClass):
+        return BsddClass(**bsdd_class.model_dump())
 
     @classmethod
-    def create_edit_class_dialog(cls, parent) -> ui.NewDialog:
-        return ui.EditDialog(parent)
+    def create_class_editor_dialog(cls, bsdd_class: BsddClass, parent_widget: QWidget):
+        def validate_inputs(dial: ui.EditDialog):
+            widget = dial._editor_widget
+            if cls.all_inputs_are_valid(widget):
+                dial.accept()
+            else:
+                pass
+
+        dialog = ui.EditDialog(parent_widget)
+        widget = cls.create_widget(bsdd_class)
+        cls.sync_from_model(widget)
+        dialog._layout.insertWidget(0, widget)
+        dialog._editor_widget = widget
+        dialog.new_button.clicked.connect(lambda _, d=dialog: validate_inputs(d))
+
+        return dialog
+
+    @classmethod
+    @classmethod
+    def set_dialog_text(cls, dialog: ui.EditDialog, text):
+        dialog.setWindowTitle(text)

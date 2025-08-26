@@ -18,10 +18,12 @@ if TYPE_CHECKING:
 
 
 class Signaller(ViewSignaller):
+    copy_selection_requested = Signal(ui.ClassView)
     delete_selection_requested = Signal(ui.ClassView)
     group_selection_requested = Signal(ui.ClassView)
     search_requested = Signal(ui.ClassView)
-    copy_requested = Signal(ui.ClassView)
+    expand_selection_requested = Signal(ui.ClassView)
+    collapse_selection_requested = Signal(ui.ClassView)
 
 
 class ClassTree(ColumnHandler, ViewHandler):
@@ -34,7 +36,7 @@ class ClassTree(ColumnHandler, ViewHandler):
     @classmethod
     def connect_signals(cls):
         cls.signaller.model_refresh_requested.connect(trigger.reset_class_views)
-        cls.signaller.copy_requested.connect(trigger.copy_selected_class)
+        cls.signaller.copy_selection_requested.connect(trigger.copy_selected_class)
 
     @classmethod
     def create_model(cls, bsdd_dictionary: BsddDictionary):
@@ -70,14 +72,38 @@ class ClassTree(ColumnHandler, ViewHandler):
         cls.signaller.selection_changed.emit(view, index.internalPointer())
 
     @classmethod
-    def add_class_to_dictionary(cls, new_class: BsddClass, bsdd_dictionary: BsddDictionary):
+    def add_class_to_dictionary(cls, new_class: BsddClass):
         cls.get_properties().model.append_row(new_class)
 
     @classmethod
-    def get_selected_class(cls, view: ui.ClassView):
-        model = view.model().sourceModel()
-        if not view.selectedIndexes():
-            return None
-        selected_index = view.selectedIndexes()[-1]
-        index = view.model().mapToSource(selected_index)
-        return index.internalPointer()
+    def get_selected_classes(cls, view: ui.ClassView) -> list[BsddClass]:
+        """Return BsddClass objects for the rows selected in column 0."""
+        sel_model = view.selectionModel()
+        if sel_model is None:
+            return []
+
+        # Only rows in column 0 (avoids duplicates across columns)
+        indexes: list[QModelIndex] = sel_model.selectedRows(0)
+        if not indexes:
+            return []
+
+        def to_source_index(idx: QModelIndex) -> QModelIndex:
+            """Map an index through any proxy chain to the ultimate source model."""
+            model = view.model()
+            src_idx = idx
+            # Walk down proxy chain if present
+            while isinstance(model, QSortFilterProxyModel):
+                src_idx = model.mapToSource(src_idx)
+                model = model.sourceModel()
+            return src_idx
+
+        result: list[BsddClass] = []
+        for proxy_idx in indexes:
+            src_idx = to_source_index(proxy_idx)
+            if not src_idx.isValid():
+                continue
+            obj = src_idx.internalPointer()
+            if isinstance(obj, BsddClass):
+                result.append(obj)
+
+        return result

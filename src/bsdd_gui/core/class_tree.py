@@ -1,5 +1,6 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication, QTreeView
+from PySide6.QtWidgets import QTreeView
+from PySide6.QtCore import QPoint, QCoreApplication
 from typing import Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -11,10 +12,9 @@ if TYPE_CHECKING:
 def connect_signals(
     class_tree: Type[tool.ClassTree],
     class_editor: Type[tool.ClassEditor],
-    project: Type[tool.Project],
 ):
     def insert_class(new_class: BsddClass):
-        class_tree.add_class_to_dictionary(new_class, project.get())
+        class_tree.add_class_to_dictionary(new_class)
 
     class_tree.connect_signals()
     class_editor.signaller.new_class_created.connect(insert_class)
@@ -65,4 +65,89 @@ def connect_to_main_window(
         "Ctrl+C", view, lambda: main_window.signaller.copy_active_class_requested.emit()
     )
 
+    util.add_shortcut("Ctrl+N", view, lambda: main_window.signaller.new_class_requested.emit())
+
     util.add_shortcut("Ctrl+E", view, view.expandAll)
+
+
+def define_class_tree_context_menu(
+    main_window: Type[tool.MainWindow],
+    class_tree: Type[tool.ClassTree],
+    class_editor: Type[tool.ClassEditor],
+):
+    def get_first_selection(v: ui.ClassView):
+        bsdd_classes = class_tree.get_selected_classes(v)
+        return bsdd_classes[0] if bsdd_classes else None
+
+    tree = main_window.get_class_view()
+    class_tree.clear_context_menu_list(tree)
+    class_tree.add_context_menu_entry(
+        tree,
+        lambda: QCoreApplication.translate("Class", "Copy"),
+        lambda: class_editor.request_class_copy(get_first_selection(tree)),
+        True,
+        True,
+        False,
+    )
+    class_tree.add_context_menu_entry(
+        tree,
+        lambda: QCoreApplication.translate("Class", "Delete"),
+        lambda: class_tree.signaller.delete_selection_requested(tree),
+        True,
+        True,
+        True,
+    )
+    class_tree.add_context_menu_entry(
+        tree,
+        lambda: QCoreApplication.translate("Class", "Extend"),
+        lambda: class_tree.signaller.expand_selection_requested(tree),
+        True,
+        True,
+        True,
+    )
+    class_tree.add_context_menu_entry(
+        tree,
+        lambda: QCoreApplication.translate("Class", "Collapse"),
+        lambda: class_tree.signaller.collapse_selection_requested(tree),
+        True,
+        True,
+        True,
+    )
+    class_tree.add_context_menu_entry(
+        tree,
+        lambda: QCoreApplication.translate("Class", "Group"),
+        lambda: class_tree.signaller.group_selection_requested(tree),
+        True,
+        True,
+        True,
+    )
+    class_tree.add_context_menu_entry(
+        tree,
+        lambda: QCoreApplication.translate("Class", "Info"),
+        lambda: class_editor.request_class_editor(get_first_selection(tree)),
+        True,
+        True,
+        False,
+    )
+
+    class_tree.add_context_menu_entry(
+        tree,
+        lambda: QCoreApplication.translate("Class", "Reset View"),
+        lambda: class_tree.signaller.model_refresh_requested.emit(),
+        False,
+        True,
+        True,
+    )
+
+
+def create_context_menu(view: ui.ClassView, pos: QPoint, class_tree: Type[tool.ClassTree]):
+    bsdd_classes = class_tree.get_selected_classes()
+    menu = class_tree.create_context_menu(view, bsdd_classes)
+    menu_pos = view.viewport().mapToGlobal(pos)
+    menu.exec(menu_pos)
+
+
+def copy_selected_class(
+    view: ui.ClassView,
+):
+    pass

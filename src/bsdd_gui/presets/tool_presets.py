@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Callable, TYPE_CHECKING, Any
+from typing import Callable, TYPE_CHECKING, Any, Iterable
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QMenu, QMenuBar
 from PySide6.QtCore import QObject, Signal, QAbstractItemModel
 from PySide6.QtGui import QAction
@@ -11,6 +11,7 @@ if TYPE_CHECKING:
         ColumnHandlerProperties,
         ViewHandlerProperties,
         WidgetHandlerProperties,
+        ContextMenuDict,
     )
 
 
@@ -107,9 +108,84 @@ class ViewSignaller(QObject):
 
 
 class ViewHandler(WidgetHandler):
+    @classmethod
+    @abstractmethod
+    def get_properties(cls) -> ViewHandlerProperties:
+        return None
 
     @classmethod
     def reset_view(cls, view: QAbstractItemView):
         source_model = view.model().sourceModel()
         source_model.beginResetModel()
         source_model.endResetModel()
+
+    @classmethod
+    def clear_context_menu_list(cls, view: QAbstractItemView):
+        prop = cls.get_properties()
+        prop.context_menu_list[view] = list()
+
+    @classmethod
+    def add_context_menu_entry(
+        cls,
+        view: QAbstractItemView,
+        label_func: Callable,  # clearer than "name_getter"
+        action_func: Callable,  # "function" → "action_func"
+        require_selection: bool,  # clearer than "on_selection"
+        allow_single: bool,  # clearer than "single"
+        allow_multi: bool,  # clearer than "multi"
+    ) -> ContextMenuDict:
+        """
+        Adds an entry to the context menu.
+
+        :param label_func: Callable that returns the display label for the menu entry.
+        :param action_func: Callable executed when the menu entry is triggered.
+        :param require_selection: Entry only available if at least one item is selected.
+        :param allow_single: Entry is available for single selection.
+        :param allow_multi: Entry is available for multi-selection.
+        :return: A dictionary representing the context menu entry.
+        """
+
+        entry: ContextMenuDict = dict()
+        entry["label_func"] = label_func
+        entry["action_func"] = action_func
+        entry["allow_multi"] = allow_multi
+        entry["allow_single"] = allow_single
+        entry["require_selection"] = require_selection
+
+        props = cls.get_properties()
+        props.context_menu_list[view].append(entry)
+        return entry
+
+    @classmethod
+    def create_context_menu(cls, view: QAbstractItemView, selected_elements: list) -> QMenu:
+        menu = QMenu(parent=view)
+        props = cls.get_properties()
+
+        entries: Iterable[ContextMenuDict] = props.context_menu_list.get(view, [])
+        sel_count = len(selected_elements)
+
+        def eligible(e: ContextMenuDict) -> bool:
+            # require_selection → block when nothing selected
+            if e["require_selection"] and sel_count == 0:
+                return False
+            # if nothing selected and not required, allow
+            if sel_count == 0:
+                return True
+            # single vs multi
+            if sel_count == 1:
+                return e["allow_single"]
+            return e["allow_multi"]
+
+        # Materialize the filtered list (not a lazy filter iterator)
+        visible_entries = [e for e in entries if eligible(e)]
+
+        for e in visible_entries:
+            # Always refresh the label (could depend on current selection/state)
+            text = e["label_func"]()
+            action = menu.addAction(text)
+            # Do not keep old connections around; create a fresh action per menu build
+            action.triggered.connect(e["action_func"])
+            # If you still want to store the last-built QAction:
+            e["action"] = action
+
+        return menu
