@@ -124,4 +124,10 @@ class ClassTree(ColumnHandler, ViewHandler):
                     iterate_deletion(child)
             model.remove_row(c)
 
-        iterate_deletion(bsdd_class)
+        if recursive:
+            iterate_deletion(bsdd_class)
+        else:
+            parent = class_utils.get_parent(bsdd_class)
+            for child in class_utils.get_children(bsdd_class):
+                model.move_row(child, parent)
+            model.remove_row(bsdd_class)

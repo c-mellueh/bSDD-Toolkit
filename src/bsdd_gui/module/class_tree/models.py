@@ -61,7 +61,7 @@ class ClassTreeModel(TableModel):
 
         return self.createIndex(row, 0, parent_class)
 
-    def append_row(self, bsdd_class: BsddClass):
+    def _get_current_parent_index(self, bsdd_class: BsddClass):
         # Determine the correct parent index in the CURRENT hierarchy
         if bsdd_class.ParentClassCode:
             parent_class = cl_utils.get_class_by_code(
@@ -73,6 +73,10 @@ class ClassTreeModel(TableModel):
                 parent_index = self._index_for_class(parent_class)
         else:
             parent_index = QModelIndex()
+        return parent_index
+
+    def append_row(self, bsdd_class: BsddClass):
+        parent_index = self._get_current_parent_index(bsdd_class)
 
         insert_row = self.rowCount(parent_index)  # current child count
         self.beginInsertRows(parent_index, insert_row, insert_row)
@@ -82,21 +86,22 @@ class ClassTreeModel(TableModel):
         self.endInsertRows()
 
     def remove_row(self, bsdd_class: BsddClass):
-        if bsdd_class.ParentClassCode:
-            parent_class = cl_utils.get_class_by_code(
-                self.bsdd_dictionary, bsdd_class.ParentClassCode
-            )
-            if parent_class is None:
-                parent_index = QModelIndex()
-            else:
-                parent_index = self._index_for_class(parent_class)
-        else:
-            parent_index = QModelIndex()
-
+        parent_index = self._get_current_parent_index(bsdd_class)
         row = cl_utils.get_row_index(bsdd_class)
         self.beginRemoveRows(parent_index, row, row)
         cl_utils.remove_class(bsdd_class)
         self.endRemoveRows()
+
+    def move_row(self, bsdd_class: BsddClass, new_parent: BsddClass | None):
+        old_parent_index = self._get_current_parent_index(bsdd_class)
+        new_parent_index = (
+            QModelIndex() if new_parent is None else self._index_for_class(new_parent)
+        )
+        row = cl_utils.get_row_index(bsdd_class)
+        new_row_count = self.rowCount(new_parent_index)
+        self.beginMoveRows(old_parent_index, row, row, new_parent_index, new_row_count)
+        bsdd_class.ParentClassCode = None if new_parent is None else new_parent.Code
+        self.endMoveRows()
 
     def _index_for_class(self, cls: BsddClass) -> QModelIndex:
         """Return the QModelIndex for an existing class object."""
