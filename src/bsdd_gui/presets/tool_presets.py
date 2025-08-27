@@ -138,7 +138,7 @@ class WidgetHandler(ABC):
         cls.register_field_setter(
             widget,
             field,
-            lambda e, v, vn=variable_name: setattr(e, vn, v),
+            lambda e, v, vn=variable_name: setattr(e, vn, v if v else None),
         )
         cls.register_field_listener(widget, field)
 

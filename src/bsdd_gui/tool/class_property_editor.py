@@ -5,7 +5,7 @@ import logging
 import bsdd_gui
 from bsdd_parser import BsddClassProperty, BsddDictionary
 from bsdd_gui.module.class_property_editor import ui
-from PySide6.QtWidgets import QLayout, QWidget
+from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor import trigger
 from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignaller
@@ -69,7 +69,7 @@ class ClassPropertyEditor(WidgetHandler):
         )
 
     @classmethod
-    def create_create_dialog(cls, bsdd_class_property, parent):
+    def create_create_dialog(cls, bsdd_class_property, parent, bsdd_dictionary: BsddDictionary):
         def validate_inputs(dial: ui.ClassPropertyCreator):
             widget = dial._editor_widget
             if cls.all_inputs_are_valid(widget):
@@ -79,7 +79,9 @@ class ClassPropertyEditor(WidgetHandler):
 
         dialog = ui.ClassPropertyCreator(bsdd_class_property)
         cls.get_properties().dialog = dialog
-        widget = cls.create_edit_widget(bsdd_class_property, parent, mode="new")
+        widget = cls.create_edit_widget(
+            bsdd_class_property, parent, mode="new", bsdd_dictionary=bsdd_dictionary
+        )
         cls.sync_from_model(widget, bsdd_class_property)
         dialog._layout.insertWidget(0, widget)
         dialog._editor_widget = widget
@@ -89,13 +91,19 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def create_edit_widget(
-        cls, bsdd_class_property: BsddClassProperty, parent: QWidget, mode="edit"
+        cls,
+        bsdd_class_property: BsddClassProperty,
+        parent: QWidget,
+        mode="edit",
+        bsdd_dictionary=None,
     ) -> ui.ClassPropertyEditor:
         prop = cls.get_properties()
         window = ui.ClassPropertyEditor(bsdd_class_property, parent, mode=mode)
         window.setWindowFlag(Qt.Tool)
         prop.widgets.add(window)
-
+        if bsdd_dictionary:
+            completer = cls.create_property_code_completer(bsdd_dictionary)
+            window.le_property_reference.setCompleter(completer)
         for plugin in prop.plugin_widget_list:
             layout: QLayout = getattr(cls.get_window(), plugin.layout_name)
             layout.insertWidget(plugin.index, plugin.widget())
@@ -106,6 +114,13 @@ class ClassPropertyEditor(WidgetHandler):
 
         cls.signaller.window_created.emit(window)
         return window
+
+    @classmethod
+    def create_property_code_completer(cls, bsdd_dictionary: BsddDictionary):
+        all_codes = cp_utils.get_all_property_codes(bsdd_dictionary)
+        completer = QCompleter(all_codes)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        return completer
 
     @classmethod
     def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
@@ -253,35 +268,21 @@ class ClassPropertyEditor(WidgetHandler):
     def update_description_placeholder(cls, widget: ui.ClassPropertyEditor):
         bsdd_class_property = widget.bsdd_class_property
         if cp_utils.is_external_ref(bsdd_class_property):
-            external_prop = cp_utils.get_external_property(bsdd_class_property)
-            if not external_prop:
-                text = ""
-            else:
-                text = external_prop.Description
+            class_property = cp_utils.get_external_property(bsdd_class_property)
         else:
-            internal_prop = cp_utils.get_internal_property(bsdd_class_property)
-            text = internal_prop.Description if internal_prop else ""
+            class_property = cp_utils.get_internal_property(bsdd_class_property)
+        if not class_property:
+            text = ""
+        elif class_property.Description:
+            text = class_property.Description
+        elif class_property.Definition:
+            text = class_property.Definition
+        else:
+            text = ""
         widget.te_description.setPlaceholderText(text)
 
     @classmethod
     def update_value_view(cls, widget: ui.ClassPropertyEditor):
-        def clear_layout(la):
-            if la is None:
-                return
-
-            while la.count():
-                item = la.takeAt(0)
-
-                # If the item is a widget, delete it
-                widget = item.widget()
-                if widget is not None:
-                    widget.setParent(None)
-
-                # If the item is another layout, clear it recursively
-                child_layout = item.layout()
-                if child_layout is not None:
-                    clear_layout(child_layout)
-
         bsdd_class_property = widget.bsdd_class_property
         if cp_utils.is_external_ref(bsdd_class_property):
             bsdd_property = cp_utils.get_external_property(bsdd_class_property)
@@ -290,8 +291,11 @@ class ClassPropertyEditor(WidgetHandler):
         if not bsdd_property:
             return
         value_kind = bsdd_property.PropertyValueKind
-        layout = widget.gl_value
-        clear_layout(layout)
-        if value_kind == "Single" or value_kind is None:
-            insert_widget = AllowedValuesTable(bsdd_class_property)
-            layout.addWidget(insert_widget)
+        layout = widget.vl_values
+        for row in range(layout.count()):
+            item = layout.itemAt(row)
+            widget = item.widget()
+            if isinstance(widget, AllowedValuesTable) and (
+                value_kind == "Single" or value_kind is None
+            ):
+                widget.setHidden(False)

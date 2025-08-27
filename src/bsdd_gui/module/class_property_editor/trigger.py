@@ -24,7 +24,7 @@ def create_class_property_creator():
 
 
 def update_property_specific_fields(window: ui.ClassPropertyEditor):
-    core.update_property_specific_fields(window, tool.ClassPropertyEditor)
+    core.update_property_specific_fields(window, tool.ClassPropertyEditor, tool.AllowedValuesTable)
 
 
 def retranslate_ui():
@@ -37,12 +37,12 @@ def on_new_project():
 
 
 def property_info_requested(som_property: BsddClassProperty):
-    core.open_property_info(som_property, tool.ClassPropertyEditor, tool.MainWindow)
+    core.open_property_info(som_property, tool.ClassPropertyEditor, tool.MainWindow, tool.Project)
 
 
 def window_created(window: ui.ClassPropertyEditor):
     core.register_widget(
-        window, tool.ClassPropertyEditor, tool.PropertyTable, tool.Project, tool.Util
+        window, tool.ClassPropertyEditor, tool.AllowedValuesTable, tool.Project, tool.Util
     )
 
 

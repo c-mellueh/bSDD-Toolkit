@@ -125,7 +125,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QGridLayout" name="gl_value"/>
+        <layout class="QVBoxLayout" name="vl_values"/>
        </item>
        <item>
         <widget class="QLabel" name="la_description">

@@ -24,7 +24,7 @@ def unregister_widget(
 def register_widget(
     widget: ui.ClassPropertyEditor,
     class_property_editor: Type[tool.ClassPropertyEditor],
-    property_table: Type[tool.PropertyTable],
+    allowed_values_table: Type[tool.AllowedValuesTable],
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
@@ -78,12 +78,16 @@ def register_widget(
     widget.pb_new_value.clicked.connect(
         lambda _, w=widget: class_property_editor.signaller.new_value_requested.emit(w)
     )
-    update_property_specific_fields(widget, class_property_editor)
+    table = allowed_values_table.create_widget(widget.bsdd_class_property)
+    widget.vl_values.addWidget(table)
+
+    update_property_specific_fields(widget, class_property_editor, allowed_values_table)
 
 
 def update_property_specific_fields(
     widget: ui.ClassPropertyEditor,
     class_property_editor: Type[tool.ClassPropertyEditor],
+    allowed_value_table: Type[tool.AllowedValuesTable],
 ):
     if not widget:
         return
@@ -92,21 +96,25 @@ def update_property_specific_fields(
     class_property_editor.update_description_placeholder(widget)
     class_property_editor.update_allowed_units(widget)
     class_property_editor.update_value_view(widget)
+    allowed_value_table.reset_view(allowed_value_table.get_view_from_property_editor(widget))
 
 
 def open_property_info(
     bsdd_class_property: BsddClassProperty,
     class_property_editor: Type[tool.ClassPropertyEditor],
     main_window: Type[tool.MainWindow],
+    project: Type[tool.Project],
 ):
     if window := class_property_editor.get_window(bsdd_class_property):
         if window.isHidden():
             window.close()
             window = class_property_editor.create_edit_widget(
-                bsdd_class_property, main_window.get()
+                bsdd_class_property, main_window.get(), bsdd_dictionary=project.get()
             )
     else:
-        window = class_property_editor.create_edit_widget(bsdd_class_property, main_window.get())
+        window = class_property_editor.create_edit_widget(
+            bsdd_class_property, main_window.get(), bsdd_dictionary=project.get()
+        )
     window.show()
     window.activateWindow()
     window.showNormal()
@@ -144,6 +152,7 @@ def connect_signals(
 def create_class_property_creator(
     class_property_editor: Type[tool.ClassPropertyEditor],
     main_window: Type[tool.MainWindow],
+    project: Type[tool.Project],
 ):
     code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
     bsdd_class_property = BsddClassProperty.model_validate(
@@ -156,7 +165,9 @@ def create_class_property_creator(
         return
     bsdd_class_property.PropertySet = property_set
     bsdd_class_property._set_parent(main_window.get_active_class())
-    dialog = class_property_editor.create_create_dialog(bsdd_class_property, main_window.get())
+    dialog = class_property_editor.create_create_dialog(
+        bsdd_class_property, main_window.get(), project.get()
+    )
     widget = dialog._editor_widget
     text = QCoreApplication.translate("ClassPropertyEditor", "Create New Class Property")
     dialog.setWindowTitle(text)

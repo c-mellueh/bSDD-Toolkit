@@ -114,9 +114,15 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
 
     @classmethod
     def get_view_from_property_editor(cls, widget: ClassPropertyEditor):
+        widgets = list()
         for table_widget in cls.get_widgets():
             if widget.bsdd_class_property == table_widget.bsdd_property:
-                return table_widget
+                widgets.append(table_widget)
+        if len(widgets) > 1:
+            logging.warning("Multiple Widgets!")
+        if not widgets:
+            return None
+        return widgets[-1]
 
     @classmethod
     def handle_new_value_request(cls, widget: ClassPropertyEditor):
@@ -130,3 +136,7 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
             if allowed_value in bsdd_property.AllowedValues:
                 bsdd_property.AllowedValues.remove(allowed_value)
         cls.reset_view(widget)
+
+    @classmethod
+    def create_widget(cls, bsdd_property: BsddClassProperty | BsddProperty):
+        return ui.AllowedValuesTable(bsdd_property)

@@ -45,7 +45,6 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFormLayout,
-    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -141,10 +140,10 @@ class Ui_PropertyWindow(object):
 
         self.verticalLayout_2.addLayout(self.hl_value_description)
 
-        self.gl_value = QGridLayout()
-        self.gl_value.setObjectName("gl_value")
+        self.vl_values = QVBoxLayout()
+        self.vl_values.setObjectName("vl_values")
 
-        self.verticalLayout_2.addLayout(self.gl_value)
+        self.verticalLayout_2.addLayout(self.vl_values)
 
         self.la_description = QLabel(self.tab_basics)
         self.la_description.setObjectName("la_description")
