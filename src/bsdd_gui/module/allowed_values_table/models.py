@@ -16,8 +16,9 @@ from bsdd_gui.presets.models_presets import TableModel
 
 class AllowedValuesModel(TableModel):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, bsdd_property, *args, **kwargs):
         super().__init__(tool.PropertyTable, *args, **kwargs)
+        self.bsdd_property = bsdd_property
 
     @property
     def bsdd_dictionary(self):

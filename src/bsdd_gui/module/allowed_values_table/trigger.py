@@ -22,4 +22,4 @@ def on_new_project():
 
 
 def table_view_created(view: ui.AllowedValuesTable):
-    core.connect_view(view, tool.AllowedValuesTable, tool.MainWindow)
+    core.setup_view(view, tool.AllowedValuesTable)
