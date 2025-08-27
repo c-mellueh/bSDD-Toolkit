@@ -275,12 +275,18 @@ class WidgetHandler(ABC):
 class ViewSignaller(QObject):
     model_refresh_requested = Signal()
     selection_changed = Signal(QWidget, Any)
+    delete_selection_requested = Signal(QWidget)
 
 
 class ViewHandler(WidgetHandler):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> ViewHandlerProperties:
+        return None
+
+    @classmethod
+    @abstractmethod
+    def get_selected(cls, view: QWidget) -> list[object]:
         return None
 
     @classmethod

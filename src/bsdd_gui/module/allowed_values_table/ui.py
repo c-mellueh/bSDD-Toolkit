@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QTableView
 from . import trigger
@@ -17,6 +17,7 @@ class AllowedValuesTable(QTableView):
         super().__init__(*args, **kwargs)
         self.bsdd_property = bsdd_property
         self.horizontalHeader().setStretchLastSection(True)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         trigger.table_view_created(self)
 
     def model(self) -> models.SortModel:

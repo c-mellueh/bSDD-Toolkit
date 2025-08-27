@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 
 class Signaller(ViewSignaller):
     copy_selection_requested = Signal(ui.ClassView)
-    delete_selection_requested = Signal(ui.ClassView)
     group_selection_requested = Signal(ui.ClassView)
     search_requested = Signal(ui.ClassView)
     expand_selection_requested = Signal(ui.ClassView)
@@ -83,7 +82,7 @@ class ClassTree(ColumnHandler, ViewHandler):
         cls.get_properties().model.append_row(new_class)
 
     @classmethod
-    def get_selected_classes(cls, view: ui.ClassView) -> list[BsddClass]:
+    def get_selected(cls, view: ui.ClassView) -> list[BsddClass]:
         """Return BsddClass objects for the rows selected in column 0."""
         sel_model = view.selectionModel()
         if sel_model is None:

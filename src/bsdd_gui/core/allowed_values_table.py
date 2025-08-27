@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClassProperty, BsddProperty
 from bsdd_gui.module.allowed_values_table import ui
+from PySide6.QtCore import QCoreApplication, QPoint
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
 
 
 def connect_signals(
@@ -14,13 +14,10 @@ def connect_signals(
     main_window: Type[tool.MainWindow],
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
-    def test(widget: ClassPropertyEditor):
-        for table_widget in allowed_values_table.get_widgets():
-            if widget.bsdd_class_property == table_widget.bsdd_property:
-                allowed_values_table.append_new_value(table_widget)
-                return
 
-    class_property_editor.signaller.new_value_requested.connect(test)
+    class_property_editor.signaller.new_value_requested.connect(
+        allowed_values_table.handle_new_value_request
+    )
     pass
 
 
@@ -47,6 +44,30 @@ def setup_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.Allo
         model, "OwnedUri", lambda av: av.OwnedUri, allowed_values_table.set_owned_uri
     )
     view.setModel(sort_model)
+    allowed_values_table.connect_view_signals(view)
+
+
+def add_context_menu_to_view(
+    view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]
+):
+    allowed_values_table.clear_context_menu_list(view)
+    allowed_values_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("AllowedValuesTable", "Delete"),
+        lambda: allowed_values_table.signaller.delete_selection_requested.emit(view),
+        True,
+        True,
+        True,
+    )
+
+
+def create_context_menu(
+    view: ui.AllowedValuesTable, pos: QPoint, allowed_values_table: Type[tool.AllowedValuesTable]
+):
+    bsdd_allowed_values = allowed_values_table.get_selected(view)
+    menu = allowed_values_table.create_context_menu(view, bsdd_allowed_values)
+    menu_pos = view.viewport().mapToGlobal(pos)
+    menu.exec(menu_pos)
 
 
 def reset_views(allowed_values_table: Type[tool.AllowedValuesTable], project: Type[tool.Project]):

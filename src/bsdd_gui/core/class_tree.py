@@ -83,7 +83,7 @@ def define_class_tree_context_menu(
     class_editor: Type[tool.ClassEditor],
 ):
     def get_first_selection(v: ui.ClassView):
-        bsdd_classes = class_tree.get_selected_classes(v)
+        bsdd_classes = class_tree.get_selected(v)
         return bsdd_classes[0] if bsdd_classes else None
 
     tree = main_window.get_class_view()
@@ -148,7 +148,7 @@ def define_class_tree_context_menu(
 
 
 def create_context_menu(view: ui.ClassView, pos: QPoint, class_tree: Type[tool.ClassTree]):
-    bsdd_classes = class_tree.get_selected_classes(view)
+    bsdd_classes = class_tree.get_selected(view)
     menu = class_tree.create_context_menu(view, bsdd_classes)
     menu_pos = view.viewport().mapToGlobal(pos)
     menu.exec(menu_pos)
@@ -158,7 +158,7 @@ def delete_selection(
     view: ui.ClassView, class_tree: Type[tool.ClassTree], popups: Type[tool.Popups]
 ):
 
-    selected_classes = class_tree.get_selected_classes(view)
+    selected_classes = class_tree.get_selected(view)
     delete_request, recursive_deletion = popups.req_delete_items(
         [c.Name for c in selected_classes], item_type=1
     )
@@ -176,7 +176,7 @@ def group_selection(
     class_tree: Type[tool.ClassTree],
     class_editor: Type[tool.ClassEditor],
 ):
-    bsdd_classes = class_tree.get_selected_classes(
+    bsdd_classes = class_tree.get_selected(
         view,
     )
     if not bsdd_classes:

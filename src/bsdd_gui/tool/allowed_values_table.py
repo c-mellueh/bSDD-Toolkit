@@ -6,10 +6,11 @@ import bsdd_gui
 
 if TYPE_CHECKING:
     from bsdd_gui.module.allowed_values_table.prop import AllowedValuesTableProperties
+    from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
 
 from bsdd_gui.presets.tool_presets import ColumnHandler, ViewHandler, ViewSignaller
 from bsdd_parser import BsddClassProperty, BsddProperty, BsddAllowedValue
-from bsdd_gui.module.allowed_values_table import models, ui
+from bsdd_gui.module.allowed_values_table import models, ui, trigger
 from bsdd_gui import tool
 
 
@@ -23,6 +24,20 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
     @classmethod
     def get_properties(cls) -> AllowedValuesTableProperties:
         return bsdd_gui.AllowedValuesTableProperties
+
+    @classmethod
+    def get_selected(cls, view: ui.AllowedValuesTable) -> list[BsddAllowedValue]:
+        selected_values = list()
+        for proxy_index in view.selectedIndexes():
+            source_index = view.model().mapToSource(proxy_index)
+            value = source_index.internalPointer()
+            if value not in selected_values:
+                selected_values.append(value)
+        return selected_values
+
+    @classmethod
+    def connect_view_signals(cls, view: ui.AllowedValuesTable):
+        view.customContextMenuRequested.connect(lambda p: trigger.create_context_menu(view, p))
 
     @classmethod
     def create_model(cls, bsdd_property: BsddClassProperty | BsddProperty):
@@ -96,3 +111,10 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
         av = BsddAllowedValue(Code=new_name, Value=new_name)
         bsdd_property.AllowedValues.append(av)
         cls.reset_view(widget)
+
+    @classmethod
+    def handle_new_value_request(cls, widget: ClassPropertyEditor):
+        for table_widget in cls.get_widgets():
+            if widget.bsdd_class_property == table_widget.bsdd_property:
+                cls.append_new_value(table_widget)
+                return
