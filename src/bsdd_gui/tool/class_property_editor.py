@@ -94,7 +94,7 @@ class ClassPropertyEditor(WidgetHandler):
         prop = cls.get_properties()
         window = ui.ClassPropertyEditor(bsdd_class_property, parent, mode=mode)
         window.setWindowFlag(Qt.Tool)
-        prop.windows.append(window)
+        prop.widgets.add(window)
 
         for plugin in prop.plugin_widget_list:
             layout: QLayout = getattr(cls.get_window(), plugin.layout_name)
@@ -108,22 +108,11 @@ class ClassPropertyEditor(WidgetHandler):
         return window
 
     @classmethod
-    def remove_window(cls, bsdd_class_property: BsddClassProperty):
-        indexes = [
-            index
-            for index, window in enumerate(cls.get_properties().windows)
-            if window.bsdd_class_property == bsdd_class_property
-        ]
-        for index in sorted(indexes, reverse=True):
-            cls.get_properties().windows.pop(index)
-        return None
-
-    @classmethod
     def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
         windows = [
-            window
-            for window in cls.get_properties().windows
-            if window.bsdd_class_property == bsdd_class_property
+            widget
+            for widget in cls.get_properties().widgets
+            if widget.bsdd_class_property == bsdd_class_property
         ]
         if len(windows) > 1:
             logging.warning(f"Multiple PropertyWindows")

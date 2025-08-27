@@ -19,7 +19,6 @@ def unregister_widget(
     widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditor]
 ):
     class_property_editor.unregister_widget(widget)
-    class_property_editor.remove_window(widget.bsdd_class_property)
 
 
 def register_widget(
@@ -165,4 +164,5 @@ def create_class_property_creator(
         class_property_editor.sync_to_model(widget, bsdd_class_property)
         bsdd_class_property.parent().ClassProperties.append(bsdd_class_property)
         class_property_editor.signaller.new_class_property_created.emit(bsdd_class_property)
+        class_property_editor.unregister_widget(widget)
     class_property_editor.unregister_widget(widget)

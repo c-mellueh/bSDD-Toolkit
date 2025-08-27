@@ -113,6 +113,8 @@ class WidgetHandler(ABC):
 
     @classmethod
     def register_widget(cls, view: QAbstractItemView):
+        logging.info(f"Register {view}")
+
         cls.get_properties().widgets.add(view)
         cls.get_properties().field_getter[view] = dict()
         cls.get_properties().field_setter[view] = dict()
