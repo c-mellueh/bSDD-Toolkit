@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 class Signaller(WidgetSignaller):
     window_created = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
+    property_reference_changed = Signal(BsddClassProperty)
 
 
 class ClassPropertyEditor(WidgetHandler):
@@ -47,6 +48,9 @@ class ClassPropertyEditor(WidgetHandler):
 
         cls.signaller.window_created.connect(
             lambda w: cls.sync_from_model(w, w.bsdd_class_property)
+        )
+        cls.signaller.property_reference_changed.connect(
+            lambda cp: trigger.update_property_specific_fields(cls.get_window(cp))
         )
 
     @classmethod
@@ -132,6 +136,7 @@ class ClassPropertyEditor(WidgetHandler):
         else:
             bsdd_class_property.PropertyCode = value
             bsdd_class_property.PropertyUri = None
+        cls.signaller.property_reference_changed.emit(bsdd_class_property)
 
     @classmethod
     def is_property_reference_valid(
@@ -171,3 +176,28 @@ class ClassPropertyEditor(WidgetHandler):
             widget.le_property_reference.show_button(False)
         else:
             widget.le_property_reference.show_button(True)
+
+    @classmethod
+    def update_allowed_units(cls, widget: ui.ClassPropertyEditor):
+        bsdd_class_property = widget.bsdd_class_property
+        allowed_units = cp_utils.get_units(bsdd_class_property)
+        current_unit = widget.cb_unit.currentText()
+        index = allowed_units.index(current_unit) if current_unit in allowed_units else 0
+        widget.cb_unit.clear()
+        if allowed_units:
+            widget.cb_unit.addItems(allowed_units)
+            widget.cb_unit.setCurrentIndex(index)
+
+    @classmethod
+    def update_description_placeholder(cls, widget: ui.ClassPropertyEditor):
+        bsdd_class_property = widget.bsdd_class_property
+        if cp_utils.is_external_ref(bsdd_class_property):
+            external_prop = cp_utils.get_external_property(bsdd_class_property)
+            if not external_prop:
+                text = ""
+            else:
+                text = external_prop.get("description")
+        else:
+            internal_prop = cp_utils.get_internal_property(bsdd_class_property)
+            text = internal_prop.Description if internal_prop else ""
+        widget.te_description.setPlaceholderText(text)

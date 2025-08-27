@@ -8,6 +8,38 @@ from bsdd import Client
 from . import bsdd_dictionary
 
 
+class Cache:
+    data = {}
+
+    @classmethod
+    def get_external_property(
+        cls, bsdd_class_property: BsddClassProperty, client: bsdd.Client | None
+    ) -> dict | None:
+        from bsdd_parser.utils import bsdd_class_property as cp_utils
+
+        def _make_request():
+            if not cp_utils.is_external_ref(bsdd_class_property):
+                return dict()
+            c = Client() if client is None else client
+            property_uri = bsdd_class_property.PropertyUri
+            result = c.get_property(property_uri)
+
+            if "statusCode" in result and result["statusCode"] == 400:
+                return None
+            return result
+
+        uri = bsdd_class_property.PropertyUri
+        if not uri:
+            return None
+        if uri not in cls.data:
+            cls.data[uri] = _make_request()
+        return cls.data[uri]
+
+    @classmethod
+    def flush_data(cls):
+        cls.data = dict()
+
+
 def get_data_type(class_property: BsddClassProperty):
 
     if not is_external_ref(class_property):
@@ -37,17 +69,30 @@ def get_internal_property(class_property: BsddClassProperty) -> BsddProperty | N
 
 
 def get_external_property(class_property: BsddClassProperty, client=None) -> dict | None:
-    if not is_external_ref(class_property):
-        return dict()
-    client = Client() if client is None else client
-    property_uri = class_property.PropertyUri
-    bsdd_uri = bsdd_dictionary.get_dictionary_path_from_uri(property_uri)
-    result = client.get_property(property_uri)
-
-    if "statusCode" in result and result["statusCode"] == 400:
-        return None
-    return result
+    return Cache.get_external_property(class_property, client)
 
 
 def get_all_property_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddProperty]:
     return {p.Code: p for p in bsdd_dictionary.Properties}
+
+
+def get_datatype(class_property: BsddClassProperty):
+    if not is_external_ref(class_property):
+        bsdd_property = get_internal_property(class_property)
+        return bsdd_property.DataType
+
+    external_property = get_external_property(class_property)
+    if external_property is None:
+        return ""
+    return external_property.get("dataType") or ""
+
+
+def get_units(class_property: BsddClassProperty):
+    if not is_external_ref(class_property):
+        bsdd_property = get_internal_property(class_property)
+        return bsdd_property.Units or []
+
+    external_property = get_external_property(class_property)
+    if external_property is None:
+        return []
+    return external_property.get("Units") or []

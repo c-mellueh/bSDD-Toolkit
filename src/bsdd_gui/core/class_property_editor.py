@@ -9,6 +9,7 @@ from bsdd_gui.module.class_property_editor.constants import (
 )
 from PySide6.QtCore import QCoreApplication
 from bsdd_gui.module.class_property_editor import ui
+from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
 def register_widget(
     widget: ui.ClassPropertyEditor,
     class_property_editor: Type[tool.ClassPropertyEditor],
+    property_table: Type[tool.PropertyTable],
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
@@ -60,6 +62,19 @@ def register_widget(
     class_property_editor.signaller.field_changed.connect(
         lambda w, f: class_property_editor.sync_to_model(w, w.bsdd_class_property, f)
     )
+
+    update_property_specific_fields(widget, class_property_editor)
+
+
+def update_property_specific_fields(
+    widget: ui.ClassPropertyEditor,
+    class_property_editor: Type[tool.ClassPropertyEditor],
+):
+    if not widget:
+        return
+    bsdd_class_property = widget.bsdd_class_property
+
+    class_property_editor.update_description_placeholder(widget)
 
 
 def open_property_info(

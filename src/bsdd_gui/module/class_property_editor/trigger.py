@@ -19,6 +19,10 @@ def connect():
     # core.create_context_menu_builders(tool.PropertyWidget)
 
 
+def update_property_specific_fields(window: ui.ClassPropertyEditor):
+    core.update_property_specific_fields(window, tool.ClassPropertyEditor)
+
+
 def retranslate_ui():
     return  # TODO
     core.retranslate_ui(tool.ClassPropertyEditor)
@@ -33,7 +37,9 @@ def property_info_requested(som_property: BsddClassProperty):
 
 
 def window_created(window: ui.ClassPropertyEditor):
-    core.register_widget(window, tool.ClassPropertyEditor, tool.Project, tool.Util)
+    core.register_widget(
+        window, tool.ClassPropertyEditor, tool.PropertyTable, tool.Project, tool.Util
+    )
 
 
 def update_window(window: ui.ClassPropertyEditor):
