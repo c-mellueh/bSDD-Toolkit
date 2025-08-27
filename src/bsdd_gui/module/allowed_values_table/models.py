@@ -54,8 +54,8 @@ class AllowedValuesModel(TableModel):
         index = self.createIndex(row, column, allowed_value)
         return index
 
-    def setData(self, index, value, /, role=...):
-        return False
+    def flags(self, index):
+        return super().flags(index) | Qt.ItemFlag.ItemIsEditable
 
 
 # typing
