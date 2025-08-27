@@ -229,3 +229,7 @@ class ClassPropertyEditor(WidgetHandler):
             internal_prop = cp_utils.get_internal_property(bsdd_class_property)
             text = internal_prop.Description if internal_prop else ""
         widget.te_description.setPlaceholderText(text)
+
+    @classmethod
+    def update_class_view(cls, widget: ui.ClassPropertyEditor):
+        pass

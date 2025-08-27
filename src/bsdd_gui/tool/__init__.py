@@ -15,3 +15,4 @@ from .popups import Popups
 from .dictionary_editor import DictionaryEditor
 from .console import Console
 from .class_property_editor import ClassPropertyEditor
+from .allowed_values_table import AllowedValuesTable
