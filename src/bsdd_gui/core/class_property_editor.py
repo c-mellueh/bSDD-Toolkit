@@ -153,18 +153,24 @@ def create_class_property_creator(
     class_property_editor: Type[tool.ClassPropertyEditor],
     main_window: Type[tool.MainWindow],
     project: Type[tool.Project],
+    property_set_table: Type[tool.PropertySetTable],
 ):
     code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
+    bsdd_class = main_window.get_active_class()
     bsdd_class_property = BsddClassProperty.model_validate(
         {"Code": code, "PropertyCode": code, "PropertyUri": None, "IsRequired": True}
     )
+
     if not main_window.get_active_class():
         return
     property_set = main_window.get_active_pset()
     if not property_set:
         return
+
+    is_temporary_pset = property_set_table.is_temporary_pset(bsdd_class, property_set)
     bsdd_class_property.PropertySet = property_set
-    bsdd_class_property._set_parent(main_window.get_active_class())
+    bsdd_class_property._set_parent(bsdd_class)
+
     dialog = class_property_editor.create_create_dialog(
         bsdd_class_property, main_window.get(), project.get()
     )
@@ -175,5 +181,7 @@ def create_class_property_creator(
         class_property_editor.sync_to_model(widget, bsdd_class_property)
         bsdd_class_property.parent().ClassProperties.append(bsdd_class_property)
         class_property_editor.signaller.new_class_property_created.emit(bsdd_class_property)
-        class_property_editor.unregister_widget(widget)
+        if is_temporary_pset:
+            property_set_table.remove_temporary_pset(bsdd_class_property.parent(), property_set)
+            property_set_table.signaller.model_refresh_requested.emit()
     class_property_editor.unregister_widget(widget)

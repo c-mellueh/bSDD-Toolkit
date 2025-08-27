@@ -20,7 +20,9 @@ def connect():
 
 
 def create_class_property_creator():
-    core.create_class_property_creator(tool.ClassPropertyEditor, tool.MainWindow)
+    core.create_class_property_creator(
+        tool.ClassPropertyEditor, tool.MainWindow, tool.Project, tool.PropertySetTable
+    )
 
 
 def update_property_specific_fields(window: ui.ClassPropertyEditor):
