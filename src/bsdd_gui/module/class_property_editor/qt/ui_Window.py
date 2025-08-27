@@ -57,6 +57,7 @@ from PySide6.QtWidgets import (
 )
 
 from bsdd_gui.module.class_property_editor.views import ValueView
+from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 
 class Ui_PropertyWindow(object):
@@ -100,7 +101,7 @@ class Ui_PropertyWindow(object):
 
         self.fl_code.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lb_property_reference)
 
-        self.le_property_reference = QLineEdit(self.tab_basics)
+        self.le_property_reference = LineEditWithButton(self.tab_basics)
         self.le_property_reference.setObjectName("le_property_reference")
 
         self.fl_code.setWidget(0, QFormLayout.ItemRole.FieldRole, self.le_property_reference)

@@ -142,6 +142,14 @@ class WidgetHandler(ABC):
 
     @classmethod
     def register_field_getter(cls, widget: QWidget, field: QWidget, getter_func: callable):
+        """_summary_
+
+        Args:
+            widget (QWidget): _description_
+            field (QWidget): _description_
+            getter_func (callable): function(element)
+        """
+
         if not widget in cls.get_properties().field_getter:
             cls.get_properties().field_getter[widget] = dict()
         cls.get_properties().field_getter[widget][field] = getter_func
@@ -157,7 +165,7 @@ class WidgetHandler(ABC):
         f = field
         w = widget
         if isinstance(f, QLineEdit):
-            f.textChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.editingFinished.connect(lambda: cls.signaller.field_changed.emit(w, f))
         if isinstance(f, QComboBox):
             f.currentTextChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
         if isinstance(f, QTextEdit):

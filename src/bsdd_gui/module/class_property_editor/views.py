@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from PySide6.QtCore import (
-    QAbstractTableModel,
+    QCoreApplication,
     QSortFilterProxyModel,
     QModelIndex,
     Qt,
     Signal,
 )
-from PySide6.QtWidgets import QWidget, QWidget, QTableView
-from PySide6.QtGui import QStandardItemModel, QStandardItem, QPalette, QIcon
+
+from PySide6.QtWidgets import QWidget, QWidget, QToolButton, QApplication, QLineEdit, QStyle
+from PySide6.QtGui import QStyleHints, QStandardItem, QPalette, QIcon
 from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
 from bsdd_gui.resources.icons import get_icon, get_link_icon
 from bsdd_parser import BsddClassProperty
