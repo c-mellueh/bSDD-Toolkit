@@ -46,7 +46,8 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
 
     @classmethod
     def set_code(cls, model: models.AllowedValuesModel, index: QModelIndex, value: str):
-        bsdd_property = model.bsdd_property
+        if not value:
+            return
         allowed_value: BsddAllowedValue = index.internalPointer()
         if allowed_value is None:
             return
@@ -54,7 +55,8 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
 
     @classmethod
     def set_value(cls, model: models.AllowedValuesModel, index: QModelIndex, value: str):
-        bsdd_property = model.bsdd_property
+        if not value:
+            return
         allowed_value: BsddAllowedValue = index.internalPointer()
         if allowed_value is None:
             return
@@ -64,27 +66,24 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
 
     @classmethod
     def set_description(cls, model: models.AllowedValuesModel, index: QModelIndex, value: str):
-        bsdd_property = model.bsdd_property
         allowed_value: BsddAllowedValue = index.internalPointer()
         if allowed_value is None:
             return
-        allowed_value.Description = value
+        allowed_value.Description = value if value else None
 
     @classmethod
     def set_sort_number(cls, model: models.AllowedValuesModel, index: QModelIndex, value: str):
-        bsdd_property = model.bsdd_property
         allowed_value: BsddAllowedValue = index.internalPointer()
         if allowed_value is None:
             return
-        allowed_value.SortNumber = value
+        allowed_value.SortNumber = value if value else None
 
     @classmethod
     def set_owned_uri(cls, model: models.AllowedValuesModel, index: QModelIndex, value: str):
-        bsdd_property = model.bsdd_property
         allowed_value: BsddAllowedValue = index.internalPointer()
         if allowed_value is None:
             return
-        allowed_value.OwnedUri = value
+        allowed_value.OwnedUri = value if value else None
 
     @classmethod
     def append_new_value(cls, widget: ui.AllowedValuesTable):
