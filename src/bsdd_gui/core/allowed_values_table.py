@@ -21,13 +21,14 @@ def setup_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.Allo
     prop: BsddClassProperty | BsddProperty = view.bsdd_property
 
     allowed_values_table.register_widget(view)
-    model = allowed_values_table.create_model(prop)
-    view.setModel(model)
+    sort_model = allowed_values_table.create_model(prop)
+    model = sort_model.sourceModel()
     allowed_values_table.add_column_to_table(model, "Code", lambda av: av.Code)
     allowed_values_table.add_column_to_table(model, "Value", lambda av: av.Value)
     allowed_values_table.add_column_to_table(model, "Description", lambda av: av.Description)
     allowed_values_table.add_column_to_table(model, "SortNumber", lambda av: av.SortNumber)
     allowed_values_table.add_column_to_table(model, "OwnedUri", lambda av: av.OwnedUri)
+    view.setModel(sort_model)
 
 
 def reset_views(allowed_values_table: Type[tool.AllowedValuesTable], project: Type[tool.Project]):

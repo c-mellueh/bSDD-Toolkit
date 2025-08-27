@@ -17,7 +17,7 @@ from bsdd_gui.presets.models_presets import TableModel
 class AllowedValuesModel(TableModel):
 
     def __init__(self, bsdd_property: BsddClassProperty | BsddProperty, *args, **kwargs):
-        super().__init__(tool.PropertyTable, *args, **kwargs)
+        super().__init__(tool.AllowedValuesTable, *args, **kwargs)
         self.bsdd_property = bsdd_property
 
     @property
@@ -31,6 +31,11 @@ class AllowedValuesModel(TableModel):
     @property
     def active_pset(self):
         return tool.MainWindow.get_active_pset()
+
+    def columnCount(self, /, parent=...):
+        res = super().columnCount(parent)
+        print(res)
+        return res
 
     def rowCount(self, parent=QModelIndex()):
         if not self.bsdd_property:
