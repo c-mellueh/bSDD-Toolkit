@@ -8,7 +8,7 @@ from PySide6.QtCore import (
     Signal,
 )
 
-from PySide6.QtWidgets import QWidget, QWidget, QToolButton, QApplication, QLineEdit, QStyle
+from PySide6.QtWidgets import QWidget, QWidget, QGridLayout, QApplication, QLineEdit, QStyle
 from PySide6.QtGui import QStyleHints, QStandardItem, QPalette, QIcon
 from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
 from bsdd_gui.resources.icons import get_icon, get_link_icon
@@ -18,7 +18,7 @@ from bsdd_gui import tool
 from .qt.ui_SplitterSettings import Ui_SplitterSettings
 
 
-class ValueView(QWidget):
+class ValueView(QGridLayout):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

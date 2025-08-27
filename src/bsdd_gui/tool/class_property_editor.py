@@ -10,6 +10,7 @@ from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor import trigger
 from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignaller
 from urllib.parse import urlparse
+from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
 
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 from bsdd_parser.utils import bsdd_class as c_utils
@@ -232,14 +233,33 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def update_value_view(cls, widget: ui.ClassPropertyEditor):
+        def clear_layout(la):
+            if la is None:
+                return
+
+            while la.count():
+                item = la.takeAt(0)
+
+                # If the item is a widget, delete it
+                widget = item.widget()
+                if widget is not None:
+                    widget.setParent(None)
+
+                # If the item is another layout, clear it recursively
+                child_layout = item.layout()
+                if child_layout is not None:
+                    clear_layout(child_layout)
+
         bsdd_class_property = widget.bsdd_class_property
         if cp_utils.is_external_ref(bsdd_class_property):
-            external_prop = cp_utils.get_external_property(bsdd_class_property)
-            if not external_prop:
-                return
-            value_kind = external_prop.PropertyValueKind
+            bsdd_property = cp_utils.get_external_property(bsdd_class_property)
         else:
-            internal_prop = cp_utils.get_internal_property(bsdd_class_property)
-            if not internal_prop:
-                return
-            value_kind = internal_prop.PropertyValueKind
+            bsdd_property = cp_utils.get_internal_property(bsdd_class_property)
+        if not bsdd_property:
+            return
+        value_kind = bsdd_property.PropertyValueKind
+        layout = widget.gl_value
+        clear_layout(layout)
+        if value_kind == "Single" or value_kind is None:
+            insert_widget = AllowedValuesTable(bsdd_class_property)
+            layout.addWidget(insert_widget)

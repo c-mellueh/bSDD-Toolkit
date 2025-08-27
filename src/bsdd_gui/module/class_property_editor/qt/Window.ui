@@ -112,7 +112,14 @@
         </layout>
        </item>
        <item>
-        <widget class="ValueView" name="widget" native="true"/>
+        <layout class="QGridLayout" name="gl_value"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="la_description">
+         <property name="text">
+          <string>Description:</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QSplitter" name="splitter">
@@ -156,12 +163,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>ValueView</class>
-   <extends>QWidget</extends>
-   <header>bsdd_gui.module.class_property_editor.views</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>LineEditWithButton</class>
    <extends>QLineEdit</extends>

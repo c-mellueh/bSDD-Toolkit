@@ -45,6 +45,7 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFormLayout,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -56,7 +57,6 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from bsdd_gui.module.class_property_editor.views import ValueView
 from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 
@@ -134,10 +134,15 @@ class Ui_PropertyWindow(object):
 
         self.verticalLayout_2.addLayout(self.hl_value_description)
 
-        self.widget = ValueView(self.tab_basics)
-        self.widget.setObjectName("widget")
+        self.gl_value = QGridLayout()
+        self.gl_value.setObjectName("gl_value")
 
-        self.verticalLayout_2.addWidget(self.widget)
+        self.verticalLayout_2.addLayout(self.gl_value)
+
+        self.la_description = QLabel(self.tab_basics)
+        self.la_description.setObjectName("la_description")
+
+        self.verticalLayout_2.addWidget(self.la_description)
 
         self.splitter = QSplitter(self.tab_basics)
         self.splitter.setObjectName("splitter")
@@ -187,6 +192,9 @@ class Ui_PropertyWindow(object):
         )
         self.cb_is_required.setText(
             QCoreApplication.translate("PropertyWindow", "Is Required", None)
+        )
+        self.la_description.setText(
+            QCoreApplication.translate("PropertyWindow", "Description:", None)
         )
         self.te_description.setPlaceholderText(
             QCoreApplication.translate("PropertyWindow", "Description", None)
