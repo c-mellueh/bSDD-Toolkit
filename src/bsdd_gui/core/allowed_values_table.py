@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClassProperty, BsddProperty
 from bsdd_gui.module.allowed_values_table import ui
 from PySide6.QtCore import QCoreApplication, QPoint
+from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -15,12 +16,18 @@ def connect_signals(
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
 
+    def remove_view(widget: ClassPropertyEditor):
+        table_view = allowed_values_table.get_view_from_property_editor(widget)
+        if table_view:
+            allowed_values_table.unregister_widget(table_view)
+
     class_property_editor.signaller.new_value_requested.connect(
         allowed_values_table.handle_new_value_request
     )
     allowed_values_table.signaller.delete_selection_requested.connect(
         allowed_values_table.delete_selection
     )
+    class_property_editor.signaller.window_closed.connect(remove_view)
     pass
 
 

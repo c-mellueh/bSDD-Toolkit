@@ -113,11 +113,15 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
         cls.reset_view(widget)
 
     @classmethod
-    def handle_new_value_request(cls, widget: ClassPropertyEditor):
+    def get_view_from_property_editor(cls, widget: ClassPropertyEditor):
         for table_widget in cls.get_widgets():
             if widget.bsdd_class_property == table_widget.bsdd_property:
-                cls.append_new_value(table_widget)
-                return
+                return table_widget
+
+    @classmethod
+    def handle_new_value_request(cls, widget: ClassPropertyEditor):
+        table_widget = cls.get_view_from_property_editor(widget)
+        cls.append_new_value(table_widget)
 
     @classmethod
     def delete_selection(cls, widget: ui.AllowedValuesTable):
