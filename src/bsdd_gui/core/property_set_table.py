@@ -47,6 +47,9 @@ def connect_to_main_window(
         if pset is None:
             return
         pset_list = property_set_table.get_pset_list(new_class)
+        if not pset_list:
+            main_window.set_active_pset(None)
+            return
         if pset in pset_list:
             row_index = property_set_table.get_row_by_name(pset_view, pset)
         else:

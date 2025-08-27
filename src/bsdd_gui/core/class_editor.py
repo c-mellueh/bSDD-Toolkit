@@ -92,7 +92,9 @@ def connect_to_main_window(
     view.doubleClicked.connect(emit_class_info_requested)
 
     main_window.signaller.new_class_requested.connect(
-        lambda: class_editor.request_new_class(main_window.get_active_class())
+        lambda: class_editor.request_new_class(
+            class_utils.get_parent(main_window.get_active_class())
+        )
     )
     main_window.signaller.copy_active_class_requested.connect(
         lambda: class_editor.request_class_copy(main_window.get_active_class())
