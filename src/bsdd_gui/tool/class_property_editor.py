@@ -4,31 +4,31 @@ import logging
 
 import bsdd_gui
 from bsdd_parser import BsddClassProperty
-from bsdd_gui.module.property_widget import ui
+from bsdd_gui.module.class_property_editor import ui
 from PySide6.QtWidgets import QLayout
 from PySide6.QtCore import Signal
-from bsdd_gui.module.property_widget import trigger
+from bsdd_gui.module.class_property_editor import trigger
 from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_widget.prop import PropertyWidgetProperties
+    from bsdd_gui.module.class_property_editor.prop import ClassPropertyEditorProperties
 
 
 class Signaller(ViewSignaller):
-    paste_clipboard = Signal(ui.PropertyWindow)
+    paste_clipboard = Signal(ui.ClassPropertyEditor)
 
 
-class PropertyWidget(ViewHandler):
+class ClassPropertyEditor(ViewHandler):
     signaller = Signaller()
 
     @classmethod
-    def get_properties(cls) -> PropertyWidgetProperties:
-        return bsdd_gui.PropertyWidgetProperties
+    def get_properties(cls) -> ClassPropertyEditorProperties:
+        return bsdd_gui.ClassPropertyEditorProperties
 
     @classmethod
-    def create_window(cls, bsdd_property: BsddClassProperty) -> ui.PropertyWindow:
+    def create_window(cls, bsdd_property: BsddClassProperty) -> ui.ClassPropertyEditor:
         prop = cls.get_properties()
-        prop.windows[bsdd_property.Code] = ui.PropertyWindow(bsdd_property)
+        prop.windows[bsdd_property.Code] = ui.ClassPropertyEditor(bsdd_property)
         for plugin in prop.plugin_widget_list:
             layout: QLayout = getattr(cls.get_window(), plugin.layout_name)
             layout.insertWidget(plugin.index, plugin.widget())
@@ -38,7 +38,7 @@ class PropertyWidget(ViewHandler):
         return cls.get_window(bsdd_property)
 
     @classmethod
-    def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.PropertyWindow:
+    def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
         return cls.get_properties().windows.get(bsdd_class_property.Code)
 
     @classmethod

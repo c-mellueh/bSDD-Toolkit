@@ -1,7 +1,7 @@
 from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
-from bsdd_gui.core import property_widget as core
+from bsdd_gui.core import class_property_editor as core
 from typing import TYPE_CHECKING
 from bsdd_parser import BsddClassProperty
 from PySide6.QtGui import QKeySequence
@@ -13,9 +13,9 @@ def connect():
     tool.Settings.add_page_to_toolbox(
         views.SplitterSettings,
         "pageSplitter",
-        lambda: core.splitter_settings_accepted(tool.PropertyWidget, tool.Appdata),
+        lambda: core.splitter_settings_accepted(tool.ClassPropertyEditor, tool.Appdata),
     )
-    core.connect_signals(tool.PropertyWidget, tool.PropertyTable)
+    core.connect_signals(tool.ClassPropertyEditor, tool.PropertyTable)
     # core.create_context_menu_builders(tool.PropertyWidget)
 
 
@@ -29,16 +29,16 @@ def on_new_project():
 
 
 def property_info_requested(som_property: BsddClassProperty):
-    core.open_property_info(som_property, tool.PropertyWidget, tool.Util)
+    core.open_property_info(som_property, tool.ClassPropertyEditor, tool.Util)
 
 
-def window_created(window: ui.PropertyWindow):
+def window_created(window: ui.ClassPropertyEditor):
     core.init_window(window, tool.PropertyWindow, tool.Util)
     core.connect_window(window, tool.PropertyWindow, tool.Util)
     core.update_window(window, tool.PropertyWindow, tool.Util, tool.Units)
 
 
-def update_window(window: ui.PropertyWindow):
+def update_window(window: ui.ClassPropertyEditor):
     return  # TODO
 
     core.update_window(window, tool.PropertyWindow, tool.Util, tool.Units)

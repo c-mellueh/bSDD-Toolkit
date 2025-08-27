@@ -18,7 +18,7 @@ from .qt.ui_SplitterSettings import Ui_SplitterSettings
 from .qt.ui_Window import Ui_PropertyWindow
 
 
-class PropertyWindow(QWidget, Ui_PropertyWindow):
+class ClassPropertyEditor(QWidget, Ui_PropertyWindow):
     closed = Signal()
 
     def __init__(self, bsdd_class_property: BsddClassProperty, *args, **kwargs):

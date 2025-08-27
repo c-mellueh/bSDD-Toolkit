@@ -18,8 +18,8 @@ class PluginProperty:
     value_test: Callable
 
 
-class PropertyWidgetProperties:
+class ClassPropertyEditorProperties:
     plugin_widget_list: list[PluginProperty] = list()
-    windows: dict[BsddClassProperty, ui.PropertyWindow] = dict()
+    windows: dict[BsddClassProperty, ui.ClassPropertyEditor] = dict()
     context_menu_builders = list()
     splitter_settings: ui.SplitterSettings = None

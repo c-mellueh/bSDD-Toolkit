@@ -58,7 +58,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from bsdd_gui.module.property_widget.views import ValueView
+from bsdd_gui.module.class_property_editor.views import ValueView
 
 
 class Ui_PropertyWindow(object):

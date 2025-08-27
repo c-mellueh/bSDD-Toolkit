@@ -3,7 +3,7 @@ from . import ui, prop, trigger
 
 
 def register():
-    bsdd_gui.PropertyWidgetProperties = prop.PropertyWidgetProperties()
+    bsdd_gui.ClassPropertyEditorProperties = prop.ClassPropertyEditorProperties()
 
 
 def retranslate_ui():
