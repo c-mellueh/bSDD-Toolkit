@@ -35,6 +35,8 @@ def get_dictionary_from_class(bsdd_class: BsddClass):
 
 
 def get_parent(bsdd_class: BsddClass) -> BsddClass | None:
+    if bsdd_class is None:
+        return None
     bsdd_dictionary = get_dictionary_from_class(bsdd_class)
     if bsdd_class.ParentClassCode is None:
         return None
