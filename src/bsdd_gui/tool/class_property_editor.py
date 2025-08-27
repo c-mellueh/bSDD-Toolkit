@@ -95,10 +95,10 @@ class ClassPropertyEditor(WidgetHandler):
         if not pset:
             return text
         text = pset + SEPERATOR + text
-        som_class = bsdd_class_property._parent_ref
-        if not som_class:
+        bsdd_class = bsdd_class_property.parent()
+        if not bsdd_class:
             return text
-        return som_class().Name + SEPERATOR + text
+        return bsdd_class.Name + SEPERATOR + text
 
     @classmethod
     def show_property_info(cls, bsdd_class_property: BsddClassProperty):
@@ -159,7 +159,9 @@ class ClassPropertyEditor(WidgetHandler):
         if not value in cp_utils.get_all_property_codes(bsdd_dictionary):
             return False
 
-        bsdd_class = bsdd_class_property._parent_ref()
+        bsdd_class = bsdd_class_property.parent()
+        if not bsdd_class:
+            return True
         if value in [cp.Code for cp in bsdd_class.ClassProperties if cp != bsdd_class_property]:
             return False
         return True
@@ -170,10 +172,8 @@ class ClassPropertyEditor(WidgetHandler):
     ):
         value = field.text()
         bsdd_class_property = widget.bsdd_class_property
-        bsdd_class = bsdd_class_property._parent_ref() if bsdd_class_property._parent_ref else None
-        bsdd_dictionary = (
-            bsdd_class._parent_ref() if bsdd_class and bsdd_class._parent_ref else None
-        )
+        bsdd_class = bsdd_class_property.parent()
+        bsdd_dictionary = bsdd_class.parent()
         line_edit = widget.le_property_reference
         if not value:
             line_edit.show_button(False)
@@ -231,5 +231,15 @@ class ClassPropertyEditor(WidgetHandler):
         widget.te_description.setPlaceholderText(text)
 
     @classmethod
-    def update_class_view(cls, widget: ui.ClassPropertyEditor):
-        pass
+    def update_value_view(cls, widget: ui.ClassPropertyEditor):
+        bsdd_class_property = widget.bsdd_class_property
+        if cp_utils.is_external_ref(bsdd_class_property):
+            external_prop = cp_utils.get_external_property(bsdd_class_property)
+            if not external_prop:
+                return
+            value_kind = external_prop.get("PropertyValueKind")
+        else:
+            internal_prop = cp_utils.get_internal_property(bsdd_class_property)
+            if not internal_prop:
+                return
+            value_kind = internal_prop.PropertyValueKind

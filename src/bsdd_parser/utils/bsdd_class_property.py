@@ -61,8 +61,8 @@ def is_external_ref(class_property: BsddClassProperty) -> bool:
 def get_internal_property(class_property: BsddClassProperty) -> BsddProperty | None:
     if is_external_ref(class_property):
         return None
-    bsdd_class = class_property._parent_ref()
-    bsdd_dictionary = bsdd_class._parent_ref()
+    bsdd_class = class_property.parent()
+    bsdd_dictionary = bsdd_class.parent()
     for p in bsdd_dictionary.Properties:
         if p.Code == class_property.PropertyCode:
             return p

@@ -79,6 +79,8 @@ def update_property_specific_fields(
     bsdd_class_property = widget.bsdd_class_property
 
     class_property_editor.update_description_placeholder(widget)
+    class_property_editor.update_allowed_units(widget)
+    class_property_editor.update_value_view(widget)
 
 
 def open_property_info(

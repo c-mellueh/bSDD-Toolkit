@@ -9,7 +9,6 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_to_main_window(tool.AllowedValuesTable, tool.MainWindow)
     core.connect_signals(tool.AllowedValuesTable, tool.MainWindow, tool.PropertySetTable)
 
 

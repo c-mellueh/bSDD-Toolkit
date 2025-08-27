@@ -31,9 +31,7 @@ def get_row_index(bsdd_class: BsddClass):
 
 
 def get_dictionary_from_class(bsdd_class: BsddClass):
-    if not bsdd_class._parent_ref:
-        return None
-    return bsdd_class._parent_ref()
+    return bsdd_class.parent()
 
 
 def get_parent(bsdd_class: BsddClass) -> BsddClass | None:
@@ -98,9 +96,9 @@ def shared_parent(
     # Resolve dictionary if not passed
     if dictionary is None:
         first = cls_list[0]
-        dictionary = first._parent_ref() if getattr(first, "_parent_ref", None) else None
+        dictionary = first.parent()
         if dictionary is None:
-            raise ValueError("shared_parent: dictionary not provided and _parent_ref is not set.")
+            raise ValueError("shared_parent: dictionary not provided and parent is not set.")
 
     # Build top-down ancestor path for the first class and an index by Code -> depth
     path0 = _ancestors_topdown(cls_list[0], dictionary)

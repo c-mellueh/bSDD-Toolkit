@@ -4,13 +4,21 @@ from pydantic import BaseModel
 
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, Field, PrivateAttr, model_validator, field_validator
+from pydantic import BaseModel, Field, PrivateAttr, model_validator, ConfigDict
 import json
 import weakref
 import logging
 
 
-class BsddDictionary(BaseModel):
+def _lower_first(s: str) -> str:
+    return s[:1].lower() + s[1:] if s else s
+
+
+class CaseInsensitiveModel(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, alias_generator=_lower_first)
+
+
+class BsddDictionary(CaseInsensitiveModel):
     OrganizationCode: str
     DictionaryCode: str
     DictionaryName: str
@@ -62,7 +70,7 @@ class BsddDictionary(BaseModel):
             p._set_parent(self)
 
 
-class BsddClass(BaseModel):
+class BsddClass(CaseInsensitiveModel):
     Code: str
     Name: str
     ClassType: str
@@ -97,6 +105,9 @@ class BsddClass(BaseModel):
 
     def _set_parent(self, parent: "BsddDictionary") -> None:
         self._parent_ref = weakref.ref(parent)
+
+    def parent(self) -> Optional[BsddDictionary]:
+        return self._parent_ref() if self._parent_ref is not None else None
 
     def model_post_init(self, context):
         for c in self.ClassProperties:
@@ -141,7 +152,7 @@ class BsddClass(BaseModel):
         object.__setattr__(self, "Code", code)
 
 
-class BsddAllowedValue(BaseModel):
+class BsddAllowedValue(CaseInsensitiveModel):
     Code: str
     Value: str
     Description: Optional[str] = None
@@ -150,14 +161,14 @@ class BsddAllowedValue(BaseModel):
     OwnedUri: Optional[str] = None
 
 
-class BsddPropertyRelation(BaseModel):
+class BsddPropertyRelation(CaseInsensitiveModel):
     RelatedPropertyName: Optional[str] = None
     RelatedPropertyUri: str
     RelationType: str
     OwnedUri: Optional[str] = None
 
 
-class BsddClassProperty(BaseModel):
+class BsddClassProperty(CaseInsensitiveModel):
     Code: str
     PropertyCode: str
     PropertyUri: str
@@ -182,8 +193,11 @@ class BsddClassProperty(BaseModel):
     def _set_parent(self, parent: "BsddClass") -> None:
         self._parent_ref = weakref.ref(parent)
 
+    def parent(self) -> Optional[BsddClass]:
+        return self._parent_ref() if self._parent_ref is not None else None
 
-class BsddProperty(BaseModel):
+
+class BsddProperty(CaseInsensitiveModel):
     Code: str
     Name: str
     Definition: Optional[str] = None
@@ -236,8 +250,11 @@ class BsddProperty(BaseModel):
     def _set_parent(self, parent: "BsddDictionary") -> None:
         self._parent_ref = weakref.ref(parent)
 
+    def parent(self) -> Optional[BsddDictionary]:
+        return self._parent_ref() if self._parent_ref is not None else None
 
-class BsddClassRelation(BaseModel):
+
+class BsddClassRelation(CaseInsensitiveModel):
     RelationType: str
     RelatedClassUri: str
     RelatedClassName: Optional[str] = None
