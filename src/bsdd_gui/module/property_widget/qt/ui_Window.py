@@ -45,14 +45,14 @@ from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
     QComboBox,
-    QGridLayout,
+    QFormLayout,
     QHBoxLayout,
     QHeaderView,
     QLabel,
     QLineEdit,
-    QPushButton,
     QSizePolicy,
     QSplitter,
+    QTabWidget,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -65,146 +65,124 @@ class Ui_PropertyWindow(object):
     def setupUi(self, PropertyWindow):
         if not PropertyWindow.objectName():
             PropertyWindow.setObjectName("PropertyWindow")
-        PropertyWindow.resize(649, 631)
+        PropertyWindow.resize(649, 695)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.verticalLayout_3 = QVBoxLayout()
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.label_name = QLabel(PropertyWindow)
-        self.label_name.setObjectName("label_name")
+        self.tabWidget = QTabWidget(PropertyWindow)
+        self.tabWidget.setObjectName("tabWidget")
+        self.tab_basics = QWidget()
+        self.tab_basics.setObjectName("tab_basics")
+        self.verticalLayout_2 = QVBoxLayout(self.tab_basics)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.fl_code = QFormLayout()
+        self.fl_code.setObjectName("fl_code")
+        self.lb_code = QLabel(self.tab_basics)
+        self.lb_code.setObjectName("lb_code")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_name.sizePolicy().hasHeightForWidth())
-        self.label_name.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.lb_code.sizePolicy().hasHeightForWidth())
+        self.lb_code.setSizePolicy(sizePolicy)
 
-        self.horizontalLayout.addWidget(self.label_name)
+        self.fl_code.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lb_code)
 
-        self.lineEdit_name = QLineEdit(PropertyWindow)
-        self.lineEdit_name.setObjectName("lineEdit_name")
+        self.le_code = QLineEdit(self.tab_basics)
+        self.le_code.setObjectName("le_code")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(1)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.lineEdit_name.sizePolicy().hasHeightForWidth())
-        self.lineEdit_name.setSizePolicy(sizePolicy1)
-        self.lineEdit_name.setMinimumSize(QSize(350, 0))
+        sizePolicy1.setHeightForWidth(self.le_code.sizePolicy().hasHeightForWidth())
+        self.le_code.setSizePolicy(sizePolicy1)
+        self.le_code.setMinimumSize(QSize(350, 0))
 
-        self.horizontalLayout.addWidget(self.lineEdit_name)
+        self.fl_code.setWidget(1, QFormLayout.ItemRole.FieldRole, self.le_code)
 
-        self.verticalLayout_3.addLayout(self.horizontalLayout)
+        self.lb_property_reference = QLabel(self.tab_basics)
+        self.lb_property_reference.setObjectName("lb_property_reference")
 
-        self.gridLayout_2 = QGridLayout()
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.label_2 = QLabel(PropertyWindow)
-        self.label_2.setObjectName("label_2")
+        self.fl_code.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lb_property_reference)
 
-        self.gridLayout_2.addWidget(self.label_2, 0, 1, 1, 1)
+        self.le_property_reference = QLineEdit(self.tab_basics)
+        self.le_property_reference.setObjectName("le_property_reference")
 
-        self.label = QLabel(PropertyWindow)
-        self.label.setObjectName("label")
+        self.fl_code.setWidget(0, QFormLayout.ItemRole.FieldRole, self.le_property_reference)
 
-        self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
+        self.lb_unit = QLabel(self.tab_basics)
+        self.lb_unit.setObjectName("lb_unit")
 
-        self.label_3 = QLabel(PropertyWindow)
-        self.label_3.setObjectName("label_3")
+        self.fl_code.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_unit)
 
-        self.gridLayout_2.addWidget(self.label_3, 0, 2, 1, 1)
+        self.cb_unit = QComboBox(self.tab_basics)
+        self.cb_unit.setObjectName("cb_unit")
 
-        self.combo_data_type = QComboBox(PropertyWindow)
-        self.combo_data_type.setObjectName("combo_data_type")
-        self.combo_data_type.setEditable(True)
+        self.fl_code.setWidget(2, QFormLayout.ItemRole.FieldRole, self.cb_unit)
 
-        self.gridLayout_2.addWidget(self.combo_data_type, 1, 0, 1, 1)
+        self.verticalLayout_2.addLayout(self.fl_code)
 
-        self.combo_value_type = QComboBox(PropertyWindow)
-        self.combo_value_type.setObjectName("combo_value_type")
-        self.combo_value_type.setEditable(True)
+        self.hl_value_description = QHBoxLayout()
+        self.hl_value_description.setObjectName("hl_value_description")
+        self.lb_allowed_values = QLabel(self.tab_basics)
+        self.lb_allowed_values.setObjectName("lb_allowed_values")
+        self.lb_allowed_values.setMinimumSize(QSize(0, 0))
 
-        self.gridLayout_2.addWidget(self.combo_value_type, 1, 1, 1, 1)
+        self.hl_value_description.addWidget(self.lb_allowed_values)
 
-        self.combo_unit = QComboBox(PropertyWindow)
-        self.combo_unit.setObjectName("combo_unit")
-        self.combo_unit.setEditable(True)
+        self.cb_is_required = QCheckBox(self.tab_basics)
+        self.cb_is_required.setObjectName("cb_is_required")
+        self.cb_is_required.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
-        self.gridLayout_2.addWidget(self.combo_unit, 1, 2, 1, 1)
+        self.hl_value_description.addWidget(self.cb_is_required)
 
-        self.verticalLayout_3.addLayout(self.gridLayout_2)
+        self.verticalLayout_2.addLayout(self.hl_value_description)
 
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.button_add_line = QPushButton(PropertyWindow)
-        self.button_add_line.setObjectName("button_add_line")
-        sizePolicy.setHeightForWidth(self.button_add_line.sizePolicy().hasHeightForWidth())
-        self.button_add_line.setSizePolicy(sizePolicy)
-        self.button_add_line.setMinimumSize(QSize(15, 15))
-        self.button_add_line.setMaximumSize(QSize(24, 24))
-
-        self.horizontalLayout_2.addWidget(self.button_add_line)
-
-        self.label_values = QLabel(PropertyWindow)
-        self.label_values.setObjectName("label_values")
-        self.label_values.setMinimumSize(QSize(0, 0))
-
-        self.horizontalLayout_2.addWidget(self.label_values)
-
-        self.check_box_optional = QCheckBox(PropertyWindow)
-        self.check_box_optional.setObjectName("check_box_optional")
-        self.check_box_optional.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-
-        self.horizontalLayout_2.addWidget(self.check_box_optional)
-
-        self.check_box_inherit = QCheckBox(PropertyWindow)
-        self.check_box_inherit.setObjectName("check_box_inherit")
-        self.check_box_inherit.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-        self.check_box_inherit.setIconSize(QSize(0, 0))
-
-        self.horizontalLayout_2.addWidget(self.check_box_inherit)
-
-        self.verticalLayout_3.addLayout(self.horizontalLayout_2)
-
-        self.splitter = QSplitter(PropertyWindow)
+        self.splitter = QSplitter(self.tab_basics)
         self.splitter.setObjectName("splitter")
         self.splitter.setOrientation(Qt.Orientation.Vertical)
-        self.table_view_value = ValueView(self.splitter)
-        self.table_view_value.setObjectName("table_view_value")
+        self.value_view = ValueView(self.splitter)
+        self.value_view.setObjectName("value_view")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(1)
-        sizePolicy2.setHeightForWidth(self.table_view_value.sizePolicy().hasHeightForWidth())
-        self.table_view_value.setSizePolicy(sizePolicy2)
-        self.table_view_value.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.table_view_value.setEditTriggers(
+        sizePolicy2.setHeightForWidth(self.value_view.sizePolicy().hasHeightForWidth())
+        self.value_view.setSizePolicy(sizePolicy2)
+        self.value_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.value_view.setEditTriggers(
             QAbstractItemView.EditTrigger.AnyKeyPressed
             | QAbstractItemView.EditTrigger.DoubleClicked
             | QAbstractItemView.EditTrigger.EditKeyPressed
         )
-        self.table_view_value.setProperty("showDropIndicator", False)
-        self.table_view_value.setAlternatingRowColors(False)
-        self.table_view_value.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.table_view_value.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table_view_value.setGridStyle(Qt.PenStyle.DashLine)
-        self.splitter.addWidget(self.table_view_value)
-        self.table_view_value.horizontalHeader().setVisible(False)
-        self.table_view_value.horizontalHeader().setStretchLastSection(True)
-        self.description = QTextEdit(self.splitter)
-        self.description.setObjectName("description")
+        self.value_view.setProperty("showDropIndicator", False)
+        self.value_view.setAlternatingRowColors(False)
+        self.value_view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.value_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.value_view.setGridStyle(Qt.PenStyle.DashLine)
+        self.splitter.addWidget(self.value_view)
+        self.value_view.horizontalHeader().setVisible(False)
+        self.value_view.horizontalHeader().setStretchLastSection(True)
+        self.te_description = QTextEdit(self.splitter)
+        self.te_description.setObjectName("te_description")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.description.sizePolicy().hasHeightForWidth())
-        self.description.setSizePolicy(sizePolicy3)
-        self.description.setMinimumSize(QSize(0, 28))
-        self.description.setAutoFormatting(QTextEdit.AutoFormattingFlag.AutoAll)
-        self.description.setReadOnly(False)
-        self.splitter.addWidget(self.description)
+        sizePolicy3.setHeightForWidth(self.te_description.sizePolicy().hasHeightForWidth())
+        self.te_description.setSizePolicy(sizePolicy3)
+        self.te_description.setMinimumSize(QSize(0, 28))
+        self.te_description.setAutoFormatting(QTextEdit.AutoFormattingFlag.AutoAll)
+        self.te_description.setReadOnly(False)
+        self.splitter.addWidget(self.te_description)
 
-        self.verticalLayout_3.addWidget(self.splitter)
+        self.verticalLayout_2.addWidget(self.splitter)
 
-        self.verticalLayout.addLayout(self.verticalLayout_3)
+        self.tabWidget.addTab(self.tab_basics, "")
+        self.tab_advanced = QWidget()
+        self.tab_advanced.setObjectName("tab_advanced")
+        self.tabWidget.addTab(self.tab_advanced, "")
+
+        self.verticalLayout.addWidget(self.tabWidget)
 
         self.retranslateUi(PropertyWindow)
+
+        self.tabWidget.setCurrentIndex(0)
 
         QMetaObject.connectSlotsByName(PropertyWindow)
 
@@ -212,25 +190,31 @@ class Ui_PropertyWindow(object):
 
     def retranslateUi(self, PropertyWindow):
         PropertyWindow.setWindowTitle(QCoreApplication.translate("PropertyWindow", "Form", None))
-        self.label_name.setText(QCoreApplication.translate("PropertyWindow", "Name:", None))
-        self.lineEdit_name.setPlaceholderText(
-            QCoreApplication.translate("PropertyWindow", "Name", None)
+        self.lb_code.setText(QCoreApplication.translate("PropertyWindow", "Code:", None))
+        self.le_code.setPlaceholderText(QCoreApplication.translate("PropertyWindow", "Code", None))
+        self.lb_property_reference.setText(
+            QCoreApplication.translate("PropertyWindow", "Property Reference", None)
         )
-        self.label_2.setText(QCoreApplication.translate("PropertyWindow", "Valuetype:", None))
-        self.label.setText(QCoreApplication.translate("PropertyWindow", "Datatype:", None))
-        self.label_3.setText(QCoreApplication.translate("PropertyWindow", "Unit:", None))
-        self.button_add_line.setText(QCoreApplication.translate("PropertyWindow", "+", None))
-        self.label_values.setText(
+        self.le_property_reference.setPlaceholderText(
+            QCoreApplication.translate("PropertyWindow", "Property Code or URI", None)
+        )
+        self.lb_unit.setText(QCoreApplication.translate("PropertyWindow", "Unit:", None))
+        self.lb_allowed_values.setText(
             QCoreApplication.translate("PropertyWindow", "Allowed Values:", None)
         )
-        self.check_box_optional.setText(
-            QCoreApplication.translate("PropertyWindow", "Optional", None)
+        self.cb_is_required.setText(
+            QCoreApplication.translate("PropertyWindow", "Is Required", None)
         )
-        self.check_box_inherit.setText(
-            QCoreApplication.translate("PropertyWindow", "Inherit Values", None)
-        )
-        self.description.setPlaceholderText(
+        self.te_description.setPlaceholderText(
             QCoreApplication.translate("PropertyWindow", "Description", None)
+        )
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_basics),
+            QCoreApplication.translate("PropertyWindow", "Basics", None),
+        )
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_advanced),
+            QCoreApplication.translate("PropertyWindow", "Advanced", None),
         )
 
     # retranslateUi

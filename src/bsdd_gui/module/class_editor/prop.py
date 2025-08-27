@@ -11,12 +11,3 @@ class ClassEditorProperties(WidgetHandlerProperties):
 
     def __init__(self):
         super().__init__()
-        self.field_getter: dict[ui.ClassEditor, dict[QWidget, callable]] = (
-            dict()
-        )  # getter function for widgets of Window
-        self.field_setter: dict[ui.ClassEditor, dict[QWidget, callable]] = (
-            dict()
-        )  # getter function for widgets of Window
-        self.validator_functions: dict[ui.ClassEditor, dict[QWidget, tuple[callable, callable]]] = (
-            dict()
-        )

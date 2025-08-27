@@ -33,8 +33,6 @@ def property_info_requested(som_property: BsddClassProperty):
 
 
 def window_created(window: ui.PropertyWindow):
-    return  # TODO
-
     core.init_window(window, tool.PropertyWindow, tool.Util)
     core.connect_window(window, tool.PropertyWindow, tool.Util)
     core.update_window(window, tool.PropertyWindow, tool.Util, tool.Units)

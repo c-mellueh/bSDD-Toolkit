@@ -37,7 +37,7 @@ def register_widget(
     class_editor.register_field_setter(
         widget,
         widget.le_code,
-        lambda v, w=widget: w.bsdd_class.set_code(v),
+        lambda e, v: e.set_code(v),
     )
 
     ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
@@ -48,7 +48,7 @@ def register_widget(
     class_editor.register_field_setter(
         widget,
         widget.cb_class_type,
-        lambda v, w=widget: setattr(w.bsdd_class, "ClassType", ct_combobox_items[v]),
+        lambda e, v: setattr(e, "ClassType", ct_combobox_items[v]),
     )
 
     st_combobox_items = ["Preview", "Active", "Inactive"]
@@ -58,7 +58,7 @@ def register_widget(
     class_editor.register_field_setter(
         widget,
         widget.cb_status,
-        lambda v, w=widget: setattr(w.bsdd_class, "Status", st_combobox_items[v]),
+        lambda e, v: setattr(e, "Status", st_combobox_items[v]),
     )
 
     # Tags
@@ -68,7 +68,7 @@ def register_widget(
     class_editor.register_field_setter(
         widget,
         widget.ti_related_ifc_entity,
-        lambda v, w=widget: setattr(w.bsdd_class, "RelatedIfcEntityNamesList", v),
+        lambda e, v, w=widget: setattr(e, "RelatedIfcEntityNamesList", v),
     )
 
 
@@ -112,7 +112,7 @@ def create_new_class(
     text = QCoreApplication.translate("ClassEditor", "Create New Class")
     dialog.setWindowTitle(text)
     if dialog.exec():
-        class_editor.sync_to_model(widget)
+        class_editor.sync_to_model(widget, new_class)
         class_editor.signaller.new_class_created.emit(new_class)
     class_editor.unregister_widget(widget)
 
@@ -130,7 +130,7 @@ def copy_class(
     text = QCoreApplication.translate("ClassEditor", "Copy Class")
     dialog.setWindowTitle(text)
     if dialog.exec():
-        class_editor.sync_to_model(widget)
+        class_editor.sync_to_model(widget, new_class)
         class_editor.signaller.new_class_created.emit(new_class)
     class_editor.unregister_widget(widget)
 
@@ -143,7 +143,7 @@ def open_class_editor(
     text = QCoreApplication.translate("ClassEditor", "Edit Class")
     dialog.setWindowTitle(text)
     if dialog.exec():
-        class_editor.sync_to_model(widget)
+        class_editor.sync_to_model(widget, bsdd_class)
     class_editor.unregister_widget(widget)
 
 
@@ -163,7 +163,7 @@ def group_classes(
     text = QCoreApplication.translate("ClassEditor", "Group Classes")
     dialog.setWindowTitle(text)
     if dialog.exec():
-        class_editor.sync_to_model(widget)
+        class_editor.sync_to_model(widget, new_class)
         class_editor.signaller.new_class_created.emit(new_class)
         for child_class in bsdd_classes:
             class_tree.move_class(child_class, new_class)

@@ -1,9 +1,20 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable, TYPE_CHECKING, Any, Iterable
-from PySide6.QtWidgets import QWidget, QAbstractItemView, QMenu, QMenuBar
+from PySide6.QtWidgets import (
+    QWidget,
+    QAbstractItemView,
+    QMenu,
+    QLineEdit,
+    QLabel,
+    QComboBox,
+    QTextEdit,
+    QDialogButtonBox,
+)
 from PySide6.QtCore import QObject, Signal, QAbstractItemModel
 from PySide6.QtGui import QAction
+from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
+
 import logging
 
 if TYPE_CHECKING:
@@ -100,6 +111,8 @@ class WidgetHandler(ABC):
     @classmethod
     def register_widget(cls, view: QAbstractItemView):
         cls.get_properties().widgets.add(view)
+        cls.get_properties().field_getter[view] = dict()
+        cls.get_properties().field_setter[view] = dict()
 
     @classmethod
     def unregister_widget(cls, view: QWidget):
@@ -107,10 +120,129 @@ class WidgetHandler(ABC):
         if not view in cls.get_properties().widgets:
             return
         cls.get_properties().widgets.remove(view)
+        cls.get_properties().field_getter.pop(view)
+        cls.get_properties().field_setter.pop(view)
 
     @classmethod
     def get_widgets(cls):
         return cls.get_properties().widgets
+
+    @classmethod
+    def register_basic_field(cls, class_editor: QWidget, field: QWidget, variable_name: str):
+        cls.register_field_getter(class_editor, field, lambda e, vn=variable_name: getattr(e, vn))
+        cls.register_field_setter(
+            class_editor,
+            field,
+            lambda e, v, vn=variable_name: setattr(e, vn, v),
+        )
+
+    @classmethod
+    def register_field_getter(cls, class_editor: QWidget, field: QWidget, getter_func: callable):
+        if not class_editor in cls.get_properties().field_getter:
+            cls.get_properties().field_getter[class_editor] = dict()
+        cls.get_properties().field_getter[class_editor][field] = getter_func
+
+    @classmethod
+    def register_field_setter(cls, class_editor: QWidget, field: QWidget, setter_func: callable):
+        if not class_editor in cls.get_properties().field_setter:
+            cls.get_properties().field_setter[class_editor] = dict()
+        cls.get_properties().field_setter[class_editor][field] = setter_func
+
+    @classmethod
+    def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
+        """
+        Register a validator for a given input field within a widget.
+
+        This method attaches a validator function and a result handler to a UI field.
+        Whenever the field's value changes, the validator is executed, and its result is passed
+        to the result function for further handling (e.g., marking a QLineEdit red if invalid).
+
+        Args:
+            widget (QWidget):
+                The parent widget the field belongs to. Used for grouping validators.
+            field (QLineEdit | QComboBox | QTextEdit | TagInput):
+                The UI element whose value will be validated.
+            validator_function (callable):
+                A function that takes the field’s current value and the widget as arguments,
+                and returns whether the value is valid (e.g., `True`/`False`, or a more detailed result).
+            result_function (callable):
+                A function that takes the field and the validator result as arguments,
+                and applies a reaction (e.g., updating styles, enabling/disabling buttons).
+
+        Example:
+            >>> def is_not_empty(value, widget):
+            ...     return bool(value.strip())
+            >>> def highlight_invalid(field, is_valid):
+            ...     field.setStyleSheet("" if is_valid else "background-color: red;")
+            >>> MyForm.add_validator(form, line_edit, is_not_empty, highlight_invalid)
+        """
+
+        if not widget in cls.get_properties().validator_functions:
+            cls.get_properties().validator_functions[widget] = dict()
+        cls.get_properties().validator_functions[widget][field] = (
+            validator_function,
+            result_function,
+        )
+        rf, vf, f, w = result_function, validator_function, field, widget
+        if isinstance(f, QLineEdit):
+            f.textChanged.connect(lambda text: rf(f, vf(text, w)))
+            rf(f, vf(f.text(), w))
+        if isinstance(f, QComboBox):
+            f.currentTextChanged.connect(lambda text: rf(f, vf(text, w)))
+            rf(f, vf(f.currentText(), w))
+        if isinstance(f, QTextEdit):
+            f.textChanged.connect(lambda: rf(f, vf(f.toPlainText(), w)))
+            rf(f, vf(f.toPlainText(), w))
+        if isinstance(f, TagInput):
+            f.tagsChanged.connect(lambda: rf(f, vf(f.tags(), w)))
+            rf(f, vf(f.tags(), w))
+
+    @classmethod
+    def sync_from_model(cls, widget: QWidget, element):
+
+        for field, getter_func in cls.get_properties().field_getter[widget].items():
+            value = getter_func(element)
+            if isinstance(field, QLineEdit):
+                field.setText(value)
+            if isinstance(field, QLabel):
+                field.setText(value)
+            if isinstance(field, QComboBox):
+                field.setCurrentText(value)
+            if isinstance(field, QTextEdit):
+                field.setPlainText(value)
+            if isinstance(field, TagInput):
+                field.setTags(value or [])
+
+    @classmethod
+    def sync_to_model(cls, widget: QWidget, element):
+        field_dict = cls.get_properties().field_setter.get(widget) or dict()
+        for field, setter_func in field_dict.items():
+            if isinstance(field, QLineEdit):
+                setter_func(element, field.text())
+            if isinstance(field, QComboBox):
+                setter_func(element, field.currentIndex())
+            if isinstance(field, QTextEdit):
+                setter_func(element, field.toPlainText())
+            if isinstance(field, TagInput):
+                setter_func(element, field.tags())
+
+    @classmethod
+    def all_inputs_are_valid(cls, widget: QWidget):
+        function_dict = cls.get_properties().validator_functions.get(widget)
+        if not function_dict:
+            return
+        for f, (validator_function, result_function) in function_dict.items():
+            if isinstance(f, QLineEdit):
+                is_valid = validator_function(f.text(), widget)
+            elif isinstance(f, QComboBox):
+                is_valid = validator_function(f.currentText(), widget)
+            elif isinstance(f, QTextEdit):
+                is_valid = validator_function(f.toPlainText(), widget)
+            elif isinstance(f, TagInput):
+                is_valid = validator_function(f.tags(), widget)
+            if not is_valid:
+                return False
+        return True
 
 
 class ViewSignaller(QObject):

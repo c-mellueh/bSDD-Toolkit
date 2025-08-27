@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QAbstractItemView
+from PySide6.QtWidgets import QAbstractItemView, QWidget
 from PySide6.QtCore import QAbstractItemModel
 from PySide6.QtGui import QAction
 from typing import TypedDict, Callable
@@ -30,6 +30,13 @@ class WidgetHandlerProperties:
     def __init__(self):
         super().__init__()
         self.widgets = set()
+        self.field_getter: dict[QWidget, dict[QWidget, callable]] = (
+            dict()
+        )  # getter function for widgets of Window
+        self.field_setter: dict[QWidget, dict[QWidget, callable]] = (
+            dict()
+        )  # getter function for widgets of Window
+        self.validator_functions: dict[QWidget, dict[QWidget, tuple[callable, callable]]] = dict()
 
 
 class ViewHandlerProperties(WidgetHandlerProperties):
