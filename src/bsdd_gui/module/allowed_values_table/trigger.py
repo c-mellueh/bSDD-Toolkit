@@ -23,3 +23,7 @@ def on_new_project():
 
 def table_view_created(view: ui.AllowedValuesTable):
     core.setup_view(view, tool.AllowedValuesTable)
+
+
+def table_closed(view: ui.AllowedValuesTable):
+    core.remove_table(view, tool.AllowedValuesTable)

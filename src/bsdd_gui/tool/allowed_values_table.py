@@ -32,8 +32,13 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
         return sort_filter_model
 
     @classmethod
-    def get_model(cls, prop: BsddClassProperty | BsddProperty):
+    def get_model(cls, prop: BsddClassProperty | BsddProperty) -> models.AllowedValuesModel:
         for model in cls.get_properties().model:
             if model.bsdd_property == prop:
                 return model
         return None
+
+    @classmethod
+    def remove_model(cls, model: models.AllowedValuesModel):
+        if model in cls.get_properties().model:
+            cls.get_properties().model.remove(model)

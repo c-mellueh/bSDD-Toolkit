@@ -33,3 +33,9 @@ def setup_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.Allo
 def reset_views(allowed_values_table: Type[tool.AllowedValuesTable], project: Type[tool.Project]):
     for view in allowed_values_table.get_widgets():
         allowed_values_table.reset_view(view)
+
+
+def remove_table(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
+    model = allowed_values_table.get_model(view.bsdd_property)
+    if model:
+        allowed_values_table.remove_model(model)

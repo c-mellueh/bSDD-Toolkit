@@ -20,3 +20,7 @@ class AllowedValuesTable(QTableView):
 
     def model(self) -> models.SortModel:
         return super().model()
+
+    def closeEvent(self, event):
+        trigger.table_closed(self)
+        return super().closeEvent(event)

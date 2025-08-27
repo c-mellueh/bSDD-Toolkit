@@ -9,14 +9,14 @@ from PySide6.QtCore import (
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty
+from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty, BsddProperty
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import TableModel
 
 
 class AllowedValuesModel(TableModel):
 
-    def __init__(self, bsdd_property, *args, **kwargs):
+    def __init__(self, bsdd_property: BsddClassProperty | BsddProperty, *args, **kwargs):
         super().__init__(tool.PropertyTable, *args, **kwargs)
         self.bsdd_property = bsdd_property
 
@@ -33,14 +33,11 @@ class AllowedValuesModel(TableModel):
         return tool.MainWindow.get_active_pset()
 
     def rowCount(self, parent=QModelIndex()):
-        if not self.active_class:
-            return 0
-        if not self.active_pset:
+        if not self.bsdd_property:
             return 0
         if parent.isValid():
             return 0
-        rc = len(tool.PropertyTable.filter_properties_by_pset(self.active_class, self.active_pset))
-        return rc
+        return len(self.bsdd_property.AllowedValues)
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if parent.isValid():
@@ -48,11 +45,8 @@ class AllowedValuesModel(TableModel):
 
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
-        bsdd_properties = tool.PropertyTable.filter_properties_by_pset(
-            self.active_class, self.active_pset
-        )
-        bsdd_property = bsdd_properties[row]
-        index = self.createIndex(row, column, bsdd_property)
+        allowed_value = self.bsdd_property.AllowedValues[row]
+        index = self.createIndex(row, column, allowed_value)
         return index
 
     def setData(self, index, value, /, role=...):
