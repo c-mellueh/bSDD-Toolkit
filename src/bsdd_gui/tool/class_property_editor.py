@@ -224,7 +224,7 @@ class ClassPropertyEditor(WidgetHandler):
             if not external_prop:
                 text = ""
             else:
-                text = external_prop.get("description")
+                text = external_prop.Description
         else:
             internal_prop = cp_utils.get_internal_property(bsdd_class_property)
             text = internal_prop.Description if internal_prop else ""
@@ -237,7 +237,7 @@ class ClassPropertyEditor(WidgetHandler):
             external_prop = cp_utils.get_external_property(bsdd_class_property)
             if not external_prop:
                 return
-            value_kind = external_prop.get("PropertyValueKind")
+            value_kind = external_prop.PropertyValueKind
         else:
             internal_prop = cp_utils.get_internal_property(bsdd_class_property)
             if not internal_prop:

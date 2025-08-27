@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from bsdd_parser import BsddClassProperty, BsddProperty, BsddDictionary
+from bsdd_parser import BsddClassProperty, BsddProperty, BsddDictionary
 import bsdd
 from bsdd import Client
 from . import bsdd_dictionary
@@ -14,7 +13,7 @@ class Cache:
     @classmethod
     def get_external_property(
         cls, bsdd_class_property: BsddClassProperty, client: bsdd.Client | None
-    ) -> dict | None:
+    ) -> BsddClassProperty | None:
         from bsdd_parser.utils import bsdd_class_property as cp_utils
 
         def _make_request():
@@ -32,7 +31,10 @@ class Cache:
         if not uri:
             return None
         if uri not in cls.data:
-            cls.data[uri] = _make_request()
+            result = _make_request()
+            if result is not None:
+                result = BsddProperty.model_validate(result)
+            cls.data[uri] = result
         return cls.data[uri]
 
     @classmethod
@@ -68,7 +70,7 @@ def get_internal_property(class_property: BsddClassProperty) -> BsddProperty | N
             return p
 
 
-def get_external_property(class_property: BsddClassProperty, client=None) -> dict | None:
+def get_external_property(class_property: BsddClassProperty, client=None) -> BsddProperty | None:
     return Cache.get_external_property(class_property, client)
 
 
@@ -84,7 +86,7 @@ def get_datatype(class_property: BsddClassProperty):
     external_property = get_external_property(class_property)
     if external_property is None:
         return ""
-    return external_property.get("dataType") or ""
+    return external_property.DataType
 
 
 def get_units(class_property: BsddClassProperty):
@@ -95,4 +97,4 @@ def get_units(class_property: BsddClassProperty):
     external_property = get_external_property(class_property)
     if external_property is None:
         return []
-    return external_property.get("Units") or []
+    return external_property.Units
