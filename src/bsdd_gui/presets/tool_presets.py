@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QComboBox,
     QTextEdit,
-    QDialogButtonBox,
+    QCheckBox,
 )
 from PySide6.QtCore import QObject, Signal, QAbstractItemModel
 from PySide6.QtGui import QAction
@@ -170,6 +170,8 @@ class WidgetHandler(ABC):
             f.currentTextChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
         if isinstance(f, QTextEdit):
             f.textChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+        if isinstance(f, QCheckBox):
+            f.checkStateChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
         if isinstance(f, TagInput):
             f.tagsChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
 
@@ -218,6 +220,9 @@ class WidgetHandler(ABC):
         if isinstance(f, QTextEdit):
             f.textChanged.connect(lambda: rf(f, vf(f.toPlainText(), w)))
             rf(f, vf(f.toPlainText(), w))
+        if isinstance(f, QCheckBox):
+            f.checkStateChanged.connect(lambda state: rf(f, vf(state, w)))
+            rf(f, vf(f.text(), w))
         if isinstance(f, TagInput):
             f.tagsChanged.connect(lambda: rf(f, vf(f.tags(), w)))
             rf(f, vf(f.tags(), w))
@@ -235,6 +240,8 @@ class WidgetHandler(ABC):
                 field.setCurrentText(value)
             if isinstance(field, QTextEdit):
                 field.setPlainText(value)
+            if isinstance(field, QCheckBox):
+                field.setChecked(value)
             if isinstance(field, TagInput):
                 field.setTags(value or [])
 
@@ -250,6 +257,8 @@ class WidgetHandler(ABC):
                 setter_func(element, field.currentIndex())
             if isinstance(field, QTextEdit):
                 setter_func(element, field.toPlainText())
+            if isinstance(field, QCheckBox):
+                setter_func(element, field.isChecked())
             if isinstance(field, TagInput):
                 setter_func(element, field.tags())
 

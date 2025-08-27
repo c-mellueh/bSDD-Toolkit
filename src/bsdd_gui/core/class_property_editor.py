@@ -33,12 +33,13 @@ def register_widget(
     widget.closed.connect(lambda w=widget: class_property_editor.signaller.window_closed.emit(w))
     class_property_editor.register_basic_field(widget, widget.le_code, "Code")
     class_property_editor.register_basic_field(widget, widget.te_description, "Description")
-
-    # Property Reference Field
+    class_property_editor.register_basic_field(widget, widget.cb_is_required, "IsRequired")
 
     widget.le_property_reference.set_button_text(
         QCoreApplication.translate("ClassPropertyEditor", "Create New")
     )
+    ### Property Reference Field
+
     class_property_editor.register_field_getter(
         widget, widget.le_property_reference, class_property_editor.get_property_reference
     )
