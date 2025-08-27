@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 
 class Signaller(ViewSignaller):
+    window_created = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
 
 
@@ -26,20 +27,37 @@ class ClassPropertyEditor(ViewHandler):
         return bsdd_gui.ClassPropertyEditorProperties
 
     @classmethod
-    def create_window(cls, bsdd_property: BsddClassProperty) -> ui.ClassPropertyEditor:
+    def connect_signals(cls):
+        cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
+        cls.signaller.window_created.connect(trigger.window_created)
+
+        cls.signaller.window_created.connect(
+            lambda w: cls.sync_from_model(w, w.bsdd_class_property)
+        )
+
+    @classmethod
+    def create_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
         prop = cls.get_properties()
-        prop.windows[bsdd_property.Code] = ui.ClassPropertyEditor(bsdd_property)
+        window = ui.ClassPropertyEditor(bsdd_class_property)
+        prop.windows.append(window)
+
         for plugin in prop.plugin_widget_list:
             layout: QLayout = getattr(cls.get_window(), plugin.layout_name)
             layout.insertWidget(plugin.index, plugin.widget())
             setattr(prop, plugin.key, plugin.value_getter)
-        title = cls.create_window_title(bsdd_property)
-        cls.get_window(bsdd_property).setWindowTitle(title)  # TODO: Update Name Getter
-        return cls.get_window(bsdd_property)
+
+        title = cls.create_window_title(bsdd_class_property)
+        cls.get_window(bsdd_class_property).setWindowTitle(title)  # TODO: Update Name Getter
+
+        cls.signaller.window_created.emit(window)
+        return window
 
     @classmethod
     def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
-        return cls.get_properties().windows.get(bsdd_class_property.Code)
+        for window in cls.get_properties().windows:
+            if window.bsdd_class_property == bsdd_class_property:
+                return window
+        return None
 
     @classmethod
     def create_window_title(cls, bsdd_class_property: BsddClassProperty):
@@ -57,10 +75,6 @@ class ClassPropertyEditor(ViewHandler):
     @classmethod
     def show_property_info(cls, bsdd_class_property: BsddClassProperty):
         trigger.property_info_requested(bsdd_class_property)
-
-    @classmethod
-    def connect_signals(cls):
-        cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
 
     ### Settings Window
     @classmethod

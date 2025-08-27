@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -41,13 +41,11 @@ from PySide6.QtGui import (
     QTransform,
 )
 from PySide6.QtWidgets import (
-    QAbstractItemView,
     QApplication,
     QCheckBox,
     QComboBox,
     QFormLayout,
     QHBoxLayout,
-    QHeaderView,
     QLabel,
     QLineEdit,
     QSizePolicy,
@@ -135,37 +133,21 @@ class Ui_PropertyWindow(object):
 
         self.verticalLayout_2.addLayout(self.hl_value_description)
 
+        self.widget = ValueView(self.tab_basics)
+        self.widget.setObjectName("widget")
+
+        self.verticalLayout_2.addWidget(self.widget)
+
         self.splitter = QSplitter(self.tab_basics)
         self.splitter.setObjectName("splitter")
         self.splitter.setOrientation(Qt.Orientation.Vertical)
-        self.value_view = ValueView(self.splitter)
-        self.value_view.setObjectName("value_view")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(1)
-        sizePolicy2.setHeightForWidth(self.value_view.sizePolicy().hasHeightForWidth())
-        self.value_view.setSizePolicy(sizePolicy2)
-        self.value_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.value_view.setEditTriggers(
-            QAbstractItemView.EditTrigger.AnyKeyPressed
-            | QAbstractItemView.EditTrigger.DoubleClicked
-            | QAbstractItemView.EditTrigger.EditKeyPressed
-        )
-        self.value_view.setProperty("showDropIndicator", False)
-        self.value_view.setAlternatingRowColors(False)
-        self.value_view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.value_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.value_view.setGridStyle(Qt.PenStyle.DashLine)
-        self.splitter.addWidget(self.value_view)
-        self.value_view.horizontalHeader().setVisible(False)
-        self.value_view.horizontalHeader().setStretchLastSection(True)
         self.te_description = QTextEdit(self.splitter)
         self.te_description.setObjectName("te_description")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.te_description.sizePolicy().hasHeightForWidth())
-        self.te_description.setSizePolicy(sizePolicy3)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.te_description.sizePolicy().hasHeightForWidth())
+        self.te_description.setSizePolicy(sizePolicy2)
         self.te_description.setMinimumSize(QSize(0, 28))
         self.te_description.setAutoFormatting(QTextEdit.AutoFormattingFlag.AutoAll)
         self.te_description.setReadOnly(False)

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from PySide6.QtWidgets import QWidget
 from . import ui
 from bsdd_parser import BsddClassProperty
+from bsdd_gui.presets.prop_presets import WidgetHandlerProperties
 
 
 @dataclass
@@ -18,8 +19,8 @@ class PluginProperty:
     value_test: Callable
 
 
-class ClassPropertyEditorProperties:
+class ClassPropertyEditorProperties(WidgetHandlerProperties):
     plugin_widget_list: list[PluginProperty] = list()
-    windows: dict[BsddClassProperty, ui.ClassPropertyEditor] = dict()
+    windows: list[ui.ClassPropertyEditor] = list()
     context_menu_builders = list()
     splitter_settings: ui.SplitterSettings = None

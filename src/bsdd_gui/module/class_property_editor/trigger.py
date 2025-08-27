@@ -21,7 +21,7 @@ def connect():
 
 def retranslate_ui():
     return  # TODO
-    core.retranslate_ui(tool.PropertyWindow)
+    core.retranslate_ui(tool.ClassPropertyEditor)
 
 
 def on_new_project():
@@ -33,33 +33,31 @@ def property_info_requested(som_property: BsddClassProperty):
 
 
 def window_created(window: ui.ClassPropertyEditor):
-    core.init_window(window, tool.PropertyWindow, tool.Util)
-    core.connect_window(window, tool.PropertyWindow, tool.Util)
-    core.update_window(window, tool.PropertyWindow, tool.Util, tool.Units)
+    core.register_widget(window, tool.ClassPropertyEditor, tool.Project, tool.Util)
 
 
 def update_window(window: ui.ClassPropertyEditor):
     return  # TODO
 
-    core.update_window(window, tool.PropertyWindow, tool.Util, tool.Units)
+    core.update_window(window, tool.ClassPropertyEditor, tool.Util, tool.Units)
 
 
 def value_context_menu_request(pos, table_view: ui.ValueView):
     return  # TODO
 
-    core.value_context_menu_request(pos, table_view, tool.PropertyWindow, tool.Util)
+    core.value_context_menu_request(pos, table_view, tool.ClassPropertyEditor, tool.Util)
 
 
 def paste_clipboard(table_view: ui.ValueView):
     return  # TODO
 
-    core.handle_paste_event(table_view, tool.PropertyWindow, tool.Appdata)
+    core.handle_paste_event(table_view, tool.ClassPropertyEditor, tool.Appdata)
 
 
 def copy_table_content(table_view: ui.ValueView):
     return  # TODO
 
-    core.handle_copy_event(table_view, tool.PropertyWindow, tool.Appdata)
+    core.handle_copy_event(table_view, tool.ClassPropertyEditor, tool.Appdata)
 
 
 # Settings Window
@@ -68,10 +66,10 @@ def copy_table_content(table_view: ui.ValueView):
 def splitter_settings_created(widget: ui.SplitterSettings):
     return  # TODO
 
-    core.fill_splitter_settings(widget, tool.PropertyWindow, tool.Appdata)
+    core.fill_splitter_settings(widget, tool.ClassPropertyEditor, tool.Appdata)
 
 
 def splitter_checkstate_changed(widget: ui.SplitterSettings):
     return  # TODO
 
-    core.update_splitter_enabled_state(widget, tool.PropertyWindow)
+    core.update_splitter_enabled_state(widget, tool.ClassPropertyEditor)

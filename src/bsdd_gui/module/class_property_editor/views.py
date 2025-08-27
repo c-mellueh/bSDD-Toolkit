@@ -18,7 +18,7 @@ from .qt.ui_SplitterSettings import Ui_SplitterSettings
 
 
 class ValueView(QWidget):
-    def __init__(*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 

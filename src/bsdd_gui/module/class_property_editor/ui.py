@@ -26,8 +26,6 @@ class ClassPropertyEditor(QWidget, Ui_PropertyWindow):
         self.setWindowIcon(get_icon())
         self.setupUi(self)
         self.bsdd_class_property = bsdd_class_property
-        self.initial_fill = True
-        trigger.window_created(self)
 
     def enterEvent(self, event):
         trigger.update_window(self)

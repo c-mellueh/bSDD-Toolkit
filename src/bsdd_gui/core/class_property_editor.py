@@ -15,11 +15,12 @@ if TYPE_CHECKING:
 
 def register_widget(
     widget: ui.ClassPropertyEditor,
-    class_editor: Type[tool.ClassPropertyEditor],
+    class_property_editor: Type[tool.ClassPropertyEditor],
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
-    pass
+    class_property_editor.register_widget(widget)
+    class_property_editor.register_basic_field(widget, widget.le_code, "Code")
 
 
 def open_property_info(
