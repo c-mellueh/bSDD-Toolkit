@@ -49,7 +49,7 @@ class PropertyTable(ColumnHandler, ViewHandler):
 
     @classmethod
     def get_allowed_values(cls, class_property: BsddClassProperty):
-        return [v.Code for v in class_property.AllowedValues]
+        return "; ".join([v.Value for v in class_property.AllowedValues])
 
     @classmethod
     def get_row_of_property(cls, view: ui.PropertyTable, class_property: BsddClassProperty):

@@ -70,8 +70,8 @@ def connect_to_main_window(
     property_table.add_column_to_table(model, "Name", lambda a: a.Code)
     property_table.add_column_to_table(model, "Datatype", cp_utils.get_datatype)
     property_table.add_column_to_table(model, "Unit", cp_utils.get_units)
-    property_table.add_column_to_table(model, "Value", property_table.get_allowed_values)
-    property_table.add_column_to_table(model, "Optional", lambda a: a.IsRequired)
+    property_table.add_column_to_table(model, "Values", property_table.get_allowed_values)
+    property_table.add_column_to_table(model, "Is Required", lambda a: a.IsRequired)
     property_table.signaller.selection_changed.connect(
         lambda v, n: (main_window.set_active_property(n) if v == property_view else None)
     )
