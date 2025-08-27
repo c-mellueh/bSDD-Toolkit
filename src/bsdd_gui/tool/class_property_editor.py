@@ -40,6 +40,7 @@ class Signaller(WidgetSignaller):
     property_reference_changed = Signal(BsddClassProperty)
     create_property_requested = Signal(ui.ClassPropertyEditor)
     view_property_requested = Signal(ui.ClassPropertyEditor)
+    new_value_requested = Signal(object)
 
 
 class ClassPropertyEditor(WidgetHandler):

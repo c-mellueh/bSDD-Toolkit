@@ -49,6 +49,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QPushButton,
     QSizePolicy,
     QSplitter,
     QTabWidget,
@@ -120,6 +121,12 @@ class Ui_PropertyWindow(object):
 
         self.hl_value_description = QHBoxLayout()
         self.hl_value_description.setObjectName("hl_value_description")
+        self.pb_new_value = QPushButton(self.tab_basics)
+        self.pb_new_value.setObjectName("pb_new_value")
+        self.pb_new_value.setMaximumSize(QSize(24, 24))
+
+        self.hl_value_description.addWidget(self.pb_new_value)
+
         self.lb_allowed_values = QLabel(self.tab_basics)
         self.lb_allowed_values.setObjectName("lb_allowed_values")
         self.lb_allowed_values.setMinimumSize(QSize(0, 0))
@@ -187,6 +194,7 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate("PropertyWindow", "Property Code or URI", None)
         )
         self.lb_unit.setText(QCoreApplication.translate("PropertyWindow", "Unit:", None))
+        self.pb_new_value.setText(QCoreApplication.translate("PropertyWindow", "+", None))
         self.lb_allowed_values.setText(
             QCoreApplication.translate("PropertyWindow", "Allowed Values:", None)
         )

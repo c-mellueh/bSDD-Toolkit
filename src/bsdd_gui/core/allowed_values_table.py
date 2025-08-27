@@ -6,14 +6,21 @@ from bsdd_gui.module.allowed_values_table import ui
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
+    from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
 
 
 def connect_signals(
     allowed_values_table: Type[tool.AllowedValuesTable],
     main_window: Type[tool.MainWindow],
-    property_set_table: Type[tool.PropertySetTable],
+    class_property_editor: Type[tool.ClassPropertyEditor],
 ):
+    def test(widget: ClassPropertyEditor):
+        for table_widget in allowed_values_table.get_widgets():
+            if widget.bsdd_class_property == table_widget.bsdd_property:
+                allowed_values_table.append_new_value(table_widget)
+                return
 
+    class_property_editor.signaller.new_value_requested.connect(test)
     pass
 
 

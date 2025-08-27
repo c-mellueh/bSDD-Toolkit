@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
-from PySide6.QtCore import Qt, QModelIndex
+from PySide6.QtCore import Qt, QModelIndex, QCoreApplication
 import bsdd_gui
 
 if TYPE_CHECKING:
@@ -9,7 +9,8 @@ if TYPE_CHECKING:
 
 from bsdd_gui.presets.tool_presets import ColumnHandler, ViewHandler, ViewSignaller
 from bsdd_parser import BsddClassProperty, BsddProperty, BsddAllowedValue
-from bsdd_gui.module.allowed_values_table import models
+from bsdd_gui.module.allowed_values_table import models, ui
+from bsdd_gui import tool
 
 
 class Signaller(ViewSignaller):
@@ -84,3 +85,15 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
         if allowed_value is None:
             return
         allowed_value.OwnedUri = value
+
+    @classmethod
+    def append_new_value(cls, widget: ui.AllowedValuesTable):
+        model = widget.model().sourceModel()
+        bsdd_property = model.bsdd_property
+        new_name = QCoreApplication.translate("AllowedValuesTable", "New Value")
+        new_name = tool.Util.get_unique_name(
+            new_name, [v.Code for v in bsdd_property.AllowedValues]
+        )
+        av = BsddAllowedValue(Code=new_name, Value=new_name)
+        bsdd_property.AllowedValues.append(av)
+        cls.reset_view(widget)

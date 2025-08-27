@@ -67,6 +67,9 @@ def register_widget(
         lambda _, w=widget: class_property_editor.handle_pr_button_press(w)
     )
 
+    widget.pb_new_value.clicked.connect(
+        lambda _, w=widget: class_property_editor.signaller.new_value_requested.emit(w)
+    )
     update_property_specific_fields(widget, class_property_editor)
 
 
