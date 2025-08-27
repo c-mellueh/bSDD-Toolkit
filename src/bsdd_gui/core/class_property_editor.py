@@ -81,14 +81,14 @@ def update_property_specific_fields(
 def open_property_info(
     bsdd_class_property: BsddClassProperty,
     class_property_editor: Type[tool.ClassPropertyEditor],
-    util: Type[tool.Util],
+    main_window: Type[tool.MainWindow],
 ):
     if window := class_property_editor.get_window(bsdd_class_property):
         if window.isHidden():
             window.close()
-            window = class_property_editor.create_window(bsdd_class_property)
+            window = class_property_editor.create_window(bsdd_class_property, main_window.get())
     else:
-        window = class_property_editor.create_window(bsdd_class_property)
+        window = class_property_editor.create_window(bsdd_class_property, main_window.get())
     window.show()
     window.activateWindow()
     window.showNormal()

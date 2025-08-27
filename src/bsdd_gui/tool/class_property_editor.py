@@ -5,8 +5,8 @@ import logging
 import bsdd_gui
 from bsdd_parser import BsddClassProperty, BsddDictionary
 from bsdd_gui.module.class_property_editor import ui
-from PySide6.QtWidgets import QLayout
-from PySide6.QtCore import Signal, QCoreApplication
+from PySide6.QtWidgets import QLayout, QWidget
+from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor import trigger
 from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignaller
 from urllib.parse import urlparse
@@ -59,9 +59,12 @@ class ClassPropertyEditor(WidgetHandler):
         )
 
     @classmethod
-    def create_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
+    def create_window(
+        cls, bsdd_class_property: BsddClassProperty, parent: QWidget
+    ) -> ui.ClassPropertyEditor:
         prop = cls.get_properties()
-        window = ui.ClassPropertyEditor(bsdd_class_property)
+        window = ui.ClassPropertyEditor(bsdd_class_property, parent)
+        window.setWindowFlag(Qt.Tool)
         prop.windows.append(window)
 
         for plugin in prop.plugin_widget_list:

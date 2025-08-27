@@ -33,7 +33,7 @@ def on_new_project():
 
 
 def property_info_requested(som_property: BsddClassProperty):
-    core.open_property_info(som_property, tool.ClassPropertyEditor, tool.Util)
+    core.open_property_info(som_property, tool.ClassPropertyEditor, tool.MainWindow)
 
 
 def window_created(window: ui.ClassPropertyEditor):
