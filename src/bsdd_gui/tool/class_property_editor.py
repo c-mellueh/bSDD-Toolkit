@@ -36,6 +36,7 @@ if TYPE_CHECKING:
 
 class Signaller(WidgetSignaller):
     window_created = Signal(ui.ClassPropertyEditor)
+    window_closed = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
     create_property_requested = Signal(ui.ClassPropertyEditor)
@@ -54,7 +55,7 @@ class ClassPropertyEditor(WidgetHandler):
     def connect_signals(cls):
         cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
         cls.signaller.window_created.connect(trigger.window_created)
-
+        cls.signaller.window_closed.connect(trigger.window_closed)
         cls.signaller.window_created.connect(
             lambda w: cls.sync_from_model(w, w.bsdd_class_property)
         )
@@ -83,11 +84,28 @@ class ClassPropertyEditor(WidgetHandler):
         return window
 
     @classmethod
-    def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
-        for window in cls.get_properties().windows:
-            if window.bsdd_class_property == bsdd_class_property:
-                return window
+    def remove_window(cls, bsdd_class_property: BsddClassProperty):
+        indexes = [
+            index
+            for index, window in enumerate(cls.get_properties().windows)
+            if window.bsdd_class_property == bsdd_class_property
+        ]
+        for index in sorted(indexes, reverse=True):
+            cls.get_properties().windows.pop(index)
         return None
+
+    @classmethod
+    def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
+        windows = [
+            window
+            for window in cls.get_properties().windows
+            if window.bsdd_class_property == bsdd_class_property
+        ]
+        if len(windows) > 1:
+            logging.warning(f"Multiple PropertyWindows")
+        elif not windows:
+            return None
+        return windows[0]
 
     @classmethod
     def create_window_title(cls, bsdd_class_property: BsddClassProperty):

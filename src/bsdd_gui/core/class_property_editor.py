@@ -15,6 +15,13 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
 
 
+def unregister_widget(
+    widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditor]
+):
+    class_property_editor.unregister_widget(widget)
+    class_property_editor.remove_window(widget.bsdd_class_property)
+
+
 def register_widget(
     widget: ui.ClassPropertyEditor,
     class_property_editor: Type[tool.ClassPropertyEditor],
@@ -23,6 +30,7 @@ def register_widget(
     util: Type[tool.Util],
 ):
     class_property_editor.register_widget(widget)
+    widget.closed.connect(lambda w=widget: class_property_editor.signaller.window_closed.emit(w))
     class_property_editor.register_basic_field(widget, widget.le_code, "Code")
     class_property_editor.register_basic_field(widget, widget.te_description, "Description")
 

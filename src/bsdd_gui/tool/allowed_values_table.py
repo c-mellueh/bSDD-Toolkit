@@ -118,3 +118,11 @@ class AllowedValuesTable(ColumnHandler, ViewHandler):
             if widget.bsdd_class_property == table_widget.bsdd_property:
                 cls.append_new_value(table_widget)
                 return
+
+    @classmethod
+    def delete_selection(cls, widget: ui.AllowedValuesTable):
+        bsdd_property = widget.bsdd_property
+        for allowed_value in cls.get_selected(widget):
+            if allowed_value in bsdd_property.AllowedValues:
+                bsdd_property.AllowedValues.remove(allowed_value)
+        cls.reset_view(widget)

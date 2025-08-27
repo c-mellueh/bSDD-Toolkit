@@ -18,6 +18,9 @@ def connect_signals(
     class_property_editor.signaller.new_value_requested.connect(
         allowed_values_table.handle_new_value_request
     )
+    allowed_values_table.signaller.delete_selection_requested.connect(
+        allowed_values_table.delete_selection
+    )
     pass
 
 

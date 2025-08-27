@@ -42,6 +42,13 @@ def window_created(window: ui.ClassPropertyEditor):
     )
 
 
+def window_closed(window: ui.ClassPropertyEditor):
+    core.unregister_widget(
+        window,
+        tool.ClassPropertyEditor,
+    )
+
+
 def update_window(window: ui.ClassPropertyEditor):
     return  # TODO
 

@@ -34,7 +34,6 @@ class AllowedValuesModel(TableModel):
 
     def columnCount(self, /, parent=...):
         res = super().columnCount(parent)
-        print(res)
         return res
 
     def rowCount(self, parent=QModelIndex()):

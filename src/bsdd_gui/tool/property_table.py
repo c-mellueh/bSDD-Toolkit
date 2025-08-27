@@ -64,6 +64,8 @@ class PropertyTable(ColumnHandler, ViewHandler):
     @classmethod
     def select_row(cls, view: ui.PropertyTable, row_index: int):
         model = view.model()
+        if row_index is None:
+            return
         index = model.index(row_index, 0)
         if not index.isValid():
             return

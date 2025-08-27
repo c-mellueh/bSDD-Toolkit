@@ -63,7 +63,7 @@ def connect_to_main_window(
             row_index = property_table.get_row_of_property(property_view, new_property)
         else:
             row_index = 0
-        property_table.select_row(property_view, row_index)
+        property_table.select_row(property_view, row_index or 0)
 
     model = main_window.get_property_view().model().sourceModel()
     property_view = main_window.get_property_view()
