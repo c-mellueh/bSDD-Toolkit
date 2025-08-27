@@ -63,6 +63,9 @@ def register_widget(
     class_property_editor.signaller.field_changed.connect(
         lambda w, f: class_property_editor.sync_to_model(w, w.bsdd_class_property, f)
     )
+    widget.le_property_reference.button.clicked.connect(
+        lambda _, w=widget: class_property_editor.handle_pr_button_press(w)
+    )
 
     update_property_specific_fields(widget, class_property_editor)
 

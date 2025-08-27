@@ -37,6 +37,8 @@ class Signaller(WidgetSignaller):
     window_created = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
+    create_property_requested = Signal(ui.ClassPropertyEditor)
+    view_property_requested = Signal(ui.ClassPropertyEditor)
 
 
 class ClassPropertyEditor(WidgetHandler):
@@ -181,19 +183,27 @@ class ClassPropertyEditor(WidgetHandler):
             line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "View"))
         elif is_valid:
             line_edit.show_button(True)
-            line_edit.set_button_mode(BUTTON_MODE_EDIT)
-            line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "Edit"))
+            line_edit.set_button_mode(BUTTON_MODE_VIEW)
+            line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "View"))
 
         elif not bsdd_dictionary:
             line_edit.show_button(False)
         elif value in cp_utils.get_all_property_codes(bsdd_dictionary):
             line_edit.show_button(True)
-            line_edit.set_button_mode(BUTTON_MODE_EDIT)
-            line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "Edit"))
+            line_edit.set_button_mode(BUTTON_MODE_VIEW)
+            line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "View"))
         else:
             line_edit.show_button(True)
             line_edit.set_button_mode(BUTTON_MODE_NEW)
             line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "New"))
+
+    @classmethod
+    def handle_pr_button_press(cls, widget: ui.ClassPropertyEditor):
+        line_edit = widget.le_property_reference
+        if line_edit.button_mode == BUTTON_MODE_VIEW:
+            cls.signaller.view_property_requested.emit(widget)
+        elif line_edit.button_mode == BUTTON_MODE_NEW:
+            cls.signaller.create_property_requested.emit(widget)
 
     @classmethod
     def update_allowed_units(cls, widget: ui.ClassPropertyEditor):
