@@ -40,6 +40,7 @@ def register_widget(
         lambda e, v, p=project: class_property_editor.set_property_reference(e, v, p.get()),
     )
     class_property_editor.register_field_listener(widget, widget.le_property_reference)
+
     class_property_editor.add_validator(
         widget,
         widget.le_property_reference,
