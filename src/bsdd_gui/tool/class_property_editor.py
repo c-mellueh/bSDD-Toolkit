@@ -39,9 +39,11 @@ class Signaller(WidgetSignaller):
     window_closed = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
-    create_property_requested = Signal(ui.ClassPropertyEditor)
+    create_bsdd_property_requested = Signal(ui.ClassPropertyEditor)
     view_property_requested = Signal(ui.ClassPropertyEditor)
     new_value_requested = Signal(object)
+    new_class_property_created = Signal(BsddClassProperty)
+    create_new_class_property_requested = Signal()
 
 
 class ClassPropertyEditor(WidgetHandler):
@@ -62,13 +64,35 @@ class ClassPropertyEditor(WidgetHandler):
         cls.signaller.property_reference_changed.connect(
             lambda cp: trigger.update_property_specific_fields(cls.get_window(cp))
         )
+        cls.signaller.create_new_class_property_requested.connect(
+            trigger.create_class_property_creator
+        )
 
     @classmethod
-    def create_window(
-        cls, bsdd_class_property: BsddClassProperty, parent: QWidget
+    def create_create_dialog(cls, bsdd_class_property, parent):
+        def validate_inputs(dial: ui.ClassPropertyCreator):
+            widget = dial._editor_widget
+            if cls.all_inputs_are_valid(widget):
+                dial.accept()
+            else:
+                pass
+
+        dialog = ui.ClassPropertyCreator(bsdd_class_property)
+        cls.get_properties().dialog = dialog
+        widget = cls.create_edit_widget(bsdd_class_property, parent, mode="new")
+        cls.sync_from_model(widget, bsdd_class_property)
+        dialog._layout.insertWidget(0, widget)
+        dialog._editor_widget = widget
+        dialog.new_button.clicked.connect(lambda _, d=dialog: validate_inputs(d))
+
+        return dialog
+
+    @classmethod
+    def create_edit_widget(
+        cls, bsdd_class_property: BsddClassProperty, parent: QWidget, mode="edit"
     ) -> ui.ClassPropertyEditor:
         prop = cls.get_properties()
-        window = ui.ClassPropertyEditor(bsdd_class_property, parent)
+        window = ui.ClassPropertyEditor(bsdd_class_property, parent, mode=mode)
         window.setWindowFlag(Qt.Tool)
         prop.windows.append(window)
 
@@ -193,7 +217,7 @@ class ClassPropertyEditor(WidgetHandler):
         value = field.text()
         bsdd_class_property = widget.bsdd_class_property
         bsdd_class = bsdd_class_property.parent()
-        bsdd_dictionary = bsdd_class.parent()
+        bsdd_dictionary = bsdd_class.parent() if bsdd_class else None
         line_edit = widget.le_property_reference
         if not value:
             line_edit.show_button(False)
@@ -223,7 +247,7 @@ class ClassPropertyEditor(WidgetHandler):
         if line_edit.button_mode == BUTTON_MODE_VIEW:
             cls.signaller.view_property_requested.emit(widget)
         elif line_edit.button_mode == BUTTON_MODE_NEW:
-            cls.signaller.create_property_requested.emit(widget)
+            cls.signaller.create_bsdd_property_requested.emit(widget)
 
     @classmethod
     def update_allowed_units(cls, widget: ui.ClassPropertyEditor):

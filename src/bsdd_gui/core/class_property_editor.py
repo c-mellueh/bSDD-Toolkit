@@ -103,9 +103,11 @@ def open_property_info(
     if window := class_property_editor.get_window(bsdd_class_property):
         if window.isHidden():
             window.close()
-            window = class_property_editor.create_window(bsdd_class_property, main_window.get())
+            window = class_property_editor.create_edit_widget(
+                bsdd_class_property, main_window.get()
+            )
     else:
-        window = class_property_editor.create_window(bsdd_class_property, main_window.get())
+        window = class_property_editor.create_edit_widget(bsdd_class_property, main_window.get())
     window.show()
     window.activateWindow()
     window.showNormal()
@@ -127,9 +129,40 @@ def splitter_settings_accepted(
 
 
 def connect_signals(
-    class_property_editor: Type[tool.ClassPropertyEditor], property_table: Type[tool.PropertyTable]
+    class_property_editor: Type[tool.ClassPropertyEditor],
+    property_table: Type[tool.PropertyTable],
+    main_window: Type[tool.MainWindow],
 ):
     property_table.signaller.property_info_requested.connect(
         class_property_editor.show_property_info
     )
     class_property_editor.connect_signals()
+    main_window.signaller.new_property_requested.connect(
+        class_property_editor.signaller.create_new_class_property_requested.emit
+    )
+
+
+def create_class_property_creator(
+    class_property_editor: Type[tool.ClassPropertyEditor],
+    main_window: Type[tool.MainWindow],
+):
+    code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
+    bsdd_class_property = BsddClassProperty.model_validate(
+        {"Code": code, "PropertyCode": code, "PropertyUri": None, "IsRequired": True}
+    )
+    if not main_window.get_active_class():
+        return
+    property_set = main_window.get_active_pset()
+    if not property_set:
+        return
+    bsdd_class_property.PropertySet = property_set
+    bsdd_class_property._set_parent(main_window.get_active_class())
+    dialog = class_property_editor.create_create_dialog(bsdd_class_property, main_window.get())
+    widget = dialog._editor_widget
+    text = QCoreApplication.translate("ClassPropertyEditor", "Create New Class Property")
+    dialog.setWindowTitle(text)
+    if dialog.exec():
+        class_property_editor.sync_to_model(widget, bsdd_class_property)
+        bsdd_class_property.parent().ClassProperties.append(bsdd_class_property)
+        class_property_editor.signaller.new_class_property_created.emit(bsdd_class_property)
+    class_property_editor.unregister_widget(widget)

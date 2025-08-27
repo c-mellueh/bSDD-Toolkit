@@ -14,9 +14,17 @@ def connect_signals(
     property_table: Type[tool.PropertyTable],
     main_window: Type[tool.MainWindow],
     property_set_table: Type[tool.PropertySetTable],
+    class_property_editor: Type[tool.ClassPropertyEditor],
 ):
+    class_property_editor.signaller.new_class_property_created.connect(
+        lambda *_: property_table.signaller.reset_all_property_tables_requested.emit()
+    )
 
-    pass
+    def reset():
+        for table in property_table.get_widgets():
+            property_table.reset_view(table)
+
+    property_table.signaller.reset_all_property_tables_requested.connect(reset)
 
 
 def connect_view(

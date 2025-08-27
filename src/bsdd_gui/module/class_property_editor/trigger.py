@@ -15,8 +15,12 @@ def connect():
         "pageSplitter",
         lambda: core.splitter_settings_accepted(tool.ClassPropertyEditor, tool.Appdata),
     )
-    core.connect_signals(tool.ClassPropertyEditor, tool.PropertyTable)
+    core.connect_signals(tool.ClassPropertyEditor, tool.PropertyTable, tool.MainWindow)
     # core.create_context_menu_builders(tool.PropertyWidget)
+
+
+def create_class_property_creator():
+    core.create_class_property_creator(tool.ClassPropertyEditor, tool.MainWindow)
 
 
 def update_property_specific_fields(window: ui.ClassPropertyEditor):

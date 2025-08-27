@@ -171,7 +171,7 @@ class BsddPropertyRelation(CaseInsensitiveModel):
 class BsddClassProperty(CaseInsensitiveModel):
     Code: str
     PropertyCode: str
-    PropertyUri: str
+    PropertyUri: str | None
     Description: Optional[str] = None
     PropertySet: Optional[str] = None
     Unit: Optional[str] = None

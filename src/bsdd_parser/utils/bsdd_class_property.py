@@ -60,11 +60,16 @@ def is_external_ref(class_property: BsddClassProperty) -> bool:
         return False
 
 
-def get_internal_property(class_property: BsddClassProperty) -> BsddProperty | None:
+def get_internal_property(
+    class_property: BsddClassProperty, bsdd_dictionary=None
+) -> BsddProperty | None:
     if is_external_ref(class_property):
         return None
     bsdd_class = class_property.parent()
-    bsdd_dictionary = bsdd_class.parent()
+    if bsdd_dictionary is None and bsdd_class is None:
+        return None
+    if bsdd_dictionary is None:
+        bsdd_dictionary = bsdd_class.parent()
     for p in bsdd_dictionary.Properties:
         if p.Code == class_property.PropertyCode:
             return p
@@ -79,22 +84,22 @@ def get_all_property_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddPro
 
 
 def get_datatype(class_property: BsddClassProperty):
-    if not is_external_ref(class_property):
+    if is_external_ref(class_property):
+        bsdd_property = get_external_property(class_property)
+    else:
         bsdd_property = get_internal_property(class_property)
-        return bsdd_property.DataType
 
-    external_property = get_external_property(class_property)
-    if external_property is None:
+    if bsdd_property is None:
         return ""
-    return external_property.DataType
+    return bsdd_property.DataType or "String"
 
 
 def get_units(class_property: BsddClassProperty):
-    if not is_external_ref(class_property):
+    if is_external_ref(class_property):
+        bsdd_property = get_external_property(class_property)
+    else:
         bsdd_property = get_internal_property(class_property)
-        return bsdd_property.Units or []
 
-    external_property = get_external_property(class_property)
-    if external_property is None:
+    if bsdd_property is None:
         return []
-    return external_property.Units
+    return bsdd_property.Units or []

@@ -22,5 +22,6 @@ class PluginProperty:
 class ClassPropertyEditorProperties(WidgetHandlerProperties):
     plugin_widget_list: list[PluginProperty] = list()
     windows: list[ui.ClassPropertyEditor] = list()
+    dialog: ui.ClassPropertyCreator = None
     context_menu_builders = list()
     splitter_settings: ui.SplitterSettings = None

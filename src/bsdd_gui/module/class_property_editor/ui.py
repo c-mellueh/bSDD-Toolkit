@@ -7,7 +7,7 @@ from PySide6.QtCore import (
     Qt,
     Signal,
 )
-from PySide6.QtWidgets import QWidget, QWidget, QTableView
+from PySide6.QtWidgets import QWidget, QWidget, QDialog, QDialogButtonBox, QVBoxLayout
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QPalette, QIcon
 
 from bsdd_gui.resources.icons import get_icon, get_link_icon
@@ -18,13 +18,28 @@ from .qt.ui_SplitterSettings import Ui_SplitterSettings
 from .qt.ui_Window import Ui_PropertyWindow
 
 
+class ClassPropertyCreator(QDialog):
+    def __init__(self, bsdd_class_property: BsddClassProperty, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bsdd_class_property = bsdd_class_property
+        self.setWindowIcon(get_icon())
+        self.button_box = QDialogButtonBox(Qt.Horizontal)
+        # Layout
+        self._layout = QVBoxLayout(self)
+        self._layout.addWidget(self.button_box)
+        self.setLayout(self._layout)
+        self._editor_widget: ClassPropertyEditor = None
+        self.new_button = self.button_box.addButton("Create", QDialogButtonBox.ActionRole)
+
+
 class ClassPropertyEditor(QWidget, Ui_PropertyWindow):
     closed = Signal()
 
-    def __init__(self, bsdd_class_property: BsddClassProperty, *args, **kwargs):
+    def __init__(self, bsdd_class_property: BsddClassProperty, *args, mode="edit", **kwargs):
         super().__init__(*args, **kwargs)
         self.setWindowIcon(get_icon())
         self.setupUi(self)
+        self.mode = mode  # edit or new
         self.bsdd_class_property = bsdd_class_property
 
     def enterEvent(self, event):
