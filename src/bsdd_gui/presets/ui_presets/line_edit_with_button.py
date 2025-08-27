@@ -11,7 +11,7 @@ class LineEditWithButton(QLineEdit):
         self.button.setText("Add Item")
         self.button.setCursor(Qt.PointingHandCursor)
         self.button.setAutoRaise(True)
-
+        self.button_mode = "new"  # if needed the button can have multiple modes like
         # Create theme-aware colors
         pal = QApplication.palette()
         base = pal.color(QPalette.Base)
@@ -62,6 +62,9 @@ class LineEditWithButton(QLineEdit):
 
     def set_button_text(self, text):
         self.button.setText(text)
+
+    def set_button_mode(self, mode: str):
+        self.button_mode = mode
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
