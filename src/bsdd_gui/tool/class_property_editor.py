@@ -8,18 +8,18 @@ from bsdd_gui.module.class_property_editor import ui
 from PySide6.QtWidgets import QLayout
 from PySide6.QtCore import Signal
 from bsdd_gui.module.class_property_editor import trigger
-from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller
+from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignaller
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_property_editor.prop import ClassPropertyEditorProperties
 
 
-class Signaller(ViewSignaller):
+class Signaller(WidgetSignaller):
     window_created = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
 
 
-class ClassPropertyEditor(ViewHandler):
+class ClassPropertyEditor(WidgetHandler):
     signaller = Signaller()
 
     @classmethod

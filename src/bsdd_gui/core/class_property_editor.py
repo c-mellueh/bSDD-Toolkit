@@ -21,6 +21,12 @@ def register_widget(
 ):
     class_property_editor.register_widget(widget)
     class_property_editor.register_basic_field(widget, widget.le_code, "Code")
+    class_property_editor.register_basic_field(widget, widget.te_description, "Description")
+
+    # Autoupdate
+    class_property_editor.signaller.field_changed.connect(
+        lambda w, f: class_property_editor.sync_to_model(w, w.bsdd_class_property, f)
+    )
 
 
 def open_property_info(

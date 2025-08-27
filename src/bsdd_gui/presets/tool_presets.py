@@ -77,10 +77,6 @@ class ColumnHandler(ABC):
         return cls.get_properties().model
 
 
-class WidgetSignaller(QObject):
-    pass
-
-
 class ModuleHandler(ABC):
     @classmethod
     @abstractmethod
@@ -101,7 +97,14 @@ class ModuleHandler(ABC):
         return cls.get_properties().actions[widget][name]
 
 
+class WidgetSignaller(QObject):
+    field_changed = Signal(
+        QWidget, QWidget
+    )  # Widget in which the field is embedded and Fieldwidget itself
+
+
 class WidgetHandler(ABC):
+    signaller = WidgetSignaller()
 
     @classmethod
     @abstractmethod
@@ -128,25 +131,39 @@ class WidgetHandler(ABC):
         return cls.get_properties().widgets
 
     @classmethod
-    def register_basic_field(cls, class_editor: QWidget, field: QWidget, variable_name: str):
-        cls.register_field_getter(class_editor, field, lambda e, vn=variable_name: getattr(e, vn))
+    def register_basic_field(cls, widget: QWidget, field: QWidget, variable_name: str):
+        cls.register_field_getter(widget, field, lambda e, vn=variable_name: getattr(e, vn))
         cls.register_field_setter(
-            class_editor,
+            widget,
             field,
             lambda e, v, vn=variable_name: setattr(e, vn, v),
         )
+        cls.register_field_listener(widget, field)
 
     @classmethod
-    def register_field_getter(cls, class_editor: QWidget, field: QWidget, getter_func: callable):
-        if not class_editor in cls.get_properties().field_getter:
-            cls.get_properties().field_getter[class_editor] = dict()
-        cls.get_properties().field_getter[class_editor][field] = getter_func
+    def register_field_getter(cls, widget: QWidget, field: QWidget, getter_func: callable):
+        if not widget in cls.get_properties().field_getter:
+            cls.get_properties().field_getter[widget] = dict()
+        cls.get_properties().field_getter[widget][field] = getter_func
 
     @classmethod
-    def register_field_setter(cls, class_editor: QWidget, field: QWidget, setter_func: callable):
-        if not class_editor in cls.get_properties().field_setter:
-            cls.get_properties().field_setter[class_editor] = dict()
-        cls.get_properties().field_setter[class_editor][field] = setter_func
+    def register_field_setter(cls, widget: QWidget, field: QWidget, setter_func: callable):
+        if not widget in cls.get_properties().field_setter:
+            cls.get_properties().field_setter[widget] = dict()
+        cls.get_properties().field_setter[widget][field] = setter_func
+
+    @classmethod
+    def register_field_listener(cls, widget: QWidget, field: QWidget):
+        f = field
+        w = widget
+        if isinstance(f, QLineEdit):
+            f.textChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+        if isinstance(f, QComboBox):
+            f.currentTextChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+        if isinstance(f, QTextEdit):
+            f.textChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+        if isinstance(f, TagInput):
+            f.tagsChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
@@ -214,9 +231,11 @@ class WidgetHandler(ABC):
                 field.setTags(value or [])
 
     @classmethod
-    def sync_to_model(cls, widget: QWidget, element):
+    def sync_to_model(cls, widget: QWidget, element, explicit_field: QWidget = None):
         field_dict = cls.get_properties().field_setter.get(widget) or dict()
         for field, setter_func in field_dict.items():
+            if explicit_field is not None and explicit_field != field:
+                continue
             if isinstance(field, QLineEdit):
                 setter_func(element, field.text())
             if isinstance(field, QComboBox):
@@ -246,12 +265,6 @@ class WidgetHandler(ABC):
 
 
 class ViewSignaller(QObject):
-
-    @classmethod
-    @abstractmethod
-    def get_properties(cls) -> ViewHandlerProperties:
-        return None
-
     model_refresh_requested = Signal()
     selection_changed = Signal(QWidget, Any)
 
