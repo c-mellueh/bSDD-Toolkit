@@ -43,7 +43,6 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
-    QDateTimeEdit,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -75,7 +74,7 @@ class Ui_PropertyWindow(object):
     def setupUi(self, PropertyWindow):
         if not PropertyWindow.objectName():
             PropertyWindow.setObjectName("PropertyWindow")
-        PropertyWindow.resize(614, 694)
+        PropertyWindow.resize(614, 550)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QTabWidget(PropertyWindow)
@@ -86,6 +85,11 @@ class Ui_PropertyWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.fl_code = QFormLayout()
         self.fl_code.setObjectName("fl_code")
+        self.fl_code.setFormAlignment(
+            Qt.AlignmentFlag.AlignLeading
+            | Qt.AlignmentFlag.AlignLeft
+            | Qt.AlignmentFlag.AlignVCenter
+        )
         self.le_code = QLineEdit(self.tab_basics)
         self.le_code.setObjectName("le_code")
 
@@ -305,11 +309,6 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lb_deactivation_time)
 
-        self.de_deactivation_time = QDateTimeEdit(self.tab_advanced)
-        self.de_deactivation_time.setObjectName("de_deactivation_time")
-
-        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.de_deactivation_time)
-
         self.lb_document_ref = QLabel(self.tab_advanced)
         self.lb_document_ref.setObjectName("lb_document_ref")
 
@@ -355,11 +354,6 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_revision_date)
 
-        self.de_revision_time = QDateTimeEdit(self.tab_advanced)
-        self.de_revision_time.setObjectName("de_revision_time")
-
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.de_revision_time)
-
         self.lb_subdivision = QLabel(self.tab_advanced)
         self.lb_subdivision.setObjectName("lb_subdivision")
 
@@ -395,11 +389,6 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(4, QFormLayout.ItemRole.LabelRole, self.lb_version_date)
 
-        self.de_version_date = QDateTimeEdit(self.tab_advanced)
-        self.de_version_date.setObjectName("de_version_date")
-
-        self.formLayout.setWidget(4, QFormLayout.ItemRole.FieldRole, self.de_version_date)
-
         self.lb_version_number = QLabel(self.tab_advanced)
         self.lb_version_number.setObjectName("lb_version_number")
 
@@ -424,6 +413,21 @@ class Ui_PropertyWindow(object):
         self.de_activation_time.setObjectName("de_activation_time")
 
         self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.de_activation_time)
+
+        self.de_revision_time = DateTimeWithNow(self.tab_advanced)
+        self.de_revision_time.setObjectName("de_revision_time")
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.de_revision_time)
+
+        self.de_deactivation_time = DateTimeWithNow(self.tab_advanced)
+        self.de_deactivation_time.setObjectName("de_deactivation_time")
+
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.de_deactivation_time)
+
+        self.de_version_date = DateTimeWithNow(self.tab_advanced)
+        self.de_version_date.setObjectName("de_version_date")
+
+        self.formLayout.setWidget(4, QFormLayout.ItemRole.FieldRole, self.de_version_date)
 
         self.tabWidget.addTab(self.tab_advanced, "")
 
