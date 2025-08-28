@@ -131,10 +131,10 @@ class Ui_DictionaryForm(object):
 
         self.formLayout.setWidget(7, QFormLayout.ItemRole.LabelRole, self.lbDictionaryUri)
 
-        self.le_dictionary_ui = QLineEdit(DictionaryForm)
-        self.le_dictionary_ui.setObjectName("le_dictionary_ui")
+        self.le_dictionary_uri = QLineEdit(DictionaryForm)
+        self.le_dictionary_uri.setObjectName("le_dictionary_uri")
 
-        self.formLayout.setWidget(7, QFormLayout.ItemRole.FieldRole, self.le_dictionary_ui)
+        self.formLayout.setWidget(7, QFormLayout.ItemRole.FieldRole, self.le_dictionary_uri)
 
         self.lbLicense = QLabel(DictionaryForm)
         self.lbLicense.setObjectName("lbLicense")
@@ -217,10 +217,10 @@ class Ui_DictionaryForm(object):
 
         self.formLayout.setWidget(16, QFormLayout.ItemRole.LabelRole, self.lbStatus)
 
-        self.widget = DateTimeWithNow(DictionaryForm)
-        self.widget.setObjectName("widget")
+        self.de_release_date = DateTimeWithNow(DictionaryForm)
+        self.de_release_date.setObjectName("de_release_date")
 
-        self.formLayout.setWidget(15, QFormLayout.ItemRole.FieldRole, self.widget)
+        self.formLayout.setWidget(15, QFormLayout.ItemRole.FieldRole, self.de_release_date)
 
         self.cb_language_iso = QComboBox(DictionaryForm)
         self.cb_language_iso.setObjectName("cb_language_iso")
@@ -334,7 +334,7 @@ class Ui_DictionaryForm(object):
             QCoreApplication.translate("DictionaryForm", "DictionaryUri *", None)
         )
         # if QT_CONFIG(tooltip)
-        self.le_dictionary_ui.setToolTip(
+        self.le_dictionary_uri.setToolTip(
             QCoreApplication.translate(
                 "DictionaryForm",
                 "Required if UseOwnUri = true. First part of all Class/Property URIs.",
@@ -342,7 +342,7 @@ class Ui_DictionaryForm(object):
             )
         )
         # endif // QT_CONFIG(tooltip)
-        self.le_dictionary_ui.setPlaceholderText(
+        self.le_dictionary_uri.setPlaceholderText(
             QCoreApplication.translate(
                 "DictionaryForm",
                 "urn:mycompany:mydictionary or https://mycompany.com/mydictionary",

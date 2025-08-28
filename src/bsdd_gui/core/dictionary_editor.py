@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QWidget
 
 from PySide6.QtGui import QCloseEvent
 from bsdd_parser import BsddDictionary
+from bsdd_gui.module.dictionary_editor.constants import LANGUAGE_ISO_CODES
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -75,7 +76,6 @@ def open_widget(
             bsdd_dictionary,
             parent_widget,
         )
-    print("HIER")
     window.show()
     window.activateWindow()
     window.showNormal()
@@ -111,8 +111,31 @@ def add_fields_to_widget(
     widget: ui.DictionaryEditor,
     dictionary_editor: Type[tool.DictionaryEditor],
 ):
-    pass
-    # dictionary_editor.register_basic_field(widget, widget.le_code, "Code")
-    # dictionary_editor.register_basic_field(widget, widget.le_name, "Name")
-    # dictionary_editor.register_basic_field(widget, widget.le_measurement, "MethodOfMeasurement")
-    # dictionary_editor.register_basic_field(widget, widget.le_example, "Example")
+
+    dictionary_editor.register_basic_field(widget, widget.le_org_code, "OrganizationCode")
+    dictionary_editor.register_basic_field(widget, widget.le_dictionary_code, "DictionaryCode")
+    dictionary_editor.register_basic_field(widget, widget.le_dictionary_name, "DictionaryName")
+    dictionary_editor.register_basic_field(
+        widget, widget.le_dictionary_version, "DictionaryVersion"
+    )
+    dictionary_editor.register_basic_field(widget, widget.cb_language_only, "LanguageOnly")
+    dictionary_editor.register_basic_field(widget, widget.cb_use_own_uri, "UseOwnUri")
+    dictionary_editor.register_basic_field(widget, widget.le_dictionary_uri, "DictionaryUri")
+    dictionary_editor.register_basic_field(widget, widget.le_license, "License")
+    dictionary_editor.register_basic_field(widget, widget.le_license_url, "LicenseUrl")
+    dictionary_editor.register_basic_field(
+        widget, widget.le_change_request_mail, "ChangeRequestEmailAddress"
+    )
+    dictionary_editor.register_basic_field(widget, widget.cb_model_version, "ModelVersion")
+    dictionary_editor.register_basic_field(widget, widget.le_more_info, "MoreInfoUrl")
+    dictionary_editor.register_basic_field(
+        widget, widget.le_qa_procedure, "QualityAssuranceProcedure"
+    )
+    dictionary_editor.register_basic_field(
+        widget, widget.le_qa_procedure_url, "QualityAssuranceProcedureUrl"
+    )
+    dictionary_editor.register_basic_field(widget, widget.de_release_date, "ReleaseDate")
+    dictionary_editor.register_basic_field(widget, widget.cb_status, "Status")
+
+    widget.cb_language_iso.addItems(LANGUAGE_ISO_CODES)
+    dictionary_editor.register_basic_field(widget, widget.cb_language_iso, "LanguageIsoCode")

@@ -122,7 +122,7 @@
     </widget>
    </item>
    <item row="7" column="1">
-    <widget class="QLineEdit" name="le_dictionary_ui">
+    <widget class="QLineEdit" name="le_dictionary_uri">
      <property name="toolTip">
       <string>Required if UseOwnUri = true. First part of all Class/Property URIs.</string>
      </property>
@@ -240,7 +240,7 @@
     </widget>
    </item>
    <item row="15" column="1">
-    <widget class="DateTimeWithNow" name="widget" native="true"/>
+    <widget class="DateTimeWithNow" name="de_release_date" native="true"/>
    </item>
    <item row="4" column="1">
     <widget class="QComboBox" name="cb_language_iso"/>
