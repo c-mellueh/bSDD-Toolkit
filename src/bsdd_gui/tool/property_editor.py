@@ -30,6 +30,7 @@ class PropertyEditor(WidgetHandler):
         cls.signaller.window_requested.connect(trigger.create_window)
         cls.signaller.widget_created.connect(trigger.widget_created)
         cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_property))
+        cls.signaller.widget_closed.connect(trigger.widget_closed)
         # Autoupdate Values
         cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_property, f))
 

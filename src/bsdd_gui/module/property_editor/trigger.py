@@ -27,3 +27,7 @@ def create_window(bsdd_property: BsddProperty, parent: QWidget):
 def widget_created(widget: ui.PropertyEditor):
     core.register_widget(widget, tool.PropertyEditor)
     core.add_fields_to_widget(widget, tool.PropertyEditor, tool.AllowedValuesTable)
+
+
+def widget_closed(widget: ui.PropertyEditor):
+    core.unregister_widget(widget, tool.PropertyEditor)

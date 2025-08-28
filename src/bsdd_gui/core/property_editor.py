@@ -44,6 +44,13 @@ def connect_signals(
     )
 
 
+def unregister_widget(
+    widget: ui.PropertyEditor,
+    property_editor: Type[tool.PropertyEditor],
+):
+    property_editor.unregister_widget(widget)
+
+
 def register_widget(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditor],
