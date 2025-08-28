@@ -43,6 +43,7 @@ class Signaller(WidgetSignaller):
     create_new_class_property_requested = Signal()
     property_widget_requested = Signal(BsddProperty)
     create_property_requested = Signal(ui.ClassPropertyEditor)
+    property_specific_redraw_requested = Signal(ui.ClassPropertyEditor)
 
 
 class ClassPropertyEditor(WidgetHandler):
@@ -53,6 +54,10 @@ class ClassPropertyEditor(WidgetHandler):
         return bsdd_gui.ClassPropertyEditorProperties
 
     @classmethod
+    def request_property_specific_redraw(cls, widget: ui.ClassPropertyEditor):
+        cls.signaller.property_specific_redraw_requested.emit(widget)
+
+    @classmethod
     def connect_internal_signals(cls):
         cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
         cls.signaller.widget_created.connect(trigger.widget_created)
@@ -61,7 +66,7 @@ class ClassPropertyEditor(WidgetHandler):
             lambda w: cls.sync_from_model(w, w.bsdd_class_property)
         )
         cls.signaller.property_reference_changed.connect(
-            lambda cp: trigger.update_property_specific_fields(cls.get_window(cp))
+            lambda cp: cls.request_property_specific_redraw(cls.get_window(cp))
         )
         cls.signaller.create_new_class_property_requested.connect(
             trigger.create_class_property_creator
@@ -69,6 +74,9 @@ class ClassPropertyEditor(WidgetHandler):
         # Autoupdate Values
         cls.signaller.field_changed.connect(
             lambda w, f: cls.sync_to_model(w, w.bsdd_class_property, f)
+        )
+        cls.signaller.property_specific_redraw_requested.connect(
+            trigger.update_property_specific_fields
         )
 
     @classmethod

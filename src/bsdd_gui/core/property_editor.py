@@ -72,7 +72,7 @@ def add_fields_to_widget(
     property_editor.register_basic_field(widget, widget.le_uid, "Uid")
     property_editor.register_basic_field(widget, widget.le_visual_rep, "VisualRepresentationUri")
 
-    property_editor.register_basic_field(widget, widget.te_description, "Definition")
+    property_editor.register_basic_field(widget, widget.te_definition, "Definition")
     property_editor.register_basic_field(widget, widget.te_description, "Description")
 
     property_editor.register_basic_field(widget, widget.ti_units, "Units")

@@ -13,6 +13,7 @@ from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
+    from bsdd_gui.module.property_editor import ui as property_editor_ui
 
 
 def unregister_widget(
@@ -130,6 +131,7 @@ def connect_signals(
     class_property_editor: Type[tool.ClassPropertyEditor],
     property_table: Type[tool.PropertyTable],
     main_window: Type[tool.MainWindow],
+    property_editor: Type[tool.PropertyEditor],
 ):
     property_table.signaller.property_info_requested.connect(
         class_property_editor.show_property_info
@@ -138,6 +140,18 @@ def connect_signals(
     main_window.signaller.new_property_requested.connect(
         class_property_editor.signaller.create_new_class_property_requested.emit
     )
+
+    def handle_field_changed(parent_widget: property_editor_ui.PropertyEditor, field):
+        for widget in class_property_editor.get_widgets():
+            bsdd_class_property: BsddClassProperty = widget.bsdd_class_property
+            internal_prop = cp_utils.get_internal_property(bsdd_class_property)
+            if not internal_prop:
+                continue
+
+            if parent_widget.bsdd_property == internal_prop:
+                class_property_editor.request_property_specific_redraw(widget)
+
+    property_editor.signaller.field_changed.connect(handle_field_changed)
 
 
 def create_class_property_creator(
