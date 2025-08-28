@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_basics">
       <attribute name="title">
@@ -332,9 +332,6 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QDateTimeEdit" name="de_activation_time"/>
-       </item>
        <item row="5" column="0">
         <widget class="QLabel" name="lb_connected_properties">
          <property name="toolTip">
@@ -528,6 +525,9 @@
        <item row="17" column="1">
         <widget class="QLineEdit" name="le_visual_rep"/>
        </item>
+       <item row="1" column="1">
+        <widget class="DateTimeWithNow" name="de_activation_time" native="true"/>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -569,6 +569,12 @@
    <class>SubdivisionTagInput</class>
    <extends>QWidget</extends>
    <header>bsdd_gui.module.property_editor.widgets</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DateTimeWithNow</class>
+   <extends>QWidget</extends>
+   <header>bsdd_gui.presets.ui_presets.datetime_now</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

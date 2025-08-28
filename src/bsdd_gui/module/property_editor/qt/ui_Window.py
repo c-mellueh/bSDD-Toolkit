@@ -68,6 +68,7 @@ from bsdd_gui.module.property_editor.widgets import (
     SubdivisionTagInput,
     UnitTagInput,
 )
+from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow
 
 
 class Ui_PropertyWindow(object):
@@ -259,11 +260,6 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lb_activation_time)
 
-        self.de_activation_time = QDateTimeEdit(self.tab_advanced)
-        self.de_activation_time.setObjectName("de_activation_time")
-
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.de_activation_time)
-
         self.lb_connected_properties = QLabel(self.tab_advanced)
         self.lb_connected_properties.setObjectName("lb_connected_properties")
 
@@ -424,13 +420,18 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(17, QFormLayout.ItemRole.FieldRole, self.le_visual_rep)
 
+        self.de_activation_time = DateTimeWithNow(self.tab_advanced)
+        self.de_activation_time.setObjectName("de_activation_time")
+
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.de_activation_time)
+
         self.tabWidget.addTab(self.tab_advanced, "")
 
         self.verticalLayout.addWidget(self.tabWidget)
 
         self.retranslateUi(PropertyWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
         QMetaObject.connectSlotsByName(PropertyWindow)
 

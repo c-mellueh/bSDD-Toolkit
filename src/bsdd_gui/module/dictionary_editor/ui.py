@@ -3,6 +3,7 @@ from PySide6.QtCore import Signal, QDateTime, Qt, QMargins
 from typing import Any
 from . import trigger
 from bsdd_gui.resources.icons import get_icon
+from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow as DTN
 
 
 class DictionaryEditor(QWidget):
@@ -19,26 +20,6 @@ class DictionaryEditor(QWidget):
         trigger.widget_close_requested(self, event)
 
 
-class DateTimeWithNow(QWidget):
+class DateTimeWithNow(DTN):
     def __init__(self):
         super().__init__()
-
-        layout = QHBoxLayout(self)
-
-        self.dt_edit = QDateTimeEdit(self)
-        self.dt_edit.setCalendarPopup(True)  # nice calendar UI
-        self.dt_edit.setDateTime(QDateTime.currentDateTime())
-        self.dt_edit.setDisplayFormat("yyyy-MM-dd HH:mm:ss")
-        self.dt_edit.setTimeSpec(Qt.TimeSpec.LocalTime)  # or Qt.LocalTime
-
-        now_btn = QPushButton("Now", self)
-        now_btn.clicked.connect(self.set_now)
-
-        layout.addWidget(self.dt_edit)
-        layout.addWidget(now_btn)
-        self.setWindowIcon(get_icon())
-        # self.setContentsMargins(QMargins(0,0,0,0))
-        self.layout().setContentsMargins(QMargins(0, 0, 0, 0))
-
-    def set_now(self):
-        self.dt_edit.setDateTime(QDateTime.currentDateTime())
