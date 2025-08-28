@@ -4,7 +4,7 @@ from types import NoneType  # Python 3.10+
 import logging
 
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import WidgetHandler, ModuleHandler
+from bsdd_gui.presets.tool_presets import WidgetHandler, ModuleHandler, WidgetSignaller
 from PySide6.QtCore import Qt, QDateTime, QObject, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -16,15 +16,15 @@ from PySide6.QtWidgets import (
 )
 from datetime import datetime
 from bsdd_gui import tool
-from bsdd_gui.module.dictionary_editor import constants, ui
+from bsdd_gui.module.dictionary_editor import constants, ui, trigger
 from bsdd_parser import BsddDictionary
 
 if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor.prop import DictionaryEditorProperties
 
 
-class Signaller(QObject):
-    window_requested = Signal()
+class Signaller(WidgetSignaller):
+    pass
 
 
 class DictionaryEditor(WidgetHandler, ModuleHandler):
@@ -35,21 +35,26 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
         return bsdd_gui.DictionaryEditorProperties
 
     @classmethod
-    def create_widget(cls, bsdd_dictionary: BsddDictionary) -> ui.DictionaryEditor:
+    def connect_internal_signals(cls):
+        cls.signaller.widget_requested.connect(trigger.create_widget)
+
+    @classmethod
+    def requeste_widget(cls, bsdd_dictionary: BsddDictionary, parent=None):
+        cls.signaller.widget_requested.emit(bsdd_dictionary, parent)
+
+    @classmethod
+    def create_widget(
+        cls, bsdd_dictionary: BsddDictionary, parent_widget: QWidget
+    ) -> ui.DictionaryEditor:
         prop = cls.get_properties()
-        widget = ui.DictionaryEditor(bsdd_dictionary)
+        widget = ui.DictionaryEditor(bsdd_dictionary, parent_widget)
         prop.widgets.add(widget)
+        cls.signaller.widget_created.emit(widget)
+        return widget
 
     @classmethod
     def get_widget(cls, bsdd_dictionary: BsddDictionary) -> ui.DictionaryEditor:
-        widgets = [
-            widget for widget in cls.get_properties().widgets if widget.data == bsdd_dictionary
-        ]
-        if len(widgets) > 1:
-            logging.warning(f"Multiple PropertyWindows")
-        elif not widgets:
-            return None
-        return widgets[0]
+        return super().get_widget(bsdd_dictionary)
 
     @classmethod
     def unwrap_type(cls, tp):

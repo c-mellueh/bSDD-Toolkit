@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QCoreApplication, Qt
+from PySide6.QtWidgets import QWidget
+
 from PySide6.QtGui import QCloseEvent
+from bsdd_parser import BsddDictionary
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -18,9 +21,10 @@ def connect_widget(widget: ui.DictionaryEditor, dictionary_editor: Type[tool.Dic
 def create_main_menu_actions(
     dictionary_editor: Type[tool.DictionaryEditor],
     main_window: Type[tool.MainWindow],
+    project: Type[tool.Project],
 ) -> None:
     action = main_window.add_action(
-        "menuEdit", "Dictionary Settings", dictionary_editor.signaller.window_requested.emit
+        "menuEdit", "Dictionary Settings", lambda: dictionary_editor.requeste_widget(project.get())
     )
     dictionary_editor.set_action(main_window.get(), "open_window", action)
 
@@ -41,34 +45,38 @@ def retranslate_ui(
         widget.setWindowTitle(title)
 
 
-def connect_signals(
+def open_widget(
+    bsdd_dictionary: BsddDictionary,
+    parent_widget: QWidget | None,
     dictionary_editor: Type[tool.DictionaryEditor],
-    project: Type[tool.Project],
     main_window: Type[tool.MainWindow],
     util: Type[tool.Util],
 ):
-    def create_window():
-        if dictionary_editor.get_widgets():
-            widget = list(dictionary_editor.get_widgets())[0]
-        else:
-            widget = dictionary_editor.create_widget()
-            dictionary_editor.register_widget(widget)
-            bsdd_dictionary = project.get()
-            dictionary_editor.set_dictionary_values(widget, bsdd_dictionary.model_dump())
-            widget.value_changed.connect(
-                lambda n, v: dictionary_editor.update_dictionary_value(bsdd_dictionary, n, v)
+    if parent_widget is None:
+        parent_widget = main_window.get()
+    if window := dictionary_editor.get_widget(bsdd_dictionary):
+        if window.isHidden():
+            window.close()
+            window = dictionary_editor.create_widget(
+                bsdd_dictionary,
+                parent_widget,
             )
-            dictionary_editor.register_widget(widget)
-            widget.setParent(main_window.get())
-            widget.setWindowFlags(Qt.Tool)
-            retranslate_ui(dictionary_editor, main_window, util)
+    else:
+        window = dictionary_editor.create_widget(
+            bsdd_dictionary,
+            parent_widget,
+        )
+    window.show()
+    window.activateWindow()
+    window.showNormal()
+    retranslate_ui(dictionary_editor, main_window, util)
+    dictionary_editor.create_widget(bsdd_dictionary)
 
-        widget.show()
-        widget.raise_()
-        widget.activateWindow()
-        widget.setFocus()
 
-    dictionary_editor.signaller.window_requested.connect(create_window)
+def connect_signals(
+    dictionary_editor: Type[tool.DictionaryEditor],
+):
+    dictionary_editor.connect_internal_signals()
 
 
 def remove_widget(

@@ -20,7 +20,7 @@ def on_new_project():
     pass
 
 
-def create_window(bsdd_property: BsddProperty, parent: QWidget):
+def create_window(bsdd_property: BsddProperty, parent: QWidget | None):
     core.open_edit_window(bsdd_property, parent, tool.PropertyEditor, tool.MainWindow, tool.Project)
 
 

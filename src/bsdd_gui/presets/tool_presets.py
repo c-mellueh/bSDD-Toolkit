@@ -280,7 +280,7 @@ class FieldHandler(ABC):
 
 
 class WidgetSignaller(FieldSignaller):
-    widget_requested = Signal(object)
+    widget_requested = Signal(object, QWidget)  # data, parent
     widget_created = Signal(QWidget)
     widget_closed = Signal(QWidget)
 
@@ -313,6 +313,15 @@ class WidgetHandler(FieldHandler):
     @classmethod
     def get_widgets(cls):
         return cls.get_properties().widgets
+
+    @classmethod
+    def get_widget(cls, bsdd_dictionary: object) -> QWidget:
+        widgets = [widget for widget in cls.get_widgets() if widget.data == bsdd_dictionary]
+        if len(widgets) > 1:
+            logging.warning(f"Multiple Widgets found for the same data")
+        elif not widgets:
+            return None
+        return widgets[0]
 
 
 class ViewSignaller(QObject):

@@ -3,6 +3,7 @@ import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import dictionary_editor as core
 from PySide6.QtGui import QCloseEvent
+from PySide6.QtWidgets import QWidget
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,8 +11,8 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.create_main_menu_actions(tool.DictionaryEditor, tool.MainWindow)
-    core.connect_signals(tool.DictionaryEditor, tool.Project, tool.MainWindow, tool.Util)
+    core.create_main_menu_actions(tool.DictionaryEditor, tool.MainWindow, tool.Project)
+    core.connect_signals(tool.DictionaryEditor)
 
 
 def retranslate_ui():
@@ -29,3 +30,7 @@ def widget_created(widget: ui.DictionaryEditor):
 
 def widget_close_requested(widget: ui.DictionaryEditor, event: QCloseEvent):
     core.remove_widget(widget, event, tool.DictionaryEditor, tool.Popups)
+
+
+def create_widget(widget: ui.DictionaryEditor, parent: QWidget | None):
+    core.open_widget(widget, parent, tool.DictionaryEditor, tool.MainWindow, tool.Util)

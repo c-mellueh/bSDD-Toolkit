@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class Signaller(WidgetSignaller):
-    window_requested = Signal(BsddProperty, QWidget)  # entity parent
+    pass
 
 
 class PropertyEditor(WidgetHandler):
@@ -27,7 +27,7 @@ class PropertyEditor(WidgetHandler):
 
     @classmethod
     def connect_internal_signals(cls):
-        cls.signaller.window_requested.connect(trigger.create_window)
+        cls.signaller.widget_requested.connect(trigger.create_window)
         cls.signaller.widget_created.connect(trigger.widget_created)
         cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.data))
         cls.signaller.widget_closed.connect(trigger.widget_closed)
@@ -40,18 +40,11 @@ class PropertyEditor(WidgetHandler):
 
     @classmethod
     def request_window(cls, bsdd_property: BsddProperty, parent=None):
-        cls.signaller.window_requested.emit(bsdd_property, parent)
+        cls.signaller.widget_requested.emit(bsdd_property, parent)
 
     @classmethod
     def get_widget(cls, bsdd_class_property: BsddClassProperty) -> ui.PropertyEditor:
-        widgets = [
-            widget for widget in cls.get_properties().widgets if widget.data == bsdd_class_property
-        ]
-        if len(widgets) > 1:
-            logging.warning(f"Multiple PropertyWindows")
-        elif not widgets:
-            return None
-        return widgets[0]
+        return super().get_widget(bsdd_class_property)
 
     @classmethod
     def create_edit_widget(
