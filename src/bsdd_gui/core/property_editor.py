@@ -52,12 +52,47 @@ def register_widget(
     property_editor.connect_widget_to_internal_signals(widget)
 
 
-def add_fields_to_widget(widget: ui.PropertyEditor, property_editor: Type[tool.PropertyEditor]):
+def add_fields_to_widget(
+    widget: ui.PropertyEditor,
+    property_editor: Type[tool.PropertyEditor],
+    allowed_values_table: Type[tool.AllowedValuesTable],
+):
     property_editor.register_basic_field(widget, widget.le_code, "Code")
     property_editor.register_basic_field(widget, widget.le_name, "Name")
+    property_editor.register_basic_field(widget, widget.le_measurement, "MethodOfMeasurement")
+    property_editor.register_basic_field(widget, widget.le_example, "Example")
+    property_editor.register_basic_field(widget, widget.le_text_format, "TextFormat")
+    property_editor.register_basic_field(widget, widget.le_uid, "Uid")
+    property_editor.register_basic_field(widget, widget.le_visual_rep, "VisualRepresentationUri")
+
     property_editor.register_basic_field(widget, widget.te_description, "Definition")
     property_editor.register_basic_field(widget, widget.te_description, "Description")
+
     property_editor.register_basic_field(widget, widget.ti_units, "Units")
+    property_editor.register_basic_field(
+        widget, widget.ti_connect_properties, "ConnectedPropertyCodes"
+    )
+    property_editor.register_basic_field(widget, widget.ti_countries, "CountriesOfUse")
+    property_editor.register_basic_field(
+        widget, widget.ti_replacing_objects, "ReplacingObjectCodes"
+    )
+    property_editor.register_basic_field(widget, widget.ti_replaced_objects, "ReplacedObjectCodes")
+    property_editor.register_basic_field(widget, widget.ti_subdivision, "SubdivisionsOfUse")
+
     property_editor.register_basic_field(widget, widget.cb_datatype, "DataType")
     property_editor.register_basic_field(widget, widget.cb_value_kind, "PropertyValueKind")
     property_editor.register_basic_field(widget, widget.cb_status, "Status")
+    property_editor.register_basic_field(widget, widget.cb_country_origin, "CountryOfOrigin")
+    property_editor.register_basic_field(widget, widget.cb_creator_iso, "CreatorLanguageIsoCode")
+    property_editor.register_basic_field(widget, widget.cb_creator_iso, "DocumentReference")
+
+    property_editor.register_basic_field(widget, widget.de_activation_time, "ActivationDateUtc")
+    property_editor.register_basic_field(widget, widget.de_revision_time, "RevisionDateUtc")
+    property_editor.register_basic_field(widget, widget.de_deactivation_time, "DeActivationDateUtc")
+    property_editor.register_basic_field(widget, widget.de_version_date, "VersionDateUtc")
+
+    property_editor.register_basic_field(widget, widget.sb_version_number, "VersionNumber")
+
+    # Allowed Values Table
+    table = allowed_values_table.create_widget(widget.bsdd_property)
+    widget.vl_values.addWidget(table)

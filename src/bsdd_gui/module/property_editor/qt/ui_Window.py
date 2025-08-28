@@ -74,7 +74,7 @@ class Ui_PropertyWindow(object):
     def setupUi(self, PropertyWindow):
         if not PropertyWindow.objectName():
             PropertyWindow.setObjectName("PropertyWindow")
-        PropertyWindow.resize(873, 808)
+        PropertyWindow.resize(614, 694)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QTabWidget(PropertyWindow)
@@ -344,15 +344,15 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(12, QFormLayout.ItemRole.LabelRole, self.lb_replacing_objects)
 
-        self.ti_replacing_objects = ReplacedObjectTagInput(self.tab_advanced)
+        self.ti_replaced_objects = ReplacedObjectTagInput(self.tab_advanced)
+        self.ti_replaced_objects.setObjectName("ti_replaced_objects")
+
+        self.formLayout.setWidget(11, QFormLayout.ItemRole.FieldRole, self.ti_replaced_objects)
+
+        self.ti_replacing_objects = ReplacingObjectTagInput(self.tab_advanced)
         self.ti_replacing_objects.setObjectName("ti_replacing_objects")
 
-        self.formLayout.setWidget(11, QFormLayout.ItemRole.FieldRole, self.ti_replacing_objects)
-
-        self.ti_replacing_objects_2 = ReplacingObjectTagInput(self.tab_advanced)
-        self.ti_replacing_objects_2.setObjectName("ti_replacing_objects_2")
-
-        self.formLayout.setWidget(12, QFormLayout.ItemRole.FieldRole, self.ti_replacing_objects_2)
+        self.formLayout.setWidget(12, QFormLayout.ItemRole.FieldRole, self.ti_replacing_objects)
 
         self.lb_revision_date = QLabel(self.tab_advanced)
         self.lb_revision_date.setObjectName("lb_revision_date")
