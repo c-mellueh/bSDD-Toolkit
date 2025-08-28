@@ -99,7 +99,7 @@ def update_property_specific_fields(
     allowed_value_table.reset_view(allowed_value_table.get_view_from_property_editor(widget))
 
 
-def open_property_info(
+def open_edit_window(
     bsdd_class_property: BsddClassProperty,
     class_property_editor: Type[tool.ClassPropertyEditor],
     main_window: Type[tool.MainWindow],

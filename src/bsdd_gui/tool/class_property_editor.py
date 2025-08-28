@@ -35,7 +35,6 @@ if TYPE_CHECKING:
 
 
 class Signaller(WidgetSignaller):
-    window_created = Signal(ui.ClassPropertyEditor)
     window_closed = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
@@ -56,9 +55,9 @@ class ClassPropertyEditor(WidgetHandler):
     @classmethod
     def connect_signals(cls):
         cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
-        cls.signaller.window_created.connect(trigger.window_created)
+        cls.signaller.widget_created.connect(trigger.window_created)
         cls.signaller.window_closed.connect(trigger.window_closed)
-        cls.signaller.window_created.connect(
+        cls.signaller.widget_created.connect(
             lambda w: cls.sync_from_model(w, w.bsdd_class_property)
         )
         cls.signaller.property_reference_changed.connect(
@@ -105,14 +104,14 @@ class ClassPropertyEditor(WidgetHandler):
             completer = cls.create_property_code_completer(bsdd_dictionary)
             window.le_property_reference.setCompleter(completer)
         for plugin in prop.plugin_widget_list:
-            layout: QLayout = getattr(cls.get_window(), plugin.layout_name)
+            layout: QLayout = getattr(window, plugin.layout_name)
             layout.insertWidget(plugin.index, plugin.widget())
             setattr(prop, plugin.key, plugin.value_getter)
 
         title = cls.create_window_title(bsdd_class_property)
         cls.get_window(bsdd_class_property).setWindowTitle(title)  # TODO: Update Name Getter
 
-        cls.signaller.window_created.emit(window)
+        cls.signaller.widget_created.emit(window)
         return window
 
     @classmethod

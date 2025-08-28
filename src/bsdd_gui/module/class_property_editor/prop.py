@@ -20,8 +20,9 @@ class PluginProperty:
 
 
 class ClassPropertyEditorProperties(WidgetHandlerProperties):
-    plugin_widget_list: list[PluginProperty] = list()
-    windows: list[ui.ClassPropertyEditor] = list()
-    dialog: ui.ClassPropertyCreator = None
-    context_menu_builders = list()
-    splitter_settings: ui.SplitterSettings = None
+
+    def __init__(self):
+        super().__init__()
+        self.plugin_widget_list: list[PluginProperty] = list()
+        self.dialog: ui.ClassPropertyCreator = None
+        self.splitter_settings: ui.SplitterSettings = None
