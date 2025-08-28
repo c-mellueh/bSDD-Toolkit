@@ -14,7 +14,6 @@ from bsdd_gui.resources.icons import get_icon, get_link_icon
 from bsdd_parser import BsddClassProperty
 from . import trigger
 from bsdd_gui import tool
-from .qt.ui_Window import Ui_PropertyWindow
 
 
 class UnitTagInput(TagInput):

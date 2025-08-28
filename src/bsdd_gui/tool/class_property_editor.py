@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import logging
 
 import bsdd_gui
-from bsdd_parser import BsddClassProperty, BsddDictionary
+from bsdd_parser import BsddClassProperty, BsddDictionary, BsddProperty
 from bsdd_gui.module.class_property_editor import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
@@ -38,11 +38,12 @@ class Signaller(WidgetSignaller):
     window_closed = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
-    create_bsdd_property_requested = Signal(ui.ClassPropertyEditor)
-    view_property_requested = Signal(ui.ClassPropertyEditor)
-    new_value_requested = Signal(object)
     new_class_property_created = Signal(BsddClassProperty)
+
+    new_value_requested = Signal(object)
     create_new_class_property_requested = Signal()
+    property_widget_requested = Signal(BsddProperty)
+    create_property_requested = Signal(ui.ClassPropertyEditor)
 
 
 class ClassPropertyEditor(WidgetHandler):
@@ -230,15 +231,14 @@ class ClassPropertyEditor(WidgetHandler):
             line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "View"))
         elif is_valid:
             line_edit.show_button(True)
-            line_edit.set_button_mode(BUTTON_MODE_VIEW)
-            line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "View"))
-
+            line_edit.set_button_mode(BUTTON_MODE_EDIT)
+            line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "Edit"))
         elif not bsdd_dictionary:
             line_edit.show_button(False)
         elif value in cp_utils.get_all_property_codes(bsdd_dictionary):
             line_edit.show_button(True)
-            line_edit.set_button_mode(BUTTON_MODE_VIEW)
-            line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "View"))
+            line_edit.set_button_mode(BUTTON_MODE_EDIT)
+            line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "Edit"))
         else:
             line_edit.show_button(True)
             line_edit.set_button_mode(BUTTON_MODE_NEW)
@@ -248,9 +248,12 @@ class ClassPropertyEditor(WidgetHandler):
     def handle_pr_button_press(cls, widget: ui.ClassPropertyEditor):
         line_edit = widget.le_property_reference
         if line_edit.button_mode == BUTTON_MODE_VIEW:
-            cls.signaller.view_property_requested.emit(widget)
+            pass  # TODO Open Website
+        elif line_edit.button_mode == BUTTON_MODE_EDIT:
+            bsdd_property = cp_utils.get_internal_property(widget.bsdd_class_property)
+            cls.signaller.property_widget_requested.emit(bsdd_property)
         elif line_edit.button_mode == BUTTON_MODE_NEW:
-            cls.signaller.create_bsdd_property_requested.emit(widget)
+            cls.signaller.create_property_requested.emit(widget.bsdd_class_property)
 
     @classmethod
     def update_allowed_units(cls, widget: ui.ClassPropertyEditor):

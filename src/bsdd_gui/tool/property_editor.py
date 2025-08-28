@@ -5,7 +5,7 @@ import logging
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignaller
 from bsdd_parser import BsddClassProperty, BsddDictionary, BsddProperty
-from bsdd_gui.module.class_property_editor import ui
+from bsdd_gui.module.property_editor import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.property_editor import trigger
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class Signaller(WidgetSignaller):
-    window_requested = Signal(BsddProperty)
+    window_requested = Signal(BsddProperty, QWidget)  # entity parent
 
 
 class PropertyEditor(WidgetHandler):
@@ -26,12 +26,12 @@ class PropertyEditor(WidgetHandler):
         return bsdd_gui.PropertyEditorProperties
 
     @classmethod
-    def connect_signals(cls):
+    def connect_request_signals(cls):
         cls.signaller.window_requested.connect(trigger.create_window)
 
     @classmethod
-    def request_window(cls, bsdd_property: BsddProperty):
-        cls.signaller.window_requested.emit(bsdd_property)
+    def request_window(cls, bsdd_property: BsddProperty, parent=None):
+        cls.signaller.window_requested.emit(bsdd_property, parent)
 
     @classmethod
     def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
@@ -54,7 +54,7 @@ class PropertyEditor(WidgetHandler):
         mode="edit",
     ) -> ui.ClassPropertyEditor:
         prop = cls.get_properties()
-        window = ui.ClassPropertyEditor(bsdd_property, parent, mode=mode)
+        window = ui.PropertyEditor(bsdd_property, parent, mode=mode)
         window.setWindowFlag(Qt.Tool)
         prop.widgets.add(window)
 
@@ -69,14 +69,6 @@ class PropertyEditor(WidgetHandler):
         return window
 
     @classmethod
-    def create_window_title(cls, bsdd_class_property: BsddClassProperty):
-        SEPERATOR = " : "
-        text = bsdd_class_property.Code
-        pset = bsdd_class_property.PropertySet
-        if not pset:
-            return text
-        text = pset + SEPERATOR + text
-        bsdd_class = bsdd_class_property.parent()
-        if not bsdd_class:
-            return text
-        return bsdd_class.Name + SEPERATOR + text
+    def create_window_title(cls, bsdd_property: BsddProperty):
+        text = f"bSDD Property '{bsdd_property.Code}' v{bsdd_property.VersionNumber or 1}"
+        return text

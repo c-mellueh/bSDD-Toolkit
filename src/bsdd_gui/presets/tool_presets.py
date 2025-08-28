@@ -101,6 +101,7 @@ class WidgetSignaller(QObject):
     field_changed = Signal(
         QWidget, QWidget
     )  # Widget in which the field is embedded and Fieldwidget itself
+    widget_requested = Signal(object)
     widget_created = Signal(QWidget)
 
 

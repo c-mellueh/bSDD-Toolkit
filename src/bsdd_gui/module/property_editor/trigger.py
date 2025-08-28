@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QWidget
 
 
 def connect():
-    pass
+    core.connect_signals(tool.PropertyEditor, tool.ClassPropertyEditor)
 
 
 def retranslate_ui():

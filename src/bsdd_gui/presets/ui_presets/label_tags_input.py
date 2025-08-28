@@ -241,10 +241,9 @@ class TagInput(QWidget):
             self._completer = QCompleter(sorted(allowed), self)
             self._completer.setCaseSensitivity(Qt.CaseInsensitive)
             self._edit.setCompleter(self._completer)
-
-        self._completer.activated[str].connect(
-            lambda text: QTimer.singleShot(0, lambda: self._complete_and_commit(text))
-        )
+            self._completer.activated[str].connect(
+                lambda text: QTimer.singleShot(0, lambda: self._complete_and_commit(text))
+            )
         # make line edit part of flow
         self._proxy = QWidget()
         pl = QHBoxLayout(self._proxy)

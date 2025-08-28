@@ -34,16 +34,12 @@ class PropertyCreator(QDialog):
 class PropertyEditor(QWidget, Ui_PropertyWindow):
     closed = Signal()
 
-    def __init__(self, bsdd_class_property: BsddClassProperty, *args, mode="edit", **kwargs):
+    def __init__(self, bsdd_property: BsddClassProperty, *args, mode="edit", **kwargs):
         super().__init__(*args, **kwargs)
         self.setWindowIcon(get_icon())
         self.setupUi(self)
         self.mode = mode  # edit or new
-        self.bsdd_class_property = bsdd_class_property
-
-    def enterEvent(self, event):
-        trigger.update_window(self)
-        return super().enterEvent(event)
+        self.bsdd_property = bsdd_property
 
     def closeEvent(self, event):
         self.closed.emit()

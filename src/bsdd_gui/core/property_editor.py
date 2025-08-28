@@ -20,12 +20,24 @@ def open_edit_window(
         if window.isHidden():
             window.close()
             window = property_editor.create_edit_widget(
-                bsdd_property, parent_widget, bsdd_dictionary=project.get()
+                bsdd_property,
+                parent_widget,
             )
     else:
         window = property_editor.create_edit_widget(
-            bsdd_property, parent_widget, bsdd_dictionary=project.get()
+            bsdd_property,
+            parent_widget,
         )
     window.show()
     window.activateWindow()
     window.showNormal()
+
+
+def connect_signals(
+    property_editor: Type[tool.PropertyEditor],
+    class_property_editor: Type[tool.ClassPropertyEditor],
+):
+    property_editor.connect_request_signals()
+    class_property_editor.signaller.property_widget_requested.connect(
+        property_editor.request_window
+    )
