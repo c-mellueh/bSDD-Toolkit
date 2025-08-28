@@ -26,7 +26,6 @@ class DateTimeWithNow(QWidget):
         self.layout().setContentsMargins(QMargins(0, 0, 0, 0))
         self.active_toggle.toggled.connect(self.enable_datetime_picker)
         self.active_toggle.setChecked(is_enabled)
-        self.active_toggle.setMaximumWidth(50)
         self.now_btn.setMaximumWidth(50)
 
     def enable_datetime_picker(self, state: bool):

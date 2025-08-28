@@ -12,10 +12,19 @@ if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor import ui
 
 
-def connect_widget(widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditor]):
+def register_widget(widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditor]):
     dictionary_editor.register_widget(widget)
-    dictionary_editor.fill_dictionary_widget(widget)
-    dictionary_editor.color_required_fields(widget)
+    dictionary_editor.connect_widget_to_internal_signals(widget)
+
+    # dictionary_editor.fill_dictionary_widget(widget)
+    # dictionary_editor.color_required_fields(widget)
+
+
+def unregister_widget(
+    widget: ui.DictionaryEditor,
+    dictionary_editor: Type[tool.DictionaryEditor],
+):
+    dictionary_editor.unregister_widget(widget)
 
 
 def create_main_menu_actions(
@@ -66,11 +75,11 @@ def open_widget(
             bsdd_dictionary,
             parent_widget,
         )
+    print("HIER")
     window.show()
     window.activateWindow()
     window.showNormal()
     retranslate_ui(dictionary_editor, main_window, util)
-    dictionary_editor.create_widget(bsdd_dictionary)
 
 
 def connect_signals(
@@ -96,3 +105,14 @@ def remove_widget(
     else:
         dictionary_editor.unregister_widget(widget)
         event.accept()
+
+
+def add_fields_to_widget(
+    widget: ui.DictionaryEditor,
+    dictionary_editor: Type[tool.DictionaryEditor],
+):
+    pass
+    # dictionary_editor.register_basic_field(widget, widget.le_code, "Code")
+    # dictionary_editor.register_basic_field(widget, widget.le_name, "Name")
+    # dictionary_editor.register_basic_field(widget, widget.le_measurement, "MethodOfMeasurement")
+    # dictionary_editor.register_basic_field(widget, widget.le_example, "Example")

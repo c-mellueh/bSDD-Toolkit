@@ -35,6 +35,7 @@ class ToggleSwitch(QAbstractButton):
 
         # Sync Animation bei Programm-Änderungen
         self.toggled.connect(self._sync_anim_with_state)
+        self.setMaximumWidth(50)
 
     # ----- API -----
     def setAnimationDuration(self, ms: int) -> None:

@@ -37,6 +37,14 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
     @classmethod
     def connect_internal_signals(cls):
         cls.signaller.widget_requested.connect(trigger.create_widget)
+        cls.signaller.widget_created.connect(trigger.widget_created)
+        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.data))
+        cls.signaller.widget_closed.connect(trigger.widget_closed)
+        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.data, f))
+
+    @classmethod
+    def connect_widget_to_internal_signals(cls, widget: ui.DictionaryEditor):
+        widget.closed.connect(lambda w=widget: cls.signaller.widget_closed.emit(w))
 
     @classmethod
     def requeste_widget(cls, bsdd_dictionary: BsddDictionary, parent=None):
@@ -232,6 +240,7 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
 
     @classmethod
     def get_missing_inputs(cls, widget: ui.DictionaryEditor):
+        return  # TODO
         missing_inputs = list()
         for name, field in BsddDictionary.model_fields.items():
             if name in ["Classes", "Properties"]:

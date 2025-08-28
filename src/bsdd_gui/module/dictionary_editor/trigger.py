@@ -23,14 +23,18 @@ def on_new_project():
     pass
 
 
-def widget_created(widget: ui.DictionaryEditor):
-    core.connect_widget(widget, tool.DictionaryEditor)
-    pass
-
-
 def widget_close_requested(widget: ui.DictionaryEditor, event: QCloseEvent):
     core.remove_widget(widget, event, tool.DictionaryEditor, tool.Popups)
 
 
+def widget_closed(widget: ui.DictionaryEditor):
+    core.unregister_widget(widget, tool.DictionaryEditor)
+
+
 def create_widget(widget: ui.DictionaryEditor, parent: QWidget | None):
     core.open_widget(widget, parent, tool.DictionaryEditor, tool.MainWindow, tool.Util)
+
+
+def widget_created(widget: ui.DictionaryEditor):
+    core.register_widget(widget, tool.DictionaryEditor)
+    core.add_fields_to_widget(widget, tool.DictionaryEditor)

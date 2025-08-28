@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DictionaryForm</class>
+ <widget class="QWidget" name="DictionaryForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>504</width>
+    <height>533</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dictionary Form</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="lbOrganizationCode">
+     <property name="text">
+      <string>OrganizationCode *</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="le_org_code">
+     <property name="toolTip">
+      <string>The organisation's code received when registering in bSDD. Preferably short; cannot start with a digit.</string>
+     </property>
+     <property name="placeholderText">
+      <string>e.g. ifc</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="lbDictionaryCode">
+     <property name="text">
+      <string>DictionaryCode *</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="le_dictionary_code">
+     <property name="toolTip">
+      <string>Code of the dictionary, preferably short.</string>
+     </property>
+     <property name="placeholderText">
+      <string>e.g. ifc</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="lbDictionaryName">
+     <property name="text">
+      <string>DictionaryName *</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="le_dictionary_name">
+     <property name="toolTip">
+      <string>Name of the dictionary. If the dictionary exists, supplying this name is not necessary.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="lbDictionaryVersion">
+     <property name="text">
+      <string>DictionaryVersion *</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="le_dictionary_version">
+     <property name="toolTip">
+      <string>Version format: up to three dot-separated numbers. Examples: 12, 10.1, 1.2.3.</string>
+     </property>
+     <property name="placeholderText">
+      <string>e.g. 1.0.1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="lbLanguageIsoCode">
+     <property name="text">
+      <string>LanguageIsoCode *</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="lbLanguageOnly">
+     <property name="text">
+      <string>LanguageOnly *</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="ToggleSwitch" name="cb_language_only">
+     <property name="toolTip">
+      <string>True if JSON contains only language-specific info.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="lbUseOwnUri">
+     <property name="text">
+      <string>UseOwnUri *</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="ToggleSwitch" name="cb_use_own_uri">
+     <property name="toolTip">
+      <string>Use your own URIs for globally unique identification. Default: false.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="lbDictionaryUri">
+     <property name="text">
+      <string>DictionaryUri *</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="le_dictionary_ui">
+     <property name="toolTip">
+      <string>Required if UseOwnUri = true. First part of all Class/Property URIs.</string>
+     </property>
+     <property name="placeholderText">
+      <string>urn:mycompany:mydictionary or https://mycompany.com/mydictionary</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="lbLicense">
+     <property name="text">
+      <string>License</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLineEdit" name="le_license">
+     <property name="toolTip">
+      <string>SPDX or well-known license identifier.</string>
+     </property>
+     <property name="placeholderText">
+      <string>e.g. MIT, CC-BY-4.0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="lbLicenseUrl">
+     <property name="text">
+      <string>LicenseUrl</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QLineEdit" name="le_license_url">
+     <property name="placeholderText">
+      <string>https://...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="lbChangeRequestEmailAddress">
+     <property name="text">
+      <string>ChangeRequestEmailAddress</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QLineEdit" name="le_change_request_mail">
+     <property name="placeholderText">
+      <string>name@example.com</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="lbModelVersion">
+     <property name="text">
+      <string>ModelVersion</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="lbMoreInfoUrl">
+     <property name="text">
+      <string>MoreInfoUrl</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QLineEdit" name="le_more_info">
+     <property name="placeholderText">
+      <string>https://...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <widget class="QLabel" name="lbQualityAssuranceProcedure">
+     <property name="text">
+      <string>QualityAssuranceProcedure</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="1">
+    <widget class="QLineEdit" name="le_qa_procedure">
+     <property name="placeholderText">
+      <string>e.g. bSI process, ETIM international</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0">
+    <widget class="QLabel" name="lbQualityAssuranceProcedureUrl">
+     <property name="text">
+      <string>QualityAssuranceProcedureUrl</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="1">
+    <widget class="QLineEdit" name="le_qa_procedure_url">
+     <property name="placeholderText">
+      <string>https://...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="0">
+    <widget class="QLabel" name="lbReleaseDate">
+     <property name="text">
+      <string>ReleaseDate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="0">
+    <widget class="QLabel" name="lbStatus">
+     <property name="text">
+      <string>Status</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="1">
+    <widget class="DateTimeWithNow" name="widget" native="true"/>
+   </item>
+   <item row="4" column="1">
+    <widget class="QComboBox" name="cb_language_iso"/>
+   </item>
+   <item row="11" column="1">
+    <widget class="QComboBox" name="cb_model_version">
+     <item>
+      <property name="text">
+       <string>1.0</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2.0</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="16" column="1">
+    <widget class="QComboBox" name="cb_status">
+     <item>
+      <property name="text">
+       <string>Preview</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Active</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Inactive</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ToggleSwitch</class>
+   <extends>QAbstractButton</extends>
+   <header>bsdd_gui.presets.ui_presets.toggle_switch</header>
+  </customwidget>
+  <customwidget>
+   <class>DateTimeWithNow</class>
+   <extends>QWidget</extends>
+   <header>bsdd_gui.presets.ui_presets.datetime_now</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
