@@ -13,7 +13,7 @@ class ContextMenuDict(TypedDict):
     action: QAction  # actual QAction object
 
 
-class ColumnHandlerProperties:
+class ItemModelHandlerProperties:
     def __init__(self):
         super().__init__()
         self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
@@ -26,10 +26,9 @@ class ModuleHandlerProperties:
         self.actions = dict()
 
 
-class WidgetHandlerProperties:
+class FieldHandlerProperties:
     def __init__(self):
         super().__init__()
-        self.widgets = set()
         self.field_getter: dict[QWidget, dict[QWidget, callable]] = (
             dict()
         )  # getter function for widgets of Window
@@ -37,6 +36,12 @@ class WidgetHandlerProperties:
             dict()
         )  # getter function for widgets of Window
         self.validator_functions: dict[QWidget, dict[QWidget, tuple[callable, callable]]] = dict()
+
+
+class WidgetHandlerProperties(FieldHandlerProperties):
+    def __init__(self):
+        super().__init__()
+        self.widgets = set()
 
 
 class ViewHandlerProperties(WidgetHandlerProperties):
@@ -47,6 +52,6 @@ class ViewHandlerProperties(WidgetHandlerProperties):
 
 class ClassTreeProperties(
     ViewHandlerProperties,
-    ColumnHandlerProperties,
+    ItemModelHandlerProperties,
 ):
     pass

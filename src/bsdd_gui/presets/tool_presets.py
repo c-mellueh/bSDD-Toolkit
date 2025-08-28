@@ -19,17 +19,18 @@ import logging
 
 if TYPE_CHECKING:
     from .prop_presets import (
-        ColumnHandlerProperties,
+        ItemModelHandlerProperties,
         ViewHandlerProperties,
         WidgetHandlerProperties,
+        FieldHandlerProperties,
         ContextMenuDict,
     )
 
 
-class ColumnHandler(ABC):
+class ItemModelHandler(ABC):
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> ColumnHandlerProperties:
+    def get_properties(cls) -> ItemModelHandlerProperties:
         return None
 
     @classmethod
@@ -97,43 +98,17 @@ class ModuleHandler(ABC):
         return cls.get_properties().actions[widget][name]
 
 
-class WidgetSignaller(QObject):
+class FieldSignaller(QObject):
     field_changed = Signal(
         QWidget, QWidget
     )  # Widget in which the field is embedded and Fieldwidget itself
-    widget_requested = Signal(object)
-    widget_created = Signal(QWidget)
-    widget_closed = Signal(QWidget)
 
 
-class WidgetHandler(ABC):
-    signaller = WidgetSignaller()
-
+class FieldHandler(ABC):
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> WidgetHandlerProperties:
+    def get_properties(cls) -> FieldHandlerProperties:
         return None
-
-    @classmethod
-    def register_widget(cls, view: QAbstractItemView):
-        logging.info(f"Register {view}")
-
-        cls.get_properties().widgets.add(view)
-        cls.get_properties().field_getter[view] = dict()
-        cls.get_properties().field_setter[view] = dict()
-
-    @classmethod
-    def unregister_widget(cls, view: QWidget):
-        logging.info(f"Unregister {view}")
-        if not view in cls.get_properties().widgets:
-            return
-        cls.get_properties().widgets.remove(view)
-        cls.get_properties().field_getter.pop(view)
-        cls.get_properties().field_setter.pop(view)
-
-    @classmethod
-    def get_widgets(cls):
-        return cls.get_properties().widgets
 
     @classmethod
     def register_basic_field(cls, widget: QWidget, field: QWidget, variable_name: str):
@@ -239,7 +214,7 @@ class WidgetHandler(ABC):
             f.tagsChanged.connect(func)
             func
         if isinstance(f, DateTimeWithNow):
-            func = lambda: rf(f, vf(f.dt_edit.dateTime().toPython(), w))
+            func = lambda: rf(f, vf(f.get_time(), w))
             f.dt_edit.dateTimeChanged.connect(func)
             func()
 
@@ -261,11 +236,7 @@ class WidgetHandler(ABC):
             if isinstance(field, TagInput):
                 field.setTags(value or [])
             if isinstance(field, DateTimeWithNow):
-                if value is None:
-                    return
-                field.dt_edit.setDateTime(
-                    QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC)
-                )
+                field.set_time(value)
 
     @classmethod
     def sync_to_model(cls, widget: QWidget, element, explicit_field: QWidget = None):
@@ -284,7 +255,7 @@ class WidgetHandler(ABC):
             if isinstance(field, TagInput):
                 setter_func(element, field.tags())
             if isinstance(field, DateTimeWithNow):
-                setter_func(element, field.dt_edit.dateTime().toPython())
+                setter_func(element, field.get_time())
 
     @classmethod
     def all_inputs_are_valid(cls, widget: QWidget):
@@ -300,9 +271,47 @@ class WidgetHandler(ABC):
                 is_valid = validator_function(f.toPlainText(), widget)
             elif isinstance(f, TagInput):
                 is_valid = validator_function(f.tags(), widget)
+            if isinstance(f, DateTimeWithNow):
+                is_valid = validator_function(f.get_time(), widget)
             if not is_valid:
                 return False
         return True
+
+
+class WidgetSignaller(FieldSignaller):
+    widget_requested = Signal(object)
+    widget_created = Signal(QWidget)
+    widget_closed = Signal(QWidget)
+
+
+class WidgetHandler(FieldHandler):
+    signaller = WidgetSignaller()
+
+    @classmethod
+    @abstractmethod
+    def get_properties(cls) -> WidgetHandlerProperties:
+        return None
+
+    @classmethod
+    def register_widget(cls, view: QAbstractItemView):
+        logging.info(f"Register {view}")
+
+        cls.get_properties().widgets.add(view)
+        cls.get_properties().field_getter[view] = dict()
+        cls.get_properties().field_setter[view] = dict()
+
+    @classmethod
+    def unregister_widget(cls, view: QWidget):
+        logging.info(f"Unregister {view}")
+        if not view in cls.get_properties().widgets:
+            return
+        cls.get_properties().widgets.remove(view)
+        cls.get_properties().field_getter.pop(view)
+        cls.get_properties().field_setter.pop(view)
+
+    @classmethod
+    def get_widgets(cls):
+        return cls.get_properties().widgets
 
 
 class ViewSignaller(QObject):

@@ -15,7 +15,7 @@ from bsdd_parser.models import BsddDictionary, BsddClass, BsddProperty
 from bsdd_parser.utils import bsdd_class as cl_utils
 from bsdd_parser.utils import bsdd_class_property as cl_prop_utils
 from bsdd_gui import tool
-from bsdd_gui.presets.models_presets import TableModel
+from bsdd_gui.presets.models_presets import ItemModel
 from PySide6.QtTest import QAbstractItemModelTester
 import json
 
@@ -23,7 +23,7 @@ JSON_MIME = "application/bsdd-class+json;v=1"
 CODES_MIME = "application/x-bsdd-classcode"  # for fast internal moves
 
 
-class ClassTreeModel(TableModel):
+class ClassTreeModel(ItemModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(tool.ClassTree, *args, **kwargs)

@@ -11,10 +11,10 @@ from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_gui import tool
-from bsdd_gui.presets.models_presets import TableModel
+from bsdd_gui.presets.models_presets import ItemModel
 
 
-class PsetTableModel(TableModel):
+class PsetTableModel(ItemModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
         super().__init__(tool.PropertySetTable, *args, **kwargs)

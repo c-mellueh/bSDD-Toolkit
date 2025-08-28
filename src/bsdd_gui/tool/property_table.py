@@ -9,7 +9,7 @@ from bsdd_parser.models import BsddClassProperty, BsddClass
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 from bsdd_gui.module.property_table import ui, models
-from bsdd_gui.presets.tool_presets import ColumnHandler, ViewHandler, ViewSignaller
+from bsdd_gui.presets.tool_presets import ItemModelHandler, ViewHandler, ViewSignaller
 
 if TYPE_CHECKING:
     from bsdd_gui.module.property_table.prop import PropertyTableProperties
@@ -20,7 +20,7 @@ class Signaller(ViewSignaller):
     reset_all_property_tables_requested = Signal()
 
 
-class PropertyTable(ColumnHandler, ViewHandler):
+class PropertyTable(ItemModelHandler, ViewHandler):
     signaller = Signaller()
 
     @classmethod

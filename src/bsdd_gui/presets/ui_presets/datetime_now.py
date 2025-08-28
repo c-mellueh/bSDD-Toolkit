@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QDateTimeEdit, 
 from PySide6.QtCore import Signal, QDateTime, Qt, QMargins
 from typing import Any
 from .toggle_switch import ToggleSwitch
+from datetime import datetime
 
 
 class DateTimeWithNow(QWidget):
@@ -34,3 +35,21 @@ class DateTimeWithNow(QWidget):
 
     def set_now(self):
         self.dt_edit.setDateTime(QDateTime.currentDateTime())
+
+    def is_active(self):
+        return self.active_toggle.isChecked()
+
+    def set_active(self, state: bool):
+        self.active_toggle.setChecked(state)
+
+    def get_time(self):
+        if self.is_active():
+            return self.dt_edit.dateTime().toPython()
+        return None
+
+    def set_time(self, value: datetime | None):
+        if value is None:
+            self.set_active(False)
+        else:
+            self.set_active(True)
+            self.dt_edit.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))
