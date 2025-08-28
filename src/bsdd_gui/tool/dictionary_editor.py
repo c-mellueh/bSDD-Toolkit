@@ -35,8 +35,21 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
         return bsdd_gui.DictionaryEditorProperties
 
     @classmethod
-    def create_widget(cls) -> ui.DictionaryEditor:
-        return ui.DictionaryEditor()
+    def create_widget(cls, bsdd_dictionary: BsddDictionary) -> ui.DictionaryEditor:
+        prop = cls.get_properties()
+        widget = ui.DictionaryEditor(bsdd_dictionary)
+        prop.widgets.add(widget)
+
+    @classmethod
+    def get_widget(cls, bsdd_dictionary: BsddDictionary) -> ui.DictionaryEditor:
+        widgets = [
+            widget for widget in cls.get_properties().widgets if widget.data == bsdd_dictionary
+        ]
+        if len(widgets) > 1:
+            logging.warning(f"Multiple PropertyWindows")
+        elif not widgets:
+            return None
+        return widgets[0]
 
     @classmethod
     def unwrap_type(cls, tp):

@@ -50,7 +50,7 @@ class AllowedValuesTable(ItemModelHandler, ViewHandler):
     @classmethod
     def get_model(cls, prop: BsddClassProperty | BsddProperty) -> models.AllowedValuesModel:
         for model in cls.get_properties().model:
-            if model.bsdd_property == prop:
+            if model.bsdd_data == prop:
                 return model
         return None
 
@@ -103,7 +103,7 @@ class AllowedValuesTable(ItemModelHandler, ViewHandler):
     @classmethod
     def append_new_value(cls, widget: ui.AllowedValuesTable):
         model = widget.model().sourceModel()
-        bsdd_property = model.bsdd_property
+        bsdd_property = model.bsdd_data
         new_name = QCoreApplication.translate("AllowedValuesTable", "New Value")
         new_name = tool.Util.get_unique_name(
             new_name, [v.Code for v in bsdd_property.AllowedValues]
@@ -116,7 +116,7 @@ class AllowedValuesTable(ItemModelHandler, ViewHandler):
     def get_view_from_property_editor(cls, widget: ClassPropertyEditor):
         widgets = list()
         for table_widget in cls.get_widgets():
-            if widget.bsdd_class_property == table_widget.bsdd_property:
+            if widget.data == table_widget.data:
                 widgets.append(table_widget)
         if len(widgets) > 1:
             logging.warning("Multiple Widgets!")
@@ -131,7 +131,7 @@ class AllowedValuesTable(ItemModelHandler, ViewHandler):
 
     @classmethod
     def delete_selection(cls, widget: ui.AllowedValuesTable):
-        bsdd_property = widget.bsdd_property
+        bsdd_property = widget.data
         for allowed_value in cls.get_selected(widget):
             if allowed_value in bsdd_property.AllowedValues:
                 bsdd_property.AllowedValues.remove(allowed_value)

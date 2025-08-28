@@ -4,15 +4,15 @@ from typing import Any
 from . import trigger
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow as DTN
+from bsdd_parser import BsddDictionary
 
 
 class DictionaryEditor(QWidget):
     value_changed = Signal(str, Any)
 
-    def __init__(self, *args, **kwargs):
-
-        self.fields = dict()
+    def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.data = bsdd_dictionary
         self.setLayout(QFormLayout())
         trigger.widget_created(self)
 

@@ -62,9 +62,7 @@ class ClassPropertyEditor(WidgetHandler):
         cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
         cls.signaller.widget_created.connect(trigger.widget_created)
         cls.signaller.widget_closed.connect(trigger.window_closed)
-        cls.signaller.widget_created.connect(
-            lambda w: cls.sync_from_model(w, w.bsdd_class_property)
-        )
+        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.data))
         cls.signaller.property_reference_changed.connect(
             lambda cp: cls.request_property_specific_redraw(cls.get_window(cp))
         )
@@ -72,9 +70,7 @@ class ClassPropertyEditor(WidgetHandler):
             trigger.create_class_property_creator
         )
         # Autoupdate Values
-        cls.signaller.field_changed.connect(
-            lambda w, f: cls.sync_to_model(w, w.bsdd_class_property, f)
-        )
+        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.data, f))
         cls.signaller.property_specific_redraw_requested.connect(
             trigger.update_property_specific_fields
         )
@@ -147,9 +143,7 @@ class ClassPropertyEditor(WidgetHandler):
     @classmethod
     def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
         windows = [
-            widget
-            for widget in cls.get_properties().widgets
-            if widget.bsdd_class_property == bsdd_class_property
+            widget for widget in cls.get_properties().widgets if widget.data == bsdd_class_property
         ]
         if len(windows) > 1:
             logging.warning(f"Multiple PropertyWindows")
@@ -241,7 +235,7 @@ class ClassPropertyEditor(WidgetHandler):
         cls, widget: ui.ClassPropertyEditor, field: LineEditWithButton, is_valid: bool
     ):
         value = field.text()
-        bsdd_class_property = widget.bsdd_class_property
+        bsdd_class_property = widget.data
         bsdd_class = bsdd_class_property.parent()
         bsdd_dictionary = bsdd_class.parent() if bsdd_class else None
         line_edit = widget.le_property_reference
@@ -272,14 +266,14 @@ class ClassPropertyEditor(WidgetHandler):
         if line_edit.button_mode == BUTTON_MODE_VIEW:
             pass  # TODO Open Website
         elif line_edit.button_mode == BUTTON_MODE_EDIT:
-            bsdd_property = cp_utils.get_internal_property(widget.bsdd_class_property)
+            bsdd_property = cp_utils.get_internal_property(widget.data)
             cls.signaller.property_widget_requested.emit(bsdd_property)
         elif line_edit.button_mode == BUTTON_MODE_NEW:
-            cls.signaller.create_property_requested.emit(widget.bsdd_class_property)
+            cls.signaller.create_property_requested.emit(widget.data)
 
     @classmethod
     def update_allowed_units(cls, widget: ui.ClassPropertyEditor):
-        bsdd_class_property = widget.bsdd_class_property
+        bsdd_class_property = widget.data
         allowed_units = cp_utils.get_units(bsdd_class_property)
         current_unit = widget.cb_unit.currentText()
         index = allowed_units.index(current_unit) if current_unit in allowed_units else 0
@@ -290,7 +284,7 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def update_description_placeholder(cls, widget: ui.ClassPropertyEditor):
-        bsdd_class_property = widget.bsdd_class_property
+        bsdd_class_property = widget.data
         if cp_utils.is_external_ref(bsdd_class_property):
             class_property = cp_utils.get_external_property(bsdd_class_property)
         else:
@@ -307,7 +301,7 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def update_value_view(cls, widget: ui.ClassPropertyEditor):
-        bsdd_class_property = widget.bsdd_class_property
+        bsdd_class_property = widget.data
         if cp_utils.is_external_ref(bsdd_class_property):
             bsdd_property = cp_utils.get_external_property(bsdd_class_property)
         else:

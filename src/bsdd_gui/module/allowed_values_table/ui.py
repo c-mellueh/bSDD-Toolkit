@@ -15,7 +15,7 @@ class AllowedValuesTable(QTableView):
 
     def __init__(self, bsdd_property: BsddClassProperty | BsddProperty, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.bsdd_property = bsdd_property
+        self.data = bsdd_property
         self.horizontalHeader().setStretchLastSection(True)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         trigger.table_view_created(self)

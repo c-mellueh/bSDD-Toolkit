@@ -32,7 +32,7 @@ def connect_signals(
 
 
 def setup_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
-    prop: BsddClassProperty | BsddProperty = view.bsdd_property
+    prop: BsddClassProperty | BsddProperty = view.data
 
     allowed_values_table.register_widget(view)
     sort_model = allowed_values_table.create_model(prop)
@@ -86,6 +86,6 @@ def reset_views(allowed_values_table: Type[tool.AllowedValuesTable], project: Ty
 
 
 def remove_table(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
-    model = allowed_values_table.get_model(view.bsdd_property)
+    model = allowed_values_table.get_model(view.data)
     if model:
         allowed_values_table.remove_model(model)

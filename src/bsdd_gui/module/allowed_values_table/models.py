@@ -18,7 +18,7 @@ class AllowedValuesModel(ItemModel):
 
     def __init__(self, bsdd_property: BsddClassProperty | BsddProperty, *args, **kwargs):
         super().__init__(tool.AllowedValuesTable, *args, **kwargs)
-        self.bsdd_property = bsdd_property
+        self.bsdd_data = bsdd_property
 
     @property
     def bsdd_dictionary(self):
@@ -37,11 +37,11 @@ class AllowedValuesModel(ItemModel):
         return res
 
     def rowCount(self, parent=QModelIndex()):
-        if not self.bsdd_property:
+        if not self.bsdd_data:
             return 0
         if parent.isValid():
             return 0
-        return len(self.bsdd_property.AllowedValues)
+        return len(self.bsdd_data.AllowedValues)
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if parent.isValid():
@@ -49,7 +49,7 @@ class AllowedValuesModel(ItemModel):
 
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
-        allowed_value = self.bsdd_property.AllowedValues[row]
+        allowed_value = self.bsdd_data.AllowedValues[row]
         index = self.createIndex(row, column, allowed_value)
         return index
 

@@ -29,10 +29,10 @@ class PropertyEditor(WidgetHandler):
     def connect_internal_signals(cls):
         cls.signaller.window_requested.connect(trigger.create_window)
         cls.signaller.widget_created.connect(trigger.widget_created)
-        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_property))
+        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.data))
         cls.signaller.widget_closed.connect(trigger.widget_closed)
         # Autoupdate Values
-        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_property, f))
+        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.data, f))
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.PropertyEditor):
@@ -43,17 +43,15 @@ class PropertyEditor(WidgetHandler):
         cls.signaller.window_requested.emit(bsdd_property, parent)
 
     @classmethod
-    def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
-        windows = [
-            widget
-            for widget in cls.get_properties().widgets
-            if widget.bsdd_property == bsdd_class_property
+    def get_widget(cls, bsdd_class_property: BsddClassProperty) -> ui.PropertyEditor:
+        widgets = [
+            widget for widget in cls.get_properties().widgets if widget.data == bsdd_class_property
         ]
-        if len(windows) > 1:
+        if len(widgets) > 1:
             logging.warning(f"Multiple PropertyWindows")
-        elif not windows:
+        elif not widgets:
             return None
-        return windows[0]
+        return widgets[0]
 
     @classmethod
     def create_edit_widget(
@@ -73,7 +71,7 @@ class PropertyEditor(WidgetHandler):
             setattr(prop, plugin.key, plugin.value_getter)
 
         title = cls.create_window_title(bsdd_property)
-        cls.get_window(bsdd_property).setWindowTitle(title)  # TODO: Update Name Getter
+        cls.get_widget(bsdd_property).setWindowTitle(title)  # TODO: Update Name Getter
         cls.signaller.widget_created.emit(window)
         return window
 

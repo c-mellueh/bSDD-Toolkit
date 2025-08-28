@@ -17,7 +17,7 @@ def open_edit_window(
 ):
     if parent_widget is None:
         parent_widget = main_window.get()
-    if window := property_editor.get_window(bsdd_property):
+    if window := property_editor.get_widget(bsdd_property):
         if window.isHidden():
             window.close()
             window = property_editor.create_edit_widget(
@@ -101,5 +101,5 @@ def add_fields_to_widget(
     property_editor.register_basic_field(widget, widget.sb_version_number, "VersionNumber")
 
     # Allowed Values Table
-    table = allowed_values_table.create_widget(widget.bsdd_property)
+    table = allowed_values_table.create_widget(widget.data)
     widget.vl_values.addWidget(table)

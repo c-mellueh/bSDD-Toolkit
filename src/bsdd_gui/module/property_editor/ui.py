@@ -20,7 +20,7 @@ from .qt.ui_Window import Ui_PropertyWindow
 class PropertyCreator(QDialog):
     def __init__(self, bsdd_class_property: BsddClassProperty, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.bsdd_class_property = bsdd_class_property
+        self.data = bsdd_class_property
         self.setWindowIcon(get_icon())
         self.button_box = QDialogButtonBox(Qt.Horizontal)
         # Layout
@@ -39,7 +39,7 @@ class PropertyEditor(QWidget, Ui_PropertyWindow):
         self.setWindowIcon(get_icon())
         self.setupUi(self)
         self.mode = mode  # edit or new
-        self.bsdd_property = bsdd_property
+        self.data = bsdd_property
 
     def closeEvent(self, event):
         self.closed.emit()
