@@ -26,8 +26,16 @@ class PropertyEditor(WidgetHandler):
         return bsdd_gui.PropertyEditorProperties
 
     @classmethod
-    def connect_request_signals(cls):
+    def connect_internal_signals(cls):
         cls.signaller.window_requested.connect(trigger.create_window)
+        cls.signaller.widget_created.connect(trigger.widget_created)
+        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_property))
+        # Autoupdate Values
+        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_property, f))
+
+    @classmethod
+    def connect_widget_to_internal_signals(cls, widget: ui.PropertyEditor):
+        widget.closed.connect(lambda w=widget: cls.signaller.widget_closed.emit(w))
 
     @classmethod
     def request_window(cls, bsdd_property: BsddProperty, parent=None):

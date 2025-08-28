@@ -103,6 +103,7 @@ class WidgetSignaller(QObject):
     )  # Widget in which the field is embedded and Fieldwidget itself
     widget_requested = Signal(object)
     widget_created = Signal(QWidget)
+    widget_closed = Signal(QWidget)
 
 
 class WidgetHandler(ABC):

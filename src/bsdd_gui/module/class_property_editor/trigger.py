@@ -42,10 +42,16 @@ def property_info_requested(som_property: BsddClassProperty):
     core.open_edit_window(som_property, tool.ClassPropertyEditor, tool.MainWindow, tool.Project)
 
 
-def window_created(window: ui.ClassPropertyEditor):
-    core.register_widget(
-        window, tool.ClassPropertyEditor, tool.AllowedValuesTable, tool.Project, tool.Util
+def widget_created(window: ui.ClassPropertyEditor):
+    core.register_widget(window, tool.ClassPropertyEditor)
+    core.add_fields_to_widget(
+        window,
+        tool.ClassPropertyEditor,
+        tool.AllowedValuesTable,
+        tool.Project,
     )
+    core.add_validators_to_widget(window, tool.ClassPropertyEditor, tool.Project, tool.Util)
+    core.update_property_specific_fields(window, tool.ClassPropertyEditor, tool.AllowedValuesTable)
 
 
 def window_closed(window: ui.ClassPropertyEditor):

@@ -42,7 +42,6 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QApplication,
-    QCheckBox,
     QComboBox,
     QDateTimeEdit,
     QFormLayout,
@@ -69,7 +68,6 @@ from bsdd_gui.module.property_editor.widgets import (
     SubdivisionTagInput,
     UnitTagInput,
 )
-from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 
 class Ui_PropertyWindow(object):
@@ -87,10 +85,10 @@ class Ui_PropertyWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.fl_code = QFormLayout()
         self.fl_code.setObjectName("fl_code")
-        self.le_property_reference = LineEditWithButton(self.tab_basics)
-        self.le_property_reference.setObjectName("le_property_reference")
+        self.le_code = QLineEdit(self.tab_basics)
+        self.le_code.setObjectName("le_code")
 
-        self.fl_code.setWidget(0, QFormLayout.ItemRole.FieldRole, self.le_property_reference)
+        self.fl_code.setWidget(0, QFormLayout.ItemRole.FieldRole, self.le_code)
 
         self.lb_code = QLabel(self.tab_basics)
         self.lb_code.setObjectName("lb_code")
@@ -118,15 +116,15 @@ class Ui_PropertyWindow(object):
 
         self.fl_code.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_unit)
 
-        self.widget = UnitTagInput(self.tab_basics)
-        self.widget.setObjectName("widget")
+        self.ti_units = UnitTagInput(self.tab_basics)
+        self.ti_units.setObjectName("ti_units")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(1)
         sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
-        self.widget.setSizePolicy(sizePolicy2)
+        sizePolicy2.setHeightForWidth(self.ti_units.sizePolicy().hasHeightForWidth())
+        self.ti_units.setSizePolicy(sizePolicy2)
 
-        self.fl_code.setWidget(2, QFormLayout.ItemRole.FieldRole, self.widget)
+        self.fl_code.setWidget(2, QFormLayout.ItemRole.FieldRole, self.ti_units)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -201,12 +199,6 @@ class Ui_PropertyWindow(object):
         self.lb_allowed_values.setMinimumSize(QSize(0, 0))
 
         self.hl_value_description.addWidget(self.lb_allowed_values)
-
-        self.cb_is_required = QCheckBox(self.tab_basics)
-        self.cb_is_required.setObjectName("cb_is_required")
-        self.cb_is_required.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-
-        self.hl_value_description.addWidget(self.cb_is_required)
 
         self.verticalLayout_2.addLayout(self.hl_value_description)
 
@@ -446,9 +438,7 @@ class Ui_PropertyWindow(object):
 
     def retranslateUi(self, PropertyWindow):
         PropertyWindow.setWindowTitle(QCoreApplication.translate("PropertyWindow", "Form", None))
-        self.le_property_reference.setPlaceholderText(
-            QCoreApplication.translate("PropertyWindow", "Code", None)
-        )
+        self.le_code.setPlaceholderText(QCoreApplication.translate("PropertyWindow", "Code", None))
         # if QT_CONFIG(tooltip)
         self.lb_code.setToolTip(
             QCoreApplication.translate(
@@ -542,9 +532,6 @@ class Ui_PropertyWindow(object):
         self.pb_new_value.setText(QCoreApplication.translate("PropertyWindow", "+", None))
         self.lb_allowed_values.setText(
             QCoreApplication.translate("PropertyWindow", "Allowed Values:", None)
-        )
-        self.cb_is_required.setText(
-            QCoreApplication.translate("PropertyWindow", "Is Required", None)
         )
         self.gb_description.setTitle("")
         self.lb_definition.setText(

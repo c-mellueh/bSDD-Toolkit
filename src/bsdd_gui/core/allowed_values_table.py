@@ -27,7 +27,7 @@ def connect_signals(
     allowed_values_table.signaller.delete_selection_requested.connect(
         allowed_values_table.delete_selection
     )
-    class_property_editor.signaller.window_closed.connect(remove_view)
+    class_property_editor.signaller.widget_closed.connect(remove_view)
     pass
 
 

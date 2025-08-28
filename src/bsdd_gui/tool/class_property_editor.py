@@ -35,7 +35,6 @@ if TYPE_CHECKING:
 
 
 class Signaller(WidgetSignaller):
-    window_closed = Signal(ui.ClassPropertyEditor)
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
     new_class_property_created = Signal(BsddClassProperty)
@@ -54,10 +53,10 @@ class ClassPropertyEditor(WidgetHandler):
         return bsdd_gui.ClassPropertyEditorProperties
 
     @classmethod
-    def connect_signals(cls):
+    def connect_internal_signals(cls):
         cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
-        cls.signaller.widget_created.connect(trigger.window_created)
-        cls.signaller.window_closed.connect(trigger.window_closed)
+        cls.signaller.widget_created.connect(trigger.widget_created)
+        cls.signaller.widget_closed.connect(trigger.window_closed)
         cls.signaller.widget_created.connect(
             lambda w: cls.sync_from_model(w, w.bsdd_class_property)
         )
@@ -66,6 +65,21 @@ class ClassPropertyEditor(WidgetHandler):
         )
         cls.signaller.create_new_class_property_requested.connect(
             trigger.create_class_property_creator
+        )
+        # Autoupdate Values
+        cls.signaller.field_changed.connect(
+            lambda w, f: cls.sync_to_model(w, w.bsdd_class_property, f)
+        )
+
+    @classmethod
+    def connect_widget_to_internal_signals(cls, widget: ui.ClassPropertyEditor):
+        widget.closed.connect(lambda w=widget: cls.signaller.widget_closed.emit(w))
+        widget.le_property_reference.button.clicked.connect(
+            lambda _, w=widget: cls.handle_pr_button_press(w)
+        )
+
+        widget.pb_new_value.clicked.connect(
+            lambda _, w=widget: cls.signaller.new_value_requested.emit(w)
         )
 
     @classmethod

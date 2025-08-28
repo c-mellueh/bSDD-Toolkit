@@ -22,23 +22,23 @@ def unregister_widget(
 
 
 def register_widget(
+    widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditor]
+):
+    class_property_editor.register_widget(widget)
+    class_property_editor.connect_widget_to_internal_signals(widget)
+
+
+def add_fields_to_widget(
     widget: ui.ClassPropertyEditor,
     class_property_editor: Type[tool.ClassPropertyEditor],
     allowed_values_table: Type[tool.AllowedValuesTable],
     project: Type[tool.Project],
-    util: Type[tool.Util],
 ):
-    class_property_editor.register_widget(widget)
-    widget.closed.connect(lambda w=widget: class_property_editor.signaller.window_closed.emit(w))
     class_property_editor.register_basic_field(widget, widget.le_code, "Code")
     class_property_editor.register_basic_field(widget, widget.te_description, "Description")
     class_property_editor.register_basic_field(widget, widget.cb_is_required, "IsRequired")
 
-    widget.le_property_reference.set_button_text(
-        QCoreApplication.translate("ClassPropertyEditor", "Create New")
-    )
     ### Property Reference Field
-
     class_property_editor.register_field_getter(
         widget, widget.le_property_reference, class_property_editor.get_property_reference
     )
@@ -48,7 +48,16 @@ def register_widget(
         lambda e, v, p=project: class_property_editor.set_property_reference(e, v, p.get()),
     )
     class_property_editor.register_field_listener(widget, widget.le_property_reference)
+    table = allowed_values_table.create_widget(widget.bsdd_class_property)
+    widget.vl_values.addWidget(table)
 
+
+def add_validators_to_widget(
+    widget: ui.ClassPropertyEditor,
+    class_property_editor: Type[tool.ClassPropertyEditor],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+):
     class_property_editor.add_validator(
         widget,
         widget.le_property_reference,
@@ -67,22 +76,6 @@ def register_widget(
         lambda f, v, w=widget: class_property_editor.handle_property_reference_button(w, f, v),
     )
 
-    # Autoupdate
-    class_property_editor.signaller.field_changed.connect(
-        lambda w, f: class_property_editor.sync_to_model(w, w.bsdd_class_property, f)
-    )
-    widget.le_property_reference.button.clicked.connect(
-        lambda _, w=widget: class_property_editor.handle_pr_button_press(w)
-    )
-
-    widget.pb_new_value.clicked.connect(
-        lambda _, w=widget: class_property_editor.signaller.new_value_requested.emit(w)
-    )
-    table = allowed_values_table.create_widget(widget.bsdd_class_property)
-    widget.vl_values.addWidget(table)
-
-    update_property_specific_fields(widget, class_property_editor, allowed_values_table)
-
 
 def update_property_specific_fields(
     widget: ui.ClassPropertyEditor,
@@ -91,8 +84,6 @@ def update_property_specific_fields(
 ):
     if not widget:
         return
-    bsdd_class_property = widget.bsdd_class_property
-
     class_property_editor.update_description_placeholder(widget)
     class_property_editor.update_allowed_units(widget)
     class_property_editor.update_value_view(widget)
@@ -143,7 +134,7 @@ def connect_signals(
     property_table.signaller.property_info_requested.connect(
         class_property_editor.show_property_info
     )
-    class_property_editor.connect_signals()
+    class_property_editor.connect_internal_signals()
     main_window.signaller.new_property_requested.connect(
         class_property_editor.signaller.create_new_class_property_requested.emit
     )

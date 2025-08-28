@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QWidget
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
+    from bsdd_gui.module.property_editor import ui
 
 
 def open_edit_window(
@@ -37,7 +38,26 @@ def connect_signals(
     property_editor: Type[tool.PropertyEditor],
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
-    property_editor.connect_request_signals()
+    property_editor.connect_internal_signals()
     class_property_editor.signaller.property_widget_requested.connect(
         property_editor.request_window
     )
+
+
+def register_widget(
+    widget: ui.PropertyEditor,
+    property_editor: Type[tool.PropertyEditor],
+):
+    property_editor.register_widget(widget)
+    property_editor.connect_widget_to_internal_signals(widget)
+
+
+def add_fields_to_widget(widget: ui.PropertyEditor, property_editor: Type[tool.PropertyEditor]):
+    property_editor.register_basic_field(widget, widget.le_code, "Code")
+    property_editor.register_basic_field(widget, widget.le_name, "Name")
+    property_editor.register_basic_field(widget, widget.te_description, "Definition")
+    property_editor.register_basic_field(widget, widget.te_description, "Description")
+    property_editor.register_basic_field(widget, widget.ti_units, "Units")
+    property_editor.register_basic_field(widget, widget.cb_datatype, "DataType")
+    property_editor.register_basic_field(widget, widget.cb_value_kind, "PropertyValueKind")
+    property_editor.register_basic_field(widget, widget.cb_status, "Status")

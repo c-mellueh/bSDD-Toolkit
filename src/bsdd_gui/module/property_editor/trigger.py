@@ -5,6 +5,7 @@ from bsdd_gui.core import property_editor as core
 from typing import TYPE_CHECKING
 from bsdd_parser import BsddProperty
 from PySide6.QtWidgets import QWidget
+from . import ui
 
 
 def connect():
@@ -21,3 +22,8 @@ def on_new_project():
 
 def create_window(bsdd_property: BsddProperty, parent: QWidget):
     core.open_edit_window(bsdd_property, parent, tool.PropertyEditor, tool.MainWindow, tool.Project)
+
+
+def widget_created(widget: ui.PropertyEditor):
+    core.register_widget(widget, tool.PropertyEditor)
+    core.add_fields_to_widget(widget, tool.PropertyEditor)
