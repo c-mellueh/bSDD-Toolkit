@@ -156,6 +156,7 @@ class FieldHandler(ABC):
             f.tagsChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
         if isinstance(f, DateTimeWithNow):
             f.dt_edit.dateTimeChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.active_toggle.toggled.connect(lambda: cls.signaller.field_changed.emit(w, f))
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):

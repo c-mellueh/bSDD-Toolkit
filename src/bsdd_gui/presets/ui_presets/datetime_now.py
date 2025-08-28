@@ -30,10 +30,11 @@ class DateTimeWithNow(QWidget):
         self.now_btn.setMaximumWidth(50)
 
     def enable_datetime_picker(self, state: bool):
-        self.now_btn.setEnabled(state)
+        # self.now_btn.setEnabled(state)
         self.dt_edit.setEnabled(state)
 
     def set_now(self):
+        self.set_active(True)
         self.dt_edit.setDateTime(QDateTime.currentDateTime())
 
     def is_active(self):

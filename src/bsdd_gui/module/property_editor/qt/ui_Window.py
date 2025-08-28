@@ -74,7 +74,7 @@ class Ui_PropertyWindow(object):
     def setupUi(self, PropertyWindow):
         if not PropertyWindow.objectName():
             PropertyWindow.setObjectName("PropertyWindow")
-        PropertyWindow.resize(614, 550)
+        PropertyWindow.resize(545, 550)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QTabWidget(PropertyWindow)
@@ -435,7 +435,7 @@ class Ui_PropertyWindow(object):
 
         self.retranslateUi(PropertyWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
         QMetaObject.connectSlotsByName(PropertyWindow)
 
