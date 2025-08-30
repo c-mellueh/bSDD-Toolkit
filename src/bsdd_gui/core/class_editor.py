@@ -48,7 +48,7 @@ def register_widget(
     class_editor.register_field_setter(
         widget,
         widget.cb_class_type,
-        lambda e, v: setattr(e, "ClassType", ct_combobox_items[v]),
+        lambda e, v: setattr(e, "ClassType", v),
     )
 
     st_combobox_items = ["Preview", "Active", "Inactive"]
@@ -58,7 +58,7 @@ def register_widget(
     class_editor.register_field_setter(
         widget,
         widget.cb_status,
-        lambda e, v: setattr(e, "Status", st_combobox_items[v]),
+        lambda e, v: setattr(e, "Status", v),
     )
 
     # Tags
