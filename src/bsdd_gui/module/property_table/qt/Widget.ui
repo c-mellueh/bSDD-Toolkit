@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>813</width>
+    <height>637</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QTableView" name="tv_properties"/>
+       </item>
+       <item>
+        <widget class="QToolButton" name="tb_new">
+         <property name="text">
+          <string>+</string>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+         </property>
+         <property name="arrowType">
+          <enum>Qt::ArrowType::NoArrow</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QTableView" name="tv_classes"/>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

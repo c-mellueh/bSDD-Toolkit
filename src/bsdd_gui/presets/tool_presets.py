@@ -356,6 +356,10 @@ class WidgetHandler(FieldHandler):
             return None
         return widgets[0]
 
+    @classmethod
+    def request_widget(cls, data: object, parent=None):
+        cls.signaller.widget_requested.emit(data, parent)
+
 
 class ViewSignaller(QObject):
     model_refresh_requested = Signal()

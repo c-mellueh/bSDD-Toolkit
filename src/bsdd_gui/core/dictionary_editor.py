@@ -34,7 +34,7 @@ def create_main_menu_actions(
     project: Type[tool.Project],
 ) -> None:
     action = main_window.add_action(
-        "menuEdit", "Dictionary Settings", lambda: dictionary_editor.requeste_widget(project.get())
+        "menuEdit", "Dictionary Settings", lambda: dictionary_editor.request_widget(project.get())
     )
     dictionary_editor.set_action(main_window.get(), "open_window", action)
 

@@ -47,10 +47,6 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
         widget.closed.connect(lambda w=widget: cls.signaller.widget_closed.emit(w))
 
     @classmethod
-    def requeste_widget(cls, bsdd_dictionary: BsddDictionary, parent=None):
-        cls.signaller.widget_requested.emit(bsdd_dictionary, parent)
-
-    @classmethod
     def create_widget(
         cls, bsdd_dictionary: BsddDictionary, parent_widget: QWidget
     ) -> ui.DictionaryEditor:
