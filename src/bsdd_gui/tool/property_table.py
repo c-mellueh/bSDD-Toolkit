@@ -22,7 +22,7 @@ from bsdd_gui.presets.tool_presets import (
 
 
 class Signaller(ViewSignaller, WidgetSignaller):
-    property_info_requested = Signal(BsddClassProperty)
+    property_info_requested = Signal(BsddProperty, ui.PropertyWidget)
     reset_all_property_tables_requested = Signal()
     new_property_requested = Signal()
 
@@ -41,7 +41,16 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.PropertyWidget):
-        pass
+
+        w = widget
+
+        def handle_double_click(index: QModelIndex):
+            proxy_model: models.SortModel = w.tv_properties.model()
+            i = proxy_model.mapToSource(index)
+            bsdd_property = i.siblingAtColumn(0).internalPointer()
+            cls.signaller.property_info_requested.emit(bsdd_property, w)
+
+        widget.tv_properties.doubleClicked.connect(handle_double_click)
 
     @classmethod
     def request_new_property(cls):

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 def create_main_menu_actions(
     property_table: Type[tool.PropertyTable],
     main_window: Type[tool.MainWindow],
-    project: Type[tool.Project],
+    property_editor: Type[tool.PropertyEditor],
 ) -> None:
     action = main_window.add_action(
         "menuEdit",
@@ -21,6 +21,7 @@ def create_main_menu_actions(
     property_table.set_action(main_window.get(), "open_window", action)
 
     property_table.connect_internal_signals()
+    property_table.signaller.property_info_requested.connect(property_editor.request_widget)
 
 
 def retranslate_ui(

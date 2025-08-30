@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.create_main_menu_actions(tool.PropertyTable, tool.MainWindow, tool.Project)
+    core.create_main_menu_actions(tool.PropertyTable, tool.MainWindow, tool.PropertyEditor)
 
 
 def retranslate_ui():

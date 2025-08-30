@@ -39,10 +39,6 @@ class PropertyEditor(WidgetHandler):
         widget.closed.connect(lambda w=widget: cls.signaller.widget_closed.emit(w))
 
     @classmethod
-    def request_window(cls, bsdd_property: BsddProperty, parent=None):
-        cls.signaller.widget_requested.emit(bsdd_property, parent)
-
-    @classmethod
     def get_widget(cls, bsdd_class_property: BsddClassProperty) -> ui.PropertyEditor:
         return super().get_widget(bsdd_class_property)
 

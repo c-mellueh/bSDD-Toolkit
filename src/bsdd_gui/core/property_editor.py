@@ -40,7 +40,7 @@ def connect_signals(
 ):
     property_editor.connect_internal_signals()
     class_property_editor.signaller.property_widget_requested.connect(
-        property_editor.request_window
+        property_editor.request_widget
     )
 
 
