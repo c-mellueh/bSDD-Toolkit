@@ -144,7 +144,7 @@ def create_context_menu(
 def delete_selection(
     view: ui.PsetTableView,
     property_set_table: Type[tool.PropertySetTable],
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.ClassPropertyTable],
     main_window: Type[tool.MainWindow],
 ):
     bsdd_class = view.model().sourceModel().active_class
@@ -167,7 +167,7 @@ def delete_selection(
 def rename_selection(
     view: ui.PsetTableView,
     property_set_table: Type[tool.PropertySetTable],
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.ClassPropertyTable],
     main_window: Type[tool.MainWindow],
 ):
     selected_psets = [i for i in view.selectedIndexes() if i.column() == 0][0]

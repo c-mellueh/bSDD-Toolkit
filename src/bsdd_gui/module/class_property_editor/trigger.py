@@ -16,7 +16,7 @@ def connect():
         lambda: core.splitter_settings_accepted(tool.ClassPropertyEditor, tool.Appdata),
     )
     core.connect_signals(
-        tool.ClassPropertyEditor, tool.PropertyTable, tool.MainWindow, tool.PropertyEditor
+        tool.ClassPropertyEditor, tool.ClassPropertyTable, tool.MainWindow, tool.PropertyEditor
     )
     # core.create_context_menu_builders(tool.PropertyWidget)
 

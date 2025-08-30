@@ -6,12 +6,12 @@ from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.property_table import ui
+    from bsdd_gui.module.class_property_table import ui
     from bsdd_parser.models import BsddClass
 
 
 def connect_signals(
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.ClassPropertyTable],
     main_window: Type[tool.MainWindow],
     property_set_table: Type[tool.PropertySetTable],
     class_property_editor: Type[tool.ClassPropertyEditor],
@@ -28,8 +28,8 @@ def connect_signals(
 
 
 def connect_view(
-    view: ui.PropertyTable,
-    property_table: Type[tool.PropertyTable],
+    view: ui.ClassPropertyTable,
+    property_table: Type[tool.ClassPropertyTable],
     main_window: Type[tool.MainWindow],
 ):
     def emit_info_requested(index: QModelIndex):
@@ -47,13 +47,13 @@ def connect_view(
     view.doubleClicked.connect(emit_info_requested)
 
 
-def reset_views(property_table: Type[tool.PropertyTable], project: Type[tool.Project]):
+def reset_views(property_table: Type[tool.ClassPropertyTable], project: Type[tool.Project]):
     for view in property_table.get_widgets():
         property_table.reset_view(view)
 
 
 def connect_to_main_window(
-    property_table: Type[tool.PropertyTable], main_window: Type[tool.MainWindow]
+    property_table: Type[tool.ClassPropertyTable], main_window: Type[tool.MainWindow]
 ):
 
     def reset_property(new_pset_name: str):

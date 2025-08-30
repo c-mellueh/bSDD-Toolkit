@@ -62,7 +62,7 @@ from PySide6.QtWidgets import (
 
 from bsdd_gui.module.class_tree.ui import ClassView
 from bsdd_gui.module.property_set_table.ui import PsetTableView
-from bsdd_gui.module.property_table.ui import PropertyTable
+from bsdd_gui.module.class_property_table.ui import ClassPropertyTable
 
 
 class Ui_MainWindow(object):
@@ -229,7 +229,7 @@ class Ui_MainWindow(object):
 
         self.vertical_layout_properties.addLayout(self.horizontalLayout_properties)
 
-        self.table_property = PropertyTable(self.verticalLayoutWidget_2)
+        self.table_property = ClassPropertyTable(self.verticalLayoutWidget_2)
         self.table_property.setObjectName("table_property")
         self.table_property.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.table_property.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)

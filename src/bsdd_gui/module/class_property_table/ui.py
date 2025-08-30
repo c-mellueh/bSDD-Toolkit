@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from . import models
 
 
-class PropertyTable(QTableView):
+class ClassPropertyTable(QTableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         trigger.table_view_created(self)

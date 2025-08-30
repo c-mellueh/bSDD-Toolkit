@@ -6,5 +6,5 @@ if TYPE_CHECKING:
 from bsdd_gui.presets.prop_presets import ItemModelHandlerProperties, ViewHandlerProperties
 
 
-class PropertyTableProperties(ItemModelHandlerProperties, ViewHandlerProperties):
+class ClassPropertyTableProperties(ItemModelHandlerProperties, ViewHandlerProperties):
     pass

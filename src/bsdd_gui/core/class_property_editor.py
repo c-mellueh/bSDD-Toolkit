@@ -129,7 +129,7 @@ def splitter_settings_accepted(
 
 def connect_signals(
     class_property_editor: Type[tool.ClassPropertyEditor],
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.ClassPropertyTable],
     main_window: Type[tool.MainWindow],
     property_editor: Type[tool.PropertyEditor],
 ):

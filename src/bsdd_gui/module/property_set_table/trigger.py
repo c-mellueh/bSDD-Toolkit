@@ -39,8 +39,8 @@ def create_context_menu(view: ui.PsetTableView, pos):
 
 
 def delete_selection(view: ui.PsetTableView):
-    core.delete_selection(view, tool.PropertySetTable, tool.PropertyTable, tool.MainWindow)
+    core.delete_selection(view, tool.PropertySetTable, tool.ClassPropertyTable, tool.MainWindow)
 
 
 def rename_selection(view: ui.PsetTableView):
-    core.rename_selection(view, tool.PropertySetTable, tool.PropertyTable, tool.MainWindow)
+    core.rename_selection(view, tool.PropertySetTable, tool.ClassPropertyTable, tool.MainWindow)

@@ -14,10 +14,10 @@ from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
 
 
-class PropertyTableModel(ItemModel):
+class ClassPropertyTableModel(ItemModel):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(tool.PropertyTable, *args, **kwargs)
+        super().__init__(tool.ClassPropertyTable, *args, **kwargs)
 
     @property
     def bsdd_dictionary(self):
@@ -38,7 +38,9 @@ class PropertyTableModel(ItemModel):
             return 0
         if parent.isValid():
             return 0
-        rc = len(tool.PropertyTable.filter_properties_by_pset(self.active_class, self.active_pset))
+        rc = len(
+            tool.ClassPropertyTable.filter_properties_by_pset(self.active_class, self.active_pset)
+        )
         return rc
 
     def index(self, row: int, column: int, parent=QModelIndex()):
@@ -47,7 +49,7 @@ class PropertyTableModel(ItemModel):
 
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
-        bsdd_properties = tool.PropertyTable.filter_properties_by_pset(
+        bsdd_properties = tool.ClassPropertyTable.filter_properties_by_pset(
             self.active_class, self.active_pset
         )
         bsdd_property = bsdd_properties[row]
@@ -63,5 +65,5 @@ class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def sourceModel(self) -> PropertyTableModel:
+    def sourceModel(self) -> ClassPropertyTableModel:
         return super().sourceModel()

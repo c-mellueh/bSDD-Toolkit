@@ -8,11 +8,11 @@ import bsdd_gui
 from bsdd_parser.models import BsddClassProperty, BsddClass
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 
-from bsdd_gui.module.property_table import ui, models
+from bsdd_gui.module.class_property_table import ui, models
 from bsdd_gui.presets.tool_presets import ItemModelHandler, ViewHandler, ViewSignaller
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_table.prop import PropertyTableProperties
+    from bsdd_gui.module.class_property_table.prop import ClassPropertyTableProperties
 
 
 class Signaller(ViewSignaller):
@@ -20,22 +20,22 @@ class Signaller(ViewSignaller):
     reset_all_property_tables_requested = Signal()
 
 
-class PropertyTable(ItemModelHandler, ViewHandler):
+class ClassPropertyTable(ItemModelHandler, ViewHandler):
     signaller = Signaller()
 
     @classmethod
-    def get_properties(cls) -> PropertyTableProperties:
-        return bsdd_gui.PropertyTableProperties
+    def get_properties(cls) -> ClassPropertyTableProperties:
+        return bsdd_gui.ClassPropertyTableProperties
 
     @classmethod
     def create_model(cls):
-        model = models.PropertyTableModel()
+        model = models.ClassPropertyTableModel()
         sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
         return sort_filter_model
 
     @classmethod
-    def on_current_changed(cls, view: ui.PropertyTable, curr: QModelIndex, prev):
+    def on_current_changed(cls, view: ui.ClassPropertyTable, curr: QModelIndex, prev):
         proxy_model = view.model()
         if not curr.isValid():
             return
@@ -53,7 +53,7 @@ class PropertyTable(ItemModelHandler, ViewHandler):
         return "; ".join([v.Value for v in class_property.AllowedValues])
 
     @classmethod
-    def get_row_of_property(cls, view: ui.PropertyTable, class_property: BsddClassProperty):
+    def get_row_of_property(cls, view: ui.ClassPropertyTable, class_property: BsddClassProperty):
         model = view.model().sourceModel()
 
         for row in range(model.rowCount()):
@@ -63,7 +63,7 @@ class PropertyTable(ItemModelHandler, ViewHandler):
         return None
 
     @classmethod
-    def select_row(cls, view: ui.PropertyTable, row_index: int):
+    def select_row(cls, view: ui.ClassPropertyTable, row_index: int):
         model = view.model()
         if row_index is None:
             return
