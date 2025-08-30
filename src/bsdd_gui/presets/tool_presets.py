@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QTextEdit,
     QCheckBox,
+    QAbstractButton,
 )
 from PySide6.QtCore import QObject, Signal, QAbstractItemModel, Qt, QDateTime
 from PySide6.QtGui import QAction
@@ -146,17 +147,19 @@ class FieldHandler(ABC):
         w = widget
         if isinstance(f, QLineEdit):
             f.editingFinished.connect(lambda: cls.signaller.field_changed.emit(w, f))
-        if isinstance(f, QComboBox):
+        elif isinstance(f, QComboBox):
             f.currentTextChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
-        if isinstance(f, QTextEdit):
+        elif isinstance(f, QTextEdit):
             f.textChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
-        if isinstance(f, QCheckBox):
+        elif isinstance(f, QCheckBox):
             f.checkStateChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
-        if isinstance(f, TagInput):
+        elif isinstance(f, TagInput):
             f.tagsChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
-        if isinstance(f, DateTimeWithNow):
+        elif isinstance(f, DateTimeWithNow):
             f.dt_edit.dateTimeChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
             f.active_toggle.toggled.connect(lambda: cls.signaller.field_changed.emit(w, f))
+        elif isinstance(f, QAbstractButton):
+            f.toggled.connect(lambda: cls.signaller.field_changed.emit(w, f))
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
@@ -198,26 +201,30 @@ class FieldHandler(ABC):
             func = lambda text: rf(f, vf(text, w))
             f.textChanged.connect(func)
             func(f.text())
-        if isinstance(f, QComboBox):
+        elif isinstance(f, QComboBox):
             func = lambda text: rf(f, vf(text, w))
             f.currentTextChanged.connect(func)
             func(f.currentText())
-        if isinstance(f, QTextEdit):
+        elif isinstance(f, QTextEdit):
             func = lambda: rf(f, vf(f.toPlainText(), w))
             f.textChanged.connect(func)
             func()
-        if isinstance(f, QCheckBox):
+        elif isinstance(f, QCheckBox):
             func = lambda state: rf(f, vf(state, w))
             f.checkStateChanged.connect(func)
-            func(f.text())
-        if isinstance(f, TagInput):
+            func(f.isChecked())
+        elif isinstance(f, TagInput):
             func = lambda: rf(f, vf(f.tags(), w))
             f.tagsChanged.connect(func)
             func
-        if isinstance(f, DateTimeWithNow):
+        elif isinstance(f, DateTimeWithNow):
             func = lambda: rf(f, vf(f.get_time(), w))
             f.dt_edit.dateTimeChanged.connect(func)
             func()
+        elif isinstance(f, QAbstractButton):
+            func = lambda state: rf(f, vf(state, w))
+            f.toggled.connect(func)
+            func(f.isChecked())
 
     @classmethod
     def sync_from_model(cls, widget: QWidget, element):
@@ -226,18 +233,20 @@ class FieldHandler(ABC):
             value = getter_func(element)
             if isinstance(field, QLineEdit):
                 field.setText(value)
-            if isinstance(field, QLabel):
+            elif isinstance(field, QLabel):
                 field.setText(value)
-            if isinstance(field, QComboBox):
+            elif isinstance(field, QComboBox):
                 field.setCurrentText(value)
-            if isinstance(field, QTextEdit):
+            elif isinstance(field, QTextEdit):
                 field.setPlainText(value)
-            if isinstance(field, QCheckBox):
+            elif isinstance(field, QCheckBox):
                 field.setChecked(value)
-            if isinstance(field, TagInput):
+            elif isinstance(field, TagInput):
                 field.setTags(value or [])
-            if isinstance(field, DateTimeWithNow):
+            elif isinstance(field, DateTimeWithNow):
                 field.set_time(value)
+            elif isinstance(field, QAbstractButton):
+                field.setChecked(value)
 
     @classmethod
     def sync_to_model(cls, widget: QWidget, element, explicit_field: QWidget = None):
@@ -247,16 +256,18 @@ class FieldHandler(ABC):
                 continue
             if isinstance(field, QLineEdit):
                 setter_func(element, field.text())
-            if isinstance(field, QComboBox):
+            elif isinstance(field, QComboBox):
                 setter_func(element, field.currentText())
-            if isinstance(field, QTextEdit):
+            elif isinstance(field, QTextEdit):
                 setter_func(element, field.toPlainText())
-            if isinstance(field, QCheckBox):
+            elif isinstance(field, QCheckBox):
                 setter_func(element, field.isChecked())
-            if isinstance(field, TagInput):
+            elif isinstance(field, TagInput):
                 setter_func(element, field.tags())
-            if isinstance(field, DateTimeWithNow):
+            elif isinstance(field, DateTimeWithNow):
                 setter_func(element, field.get_time())
+            elif isinstance(field, QAbstractButton):
+                setter_func(element, field.isChecked())
 
     @classmethod
     def all_inputs_are_valid(cls, widget: QWidget):
@@ -277,6 +288,28 @@ class FieldHandler(ABC):
             if not is_valid:
                 return False
         return True
+
+    @classmethod
+    def get_invalid_inputs(cls, widget: QWidget):
+        function_dict = cls.get_properties().validator_functions.get(widget)
+        if not function_dict:
+            return []
+        invalid_inputs = list()
+        for f, (validator_function, result_function) in function_dict.items():
+            if isinstance(f, QLineEdit):
+                value = f.text()
+            elif isinstance(f, QComboBox):
+                value = f.currentText()
+            elif isinstance(f, QTextEdit):
+                value = f.toPlainText()
+            elif isinstance(f, TagInput):
+                value = f.tags()
+            if isinstance(f, DateTimeWithNow):
+                value = f.get_time()
+            is_valid = validator_function(value, widget)
+            if not is_valid:
+                invalid_inputs.append(f.objectName())
+        return invalid_inputs
 
 
 class WidgetSignaller(FieldSignaller):

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, get_origin, Union, get_args
 from types import NoneType  # Python 3.10+
 import logging
-
+import re
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetHandler, ModuleHandler, WidgetSignaller
 from PySide6.QtCore import Qt, QDateTime, QObject, Signal
@@ -235,24 +235,6 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
         return not empty
 
     @classmethod
-    def all_inputs_are_valid(cls, widget: ui.DictionaryEditor):
-        return not bool(cls.get_missing_inputs(widget))
-
-    @classmethod
-    def get_missing_inputs(cls, widget: ui.DictionaryEditor):
-        return  # TODO
-        missing_inputs = list()
-        for name, field in BsddDictionary.model_fields.items():
-            if name in ["Classes", "Properties"]:
-                continue
-            if cls.is_optional(field.annotation):
-                continue
-            field_widget = widget.fields[name]
-            if cls.is_empty(field_widget):
-                missing_inputs.append(name)
-        return missing_inputs
-
-    @classmethod
     def update_dictionary_value(cls, bsdd_dictionary: BsddDictionary, name, value):
         if name not in BsddDictionary.model_fields:
             return
@@ -263,3 +245,43 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
         elif isinstance(value, QDateTime):
             value = value.toPython()
         setattr(bsdd_dictionary, name, value)
+
+    @classmethod
+    def is_dictionary_code_valid(cls, value, widget):
+        if value:
+            return True
+        return False
+
+    @classmethod
+    def is_org_code_valid(cls, value, widget):
+        if value:
+            return True
+        return False
+
+    @classmethod
+    def is_dictionary_name_valid(cls, value, widget):
+        if value:
+            return True
+        return False
+
+    @classmethod
+    def is_dictionary_version_valid(cls, value, widget):
+        _version_pattern = re.compile(r"^(0|[1-9]\d*)(?:\.(0|[1-9]\d*)){0,2}$")
+        return bool(_version_pattern.match(value))
+
+    @classmethod
+    def is_language_iso_valid(cls, value, widget):
+        if value:
+            return True
+        return False
+
+    @classmethod
+    def is_dictionary_uri_valid(cls, value, widget: ui.DictionaryEditor):
+        if widget.cb_use_own_uri.isChecked():
+            if not value:
+                return False
+            return True
+        else:
+            if value:
+                return False
+            return True

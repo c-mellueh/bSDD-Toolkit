@@ -38,3 +38,4 @@ def create_widget(widget: ui.DictionaryEditor, parent: QWidget | None):
 def widget_created(widget: ui.DictionaryEditor):
     core.register_widget(widget, tool.DictionaryEditor)
     core.add_fields_to_widget(widget, tool.DictionaryEditor)
+    core.add_validator_functions_to_widget(widget, tool.DictionaryEditor, tool.Util)

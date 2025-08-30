@@ -89,7 +89,7 @@ def new_file_clicked(
         else:
             text = QCoreApplication.translate("Project", "Required Inputs are missing!")
             missing_text = QCoreApplication.translate("Project", "is missing")
-            missing_inputs = dictionary_editor.get_missing_inputs(widget)
+            missing_inputs = dictionary_editor.get_invalid_inputs(widget)
             popups.create_warning_popup(
                 f" {missing_text}\n".join(missing_inputs) + f" {missing_text}", None, text
             )

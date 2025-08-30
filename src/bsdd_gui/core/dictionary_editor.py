@@ -98,7 +98,7 @@ def remove_widget(
         event.ignore()
         text = QCoreApplication.translate("Project", "Required Inputs are missing!")
         missing_text = QCoreApplication.translate("Project", "is mssing")
-        missing_inputs = dictionary_editor.get_missing_inputs(widget)
+        missing_inputs = dictionary_editor.get_invalid_inputs(widget)
         popups.create_warning_popup(
             f" {missing_text}\n".join(missing_inputs) + f" {missing_text}", None, text
         )
@@ -139,3 +139,53 @@ def add_fields_to_widget(
 
     widget.cb_language_iso.addItems(LANGUAGE_ISO_CODES)
     dictionary_editor.register_basic_field(widget, widget.cb_language_iso, "LanguageIsoCode")
+
+
+def add_validator_functions_to_widget(
+    widget: ui.DictionaryEditor,
+    dictionary_editor: Type[tool.DictionaryEditor],
+    util: Type[tool.Util],
+):
+    dictionary_editor.add_validator(
+        widget,
+        widget.le_dictionary_code,
+        dictionary_editor.is_dictionary_code_valid,
+        lambda w, v: util.set_invalid(w, not v),
+    )
+    dictionary_editor.add_validator(
+        widget,
+        widget.le_org_code,
+        dictionary_editor.is_org_code_valid,
+        lambda w, v: util.set_invalid(w, not v),
+    )
+    dictionary_editor.add_validator(
+        widget,
+        widget.le_dictionary_name,
+        dictionary_editor.is_dictionary_name_valid,
+        lambda w, v: util.set_invalid(w, not v),
+    )
+
+    dictionary_editor.add_validator(
+        widget,
+        widget.le_dictionary_version,
+        dictionary_editor.is_dictionary_version_valid,
+        lambda w, v: util.set_invalid(w, not v),
+    )
+    dictionary_editor.add_validator(
+        widget,
+        widget.cb_language_iso,
+        dictionary_editor.is_language_iso_valid,
+        lambda w, v: util.set_invalid(w, not v),
+    )
+    dictionary_editor.add_validator(
+        widget,
+        widget.le_dictionary_uri,
+        dictionary_editor.is_dictionary_uri_valid,
+        lambda w, v: util.set_invalid(w, not v),
+    )
+    dictionary_editor.add_validator(
+        widget,
+        widget.cb_use_own_uri,
+        lambda _, w: dictionary_editor.is_dictionary_uri_valid(w.le_dictionary_uri.text(), w),
+        lambda _, v, w=widget.le_dictionary_uri: util.set_invalid(w, not v),
+    )
