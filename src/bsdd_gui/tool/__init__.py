@@ -17,3 +17,4 @@ from .console import Console
 from .class_property_editor import ClassPropertyEditor
 from .allowed_values_table import AllowedValuesTable
 from .property_editor import PropertyEditor
+from .property_table import PropertyTable
