@@ -69,6 +69,8 @@ class Ui_Form(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.tv_properties = QTableView(self.verticalLayoutWidget)
         self.tv_properties.setObjectName("tv_properties")
+        self.tv_properties.setSortingEnabled(True)
+        self.tv_properties.horizontalHeader().setStretchLastSection(True)
 
         self.verticalLayout.addWidget(self.tv_properties)
 

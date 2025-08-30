@@ -30,7 +30,6 @@ class ItemModel(QAbstractItemModel):
 
         if role != Qt.ItemDataRole.DisplayRole:
             return None
-
         getter_func = self.tool.get_value_functions(self)[index.column()]
         return getter_func(index.internalPointer())
 

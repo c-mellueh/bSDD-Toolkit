@@ -37,6 +37,7 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
     @classmethod
     def connect_internal_signals(cls):
         cls.signaller.widget_requested.connect(lambda _, p: trigger.create_widget(p))
+        cls.signaller.widget_created.connect(trigger.widget_created)
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.PropertyWidget):
@@ -52,3 +53,10 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
         cls.get_properties().widgets.add(widget)
         cls.signaller.widget_created.emit(widget)
         return widget
+
+    @classmethod
+    def create_model(cls):
+        model = models.PropertyTableModel()
+        sort_filter_model = models.SortModel()
+        sort_filter_model.setSourceModel(model)
+        return sort_filter_model

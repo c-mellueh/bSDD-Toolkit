@@ -46,6 +46,12 @@ def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.Propert
     property_table.register_widget(widget)
     property_table.connect_widget_to_internal_signals(widget)
 
+    proxy_model = property_table.create_model()
+    source_model = proxy_model.sourceModel()
+    property_table.add_column_to_table(source_model, "Code", lambda a: a.Code)
+    property_table.add_column_to_table(source_model, "Datatype", lambda p: p.DataType)
+
+    widget.tv_properties.setModel(proxy_model)
     # dictionary_editor.fill_dictionary_widget(widget)
     # dictionary_editor.color_required_fields(widget)
 
