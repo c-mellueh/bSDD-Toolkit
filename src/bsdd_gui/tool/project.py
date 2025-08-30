@@ -29,8 +29,11 @@ class Project(ModuleHandler):
         )
         if input_dict:
             new_dict = BsddDictionary(**input_dict)
+        return new_dict
 
-        cls.get_properties().project_dictionary = new_dict
+    @classmethod
+    def register_project(cls, bsdd_dictionary: BsddDictionary):
+        cls.get_properties().project_dictionary = bsdd_dictionary
         bsdd_gui.on_new_project()
 
     @classmethod

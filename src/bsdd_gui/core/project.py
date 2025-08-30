@@ -20,7 +20,8 @@ if TYPE_CHECKING:
 
 def create_project(project: Type[tool.Project]):
     logging.debug(f"Create Project")
-    project.create_project()
+    bsdd_dictionary = project.create_project()
+    project.register_project(bsdd_dictionary)
 
 
 def open_project(path, project: Type[tool.Project]):
@@ -95,14 +96,15 @@ def new_file_clicked(
             )
 
     dialog = project.create_new_project_widget(main_window.get())
-    widget = dictionary_editor.create_widget()
+
+    new_dict = project.create_project()
+    widget = dictionary_editor.create_widget(new_dict, dialog)
     name = QCoreApplication.translate("Project", "New Project")
     dialog.setWindowTitle(name)
     dialog._layout.insertWidget(0, widget)
     dialog.new_button.clicked.connect(validate)
     if dialog.exec():
-        dv = dictionary_editor.get_dictionary_values(widget)
-        project.create_project(dv)
+        project.register_project(new_dict)
     dictionary_editor.unregister_widget(widget)
 
 
