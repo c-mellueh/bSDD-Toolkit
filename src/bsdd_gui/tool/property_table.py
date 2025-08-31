@@ -24,7 +24,7 @@ from bsdd_gui.presets.tool_presets import (
 class Signaller(ViewSignaller, WidgetSignaller):
     property_info_requested = Signal(BsddProperty, ui.PropertyWidget)
     reset_all_property_tables_requested = Signal()
-    new_property_requested = Signal()
+    new_property_requested = Signal(ui.PropertyWidget)
 
 
 class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler):
@@ -51,6 +51,9 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
             cls.signaller.property_info_requested.emit(bsdd_property, w)
 
         widget.tv_properties.doubleClicked.connect(handle_double_click)
+        widget.tb_new.clicked.connect(
+            lambda _, w=widget: cls.signaller.new_property_requested.emit(w)
+        )
 
     @classmethod
     def request_new_property(cls):

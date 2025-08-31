@@ -1,7 +1,9 @@
 from __future__ import annotations
-from bsdd_parser import BsddClassProperty
+from bsdd_parser import BsddClassProperty, BsddProperty
 from typing import TYPE_CHECKING, Type
 from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QCoreApplication
+from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -39,8 +41,11 @@ def connect_signals(
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
     property_editor.connect_internal_signals()
-    class_property_editor.signaller.property_widget_requested.connect(
+    class_property_editor.signaller.edit_bsdd_property_requested.connect(
         property_editor.request_widget
+    )
+    class_property_editor.signaller.create_bsdd_property_requested.connect(
+        property_editor.request_new_property
     )
 
 
@@ -103,3 +108,34 @@ def add_fields_to_widget(
     # Allowed Values Table
     table = allowed_values_table.create_widget(widget.data)
     widget.vl_values.addWidget(table)
+
+
+def create_property_creator(
+    blueprint: dict,
+    property_editor: Type[tool.PropertyEditor],
+    main_window: Type[tool.MainWindow],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+):
+    code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
+    existing_names = cp_utils.get_all_property_codes(project.get()).keys()
+    code = util.get_unique_name(code, existing_names)
+    model_dict = dict() if not blueprint else blueprint
+    if "Code" not in model_dict:
+        model_dict["Code"] = code
+    if "Name" not in model_dict:
+        model_dict["Name"] = code
+    if "DataType" not in model_dict:
+        model_dict["DataType"] = "String"
+    bsdd_property = BsddProperty.model_validate(model_dict)
+    bsdd_property._set_parent(project.get())
+
+    dialog = property_editor.create_create_dialog(bsdd_property, main_window.get())
+    widget = dialog._editor_widget
+    text = QCoreApplication.translate("ClassPropertyEditor", "Create New Property")
+    dialog.setWindowTitle(text)
+    if dialog.exec():
+        property_editor.sync_to_model(widget, bsdd_property)
+        project.get().Properties.append(bsdd_property)
+        property_editor.signaller.new_property_created.emit(bsdd_property)
+    property_editor.unregister_widget(widget)

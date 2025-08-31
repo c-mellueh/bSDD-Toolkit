@@ -22,6 +22,7 @@ def create_main_menu_actions(
 
     property_table.connect_internal_signals()
     property_table.signaller.property_info_requested.connect(property_editor.request_widget)
+    # property_table.signaller.new_property_requested.connect(property_editor.request)
 
 
 def retranslate_ui(

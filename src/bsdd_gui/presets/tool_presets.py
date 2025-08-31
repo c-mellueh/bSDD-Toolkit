@@ -273,7 +273,9 @@ class FieldHandler(ABC):
     def all_inputs_are_valid(cls, widget: QWidget):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
-            return
+            logging.info(f"No Validator Functions found for widget {widget}")
+            return True
+
         for f, (validator_function, result_function) in function_dict.items():
             if isinstance(f, QLineEdit):
                 is_valid = validator_function(f.text(), widget)

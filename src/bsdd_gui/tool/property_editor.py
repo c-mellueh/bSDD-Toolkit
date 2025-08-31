@@ -15,7 +15,8 @@ if TYPE_CHECKING:
 
 
 class Signaller(WidgetSignaller):
-    pass
+    new_property_created = Signal(object)
+    new_property_requested = Signal(object)  # blueprint: dict[] with property values
 
 
 class PropertyEditor(WidgetHandler):
@@ -31,8 +32,13 @@ class PropertyEditor(WidgetHandler):
         cls.signaller.widget_created.connect(trigger.widget_created)
         cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.data))
         cls.signaller.widget_closed.connect(trigger.widget_closed)
+        cls.signaller.new_property_requested.connect(trigger.create_property_creator)
         # Autoupdate Values
         cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.data, f))
+
+    @classmethod
+    def request_new_property(cls, blueprint: dict = None):
+        cls.signaller.new_property_requested.emit(blueprint)
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.PropertyEditor):
@@ -68,3 +74,25 @@ class PropertyEditor(WidgetHandler):
     def create_window_title(cls, bsdd_property: BsddProperty):
         text = f"bSDD Property '{bsdd_property.Code}' v{bsdd_property.VersionNumber or 1}"
         return text
+
+    @classmethod
+    def create_create_dialog(
+        cls,
+        bsdd_property: BsddProperty,
+        parent,
+    ) -> ui.PropertyCreator:
+        def validate_inputs(dial: ui.PropertyCreator):
+            widget = dial._editor_widget
+            if cls.all_inputs_are_valid(widget):
+                dial.accept()
+            else:
+                pass
+
+        dialog = ui.PropertyCreator(bsdd_property)
+        cls.get_properties().dialog = dialog
+        widget = cls.create_edit_widget(bsdd_property, parent, mode="new")
+        cls.sync_from_model(widget, bsdd_property)
+        dialog._layout.insertWidget(0, widget)
+        dialog._editor_widget = widget
+        dialog.new_button.clicked.connect(lambda _, d=dialog: validate_inputs(d))
+        return dialog

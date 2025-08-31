@@ -41,8 +41,8 @@ class Signaller(WidgetSignaller):
 
     new_value_requested = Signal(object)
     create_new_class_property_requested = Signal()
-    property_widget_requested = Signal(BsddProperty)
-    create_property_requested = Signal(ui.ClassPropertyEditor)
+    edit_bsdd_property_requested = Signal(BsddProperty)  # BsddProperty not BsddClassProperty
+    create_bsdd_property_requested = Signal(object)  # BsddProperty not BsddClassProperty
     property_specific_redraw_requested = Signal(ui.ClassPropertyEditor)
 
 
@@ -267,9 +267,16 @@ class ClassPropertyEditor(WidgetHandler):
             pass  # TODO Open Website
         elif line_edit.button_mode == BUTTON_MODE_EDIT:
             bsdd_property = cp_utils.get_internal_property(widget.data)
-            cls.signaller.property_widget_requested.emit(bsdd_property)
+            cls.signaller.edit_bsdd_property_requested.emit(bsdd_property)
         elif line_edit.button_mode == BUTTON_MODE_NEW:
-            cls.signaller.create_property_requested.emit(widget.data)
+            bsdd_class_property: BsddClassProperty = widget.data
+            code = widget.le_property_reference.text()
+            blueprint = {
+                "Code": code,
+                "Name": code,
+                "DataType": cp_utils.get_data_type(bsdd_class_property),
+            }
+            cls.signaller.create_bsdd_property_requested.emit(blueprint)
 
     @classmethod
     def update_allowed_units(cls, widget: ui.ClassPropertyEditor):
