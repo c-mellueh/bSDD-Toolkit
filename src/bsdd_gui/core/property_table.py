@@ -21,8 +21,13 @@ def create_main_menu_actions(
     property_table.set_action(main_window.get(), "open_window", action)
 
     property_table.connect_internal_signals()
+
+
+def connect_signals(
+    property_table: Type[tool.PropertyTable], property_editor: Type[tool.PropertyEditor]
+):
     property_table.signaller.property_info_requested.connect(property_editor.request_widget)
-    # property_table.signaller.new_property_requested.connect(property_editor.request)
+    property_table.signaller.new_property_requested.connect(property_editor.request_new_property)
 
 
 def retranslate_ui(
