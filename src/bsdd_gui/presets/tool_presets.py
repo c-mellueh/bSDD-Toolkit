@@ -391,7 +391,10 @@ class ViewHandler(WidgetHandler):
 
     @classmethod
     def reset_view(cls, view: QAbstractItemView):
-        source_model = view.model().sourceModel()
+        model = view.model()
+        if not model:
+            return
+        source_model = model.sourceModel()
         source_model.beginResetModel()
         source_model.endResetModel()
 

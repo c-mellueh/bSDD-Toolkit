@@ -48,20 +48,33 @@ def create_widget(parent: QWidget, property_table: Type[tool.PropertyTable]):
     widget = property_table.create_widget()
     widget.show()
 
+    def handle_current_changed(current, prv):
+        if not current.isValid():
+            return
+        index = widget.tv_properties.model().mapToSource(current)
+        bsdd_property = index.internalPointer()
+        property_table.set_active_property(bsdd_property)
+
+    widget.tv_properties.selectionModel().currentChanged.connect(handle_current_changed)
+
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTable]):
     property_table.register_widget(widget)
     property_table.register_widget(widget.tv_properties)
+    property_table.register_widget(widget.tv_classes)
     property_table.connect_widget_to_internal_signals(widget)
 
-    proxy_model = property_table.create_model()
+    proxy_model = property_table.create_property_model()
     source_model = proxy_model.sourceModel()
-    property_table.add_column_to_table(source_model, "Code", lambda a: a.Code)
+    property_table.add_column_to_table(source_model, "Code", lambda p: p.Code)
     property_table.add_column_to_table(source_model, "Datatype", lambda p: p.DataType)
-
     widget.tv_properties.setModel(proxy_model)
-    # dictionary_editor.fill_dictionary_widget(widget)
-    # dictionary_editor.color_required_fields(widget)
+
+    proxy_model = property_table.create_class_model()
+    source_model = proxy_model.sourceModel()
+    property_table.add_column_to_table(source_model, "Code", lambda c: c.Code)
+    property_table.add_column_to_table(source_model, "Name", lambda c: c.Name)
+    widget.tv_classes.setModel(proxy_model)
 
 
 def unregister_widget(
@@ -70,3 +83,4 @@ def unregister_widget(
 ):
     property_table.unregister_widget(widget)
     property_table.unregister_widget(widget.tv_properties)
+    property_table.unregister_widget(widget.tv_classes)

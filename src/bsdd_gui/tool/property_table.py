@@ -25,6 +25,7 @@ class Signaller(ViewSignaller, WidgetSignaller):
     property_info_requested = Signal(BsddProperty, ui.PropertyWidget)
     reset_all_property_tables_requested = Signal()
     new_property_requested = Signal()
+    active_property_changed = Signal(object)
 
 
 class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler):
@@ -38,6 +39,7 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
     def connect_internal_signals(cls):
         cls.signaller.widget_requested.connect(lambda _, p: trigger.create_widget(p))
         cls.signaller.widget_created.connect(trigger.widget_created)
+        cls.signaller.active_property_changed.connect(lambda _: cls.reset_views())
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.PropertyWidget):
@@ -55,6 +57,12 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
             lambda _, w=widget: cls.signaller.new_property_requested.emit()
         )
 
+        def handle_prop_change(new_prop: BsddProperty):
+            code = new_prop.Code if new_prop else ""
+            w.lb_property_name.setText(code)
+
+        cls.signaller.active_property_changed.connect(handle_prop_change)
+
     @classmethod
     def request_new_property(cls):
         cls.signaller.new_property_requested.emit()
@@ -67,8 +75,24 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
         return widget
 
     @classmethod
-    def create_model(cls):
+    def create_property_model(cls):
         model = models.PropertyTableModel()
         sort_filter_model = models.SortModel()
         sort_filter_model.setSourceModel(model)
         return sort_filter_model
+
+    @classmethod
+    def create_class_model(cls):
+        model = models.ClassTableModel()
+        sort_filter_model = models.SortModel()
+        sort_filter_model.setSourceModel(model)
+        return sort_filter_model
+
+    @classmethod
+    def get_active_property(cls) -> BsddProperty:
+        return cls.get_properties().active_property
+
+    @classmethod
+    def set_active_property(cls, value: BsddProperty):
+        cls.get_properties().active_property = value
+        cls.signaller.active_property_changed.emit(value)

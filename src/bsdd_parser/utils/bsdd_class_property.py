@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from bsdd_parser import BsddClassProperty, BsddProperty, BsddDictionary
+from bsdd_parser import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass
 import bsdd
 from bsdd import Client
 from . import bsdd_dictionary
@@ -103,3 +103,17 @@ def get_units(class_property: BsddClassProperty):
     if bsdd_property is None:
         return []
     return bsdd_property.Units or []
+
+
+def get_classes_with_bsdd_property(property_code: str, bsdd_dictionary: BsddDictionary):
+    is_external = True if property_code.startswith("https://") else False
+
+    def _has_prop(c: BsddClass):
+        for p in c.ClassProperties:
+            if is_external and p.PropertyUri == property_code:
+                return True
+            elif not is_external and p.PropertyCode == property_code:
+                return True
+        return False
+
+    return list(filter(_has_prop, bsdd_dictionary.Classes))
