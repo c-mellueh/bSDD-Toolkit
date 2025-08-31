@@ -20,14 +20,14 @@ def create_main_menu_actions(
     )
     property_table.set_action(main_window.get(), "open_window", action)
 
-    property_table.connect_internal_signals()
-
 
 def connect_signals(
     property_table: Type[tool.PropertyTable], property_editor: Type[tool.PropertyEditor]
 ):
     property_table.signaller.property_info_requested.connect(property_editor.request_widget)
     property_table.signaller.new_property_requested.connect(property_editor.request_new_property)
+    property_editor.signaller.new_property_created.connect(lambda _: property_table.reset_views())
+    property_table.connect_internal_signals()
 
 
 def retranslate_ui(
@@ -51,6 +51,7 @@ def create_widget(parent: QWidget, property_table: Type[tool.PropertyTable]):
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTable]):
     property_table.register_widget(widget)
+    property_table.register_widget(widget.tv_properties)
     property_table.connect_widget_to_internal_signals(widget)
 
     proxy_model = property_table.create_model()
@@ -68,3 +69,4 @@ def unregister_widget(
     property_table: Type[tool.PropertyTable],
 ):
     property_table.unregister_widget(widget)
+    property_table.unregister_widget(widget.tv_properties)

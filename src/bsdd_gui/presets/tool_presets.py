@@ -381,6 +381,15 @@ class ViewHandler(WidgetHandler):
         return None
 
     @classmethod
+    def get_views(cls):
+        return [v for v in cls.get_properties().widgets if isinstance(v, QAbstractItemView)]
+
+    @classmethod
+    def reset_views(cls):
+        for view in cls.get_views():
+            cls.reset_view(view)
+
+    @classmethod
     def reset_view(cls, view: QAbstractItemView):
         source_model = view.model().sourceModel()
         source_model.beginResetModel()
