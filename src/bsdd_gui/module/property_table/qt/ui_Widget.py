@@ -96,6 +96,6 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", "Form", None))
-        self.tb_new.setText(QCoreApplication.translate("Form", "+", None))
+        self.tb_new.setText(QCoreApplication.translate("Form", "New", None))
 
     # retranslateUi

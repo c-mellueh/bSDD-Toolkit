@@ -5,6 +5,7 @@ import logging
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignaller
 from bsdd_parser import BsddClassProperty, BsddDictionary, BsddProperty
+from bsdd_parser.utils import bsdd_class_property as cp_utils
 from bsdd_gui.module.property_editor import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
@@ -96,3 +97,25 @@ class PropertyEditor(WidgetHandler):
         dialog._editor_widget = widget
         dialog.new_button.clicked.connect(lambda _, d=dialog: validate_inputs(d))
         return dialog
+
+    @classmethod
+    def is_code_valid(cls, code: str, widget: ui.PropertyEditor, bsdd_dictionary: BsddDictionary):
+        if not code:
+            return False
+        bsdd_property = widget.data
+        for prop in bsdd_dictionary.Properties:
+            if prop.Code == code and prop != bsdd_property:
+                return False
+        return True
+
+    @classmethod
+    def is_name_valid(
+        cls,
+        name: str,
+        widget: ui.PropertyEditor,
+    ):
+        return bool(name)
+
+    @classmethod
+    def is_datatype_valid(cls, datatype: str, widget: ui.PropertyEditor):
+        return datatype in ["Boolean", "Character", "Integer", "Real", "String", "Tim"]

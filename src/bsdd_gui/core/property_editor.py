@@ -110,6 +110,32 @@ def add_fields_to_widget(
     widget.vl_values.addWidget(table)
 
 
+def add_validator_functions_to_widget(
+    widget: ui.PropertyEditor,
+    property_editor: Type[tool.PropertyEditor],
+    util: Type[tool.Util],
+    project: Type[tool.Project],
+):
+    property_editor.add_validator(
+        widget,
+        widget.le_code,
+        lambda v, w: property_editor.is_code_valid(v, w, project.get()),
+        lambda w, v: util.set_invalid(w, not v),
+    )
+    property_editor.add_validator(
+        widget,
+        widget.le_name,
+        property_editor.is_name_valid,
+        lambda w, v: util.set_invalid(w, not v),
+    )
+    property_editor.add_validator(
+        widget,
+        widget.cb_datatype,
+        property_editor.is_datatype_valid,
+        lambda w, v: util.set_invalid(w, not v),
+    )
+
+
 def create_property_creator(
     blueprint: dict,
     property_editor: Type[tool.PropertyEditor],
