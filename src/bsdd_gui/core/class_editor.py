@@ -74,8 +74,9 @@ def register_widget(
     relationship_editor.init_widget(widget.relationship_editor, widget.data, mode="dialog")
 
 
-def connect_signals(class_editor: Type[tool.ClassEditor]):
+def connect_signals(class_editor: Type[tool.ClassEditor], project: Type[tool.Project]):
     class_editor.connect_signaller()
+    class_editor.signaller.new_class_created.connect(project.signaller.class_added.emit)
 
 
 def connect_to_main_window(

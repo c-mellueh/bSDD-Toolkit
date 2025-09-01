@@ -126,6 +126,7 @@ class ClassTree(ItemModelHandler, ViewHandler):
         for child in class_utils.get_children(bsdd_class):
             model.move_row(child, parent)
         model.remove_row(bsdd_class)
+        cls.signaller.item_deleted.emit(bsdd_class)
 
     @classmethod
     def move_class(cls, bsdd_class: BsddClass, new_parent: BsddClass | None):
@@ -144,6 +145,7 @@ class ClassTree(ItemModelHandler, ViewHandler):
 
         for node in reversed(to_delete):
             model.remove_row(node)
+            cls.signaller.item_deleted.emit(node)
 
     @classmethod
     def select_and_expand(cls, bsdd_class: BsddClass, view: ui.ClassView | None = None) -> bool:

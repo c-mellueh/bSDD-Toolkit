@@ -9,7 +9,7 @@ from . import ui
 
 
 def connect():
-    core.connect_signals(tool.PropertyEditor, tool.ClassPropertyEditor)
+    core.connect_signals(tool.PropertyEditor, tool.ClassPropertyEditor, tool.Project)
 
 
 def retranslate_ui():

@@ -364,6 +364,7 @@ class ViewSignaller(WidgetSignaller):
     model_refresh_requested = Signal()
     selection_changed = Signal(QWidget, Any)
     delete_selection_requested = Signal(QWidget)
+    item_deleted = Signal([object])  # Write BsddClass, BsddProperty etc not QModelIndex in Signal
 
 
 class ViewHandler(WidgetHandler):

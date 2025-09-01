@@ -4,7 +4,7 @@ import logging
 import os
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ModuleHandler
-from bsdd_parser import BsddDictionary
+from bsdd_parser import BsddDictionary, BsddClass, BsddProperty
 from bsdd_gui.module.project import ui
 from PySide6.QtCore import QObject, Signal
 
@@ -14,6 +14,10 @@ if TYPE_CHECKING:
 
 class Signaller(QObject):
     data_changed = Signal(str, object)  # name of datafield, new_value
+    class_added = Signal(BsddClass)
+    class_removed = Signal(BsddClass)
+    property_added = Signal(BsddProperty)
+    property_removed = Signal(BsddProperty)
 
 
 class Project(ModuleHandler):

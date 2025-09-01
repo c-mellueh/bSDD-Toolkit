@@ -39,6 +39,7 @@ def open_edit_window(
 def connect_signals(
     property_editor: Type[tool.PropertyEditor],
     class_property_editor: Type[tool.ClassPropertyEditor],
+    project: Type[tool.Project],
 ):
     property_editor.connect_internal_signals()
     class_property_editor.signaller.edit_bsdd_property_requested.connect(
@@ -47,6 +48,8 @@ def connect_signals(
     class_property_editor.signaller.create_bsdd_property_requested.connect(
         property_editor.request_new_property
     )
+
+    property_editor.signaller.new_property_created.connect(project.signaller.property_added.emit)
 
 
 def unregister_widget(

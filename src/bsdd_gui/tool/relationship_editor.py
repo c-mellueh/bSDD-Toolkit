@@ -2,13 +2,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 import logging
 
-from PySide6.QtWidgets import QTreeView
+from PySide6.QtWidgets import QTreeView, QCompleter
+from PySide6.QtCore import Qt
 import bsdd_gui
 from bsdd_parser import BsddProperty, BsddClass, BsddDictionary
 from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller, ItemModelHandler
 from bsdd_parser.utils import bsdd_dictionary as dict_util
-from bsdd_parser.utils import bsdd_class as cl_utils
-from bsdd_parser.utils import bsdd_class_property as prop_utils
+from bsdd_parser.utils import bsdd_class as cl_util
+from bsdd_parser.utils import bsdd_class_property as prop_util
 
 if TYPE_CHECKING:
     from bsdd_gui.module.relationship_editor.prop import RelationshipEditorProperties
@@ -57,9 +58,9 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
         if dict_util.is_uri(value):
             return True
         if isinstance(widget.data, BsddClass):
-            element = cl_utils.get_class_by_code(bsdd_dictionary, value)
+            element = cl_util.get_class_by_code(bsdd_dictionary, value)
         elif isinstance(widget.data, BsddProperty):
-            element = prop_utils.get_property_by_code(value, bsdd_dictionary)
+            element = prop_util.get_property_by_code(value, bsdd_dictionary)
         if element is None:
             return False
         if element == widget.data:
@@ -107,3 +108,39 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
     ):
         widget.lb_owned_uri.setVisible(bsdd_dictionary.UseOwnUri)
         widget.le_owned_uri.setVisible(bsdd_dictionary.UseOwnUri)
+
+    @classmethod
+    def update_code_completer(
+        cls,
+        widget: ui.RelationshipWidget,
+        bsdd_dictionary: BsddDictionary,
+    ):
+
+        if isinstance(widget.data, BsddClass):
+            codes = [c.Code for c in bsdd_dictionary.Classes]
+            completer = QCompleter(codes)
+        else:
+            codes = [c.Code for c in bsdd_dictionary.Properties]
+            completer = QCompleter(codes)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        widget.le_related_class.setCompleter(completer)
+
+    @classmethod
+    def update_on_dict_change(cls, field_name, value, bsdd_dictionary: BsddDictionary):
+        if field_name == "UseOwnUri":
+            for widget in cls.get_widgets():
+                if not isinstance(widget, ui.RelationshipWidget):
+                    continue
+                cls.update_owned_uri_visibility(widget, bsdd_dictionary)
+        if field_name in ["DictionaryVersion", "OrganizationCode", "DictionaryCode"]:
+            for cl in bsdd_dictionary.Classes:
+                cl_util.update_relations_to_new_uri(cl, bsdd_dictionary)
+            for prop in bsdd_dictionary.Properties:
+                prop_util.update_relations_to_new_uri(prop, bsdd_dictionary)
+
+    @classmethod
+    def update_all_completers(cls, bsdd_dictionary: BsddDictionary):
+        for widget in cls.get_widgets():
+            if not isinstance(widget, ui.RelationshipWidget):
+                continue
+            cls.update_code_completer(widget, bsdd_dictionary)

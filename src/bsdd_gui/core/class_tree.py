@@ -10,15 +10,13 @@ if TYPE_CHECKING:
     from bsdd_parser.models import BsddClass
 
 
-def connect_signals(
-    class_tree: Type[tool.ClassTree],
-    class_editor: Type[tool.ClassEditor],
-):
+def connect_signals(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
     def insert_class(new_class: BsddClass):
         class_tree.add_class_to_dictionary(new_class)
 
     class_tree.connect_internal_signals()
-    class_editor.signaller.new_class_created.connect(insert_class)
+    project.signaller.class_added.connect(insert_class)
+    class_tree.signaller.item_deleted.connect(project.signaller.class_removed.emit)
 
 
 def connect_view(

@@ -12,7 +12,7 @@ from PySide6.QtCore import (
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_parser.models import BsddDictionary, BsddClass, BsddProperty
-from bsdd_parser.utils import bsdd_class as cl_utils
+from bsdd_parser.utils import bsdd_class as cl_util
 from bsdd_parser.utils import bsdd_class_property as cl_prop_utils
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
@@ -41,10 +41,10 @@ class ClassTreeModel(ItemModel):
         if parent.isValid() and parent.column() != 0:
             return 0
         if not parent.isValid():
-            return len(cl_utils.get_root_classes(self.bsdd_dictionary))
+            return len(cl_util.get_root_classes(self.bsdd_dictionary))
         else:
             bsdd_class: BsddClass = parent.internalPointer()
-            return len(cl_utils.get_children(bsdd_class))
+            return len(cl_util.get_children(bsdd_class))
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         # Für Eltern in Spalte != 0 KEINE Kinder liefern
@@ -52,14 +52,14 @@ class ClassTreeModel(ItemModel):
             return QModelIndex()
 
         if not parent.isValid():
-            roots = cl_utils.get_root_classes(self.bsdd_dictionary)
+            roots = cl_util.get_root_classes(self.bsdd_dictionary)
             if 0 <= row < len(roots):
                 return self.createIndex(row, column, roots[row])
             return QModelIndex()
 
         parent = parent.siblingAtColumn(0)  # optional, schadet nicht
         parent_class: BsddClass = parent.internalPointer()
-        children = cl_utils.get_children(parent_class)
+        children = cl_util.get_children(parent_class)
         if 0 <= row < len(children):
             return self.createIndex(row, column, children[row])
         return QModelIndex()
@@ -75,21 +75,21 @@ class ClassTreeModel(ItemModel):
         if not node.ParentClassCode:
             return QModelIndex()  # root hat keinen Parent
 
-        parent_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, node.ParentClassCode)
+        parent_cls = cl_util.get_class_by_code(self.bsdd_dictionary, node.ParentClassCode)
         if parent_cls is None:
             return QModelIndex()
 
         # Geschwister des Elterns ermitteln – exakt wie in index():
         gp_code = parent_cls.ParentClassCode
         if gp_code:
-            gp_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, gp_code)
+            gp_cls = cl_util.get_class_by_code(self.bsdd_dictionary, gp_code)
             siblings = (
-                cl_utils.get_children(gp_cls)
+                cl_util.get_children(gp_cls)
                 if gp_cls is not None
-                else cl_utils.get_root_classes(self.bsdd_dictionary)
+                else cl_util.get_root_classes(self.bsdd_dictionary)
             )
         else:
-            siblings = cl_utils.get_root_classes(self.bsdd_dictionary)
+            siblings = cl_util.get_root_classes(self.bsdd_dictionary)
 
         try:
             row = siblings.index(parent_cls)
@@ -101,7 +101,7 @@ class ClassTreeModel(ItemModel):
     def _get_current_parent_index(self, bsdd_class: BsddClass):
         # Determine the correct parent index in the CURRENT hierarchy
         if bsdd_class.ParentClassCode:
-            parent_class = cl_utils.get_class_by_code(
+            parent_class = cl_util.get_class_by_code(
                 self.bsdd_dictionary, bsdd_class.ParentClassCode
             )
             if parent_class is None:
@@ -125,13 +125,13 @@ class ClassTreeModel(ItemModel):
     def _parent_and_siblings(self, c: BsddClass) -> tuple[QModelIndex, list[BsddClass]]:
         """Ermittle *aktuellen* Parent-Index und die *aktuelle* Geschwisterliste von c."""
         if c.ParentClassCode:
-            parent_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, c.ParentClassCode)
+            parent_cls = cl_util.get_class_by_code(self.bsdd_dictionary, c.ParentClassCode)
             if parent_cls is not None:
                 parent_index = self._index_for_class(parent_cls)
-                siblings = cl_utils.get_children(parent_cls)
+                siblings = cl_util.get_children(parent_cls)
                 return parent_index, siblings
         # Root-Fall
-        return QModelIndex(), cl_utils.get_root_classes(self.bsdd_dictionary)
+        return QModelIndex(), cl_util.get_root_classes(self.bsdd_dictionary)
 
     def remove_row(self, bsdd_class: BsddClass) -> bool:
         old_index = self._index_for_class(bsdd_class)
@@ -139,7 +139,7 @@ class ClassTreeModel(ItemModel):
         row = old_index.row()
 
         self.beginRemoveRows(parent_index, row, row)
-        cl_utils.remove_class(bsdd_class)  # entfernt das Objekt aus bsdd_dictionary.Classes
+        cl_util.remove_class(bsdd_class)  # entfernt das Objekt aus bsdd_dictionary.Classes
         self.endRemoveRows()
         return True
 
@@ -148,7 +148,7 @@ class ClassTreeModel(ItemModel):
         new_parent_index = (
             QModelIndex() if new_parent is None else self._index_for_class(new_parent)
         )
-        row = cl_utils.get_row_index(bsdd_class)
+        row = cl_util.get_row_index(bsdd_class)
         new_row_count = self.rowCount(new_parent_index)
         self.beginMoveRows(old_parent_index, row, row, new_parent_index, new_row_count)
         bsdd_class.ParentClassCode = None if new_parent is None else new_parent.Code
@@ -159,15 +159,15 @@ class ClassTreeModel(ItemModel):
         # find its parent chain to build the index properly
         parent_code = cls.ParentClassCode
         if parent_code:
-            parent_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, parent_code)
+            parent_cls = cl_util.get_class_by_code(self.bsdd_dictionary, parent_code)
             gp_idx = self._index_for_class(parent_cls)  # recurse to get parent's parent index
             # children of the parent
-            children = cl_utils.get_children(parent_cls)
+            children = cl_util.get_children(parent_cls)
             row = children.index(cls)
             return self.index(row, 0, gp_idx)
         else:
             # root class
-            roots = cl_utils.get_root_classes(self.bsdd_dictionary)
+            roots = cl_util.get_root_classes(self.bsdd_dictionary)
             row = roots.index(cls)
             return self.index(row, 0, QModelIndex())
 
@@ -237,7 +237,7 @@ class ClassTreeModel(ItemModel):
                 return False
             # one-at-a-time move (extend to multi later if needed)
             code = codes[0]
-            node = cl_utils.get_class_by_code(self.bsdd_dictionary, code)
+            node = cl_util.get_class_by_code(self.bsdd_dictionary, code)
             if node is None:
                 return False
             # destination row (append)
@@ -275,7 +275,7 @@ class ClassTreeModel(ItemModel):
         while cur and cur.ParentClassCode:
             if cur.ParentClassCode == maybe_ancestor.Code:
                 return True
-            cur = cl_utils.get_class_by_code(self.bsdd_dictionary, cur.ParentClassCode)
+            cur = cl_util.get_class_by_code(self.bsdd_dictionary, cur.ParentClassCode)
         return False
 
     def _import_classes_payload(
@@ -319,7 +319,7 @@ class ClassTreeModel(ItemModel):
         ordered_class_codes = sorted(class_code_dict.keys(), key=depth_of)  # parents first
 
         # 2) conflict-safe code mapping
-        existing_classes = set(cl_utils.get_all_class_codes(self.bsdd_dictionary))
+        existing_classes = set(cl_util.get_all_class_codes(self.bsdd_dictionary))
         existing_properties = set(cl_prop_utils.get_property_code_dict(self.bsdd_dictionary))
 
         old2new = {}
@@ -393,10 +393,10 @@ class ClassTreeModel(ItemModel):
 
         # current position of the node among its siblings
         siblings_src = (
-            cl_utils.get_root_classes(self.bsdd_dictionary)
+            cl_util.get_root_classes(self.bsdd_dictionary)
             if not bsdd_class.ParentClassCode
-            else cl_utils.get_children(
-                cl_utils.get_class_by_code(self.bsdd_dictionary, bsdd_class.ParentClassCode)
+            else cl_util.get_children(
+                cl_util.get_class_by_code(self.bsdd_dictionary, bsdd_class.ParentClassCode)
             )
         )
         try:
@@ -425,7 +425,7 @@ class ClassTreeModel(ItemModel):
                 continue
             seen_codes.add(n.Code)
             out.append(n)
-            stack.extend(cl_utils.get_children(n))
+            stack.extend(cl_util.get_children(n))
         return out
 
     def _classes_to_json_bytes(self, classes: list[BsddClass], *, include_subtree: bool) -> bytes:
