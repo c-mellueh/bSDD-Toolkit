@@ -40,7 +40,22 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
     def connect_internal_signals(cls):
         cls.signaller.widget_requested.connect(lambda _, p: trigger.create_widget(p))
         cls.signaller.widget_created.connect(trigger.widget_created)
-        cls.signaller.active_property_changed.connect(lambda _: cls.reset_views())
+        # Only class list depends on the active property; avoid resetting the
+        # properties table itself on selection changes to keep keyboard
+        # navigation intact.
+        cls.signaller.active_property_changed.connect(lambda _: cls.reset_class_views())
+
+    @classmethod
+    def reset_class_views(cls):
+        for w in cls.get_widgets():
+            # Registered widgets include the container widget and its views.
+            # We only want to refresh the classes table when the active
+            # property changes.
+            try:
+                if hasattr(w, "tv_classes"):
+                    cls.reset_view(w.tv_classes)
+            except Exception:
+                pass
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.PropertyWidget):

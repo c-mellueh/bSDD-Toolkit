@@ -51,3 +51,15 @@ class ItemModel(QAbstractItemModel):
         if orientation == Qt.Orientation.Vertical:
             return None
         return self.tool.get_column_names(self)[section]
+
+    def flags(self, index: QModelIndex):
+        """Ensure items are selectable and enabled for keyboard navigation.
+
+        Qt's default flags implementation may not include ItemIsSelectable,
+        which prevents arrow-key navigation/selecting. This base implementation
+        guarantees that valid indexes are both enabled and selectable.
+        """
+        base = super().flags(index)
+        if not index.isValid():
+            return base
+        return base | Qt.ItemIsSelectable | Qt.ItemIsEnabled

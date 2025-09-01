@@ -386,6 +386,7 @@ class ViewHandler(WidgetHandler):
 
     @classmethod
     def reset_views(cls):
+        logging.info(f"Reset Views")
         for view in cls.get_views():
             cls.reset_view(view)
 
