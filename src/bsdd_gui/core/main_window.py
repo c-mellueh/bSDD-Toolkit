@@ -22,7 +22,7 @@ def create_main_window(
     main_window.install_validation_styles(application)
 
 
-def connect_main_window(main_window: Type[tool.MainWindow], pset_list: Type[tool.PropertySetTable]):
+def connect_main_window(main_window: Type[tool.MainWindow], class_tree: Type[tool.ClassTree]):
     main_window.signaller.active_class_changed.connect(
         lambda c: main_window.set_class_text(c.Name if c is not None else "")
     )
@@ -35,3 +35,8 @@ def connect_main_window(main_window: Type[tool.MainWindow], pset_list: Type[tool
     ui.button_classes_add.clicked.connect(signaller.new_class_requested.emit)
     ui.button_Pset_add.clicked.connect(signaller.new_property_set_requested.emit)
     ui.button_property_add.clicked.connect(signaller.new_property_requested.emit)
+
+    ui.button_search.clicked.connect(
+        lambda _: class_tree.request_search(main_window.get_class_view())
+    )
+    main_window.connect_internal_signals()

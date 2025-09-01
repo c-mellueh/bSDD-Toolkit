@@ -17,7 +17,7 @@ def connect_signals(
     def insert_class(new_class: BsddClass):
         class_tree.add_class_to_dictionary(new_class)
 
-    class_tree.connect_signals()
+    class_tree.connect_internal_signals()
     class_editor.signaller.new_class_created.connect(insert_class)
 
 
@@ -188,3 +188,16 @@ def copy_selected_class(
     view: ui.ClassView,
 ):
     pass
+
+
+def search_class(
+    view: ui.ClassView,
+    search: Type[tool.Search],
+    class_tree: Type[tool.ClassTree],
+    project: Type[tool.Project],
+):
+
+    cl = search.search_class(project.get().Classes)
+    if not cl:
+        return
+    class_tree.select_and_expand(cl, view)

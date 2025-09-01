@@ -8,6 +8,7 @@ from bsdd_gui.module.main_window import ui
 from bsdd_parser.models import BsddClass, BsddClassProperty
 from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
 from PySide6.QtGui import QAction
+from bsdd_gui.module.main_window import trigger
 
 if TYPE_CHECKING:
     from bsdd_gui.module.main_window.prop import MainWindowProperties
@@ -29,6 +30,10 @@ class MainWindow:
     @classmethod
     def get_properties(cls) -> MainWindowProperties:
         return bsdd_gui.MainWindowProperties
+
+    @classmethod
+    def connect_internal_signals(cls):
+        pass
 
     @classmethod
     def create(cls, application: QApplication) -> ui.MainWindow:

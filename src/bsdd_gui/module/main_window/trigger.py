@@ -7,7 +7,7 @@ TOOGLE_CONSOLE_ACTION = "toggle_console"
 
 
 def connect():
-    core.connect_main_window(tool.MainWindow, tool.PropertySetTable)
+    core.connect_main_window(tool.MainWindow, tool.ClassTree)
 
 
 def on_new_project():

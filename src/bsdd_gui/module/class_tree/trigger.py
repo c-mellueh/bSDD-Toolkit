@@ -50,3 +50,7 @@ def delete_selection(view: ui.ClassView):
 
 def group_selection(view: ui.ClassView):
     core.group_selection(view, tool.ClassTree, tool.ClassEditor)
+
+
+def search_class(view: ui.ClassView):
+    core.search_class(view, tool.Search, tool.ClassTree, tool.Project)

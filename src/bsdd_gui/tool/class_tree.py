@@ -34,15 +34,20 @@ class ClassTree(ItemModelHandler, ViewHandler):
         return bsdd_gui.ClassTreeProperties
 
     @classmethod
-    def connect_signals(cls):
+    def connect_internal_signals(cls):
         cls.signaller.model_refresh_requested.connect(trigger.reset_class_views)
         cls.signaller.copy_selection_requested.connect(trigger.copy_selected_class)
         cls.signaller.delete_selection_requested.connect(trigger.delete_selection)
         cls.signaller.group_selection_requested.connect(trigger.group_selection)
+        cls.signaller.search_requested.connect(trigger.search_class)
 
     @classmethod
     def connect_view_signals(cls, view: ui.ClassView):
         view.customContextMenuRequested.connect(lambda p: trigger.create_context_menu(view, p))
+
+    @classmethod
+    def request_search(cls, view: ui.ClassView):
+        cls.signaller.search_requested.emit(view)
 
     @classmethod
     def create_model(cls, bsdd_dictionary: BsddDictionary):
