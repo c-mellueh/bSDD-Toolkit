@@ -2,9 +2,47 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Iterable, Optional, Literal, Dict, List, Set
 import logging
 from . import bsdd_dictionary as dict_util
+import bsdd
 
-if TYPE_CHECKING:
-    from bsdd_parser.models import BsddDictionary, BsddClass
+from bsdd_parser.models import BsddDictionary, BsddClass
+
+
+class Cache:
+    data = {}
+
+    @classmethod
+    def get_external_class(
+        cls, class_uri: str, client: bsdd.Client | None = None
+    ) -> BsddClass | None:
+        from bsdd_parser.utils import bsdd_class_property as cp_utils
+
+        def _make_request():
+            if not dict_util.is_uri(class_uri):
+                return dict()
+            c = bsdd.Client() if client is None else client
+            result = c.get_class(
+                class_uri,
+                include_class_properties=False,
+                include_class_relations=False,
+                include_reverse_relations=False,
+            )
+
+            if "statusCode" in result and result["statusCode"] == 400:
+                return None
+            return result
+
+        if not class_uri:
+            return None
+        if class_uri not in cls.data:
+            result = _make_request()
+            if result is not None:
+                result = BsddClass.model_validate(result)
+            cls.data[class_uri] = result
+        return cls.data[class_uri]
+
+    @classmethod
+    def flush_data(cls):
+        cls.data = dict()
 
 
 def get_root_classes(bsdd_dictionary: BsddDictionary):
@@ -45,7 +83,11 @@ def get_parent(bsdd_class: BsddClass) -> BsddClass | None:
 
 
 def get_class_by_code(bsdd_dictionary: BsddDictionary, code: str) -> BsddClass | None:
-    return get_all_class_codes(bsdd_dictionary).get(code)
+    if dict_util.is_uri(code):
+        bsdd_class = Cache.get_external_class(code)
+    else:
+        bsdd_class = get_all_class_codes(bsdd_dictionary).get(code)
+    return bsdd_class
 
 
 def get_all_class_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddClass]:
@@ -134,3 +176,16 @@ def update_relations_to_new_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDict
         new_uri["version"] = version
         if old_uri != new_uri:
             relationship.RelatedClassUri = dict_util.build_bsdd_url(new_uri)
+
+
+def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
+    data = {
+        "namespace": [bsdd_dictionary.OrganizationCode, bsdd_dictionary.DictionaryCode],
+        "version": bsdd_dictionary.DictionaryVersion,
+        "resource_type": "class",
+        "resource_id": bsdd_class.Code,
+    }
+    if bsdd_dictionary.UseOwnUri:
+        data["host"] = bsdd_dictionary.DictionaryUri
+
+    return dict_util.build_bsdd_url(data)

@@ -81,7 +81,6 @@ def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
     or from a dict with keys:
       - scheme (default "https")
       - host (default "identifier.buildingsmart.org")
-      - path_segments
       - after_uri
       - namespace: "hw/som" or ["hw","som"]
       - version

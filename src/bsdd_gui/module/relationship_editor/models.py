@@ -11,7 +11,14 @@ from typing import Literal
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty, BsddProperty
+from bsdd_parser.models import (
+    BsddDictionary,
+    BsddClass,
+    BsddClassProperty,
+    BsddProperty,
+    BsddClassRelation,
+    BsddPropertyRelation,
+)
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
 
@@ -52,6 +59,13 @@ class PropertyModel(ItemModel):
     def setData(self, index, value, /, role=...):
         return False
 
+    def append_row(self, property_relation: BsddPropertyRelation):
+        parent_index = QModelIndex()
+        insert_row = self.rowCount(parent_index)  # current child count
+        self.beginInsertRows(parent_index, insert_row, insert_row)
+        self.bsdd_property.PropertyRelations.append(property_relation)
+        self.endInsertRows()
+
 
 class ClassModel(ItemModel):
 
@@ -88,6 +102,13 @@ class ClassModel(ItemModel):
     def beginResetModel(self):
         self._data = None
         return super().beginResetModel()
+
+    def append_row(self, class_relation: BsddClassRelation):
+        parent_index = QModelIndex()
+        insert_row = self.rowCount(parent_index)  # current child count
+        self.beginInsertRows(parent_index, insert_row, insert_row)
+        self.bsdd_class.ClassRelations.append(class_relation)
+        self.endInsertRows()
 
 
 # typing

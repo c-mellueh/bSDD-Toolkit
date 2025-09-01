@@ -5,7 +5,13 @@ import logging
 from PySide6.QtWidgets import QTreeView, QCompleter
 from PySide6.QtCore import Qt
 import bsdd_gui
-from bsdd_parser import BsddProperty, BsddClass, BsddDictionary
+from bsdd_parser import (
+    BsddProperty,
+    BsddClass,
+    BsddDictionary,
+    BsddClassRelation,
+    BsddPropertyRelation,
+)
 from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller, ItemModelHandler
 from bsdd_parser.utils import bsdd_dictionary as dict_util
 from bsdd_parser.utils import bsdd_class as cl_util
@@ -53,6 +59,7 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
         widget.cb_relation_type.currentTextChanged.connect(
             lambda _w=widget: cls.update_code_completer(widget, bsdd_dictionary)
         )
+        widget.tb_add.clicked.connect(lambda _, w=widget: cls.add_row_to_model(w, bsdd_dictionary))
 
     @classmethod
     def is_related_class_valid(
@@ -129,7 +136,7 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
             codes = [c.Code for c in bsdd_dictionary.Properties]
             completer = QCompleter(codes)
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        widget.le_related_class.setCompleter(completer)
+        widget.le_related_element.setCompleter(completer)
 
     @classmethod
     def update_on_dict_change(cls, field_name, value, bsdd_dictionary: BsddDictionary):
@@ -150,3 +157,55 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
             if not isinstance(widget, ui.RelationshipWidget):
                 continue
             cls.update_code_completer(widget, bsdd_dictionary)
+
+    @classmethod
+    def add_row_to_model(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
+        def clear_inputs():
+            widget.le_owned_uri.clear()
+            widget.le_related_element.clear()
+            widget.ds_fraction.clear()
+
+        model = widget.tv_relations.model().sourceModel()
+        model: models.ClassModel | models.PropertyModel
+        model_kind = "class" if isinstance(model, models.ClassModel) else "property"
+        data_dict = {"RelationType": widget.cb_relation_type.currentText()}
+        if bsdd_dictionary.UseOwnUri and widget.le_owned_uri.text():
+            data_dict["OwnedUri"] = widget.le_owned_uri.text()
+
+        if model_kind == "class":
+            code = widget.le_related_element.text()
+            related_class = cl_util.get_class_by_code(bsdd_dictionary, code)
+            if not related_class:
+                clear_inputs()
+                return
+            if dict_util.is_uri(code):
+                data_dict["RelatedClassUri"] = code
+            else:
+                data_dict["RelatedClassUri"] = cl_util.build_bsdd_uri(
+                    related_class, bsdd_dictionary
+                )
+            data_dict["RelatedClassName"] = related_class.Name
+
+            if (
+                widget.cb_fraction.isChecked()
+                and widget.cb_relation_type.currentText() == "HasMaterial"
+            ):
+                data_dict["Fraction"] = widget.ds_fraction.value()
+            relation = BsddClassRelation.model_validate(data_dict)
+        else:
+            code = widget.le_related_element.text()
+            related_property = prop_util.get_property_by_code(bsdd_dictionary, code)
+            if not related_property:
+                clear_inputs()
+                return
+            if dict_util.is_uri(code):
+                data_dict["RelatedPropertyUri"] = code
+            else:
+                data_dict["RelatedPropertyUri"] = prop_util.build_bsdd_uri(
+                    related_property, bsdd_dictionary
+                )
+            data_dict["RelatedPropertyName"] = related_property.Name
+            relation = BsddPropertyRelation.model_validate(data_dict)
+
+        model.append_row(relation)
+        clear_inputs()

@@ -95,11 +95,11 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.ds_fraction, 1, 2, 1, 1)
 
-        self.le_related_class = QLineEdit(Form)
-        self.le_related_class.setObjectName("le_related_class")
-        self.le_related_class.setPlaceholderText("https://identifier.buildingsmart.org/uri/...")
+        self.le_related_element = QLineEdit(Form)
+        self.le_related_element.setObjectName("le_related_element")
+        self.le_related_element.setPlaceholderText("https://identifier.buildingsmart.org/uri/...")
 
-        self.gridLayout.addWidget(self.le_related_class, 0, 11, 1, 1)
+        self.gridLayout.addWidget(self.le_related_element, 0, 11, 1, 1)
 
         self.lb_owned_uri = QLabel(Form)
         self.lb_owned_uri.setObjectName("lb_owned_uri")
@@ -134,10 +134,10 @@ class Ui_Form(object):
 
         self.hl_releationship_button = QHBoxLayout()
         self.hl_releationship_button.setObjectName("hl_releationship_button")
-        self.toolButton = QToolButton(Form)
-        self.toolButton.setObjectName("toolButton")
+        self.tb_add = QToolButton(Form)
+        self.tb_add.setObjectName("tb_add")
 
-        self.hl_releationship_button.addWidget(self.toolButton)
+        self.hl_releationship_button.addWidget(self.tb_add)
 
         self.horizontalSpacer = QSpacerItem(
             40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
@@ -182,6 +182,6 @@ class Ui_Form(object):
         self.cb_relation_type.setItemText(6, QCoreApplication.translate("Form", "HasPart", None))
         self.cb_relation_type.setItemText(7, QCoreApplication.translate("Form", "IsPartOf", None))
 
-        self.toolButton.setText(QCoreApplication.translate("Form", "Add", None))
+        self.tb_add.setText(QCoreApplication.translate("Form", "Add", None))
 
     # retranslateUi

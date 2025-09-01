@@ -136,3 +136,16 @@ def update_relations_to_new_uri(bsdd_proeprty: BsddProperty, bsdd_dictionary: Bs
         new_uri["version"] = version
         if old_uri != new_uri:
             relationship.RelatedPropertyUri = dict_util.build_bsdd_url(new_uri)
+
+
+def build_bsdd_uri(bsdd_property: BsddProperty, bsdd_dictionary: BsddDictionary):
+    data = {
+        "namespace": [bsdd_dictionary.OrganizationCode, bsdd_dictionary.DictionaryCode],
+        "version": bsdd_dictionary.DictionaryVersion,
+        "resource_type": "property",
+        "resource_id": bsdd_property.Code,
+    }
+    if bsdd_dictionary.UseOwnUri:
+        data["host"] = bsdd_dictionary.DictionaryUri
+
+    return dict_util.build_bsdd_url(data)

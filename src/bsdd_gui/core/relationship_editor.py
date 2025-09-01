@@ -43,7 +43,7 @@ def add_field_validators(
 ):
     relationship_editor.add_validator(
         widget,
-        widget.le_related_class,
+        widget.le_related_element,
         lambda v, w,: relationship_editor.is_related_class_valid(v, w, project.get()),
         lambda w, v: util.set_invalid(w, not v),
     )
