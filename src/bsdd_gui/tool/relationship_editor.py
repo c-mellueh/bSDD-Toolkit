@@ -83,14 +83,13 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
 
     @classmethod
     def create_model(cls, data: BsddClass | BsddProperty, mode):
-        model = models.ClassModel if isinstance(data, BsddClass) else models.PropertyModel
-        data_model = model(data, mode)
+        data_model = models.RelationshipModel(data, mode)
         proxy_model = models.SortModel()
         proxy_model.setSourceModel(data_model)
         return proxy_model
 
     @classmethod
-    def add_class_columns_to_table(cls, model: models.ClassModel):
+    def add_class_columns_to_table(cls, model: models.RelationshipModel):
         cls.add_column_to_table(model, "RelationType", lambda cr: cr.RelationType)
         cls.add_column_to_table(model, "RelatedClassUri", lambda cr: cr.RelatedClassUri)
         cls.add_column_to_table(model, "RelatedClassName", lambda cr: cr.RelatedClassName)
@@ -98,7 +97,7 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
         cls.add_column_to_table(model, "OwnedUri", lambda cr: cr.OwnedUri)
 
     @classmethod
-    def add_property_columns_to_table(cls, model: models.PropertyModel):
+    def add_property_columns_to_table(cls, model: models.RelationshipModel):
         cls.add_column_to_table(model, "RelationType", lambda cr: cr.RelationType)
         cls.add_column_to_table(model, "RelatedPropertyUri", lambda cr: cr.RelatedPropertyUri)
         cls.add_column_to_table(model, "RelatedPropertyName", lambda cr: cr.RelatedPropertyName)
@@ -170,8 +169,8 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
             widget.ds_fraction.clear()
 
         model = widget.tv_relations.model().sourceModel()
-        model: models.ClassModel | models.PropertyModel
-        model_kind = "class" if isinstance(model, models.ClassModel) else "property"
+        model: models.RelationshipModel
+        model_kind = "class" if isinstance(model.item_data, BsddClass) else "property"
         data_dict = {"RelationType": widget.cb_relation_type.currentText()}
         if bsdd_dictionary.UseOwnUri and widget.le_owned_uri.text():
             data_dict["OwnedUri"] = widget.le_owned_uri.text()
@@ -221,23 +220,19 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
     def transform_virtual_relationships_to_real(cls, widget: QWidget):
         if isinstance(widget, class_editor_ui.ClassEditor):
             table_view = widget.relationship_editor.tv_relations
-            model: models.ClassModel | models.PropertyModel = table_view.model().sourceModel()
+            model: models.RelationshipModel = table_view.model().sourceModel()
             model.beginResetModel()
-            for relationship in model.virtual_remove:
-                if isinstance(model, models.ClassModel):
-                    bsdd_class = model.bsdd_class
-                    bsdd_class.ClassRelations.remove(relationship)
+            for relationship in list(model.virtual_remove):
+                if isinstance(model.item_data, BsddClass):
+                    model.item_data.ClassRelations.remove(relationship)  # type: ignore[arg-type]
                 else:
-                    bsdd_property = model.bsdd_property
-                    bsdd_property.PropertyRelations.remove(relationship)
+                    model.item_data.PropertyRelations.remove(relationship)  # type: ignore[arg-type]
                 model.virtual_remove.remove(relationship)
 
-            for relationship in model.virtual_append:
-                if isinstance(model, models.ClassModel):
-                    bsdd_class = model.bsdd_class
-                    bsdd_class.ClassRelations.append(relationship)
+            for relationship in list(model.virtual_append):
+                if isinstance(model.item_data, BsddClass):
+                    model.item_data.ClassRelations.append(relationship)  # type: ignore[arg-type]
                 else:
-                    bsdd_property = model.bsdd_property
-                    bsdd_property.PropertyRelations.append(relationship)
+                    model.item_data.PropertyRelations.append(relationship)  # type: ignore[arg-type]
                 model.virtual_append.remove(relationship)
             model.endResetModel()
