@@ -20,6 +20,14 @@ def connect_widget(
     widget.data = data
     widget.mode = mode
     relationship_editor.connect_widget_signals(widget)
+    proxy_model = relationship_editor.create_model(data, mode)
+    model = proxy_model.sourceModel()
+    if isinstance(data, BsddClass):
+        relationship_editor.add_class_columns_to_table(model)
+    else:
+        relationship_editor.add_property_columns_to_table(model)
+
+    widget.tv_relations.setModel(proxy_model)
 
 
 def add_field_validators(
@@ -34,6 +42,8 @@ def add_field_validators(
         lambda v, w,: relationship_editor.is_related_class_valid(v, w, project.get()),
         lambda w, v: util.set_invalid(w, not v),
     )
+
+    relationship_editor.set_fractions_visible_if_is_material(widget)
 
 
 def remove_widget(

@@ -7,6 +7,7 @@ from PySide6.QtCore import (
     QModelIndex,
     QSortFilterProxyModel,
 )
+from typing import Literal
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
@@ -17,9 +18,16 @@ from bsdd_gui.presets.models_presets import ItemModel
 
 class PropertyModel(ItemModel):
 
-    def __init__(self, bsdd_property: BsddProperty, *args, **kwargs):
-        super().__init__(tool.PropertyTable, *args, **kwargs)
+    def __init__(
+        self,
+        bsdd_property: BsddProperty,
+        mode: Literal["dialog"] | Literal["live"],
+        *args,
+        **kwargs,
+    ):
+        super().__init__(tool.RelationshipEditor, *args, **kwargs)
         self.bsdd_property = bsdd_property
+        self.mode = mode
 
     @property
     def bsdd_dictionary(self):
@@ -47,9 +55,12 @@ class PropertyModel(ItemModel):
 
 class ClassModel(ItemModel):
 
-    def __init__(self, bsdd_class: BsddClass, *args, **kwargs):
-        super().__init__(tool.PropertyTable, *args, **kwargs)
+    def __init__(
+        self, bsdd_class: BsddClass, mode: Literal["dialog"] | Literal["live"], *args, **kwargs
+    ):
+        super().__init__(tool.RelationshipEditor, *args, **kwargs)
         self.bsdd_class = bsdd_class
+        self.mode = mode
 
     @property
     def bsdd_dictionary(self):

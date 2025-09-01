@@ -16,43 +16,8 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="2">
-      <widget class="QLabel" name="lb_fraction">
-       <property name="text">
-        <string>Fraction</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="lb_related_class_name">
-       <property name="text">
-        <string>Related Class Name</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4" colspan="8">
-      <widget class="QLineEdit" name="le_related_class">
-       <property name="placeholderText">
-        <string notr="true">https://identifier.buildingsmart.org/uri/...</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="11">
       <widget class="QLineEdit" name="le_owned_uri"/>
-     </item>
-     <item row="1" column="5" colspan="6">
-      <widget class="QLabel" name="lb_owned_uri">
-       <property name="text">
-        <string>OwnedUri</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QDoubleSpinBox" name="ds_fraction">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="lb_relationType">
@@ -61,7 +26,49 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item row="1" column="1">
+      <widget class="ToggleSwitch" name="cb_fraction">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lb_fraction">
+       <property name="text">
+        <string>Fraction</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QDoubleSpinBox" name="ds_fraction">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="11">
+      <widget class="QLineEdit" name="le_related_class">
+       <property name="placeholderText">
+        <string notr="true">https://identifier.buildingsmart.org/uri/...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLabel" name="lb_owned_uri">
+       <property name="text">
+        <string>OwnedUri</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="lb_related_class">
+       <property name="text">
+        <string>RelatedClass</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" colspan="2">
       <widget class="QComboBox" name="cb_relation_type">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -117,23 +124,6 @@
        </item>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="le_relatec_class_name"/>
-     </item>
-     <item row="1" column="3">
-      <widget class="ToggleSwitch" name="cb_fraction">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2" colspan="2">
-      <widget class="QLabel" name="lb_related_class">
-       <property name="text">
-        <string>RelatedClass</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -161,7 +151,14 @@
     </layout>
    </item>
    <item>
-    <widget class="QTableView" name="tv_relations"/>
+    <widget class="QTableView" name="tv_relations">
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+    </widget>
    </item>
   </layout>
  </widget>
