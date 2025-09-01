@@ -48,7 +48,11 @@
       </widget>
      </item>
      <item row="1" column="4">
-      <widget class="QDoubleSpinBox" name="ds_fraction"/>
+      <widget class="QDoubleSpinBox" name="ds_fraction">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="lb_relationType">
@@ -117,7 +121,7 @@
       <widget class="QLineEdit" name="le_relatec_class_name"/>
      </item>
      <item row="1" column="3">
-      <widget class="QCheckBox" name="cb_fraction">
+      <widget class="ToggleSwitch" name="cb_fraction">
        <property name="text">
         <string/>
        </property>
@@ -161,6 +165,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ToggleSwitch</class>
+   <extends>QAbstractButton</extends>
+   <header>bsdd_gui.presets.ui_presets.toggle_switch</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

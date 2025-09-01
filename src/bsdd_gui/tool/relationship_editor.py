@@ -41,7 +41,11 @@ class RelationshipEditor(ViewHandler):
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.RelationshipWidget):
-        widget.closed.connect(lambda w=widget: trigger.widget_closed(w))
+        w = widget
+        widget.closed.connect(lambda: trigger.widget_closed(w))
+        widget.cb_fraction.toggled.connect(
+            lambda: w.ds_fraction.setEnabled(w.cb_fraction.isChecked())
+        )
 
     @classmethod
     def is_related_class_valid(

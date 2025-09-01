@@ -42,7 +42,6 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QApplication,
-    QCheckBox,
     QComboBox,
     QDoubleSpinBox,
     QGridLayout,
@@ -57,6 +56,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
 
 
 class Ui_Form(object):
@@ -96,6 +97,7 @@ class Ui_Form(object):
 
         self.ds_fraction = QDoubleSpinBox(Form)
         self.ds_fraction.setObjectName("ds_fraction")
+        self.ds_fraction.setEnabled(False)
 
         self.gridLayout.addWidget(self.ds_fraction, 1, 4, 1, 1)
 
@@ -128,7 +130,7 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.le_relatec_class_name, 1, 1, 1, 1)
 
-        self.cb_fraction = QCheckBox(Form)
+        self.cb_fraction = ToggleSwitch(Form)
         self.cb_fraction.setObjectName("cb_fraction")
 
         self.gridLayout.addWidget(self.cb_fraction, 1, 3, 1, 1)
