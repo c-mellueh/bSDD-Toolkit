@@ -61,6 +61,9 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
             lambda _w=widget: cls.update_code_completer(widget, bsdd_dictionary)
         )
         widget.tb_add.clicked.connect(lambda _, w=widget: cls.add_row_to_model(w, bsdd_dictionary))
+        widget.le_related_element.returnPressed.connect(
+            lambda w=widget: cls.add_row_to_model(w, bsdd_dictionary)
+        )
 
     @classmethod
     def is_related_class_valid(
@@ -209,7 +212,7 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
             relation = BsddPropertyRelation.model_validate(data_dict)
 
         if model.mode == "dialog":
-            model.append_virtual_row(relation)
+            model.append_row(relation)
         else:
             model.append_row(relation)
         clear_inputs()

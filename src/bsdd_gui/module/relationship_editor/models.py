@@ -69,11 +69,17 @@ class PropertyModel(ItemModel):
     def setData(self, index, value, /, role=...):
         return False
 
-    def append_row(self, property_relation: BsddPropertyRelation):
+    def append_row(self, relation: BsddPropertyRelation):
         parent_index = QModelIndex()
         insert_row = self.rowCount(parent_index)  # current child count
         self.beginInsertRows(parent_index, insert_row, insert_row)
-        self.bsdd_property.PropertyRelations.append(property_relation)
+        if relation in self.virtual_remove and self.mode == "dialog":
+            self.virtual_remove.remove(relation)
+        else:
+            if self.mode == "dialog":
+                self.virtual_append.append(relation)
+            else:
+                self.bsdd_property.PropertyRelations.append(relation)
         self.endInsertRows()
 
 
@@ -123,18 +129,21 @@ class ClassModel(ItemModel):
         self._data = None
         return super().beginResetModel()
 
-    def append_row(self, class_relation: BsddClassRelation):
+    def append_row(self, relation: BsddClassRelation):
+        if relation in self.bsdd_class.ClassRelations:
+            return
+        if relation in self.virtual_append:
+            return
         parent_index = QModelIndex()
         insert_row = self.rowCount(parent_index)  # current child count
         self.beginInsertRows(parent_index, insert_row, insert_row)
-        self.bsdd_class.ClassRelations.append(class_relation)
-        self.endInsertRows()
-
-    def append_virtual_row(self, class_relation: BsddClassRelation):
-        parent_index = QModelIndex()
-        insert_row = self.rowCount(parent_index)  # current child count
-        self.beginInsertRows(parent_index, insert_row, insert_row)
-        self.virtual_append.append(class_relation)
+        if relation in self.virtual_remove and self.mode == "dialog":
+            self.virtual_remove.remove(relation)
+        else:
+            if self.mode == "dialog":
+                self.virtual_append.append(relation)
+            else:
+                self.bsdd_class.ClassRelations.append(relation)
         self.endInsertRows()
 
 
