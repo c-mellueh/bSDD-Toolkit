@@ -329,12 +329,12 @@ class WidgetHandler(FieldHandler):
         return None
 
     @classmethod
-    def register_widget(cls, view: QAbstractItemView):
-        logging.info(f"Register {view}")
+    def register_widget(cls, widget: QWidget):
+        logging.info(f"Register {widget}")
 
-        cls.get_properties().widgets.add(view)
-        cls.get_properties().field_getter[view] = dict()
-        cls.get_properties().field_setter[view] = dict()
+        cls.get_properties().widgets.add(widget)
+        cls.get_properties().field_getter[widget] = dict()
+        cls.get_properties().field_setter[widget] = dict()
 
     @classmethod
     def unregister_widget(cls, view: QWidget):
@@ -350,8 +350,8 @@ class WidgetHandler(FieldHandler):
         return cls.get_properties().widgets
 
     @classmethod
-    def get_widget(cls, bsdd_dictionary: object) -> QWidget:
-        widgets = [widget for widget in cls.get_widgets() if widget.data == bsdd_dictionary]
+    def get_widget(cls, data: object) -> QWidget:
+        widgets = [widget for widget in cls.get_widgets() if widget.data == data]
         if len(widgets) > 1:
             logging.warning(f"Multiple Widgets found for the same data")
         elif not widgets:
