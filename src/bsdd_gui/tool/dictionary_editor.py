@@ -125,3 +125,16 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
             widget.cb_status: "Status",
         }
         return mapping.get(field)
+
+    @classmethod
+    def get_invalid_inputs(cls, widget: QWidget):
+        function_dict = cls.get_properties().validator_functions.get(widget)
+        if not function_dict:
+            return []
+        invalid_inputs = list()
+        for f, (validator_function, result_function) in function_dict.items():
+            value = cls.get_value_from_field(f)
+            is_valid = validator_function(value, widget)
+            if not is_valid:
+                invalid_inputs.append(cls.get_name_from_field(widget, f))
+        return invalid_inputs
