@@ -14,7 +14,7 @@ def connect():
 
 
 def retranslate_ui():
-    pass
+    core.retranslate_ui(tool.RelationshipEditor)
 
 
 def on_new_project():
@@ -28,6 +28,7 @@ def widget_created(
 ):
     core.connect_widget(widget, data, mode, tool.RelationshipEditor, tool.Project)
     core.add_field_validators(widget, tool.RelationshipEditor, tool.Util, tool.Project)
+    core.retranslate_ui(tool.RelationshipEditor)
 
 
 def widget_closed(widget: ui.RelationshipWidget):

@@ -82,46 +82,6 @@
          <height>0</height>
         </size>
        </property>
-       <item>
-        <property name="text">
-         <string>IsSimilarTo</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>HasMaterial</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>HasReference</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>IsEqualTo</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>IsParentOf</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>IsChildOf</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>HasPart</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>IsPartOf</string>
-        </property>
-       </item>
       </widget>
      </item>
     </layout>

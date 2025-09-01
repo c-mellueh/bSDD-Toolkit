@@ -112,14 +112,6 @@ class Ui_Form(object):
         self.gridLayout.addWidget(self.lb_related_class, 0, 3, 1, 1)
 
         self.cb_relation_type = QComboBox(Form)
-        self.cb_relation_type.addItem("")
-        self.cb_relation_type.addItem("")
-        self.cb_relation_type.addItem("")
-        self.cb_relation_type.addItem("")
-        self.cb_relation_type.addItem("")
-        self.cb_relation_type.addItem("")
-        self.cb_relation_type.addItem("")
-        self.cb_relation_type.addItem("")
         self.cb_relation_type.setObjectName("cb_relation_type")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -167,21 +159,6 @@ class Ui_Form(object):
         self.lb_fraction.setText(QCoreApplication.translate("Form", "Fraction", None))
         self.lb_owned_uri.setText(QCoreApplication.translate("Form", "OwnedUri", None))
         self.lb_related_class.setText(QCoreApplication.translate("Form", "RelatedClass", None))
-        self.cb_relation_type.setItemText(
-            0, QCoreApplication.translate("Form", "IsSimilarTo", None)
-        )
-        self.cb_relation_type.setItemText(
-            1, QCoreApplication.translate("Form", "HasMaterial", None)
-        )
-        self.cb_relation_type.setItemText(
-            2, QCoreApplication.translate("Form", "HasReference", None)
-        )
-        self.cb_relation_type.setItemText(3, QCoreApplication.translate("Form", "IsEqualTo", None))
-        self.cb_relation_type.setItemText(4, QCoreApplication.translate("Form", "IsParentOf", None))
-        self.cb_relation_type.setItemText(5, QCoreApplication.translate("Form", "IsChildOf", None))
-        self.cb_relation_type.setItemText(6, QCoreApplication.translate("Form", "HasPart", None))
-        self.cb_relation_type.setItemText(7, QCoreApplication.translate("Form", "IsPartOf", None))
-
         self.tb_add.setText(QCoreApplication.translate("Form", "Add", None))
 
     # retranslateUi

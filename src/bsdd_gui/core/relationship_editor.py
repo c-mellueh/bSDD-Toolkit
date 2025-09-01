@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Literal
 from bsdd_parser import BsddProperty, BsddClass
 from PySide6.QtWidgets import QWidget
-
+from PySide6.QtCore import QCoreApplication
+from bsdd_gui.module.relationship_editor import ui
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.relationship_editor import ui
     from bsdd_gui.module.dictionary_editor import ui as ui_dict
     from bsdd_gui.presets.ui_presets import ToggleSwitch
 
@@ -35,6 +35,18 @@ def connect_widget(
     widget.tv_relations.setModel(proxy_model)
 
 
+def retranslate_ui(relationship_editor: Type[tool.RelationshipEditor]):
+    for widget in relationship_editor.get_widgets():
+        if not isinstance(widget, ui.RelationshipWidget):
+            continue
+        widget.retranslateUi(widget)
+        if isinstance(widget.data, BsddClass):
+            text = QCoreApplication.translate("RelationshipEditor", "Related Class")
+        else:
+            text = QCoreApplication.translate("RelationshipEditor", "Related Property")
+            widget.lb_related_class.setText(text)
+
+
 def add_field_validators(
     widget: ui.RelationshipWidget,
     relationship_editor: Type[tool.RelationshipEditor],
@@ -51,6 +63,21 @@ def add_field_validators(
     relationship_editor.set_fractions_visible_if_is_material(widget)
     relationship_editor.update_owned_uri_visibility(widget, project.get())
     relationship_editor.update_code_completer(widget, project.get())
+    if isinstance(widget.data, BsddClass):
+        elements = [
+            "HasMaterial",
+            "HasReference",
+            "IsEqualTo",
+            "IsSimilarTo",
+            "IsParentOf",
+            "IsChildOf",
+            "HasPart",
+            "IsPartOf",
+        ]
+    else:
+        elements = ["HasReference", "IsEqualTo", " IsSimilarTo"]
+    widget.cb_relation_type.clear()
+    widget.cb_relation_type.addItems(elements)
 
 
 def remove_widget(

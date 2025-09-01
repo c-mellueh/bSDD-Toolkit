@@ -197,7 +197,7 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
             relation = BsddClassRelation.model_validate(data_dict)
         else:
             code = widget.le_related_element.text()
-            related_property = prop_util.get_property_by_code(bsdd_dictionary, code)
+            related_property = prop_util.get_property_by_code(code, bsdd_dictionary)
             if not related_property:
                 clear_inputs()
                 return

@@ -71,6 +71,7 @@ def add_fields_to_widget(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditor],
     allowed_values_table: Type[tool.AllowedValuesTable],
+    relationship_editor: Type[tool.RelationshipEditor],
 ):
     property_editor.register_basic_field(widget, widget.le_code, "Code")
     property_editor.register_basic_field(widget, widget.le_name, "Name")
@@ -111,6 +112,7 @@ def add_fields_to_widget(
     # Allowed Values Table
     table = allowed_values_table.create_widget(widget.data)
     widget.vl_values.addWidget(table)
+    relationship_editor.init_widget(widget.relationship_widget, widget.data, mode="live")
 
 
 def add_validator_functions_to_widget(

@@ -94,6 +94,11 @@ class Ui_PropertyWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.fl_code = QFormLayout()
         self.fl_code.setObjectName("fl_code")
+        self.fl_code.setFormAlignment(
+            Qt.AlignmentFlag.AlignLeading
+            | Qt.AlignmentFlag.AlignLeft
+            | Qt.AlignmentFlag.AlignVCenter
+        )
         self.le_code = QLineEdit(self.gb_basics)
         self.le_code.setObjectName("le_code")
 
@@ -221,10 +226,10 @@ class Ui_PropertyWindow(object):
         self.gb_relations.setObjectName("gb_relations")
         self.verticalLayout_4 = QVBoxLayout(self.gb_relations)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.widget = RelationshipWidget(self.gb_relations)
-        self.widget.setObjectName("widget")
+        self.relationship_widget = RelationshipWidget(self.gb_relations)
+        self.relationship_widget.setObjectName("relationship_widget")
 
-        self.verticalLayout_4.addWidget(self.widget)
+        self.verticalLayout_4.addWidget(self.relationship_widget)
 
         self.splitter.addWidget(self.gb_relations)
         self.gb_description = QGroupBox(self.splitter)
