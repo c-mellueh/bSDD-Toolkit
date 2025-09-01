@@ -3,6 +3,7 @@ import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import property_table as core
 from typing import TYPE_CHECKING
+from PySide6.QtWidgets import QTreeView
 
 if TYPE_CHECKING:
     from . import ui, views
@@ -19,7 +20,7 @@ def retranslate_ui():
 
 
 def create_widget(parent_widget):
-    core.create_widget(parent_widget, tool.PropertyTable)
+    core.create_widget(parent_widget, tool.PropertyTable, tool.Util)
 
 
 def widget_created(widget: ui.PropertyWidget):
@@ -28,6 +29,10 @@ def widget_created(widget: ui.PropertyWidget):
 
 def widget_removed(widget: ui.PropertyWidget):
     core.unregister_widget(widget, tool.PropertyTable)
+
+
+def search_property(view: QTreeView):
+    core.search_property(view, tool.PropertyTable, tool.Search, tool.Project)
 
 
 def on_new_project():

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from PySide6.QtCore import QCoreApplication, Qt
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QTreeView
 from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.property_table import ui
 
@@ -53,7 +53,7 @@ def retranslate_ui(
         widget.setWindowTitle(title)
 
 
-def create_widget(parent: QWidget, property_table: Type[tool.PropertyTable]):
+def create_widget(parent: QWidget, property_table: Type[tool.PropertyTable], util: Type[tool.Util]):
     widget = property_table.create_widget()
     widget.show()
 
@@ -65,6 +65,12 @@ def create_widget(parent: QWidget, property_table: Type[tool.PropertyTable]):
         property_table.set_active_property(bsdd_property)
 
     widget.tv_properties.selectionModel().currentChanged.connect(handle_current_changed)
+
+    util.add_shortcut(
+        "Ctrl+F",
+        widget.tv_properties,
+        lambda: property_table.signaller.search_requested.emit(widget.tv_properties),
+    )
 
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTable]):
@@ -93,3 +99,17 @@ def unregister_widget(
     property_table.unregister_widget(widget)
     property_table.unregister_widget(widget.tv_properties)
     property_table.unregister_widget(widget.tv_classes)
+
+
+def search_property(
+    view: QTreeView,
+    property_table: Type[tool.PropertyTable],
+    search: Type[tool.Search],
+    project: Type[tool.Project],
+):
+    bsdd_properties = project.get().Properties
+    bsdd_property = search.search_property(bsdd_properties)
+    if not bsdd_property:
+        return
+    # Select the found property in the view and scroll to it
+    property_table.select_property(bsdd_property, view)
