@@ -51,6 +51,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QRadioButton,
     QSizePolicy,
+    QSpacerItem,
     QSpinBox,
     QSplitter,
     QTabWidget,
@@ -67,6 +68,7 @@ from bsdd_gui.module.property_editor.widgets import (
     SubdivisionTagInput,
     UnitTagInput,
 )
+from bsdd_gui.module.relationship_editor.ui import RelationshipWidget
 from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow
 
 
@@ -74,28 +76,30 @@ class Ui_PropertyWindow(object):
     def setupUi(self, PropertyWindow):
         if not PropertyWindow.objectName():
             PropertyWindow.setObjectName("PropertyWindow")
-        PropertyWindow.resize(545, 550)
+        PropertyWindow.resize(631, 726)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QTabWidget(PropertyWindow)
         self.tabWidget.setObjectName("tabWidget")
         self.tab_basics = QWidget()
         self.tab_basics.setObjectName("tab_basics")
-        self.verticalLayout_2 = QVBoxLayout(self.tab_basics)
+        self.horizontalLayout_2 = QHBoxLayout(self.tab_basics)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.splitter = QSplitter(self.tab_basics)
+        self.splitter.setObjectName("splitter")
+        self.splitter.setOrientation(Qt.Orientation.Vertical)
+        self.gb_basics = QGroupBox(self.splitter)
+        self.gb_basics.setObjectName("gb_basics")
+        self.verticalLayout_2 = QVBoxLayout(self.gb_basics)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.fl_code = QFormLayout()
         self.fl_code.setObjectName("fl_code")
-        self.fl_code.setFormAlignment(
-            Qt.AlignmentFlag.AlignLeading
-            | Qt.AlignmentFlag.AlignLeft
-            | Qt.AlignmentFlag.AlignVCenter
-        )
-        self.le_code = QLineEdit(self.tab_basics)
+        self.le_code = QLineEdit(self.gb_basics)
         self.le_code.setObjectName("le_code")
 
         self.fl_code.setWidget(0, QFormLayout.ItemRole.FieldRole, self.le_code)
 
-        self.lb_code = QLabel(self.tab_basics)
+        self.lb_code = QLabel(self.gb_basics)
         self.lb_code.setObjectName("lb_code")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -105,7 +109,7 @@ class Ui_PropertyWindow(object):
 
         self.fl_code.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lb_code)
 
-        self.le_name = QLineEdit(self.tab_basics)
+        self.le_name = QLineEdit(self.gb_basics)
         self.le_name.setObjectName("le_name")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(1)
@@ -116,12 +120,12 @@ class Ui_PropertyWindow(object):
 
         self.fl_code.setWidget(1, QFormLayout.ItemRole.FieldRole, self.le_name)
 
-        self.lb_unit = QLabel(self.tab_basics)
+        self.lb_unit = QLabel(self.gb_basics)
         self.lb_unit.setObjectName("lb_unit")
 
         self.fl_code.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_unit)
 
-        self.ti_units = UnitTagInput(self.tab_basics)
+        self.ti_units = UnitTagInput(self.gb_basics)
         self.ti_units.setObjectName("ti_units")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(1)
@@ -133,12 +137,12 @@ class Ui_PropertyWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.lb_datatype = QLabel(self.tab_basics)
+        self.lb_datatype = QLabel(self.gb_basics)
         self.lb_datatype.setObjectName("lb_datatype")
 
         self.horizontalLayout.addWidget(self.lb_datatype)
 
-        self.cb_datatype = QComboBox(self.tab_basics)
+        self.cb_datatype = QComboBox(self.gb_basics)
         self.cb_datatype.addItem("")
         self.cb_datatype.addItem("")
         self.cb_datatype.addItem("")
@@ -151,12 +155,12 @@ class Ui_PropertyWindow(object):
 
         self.horizontalLayout.addWidget(self.cb_datatype)
 
-        self.lb_value_kind = QLabel(self.tab_basics)
+        self.lb_value_kind = QLabel(self.gb_basics)
         self.lb_value_kind.setObjectName("lb_value_kind")
 
         self.horizontalLayout.addWidget(self.lb_value_kind)
 
-        self.cb_value_kind = QComboBox(self.tab_basics)
+        self.cb_value_kind = QComboBox(self.gb_basics)
         self.cb_value_kind.addItem("")
         self.cb_value_kind.addItem("")
         self.cb_value_kind.addItem("")
@@ -168,12 +172,12 @@ class Ui_PropertyWindow(object):
 
         self.horizontalLayout.addWidget(self.cb_value_kind)
 
-        self.lb_status = QLabel(self.tab_basics)
+        self.lb_status = QLabel(self.gb_basics)
         self.lb_status.setObjectName("lb_status")
 
         self.horizontalLayout.addWidget(self.lb_status)
 
-        self.cb_status = QComboBox(self.tab_basics)
+        self.cb_status = QComboBox(self.gb_basics)
         self.cb_status.addItem("")
         self.cb_status.addItem("")
         self.cb_status.setObjectName("cb_status")
@@ -184,47 +188,50 @@ class Ui_PropertyWindow(object):
 
         self.fl_code.setLayout(3, QFormLayout.ItemRole.SpanningRole, self.horizontalLayout)
 
-        self.lb_property_reference = QLabel(self.tab_basics)
+        self.lb_property_reference = QLabel(self.gb_basics)
         self.lb_property_reference.setObjectName("lb_property_reference")
 
         self.fl_code.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lb_property_reference)
 
         self.verticalLayout_2.addLayout(self.fl_code)
 
+        self.splitter.addWidget(self.gb_basics)
+        self.gb_values = QGroupBox(self.splitter)
+        self.gb_values.setObjectName("gb_values")
+        self.vl_values = QVBoxLayout(self.gb_values)
+        self.vl_values.setObjectName("vl_values")
         self.hl_value_description = QHBoxLayout()
         self.hl_value_description.setObjectName("hl_value_description")
-        self.pb_new_value = QPushButton(self.tab_basics)
+        self.pb_new_value = QPushButton(self.gb_values)
         self.pb_new_value.setObjectName("pb_new_value")
         self.pb_new_value.setMaximumSize(QSize(24, 24))
 
         self.hl_value_description.addWidget(self.pb_new_value)
 
-        self.lb_allowed_values = QLabel(self.tab_basics)
-        self.lb_allowed_values.setObjectName("lb_allowed_values")
-        self.lb_allowed_values.setMinimumSize(QSize(0, 0))
+        self.horizontalSpacer = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
 
-        self.hl_value_description.addWidget(self.lb_allowed_values)
+        self.hl_value_description.addItem(self.horizontalSpacer)
 
-        self.verticalLayout_2.addLayout(self.hl_value_description)
+        self.vl_values.addLayout(self.hl_value_description)
 
-        self.vl_values = QVBoxLayout()
-        self.vl_values.setObjectName("vl_values")
+        self.splitter.addWidget(self.gb_values)
+        self.gb_relations = QGroupBox(self.splitter)
+        self.gb_relations.setObjectName("gb_relations")
+        self.verticalLayout_4 = QVBoxLayout(self.gb_relations)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.widget = RelationshipWidget(self.gb_relations)
+        self.widget.setObjectName("widget")
 
-        self.verticalLayout_2.addLayout(self.vl_values)
+        self.verticalLayout_4.addWidget(self.widget)
 
-        self.splitter = QSplitter(self.tab_basics)
-        self.splitter.setObjectName("splitter")
-        self.splitter.setOrientation(Qt.Orientation.Vertical)
+        self.splitter.addWidget(self.gb_relations)
         self.gb_description = QGroupBox(self.splitter)
         self.gb_description.setObjectName("gb_description")
         self.verticalLayout_3 = QVBoxLayout(self.gb_description)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.lb_definition = QLabel(self.gb_description)
-        self.lb_definition.setObjectName("lb_definition")
-
-        self.verticalLayout_3.addWidget(self.lb_definition)
-
         self.te_definition = QTextEdit(self.gb_description)
         self.te_definition.setObjectName("te_definition")
 
@@ -242,7 +249,7 @@ class Ui_PropertyWindow(object):
 
         self.splitter.addWidget(self.gb_description)
 
-        self.verticalLayout_2.addWidget(self.splitter)
+        self.horizontalLayout_2.addWidget(self.splitter)
 
         self.tabWidget.addTab(self.tab_basics, "")
         self.tab_advanced = QWidget()
@@ -443,11 +450,15 @@ class Ui_PropertyWindow(object):
 
     def retranslateUi(self, PropertyWindow):
         PropertyWindow.setWindowTitle(QCoreApplication.translate("PropertyWindow", "Form", None))
+        self.gb_basics.setTitle("")
         self.le_code.setPlaceholderText(QCoreApplication.translate("PropertyWindow", "Code", None))
         # if QT_CONFIG(tooltip)
         self.lb_code.setToolTip(
             QCoreApplication.translate(
-                "PropertyWindow", 'Name of the Property Example: "IsExternal"', None
+                "PropertyWindow",
+                "Name of the Property\n"
+                '                                                                    Example: "IsExternal"',
+                None,
             )
         )
         # endif // QT_CONFIG(tooltip)
@@ -457,7 +468,18 @@ class Ui_PropertyWindow(object):
         self.lb_unit.setToolTip(
             QCoreApplication.translate(
                 "PropertyWindow",
-                "The units represent a scale that enables a value to be measured (ISO 80000 or ISO 4217, or ISO 8601). List of values. See reference list (JSON) units. We are working on supporting the QUDT vocabulary. If you would like to import using QUDT units or want to have the QUDT units in the API output, please let us know.",
+                "The units represent a scale\n"
+                "                                                                    that enables a value to be\n"
+                "                                                                    measured (ISO 80000 or ISO 4217,\n"
+                "                                                                    or ISO 8601). List of values.\n"
+                "                                                                    See reference list (JSON) units.\n"
+                "                                                                    We are working on supporting the\n"
+                "                                                                    QUDT vocabulary. If you would\n"
+                "                                                                    like to import using QUDT units\n"
+                "                                                                    or want to have the QUDT units\n"
+                "                                                                    in the API output, please let us\n"
+                "                                                               "
+                "     know.",
                 None,
             )
         )
@@ -483,7 +505,21 @@ class Ui_PropertyWindow(object):
         self.lb_value_kind.setToolTip(
             QCoreApplication.translate(
                 "PropertyWindow",
-                "Must be one of: Single (one value; this is the default), Range (two values), List (multiple values), Complex (neither single/range/list, for example an object like IfcActor or an aggregation of connected properties - see assembling properties), ComplexList (list of complex values).",
+                "Must be one of:\n"
+                "                                                                            Single (one value; this\n"
+                "                                                                            is the default), Range\n"
+                "                                                                            (two values), List\n"
+                "                                                                            (multiple values),\n"
+                "                                                                            Complex (neither\n"
+                "                                                                            single/range/list, for\n"
+                "                                                                            example an object like\n"
+                "                                                                            IfcActor or an\n"
+                "                                                                            aggregation of connected\n"
+                "                                                                            properties - see\n"
+                ""
+                "                                                                            assembling properties),\n"
+                "                                                                            ComplexList (list of\n"
+                "                                                                            complex values).",
                 None,
             )
         )
@@ -511,7 +547,21 @@ class Ui_PropertyWindow(object):
         self.cb_value_kind.setToolTip(
             QCoreApplication.translate(
                 "PropertyWindow",
-                "Must be one of: Single (one value; this is the default), Range (two values), List (multiple values), Complex (neither single/range/list, for example an object like IfcActor or an aggregation of connected properties - see assembling properties), ComplexList (list of complex values).",
+                "Must be one of:\n"
+                "                                                                            Single (one value; this\n"
+                "                                                                            is the default), Range\n"
+                "                                                                            (two values), List\n"
+                "                                                                            (multiple values),\n"
+                "                                                                            Complex (neither\n"
+                "                                                                            single/range/list, for\n"
+                "                                                                            example an object like\n"
+                "                                                                            IfcActor or an\n"
+                "                                                                            aggregation of connected\n"
+                "                                                                            properties - see\n"
+                ""
+                "                                                                            assembling properties),\n"
+                "                                                                            ComplexList (list of\n"
+                "                                                                            complex values).",
                 None,
             )
         )
@@ -526,7 +576,11 @@ class Ui_PropertyWindow(object):
         self.lb_property_reference.setToolTip(
             QCoreApplication.translate(
                 "PropertyWindow",
-                'Unique identification of the property within the dictionary. Example: "abc-00123-01" or "SpecialWidth".',
+                "Unique identification of the\n"
+                "                                                                    property within the dictionary.\n"
+                "                                                                    Example:\n"
+                '                                                                    "abc-00123-01" or\n'
+                '                                                                    "SpecialWidth".',
                 None,
             )
         )
@@ -534,13 +588,15 @@ class Ui_PropertyWindow(object):
         self.lb_property_reference.setText(
             QCoreApplication.translate("PropertyWindow", "Code:", None)
         )
-        self.pb_new_value.setText(QCoreApplication.translate("PropertyWindow", "+", None))
-        self.lb_allowed_values.setText(
-            QCoreApplication.translate("PropertyWindow", "Allowed Values:", None)
+        self.gb_values.setTitle(
+            QCoreApplication.translate("PropertyWindow", "Allowed Values", None)
         )
-        self.gb_description.setTitle("")
-        self.lb_definition.setText(
-            QCoreApplication.translate("PropertyWindow", "Definition:", None)
+        self.pb_new_value.setText(QCoreApplication.translate("PropertyWindow", "+", None))
+        self.gb_relations.setTitle(
+            QCoreApplication.translate("PropertyWindow", "PropertyRelations", None)
+        )
+        self.gb_description.setTitle(
+            QCoreApplication.translate("PropertyWindow", "Definition", None)
         )
         self.rb_description.setText(
             QCoreApplication.translate("PropertyWindow", "Description:", None)
@@ -562,7 +618,9 @@ class Ui_PropertyWindow(object):
         self.lb_connected_properties.setToolTip(
             QCoreApplication.translate(
                 "PropertyWindow",
-                " List of codes of one or more connected properties. Can also be full URI instead of code, in case it is a property of another dictionary.",
+                " List of codes of one or more connected properties.\n"
+                "                                            Can also be full URI instead of code, in case it is a\n"
+                "                                            property of another dictionary.",
                 None,
             )
         )
@@ -573,7 +631,10 @@ class Ui_PropertyWindow(object):
         # if QT_CONFIG(tooltip)
         self.lb_country_use.setToolTip(
             QCoreApplication.translate(
-                "PropertyWindow", "List of country ISO codes this Property is being used.", None
+                "PropertyWindow",
+                "List of country ISO codes this Property is being\n"
+                "                                            used.",
+                None,
             )
         )
         # endif // QT_CONFIG(tooltip)
@@ -583,7 +644,10 @@ class Ui_PropertyWindow(object):
         # if QT_CONFIG(tooltip)
         self.lb_country_origin.setToolTip(
             QCoreApplication.translate(
-                "PropertyWindow", "ISO Country Code of the country of origin of this Property", None
+                "PropertyWindow",
+                "ISO Country Code of the country of origin of this\n"
+                "                                            Property",
+                None,
             )
         )
         # endif // QT_CONFIG(tooltip)
@@ -605,7 +669,8 @@ class Ui_PropertyWindow(object):
         self.lb_document_ref.setToolTip(
             QCoreApplication.translate(
                 "PropertyWindow",
-                "Reference to document with the full or official definition of the Property",
+                "Reference to document with the full or official\n"
+                "                                            definition of the Property",
                 None,
             )
         )
@@ -616,7 +681,10 @@ class Ui_PropertyWindow(object):
         # if QT_CONFIG(tooltip)
         self.lb_measurement.setToolTip(
             QCoreApplication.translate(
-                "PropertyWindow", 'Example: "Thermal transmittance according to ISO 10077-1"', None
+                "PropertyWindow",
+                'Example: "Thermal transmittance according to\n'
+                '                                            ISO 10077-1"',
+                None,
             )
         )
         # endif // QT_CONFIG(tooltip)
@@ -649,7 +717,10 @@ class Ui_PropertyWindow(object):
         # if QT_CONFIG(tooltip)
         self.lb_subdivision.setToolTip(
             QCoreApplication.translate(
-                "PropertyWindow", 'List of geographical regions of use Example: "US-MT"', None
+                "PropertyWindow",
+                "List of geographical regions of use Example:\n"
+                '                                            "US-MT"',
+                None,
             )
         )
         # endif // QT_CONFIG(tooltip)
@@ -660,7 +731,10 @@ class Ui_PropertyWindow(object):
         self.lb_text_format.setToolTip(
             QCoreApplication.translate(
                 "PropertyWindow",
-                'Pair for text type (encoding, number of characters) The encoding is set according to "Name of encoding standard" of IANA, RFC 2978, Example: "(UTF-8,32)"',
+                "Pair for text type (encoding, number of characters)\n"
+                '                                            The encoding is set according to "Name of encoding\n'
+                '                                            standard" of IANA, RFC 2978, Example:\n'
+                '                                            "(UTF-8,32)"',
                 None,
             )
         )
@@ -671,7 +745,10 @@ class Ui_PropertyWindow(object):
         # if QT_CONFIG(tooltip)
         self.lb_uid.setToolTip(
             QCoreApplication.translate(
-                "PropertyWindow", "Unique identification (ID), in case the URI is not enough.", None
+                "PropertyWindow",
+                "Unique identification (ID), in case the URI is not\n"
+                "                                            enough.",
+                None,
             )
         )
         # endif // QT_CONFIG(tooltip)

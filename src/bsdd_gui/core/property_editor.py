@@ -168,3 +168,6 @@ def create_property_creator(
         project.get().Properties.append(bsdd_property)
         property_editor.signaller.new_property_created.emit(bsdd_property)
     property_editor.unregister_widget(widget)
+
+
+# TODO: add tablevalue add/remove function
