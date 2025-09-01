@@ -13,7 +13,14 @@ if TYPE_CHECKING:
 class PropertyTable(QTableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        trigger.table_view_created(self)
+
+    def model(self) -> models.SortModel:
+        return super().model()
+
+
+class ClassTable(QTableView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def model(self) -> models.SortModel:
         return super().model()

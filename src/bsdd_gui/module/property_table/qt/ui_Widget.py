@@ -72,6 +72,7 @@ class Ui_Form(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.tv_properties = QTableView(self.verticalLayoutWidget)
         self.tv_properties.setObjectName("tv_properties")
+        self.tv_properties.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tv_properties.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.tv_properties.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tv_properties.setSortingEnabled(True)
@@ -108,7 +109,8 @@ class Ui_Form(object):
 
         self.tv_classes = QTableView(self.verticalLayoutWidget_2)
         self.tv_classes.setObjectName("tv_classes")
-        self.tv_classes.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.tv_classes.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tv_classes.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.tv_classes.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tv_classes.setSortingEnabled(True)
         self.tv_classes.horizontalHeader().setProperty("showSortIndicator", True)

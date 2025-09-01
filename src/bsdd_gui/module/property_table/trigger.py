@@ -37,5 +37,13 @@ def search_property(view: QTreeView):
     core.search_property(view, tool.PropertyTable, tool.Search, tool.Project)
 
 
+def create_context_menu(pos, view: QTreeView):
+    core.create_context_menu(view, pos, tool.PropertyTable)
+
+
+def delete_selection(view: QTreeView):
+    core.delete_selection(view, tool.PropertyTable, tool.Project)
+
+
 def on_new_project():
     pass

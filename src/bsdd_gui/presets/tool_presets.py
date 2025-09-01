@@ -435,6 +435,11 @@ class ViewHandler(WidgetHandler):
         return entry
 
     @classmethod
+    def register_widget(cls, widget):
+        super().register_widget(widget)
+        cls.get_properties().context_menu_list[widget] = list()
+
+    @classmethod
     def create_context_menu(cls, view: QAbstractItemView, selected_elements: list) -> QMenu:
         menu = QMenu(parent=view)
         props = cls.get_properties()

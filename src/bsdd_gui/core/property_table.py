@@ -2,7 +2,9 @@ from __future__ import annotations
 from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtWidgets import QWidget, QTreeView
 from typing import TYPE_CHECKING, Type
-from bsdd_gui.module.property_table import ui
+from bsdd_gui.module.property_table import ui, models
+from bsdd_parser import BsddProperty, BsddClass
+from bsdd_parser.utils import bsdd_class as cl_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -98,6 +100,24 @@ def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.Propert
     property_table.add_column_to_table(source_model, "Name", lambda c: c.Name)
     widget.tv_classes.setModel(proxy_model)
 
+    property_table.add_context_menu_entry(
+        widget.tv_properties,
+        lambda: QCoreApplication.translate("PropertySet", "Delete"),
+        lambda: property_table.signaller.delete_selection_requested.emit(widget.tv_properties),
+        True,
+        True,
+        True,
+    )
+
+    property_table.add_context_menu_entry(
+        widget.tv_classes,
+        lambda: QCoreApplication.translate("PropertySet", "Delete Properties"),
+        lambda: property_table.signaller.delete_selection_requested.emit(widget.tv_classes),
+        True,
+        True,
+        True,
+    )
+
 
 def unregister_widget(
     widget: ui.PropertyWidget,
@@ -120,3 +140,33 @@ def search_property(
         return
     # Select the found property in the view and scroll to it
     property_table.select_property(bsdd_property, view)
+
+
+def create_context_menu(view: QTreeView, pos, property_table: Type[tool.PropertyTable]):
+    selected_elements = property_table.get_selected(view)
+    menu = property_table.create_context_menu(view, selected_elements)
+    if not menu:
+        return
+    menu_pos = view.viewport().mapToGlobal(pos)
+    menu.exec(menu_pos)
+
+
+def delete_selection(
+    view: QTreeView, property_table: Type[tool.PropertyTable], project: Type[tool.Project]
+):
+    selected_elements = property_table.get_selected(view)
+    if not selected_elements:
+        return
+    bsdd_dictionary = project.get()
+    if isinstance(selected_elements[0], BsddProperty):
+        for bsdd_property in selected_elements:
+            bsdd_dictionary.Properties.remove(bsdd_property)
+    elif isinstance(selected_elements[0], BsddClass):
+        selected_elements: list[BsddClass]
+        active_prop = property_table.get_active_property()
+        for cl in selected_elements:
+            for bsdd_class_property in list(cl.ClassProperties):
+                if bsdd_class_property.PropertyCode == active_prop.Code:
+                    cl.ClassProperties.remove(bsdd_class_property)
+                    project.signaller.property_removed.emit(bsdd_class_property)
+    property_table.reset_view(view)

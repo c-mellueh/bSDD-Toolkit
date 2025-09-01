@@ -11,9 +11,9 @@ from PySide6.QtCore import (
     QSortFilterProxyModel,
     QItemSelectionModel,
 )
-from PySide6.QtWidgets import QWidget, QAbstractItemView
+from PySide6.QtWidgets import QWidget, QAbstractItemView, QTreeView
 from bsdd_parser.models import BsddClassProperty, BsddClass, BsddProperty
-from bsdd_gui.module.property_table import ui, models, trigger
+from bsdd_gui.module.property_table import ui, models, trigger, views
 
 
 if TYPE_CHECKING:
@@ -54,6 +54,7 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
         # navigation intact.
         cls.signaller.active_property_changed.connect(lambda _: cls.reset_class_views())
         cls.signaller.search_requested.connect(trigger.search_property)
+        cls.signaller.delete_selection_requested.connect(trigger.delete_selection)
 
     @classmethod
     def reset_class_views(cls):
@@ -95,8 +96,15 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
             bsdd_class = i.siblingAtColumn(0).internalPointer()
             cls.signaller.bsdd_class_double_clicked.emit(bsdd_class)
 
-        widget.tv_classes.doubleClicked.connect(handle_class_double_click)
-        widget.closed.connect(lambda w=widget: trigger.widget_removed(w))
+        w.tv_classes.doubleClicked.connect(handle_class_double_click)
+        w.closed.connect(lambda w=widget: trigger.widget_removed(w))
+        w.tv_properties.customContextMenuRequested.connect(
+            lambda p: trigger.create_context_menu(p, w.tv_properties)
+        )
+
+        w.tv_classes.customContextMenuRequested.connect(
+            lambda p: trigger.create_context_menu(p, w.tv_classes)
+        )
 
     @classmethod
     def request_new_property(cls):
@@ -197,3 +205,11 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
         sel_model.select(proxy_index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
         view.scrollTo(proxy_index, QAbstractItemView.PositionAtCenter)
         return True
+
+    @classmethod
+    def get_selected(cls, view: QTreeView):
+        proxy_indexes = view.selectionModel().selectedIndexes()
+        source_indexes: list[QModelIndex] = [
+            view.model().mapToSource(i) for i in proxy_indexes if i.column() == 0
+        ]
+        return [i.internalPointer() for i in source_indexes]
