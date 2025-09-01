@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 def connect():
     core.create_main_menu_actions(tool.DictionaryEditor, tool.MainWindow, tool.Project)
-    core.connect_signals(tool.DictionaryEditor)
+    core.connect_signals(tool.DictionaryEditor, tool.Project)
 
 
 def retranslate_ui():

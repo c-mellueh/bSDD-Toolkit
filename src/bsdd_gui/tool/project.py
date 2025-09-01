@@ -6,12 +6,19 @@ import bsdd_gui
 from bsdd_gui.presets.tool_presets import ModuleHandler
 from bsdd_parser import BsddDictionary
 from bsdd_gui.module.project import ui
+from PySide6.QtCore import QObject, Signal
 
 if TYPE_CHECKING:
     from bsdd_gui.module.project.prop import ProjectProperties
 
 
+class Signaller(QObject):
+    data_changed = Signal(str, object)  # name of datafield, new_value
+
+
 class Project(ModuleHandler):
+    signaller = Signaller()
+
     @classmethod
     def get_properties(cls) -> ProjectProperties:
         return bsdd_gui.ProjectProperties

@@ -82,10 +82,15 @@ def open_widget(
     retranslate_ui(dictionary_editor, main_window, util)
 
 
-def connect_signals(
-    dictionary_editor: Type[tool.DictionaryEditor],
-):
+def connect_signals(dictionary_editor: Type[tool.DictionaryEditor], project: Type[tool.Project]):
     dictionary_editor.connect_internal_signals()
+
+    def handle_field_change(widget, field):
+        name = dictionary_editor.get_name_from_field(widget, field)
+        value = dictionary_editor.get_value_from_field(field)
+        project.signaller.data_changed.emit(name, value)
+
+    dictionary_editor.signaller.field_changed.connect(handle_field_change)
 
 
 def remove_widget(

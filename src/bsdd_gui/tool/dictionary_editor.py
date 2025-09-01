@@ -99,3 +99,30 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
             if value:
                 return False
             return True
+
+    @classmethod
+    def get_name_from_field(cls, widget: ui.DictionaryEditor, field: QWidget):
+        """Return the bSDD field name for a given UI field.
+
+        The mapping follows the bSDD Dictionary schema as per the provided table.
+        """
+        mapping = {
+            widget.le_org_code: "OrganizationCode",
+            widget.le_dictionary_code: "DictionaryCode",
+            widget.le_dictionary_name: "DictionaryName",
+            widget.le_dictionary_version: "DictionaryVersion",
+            widget.cb_language_iso: "LanguageIsoCode",
+            widget.cb_language_only: "LanguageOnly",
+            widget.cb_use_own_uri: "UseOwnUri",
+            widget.le_dictionary_uri: "DictionaryUri",
+            widget.le_license: "License",
+            widget.le_license_url: "LicenseUrl",
+            widget.le_change_request_mail: "ChangeRequestEmailAddress",
+            widget.cb_model_version: "ModelVersion",
+            widget.le_more_info: "MoreInfoUrl",
+            widget.le_qa_procedure: "QualityAssuranceProcedure",
+            widget.le_qa_procedure_url: "QualityAssuranceProcedureUrl",
+            widget.de_release_date: "ReleaseDate",
+            widget.cb_status: "Status",
+        }
+        return mapping.get(field)

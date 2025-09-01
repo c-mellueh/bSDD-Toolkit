@@ -227,6 +227,26 @@ class FieldHandler(ABC):
             func(f.isChecked())
 
     @classmethod
+    def get_value_from_field(cls, field: QWidget):
+        if isinstance(field, QLineEdit):
+            value = field.text()
+        elif isinstance(field, QComboBox):
+            value = field.currentText()
+        elif isinstance(field, QTextEdit):
+            value = field.toPlainText()
+        elif isinstance(field, QCheckBox):
+            value = field.isChecked()
+        elif isinstance(field, TagInput):
+            value = field.tags()
+        elif isinstance(field, DateTimeWithNow):
+            value = field.get_time()
+        elif isinstance(field, QAbstractButton):
+            value = field.isChecked()
+        else:
+            value = None
+        return value
+
+    @classmethod
     def sync_from_model(cls, widget: QWidget, element):
 
         for field, getter_func in cls.get_properties().field_getter[widget].items():
@@ -254,20 +274,8 @@ class FieldHandler(ABC):
         for field, setter_func in field_dict.items():
             if explicit_field is not None and explicit_field != field:
                 continue
-            if isinstance(field, QLineEdit):
-                setter_func(element, field.text())
-            elif isinstance(field, QComboBox):
-                setter_func(element, field.currentText())
-            elif isinstance(field, QTextEdit):
-                setter_func(element, field.toPlainText())
-            elif isinstance(field, QCheckBox):
-                setter_func(element, field.isChecked())
-            elif isinstance(field, TagInput):
-                setter_func(element, field.tags())
-            elif isinstance(field, DateTimeWithNow):
-                setter_func(element, field.get_time())
-            elif isinstance(field, QAbstractButton):
-                setter_func(element, field.isChecked())
+            value = cls.get_value_from_field(field)
+            setter_func(element, value)
 
     @classmethod
     def all_inputs_are_valid(cls, widget: QWidget):
@@ -277,16 +285,8 @@ class FieldHandler(ABC):
             return True
 
         for f, (validator_function, result_function) in function_dict.items():
-            if isinstance(f, QLineEdit):
-                is_valid = validator_function(f.text(), widget)
-            elif isinstance(f, QComboBox):
-                is_valid = validator_function(f.currentText(), widget)
-            elif isinstance(f, QTextEdit):
-                is_valid = validator_function(f.toPlainText(), widget)
-            elif isinstance(f, TagInput):
-                is_valid = validator_function(f.tags(), widget)
-            if isinstance(f, DateTimeWithNow):
-                is_valid = validator_function(f.get_time(), widget)
+            value = cls.get_value_from_field(f)
+            is_valid = validator_function(value, widget)
             if not is_valid:
                 return False
         return True
@@ -298,16 +298,7 @@ class FieldHandler(ABC):
             return []
         invalid_inputs = list()
         for f, (validator_function, result_function) in function_dict.items():
-            if isinstance(f, QLineEdit):
-                value = f.text()
-            elif isinstance(f, QComboBox):
-                value = f.currentText()
-            elif isinstance(f, QTextEdit):
-                value = f.toPlainText()
-            elif isinstance(f, TagInput):
-                value = f.tags()
-            if isinstance(f, DateTimeWithNow):
-                value = f.get_time()
+            value = cls.get_value_from_field(f)
             is_valid = validator_function(value, widget)
             if not is_valid:
                 invalid_inputs.append(f.objectName())
