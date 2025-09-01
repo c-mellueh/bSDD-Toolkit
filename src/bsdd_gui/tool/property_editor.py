@@ -43,7 +43,9 @@ class PropertyEditor(WidgetHandler):
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.PropertyEditor):
-        widget.closed.connect(lambda w=widget: cls.signaller.widget_closed.emit(w))
+        w = widget
+        w.closed.connect(lambda: cls.signaller.widget_closed.emit(w))
+        w.cb_description.toggled.connect(lambda: cls.update_description_visiblility(w))
 
     @classmethod
     def get_widget(cls, bsdd_class_property: BsddClassProperty) -> ui.PropertyEditor:
@@ -119,3 +121,12 @@ class PropertyEditor(WidgetHandler):
     @classmethod
     def is_datatype_valid(cls, datatype: str, widget: ui.PropertyEditor):
         return datatype in ["Boolean", "Character", "Integer", "Real", "String", "Tim"]
+
+    @classmethod
+    def update_description_visiblility(cls, widget: ui.PropertyEditor):
+        if widget.cb_description.isChecked():
+            widget.te_description.setVisible(True)
+            widget.data.Description = widget.te_description.toPlainText()
+        else:
+            widget.te_description.setVisible(False)
+            widget.data.Description = None

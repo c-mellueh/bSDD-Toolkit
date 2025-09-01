@@ -49,7 +49,6 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QPushButton,
-    QRadioButton,
     QSizePolicy,
     QSpacerItem,
     QSpinBox,
@@ -69,6 +68,7 @@ from bsdd_gui.module.property_editor.widgets import (
     UnitTagInput,
 )
 from bsdd_gui.module.relationship_editor.ui import RelationshipWidget
+from bsdd_gui.presets.ui_presets import ToggleSwitch
 from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow
 
 
@@ -251,10 +251,25 @@ class Ui_PropertyWindow(object):
 
         self.verticalLayout_3.addWidget(self.te_definition)
 
-        self.rb_description = QRadioButton(self.gb_description)
-        self.rb_description.setObjectName("rb_description")
+        self.hl_defintion = QHBoxLayout()
+        self.hl_defintion.setObjectName("hl_defintion")
+        self.lb_description = QLabel(self.gb_description)
+        self.lb_description.setObjectName("lb_description")
 
-        self.verticalLayout_3.addWidget(self.rb_description)
+        self.hl_defintion.addWidget(self.lb_description)
+
+        self.cb_description = ToggleSwitch(self.gb_description)
+        self.cb_description.setObjectName("cb_description")
+
+        self.hl_defintion.addWidget(self.cb_description)
+
+        self.horizontalSpacer_2 = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
+
+        self.hl_defintion.addItem(self.horizontalSpacer_2)
+
+        self.verticalLayout_3.addLayout(self.hl_defintion)
 
         self.te_description = QTextEdit(self.gb_description)
         self.te_description.setObjectName("te_description")
@@ -471,7 +486,7 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate(
                 "PropertyWindow",
                 "Name of the Property\n"
-                '                                                                    Example: "IsExternal"',
+                '                                                                Example: "IsExternal"',
                 None,
             )
         )
@@ -483,17 +498,16 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate(
                 "PropertyWindow",
                 "The units represent a scale\n"
-                "                                                                    that enables a value to be\n"
-                "                                                                    measured (ISO 80000 or ISO 4217,\n"
-                "                                                                    or ISO 8601). List of values.\n"
-                "                                                                    See reference list (JSON) units.\n"
-                "                                                                    We are working on supporting the\n"
-                "                                                                    QUDT vocabulary. If you would\n"
-                "                                                                    like to import using QUDT units\n"
-                "                                                                    or want to have the QUDT units\n"
-                "                                                                    in the API output, please let us\n"
-                "                                                               "
-                "     know.",
+                "                                                                that enables a value to be\n"
+                "                                                                measured (ISO 80000 or ISO 4217,\n"
+                "                                                                or ISO 8601). List of values.\n"
+                "                                                                See reference list (JSON) units.\n"
+                "                                                                We are working on supporting the\n"
+                "                                                                QUDT vocabulary. If you would\n"
+                "                                                                like to import using QUDT units\n"
+                "                                                                or want to have the QUDT units\n"
+                "                                                                in the API output, please let us\n"
+                "                                                                know.",
                 None,
             )
         )
@@ -520,20 +534,20 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate(
                 "PropertyWindow",
                 "Must be one of:\n"
-                "                                                                            Single (one value; this\n"
-                "                                                                            is the default), Range\n"
-                "                                                                            (two values), List\n"
-                "                                                                            (multiple values),\n"
-                "                                                                            Complex (neither\n"
-                "                                                                            single/range/list, for\n"
-                "                                                                            example an object like\n"
-                "                                                                            IfcActor or an\n"
-                "                                                                            aggregation of connected\n"
-                "                                                                            properties - see\n"
-                ""
-                "                                                                            assembling properties),\n"
-                "                                                                            ComplexList (list of\n"
-                "                                                                            complex values).",
+                "                                                                        Single (one value; this\n"
+                "                                                                        is the default), Range\n"
+                "                                                                        (two values), List\n"
+                "                                                                        (multiple values),\n"
+                "                                                                        Complex (neither\n"
+                "                                                                        single/range/list, for\n"
+                "                                                                        example an object like\n"
+                "                                                                        IfcActor or an\n"
+                "                                                                        aggregation of connected\n"
+                "                                                                        properties - see\n"
+                "                                        "
+                "                                assembling properties),\n"
+                "                                                                        ComplexList (list of\n"
+                "                                                                        complex values).",
                 None,
             )
         )
@@ -562,20 +576,20 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate(
                 "PropertyWindow",
                 "Must be one of:\n"
-                "                                                                            Single (one value; this\n"
-                "                                                                            is the default), Range\n"
-                "                                                                            (two values), List\n"
-                "                                                                            (multiple values),\n"
-                "                                                                            Complex (neither\n"
-                "                                                                            single/range/list, for\n"
-                "                                                                            example an object like\n"
-                "                                                                            IfcActor or an\n"
-                "                                                                            aggregation of connected\n"
-                "                                                                            properties - see\n"
-                ""
-                "                                                                            assembling properties),\n"
-                "                                                                            ComplexList (list of\n"
-                "                                                                            complex values).",
+                "                                                                        Single (one value; this\n"
+                "                                                                        is the default), Range\n"
+                "                                                                        (two values), List\n"
+                "                                                                        (multiple values),\n"
+                "                                                                        Complex (neither\n"
+                "                                                                        single/range/list, for\n"
+                "                                                                        example an object like\n"
+                "                                                                        IfcActor or an\n"
+                "                                                                        aggregation of connected\n"
+                "                                                                        properties - see\n"
+                "                                        "
+                "                                assembling properties),\n"
+                "                                                                        ComplexList (list of\n"
+                "                                                                        complex values).",
                 None,
             )
         )
@@ -591,10 +605,10 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate(
                 "PropertyWindow",
                 "Unique identification of the\n"
-                "                                                                    property within the dictionary.\n"
-                "                                                                    Example:\n"
-                '                                                                    "abc-00123-01" or\n'
-                '                                                                    "SpecialWidth".',
+                "                                                                property within the dictionary.\n"
+                "                                                                Example:\n"
+                '                                                                "abc-00123-01" or\n'
+                '                                                                "SpecialWidth".',
                 None,
             )
         )
@@ -616,7 +630,10 @@ class Ui_PropertyWindow(object):
         self.gb_description.setTitle(
             QCoreApplication.translate("PropertyWindow", "Definition", None)
         )
-        self.rb_description.setText(
+        self.lb_description.setText(
+            QCoreApplication.translate("PropertyWindow", "Description", None)
+        )
+        self.cb_description.setText(
             QCoreApplication.translate("PropertyWindow", "Description:", None)
         )
         self.tabWidget.setTabText(

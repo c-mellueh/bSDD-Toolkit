@@ -52,7 +52,7 @@
               </property>
               <property name="toolTip">
                <string>Name of the Property
-                                                                    Example: &quot;IsExternal&quot;</string>
+                                                                Example: &quot;IsExternal&quot;</string>
               </property>
               <property name="text">
                <string>Name:</string>
@@ -82,16 +82,16 @@
              <widget class="QLabel" name="lb_unit">
               <property name="toolTip">
                <string>The units represent a scale
-                                                                    that enables a value to be
-                                                                    measured (ISO 80000 or ISO 4217,
-                                                                    or ISO 8601). List of values.
-                                                                    See reference list (JSON) units.
-                                                                    We are working on supporting the
-                                                                    QUDT vocabulary. If you would
-                                                                    like to import using QUDT units
-                                                                    or want to have the QUDT units
-                                                                    in the API output, please let us
-                                                                    know.</string>
+                                                                that enables a value to be
+                                                                measured (ISO 80000 or ISO 4217,
+                                                                or ISO 8601). List of values.
+                                                                See reference list (JSON) units.
+                                                                We are working on supporting the
+                                                                QUDT vocabulary. If you would
+                                                                like to import using QUDT units
+                                                                or want to have the QUDT units
+                                                                in the API output, please let us
+                                                                know.</string>
               </property>
               <property name="text">
                <string>Units:</string>
@@ -161,19 +161,19 @@
                <widget class="QLabel" name="lb_value_kind">
                 <property name="toolTip">
                  <string>Must be one of:
-                                                                            Single (one value; this
-                                                                            is the default), Range
-                                                                            (two values), List
-                                                                            (multiple values),
-                                                                            Complex (neither
-                                                                            single/range/list, for
-                                                                            example an object like
-                                                                            IfcActor or an
-                                                                            aggregation of connected
-                                                                            properties - see
-                                                                            assembling properties),
-                                                                            ComplexList (list of
-                                                                            complex values).</string>
+                                                                        Single (one value; this
+                                                                        is the default), Range
+                                                                        (two values), List
+                                                                        (multiple values),
+                                                                        Complex (neither
+                                                                        single/range/list, for
+                                                                        example an object like
+                                                                        IfcActor or an
+                                                                        aggregation of connected
+                                                                        properties - see
+                                                                        assembling properties),
+                                                                        ComplexList (list of
+                                                                        complex values).</string>
                 </property>
                 <property name="text">
                  <string>Property Value Kind:</string>
@@ -190,19 +190,19 @@
                 </property>
                 <property name="toolTip">
                  <string>Must be one of:
-                                                                            Single (one value; this
-                                                                            is the default), Range
-                                                                            (two values), List
-                                                                            (multiple values),
-                                                                            Complex (neither
-                                                                            single/range/list, for
-                                                                            example an object like
-                                                                            IfcActor or an
-                                                                            aggregation of connected
-                                                                            properties - see
-                                                                            assembling properties),
-                                                                            ComplexList (list of
-                                                                            complex values).</string>
+                                                                        Single (one value; this
+                                                                        is the default), Range
+                                                                        (two values), List
+                                                                        (multiple values),
+                                                                        Complex (neither
+                                                                        single/range/list, for
+                                                                        example an object like
+                                                                        IfcActor or an
+                                                                        aggregation of connected
+                                                                        properties - see
+                                                                        assembling properties),
+                                                                        ComplexList (list of
+                                                                        complex values).</string>
                 </property>
                 <item>
                  <property name="text">
@@ -264,10 +264,10 @@
              <widget class="QLabel" name="lb_property_reference">
               <property name="toolTip">
                <string>Unique identification of the
-                                                                    property within the dictionary.
-                                                                    Example:
-                                                                    &quot;abc-00123-01&quot; or
-                                                                    &quot;SpecialWidth&quot;.</string>
+                                                                property within the dictionary.
+                                                                Example:
+                                                                &quot;abc-00123-01&quot; or
+                                                                &quot;SpecialWidth&quot;.</string>
               </property>
               <property name="text">
                <string>Code:</string>
@@ -376,11 +376,35 @@
             <widget class="QTextEdit" name="te_definition"/>
            </item>
            <item>
-            <widget class="QRadioButton" name="rb_description">
-             <property name="text">
-              <string>Description:</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="hl_defintion">
+             <item>
+              <widget class="QLabel" name="lb_description">
+               <property name="text">
+                <string>Description</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="ToggleSwitch" name="cb_description">
+               <property name="text">
+                <string>Description:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
            </item>
            <item>
             <widget class="QTextEdit" name="te_description"/>
@@ -677,6 +701,11 @@
    <extends>QWidget</extends>
    <header>bsdd_gui.module.relationship_editor.ui</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ToggleSwitch</class>
+   <extends>QAbstractButton</extends>
+   <header>bsdd_gui.presets.ui_presets</header>
   </customwidget>
  </customwidgets>
  <resources/>

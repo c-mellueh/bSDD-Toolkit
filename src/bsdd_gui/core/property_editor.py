@@ -118,6 +118,10 @@ def add_fields_to_widget(
         lambda w=widget: allowed_values_table.append_new_value(table)
     )
 
+    if widget.data.Description:
+        widget.cb_description.setChecked(True)
+    property_editor.update_description_visiblility(widget)
+
 
 def add_validator_functions_to_widget(
     widget: ui.PropertyEditor,
