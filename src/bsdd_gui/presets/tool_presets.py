@@ -119,6 +119,10 @@ class FieldHandler(ABC):
             field,
             lambda e, v, vn=variable_name: setattr(e, vn, v if v else None),
         )
+        if hasattr(widget, "data"):
+            cls.sync_from_model(widget, widget.data, explicit_field=field)
+        else:
+            logging.info(f"Attribute 'data' not set for {widget}")
         cls.register_field_listener(widget, field)
 
     @classmethod
@@ -146,7 +150,7 @@ class FieldHandler(ABC):
         f = field
         w = widget
         if isinstance(f, QLineEdit):
-            f.editingFinished.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.textChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
         elif isinstance(f, QComboBox):
             f.currentTextChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
         elif isinstance(f, QTextEdit):
@@ -247,10 +251,12 @@ class FieldHandler(ABC):
         return value
 
     @classmethod
-    def sync_from_model(cls, widget: QWidget, element):
+    def sync_from_model(cls, widget: QWidget, data, explicit_field=None):
 
         for field, getter_func in cls.get_properties().field_getter[widget].items():
-            value = getter_func(element)
+            if explicit_field is not None and explicit_field != field:
+                continue
+            value = getter_func(data)
             if isinstance(field, QLineEdit):
                 field.setText(value)
             elif isinstance(field, QLabel):

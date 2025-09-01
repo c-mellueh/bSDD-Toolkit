@@ -38,7 +38,6 @@ class DictionaryEditor(WidgetHandler, ModuleHandler):
     def connect_internal_signals(cls):
         cls.signaller.widget_requested.connect(trigger.create_widget)
         cls.signaller.widget_created.connect(trigger.widget_created)
-        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.data))
         cls.signaller.widget_closed.connect(trigger.widget_closed)
         cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.data, f))
 
