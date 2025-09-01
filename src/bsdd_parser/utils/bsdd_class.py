@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Iterable, Optional, Literal, Dict, List, Set
 import logging
+from . import bsdd_dictionary as dict_util
 
 if TYPE_CHECKING:
     from bsdd_parser.models import BsddDictionary, BsddClass
@@ -121,3 +122,15 @@ def shared_parent(
         code, _ = max(((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1])
 
     return get_class_by_code(dictionary, code)
+
+
+def update_relations_to_new_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
+    namespace = f"{bsdd_dictionary.OrganizationCode}/{bsdd_dictionary.DictionaryCode}"
+    version = bsdd_dictionary.DictionaryVersion
+    for relationship in bsdd_class.ClassRelations:
+        old_uri = dict_util.parse_bsdd_url(relationship.RelatedClassUri)
+        new_uri = dict(old_uri)
+        new_uri["namespace"] = namespace
+        new_uri["version"] = version
+        if old_uri != new_uri:
+            relationship.RelatedClassUri = dict_util.build_bsdd_url(new_uri)

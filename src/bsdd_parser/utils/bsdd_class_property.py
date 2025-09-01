@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from bsdd_parser import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass
 import bsdd
 from bsdd import Client
-from . import bsdd_dictionary as dict_utils
+from . import bsdd_dictionary as dict_util
 
 
 class Cache:
@@ -17,7 +17,7 @@ class Cache:
         from bsdd_parser.utils import bsdd_class_property as cp_utils
 
         def _make_request():
-            if not dict_utils.is_uri(property_uri):
+            if not dict_util.is_uri(property_uri):
                 return dict()
             c = Client() if client is None else client
             result = c.get_property(property_uri)
@@ -118,8 +118,21 @@ def get_classes_with_bsdd_property(property_code: str, bsdd_dictionary: BsddDict
 
 
 def get_property_by_code(code: str, bsdd_dictionary: BsddDictionary) -> BsddProperty | None:
-    if dict_utils.is_uri(code):
+    if dict_util.is_uri(code):
         prop = Cache.get_external_property(code)
     else:
         prop = get_property_code_dict(bsdd_dictionary).get(code)
     return prop
+
+
+def update_relations_to_new_uri(bsdd_proeprty: BsddProperty, bsdd_dictionary: BsddDictionary):
+    namespace = f"{bsdd_dictionary.OrganizationCode}/{bsdd_dictionary.DictionaryCode}"
+    version = bsdd_dictionary.DictionaryVersion
+
+    for relationship in bsdd_proeprty.PropertyRelations:
+        old_uri = dict_util.parse_bsdd_url(relationship.RelatedPropertyUri)
+        new_uri = dict(old_uri)
+        new_uri["namespace"] = namespace
+        new_uri["version"] = version
+        if old_uri != new_uri:
+            relationship.RelatedPropertyUri = dict_util.build_bsdd_url(new_uri)

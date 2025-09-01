@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Literal
 from bsdd_parser import BsddProperty, BsddClass
 from PySide6.QtWidgets import QWidget
+from bsdd_parser.utils import bsdd_class as cl_util
+from bsdd_parser.utils import bsdd_class_property as prop_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -60,18 +62,21 @@ def remove_widget(
 
 def connect_signals(
     relationship_editor: Type[tool.RelationshipEditor],
-    dictionary_editor: Type[tool.DictionaryEditor],
     project: Type[tool.Project],
 ):
     relationship_editor.connect_internal_signals()
 
-    def handle_dict_field(de_widget: ui_dict.DictionaryEditor, field: ToggleSwitch):
-        if not field == de_widget.cb_use_own_uri:
-            return
-        bsdd_dict = project.get()
-        for widget in relationship_editor.get_widgets():
-            if not isinstance(widget, ui.RelationshipWidget):
-                continue
-            relationship_editor.update_owned_uri_visibility(widget, bsdd_dict)
+    def handle_dict_field(name, value):
+        bsdd_dictionary = project.get()
+        if name == "UseOwnUri":
+            for widget in relationship_editor.get_widgets():
+                if not isinstance(widget, ui.RelationshipWidget):
+                    continue
+                relationship_editor.update_owned_uri_visibility(widget, bsdd_dictionary)
+        if name in ["DictionaryVersion", "OrganizationCode", "DictionaryCode"]:
+            for cl in project.get().Classes:
+                cl_util.update_relations_to_new_uri(cl, bsdd_dictionary)
+            for prop in project.get().Properties:
+                prop_utils.update_relations_to_new_uri(prop, bsdd_dictionary)
 
-    dictionary_editor.signaller.field_changed.connect(handle_dict_field)
+    project.signaller.data_changed.connect(handle_dict_field)

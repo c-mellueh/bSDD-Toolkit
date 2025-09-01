@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QTreeView
 import bsdd_gui
 from bsdd_parser import BsddProperty, BsddClass, BsddDictionary
 from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller, ItemModelHandler
-from bsdd_parser.utils import bsdd_dictionary as dict_utils
+from bsdd_parser.utils import bsdd_dictionary as dict_util
 from bsdd_parser.utils import bsdd_class as cl_utils
 from bsdd_parser.utils import bsdd_class_property as prop_utils
 
@@ -54,7 +54,7 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
     def is_related_class_valid(
         cls, value, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary
     ):
-        if dict_utils.is_uri(value):
+        if dict_util.is_uri(value):
             return True
         if isinstance(widget.data, BsddClass):
             element = cl_utils.get_class_by_code(bsdd_dictionary, value)

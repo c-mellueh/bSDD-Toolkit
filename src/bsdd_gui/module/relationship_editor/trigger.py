@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.RelationshipEditor, tool.DictionaryEditor, tool.Project)
+    core.connect_signals(tool.RelationshipEditor, tool.Project)
 
 
 def retranslate_ui():
