@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 def connect():
     core.create_main_menu_actions(tool.Project, tool.MainWindow)
+    core.connect_signals(tool.Project)
 
 
 def retranslate_ui():

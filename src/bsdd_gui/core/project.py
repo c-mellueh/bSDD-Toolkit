@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QCoreApplication, Qt
 from typing import Type, TYPE_CHECKING
 from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH
-
+import logging
 import bsdd_gui
 import os
 import json
@@ -16,6 +16,10 @@ import logging
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
+
+
+def connect_signals(project: Type[tool.Project]):
+    project.signaller.data_changed.connect(lambda n, v: logging.debug(f"'{n}' changed to '{v}'"))
 
 
 def create_project(project: Type[tool.Project]):
