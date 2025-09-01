@@ -96,6 +96,7 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
             cls.signaller.bsdd_class_double_clicked.emit(bsdd_class)
 
         widget.tv_classes.doubleClicked.connect(handle_class_double_click)
+        widget.closed.connect(lambda w=widget: trigger.widget_removed(w))
 
     @classmethod
     def request_new_property(cls):
