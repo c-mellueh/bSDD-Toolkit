@@ -34,7 +34,9 @@ class PropertyModel(ItemModel):
     ):
         super().__init__(tool.RelationshipEditor, *args, **kwargs)
         self.bsdd_property = bsdd_property
-        self.mode = mode
+        self.mode: Literal["dialog"] | Literal["live"] = mode
+        self.virtual_append = list()
+        self.virtual_remove = list()
 
     @property
     def bsdd_dictionary(self):
@@ -43,7 +45,15 @@ class PropertyModel(ItemModel):
     def rowCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0
-        return len(self.bsdd_property.PropertyRelations)
+        return (
+            len(self.bsdd_property.PropertyRelations)
+            + len(self.virtual_append)
+            - len(self.virtual_remove)
+        )
+
+    def get_virtual_list(self) -> list[BsddClassRelation]:
+        items = [cr for cr in self.bsdd_property.PropertyRelations if cr not in self.virtual_remove]
+        return items + self.virtual_append
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if parent.isValid():
@@ -51,7 +61,7 @@ class PropertyModel(ItemModel):
 
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
-        relations = self.bsdd_property.PropertyRelations
+        relations = self.get_virtual_list()
         bsdd_property_relation = relations[row]
         index = self.createIndex(row, column, bsdd_property_relation)
         return index
@@ -74,7 +84,9 @@ class ClassModel(ItemModel):
     ):
         super().__init__(tool.RelationshipEditor, *args, **kwargs)
         self.bsdd_class = bsdd_class
-        self.mode = mode
+        self.mode: Literal["dialog"] | Literal["live"] = mode
+        self.virtual_append = list()
+        self.virtual_remove = list()
 
     @property
     def bsdd_dictionary(self):
@@ -83,7 +95,15 @@ class ClassModel(ItemModel):
     def rowCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0
-        return len(self.bsdd_class.ClassRelations)
+        return (
+            len(self.bsdd_class.ClassRelations)
+            + len(self.virtual_append)
+            - len(self.virtual_remove)
+        )
+
+    def get_virtual_list(self) -> list[BsddClassRelation]:
+        items = [cr for cr in self.bsdd_class.ClassRelations if cr not in self.virtual_remove]
+        return items + self.virtual_append
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if parent.isValid():
@@ -91,7 +111,7 @@ class ClassModel(ItemModel):
 
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
-        relations = self.bsdd_class.ClassRelations
+        relations = self.get_virtual_list()
         bsdd_class_relation = relations[row]
         index = self.createIndex(row, column, bsdd_class_relation)
         return index
@@ -108,6 +128,13 @@ class ClassModel(ItemModel):
         insert_row = self.rowCount(parent_index)  # current child count
         self.beginInsertRows(parent_index, insert_row, insert_row)
         self.bsdd_class.ClassRelations.append(class_relation)
+        self.endInsertRows()
+
+    def append_virtual_row(self, class_relation: BsddClassRelation):
+        parent_index = QModelIndex()
+        insert_row = self.rowCount(parent_index)  # current child count
+        self.beginInsertRows(parent_index, insert_row, insert_row)
+        self.virtual_append.append(class_relation)
         self.endInsertRows()
 
 

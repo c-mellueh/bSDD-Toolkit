@@ -207,5 +207,8 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
             data_dict["RelatedPropertyName"] = related_property.Name
             relation = BsddPropertyRelation.model_validate(data_dict)
 
-        model.append_row(relation)
+        if model.mode == "dialog":
+            model.append_virtual_row(relation)
+        else:
+            model.append_row(relation)
         clear_inputs()
