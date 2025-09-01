@@ -42,6 +42,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QApplication,
+    QCheckBox,
     QComboBox,
     QDoubleSpinBox,
     QGridLayout,
@@ -77,20 +78,31 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.lb_related_class_name, 1, 0, 1, 1)
 
+        self.le_related_class = QLineEdit(Form)
+        self.le_related_class.setObjectName("le_related_class")
+        self.le_related_class.setPlaceholderText("https://identifier.buildingsmart.org/uri/...")
+
+        self.gridLayout.addWidget(self.le_related_class, 0, 4, 1, 8)
+
+        self.le_owned_uri = QLineEdit(Form)
+        self.le_owned_uri.setObjectName("le_owned_uri")
+
+        self.gridLayout.addWidget(self.le_owned_uri, 1, 11, 1, 1)
+
+        self.lb_owned_uri = QLabel(Form)
+        self.lb_owned_uri.setObjectName("lb_owned_uri")
+
+        self.gridLayout.addWidget(self.lb_owned_uri, 1, 5, 1, 6)
+
         self.ds_fraction = QDoubleSpinBox(Form)
         self.ds_fraction.setObjectName("ds_fraction")
 
-        self.gridLayout.addWidget(self.ds_fraction, 1, 3, 1, 1)
+        self.gridLayout.addWidget(self.ds_fraction, 1, 4, 1, 1)
 
         self.lb_relationType = QLabel(Form)
         self.lb_relationType.setObjectName("lb_relationType")
 
         self.gridLayout.addWidget(self.lb_relationType, 0, 0, 1, 1)
-
-        self.lb_related_class = QLabel(Form)
-        self.lb_related_class.setObjectName("lb_related_class")
-
-        self.gridLayout.addWidget(self.lb_related_class, 0, 2, 1, 1)
 
         self.cb_relation_type = QComboBox(Form)
         self.cb_relation_type.addItem("")
@@ -116,21 +128,15 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.le_relatec_class_name, 1, 1, 1, 1)
 
-        self.le_owned_uri = QLineEdit(Form)
-        self.le_owned_uri.setObjectName("le_owned_uri")
+        self.cb_fraction = QCheckBox(Form)
+        self.cb_fraction.setObjectName("cb_fraction")
 
-        self.gridLayout.addWidget(self.le_owned_uri, 1, 10, 1, 1)
+        self.gridLayout.addWidget(self.cb_fraction, 1, 3, 1, 1)
 
-        self.lb_owned_uri = QLabel(Form)
-        self.lb_owned_uri.setObjectName("lb_owned_uri")
+        self.lb_related_class = QLabel(Form)
+        self.lb_related_class.setObjectName("lb_related_class")
 
-        self.gridLayout.addWidget(self.lb_owned_uri, 1, 4, 1, 6)
-
-        self.le_related_class = QLineEdit(Form)
-        self.le_related_class.setObjectName("le_related_class")
-        self.le_related_class.setPlaceholderText("https://identifier.buildingsmart.org/uri/...")
-
-        self.gridLayout.addWidget(self.le_related_class, 0, 3, 1, 8)
+        self.gridLayout.addWidget(self.lb_related_class, 0, 2, 1, 2)
 
         self.verticalLayout.addLayout(self.gridLayout)
 
@@ -149,10 +155,10 @@ class Ui_Form(object):
 
         self.verticalLayout.addLayout(self.hl_releationship_button)
 
-        self.tableView = QTableView(Form)
-        self.tableView.setObjectName("tableView")
+        self.tv_relations = QTableView(Form)
+        self.tv_relations.setObjectName("tv_relations")
 
-        self.verticalLayout.addWidget(self.tableView)
+        self.verticalLayout.addWidget(self.tv_relations)
 
         self.retranslateUi(Form)
 
@@ -166,8 +172,8 @@ class Ui_Form(object):
         self.lb_related_class_name.setText(
             QCoreApplication.translate("Form", "Related Class Name", None)
         )
+        self.lb_owned_uri.setText(QCoreApplication.translate("Form", "OwnedUri", None))
         self.lb_relationType.setText(QCoreApplication.translate("Form", "RelationType", None))
-        self.lb_related_class.setText(QCoreApplication.translate("Form", "RelatedClass", None))
         self.cb_relation_type.setItemText(
             0, QCoreApplication.translate("Form", "IsSimilarTo", None)
         )
@@ -183,7 +189,8 @@ class Ui_Form(object):
         self.cb_relation_type.setItemText(6, QCoreApplication.translate("Form", "HasPart", None))
         self.cb_relation_type.setItemText(7, QCoreApplication.translate("Form", "IsPartOf", None))
 
-        self.lb_owned_uri.setText(QCoreApplication.translate("Form", "OwnedUri", None))
+        self.cb_fraction.setText("")
+        self.lb_related_class.setText(QCoreApplication.translate("Form", "RelatedClass", None))
         self.toolButton.setText(QCoreApplication.translate("Form", "Add", None))
 
     # retranslateUi

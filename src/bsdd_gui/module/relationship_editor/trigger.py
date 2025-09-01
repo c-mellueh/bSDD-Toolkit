@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    pass
+    core.connect_signals(tool.RelationshipEditor)
 
 
 def retranslate_ui():
@@ -27,3 +27,8 @@ def widget_created(
     mode: Literal["dialog"] | Literal["live"],
 ):
     core.connect_widget(widget, data, mode, tool.RelationshipEditor)
+    core.add_field_validators(widget, tool.RelationshipEditor, tool.Util, tool.Project)
+
+
+def widget_closed(widget: ui.RelationshipWidget):
+    core.remove_widget(widget, tool.RelationshipEditor)

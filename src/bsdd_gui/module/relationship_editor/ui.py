@@ -9,7 +9,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtWidgets import QWidget, QWidget, QDialog, QDialogButtonBox, QVBoxLayout
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QPalette, QIcon
-
+from typing import Literal
 from bsdd_gui.resources.icons import get_icon, get_link_icon
 from bsdd_parser import BsddClass, BsddProperty
 from . import trigger
@@ -23,6 +23,7 @@ class RelationshipWidget(QWidget, Ui_Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.data = None
+        self.mode: Literal["dialog"] | Literal["live"] = None
         self.setWindowIcon(get_icon())
         self.setupUi(self)
 

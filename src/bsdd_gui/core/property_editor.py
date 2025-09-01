@@ -144,7 +144,7 @@ def create_property_creator(
     util: Type[tool.Util],
 ):
     code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
-    existing_names = cp_utils.get_all_property_codes(project.get()).keys()
+    existing_names = cp_utils.get_property_code_dict(project.get()).keys()
     code = util.get_unique_name(code, existing_names)
     model_dict = dict() if not blueprint else blueprint
     if "Code" not in model_dict:

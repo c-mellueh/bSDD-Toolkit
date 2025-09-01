@@ -41,4 +41,6 @@ def group_classes(bsdd_classes: list[BsddClass]):
 
 
 def class_editor_created(class_editor: ui.ClassEditor):
-    core.register_widget(class_editor, tool.ClassEditor, tool.Project, tool.Util)
+    core.register_widget(
+        class_editor, tool.ClassEditor, tool.Project, tool.Util, tool.RelationshipEditor
+    )

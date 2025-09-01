@@ -363,7 +363,7 @@ class WidgetHandler(FieldHandler):
         cls.signaller.widget_requested.emit(data, parent)
 
 
-class ViewSignaller(QObject):
+class ViewSignaller(WidgetSignaller):
     model_refresh_requested = Signal()
     selection_changed = Signal(QWidget, Any)
     delete_selection_requested = Signal(QWidget)

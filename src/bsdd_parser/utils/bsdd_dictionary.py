@@ -24,3 +24,11 @@ def get_dictionary_path_from_uri(uri: str) -> str:
     # Construct normalized result
     result = f"{base_prefix}{path_parts[1]}/{path_parts[2]}/{path_parts[3]}/"
     return result
+
+
+def is_uri(s: str) -> bool:
+    try:
+        result = urlparse(s)
+        return all([result.scheme, result.netloc])  # requires scheme + host
+    except ValueError:
+        return False

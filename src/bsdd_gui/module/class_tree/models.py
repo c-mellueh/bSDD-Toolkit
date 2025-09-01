@@ -320,7 +320,7 @@ class ClassTreeModel(ItemModel):
 
         # 2) conflict-safe code mapping
         existing_classes = set(cl_utils.get_all_class_codes(self.bsdd_dictionary))
-        existing_properties = set(cl_prop_utils.get_all_property_codes(self.bsdd_dictionary))
+        existing_properties = set(cl_prop_utils.get_property_code_dict(self.bsdd_dictionary))
 
         old2new = {}
 

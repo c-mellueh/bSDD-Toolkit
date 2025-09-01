@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from bsdd_parser import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass
 import bsdd
 from bsdd import Client
-from . import bsdd_dictionary
+from . import bsdd_dictionary as dict_utils
 
 
 class Cache:
@@ -12,30 +12,28 @@ class Cache:
 
     @classmethod
     def get_external_property(
-        cls, bsdd_class_property: BsddClassProperty, client: bsdd.Client | None
+        cls, property_uri: str, client: bsdd.Client | None
     ) -> BsddClassProperty | None:
         from bsdd_parser.utils import bsdd_class_property as cp_utils
 
         def _make_request():
-            if not cp_utils.is_external_ref(bsdd_class_property):
+            if not dict_utils.is_uri(property_uri):
                 return dict()
             c = Client() if client is None else client
-            property_uri = bsdd_class_property.PropertyUri
             result = c.get_property(property_uri)
 
             if "statusCode" in result and result["statusCode"] == 400:
                 return None
             return result
 
-        uri = bsdd_class_property.PropertyUri
-        if not uri:
+        if not property_uri:
             return None
-        if uri not in cls.data:
+        if property_uri not in cls.data:
             result = _make_request()
             if result is not None:
                 result = BsddProperty.model_validate(result)
-            cls.data[uri] = result
-        return cls.data[uri]
+            cls.data[property_uri] = result
+        return cls.data[property_uri]
 
     @classmethod
     def flush_data(cls):
@@ -76,10 +74,10 @@ def get_internal_property(
 
 
 def get_external_property(class_property: BsddClassProperty, client=None) -> BsddProperty | None:
-    return Cache.get_external_property(class_property, client)
+    return Cache.get_external_property(class_property.PropertyUri, client)
 
 
-def get_all_property_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddProperty]:
+def get_property_code_dict(bsdd_dictionary: BsddDictionary) -> dict[str, BsddProperty]:
     return {p.Code: p for p in bsdd_dictionary.Properties}
 
 
@@ -117,3 +115,11 @@ def get_classes_with_bsdd_property(property_code: str, bsdd_dictionary: BsddDict
         return False
 
     return list(filter(_has_prop, bsdd_dictionary.Classes))
+
+
+def get_property_by_code(code: str, bsdd_dictionary: BsddDictionary) -> BsddProperty | None:
+    if dict_utils.is_uri(code):
+        prop = Cache.get_external_property(code)
+    else:
+        prop = get_property_code_dict(bsdd_dictionary).get(code)
+    return prop

@@ -12,21 +12,13 @@ from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignaller
 from urllib.parse import urlparse
 from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
 
+from bsdd_parser.utils.bsdd_dictionary import is_uri
 from bsdd_parser.utils import bsdd_class_property as cp_utils
-from bsdd_parser.utils import bsdd_class as c_utils
 from bsdd_gui.module.class_property_editor.constants import (
     BUTTON_MODE_EDIT,
     BUTTON_MODE_NEW,
     BUTTON_MODE_VIEW,
 )
-
-
-def is_uri(s: str) -> bool:
-    try:
-        result = urlparse(s)
-        return all([result.scheme, result.netloc])  # requires scheme + host
-    except ValueError:
-        return False
 
 
 if TYPE_CHECKING:
@@ -135,7 +127,7 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def create_property_code_completer(cls, bsdd_dictionary: BsddDictionary):
-        all_codes = cp_utils.get_all_property_codes(bsdd_dictionary)
+        all_codes = cp_utils.get_property_code_dict(bsdd_dictionary)
         completer = QCompleter(all_codes)
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         return completer
@@ -220,7 +212,7 @@ class ClassPropertyEditor(WidgetHandler):
             return True  # Todo: check if this really exists
 
         # Code doesn't exist
-        if not value in cp_utils.get_all_property_codes(bsdd_dictionary):
+        if not value in cp_utils.get_property_code_dict(bsdd_dictionary):
             return False
 
         bsdd_class = bsdd_class_property.parent()
@@ -251,7 +243,7 @@ class ClassPropertyEditor(WidgetHandler):
             line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "Edit"))
         elif not bsdd_dictionary:
             line_edit.show_button(False)
-        elif value in cp_utils.get_all_property_codes(bsdd_dictionary):
+        elif value in cp_utils.get_property_code_dict(bsdd_dictionary):
             line_edit.show_button(True)
             line_edit.set_button_mode(BUTTON_MODE_EDIT)
             line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "Edit"))
