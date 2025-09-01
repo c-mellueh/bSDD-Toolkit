@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'MainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -60,16 +60,16 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from bsdd_gui.module.class_property_table.ui import ClassPropertyTable
 from bsdd_gui.module.class_tree.ui import ClassView
 from bsdd_gui.module.property_set_table.ui import PsetTableView
-from bsdd_gui.module.class_property_table.ui import ClassPropertyTable
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1514, 776)
+        MainWindow.resize(1468, 740)
         MainWindow.setMinimumSize(QSize(0, 0))
         self.actiondqwd = QAction(MainWindow)
         self.actiondqwd.setObjectName("actiondqwd")
@@ -249,15 +249,13 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.verticalLayout_main)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName("menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1514, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1468, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
         self.menuExport = QMenu(self.menuFile)
         self.menuExport.setObjectName("menuExport")
-        self.menuEdit = QMenu(self.menubar)
-        self.menuEdit.setObjectName("menuEdit")
-        self.menuDesite = QMenu(self.menubar)
-        self.menuDesite.setObjectName("menuDesite")
+        self.menuData = QMenu(self.menubar)
+        self.menuData.setObjectName("menuData")
         self.menuModels = QMenu(self.menubar)
         self.menuModels.setObjectName("menuModels")
         MainWindow.setMenuBar(self.menubar)
@@ -270,9 +268,8 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.button_Pset_add, self.table_property)
 
         self.menubar.addAction(self.menuFile.menuAction())
-        self.menubar.addAction(self.menuEdit.menuAction())
+        self.menubar.addAction(self.menuData.menuAction())
         self.menubar.addAction(self.menuModels.menuAction())
-        self.menubar.addAction(self.menuDesite.menuAction())
         self.menuFile.addAction(self.menuExport.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -296,8 +293,7 @@ class Ui_MainWindow(object):
         self.button_property_add.setText(QCoreApplication.translate("MainWindow", "New", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", "File", None))
         self.menuExport.setTitle(QCoreApplication.translate("MainWindow", "Export", None))
-        self.menuEdit.setTitle(QCoreApplication.translate("MainWindow", "Edit", None))
-        self.menuDesite.setTitle(QCoreApplication.translate("MainWindow", "Desite", None))
-        self.menuModels.setTitle(QCoreApplication.translate("MainWindow", "Models", None))
+        self.menuData.setTitle(QCoreApplication.translate("MainWindow", "Edit", None))
+        self.menuModels.setTitle(QCoreApplication.translate("MainWindow", "Data", None))
 
     # retranslateUi

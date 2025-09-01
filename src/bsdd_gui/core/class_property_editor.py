@@ -116,6 +116,7 @@ def splitter_settings_accepted(
     class_property_editor: Type[tool.ClassPropertyEditor], appdata: Type[tool.Appdata]
 ):
     widget = class_property_editor.get_splitter_settings_widget()
+    return  # TODO:fix
     is_seperator_activated = class_property_editor.get_splitter_settings_checkstate(widget)
     text = class_property_editor.get_splitter_settings_text(widget)
     text = text.replace("\\n", "\n")

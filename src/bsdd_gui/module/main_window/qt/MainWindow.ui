@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1514</width>
-    <height>776</height>
+    <width>1468</width>
+    <height>740</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -281,7 +281,7 @@
          </layout>
         </item>
         <item>
-         <widget class="PropertyTable" name="table_property">
+         <widget class="ClassPropertyTable" name="table_property">
           <property name="contextMenuPolicy">
            <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
           </property>
@@ -319,7 +319,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1514</width>
+     <width>1468</width>
      <height>22</height>
     </rect>
    </property>
@@ -334,25 +334,19 @@
     </widget>
     <addaction name="menuExport"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
+   <widget class="QMenu" name="menuData">
     <property name="title">
      <string>Edit</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuDesite">
-    <property name="title">
-     <string>Desite</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuModels">
     <property name="title">
-     <string>Models</string>
+     <string>Data</string>
     </property>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
+   <addaction name="menuData"/>
    <addaction name="menuModels"/>
-   <addaction name="menuDesite"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actiondqwd">
@@ -373,9 +367,9 @@
    <header>bsdd_gui.module.property_set_table.ui</header>
   </customwidget>
   <customwidget>
-   <class>PropertyTable</class>
+   <class>ClassPropertyTable</class>
    <extends>QTableView</extends>
-   <header>bsdd_gui.module.property_table.ui</header>
+   <header>bsdd_gui.module.class_property_table.ui</header>
   </customwidget>
  </customwidgets>
  <tabstops>
