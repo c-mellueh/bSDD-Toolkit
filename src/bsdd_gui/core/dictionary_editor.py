@@ -34,7 +34,7 @@ def create_main_menu_actions(
     project: Type[tool.Project],
 ) -> None:
     action = main_window.add_action(
-        "menuEdit", "Dictionary Settings", lambda: dictionary_editor.request_widget(project.get())
+        "menuModels", "Dictionary Data", lambda: dictionary_editor.request_widget(project.get())
     )
     dictionary_editor.set_action(main_window.get(), "open_window", action)
 
@@ -46,7 +46,7 @@ def retranslate_ui(
 ):
     """Retranslates the UI elements of dictionary Editor. and the Actions."""
     action = dictionary_editor.get_action(main_window.get(), "open_window")
-    text = QCoreApplication.translate("DictionaryEditor", "Dictionary Settings")
+    text = QCoreApplication.translate("DictionaryEditor", "Dictionary Data")
     action.setText(text)
     title = util.get_window_title(
         QCoreApplication.translate("DictionaryEditor", " bSDD-Dictionary")

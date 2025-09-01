@@ -20,7 +20,7 @@ def retranslate_ui():
 
 
 def create_widget(parent_widget):
-    core.create_widget(parent_widget, tool.PropertyTable, tool.Util)
+    core.create_widget(parent_widget, tool.PropertyTable, tool.Util, tool.MainWindow)
 
 
 def widget_created(widget: ui.PropertyWidget):

@@ -14,7 +14,7 @@ def create_main_menu_actions(
     property_editor: Type[tool.PropertyEditor],
 ) -> None:
     action = main_window.add_action(
-        "menuEdit",
+        "menuModels",
         "bSDD Properties",
         lambda: property_table.request_widget(None, main_window.get()),
     )
@@ -46,14 +46,19 @@ def retranslate_ui(
 ):
     """Retranslates the UI elements of dictionary Editor. and the Actions."""
     action = property_table.get_action(main_window.get(), "open_window")
-    text = QCoreApplication.translate("PropertyTable", "bSDD Properties")
+    text = QCoreApplication.translate("PropertyTable", "Properties Data")
     action.setText(text)
-    title = util.get_window_title(QCoreApplication.translate("PropertyTable", "bSDD Properties"))
+    title = util.get_window_title(QCoreApplication.translate("PropertyTable", "Properties Data"))
     for widget in property_table.get_widgets():
         widget.setWindowTitle(title)
 
 
-def create_widget(parent: QWidget, property_table: Type[tool.PropertyTable], util: Type[tool.Util]):
+def create_widget(
+    parent: QWidget,
+    property_table: Type[tool.PropertyTable],
+    util: Type[tool.Util],
+    main_window: Type[tool.MainWindow],
+):
     widget = property_table.create_widget()
     widget.show()
 
@@ -71,6 +76,7 @@ def create_widget(parent: QWidget, property_table: Type[tool.PropertyTable], uti
         widget.tv_properties,
         lambda: property_table.signaller.search_requested.emit(widget.tv_properties),
     )
+    retranslate_ui(property_table, main_window, util)
 
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTable]):
