@@ -76,19 +76,16 @@ class Ui_PropertyWindow(object):
     def setupUi(self, PropertyWindow):
         if not PropertyWindow.objectName():
             PropertyWindow.setObjectName("PropertyWindow")
-        PropertyWindow.resize(631, 726)
+        PropertyWindow.resize(631, 765)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QTabWidget(PropertyWindow)
         self.tabWidget.setObjectName("tabWidget")
         self.tab_basics = QWidget()
         self.tab_basics.setObjectName("tab_basics")
-        self.horizontalLayout_2 = QHBoxLayout(self.tab_basics)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.splitter = QSplitter(self.tab_basics)
-        self.splitter.setObjectName("splitter")
-        self.splitter.setOrientation(Qt.Orientation.Vertical)
-        self.gb_basics = QGroupBox(self.splitter)
+        self.verticalLayout_6 = QVBoxLayout(self.tab_basics)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.gb_basics = QGroupBox(self.tab_basics)
         self.gb_basics.setObjectName("gb_basics")
         self.verticalLayout_2 = QVBoxLayout(self.gb_basics)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -200,8 +197,9 @@ class Ui_PropertyWindow(object):
 
         self.verticalLayout_2.addLayout(self.fl_code)
 
-        self.splitter.addWidget(self.gb_basics)
-        self.gb_values = QGroupBox(self.splitter)
+        self.verticalLayout_6.addWidget(self.gb_basics)
+
+        self.gb_values = QGroupBox(self.tab_basics)
         self.gb_values.setObjectName("gb_values")
         self.vl_values = QVBoxLayout(self.gb_values)
         self.vl_values.setObjectName("vl_values")
@@ -221,18 +219,29 @@ class Ui_PropertyWindow(object):
 
         self.vl_values.addLayout(self.hl_value_description)
 
-        self.splitter.addWidget(self.gb_values)
-        self.gb_relations = QGroupBox(self.splitter)
+        self.verticalLayout_6.addWidget(self.gb_values)
+
+        self.tabWidget.addTab(self.tab_basics, "")
+        self.tab_def_and_rel = QWidget()
+        self.tab_def_and_rel.setObjectName("tab_def_and_rel")
+        self.verticalLayout_5 = QVBoxLayout(self.tab_def_and_rel)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.splitter_2 = QSplitter(self.tab_def_and_rel)
+        self.splitter_2.setObjectName("splitter_2")
+        self.splitter_2.setOrientation(Qt.Orientation.Vertical)
+        self.gb_relations = QGroupBox(self.splitter_2)
         self.gb_relations.setObjectName("gb_relations")
         self.verticalLayout_4 = QVBoxLayout(self.gb_relations)
+        self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.relationship_widget = RelationshipWidget(self.gb_relations)
         self.relationship_widget.setObjectName("relationship_widget")
 
         self.verticalLayout_4.addWidget(self.relationship_widget)
 
-        self.splitter.addWidget(self.gb_relations)
-        self.gb_description = QGroupBox(self.splitter)
+        self.splitter_2.addWidget(self.gb_relations)
+        self.gb_description = QGroupBox(self.splitter_2)
         self.gb_description.setObjectName("gb_description")
         self.verticalLayout_3 = QVBoxLayout(self.gb_description)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -252,11 +261,11 @@ class Ui_PropertyWindow(object):
 
         self.verticalLayout_3.addWidget(self.te_description)
 
-        self.splitter.addWidget(self.gb_description)
+        self.splitter_2.addWidget(self.gb_description)
 
-        self.horizontalLayout_2.addWidget(self.splitter)
+        self.verticalLayout_5.addWidget(self.splitter_2)
 
-        self.tabWidget.addTab(self.tab_basics, "")
+        self.tabWidget.addTab(self.tab_def_and_rel, "")
         self.tab_advanced = QWidget()
         self.tab_advanced.setObjectName("tab_advanced")
         self.formLayout = QFormLayout(self.tab_advanced)
@@ -597,6 +606,10 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate("PropertyWindow", "Allowed Values", None)
         )
         self.pb_new_value.setText(QCoreApplication.translate("PropertyWindow", "+", None))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_basics),
+            QCoreApplication.translate("PropertyWindow", "Basics", None),
+        )
         self.gb_relations.setTitle(
             QCoreApplication.translate("PropertyWindow", "PropertyRelations", None)
         )
@@ -607,8 +620,8 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate("PropertyWindow", "Description:", None)
         )
         self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_basics),
-            QCoreApplication.translate("PropertyWindow", "Basics", None),
+            self.tabWidget.indexOf(self.tab_def_and_rel),
+            QCoreApplication.translate("PropertyWindow", "Definitions and Relations", None),
         )
         # if QT_CONFIG(tooltip)
         self.lb_example.setToolTip(

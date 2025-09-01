@@ -67,6 +67,7 @@ class Ui_Form(object):
         Form.resize(809, 382)
         self.verticalLayout = QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
         self.le_owned_uri = QLineEdit(Form)

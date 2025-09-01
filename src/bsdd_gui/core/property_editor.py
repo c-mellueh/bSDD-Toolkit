@@ -62,6 +62,7 @@ def unregister_widget(
 def register_widget(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditor],
+    allowed_values_table: Type[tool.AllowedValuesTable],
 ):
     property_editor.register_widget(widget)
     property_editor.connect_widget_to_internal_signals(widget)
@@ -113,6 +114,9 @@ def add_fields_to_widget(
     table = allowed_values_table.create_widget(widget.data)
     widget.vl_values.addWidget(table)
     relationship_editor.init_widget(widget.relationship_widget, widget.data, mode="live")
+    widget.pb_new_value.clicked.connect(
+        lambda w=widget: allowed_values_table.append_new_value(table)
+    )
 
 
 def add_validator_functions_to_widget(
