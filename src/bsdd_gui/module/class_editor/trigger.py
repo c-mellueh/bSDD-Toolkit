@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 def connect():
     core.connect_to_main_window(tool.ClassEditor, tool.MainWindow, tool.Project)
-    core.connect_signals(tool.ClassEditor)
+    core.connect_signals(tool.ClassEditor, tool.Project)
 
 
 def retranslate_ui():
