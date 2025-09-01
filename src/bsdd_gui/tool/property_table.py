@@ -26,6 +26,7 @@ class Signaller(ViewSignaller, WidgetSignaller):
     reset_all_property_tables_requested = Signal()
     new_property_requested = Signal()
     active_property_changed = Signal(object)
+    bsdd_class_double_clicked = Signal(object)
 
 
 class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler):
@@ -62,6 +63,14 @@ class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler)
             w.lb_property_name.setText(code)
 
         cls.signaller.active_property_changed.connect(handle_prop_change)
+
+        def handle_class_double_click(index: QModelIndex):
+            proxy_model: models.SortModel = w.tv_classes.model()
+            i: QModelIndex = proxy_model.mapToSource(index)
+            bsdd_class = i.siblingAtColumn(0).internalPointer()
+            cls.signaller.bsdd_class_double_clicked.emit(bsdd_class)
+
+        widget.tv_classes.doubleClicked.connect(handle_class_double_click)
 
     @classmethod
     def request_new_property(cls):

@@ -22,11 +22,20 @@ def create_main_menu_actions(
 
 
 def connect_signals(
-    property_table: Type[tool.PropertyTable], property_editor: Type[tool.PropertyEditor]
+    property_table: Type[tool.PropertyTable],
+    property_editor: Type[tool.PropertyEditor],
+    main_window: Type[tool.MainWindow],
+    class_tree: Type[tool.ClassTree],
 ):
     property_table.signaller.property_info_requested.connect(property_editor.request_widget)
     property_table.signaller.new_property_requested.connect(property_editor.request_new_property)
     property_editor.signaller.new_property_created.connect(lambda _: property_table.reset_views())
+    property_table.signaller.bsdd_class_double_clicked.connect(
+        lambda c: class_tree.select_and_expand(c, main_window.get_class_view())
+    )
+    property_table.signaller.bsdd_class_double_clicked.connect(
+        lambda c: main_window.get().activateWindow()
+    )
     property_table.connect_internal_signals()
 
 

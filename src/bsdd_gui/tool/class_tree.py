@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Any
 import ctypes
 import logging
 
-from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel, QModelIndex
-from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel, QModelIndex, QItemSelectionModel
+from PySide6.QtWidgets import QWidget, QAbstractItemView
 
 import bsdd_gui
 
@@ -139,3 +139,68 @@ class ClassTree(ItemModelHandler, ViewHandler):
 
         for node in reversed(to_delete):
             model.remove_row(node)
+
+    @classmethod
+    def select_and_expand(cls, bsdd_class: BsddClass, view: ui.ClassView | None = None) -> bool:
+        """
+        Select the given BsddClass in the class tree view and expand the tree down to it.
+        Returns True if the item was found and selected, False otherwise.
+        """
+        # choose a view if none supplied
+        if view is None:
+            widgets = cls.get_widgets()
+            if not widgets:
+                return False
+            view = widgets[0]
+
+        top_model = view.model()
+        # collect proxy chain from top to bottom
+        proxies: list[QSortFilterProxyModel] = []
+        model = top_model
+        while isinstance(model, QSortFilterProxyModel):
+            proxies.append(model)
+            model = model.sourceModel()
+        source_model = model  # ultimate source model
+
+        # recursively search the source model for the internalPointer == bsdd_class
+        def find_in_source(parent: QModelIndex = QModelIndex()) -> QModelIndex:
+            row_count = source_model.rowCount(parent)
+            for row in range(row_count):
+                idx = source_model.index(row, 0, parent)
+                if not idx.isValid():
+                    continue
+                if idx.internalPointer() is bsdd_class:
+                    return idx
+                found = find_in_source(idx)
+                if found.isValid():
+                    return found
+            return QModelIndex()
+
+        src_index = find_in_source(QModelIndex())
+        if not src_index.isValid():
+            return False
+
+        # map source index up through proxy chain to the view's model
+        proxy_index = src_index
+        for p in reversed(proxies):
+            proxy_index = p.mapFromSource(proxy_index)
+
+        # expand all parents (from root down to immediate parent)
+        parents: list[QModelIndex] = []
+        p = proxy_index.parent()
+        while p.isValid():
+            parents.append(p)
+            p = p.parent()
+        for parent in reversed(parents):
+            view.expand(parent)
+
+        sel_model = view.selectionModel()
+        if sel_model is None:
+            return False
+
+        # select and make current, then ensure it's visible
+        sel_model.clearSelection()
+        sel_model.setCurrentIndex(proxy_index, QItemSelectionModel.ClearAndSelect)
+        sel_model.select(proxy_index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+        view.scrollTo(proxy_index, QAbstractItemView.PositionAtCenter)
+        return True
