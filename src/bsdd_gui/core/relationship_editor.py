@@ -17,13 +17,14 @@ def connect_widget(
     data: BsddClass | BsddProperty,
     mode: Literal["dialog"] | Literal["live"],
     relationship_editor: Type[tool.RelationshipEditor],
+    project: Type[tool.Project],
 ):
 
     relationship_editor.register_widget(widget)
     relationship_editor.register_widget(widget.tv_relations)
     widget.data = data
     widget.mode = mode
-    relationship_editor.connect_widget_signals(widget)
+    relationship_editor.connect_widget_signals(widget, project.get())
     proxy_model = relationship_editor.create_model(data, mode)
     model = proxy_model.sourceModel()
     if isinstance(data, BsddClass):

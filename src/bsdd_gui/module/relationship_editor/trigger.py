@@ -26,7 +26,7 @@ def widget_created(
     data: BsddClass | BsddProperty,
     mode: Literal["dialog"] | Literal["live"],
 ):
-    core.connect_widget(widget, data, mode, tool.RelationshipEditor)
+    core.connect_widget(widget, data, mode, tool.RelationshipEditor, tool.Project)
     core.add_field_validators(widget, tool.RelationshipEditor, tool.Util, tool.Project)
 
 

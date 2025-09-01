@@ -41,7 +41,7 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
         pass
 
     @classmethod
-    def connect_widget_signals(cls, widget: ui.RelationshipWidget):
+    def connect_widget_signals(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
         w = widget
         widget.closed.connect(lambda: trigger.widget_closed(w))
         widget.cb_fraction.toggled.connect(
@@ -49,6 +49,9 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
         )
         widget.cb_relation_type.currentTextChanged.connect(
             lambda _, w=widget: cls.set_fractions_visible_if_is_material(widget)
+        )
+        widget.cb_relation_type.currentTextChanged.connect(
+            lambda _w=widget: cls.update_code_completer(widget, bsdd_dictionary)
         )
 
     @classmethod
@@ -115,9 +118,12 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
         widget: ui.RelationshipWidget,
         bsdd_dictionary: BsddDictionary,
     ):
-
         if isinstance(widget.data, BsddClass):
             codes = [c.Code for c in bsdd_dictionary.Classes]
+            if widget.cb_relation_type.currentText() == "HasMaterial":
+                codes = [c.Code for c in bsdd_dictionary.Classes if c.ClassType == "Material"]
+            else:
+                codes = [c.Code for c in bsdd_dictionary.Classes]
             completer = QCompleter(codes)
         else:
             codes = [c.Code for c in bsdd_dictionary.Properties]
