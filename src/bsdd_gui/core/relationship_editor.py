@@ -64,6 +64,7 @@ def remove_widget(
 def connect_signals(
     relationship_editor: Type[tool.RelationshipEditor],
     project: Type[tool.Project],
+    class_editor: Type[tool.ClassEditor],
 ):
     relationship_editor.connect_internal_signals()
     project.signaller.data_changed.connect(
@@ -80,4 +81,7 @@ def connect_signals(
     )
     project.signaller.property_removed.connect(
         lambda _: relationship_editor.update_all_completers(project.get())
+    )
+    class_editor.signaller.dialog_accepted.connect(
+        relationship_editor.transform_virtual_relationships_to_real
     )

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 import logging
 
-from PySide6.QtWidgets import QTreeView, QCompleter
+from PySide6.QtWidgets import QTreeView, QCompleter, QWidget
 from PySide6.QtCore import Qt
 import bsdd_gui
 from bsdd_parser import (
@@ -16,6 +16,7 @@ from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller, ItemModelH
 from bsdd_parser.utils import bsdd_dictionary as dict_util
 from bsdd_parser.utils import bsdd_class as cl_util
 from bsdd_parser.utils import bsdd_class_property as prop_util
+from bsdd_gui.module.class_editor import ui as class_editor_ui
 
 if TYPE_CHECKING:
     from bsdd_gui.module.relationship_editor.prop import RelationshipEditorProperties
@@ -212,3 +213,28 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
         else:
             model.append_row(relation)
         clear_inputs()
+
+    @classmethod
+    def transform_virtual_relationships_to_real(cls, widget: QWidget):
+        if isinstance(widget, class_editor_ui.ClassEditor):
+            table_view = widget.relationship_editor.tv_relations
+            model: models.ClassModel | models.PropertyModel = table_view.model().sourceModel()
+            model.beginResetModel()
+            for relationship in model.virtual_remove:
+                if isinstance(model, models.ClassModel):
+                    bsdd_class = model.bsdd_class
+                    bsdd_class.ClassRelations.remove(relationship)
+                else:
+                    bsdd_property = model.bsdd_property
+                    bsdd_property.PropertyRelations.remove(relationship)
+                model.virtual_remove.remove(relationship)
+
+            for relationship in model.virtual_append:
+                if isinstance(model, models.ClassModel):
+                    bsdd_class = model.bsdd_class
+                    bsdd_class.ClassRelations.append(relationship)
+                else:
+                    bsdd_property = model.bsdd_property
+                    bsdd_property.PropertyRelations.append(relationship)
+                model.virtual_append.remove(relationship)
+            model.endResetModel()

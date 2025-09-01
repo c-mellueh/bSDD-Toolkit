@@ -23,6 +23,7 @@ class Signaller(WidgetSignaller):
     new_class_created = Signal(
         BsddClass
     )  # the class is not added to the Dictionary So far, this gets handled by ClassTree
+    dialog_accepted = Signal(ui.ClassEditor)
 
 
 class ClassEditor(WidgetHandler):

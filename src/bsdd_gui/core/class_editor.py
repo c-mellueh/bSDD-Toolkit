@@ -119,6 +119,7 @@ def create_new_class(
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
         class_editor.signaller.new_class_created.emit(new_class)
+        class_editor.signaller.dialog_accepted.emit(widget)
     class_editor.unregister_widget(widget)
 
 
@@ -137,6 +138,7 @@ def copy_class(
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
         class_editor.signaller.new_class_created.emit(new_class)
+        class_editor.signaller.dialog_accepted.emit(widget)
     class_editor.unregister_widget(widget)
 
 
@@ -149,6 +151,7 @@ def open_class_editor(
     dialog.setWindowTitle(text)
     if dialog.exec():
         class_editor.sync_to_model(widget, bsdd_class)
+        class_editor.signaller.dialog_accepted.emit(widget)
     class_editor.unregister_widget(widget)
 
 
@@ -170,5 +173,6 @@ def group_classes(
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
         class_editor.signaller.new_class_created.emit(new_class)
+        class_editor.signaller.dialog_accepted.emit(widget)
         for child_class in bsdd_classes:
             class_tree.move_class(child_class, new_class)
