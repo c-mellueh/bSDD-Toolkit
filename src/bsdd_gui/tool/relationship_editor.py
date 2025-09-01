@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 import logging
 
-
+from PySide6.QtWidgets import QTreeView
 import bsdd_gui
 from bsdd_parser import BsddProperty, BsddClass, BsddDictionary
 from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller, ItemModelHandler
@@ -96,3 +96,14 @@ class RelationshipEditor(ViewHandler, ItemModelHandler):
         widget.cb_fraction.setVisible(visible)
         widget.lb_fraction.setVisible(visible)
         widget.ds_fraction.setVisible(visible)
+
+    @classmethod
+    def get_widgets(cls) -> set[ui.RelationshipWidget | QTreeView]:
+        return super().get_widgets()
+
+    @classmethod
+    def update_owned_uri_visibility(
+        cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary
+    ):
+        widget.lb_owned_uri.setVisible(bsdd_dictionary.UseOwnUri)
+        widget.le_owned_uri.setVisible(bsdd_dictionary.UseOwnUri)

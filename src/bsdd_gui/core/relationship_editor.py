@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type, Literal
 from bsdd_parser import BsddProperty, BsddClass
+from PySide6.QtWidgets import QWidget
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.relationship_editor import ui
+    from bsdd_gui.module.dictionary_editor import ui as ui_dict
+    from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 
 def connect_widget(
@@ -44,6 +47,7 @@ def add_field_validators(
     )
 
     relationship_editor.set_fractions_visible_if_is_material(widget)
+    relationship_editor.update_owned_uri_visibility(widget, project.get())
 
 
 def remove_widget(
@@ -56,5 +60,18 @@ def remove_widget(
 
 def connect_signals(
     relationship_editor: Type[tool.RelationshipEditor],
+    dictionary_editor: Type[tool.DictionaryEditor],
+    project: Type[tool.Project],
 ):
     relationship_editor.connect_internal_signals()
+
+    def handle_dict_field(de_widget: ui_dict.DictionaryEditor, field: ToggleSwitch):
+        if not field == de_widget.cb_use_own_uri:
+            return
+        bsdd_dict = project.get()
+        for widget in relationship_editor.get_widgets():
+            if not isinstance(widget, ui.RelationshipWidget):
+                continue
+            relationship_editor.update_owned_uri_visibility(widget, bsdd_dict)
+
+    dictionary_editor.signaller.field_changed.connect(handle_dict_field)
