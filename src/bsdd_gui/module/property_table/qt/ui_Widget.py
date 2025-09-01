@@ -72,7 +72,7 @@ class Ui_Form(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.tv_properties = QTableView(self.verticalLayoutWidget)
         self.tv_properties.setObjectName("tv_properties")
-        self.tv_properties.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.tv_properties.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.tv_properties.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tv_properties.setSortingEnabled(True)
         self.tv_properties.horizontalHeader().setStretchLastSection(True)
