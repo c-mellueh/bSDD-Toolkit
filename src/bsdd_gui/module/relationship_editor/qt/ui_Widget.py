@@ -160,6 +160,6 @@ class Ui_Form(object):
         self.lb_fraction.setText(QCoreApplication.translate("Form", "Fraction", None))
         self.lb_owned_uri.setText(QCoreApplication.translate("Form", "OwnedUri", None))
         self.lb_related_class.setText(QCoreApplication.translate("Form", "RelatedClass", None))
-        self.tb_add.setText(QCoreApplication.translate("Form", "Add", None))
+        self.tb_add.setText(QCoreApplication.translate("Form", "New", None))
 
     # retranslateUi

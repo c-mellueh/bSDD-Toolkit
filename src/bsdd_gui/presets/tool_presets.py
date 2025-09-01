@@ -117,7 +117,7 @@ class FieldHandler(ABC):
         cls.register_field_setter(
             widget,
             field,
-            lambda e, v, vn=variable_name: setattr(e, vn, v if v else None),
+            lambda e, v, vn=variable_name: setattr(e, vn, v if v is not None else None),
         )
         if hasattr(widget, "data"):
             cls.sync_from_model(widget, widget.data, explicit_field=field)
@@ -266,7 +266,7 @@ class FieldHandler(ABC):
             elif isinstance(field, QTextEdit):
                 field.setPlainText(value)
             elif isinstance(field, QCheckBox):
-                field.setChecked(value)
+                field.setChecked(value or False)
             elif isinstance(field, TagInput):
                 field.setTags(value or [])
             elif isinstance(field, DateTimeWithNow):
