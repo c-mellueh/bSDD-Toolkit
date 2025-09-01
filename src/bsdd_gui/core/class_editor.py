@@ -15,6 +15,7 @@ def register_widget(
     class_editor: Type[tool.ClassEditor],
     project: Type[tool.Project],
     util: Type[tool.Util],
+    relationship_editor: Type[tool.RelationshipEditor],
 ):
     class_editor.register_widget(widget)
     class_editor.register_basic_field(widget, widget.le_name, "Name")
@@ -70,6 +71,7 @@ def register_widget(
         widget.ti_related_ifc_entity,
         lambda e, v, w=widget: setattr(e, "RelatedIfcEntityNamesList", v),
     )
+    relationship_editor.init_widget(widget.relationship_editor, widget.data, mode="dialog")
 
 
 def connect_signals(class_editor: Type[tool.ClassEditor]):

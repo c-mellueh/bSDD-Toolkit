@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ClassEditor.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -48,22 +48,21 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QPushButton,
     QSizePolicy,
-    QSpacerItem,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
 from bsdd_gui.module.class_editor.ui import IfcTagInput
+from bsdd_gui.module.relationship_editor.ui import RelationshipWidget
 
 
 class Ui_ClassEditor(object):
     def setupUi(self, ClassEditor):
         if not ClassEditor.objectName():
             ClassEditor.setObjectName("ClassEditor")
-        ClassEditor.resize(913, 442)
+        ClassEditor.resize(737, 625)
         self.verticalLayout = QVBoxLayout(ClassEditor)
         self.verticalLayout.setObjectName("verticalLayout")
         self.gb_required = QGroupBox(ClassEditor)
@@ -139,40 +138,25 @@ class Ui_ClassEditor(object):
 
         self.verticalLayout.addWidget(self.gb_defintion)
 
-        self.groupBox = QGroupBox(ClassEditor)
-        self.groupBox.setObjectName("groupBox")
-        self.verticalLayout_4 = QVBoxLayout(self.groupBox)
+        self.gb_ifc_entities = QGroupBox(ClassEditor)
+        self.gb_ifc_entities.setObjectName("gb_ifc_entities")
+        self.verticalLayout_4 = QVBoxLayout(self.gb_ifc_entities)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.ti_related_ifc_entity = IfcTagInput(self.groupBox)
+        self.ti_related_ifc_entity = IfcTagInput(self.gb_ifc_entities)
         self.ti_related_ifc_entity.setObjectName("ti_related_ifc_entity")
 
         self.verticalLayout_4.addWidget(self.ti_related_ifc_entity)
 
-        self.verticalLayout.addWidget(self.groupBox)
+        self.verticalLayout.addWidget(self.gb_ifc_entities)
 
         self.gb_relationship = QGroupBox(ClassEditor)
         self.gb_relationship.setObjectName("gb_relationship")
         self.verticalLayout_3 = QVBoxLayout(self.gb_relationship)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.vl_relationship = QVBoxLayout()
-        self.vl_relationship.setObjectName("vl_relationship")
+        self.relationship_editor = RelationshipWidget(self.gb_relationship)
+        self.relationship_editor.setObjectName("relationship_editor")
 
-        self.verticalLayout_3.addLayout(self.vl_relationship)
-
-        self.hl_releationship_button = QHBoxLayout()
-        self.hl_releationship_button.setObjectName("hl_releationship_button")
-        self.pushButton = QPushButton(self.gb_relationship)
-        self.pushButton.setObjectName("pushButton")
-
-        self.hl_releationship_button.addWidget(self.pushButton)
-
-        self.horizontalSpacer = QSpacerItem(
-            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
-        )
-
-        self.hl_releationship_button.addItem(self.horizontalSpacer)
-
-        self.verticalLayout_3.addLayout(self.hl_releationship_button)
+        self.verticalLayout_3.addWidget(self.relationship_editor)
 
         self.verticalLayout.addWidget(self.gb_relationship)
 
@@ -190,12 +174,11 @@ class Ui_ClassEditor(object):
         self.lb_class_type.setText(QCoreApplication.translate("ClassEditor", "Class Type", None))
         self.lb_status.setText(QCoreApplication.translate("ClassEditor", "Status", None))
         self.gb_defintion.setTitle(QCoreApplication.translate("ClassEditor", "Definition", None))
-        self.groupBox.setTitle(
+        self.gb_ifc_entities.setTitle(
             QCoreApplication.translate("ClassEditor", "Related IFC Entities", None)
         )
         self.gb_relationship.setTitle(
             QCoreApplication.translate("ClassEditor", "Relationships", None)
         )
-        self.pushButton.setText(QCoreApplication.translate("ClassEditor", "Add", None))
 
     # retranslateUi

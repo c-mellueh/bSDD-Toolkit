@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QWidget, QWidget, QDialog, QDialogButtonBox, QVBox
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QPalette, QIcon
 
 from bsdd_gui.resources.icons import get_icon, get_link_icon
-from bsdd_parser import BsddClassProperty
+from bsdd_parser import BsddClass, BsddProperty
 from . import trigger
 from bsdd_gui import tool
 from .qt.ui_Widget import Ui_Form
@@ -22,9 +22,9 @@ class RelationshipWidget(QWidget, Ui_Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.data = None
         self.setWindowIcon(get_icon())
         self.setupUi(self)
-        trigger.widget_created(self)
 
     def closeEvent(self, event):
         self.closed.emit()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>913</width>
-    <height>442</height>
+    <width>737</width>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,7 +92,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="gb_ifc_entities">
      <property name="title">
       <string>Related IFC Entities</string>
      </property>
@@ -110,31 +110,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <layout class="QVBoxLayout" name="vl_relationship"/>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="hl_releationship_button">
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>Add</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+       <widget class="RelationshipWidget" name="relationship_editor" native="true"/>
       </item>
      </layout>
     </widget>
@@ -146,6 +122,12 @@
    <class>IfcTagInput</class>
    <extends>QWidget</extends>
    <header>bsdd_gui.module.class_editor.ui</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RelationshipWidget</class>
+   <extends>QWidget</extends>
+   <header>bsdd_gui.module.relationship_editor.ui</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
