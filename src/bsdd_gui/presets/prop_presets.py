@@ -1,7 +1,10 @@
 from PySide6.QtWidgets import QAbstractItemView, QWidget
 from PySide6.QtCore import QAbstractItemModel
 from PySide6.QtGui import QAction
-from typing import TypedDict, Callable
+from typing import TypedDict, Callable, TypeAlias
+from .view_presets import TreeItemView, TableItemView
+
+ItemViewType: TypeAlias = TreeItemView | TableItemView
 
 
 class ContextMenuDict(TypedDict):
@@ -43,3 +46,5 @@ class ViewHandlerProperties(WidgetHandlerProperties):
         self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()
         self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
         self.model: QAbstractItemModel = None
+        self.models = dict(object, QAbstractItemModel)
+        self.views: set[ItemViewType] = set()

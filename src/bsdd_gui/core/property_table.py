@@ -83,9 +83,9 @@ def create_widget(
 
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTable]):
-    property_table.register_widget(widget)
-    property_table.register_widget(widget.tv_properties)
-    property_table.register_widget(widget.tv_classes)
+    property_table.register_view(widget)
+    property_table.register_view(widget.tv_properties)
+    property_table.register_view(widget.tv_classes)
     property_table.connect_widget_to_internal_signals(widget)
 
     proxy_model = property_table.create_property_model()

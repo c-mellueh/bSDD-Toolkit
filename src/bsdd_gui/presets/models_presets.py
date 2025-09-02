@@ -14,8 +14,9 @@ from bsdd_gui.presets.tool_presets import ItemViewHandler
 
 class ItemModel(QAbstractItemModel):
 
-    def __init__(self, tool: ItemViewHandler, *args, **kwargs):
+    def __init__(self, tool: ItemViewHandler, bsdd_data: object, *args, **kwargs):
         self.tool = tool
+        self.bsdd_data = bsdd_data
         super().__init__(*args, **kwargs)
 
     def columnCount(self, /, parent=...):

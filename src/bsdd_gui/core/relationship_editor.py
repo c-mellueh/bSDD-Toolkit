@@ -20,8 +20,8 @@ def connect_widget(
     project: Type[tool.Project],
 ):
 
-    relationship_editor.register_widget(widget)
-    relationship_editor.register_widget(widget.tv_relations)
+    relationship_editor.register_view(widget)
+    relationship_editor.register_view(widget.tv_relations)
     widget.data = data
     widget.mode = mode
     relationship_editor.connect_widget_signals(widget, project.get())

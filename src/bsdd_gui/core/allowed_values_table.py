@@ -12,32 +12,28 @@ if TYPE_CHECKING:
 
 def connect_signals(
     allowed_values_table: Type[tool.AllowedValuesTable],
-    main_window: Type[tool.MainWindow],
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
-
-    def remove_view(widget: ClassPropertyEditor):
-        table_view = allowed_values_table.get_view_from_property_editor(widget)
-        if table_view:
-            allowed_values_table.unregister_widget(table_view)
-
     class_property_editor.signaller.new_value_requested.connect(
         allowed_values_table.handle_new_value_request
     )
-    allowed_values_table.signaller.delete_selection_requested.connect(
-        allowed_values_table.delete_selection
+    allowed_values_table.connect_internal_signals()
+    class_property_editor.signaller.widget_closed.connect(
+        allowed_values_table.remove_view_by_property_editor
     )
-    class_property_editor.signaller.widget_closed.connect(remove_view)
+
+
+def retranslate_ui(allowed_values_table: Type[tool.AllowedValuesTable]):
     pass
 
 
-def setup_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
+def add_columns_to_view(
+    view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]
+):
     prop: BsddClassProperty | BsddProperty = view.data
 
-    allowed_values_table.register_widget(view)
-    sort_model = allowed_values_table.create_model(prop)
-    model = sort_model.sourceModel()
-
+    allowed_values_table.register_view(view)
+    sort_model, model = allowed_values_table.create_model(prop)
     allowed_values_table.add_column_to_table(
         model, "Value", lambda av: av.Value, allowed_values_table.set_value
     )
@@ -80,12 +76,5 @@ def create_context_menu(
     menu.exec(menu_pos)
 
 
-def reset_views(allowed_values_table: Type[tool.AllowedValuesTable], project: Type[tool.Project]):
-    for view in allowed_values_table.get_widgets():
-        allowed_values_table.reset_view(view)
-
-
-def remove_table(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
-    model = allowed_values_table.get_model(view.data)
-    if model:
-        allowed_values_table.remove_model(model)
+def remove_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
+    allowed_values_table.remove_model(view.model().sourceModel())

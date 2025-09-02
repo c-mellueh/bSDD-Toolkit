@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Callable, TYPE_CHECKING, Any, Iterable
+from typing import Callable, TYPE_CHECKING, Any, Iterable, Type
+from types import ModuleType
 from PySide6.QtWidgets import (
     QWidget,
     QAbstractItemView,
@@ -12,12 +13,14 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QAbstractButton,
 )
-from PySide6.QtCore import QObject, Signal, QAbstractItemModel, Qt, QDateTime
+from PySide6.QtCore import QObject, Signal, Qt, QSortFilterProxyModel
 from PySide6.QtGui import QAction
 from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
 from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow
 import logging
 from .signal_presets import WidgetSignals, FieldSignals, ViewSignals
+from .models_presets import ItemModel
+from .view_presets import ItemViewType
 
 if TYPE_CHECKING:
     from .prop_presets import (
@@ -27,6 +30,18 @@ if TYPE_CHECKING:
         FieldHandlerProperties,
         ContextMenuDict,
     )
+
+
+class BaseHandler(ABC):
+    @classmethod
+    @abstractmethod
+    def get_properties(cls) -> object:
+        return None
+
+    @classmethod
+    @abstractmethod
+    def connect_internal_signals(cls):
+        return None
 
 
 class ActionsHandler(ABC):
@@ -264,7 +279,7 @@ class WidgetHandler(FieldHandler):
         return None
 
     @classmethod
-    def register_widget(cls, widget: QWidget):
+    def register_view(cls, widget: QWidget):
         logging.info(f"Register {widget}")
 
         cls.get_properties().widgets.add(widget)
@@ -298,7 +313,9 @@ class WidgetHandler(FieldHandler):
         cls.signaller.widget_requested.emit(data, parent)
 
 
-class ItemViewHandler(WidgetHandler):
+class ItemViewHandler(ABC):
+    signaller = ViewSignals()  # TODO: rename to signals
+
     @classmethod
     @abstractmethod
     def get_properties(cls) -> ViewHandlerProperties:
@@ -306,37 +323,104 @@ class ItemViewHandler(WidgetHandler):
 
     @classmethod
     @abstractmethod
-    def get_selected(cls, view: QWidget) -> list[object]:
+    def _get_model_class(cls) -> Type[ItemModel]:
         return None
 
     @classmethod
-    def get_views(cls):
-        return [v for v in cls.get_properties().widgets if isinstance(v, QAbstractItemView)]
+    @abstractmethod
+    def _get_trigger(cls) -> ModuleType:
+        return None
+
+    @classmethod
+    @abstractmethod
+    def delete_selection(view: ItemViewType):
+        return None
+
+    @classmethod
+    def _get_proxy_model_class(cls) -> Type[QSortFilterProxyModel]:
+        return QSortFilterProxyModel
+
+    @classmethod
+    def connect_internal_signals(cls):
+        cls.signaller.delete_selection_requested.connect(cls.delete_selection)
+
+    @classmethod
+    def connect_view_signals(cls, view: QAbstractItemView) -> None:
+        view.customContextMenuRequested.connect(
+            lambda p: cls._get_trigger().context_menu_requested(view, p)
+        )
+
+    @classmethod
+    def get_selected(cls, view: QAbstractItemView) -> list[object]:
+        selected_values = list()
+        for proxy_index in view.selectedIndexes():
+            source_index = view.model().mapToSource(proxy_index)
+            value = source_index.internalPointer()
+            if value not in selected_values:
+                selected_values.append(value)
+        return selected_values
+
+    @classmethod
+    def create_model(cls, data: object) -> QSortFilterProxyModel:
+        model = cls._get_model_class()(data)
+        cls.get_properties().models[data] = model
+        proxy_model = cls._get_proxy_model_class()()
+        proxy_model.setSourceModel(model)
+        proxy_model.setDynamicSortFilter(True)
+        return proxy_model, model
+
+    @classmethod
+    def get_model(cls, data: object) -> ItemModel | None:
+        return cls.get_properties().models.get(data)
+
+    @classmethod
+    def remove_model(cls, model: ItemModel):
+        if model.bsdd_data in cls.get_properties().models:
+            cls.get_properties().models.pop(model.bsdd_data)
+
+    @classmethod
+    def register_view(cls, view: ItemViewType):
+        logging.info(f"Register View: {view}")
+
+        cls.get_properties().views.add(view)
+        cls.get_properties().context_menu_list[view] = list()
+
+    @classmethod
+    def unregister_view(cls, view: ItemViewType):
+        logging.info(f"Unregister View: {view}")
+        if not view in cls.get_properties().views:
+            return
+        cls.get_properties().views.remove(view)
+        cls.get_properties().context_menu_list.pop(view)
+
+    @classmethod
+    def get_views(cls) -> set[ItemViewType]:
+        return cls.get_properties().views
 
     @classmethod
     def reset_views(cls):
-        logging.info(f"Reset Views")
         for view in cls.get_views():
             cls.reset_view(view)
 
     @classmethod
-    def reset_view(cls, view: QAbstractItemView):
-        model = view.model()
-        if not model:
+    def reset_view(cls, view: ItemViewType):
+        logging.info(f"Reset View {view}")
+        proxy_model = view.model()
+        if not proxy_model:
             return
-        source_model = model.sourceModel()
+        source_model = proxy_model.sourceModel()
         source_model.beginResetModel()
         source_model.endResetModel()
 
     @classmethod
-    def clear_context_menu_list(cls, view: QAbstractItemView):
+    def clear_context_menu_list(cls, view: ItemViewType):
         prop = cls.get_properties()
         prop.context_menu_list[view] = list()
 
     @classmethod
     def add_context_menu_entry(
         cls,
-        view: QAbstractItemView,
+        view: ItemViewType,
         label_func: Callable,  # clearer than "name_getter"
         action_func: Callable,  # "function" → "action_func"
         require_selection: bool,  # clearer than "on_selection"
@@ -366,12 +450,7 @@ class ItemViewHandler(WidgetHandler):
         return entry
 
     @classmethod
-    def register_widget(cls, widget):
-        super().register_widget(widget)
-        cls.get_properties().context_menu_list[widget] = list()
-
-    @classmethod
-    def create_context_menu(cls, view: QAbstractItemView, selected_elements: list) -> QMenu:
+    def create_context_menu(cls, view: ItemViewType, selected_elements: list) -> QMenu:
         menu = QMenu(parent=view)
         props = cls.get_properties()
 
@@ -406,7 +485,7 @@ class ItemViewHandler(WidgetHandler):
 
     @classmethod
     def add_column_to_table(
-        cls, model: QAbstractItemModel, name: str, get_function: Callable, set_function=None
+        cls, model: ItemModel, name: str, get_function: Callable, set_function=None
     ) -> None:
         """
         Define Column which should be shown in Table
@@ -420,16 +499,16 @@ class ItemViewHandler(WidgetHandler):
         cls.get_properties().columns[model].append((name, get_function, set_function))
 
     @classmethod
-    def get_column_count(cls, model: QAbstractItemModel):
+    def get_column_count(cls, model: ItemModel):
         columns = cls.get_properties().columns.get(model)
         return len(columns) if columns else 0
 
     @classmethod
-    def get_column_names(cls, model: QAbstractItemModel):
+    def get_column_names(cls, model: ItemModel):
         return [x[0] for x in cls.get_properties().columns.get(model) or []]
 
     @classmethod
-    def value_getter_functions(cls, model: QAbstractItemModel):
+    def value_getter_functions(cls, model: ItemModel):
         """_summary_
         returns the function for the value getter
 
@@ -437,12 +516,8 @@ class ItemViewHandler(WidgetHandler):
         return [x[1] for x in cls.get_properties().columns.get(model) or []]
 
     @classmethod
-    def value_setter_functions(cls, model: QAbstractItemModel):
+    def value_setter_functions(cls, model: ItemModel):
         """_summary_
         returns the function for the value setter
         """
         return [x[2] for x in cls.get_properties().columns.get(model) or []]
-
-    @classmethod
-    def get_model(cls):
-        return cls.get_properties().model

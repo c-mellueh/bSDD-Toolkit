@@ -20,12 +20,12 @@ def on_new_project():
     pass
 
 
-def create_context_menu(view, pos):
+def context_menu_requested(view, pos):
     core.create_context_menu(view, pos, tool.AllowedValuesTable)
 
 
 def table_view_created(view: ui.AllowedValuesTable):
-    core.setup_view(view, tool.AllowedValuesTable)
+    core.add_columns_to_view(view, tool.AllowedValuesTable)
     core.add_context_menu_to_view(view, tool.AllowedValuesTable)
 
 

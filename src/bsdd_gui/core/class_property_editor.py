@@ -25,7 +25,7 @@ def unregister_widget(
 def register_widget(
     widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditor]
 ):
-    class_property_editor.register_widget(widget)
+    class_property_editor.register_view(widget)
     class_property_editor.connect_widget_to_internal_signals(widget)
 
 
@@ -49,7 +49,7 @@ def add_fields_to_widget(
         lambda e, v, p=project: class_property_editor.set_property_reference(e, v, p.get()),
     )
     class_property_editor.register_field_listener(widget, widget.le_property_reference)
-    table = allowed_values_table.create_widget(widget.data)
+    table = allowed_values_table.create_view(widget.data)
     widget.vl_values.addWidget(table)
 
 

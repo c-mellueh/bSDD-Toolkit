@@ -3,6 +3,7 @@ from typing import Any
 from PySide6.QtWidgets import QWidget
 
 from PySide6.QtCore import QObject, Signal
+from .view_presets import ItemViewType
 
 
 class FieldSignals(QObject):
@@ -18,7 +19,8 @@ class WidgetSignals(FieldSignals):
 
 
 class ViewSignals(WidgetSignals):
+    view_closed = Signal(ItemViewType)
     model_refresh_requested = Signal()
     selection_changed = Signal(QWidget, Any)
-    delete_selection_requested = Signal(QWidget)
+    delete_selection_requested = Signal(ItemViewType)
     item_deleted = Signal([object])  # Write BsddClass, BsddProperty etc not QModelIndex in Signal

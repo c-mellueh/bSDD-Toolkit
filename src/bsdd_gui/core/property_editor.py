@@ -64,7 +64,7 @@ def register_widget(
     property_editor: Type[tool.PropertyEditor],
     allowed_values_table: Type[tool.AllowedValuesTable],
 ):
-    property_editor.register_widget(widget)
+    property_editor.register_view(widget)
     property_editor.connect_widget_to_internal_signals(widget)
 
 
@@ -111,7 +111,7 @@ def add_fields_to_widget(
     property_editor.register_basic_field(widget, widget.sb_version_number, "VersionNumber")
 
     # Allowed Values Table
-    table = allowed_values_table.create_widget(widget.data)
+    table = allowed_values_table.create_view(widget.data)
     widget.vl_values.addWidget(table)
     relationship_editor.init_widget(widget.relationship_widget, widget.data, mode="live")
     widget.pb_new_value.clicked.connect(

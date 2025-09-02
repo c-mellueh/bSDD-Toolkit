@@ -48,7 +48,7 @@ class Search(WidgetHandler):
         """
         prop = cls.get_properties()
         search_dialog = ui.SearchDialog()
-        cls.register_widget(search_dialog)
+        cls.register_view(search_dialog)
 
         search_dialog.search_mode = search_mode
         cls.fill_table(search_dialog, search_items, data_getters)

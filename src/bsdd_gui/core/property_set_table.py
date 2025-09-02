@@ -18,7 +18,7 @@ def connect_view(
     project: Type[tool.Project],
     main_window: Type[tool.MainWindow],
 ):
-    property_set_table.register_widget(view)
+    property_set_table.register_view(view)
     bsdd_dictionary = project.get()
     model = property_set_table.create_model(bsdd_dictionary)
     view.setModel(model)

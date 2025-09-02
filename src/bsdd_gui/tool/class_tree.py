@@ -155,10 +155,10 @@ class ClassTree(ItemViewHandler):
         """
         # choose a view if none supplied
         if view is None:
-            widgets = cls.get_widgets()
-            if not widgets:
+            views = cls.get_views()
+            if not views:
                 return False
-            view = widgets[0]
+            view = views[0]
 
         top_model = view.model()
         # collect proxy chain from top to bottom

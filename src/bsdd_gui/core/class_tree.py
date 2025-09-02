@@ -25,7 +25,7 @@ def connect_view(
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
-    class_tree.register_widget(view)
+    class_tree.register_view(view)
     bsdd_dictionary = project.get()
 
     view.setModel(class_tree.create_model(bsdd_dictionary))

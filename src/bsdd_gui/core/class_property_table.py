@@ -39,7 +39,7 @@ def connect_view(
             return
         property_table.signaller.property_info_requested.emit(bsdd_class_property)
 
-    property_table.register_widget(view)
+    property_table.register_view(view)
     model = property_table.create_model()
     view.setModel(model)
     sel_model = view.selectionModel()
