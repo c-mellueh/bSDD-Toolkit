@@ -20,7 +20,7 @@ def connect_signals(
     )
 
 
-def retranslate_ui(property_table: Type[tool.ClassPropertyTable]):
+def rentranslate_ui(property_table: Type[tool.ClassPropertyTable]):
     pass
 
 
@@ -45,10 +45,13 @@ def add_context_menu_to_view(
     pass  # TODO
 
 
+def create_context_menu(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTable]):
+    pass
+
+
 def connect_view(
     view: ui.ClassPropertyTable,
     property_table: Type[tool.ClassPropertyTable],
-    main_window: Type[tool.MainWindow],
 ):
     def emit_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)

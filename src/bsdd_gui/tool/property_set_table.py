@@ -28,7 +28,7 @@ class PropertySetTable(ItemViewHandler):
 
     @classmethod
     def _get_model_class(cls) -> Type[models.PsetTableModel]:
-        return models.ItemModel
+        return models.PsetTableModel
 
     @classmethod
     def _get_trigger(cls) -> ModuleType:

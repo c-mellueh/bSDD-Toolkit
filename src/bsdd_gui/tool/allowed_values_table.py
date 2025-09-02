@@ -28,7 +28,7 @@ class AllowedValuesTable(ItemViewHandler):
 
     @classmethod
     def connect_internal_signals(cls):
-        super().connect_internal_signals(cls)
+        super().connect_internal_signals()
 
     @classmethod
     def _get_model_class(cls) -> models.AllowedValuesModel:

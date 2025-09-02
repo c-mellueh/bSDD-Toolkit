@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QTreeView
 from PySide6.QtCore import QPoint, QCoreApplication, Qt
 from typing import Type, TYPE_CHECKING
 from bsdd_parser.utils import bsdd_class as class_utils
+import logging
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -32,6 +33,7 @@ def register_view(view: ui.ClassView, class_tree: Type[tool.ClassTree]):
     view.setDropIndicatorShown(True)
     view.setDefaultDropAction(Qt.MoveAction)
     view.setDragDropMode(QTreeView.DragDropMode.DragDrop)  # internal DnD
+    logging.info(f"register View {view} done!")
 
 
 def add_columns_to_view(
@@ -40,12 +42,12 @@ def add_columns_to_view(
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
-    class_tree.register_view(view)
     proxy_model, model = class_tree.create_model(project.get())
     class_tree.add_column_to_table(model, "Name", lambda a: a.Name)
     class_tree.add_column_to_table(model, "Code", lambda a: a.Code)
     class_tree.add_column_to_table(model, "Status", lambda a: a.Status)
     view.setModel(proxy_model)
+    logging.info(f"add columns to view {view} done!")
 
 
 def add_context_menu_to_view(

@@ -31,7 +31,7 @@ class ClassTreeModel(ItemModel):
 
     @property
     def bsdd_dictionary(self):
-        return self.bsdd_dictionary
+        return self.bsdd_data
 
     def hasChildren(self, parent=QModelIndex()):
         if parent.isValid() and parent.column() != 0:
