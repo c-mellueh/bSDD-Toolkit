@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from types import ModuleType
 import logging
-from PySide6.QtCore import Qt, QModelIndex, QCoreApplication
+from PySide6.QtCore import Qt, QModelIndex, QCoreApplication, Signal
 import bsdd_gui
 
 if TYPE_CHECKING:
@@ -123,26 +123,12 @@ class AllowedValuesTable(ItemViewHandler):
 
     @classmethod
     def get_view_from_property_editor(cls, widget: ClassPropertyEditor):
-        views = list()
-        for table_view in cls.get_views():
-            if widget.bsdd_data == table_view.bsdd_data:
-                views.append(table_view)
-        if len(views) > 1:
-            logging.warning("Multiple Views!")
-        if not views:
-            return None
-        return views[-1]
+        return widget.tv_allowed_values
 
     @classmethod
     def handle_new_value_request(cls, widget: ClassPropertyEditor):
         table_view = cls.get_view_from_property_editor(widget)
         cls.append_new_value(table_view)
-
-    @classmethod
-    def create_view(cls, bsdd_property: BsddClassProperty | BsddProperty):
-        view = ui.AllowedValuesTable(bsdd_property)
-        trigger.view_created(view)
-        return view
 
     @classmethod
     def remove_view_by_property_editor(cls, widget: ClassPropertyEditor):

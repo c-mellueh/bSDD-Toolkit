@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClassProperty, BsddProperty
 from bsdd_gui.module.allowed_values_table import ui
 from PySide6.QtCore import QCoreApplication, QPoint
-from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -36,7 +35,9 @@ def add_columns_to_view(
 ):
     prop: BsddClassProperty | BsddProperty = view.bsdd_data
 
-    sort_model, model = allowed_values_table.create_model(prop)
+    sort_model, model = allowed_values_table.create_model(
+        prop
+    )  # if the widget is enbedded in ui the value needs to be updated on setup
     allowed_values_table.add_column_to_table(
         model, "Value", lambda av: av.Value, allowed_values_table.set_value
     )

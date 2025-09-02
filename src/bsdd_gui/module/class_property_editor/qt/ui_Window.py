@@ -46,17 +46,18 @@ from PySide6.QtWidgets import (
     QComboBox,
     QFormLayout,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QLineEdit,
     QPushButton,
     QSizePolicy,
     QSplitter,
-    QTabWidget,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
+from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
 from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 
@@ -67,15 +68,14 @@ class Ui_PropertyWindow(object):
         PropertyWindow.resize(649, 695)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.tabWidget = QTabWidget(PropertyWindow)
-        self.tabWidget.setObjectName("tabWidget")
-        self.tab_basics = QWidget()
-        self.tab_basics.setObjectName("tab_basics")
-        self.verticalLayout_2 = QVBoxLayout(self.tab_basics)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.vl_values = QVBoxLayout()
+        self.vl_values.setObjectName("vl_values")
+
+        self.verticalLayout.addLayout(self.vl_values)
+
         self.fl_code = QFormLayout()
         self.fl_code.setObjectName("fl_code")
-        self.lb_code = QLabel(self.tab_basics)
+        self.lb_code = QLabel(PropertyWindow)
         self.lb_code.setObjectName("lb_code")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -85,7 +85,7 @@ class Ui_PropertyWindow(object):
 
         self.fl_code.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lb_code)
 
-        self.le_code = QLineEdit(self.tab_basics)
+        self.le_code = QLineEdit(PropertyWindow)
         self.le_code.setObjectName("le_code")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(1)
@@ -96,61 +96,61 @@ class Ui_PropertyWindow(object):
 
         self.fl_code.setWidget(1, QFormLayout.ItemRole.FieldRole, self.le_code)
 
-        self.lb_property_reference = QLabel(self.tab_basics)
+        self.lb_property_reference = QLabel(PropertyWindow)
         self.lb_property_reference.setObjectName("lb_property_reference")
 
         self.fl_code.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lb_property_reference)
 
-        self.le_property_reference = LineEditWithButton(self.tab_basics)
+        self.le_property_reference = LineEditWithButton(PropertyWindow)
         self.le_property_reference.setObjectName("le_property_reference")
 
         self.fl_code.setWidget(0, QFormLayout.ItemRole.FieldRole, self.le_property_reference)
 
-        self.lb_unit = QLabel(self.tab_basics)
+        self.lb_unit = QLabel(PropertyWindow)
         self.lb_unit.setObjectName("lb_unit")
 
         self.fl_code.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_unit)
 
-        self.cb_unit = QComboBox(self.tab_basics)
+        self.cb_unit = QComboBox(PropertyWindow)
         self.cb_unit.setObjectName("cb_unit")
 
         self.fl_code.setWidget(2, QFormLayout.ItemRole.FieldRole, self.cb_unit)
 
-        self.verticalLayout_2.addLayout(self.fl_code)
+        self.verticalLayout.addLayout(self.fl_code)
 
         self.hl_value_description = QHBoxLayout()
         self.hl_value_description.setObjectName("hl_value_description")
-        self.pb_new_value = QPushButton(self.tab_basics)
+        self.pb_new_value = QPushButton(PropertyWindow)
         self.pb_new_value.setObjectName("pb_new_value")
         self.pb_new_value.setMaximumSize(QSize(24, 24))
 
         self.hl_value_description.addWidget(self.pb_new_value)
 
-        self.lb_allowed_values = QLabel(self.tab_basics)
+        self.lb_allowed_values = QLabel(PropertyWindow)
         self.lb_allowed_values.setObjectName("lb_allowed_values")
         self.lb_allowed_values.setMinimumSize(QSize(0, 0))
 
         self.hl_value_description.addWidget(self.lb_allowed_values)
 
-        self.cb_is_required = QCheckBox(self.tab_basics)
+        self.cb_is_required = QCheckBox(PropertyWindow)
         self.cb_is_required.setObjectName("cb_is_required")
         self.cb_is_required.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
         self.hl_value_description.addWidget(self.cb_is_required)
 
-        self.verticalLayout_2.addLayout(self.hl_value_description)
+        self.verticalLayout.addLayout(self.hl_value_description)
 
-        self.vl_values = QVBoxLayout()
-        self.vl_values.setObjectName("vl_values")
+        self.tv_allowed_values = AllowedValuesTable(PropertyWindow)
+        self.tv_allowed_values.setObjectName("tv_allowed_values")
 
-        self.verticalLayout_2.addLayout(self.vl_values)
+        self.verticalLayout.addWidget(self.tv_allowed_values)
 
-        self.la_description = QLabel(self.tab_basics)
+        self.la_description = QLabel(PropertyWindow)
         self.la_description.setObjectName("la_description")
 
-        self.verticalLayout_2.addWidget(self.la_description)
+        self.verticalLayout.addWidget(self.la_description)
 
-        self.splitter = QSplitter(self.tab_basics)
+        self.splitter = QSplitter(PropertyWindow)
         self.splitter.setObjectName("splitter")
         self.splitter.setOrientation(Qt.Orientation.Vertical)
         self.te_description = QTextEdit(self.splitter)
@@ -165,18 +165,9 @@ class Ui_PropertyWindow(object):
         self.te_description.setReadOnly(False)
         self.splitter.addWidget(self.te_description)
 
-        self.verticalLayout_2.addWidget(self.splitter)
-
-        self.tabWidget.addTab(self.tab_basics, "")
-        self.tab_advanced = QWidget()
-        self.tab_advanced.setObjectName("tab_advanced")
-        self.tabWidget.addTab(self.tab_advanced, "")
-
-        self.verticalLayout.addWidget(self.tabWidget)
+        self.verticalLayout.addWidget(self.splitter)
 
         self.retranslateUi(PropertyWindow)
-
-        self.tabWidget.setCurrentIndex(0)
 
         QMetaObject.connectSlotsByName(PropertyWindow)
 
@@ -205,14 +196,6 @@ class Ui_PropertyWindow(object):
         )
         self.te_description.setPlaceholderText(
             QCoreApplication.translate("PropertyWindow", "Description", None)
-        )
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_basics),
-            QCoreApplication.translate("PropertyWindow", "Basics", None),
-        )
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_advanced),
-            QCoreApplication.translate("PropertyWindow", "Advanced", None),
         )
 
     # retranslateUi

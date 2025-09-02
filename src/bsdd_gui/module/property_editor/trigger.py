@@ -39,4 +39,4 @@ def widget_created(widget: ui.PropertyEditor):
 
 
 def widget_closed(widget: ui.PropertyEditor):
-    core.unregister_widget(widget, tool.PropertyEditor)
+    core.unregister_widget(widget, tool.PropertyEditor, tool.AllowedValuesTable)

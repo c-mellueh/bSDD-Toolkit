@@ -55,8 +55,10 @@ def connect_signals(
 def unregister_widget(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditor],
+    allowed_values_table: Type[tool.AllowedValuesTable],
 ):
     property_editor.unregister_widget(widget)
+    allowed_values_table.unregister_view(widget.tv_allowed_values)
 
 
 def register_widget(
@@ -65,6 +67,7 @@ def register_widget(
     allowed_values_table: Type[tool.AllowedValuesTable],
 ):
     property_editor.register_widget(widget)
+    widget.tv_allowed_values.model().sourceModel().bsdd_data = widget.bsdd_data
     property_editor.connect_widget_to_internal_signals(widget)
 
 
@@ -111,11 +114,10 @@ def add_fields_to_widget(
     property_editor.register_basic_field(widget, widget.sb_version_number, "VersionNumber")
 
     # Allowed Values Table
-    table = allowed_values_table.create_view(widget.bsdd_data)
-    widget.vl_values.addWidget(table)
+
     relationship_editor.init_widget(widget.relationship_widget, widget.bsdd_data, mode="live")
     widget.pb_new_value.clicked.connect(
-        lambda w=widget: allowed_values_table.append_new_value(table)
+        lambda w=widget: allowed_values_table.append_new_value(widget.tv_allowed_values)
     )
 
     if widget.bsdd_data.Description:
@@ -177,7 +179,7 @@ def create_property_creator(
         property_editor.sync_to_model(widget, bsdd_property)
         project.get().Properties.append(bsdd_property)
         property_editor.signaller.new_property_created.emit(bsdd_property)
-    property_editor.unregister_widget(widget)
+    widget.closed.emit()
 
 
 # TODO: add tablevalue add/remove function

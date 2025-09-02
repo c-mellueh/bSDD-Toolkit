@@ -15,161 +15,145 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="currentIndex">
-      <number>0</number>
+    <layout class="QVBoxLayout" name="vl_values"/>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="fl_code">
+     <item row="1" column="0">
+      <widget class="QLabel" name="lb_code">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="le_code">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>350</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="placeholderText">
+        <string>Code</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="lb_property_reference">
+       <property name="text">
+        <string>Property Reference</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="LineEditWithButton" name="le_property_reference">
+       <property name="placeholderText">
+        <string>Property Code or URI</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lb_unit">
+       <property name="text">
+        <string>Unit:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cb_unit"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="hl_value_description">
+     <item>
+      <widget class="QPushButton" name="pb_new_value">
+       <property name="maximumSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>+</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lb_allowed_values">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Allowed Values:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_is_required">
+       <property name="layoutDirection">
+        <enum>Qt::LayoutDirection::RightToLeft</enum>
+       </property>
+       <property name="text">
+        <string>Is Required</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="AllowedValuesTable" name="tv_allowed_values"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="la_description">
+     <property name="text">
+      <string>Description:</string>
      </property>
-     <widget class="QWidget" name="tab_basics">
-      <attribute name="title">
-       <string>Basics</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <layout class="QFormLayout" name="fl_code">
-         <item row="1" column="0">
-          <widget class="QLabel" name="lb_code">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Code:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="le_code">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>350</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="placeholderText">
-            <string>Code</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="lb_property_reference">
-           <property name="text">
-            <string>Property Reference</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="LineEditWithButton" name="le_property_reference">
-           <property name="placeholderText">
-            <string>Property Code or URI</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="lb_unit">
-           <property name="text">
-            <string>Unit:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="cb_unit"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="hl_value_description">
-         <item>
-          <widget class="QPushButton" name="pb_new_value">
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>+</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lb_allowed_values">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Allowed Values:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="cb_is_required">
-           <property name="layoutDirection">
-            <enum>Qt::LayoutDirection::RightToLeft</enum>
-           </property>
-           <property name="text">
-            <string>Is Required</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="vl_values"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="la_description">
-         <property name="text">
-          <string>Description:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSplitter" name="splitter">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <widget class="QTextEdit" name="te_description">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="autoFormatting">
-           <set>QTextEdit::AutoFormattingFlag::AutoAll</set>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-          <property name="placeholderText">
-           <string>Description</string>
-          </property>
-         </widget>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_advanced">
-      <attribute name="title">
-       <string>Advanced</string>
-      </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <widget class="QTextEdit" name="te_description">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="autoFormatting">
+       <set>QTextEdit::AutoFormattingFlag::AutoAll</set>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+      <property name="placeholderText">
+       <string>Description</string>
+      </property>
      </widget>
     </widget>
    </item>
@@ -180,6 +164,11 @@
    <class>LineEditWithButton</class>
    <extends>QLineEdit</extends>
    <header>bsdd_gui.presets.ui_presets.line_edit_with_button</header>
+  </customwidget>
+  <customwidget>
+   <class>AllowedValuesTable</class>
+   <extends>QTableView</extends>
+   <header>bsdd_gui.module.allowed_values_table.ui</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -12,11 +12,12 @@ if TYPE_CHECKING:
 
 class AllowedValuesTable(TableItemView):
 
-    def __init__(self, bsdd_property: BsddClassProperty | BsddProperty, *args, **kwargs):
+    def __init__(self, *args, bsdd_data=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.bsdd_data: BsddClassProperty | BsddProperty = bsdd_property
+        self.bsdd_data: BsddClassProperty | BsddProperty = bsdd_data
         self.horizontalHeader().setStretchLastSection(True)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        trigger.view_created(self)
 
     def model(self) -> models.SortModel:
         return super().model()

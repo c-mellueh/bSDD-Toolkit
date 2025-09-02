@@ -17,22 +17,25 @@ if TYPE_CHECKING:
 
 
 def unregister_widget(
-    widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditor]
+    widget: ui.ClassPropertyEditor,
+    class_property_editor: Type[tool.ClassPropertyEditor],
+    allowed_table_view: Type[tool.AllowedValuesTable],
 ):
     class_property_editor.unregister_widget(widget)
+    allowed_table_view.unregister_view(widget.tv_allowed_values)
 
 
 def register_widget(
     widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditor]
 ):
     class_property_editor.register_widget(widget)
+    widget.tv_allowed_values.model().sourceModel().bsdd_data = widget.bsdd_data
     class_property_editor.connect_widget_to_internal_signals(widget)
 
 
 def add_fields_to_widget(
     widget: ui.ClassPropertyEditor,
     class_property_editor: Type[tool.ClassPropertyEditor],
-    allowed_values_table: Type[tool.AllowedValuesTable],
     project: Type[tool.Project],
 ):
     class_property_editor.register_basic_field(widget, widget.le_code, "Code")
@@ -49,8 +52,6 @@ def add_fields_to_widget(
         lambda e, v, p=project: class_property_editor.set_property_reference(e, v, p.get()),
     )
     class_property_editor.register_field_listener(widget, widget.le_property_reference)
-    table = allowed_values_table.create_view(widget.bsdd_data)
-    widget.vl_values.addWidget(table)
 
 
 def add_validators_to_widget(
@@ -190,4 +191,4 @@ def create_class_property_creator(
         if is_temporary_pset:
             property_set_table.remove_temporary_pset(bsdd_class_property.parent(), property_set)
             property_set_table.signaller.model_refresh_requested.emit()
-    class_property_editor.unregister_widget(widget)
+    widget.closed.emit()

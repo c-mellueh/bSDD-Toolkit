@@ -49,7 +49,6 @@ def widget_created(window: ui.ClassPropertyEditor):
     core.add_fields_to_widget(
         window,
         tool.ClassPropertyEditor,
-        tool.AllowedValuesTable,
         tool.Project,
     )
     core.add_validators_to_widget(window, tool.ClassPropertyEditor, tool.Project, tool.Util)
@@ -57,10 +56,7 @@ def widget_created(window: ui.ClassPropertyEditor):
 
 
 def window_closed(window: ui.ClassPropertyEditor):
-    core.unregister_widget(
-        window,
-        tool.ClassPropertyEditor,
-    )
+    core.unregister_widget(window, tool.ClassPropertyEditor, tool.AllowedValuesTable)
 
 
 def update_window(window: ui.ClassPropertyEditor):

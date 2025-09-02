@@ -315,6 +315,9 @@
             </item>
            </layout>
           </item>
+          <item>
+           <widget class="AllowedValuesTable" name="tv_allowed_values"/>
+          </item>
          </layout>
         </widget>
        </item>
@@ -706,6 +709,11 @@
    <class>ToggleSwitch</class>
    <extends>QAbstractButton</extends>
    <header>bsdd_gui.presets.ui_presets</header>
+  </customwidget>
+  <customwidget>
+   <class>AllowedValuesTable</class>
+   <extends>QTableView</extends>
+   <header>bsdd_gui.module.allowed_values_table.ui</header>
   </customwidget>
  </customwidgets>
  <resources/>

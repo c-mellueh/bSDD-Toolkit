@@ -46,6 +46,7 @@ from PySide6.QtWidgets import (
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QLineEdit,
     QPushButton,
@@ -59,6 +60,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
 from bsdd_gui.module.property_editor.widgets import (
     ConnectedPropertyTag,
     ContryTagInput,
@@ -218,6 +220,11 @@ class Ui_PropertyWindow(object):
         self.hl_value_description.addItem(self.horizontalSpacer)
 
         self.vl_values.addLayout(self.hl_value_description)
+
+        self.tv_allowed_values = AllowedValuesTable(self.gb_values)
+        self.tv_allowed_values.setObjectName("tv_allowed_values")
+
+        self.vl_values.addWidget(self.tv_allowed_values)
 
         self.verticalLayout_6.addWidget(self.gb_values)
 
