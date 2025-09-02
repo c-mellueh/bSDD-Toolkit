@@ -48,11 +48,12 @@ from PySide6.QtWidgets import (
     QLabel,
     QSizePolicy,
     QSplitter,
-    QTableView,
     QToolButton,
     QVBoxLayout,
     QWidget,
 )
+
+from bsdd_gui.module.property_table.views import ClassTable, PropertyTable
 
 
 class Ui_Form(object):
@@ -70,7 +71,7 @@ class Ui_Form(object):
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.tv_properties = QTableView(self.verticalLayoutWidget)
+        self.tv_properties = PropertyTable(self.verticalLayoutWidget)
         self.tv_properties.setObjectName("tv_properties")
         self.tv_properties.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tv_properties.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
@@ -107,7 +108,7 @@ class Ui_Form(object):
 
         self.verticalLayout_3.addLayout(self.formLayout)
 
-        self.tv_classes = QTableView(self.verticalLayoutWidget_2)
+        self.tv_classes = ClassTable(self.verticalLayoutWidget_2)
         self.tv_classes.setObjectName("tv_classes")
         self.tv_classes.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tv_classes.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)

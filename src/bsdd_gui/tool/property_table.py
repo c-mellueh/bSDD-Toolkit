@@ -46,30 +46,31 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
         return bsdd_gui.PropertyTableProperties
 
     @classmethod
+    def create_model(cls, data):
+        logging.info(
+            f"Create Model not isable in this module use create_class_model and create_property_model"
+        )
+        return None
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def delete_selection(view: views.ClassTable | views.PropertyTable):
+        trigger.delete_selection(view)
+
+    @classmethod
     def connect_internal_signals(cls):
+        super().connect_internal_signals()
         cls.signaller.widget_requested.connect(lambda _, p: trigger.create_widget(p))
         cls.signaller.widget_created.connect(trigger.widget_created)
-        # Only class list depends on the active property; avoid resetting the
-        # properties table itself on selection changes to keep keyboard
-        # navigation intact.
-        cls.signaller.active_property_changed.connect(lambda _: cls.reset_class_views())
-        cls.signaller.search_requested.connect(trigger.search_property)
-        cls.signaller.delete_selection_requested.connect(trigger.delete_selection)
+        cls.signaller.selection_changed.connect(cls.on_selection_change)
+
+        cls.signaller.search_requested.connect(trigger.search_requested)
 
     @classmethod
-    def reset_class_views(cls):
-        for w in cls.get_widgets():
-            # Registered widgets include the container widget and its views.
-            # We only want to refresh the classes table when the active
-            # property changes.
-            try:
-                if hasattr(w, "tv_classes"):
-                    cls.reset_view(w.tv_classes)
-            except Exception:
-                pass
-
-    @classmethod
-    def connect_widget_to_internal_signals(cls, widget: ui.PropertyWidget):
+    def connect_widget_signals(cls, widget: ui.PropertyWidget):
 
         w = widget
 
@@ -84,12 +85,6 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
             lambda _, w=widget: cls.signaller.new_property_requested.emit()
         )
 
-        def handle_prop_change(new_prop: BsddProperty):
-            code = new_prop.Code if new_prop else ""
-            w.lb_property_name.setText(code)
-
-        cls.signaller.active_property_changed.connect(handle_prop_change)
-
         def handle_class_double_click(index: QModelIndex):
             proxy_model: models.SortModel = w.tv_classes.model()
             i: QModelIndex = proxy_model.mapToSource(index)
@@ -99,16 +94,12 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
         w.tv_classes.doubleClicked.connect(handle_class_double_click)
         w.closed.connect(lambda w=widget: trigger.widget_removed(w))
         w.tv_properties.customContextMenuRequested.connect(
-            lambda p: trigger.create_context_menu(p, w.tv_properties)
+            lambda p: trigger.context_menu_requested(w.tv_properties, p)
         )
 
         w.tv_classes.customContextMenuRequested.connect(
-            lambda p: trigger.create_context_menu(p, w.tv_classes)
+            lambda p: trigger.context_menu_requested(w.tv_classes, p)
         )
-
-    @classmethod
-    def request_new_property(cls):
-        cls.signaller.new_property_requested.emit()
 
     @classmethod
     def create_widget(cls):
@@ -120,25 +111,38 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
     @classmethod
     def create_property_model(cls):
         model = models.PropertyTableModel()
-        sort_filter_model = models.SortModel()
-        sort_filter_model.setSourceModel(model)
-        return sort_filter_model
+        cls.get_properties().models["property"] = model
+        proxy_model = models.SortModel()
+        proxy_model.setSourceModel(model)
+        proxy_model.setDynamicSortFilter(True)
+        return proxy_model, model
 
     @classmethod
     def create_class_model(cls):
         model = models.ClassTableModel()
-        sort_filter_model = models.SortModel()
-        sort_filter_model.setSourceModel(model)
-        return sort_filter_model
+        cls.get_properties().models["class"] = model
+        proxy_model = models.SortModel()
+        proxy_model.setSourceModel(model)
+        proxy_model.setDynamicSortFilter(True)
+        return proxy_model, model
 
     @classmethod
     def get_active_property(cls) -> BsddProperty:
         return cls.get_properties().active_property
 
     @classmethod
-    def set_active_property(cls, value: BsddProperty):
-        cls.get_properties().active_property = value
-        cls.signaller.active_property_changed.emit(value)
+    def on_selection_change(cls, view: views.ClassTable | views.PropertyTable, value: BsddProperty):
+        def reset_class_views(cls):
+            for view in cls.get_views():
+                if isinstance(view, views.ClassTable):
+                    cls.reset_view(view)
+
+        if isinstance(view, PropertyTable):
+            cls.get_properties().active_property = value
+            cls.signaller.active_property_changed.emit(value)
+            reset_class_views()
+            code = value.Code if value else ""
+            view.parent().lb_property_name.setText(code)
 
     @classmethod
     def select_property(
@@ -207,9 +211,5 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
         return True
 
     @classmethod
-    def get_selected(cls, view: QTreeView):
-        proxy_indexes = view.selectionModel().selectedIndexes()
-        source_indexes: list[QModelIndex] = [
-            view.model().mapToSource(i) for i in proxy_indexes if i.column() == 0
-        ]
-        return [i.internalPointer() for i in source_indexes]
+    def request_new_property(cls):
+        cls.signaller.new_property_requested.emit()

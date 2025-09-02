@@ -22,7 +22,7 @@
      <widget class="QWidget" name="verticalLayoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QTableView" name="tv_properties">
+        <widget class="PropertyTable" name="tv_properties">
          <property name="contextMenuPolicy">
           <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
          </property>
@@ -76,7 +76,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QTableView" name="tv_classes">
+        <widget class="ClassTable" name="tv_classes">
          <property name="contextMenuPolicy">
           <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
          </property>
@@ -103,6 +103,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PropertyTable</class>
+   <extends>QTableView</extends>
+   <header>bsdd_gui.module.property_table.views</header>
+  </customwidget>
+  <customwidget>
+   <class>ClassTable</class>
+   <extends>QTableView</extends>
+   <header>bsdd_gui.module.property_table.views</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

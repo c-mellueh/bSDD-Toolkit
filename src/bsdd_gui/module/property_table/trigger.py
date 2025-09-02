@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.create_main_menu_actions(tool.PropertyTable, tool.MainWindow, tool.PropertyEditor)
+    core.connect_to_main_menu(tool.PropertyTable, tool.MainWindow)
     core.connect_signals(
         tool.PropertyTable, tool.PropertyEditor, tool.MainWindow, tool.ClassTree, tool.Project
     )
@@ -26,18 +26,33 @@ def create_widget(parent_widget):
 
 
 def widget_created(widget: ui.PropertyWidget):
+
+    view = widget.tv_properties
+    core.register_view(view, tool.PropertyTable)
+    core.add_columns_to_view(view, tool.PropertyTable)
+    core.add_context_menu_to_view(view, tool.PropertyTable)
+    core.connect_view(view, tool.PropertyTable, tool.Util)
+
+    view = widget.tv_classes
+    core.register_view(view, tool.PropertyTable)
+    core.add_columns_to_view(view, tool.PropertyTable)
+    core.add_context_menu_to_view(view, tool.PropertyTable)
+    core.connect_view(view, tool.PropertyTable, tool.Util)
+
     core.register_widget(widget, tool.PropertyTable)
 
 
 def widget_removed(widget: ui.PropertyWidget):
     core.unregister_widget(widget, tool.PropertyTable)
+    core.remove_view(widget.tv_properties, tool.PropertyTable)
+    core.remove_view(widget.tv_classes, tool.PropertyTable)
 
 
-def search_property(view: QTreeView):
+def search_requested(view: QTreeView):
     core.search_property(view, tool.PropertyTable, tool.Search, tool.Project)
 
 
-def create_context_menu(pos, view: QTreeView):
+def context_menu_requested(view: views.PropertyTable | views.ClassTable, pos):
     core.create_context_menu(view, pos, tool.PropertyTable)
 
 

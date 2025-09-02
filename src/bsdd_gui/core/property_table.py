@@ -1,26 +1,13 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication, Qt
+from PySide6.QtCore import QCoreApplication, Qt, QPoint
 from PySide6.QtWidgets import QWidget, QTreeView
 from typing import TYPE_CHECKING, Type
-from bsdd_gui.module.property_table import ui, models
+from bsdd_gui.module.property_table import views, ui, models
 from bsdd_parser import BsddProperty, BsddClass
 from bsdd_parser.utils import bsdd_class as cl_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-
-
-def create_main_menu_actions(
-    property_table: Type[tool.PropertyTable],
-    main_window: Type[tool.MainWindow],
-    property_editor: Type[tool.PropertyEditor],
-) -> None:
-    action = main_window.add_action(
-        "menuModels",
-        "bSDD Properties",
-        lambda: property_table.request_widget(None, main_window.get()),
-    )
-    property_table.set_action(main_window.get(), "open_window", action)
 
 
 def connect_signals(
@@ -56,6 +43,100 @@ def retranslate_ui(
         widget.setWindowTitle(title)
 
 
+def register_view(
+    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTable]
+):
+    property_table.register_view(view)
+
+
+def add_columns_to_view(
+    view: views.PropertyTable | views.ClassTable,
+    property_table: Type[tool.PropertyTable],
+):
+
+    if isinstance(view, views.PropertyTable):
+        proxy_model, model = property_table.create_property_model()
+        model = proxy_model.sourceModel()
+        property_table.add_column_to_table(model, "Code", lambda p: p.Code)
+        property_table.add_column_to_table(model, "Datatype", lambda p: p.DataType)
+        view.setModel(proxy_model)
+
+    else:
+        proxy_model, model = property_table.create_class_model()
+        source_model = proxy_model.sourceModel()
+        property_table.add_column_to_table(source_model, "Code", lambda c: c.Code)
+        property_table.add_column_to_table(source_model, "Name", lambda c: c.Name)
+        view.setModel(proxy_model)
+
+
+def add_context_menu_to_view(
+    view: views.PropertyTable | views.ClassTable,
+    property_table: Type[tool.PropertyTable],
+):
+
+    if isinstance(view, views.PropertyTable):
+        property_table.add_context_menu_entry(
+            view,
+            lambda: QCoreApplication.translate("PropertySet", "Delete"),
+            lambda: property_table.signaller.delete_selection_requested.emit(view),
+            True,
+            True,
+            True,
+        )
+    else:
+        property_table.add_context_menu_entry(
+            view,
+            lambda: QCoreApplication.translate("PropertySet", "Delete Properties"),
+            lambda: property_table.signaller.delete_selection_requested.emit(view),
+            True,
+            True,
+            True,
+        )
+
+
+def connect_view(
+    view: views.PropertyTable | views.ClassTable,
+    property_table: Type[tool.PropertyTable],
+    util: Type[tool.Util],
+):
+    property_table.connect_view_signals(view)
+    if isinstance(view, views.PropertyTable):
+        util.add_shortcut(
+            "Ctrl+F",
+            view,
+            lambda: property_table.signaller.search_requested.emit(view),
+        )
+
+
+def create_context_menu(
+    view: views.PropertyTable | views.ClassTable,
+    pos: QPoint,
+    property_table: Type[tool.PropertyTable],
+):
+    bsdd_allowed_values = property_table.get_selected(view)
+    menu = property_table.create_context_menu(view, bsdd_allowed_values)
+    menu_pos = view.viewport().mapToGlobal(pos)
+    menu.exec(menu_pos)
+
+
+def remove_view(
+    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTable]
+):
+    property_table.remove_model(view.model().sourceModel())
+
+
+def connect_to_main_menu(
+    property_table: Type[tool.PropertyTable],
+    main_window: Type[tool.MainWindow],
+) -> None:
+    action = main_window.add_action(
+        "menuModels",
+        "bSDD Properties",
+        lambda: property_table.request_widget(None, main_window.get()),
+    )
+    property_table.set_action(main_window.get(), "open_window", action)
+
+
 def create_widget(
     parent: QWidget,
     property_table: Type[tool.PropertyTable],
@@ -64,59 +145,12 @@ def create_widget(
 ):
     widget = property_table.create_widget()
     widget.show()
-
-    def handle_current_changed(current, prv):
-        if not current.isValid():
-            return
-        index = widget.tv_properties.model().mapToSource(current)
-        bsdd_property = index.internalPointer()
-        property_table.set_active_property(bsdd_property)
-
-    widget.tv_properties.selectionModel().currentChanged.connect(handle_current_changed)
-
-    util.add_shortcut(
-        "Ctrl+F",
-        widget.tv_properties,
-        lambda: property_table.signaller.search_requested.emit(widget.tv_properties),
-    )
     retranslate_ui(property_table, main_window, util)
 
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTable]):
     property_table.register_view(widget)
-    property_table.register_view(widget.tv_properties)
-    property_table.register_view(widget.tv_classes)
-    property_table.connect_widget_to_internal_signals(widget)
-
-    proxy_model = property_table.create_property_model()
-    source_model = proxy_model.sourceModel()
-    property_table.add_column_to_table(source_model, "Code", lambda p: p.Code)
-    property_table.add_column_to_table(source_model, "Datatype", lambda p: p.DataType)
-    widget.tv_properties.setModel(proxy_model)
-
-    proxy_model = property_table.create_class_model()
-    source_model = proxy_model.sourceModel()
-    property_table.add_column_to_table(source_model, "Code", lambda c: c.Code)
-    property_table.add_column_to_table(source_model, "Name", lambda c: c.Name)
-    widget.tv_classes.setModel(proxy_model)
-
-    property_table.add_context_menu_entry(
-        widget.tv_properties,
-        lambda: QCoreApplication.translate("PropertySet", "Delete"),
-        lambda: property_table.signaller.delete_selection_requested.emit(widget.tv_properties),
-        True,
-        True,
-        True,
-    )
-
-    property_table.add_context_menu_entry(
-        widget.tv_classes,
-        lambda: QCoreApplication.translate("PropertySet", "Delete Properties"),
-        lambda: property_table.signaller.delete_selection_requested.emit(widget.tv_classes),
-        True,
-        True,
-        True,
-    )
+    property_table.connect_widget_signals(widget)
 
 
 def unregister_widget(
@@ -124,8 +158,6 @@ def unregister_widget(
     property_table: Type[tool.PropertyTable],
 ):
     property_table.unregister_widget(widget)
-    property_table.unregister_widget(widget.tv_properties)
-    property_table.unregister_widget(widget.tv_classes)
 
 
 def search_property(
@@ -140,15 +172,6 @@ def search_property(
         return
     # Select the found property in the view and scroll to it
     property_table.select_property(bsdd_property, view)
-
-
-def create_context_menu(view: QTreeView, pos, property_table: Type[tool.PropertyTable]):
-    selected_elements = property_table.get_selected(view)
-    menu = property_table.create_context_menu(view, selected_elements)
-    if not menu:
-        return
-    menu_pos = view.viewport().mapToGlobal(pos)
-    menu.exec(menu_pos)
 
 
 def delete_selection(
