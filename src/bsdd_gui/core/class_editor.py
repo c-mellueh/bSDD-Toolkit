@@ -17,7 +17,7 @@ def register_widget(
     util: Type[tool.Util],
     relationship_editor: Type[tool.RelationshipEditor],
 ):
-    class_editor.register_view(widget)
+    class_editor.register_widget(widget)
     class_editor.register_basic_field(widget, widget.le_name, "Name")
     class_editor.register_basic_field(widget, widget.te_definition, "Definition")
 

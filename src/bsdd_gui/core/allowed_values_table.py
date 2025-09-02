@@ -27,12 +27,16 @@ def retranslate_ui(allowed_values_table: Type[tool.AllowedValuesTable]):
     pass
 
 
+def register_view(view: ui.AllowedValuesTable, item_view_handler: Type[tool.AllowedValuesTable]):
+    item_view_handler.register_view(view)
+    item_view_handler.connect_view_signals(view)
+
+
 def add_columns_to_view(
     view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]
 ):
     prop: BsddClassProperty | BsddProperty = view.data
 
-    allowed_values_table.register_view(view)
     sort_model, model = allowed_values_table.create_model(prop)
     allowed_values_table.add_column_to_table(
         model, "Value", lambda av: av.Value, allowed_values_table.set_value
@@ -50,7 +54,6 @@ def add_columns_to_view(
         model, "OwnedUri", lambda av: av.OwnedUri, allowed_values_table.set_owned_uri
     )
     view.setModel(sort_model)
-    allowed_values_table.connect_view_signals(view)
 
 
 def add_context_menu_to_view(

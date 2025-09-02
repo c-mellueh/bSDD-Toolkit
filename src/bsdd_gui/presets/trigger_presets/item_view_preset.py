@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from bsdd_gui.presets.view_presets import ItemViewType
 from PySide6.QtCore import QPoint
 
-from bsdd_gui.core import allowed_values_table as core  # <- modify to fit your need
+from bsdd_gui.presets.core_presets import item_view_preset as core  # <- modify to fit your need
 from bsdd_gui.presets import tool_presets as tool  # <- modify to fit your need
 
 if TYPE_CHECKING:
@@ -31,6 +31,7 @@ def context_menu_requested(view: ItemViewType, pos: QPoint):
 
 
 def view_created(view: ItemViewType):
+    core.register_view(view, tool.ItemViewHandler)
     core.add_columns_to_view(view, tool.ItemViewHandler)
     core.add_context_menu_to_view(view, tool.ItemViewHandler)
 

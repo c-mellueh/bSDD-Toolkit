@@ -25,7 +25,7 @@ def unregister_widget(
 def register_widget(
     widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditor]
 ):
-    class_property_editor.register_view(widget)
+    class_property_editor.register_widget(widget)
     class_property_editor.connect_widget_to_internal_signals(widget)
 
 

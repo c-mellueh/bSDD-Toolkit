@@ -279,7 +279,7 @@ class WidgetHandler(FieldHandler):
         return None
 
     @classmethod
-    def register_view(cls, widget: QWidget):
+    def register_widget(cls, widget: QWidget):
         logging.info(f"Register {widget}")
 
         cls.get_properties().widgets.add(widget)

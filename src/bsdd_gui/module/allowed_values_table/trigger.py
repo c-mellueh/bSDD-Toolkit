@@ -25,6 +25,7 @@ def context_menu_requested(view, pos):
 
 
 def table_view_created(view: ui.AllowedValuesTable):
+    core.register_view(view)
     core.add_columns_to_view(view, tool.AllowedValuesTable)
     core.add_context_menu_to_view(view, tool.AllowedValuesTable)
 

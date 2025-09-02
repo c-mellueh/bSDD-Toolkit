@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def register_widget(widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditor]):
-    dictionary_editor.register_view(widget)
+    dictionary_editor.register_widget(widget)
     dictionary_editor.connect_widget_to_internal_signals(widget)
 
     # dictionary_editor.fill_dictionary_widget(widget)

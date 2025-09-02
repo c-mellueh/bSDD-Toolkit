@@ -64,7 +64,7 @@ def register_widget(
     property_editor: Type[tool.PropertyEditor],
     allowed_values_table: Type[tool.AllowedValuesTable],
 ):
-    property_editor.register_view(widget)
+    property_editor.register_widget(widget)
     property_editor.connect_widget_to_internal_signals(widget)
 
 
