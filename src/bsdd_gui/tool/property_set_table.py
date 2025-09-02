@@ -5,7 +5,7 @@ import logging
 import bsdd_gui
 from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
 from bsdd_gui.module.property_set_table import ui, models, trigger
-from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignals, ViewHandler
+from bsdd_gui.presets.tool_presets import ItemViewHandler, ViewSignals, ItemViewHandler
 from bsdd_parser.models import BsddDictionary, BsddClass
 
 if TYPE_CHECKING:
@@ -19,7 +19,7 @@ class Signaller(ViewSignals):
     rename_selection_requested = Signal(ui.PsetTableView)
 
 
-class PropertySetTable(ViewHandler):
+class PropertySetTable(ItemViewHandler):
     signaller = Signaller()
 
     @classmethod

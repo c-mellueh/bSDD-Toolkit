@@ -11,7 +11,7 @@ import bsdd_gui
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_parser.utils import bsdd_class as class_utils
 from bsdd_gui.module.class_tree import ui, models, trigger
-from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignals
+from bsdd_gui.presets.tool_presets import ItemViewHandler, ViewSignals
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_tree.prop import ClassTreeProperties
@@ -26,7 +26,7 @@ class Signaller(ViewSignals):
     collapse_selection_requested = Signal(ui.ClassView)
 
 
-class ClassTree(ViewHandler):
+class ClassTree(ItemViewHandler):
     signaller = Signaller()
 
     @classmethod

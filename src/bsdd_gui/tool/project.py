@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 import logging
 import os
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import ModuleHandler
+from bsdd_gui.presets.tool_presets import ActionsHandler
 from bsdd_parser import BsddDictionary, BsddClass, BsddProperty
 from bsdd_gui.module.project import ui
 from PySide6.QtCore import QObject, Signal
@@ -20,7 +20,7 @@ class Signaller(QObject):
     property_removed = Signal(BsddProperty)
 
 
-class Project(ModuleHandler):
+class Project(ActionsHandler):
     signaller = Signaller()
 
     @classmethod

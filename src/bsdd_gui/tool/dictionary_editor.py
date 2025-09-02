@@ -4,7 +4,7 @@ from types import NoneType  # Python 3.10+
 import logging
 import re
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import WidgetHandler, ModuleHandler, WidgetSignals
+from bsdd_gui.presets.tool_presets import WidgetHandler, ActionsHandler, WidgetSignals
 from PySide6.QtCore import Qt, QDateTime, QObject, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -27,7 +27,7 @@ class Signaller(WidgetSignals):
     pass
 
 
-class DictionaryEditor(WidgetHandler, ModuleHandler):
+class DictionaryEditor(WidgetHandler, ActionsHandler):
     signaller = Signaller()
 
     @classmethod

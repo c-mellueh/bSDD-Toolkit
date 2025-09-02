@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     )
 
 
-class ModuleHandler(ABC):
+class ActionsHandler(ABC):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> WidgetHandlerProperties:
@@ -298,7 +298,7 @@ class WidgetHandler(FieldHandler):
         cls.signaller.widget_requested.emit(data, parent)
 
 
-class ViewHandler(WidgetHandler):
+class ItemViewHandler(WidgetHandler):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> ViewHandlerProperties:

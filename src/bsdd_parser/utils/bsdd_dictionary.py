@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 
 
 def get_dictionary_path_from_uri(uri: str) -> str:
@@ -79,18 +79,17 @@ def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
     """
     Build a buildingSMART identifier URI from a dict produced by parse_bsdd_url
     or from a dict with keys:
-      - scheme (default "https")
-      - host (default "identifier.buildingsmart.org")
-      - after_uri
-      - namespace: "hw/som" or ["hw","som"]
-      - version
-      - resource_type
-      - resource_id
-      - path_segments: full list of segments (may include leading "uri")
+    - scheme (default "https")
+    - host (default "identifier.buildingsmart.org")
+    - after_uri
+    - namespace: "hw/som" or ["hw","som"]
+    - version
+    - resource_type
+    - resource_id
+    - path_segments: full list of segments (may include leading "uri")
     Returns constructed URI string or empty string if not enough information.
-    """
-    from urllib.parse import quote
 
+    """
     scheme = data.get("scheme", "https")
     host = data.get("host", "identifier.buildingsmart.org")
 
