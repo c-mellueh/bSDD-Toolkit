@@ -3,6 +3,7 @@ from PySide6.QtCore import QAbstractItemModel
 from PySide6.QtGui import QAction
 from typing import TypedDict, Callable, TypeAlias
 from .view_presets import TreeItemView, TableItemView
+from .models_presets import ItemModel
 
 ItemViewType: TypeAlias = TreeItemView | TableItemView
 
@@ -45,5 +46,5 @@ class ViewProperties:
         super().__init__()
         self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()
         self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
-        self.models = dict(object, QAbstractItemModel)
+        self.models: dict[object, ItemModel] = dict()
         self.views: set[ItemViewType] = set()

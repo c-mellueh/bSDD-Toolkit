@@ -58,7 +58,7 @@ class ClassTree(ItemViewHandler):
 
     @classmethod
     def create_model(cls, bsdd_dictionary: BsddDictionary) -> models.ClassTreeModel:
-        super().create_model(bsdd_dictionary)
+        return super().create_model(bsdd_dictionary)
 
     @classmethod
     def request_search(cls, view: ui.ClassView):
