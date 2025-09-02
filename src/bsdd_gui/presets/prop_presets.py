@@ -16,13 +16,13 @@ class ContextMenuDict(TypedDict):
     action: QAction  # actual QAction object
 
 
-class ModuleHandlerProperties:
+class ActionsProperties:
     def __init__(self):
         super().__init__()
         self.actions = dict()
 
 
-class FieldHandlerProperties:
+class FieldProperties:
     def __init__(self):
         super().__init__()
         self.field_getter: dict[QWidget, dict[QWidget, callable]] = (
@@ -34,13 +34,13 @@ class FieldHandlerProperties:
         self.validator_functions: dict[QWidget, dict[QWidget, tuple[callable, callable]]] = dict()
 
 
-class WidgetHandlerProperties(FieldHandlerProperties):
+class WidgetProperties(FieldProperties):
     def __init__(self):
         super().__init__()
         self.widgets = set()
 
 
-class ViewHandlerProperties(WidgetHandlerProperties):
+class ViewProperties:
     def __init__(self):
         super().__init__()
         self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()

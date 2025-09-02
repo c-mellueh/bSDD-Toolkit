@@ -1,6 +1,6 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import ViewHandlerProperties
+from bsdd_gui.presets.prop_presets import ViewProperties
 
 
-class RelationshipEditorProperties(ViewHandlerProperties):
+class RelationshipEditorProperties(ViewProperties):
     pass

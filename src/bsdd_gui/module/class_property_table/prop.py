@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from . import ui
-from bsdd_gui.presets.prop_presets import ViewHandlerProperties
+from bsdd_gui.presets.prop_presets import ViewProperties
 
 
-class ClassPropertyTableProperties(ViewHandlerProperties):
+class ClassPropertyTableProperties(ViewProperties):
     pass

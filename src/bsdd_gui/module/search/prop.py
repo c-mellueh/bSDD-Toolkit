@@ -7,10 +7,10 @@ from dataclasses import dataclass
 
 from PySide6.QtWidgets import QDialog
 
-from bsdd_gui.presets.prop_presets import WidgetHandlerProperties
+from bsdd_gui.presets.prop_presets import WidgetProperties
 
 
-class SearchProperties(WidgetHandlerProperties):
+class SearchProperties(WidgetProperties):
     filter_threshold: int = 65
     search_mode = 1  # 1 = Class 2= Property
     selected_info = None

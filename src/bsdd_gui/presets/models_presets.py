@@ -9,7 +9,10 @@ from PySide6.QtCore import (
 )
 from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty
 from bsdd_gui import tool
-from bsdd_gui.presets.tool_presets import ItemViewHandler
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bsdd_gui.presets.tool_presets import ItemViewHandler
 
 
 class ItemModel(QAbstractItemModel):

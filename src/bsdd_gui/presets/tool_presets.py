@@ -35,10 +35,10 @@ BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassP
 
 if TYPE_CHECKING:
     from .prop_presets import (
-        ViewHandlerProperties,
-        ViewHandlerProperties,
-        WidgetHandlerProperties,
-        FieldHandlerProperties,
+        ViewProperties,
+        ViewProperties,
+        WidgetProperties,
+        FieldProperties,
         ContextMenuDict,
     )
 
@@ -58,7 +58,7 @@ class BaseHandler(ABC):
 class ActionsHandler(BaseHandler):
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> WidgetHandlerProperties:
+    def get_properties(cls) -> WidgetProperties:
         return None
 
     @classmethod
@@ -78,7 +78,7 @@ class ActionsHandler(BaseHandler):
 class FieldHandler(BaseHandler):
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> FieldHandlerProperties:
+    def get_properties(cls) -> FieldProperties:
         return None
 
     @classmethod
@@ -286,7 +286,7 @@ class WidgetHandler(FieldHandler):
 
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> WidgetHandlerProperties:
+    def get_properties(cls) -> WidgetProperties:
         return None
 
     @classmethod
@@ -331,7 +331,7 @@ class ItemViewHandler(BaseHandler):
 
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> ViewHandlerProperties:
+    def get_properties(cls) -> ViewProperties:
         return None
 
     @classmethod

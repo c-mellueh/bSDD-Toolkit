@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from bsdd_gui.presets.prop_presets import ModuleHandlerProperties
+from bsdd_gui.presets.prop_presets import ActionsProperties
 
 if TYPE_CHECKING:
     from bsdd_parser.models import BsddDictionary
 
 
-class ProjectProperties(ModuleHandlerProperties):
+class ProjectProperties(ActionsProperties):
     def __init__(self):
         super().__init__()
         self.project_dictionary: BsddDictionary = None
