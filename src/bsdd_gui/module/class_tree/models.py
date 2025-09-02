@@ -26,8 +26,8 @@ CODES_MIME = "application/x-bsdd-classcode"  # for fast internal moves
 class ClassTreeModel(ItemModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
-        super().__init__(tool.ClassTree, *args, **kwargs)
-        self.bsdd_data: BsddDictionary = bsdd_dictionary
+        super().__init__(tool.ClassTree, bsdd_dictionary, *args, **kwargs)
+        self.bsdd_data: BsddDictionary
 
     @property
     def bsdd_dictionary(self):

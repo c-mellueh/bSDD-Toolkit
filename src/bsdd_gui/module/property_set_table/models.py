@@ -17,8 +17,8 @@ from bsdd_gui.presets.models_presets import ItemModel
 class PsetTableModel(ItemModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
-        self.bsdd_data = bsdd_dictionary
-        super().__init__(tool.PropertySetTable, *args, **kwargs)
+        super().__init__(tool.PropertySetTable, bsdd_dictionary, *args, **kwargs)
+        self.bsdd_data: BsddDictionary
 
     @property
     def active_class(self):

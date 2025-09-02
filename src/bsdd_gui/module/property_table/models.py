@@ -47,8 +47,8 @@ class PropertyTableModel(ItemModel):
 
 class ClassTableModel(ItemModel):
 
-    def __init__(self, _, *args, **kwargs):
-        super().__init__(tool.PropertyTable, _, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(tool.PropertyTable, None, *args, **kwargs)
         self._data = None
 
     @property

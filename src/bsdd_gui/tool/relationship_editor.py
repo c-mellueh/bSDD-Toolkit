@@ -170,7 +170,7 @@ class RelationshipEditor(ItemViewHandler):
 
         model = widget.tv_relations.model().sourceModel()
         model: models.RelationshipModel
-        model_kind = "class" if isinstance(model.item_data, BsddClass) else "property"
+        model_kind = "class" if isinstance(model.bsdd_data, BsddClass) else "property"
         data_dict = {"RelationType": widget.cb_relation_type.currentText()}
         if bsdd_dictionary.UseOwnUri and widget.le_owned_uri.text():
             data_dict["OwnedUri"] = widget.le_owned_uri.text()
@@ -223,16 +223,16 @@ class RelationshipEditor(ItemViewHandler):
             model: models.RelationshipModel = table_view.model().sourceModel()
             model.beginResetModel()
             for relationship in list(model.virtual_remove):
-                if isinstance(model.item_data, BsddClass):
-                    model.item_data.ClassRelations.remove(relationship)  # type: ignore[arg-type]
+                if isinstance(model.bsdd_data, BsddClass):
+                    model.bsdd_data.ClassRelations.remove(relationship)  # type: ignore[arg-type]
                 else:
-                    model.item_data.PropertyRelations.remove(relationship)  # type: ignore[arg-type]
+                    model.bsdd_data.PropertyRelations.remove(relationship)  # type: ignore[arg-type]
                 model.virtual_remove.remove(relationship)
 
             for relationship in list(model.virtual_append):
-                if isinstance(model.item_data, BsddClass):
-                    model.item_data.ClassRelations.append(relationship)  # type: ignore[arg-type]
+                if isinstance(model.bsdd_data, BsddClass):
+                    model.bsdd_data.ClassRelations.append(relationship)  # type: ignore[arg-type]
                 else:
-                    model.item_data.PropertyRelations.append(relationship)  # type: ignore[arg-type]
+                    model.bsdd_data.PropertyRelations.append(relationship)  # type: ignore[arg-type]
                 model.virtual_append.remove(relationship)
             model.endResetModel()
