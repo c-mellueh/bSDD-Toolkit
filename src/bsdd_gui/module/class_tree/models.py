@@ -25,12 +25,13 @@ CODES_MIME = "application/x-bsdd-classcode"  # for fast internal moves
 
 class ClassTreeModel(ItemModel):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
         super().__init__(tool.ClassTree, *args, **kwargs)
+        self.bsdd_data: BsddDictionary = bsdd_dictionary
 
     @property
     def bsdd_dictionary(self):
-        return tool.Project.get()
+        return self.bsdd_dictionary
 
     def hasChildren(self, parent=QModelIndex()):
         if parent.isValid() and parent.column() != 0:

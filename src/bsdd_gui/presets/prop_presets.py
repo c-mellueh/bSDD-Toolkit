@@ -45,6 +45,5 @@ class ViewHandlerProperties(WidgetHandlerProperties):
         super().__init__()
         self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()
         self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
-        self.model: QAbstractItemModel = None
         self.models = dict(object, QAbstractItemModel)
         self.views: set[ItemViewType] = set()

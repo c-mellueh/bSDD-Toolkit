@@ -20,7 +20,6 @@ def retranslate_ui(item_view_handler: Type[tool.ItemViewHandler]):
 
 def register_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewHandler]):
     item_view_handler.register_view(view)
-    item_view_handler.connect_view_signals(view)
 
 
 def add_columns_to_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewHandler]):
@@ -44,9 +43,7 @@ def add_columns_to_view(view: ItemViewType, item_view_handler: Type[tool.ItemVie
     view.setModel(sort_model)
 
 
-def add_context_menu_to_view(
-    view: ui.AllowedValuesTable, item_view_handler: Type[tool.ItemViewHandler]
-):
+def add_context_menu_to_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewHandler]):
     item_view_handler.clear_context_menu_list(view)
     item_view_handler.add_context_menu_entry(
         view,
@@ -58,8 +55,12 @@ def add_context_menu_to_view(
     )
 
 
+def connect_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewHandler]):
+    item_view_handler.connect_view_signals(view)
+
+
 def create_context_menu(
-    view: ui.AllowedValuesTable, pos: QPoint, item_view_handler: Type[tool.ItemViewHandler]
+    view: ItemViewType, pos: QPoint, item_view_handler: Type[tool.ItemViewHandler]
 ):
     bsdd_allowed_values = item_view_handler.get_selected(view)
     menu = item_view_handler.create_context_menu(view, bsdd_allowed_values)
@@ -67,5 +68,5 @@ def create_context_menu(
     menu.exec(menu_pos)
 
 
-def remove_view(view: ui.AllowedValuesTable, item_view_handler: Type[tool.ItemViewHandler]):
+def remove_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewHandler]):
     item_view_handler.remove_model(view.model().sourceModel())

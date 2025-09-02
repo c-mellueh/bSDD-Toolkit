@@ -13,11 +13,10 @@ if TYPE_CHECKING:
 def connect():
     core.connect_signals(tool.ClassTree, tool.Project)
     core.connect_to_main_window(tool.ClassTree, tool.MainWindow, tool.Util)
-    core.define_class_tree_context_menu(tool.MainWindow, tool.ClassTree, tool.ClassEditor)
 
 
 def on_new_project():
-    core.reset_views(tool.ClassTree, tool.Project)
+    core.reset_models(tool.ClassTree, tool.Project)
 
 
 def retranslate_ui():
@@ -28,24 +27,23 @@ def close_event(event):
     pass
 
 
-def class_view_created(class_view: ui.ClassView):
-    core.connect_view(class_view, tool.ClassTree, tool.Project, tool.Util)
-
-
-def reset_class_views():
-    core.reset_views(tool.ClassTree, tool.Project)
+def class_view_created(view: ui.ClassView):
+    core.register_view(view, tool.ClassTree)
+    core.add_columns_to_view(view, tool.ClassTree, tool.Project, tool.Util)
+    core.add_context_menu_to_view(view, tool.ClassTree, tool.ClassEditor)
+    core.connect_view(view, tool.ClassTree)
 
 
 def copy_selected_class(view: ui.ClassView):
     core.copy_selected_class(view, tool.ClassTree, tool.ClassEditor)
 
 
-def create_context_menu(view: ui.ClassView, pos):
+def context_menu_requested(view: ui.ClassView, pos):
     core.create_context_menu(view, pos, tool.ClassTree)
 
 
 def delete_selection(view: ui.ClassView):
-    core.delete_selection(view, tool.ClassTree, tool.Popups)
+    core.delete_selection(view, tool.ClassTree, tool.Popups, tool.Project)
 
 
 def group_selection(view: ui.ClassView):

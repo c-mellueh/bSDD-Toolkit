@@ -11,48 +11,122 @@ if TYPE_CHECKING:
 
 
 def connect_signals(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
-    def insert_class(new_class: BsddClass):
-        class_tree.add_class_to_dictionary(new_class)
-
     class_tree.connect_internal_signals()
-    project.signaller.class_added.connect(insert_class)
+    project.signaller.class_added.connect(
+        lambda c: class_tree.add_class_to_dictionary(c, project.get())
+    )
     class_tree.signaller.item_deleted.connect(project.signaller.class_removed.emit)
 
 
-def connect_view(
+def retranslate_ui(class_tree: Type[tool.ClassTree]):
+    pass
+
+
+def register_view(view: ui.ClassView, class_tree: Type[tool.ClassTree]):
+    class_tree.register_view(view)
+    view.setSelectionBehavior(QTreeView.SelectRows)
+    view.setSelectionMode(QTreeView.ExtendedSelection)
+    view.setAlternatingRowColors(True)
+    view.setDragEnabled(True)
+    view.setAcceptDrops(True)
+    view.setDropIndicatorShown(True)
+    view.setDefaultDropAction(Qt.MoveAction)
+    view.setDragDropMode(QTreeView.DragDropMode.DragDrop)  # internal DnD
+
+
+def add_columns_to_view(
     view: ui.ClassView,
     class_tree: Type[tool.ClassTree],
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
     class_tree.register_view(view)
-    bsdd_dictionary = project.get()
+    proxy_model, model = class_tree.create_model(project.get())
+    class_tree.add_column_to_table(model, "Name", lambda a: a.Name)
+    class_tree.add_column_to_table(model, "Code", lambda a: a.Code)
+    class_tree.add_column_to_table(model, "Status", lambda a: a.Status)
+    view.setModel(proxy_model)
 
-    view.setModel(class_tree.create_model(bsdd_dictionary))
-    view.setSelectionBehavior(QTreeView.SelectRows)
-    view.setSelectionMode(QTreeView.ExtendedSelection)
-    view.setAlternatingRowColors(True)
+
+def add_context_menu_to_view(
+    view: ui.ClassView,
+    class_tree: Type[tool.ClassTree],
+    class_editor: Type[tool.ClassEditor],
+):
+    def get_first_selection(v: ui.ClassView):
+        bsdd_classes = class_tree.get_selected(v)
+        return bsdd_classes[0] if bsdd_classes else None
+
+    class_tree.clear_context_menu_list(view)
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Copy"),
+        lambda: class_editor.request_class_copy(get_first_selection(view)),
+        True,
+        True,
+        False,
+    )
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Delete"),
+        lambda: class_tree.signaller.delete_selection_requested.emit(view),
+        True,
+        True,
+        True,
+    )
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Extend"),
+        lambda: class_tree.signaller.expand_selection_requested.emit(view),
+        True,
+        True,
+        True,
+    )
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Collapse"),
+        lambda: class_tree.signaller.collapse_selection_requested.emit(view),
+        True,
+        True,
+        True,
+    )
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Group"),
+        lambda: class_tree.signaller.group_selection_requested.emit(view),
+        True,
+        True,
+        True,
+    )
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Info"),
+        lambda: class_editor.request_class_editor(get_first_selection(view)),
+        True,
+        True,
+        False,
+    )
+
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Reset View"),
+        lambda: class_tree.signaller.model_refresh_requested.emit(),
+        False,
+        True,
+        True,
+    )
+
+
+def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree]):
+    class_tree.connect_view_signals(view)
     sel_model = view.selectionModel()
     sel_model.currentChanged.connect(lambda s, d: class_tree.on_current_changed(view, s, d))
-    class_tree.connect_view_signals(view)
-
-
-def reset_views(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
-    for view in class_tree.get_widgets():
-        class_tree.reset_view(view)
 
 
 def connect_to_main_window(
     class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow], util: Type[tool.Util]
 ):
     view = main_window.get_class_view()
-    model = view.model().sourceModel()
-    class_tree.add_column_to_table(model, "Name", lambda a: a.Name)
-    class_tree.add_column_to_table(model, "Code", lambda a: a.Code)
-    class_tree.add_column_to_table(model, "Status", lambda a: a.Status)
-    class_tree.signaller.selection_changed.connect(
-        lambda v, n: (main_window.set_active_class(n) if v == view else None)
-    )
     util.add_shortcut(
         "Del", view, lambda: class_tree.signaller.delete_selection_requested.emit(view)
     )
@@ -67,81 +141,8 @@ def connect_to_main_window(
     util.add_shortcut("Ctrl+N", view, lambda: main_window.signaller.new_class_requested.emit())
 
     util.add_shortcut("Ctrl+E", view, view.expandAll)
-
-    view.setDragEnabled(True)
-    view.setAcceptDrops(True)
-    view.setDropIndicatorShown(True)
-    view.setDefaultDropAction(Qt.MoveAction)
-    view.setDragDropMode(QTreeView.DragDropMode.DragDrop)  # internal DnD
-
-
-def define_class_tree_context_menu(
-    main_window: Type[tool.MainWindow],
-    class_tree: Type[tool.ClassTree],
-    class_editor: Type[tool.ClassEditor],
-):
-    def get_first_selection(v: ui.ClassView):
-        bsdd_classes = class_tree.get_selected(v)
-        return bsdd_classes[0] if bsdd_classes else None
-
-    tree = main_window.get_class_view()
-    class_tree.clear_context_menu_list(tree)
-    class_tree.add_context_menu_entry(
-        tree,
-        lambda: QCoreApplication.translate("Class", "Copy"),
-        lambda: class_editor.request_class_copy(get_first_selection(tree)),
-        True,
-        True,
-        False,
-    )
-    class_tree.add_context_menu_entry(
-        tree,
-        lambda: QCoreApplication.translate("Class", "Delete"),
-        lambda: class_tree.signaller.delete_selection_requested.emit(tree),
-        True,
-        True,
-        True,
-    )
-    class_tree.add_context_menu_entry(
-        tree,
-        lambda: QCoreApplication.translate("Class", "Extend"),
-        lambda: class_tree.signaller.expand_selection_requested.emit(tree),
-        True,
-        True,
-        True,
-    )
-    class_tree.add_context_menu_entry(
-        tree,
-        lambda: QCoreApplication.translate("Class", "Collapse"),
-        lambda: class_tree.signaller.collapse_selection_requested.emit(tree),
-        True,
-        True,
-        True,
-    )
-    class_tree.add_context_menu_entry(
-        tree,
-        lambda: QCoreApplication.translate("Class", "Group"),
-        lambda: class_tree.signaller.group_selection_requested.emit(tree),
-        True,
-        True,
-        True,
-    )
-    class_tree.add_context_menu_entry(
-        tree,
-        lambda: QCoreApplication.translate("Class", "Info"),
-        lambda: class_editor.request_class_editor(get_first_selection(tree)),
-        True,
-        True,
-        False,
-    )
-
-    class_tree.add_context_menu_entry(
-        tree,
-        lambda: QCoreApplication.translate("Class", "Reset View"),
-        lambda: class_tree.signaller.model_refresh_requested.emit(),
-        False,
-        True,
-        True,
+    class_tree.signaller.selection_changed.connect(
+        lambda v, n: (main_window.set_active_class(n) if v == view else None)
     )
 
 
@@ -153,7 +154,10 @@ def create_context_menu(view: ui.ClassView, pos: QPoint, class_tree: Type[tool.C
 
 
 def delete_selection(
-    view: ui.ClassView, class_tree: Type[tool.ClassTree], popups: Type[tool.Popups]
+    view: ui.ClassView,
+    class_tree: Type[tool.ClassTree],
+    popups: Type[tool.Popups],
+    project: Type[tool.Project],
 ):
 
     selected_classes = class_tree.get_selected(view)
@@ -164,9 +168,9 @@ def delete_selection(
         return
     for bsdd_class in selected_classes:
         if recursive_deletion:
-            class_tree.delete_class_with_children(bsdd_class)
+            class_tree.delete_class_with_children(bsdd_class, project.get())
         else:
-            class_tree.delete_class(bsdd_class)
+            class_tree.delete_class(bsdd_class, project.get())
 
 
 def group_selection(
@@ -185,7 +189,7 @@ def group_selection(
 def copy_selected_class(
     view: ui.ClassView,
 ):
-    pass
+    pass  # TODO
 
 
 def search_class(
@@ -199,3 +203,11 @@ def search_class(
     if not cl:
         return
     class_tree.select_and_expand(cl, view)
+
+
+def reset_models(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
+    for bsdd_dictionary, model in class_tree.get_models_dict().items():
+        model.bsdd_data = project.get()
+        class_tree.get_models_dict().pop(bsdd_dictionary)
+        class_tree.get_models_dict()[project.get()] = model
+    class_tree.reset_views()

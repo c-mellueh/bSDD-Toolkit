@@ -175,4 +175,4 @@ def group_classes(
         class_editor.signaller.new_class_created.emit(new_class)
         class_editor.signaller.dialog_accepted.emit(widget)
         for child_class in bsdd_classes:
-            class_tree.move_class(child_class, new_class)
+            class_tree.move_class(child_class, new_class, tool.Project)

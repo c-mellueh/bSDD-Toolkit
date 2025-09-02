@@ -27,9 +27,8 @@ def retranslate_ui(allowed_values_table: Type[tool.AllowedValuesTable]):
     pass
 
 
-def register_view(view: ui.AllowedValuesTable, item_view_handler: Type[tool.AllowedValuesTable]):
-    item_view_handler.register_view(view)
-    item_view_handler.connect_view_signals(view)
+def register_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
+    allowed_values_table.register_view(view)
 
 
 def add_columns_to_view(
@@ -68,6 +67,10 @@ def add_context_menu_to_view(
         True,
         True,
     )
+
+
+def connect_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
+    allowed_values_table.connect_view_signals(view)
 
 
 def create_context_menu(
