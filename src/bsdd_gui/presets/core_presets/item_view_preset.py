@@ -23,7 +23,7 @@ def register_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewHandl
 
 
 def add_columns_to_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewHandler]):
-    prop: BsddClassProperty | BsddProperty = view.data
+    prop: BsddClassProperty | BsddProperty = view.bsdd_data
     sort_model, model = item_view_handler.create_model(prop)
     item_view_handler.add_column_to_table(
         model, "Value", lambda av: av.Value, item_view_handler.set_value

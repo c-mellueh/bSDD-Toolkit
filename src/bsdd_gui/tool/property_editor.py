@@ -31,11 +31,11 @@ class PropertyEditor(WidgetHandler):
     def connect_internal_signals(cls):
         cls.signaller.widget_requested.connect(trigger.create_window)
         cls.signaller.widget_created.connect(trigger.widget_created)
-        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.data))
+        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_data))
         cls.signaller.widget_closed.connect(trigger.widget_closed)
         cls.signaller.new_property_requested.connect(trigger.create_property_creator)
         # Autoupdate Values
-        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.data, f))
+        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
     @classmethod
     def request_new_property(cls, blueprint: dict = None):

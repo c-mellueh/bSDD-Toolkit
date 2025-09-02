@@ -54,7 +54,7 @@ class ClassPropertyEditor(WidgetHandler):
         cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
         cls.signaller.widget_created.connect(trigger.widget_created)
         cls.signaller.widget_closed.connect(trigger.window_closed)
-        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.data))
+        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_data))
         cls.signaller.property_reference_changed.connect(
             lambda cp: cls.request_property_specific_redraw(cls.get_window(cp))
         )
@@ -62,7 +62,7 @@ class ClassPropertyEditor(WidgetHandler):
             trigger.create_class_property_creator
         )
         # Autoupdate Values
-        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.data, f))
+        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
         cls.signaller.property_specific_redraw_requested.connect(
             trigger.update_property_specific_fields
         )

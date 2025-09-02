@@ -90,7 +90,7 @@ class FieldHandler(BaseHandler):
             lambda e, v, vn=variable_name: setattr(e, vn, v if v is not None else None),
         )
         if hasattr(widget, "data"):
-            cls.sync_from_model(widget, widget.data, explicit_field=field)
+            cls.sync_from_model(widget, widget.bsdd_data, explicit_field=field)
         else:
             logging.info(f"Attribute 'data' not set for {widget}")
         cls.register_field_listener(widget, field)
