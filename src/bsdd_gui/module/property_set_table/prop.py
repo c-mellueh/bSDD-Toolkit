@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from . import ui
 from bsdd_parser import BsddClass
-from bsdd_gui.presets.prop_presets import ItemModelHandlerProperties, ViewHandlerProperties
+from bsdd_gui.presets.prop_presets import ViewHandlerProperties
 
 
-class PropertySetTableProperties(ItemModelHandlerProperties, ViewHandlerProperties):
+class PropertySetTableProperties(ViewHandlerProperties):
     views: set[ui.PsetTableView] = set()
     temporary_pset: dict[BsddClass, list[str]] = dict()

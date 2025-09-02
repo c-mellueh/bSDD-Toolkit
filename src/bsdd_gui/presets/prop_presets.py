@@ -13,13 +13,6 @@ class ContextMenuDict(TypedDict):
     action: QAction  # actual QAction object
 
 
-class ItemModelHandlerProperties:
-    def __init__(self):
-        super().__init__()
-        self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
-        self.model: QAbstractItemModel = None
-
-
 class ModuleHandlerProperties:
     def __init__(self):
         super().__init__()
@@ -48,10 +41,5 @@ class ViewHandlerProperties(WidgetHandlerProperties):
     def __init__(self):
         super().__init__()
         self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()
-
-
-class ClassTreeProperties(
-    ViewHandlerProperties,
-    ItemModelHandlerProperties,
-):
-    pass
+        self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
+        self.model: QAbstractItemModel = None

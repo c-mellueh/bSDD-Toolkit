@@ -9,12 +9,12 @@ from PySide6.QtCore import (
 )
 from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty
 from bsdd_gui import tool
-from bsdd_gui.presets.tool_presets import AbstractItemModelHandler
+from bsdd_gui.presets.tool_presets import ViewHandler
 
 
 class ItemModel(QAbstractItemModel):
 
-    def __init__(self, tool: AbstractItemModelHandler, *args, **kwargs):
+    def __init__(self, tool: ViewHandler, *args, **kwargs):
         self.tool = tool
         super().__init__(*args, **kwargs)
 
@@ -30,14 +30,14 @@ class ItemModel(QAbstractItemModel):
 
         if role != Qt.ItemDataRole.DisplayRole:
             return None
-        getter_func = self.tool.get_value_functions(self)[index.column()]
+        getter_func = self.tool.value_getter_functions(self)[index.column()]
         return getter_func(index.internalPointer())
 
     def setData(self, index, value, /, role=...):
         if not index.isValid():
             return False
         if role == Qt.ItemDataRole.EditRole:
-            setter_func = self.tool.set_value_functions(self)[index.column()]
+            setter_func = self.tool.value_setter_functions(self)[index.column()]
             if setter_func is None:
                 return False
             setter_func(self, index, value)

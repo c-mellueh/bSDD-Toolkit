@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_table.prop import PropertyTableProperties
 
 from bsdd_gui.presets.tool_presets import (
-    AbstractItemModelHandler,
+    ViewHandler,
     ViewHandler,
     ViewSignals,
     WidgetSignals,
@@ -38,7 +38,7 @@ class Signaller(ViewSignals, WidgetSignals):
     search_requested = Signal(QWidget)
 
 
-class PropertyTable(AbstractItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler):
+class PropertyTable(ViewHandler, ModuleHandler, WidgetHandler):
     signaller = Signaller()
 
     @classmethod

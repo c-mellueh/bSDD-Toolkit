@@ -21,63 +21,12 @@ from .signal_presets import WidgetSignals, FieldSignals, ViewSignals
 
 if TYPE_CHECKING:
     from .prop_presets import (
-        ItemModelHandlerProperties,
+        ViewHandlerProperties,
         ViewHandlerProperties,
         WidgetHandlerProperties,
         FieldHandlerProperties,
         ContextMenuDict,
     )
-
-
-class AbstractItemModelHandler(ABC):
-    @classmethod
-    @abstractmethod
-    def get_properties(cls) -> ItemModelHandlerProperties:
-        return None
-
-    @classmethod
-    def add_column_to_table(
-        cls, model: QAbstractItemModel, name: str, get_function: Callable, set_function=None
-    ) -> None:
-        """
-        Define Column which should be shown in Table
-        :param name: Name of Column
-        :param get_function: getter function for cell value. SOMcreator.SOMProperty will be passed as argument
-        set_function: function(model,index,new_value)
-        :return:
-        """
-        if not model in cls.get_properties().columns:
-            cls.get_properties().columns[model] = list()
-        cls.get_properties().columns[model].append((name, get_function, set_function))
-
-    @classmethod
-    def get_column_count(cls, model: QAbstractItemModel):
-        columns = cls.get_properties().columns.get(model)
-        return len(columns) if columns else 0
-
-    @classmethod
-    def get_column_names(cls, model: QAbstractItemModel):
-        return [x[0] for x in cls.get_properties().columns.get(model) or []]
-
-    @classmethod
-    def get_value_functions(cls, model: QAbstractItemModel):
-        return [x[1] for x in cls.get_properties().columns.get(model) or []]
-
-    @classmethod
-    def set_value_functions(cls, model: QAbstractItemModel):
-        """_summary_
-        model,index,new_value
-        Args:
-            model (QAbstractItemModel): _description_
-
-        Returns:
-            _type_: _description_
-        """
-        return [x[2] for x in cls.get_properties().columns.get(model) or []]
-
-    @classmethod
-    def get_model(cls):
-        return cls.get_properties().model
 
 
 class ModuleHandler(ABC):
@@ -454,3 +403,46 @@ class ViewHandler(WidgetHandler):
             e["action"] = action
 
         return menu
+
+    @classmethod
+    def add_column_to_table(
+        cls, model: QAbstractItemModel, name: str, get_function: Callable, set_function=None
+    ) -> None:
+        """
+        Define Column which should be shown in Table
+        :param name: Name of Column
+        :param get_function: getter function for cell value. SOMcreator.SOMProperty will be passed as argument
+        set_function: function(model,index,new_value)
+        :return:
+        """
+        if not model in cls.get_properties().columns:
+            cls.get_properties().columns[model] = list()
+        cls.get_properties().columns[model].append((name, get_function, set_function))
+
+    @classmethod
+    def get_column_count(cls, model: QAbstractItemModel):
+        columns = cls.get_properties().columns.get(model)
+        return len(columns) if columns else 0
+
+    @classmethod
+    def get_column_names(cls, model: QAbstractItemModel):
+        return [x[0] for x in cls.get_properties().columns.get(model) or []]
+
+    @classmethod
+    def value_getter_functions(cls, model: QAbstractItemModel):
+        """_summary_
+        returns the function for the value getter
+
+        """
+        return [x[1] for x in cls.get_properties().columns.get(model) or []]
+
+    @classmethod
+    def value_setter_functions(cls, model: QAbstractItemModel):
+        """_summary_
+        returns the function for the value setter
+        """
+        return [x[2] for x in cls.get_properties().columns.get(model) or []]
+
+    @classmethod
+    def get_model(cls):
+        return cls.get_properties().model
