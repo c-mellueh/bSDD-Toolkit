@@ -42,7 +42,7 @@ def add_columns_to_view(
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
-    proxy_model, model = class_tree.create_model(project.get())
+    proxy_model, model = class_tree.create_model(None)
     class_tree.add_column_to_table(model, "Name", lambda a: a.Name)
     class_tree.add_column_to_table(model, "Code", lambda a: a.Code)
     class_tree.add_column_to_table(model, "Status", lambda a: a.Status)
@@ -206,8 +206,6 @@ def search_class(
 
 
 def reset_models(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
-    for bsdd_dictionary, model in class_tree.get_models_dict().items():
+    for model in class_tree.get_models():
         model.bsdd_data = project.get()
-        class_tree.get_models_dict().pop(bsdd_dictionary)
-        class_tree.get_models_dict()[project.get()] = model
     class_tree.reset_views()

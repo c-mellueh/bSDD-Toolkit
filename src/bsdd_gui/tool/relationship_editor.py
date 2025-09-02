@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Type
 import logging
 
 from PySide6.QtWidgets import QTreeView, QCompleter, QWidget
@@ -12,7 +12,7 @@ from bsdd_parser import (
     BsddClassRelation,
     BsddPropertyRelation,
 )
-from bsdd_gui.presets.tool_presets import ItemViewHandler, ViewSignals, ItemViewHandler
+from bsdd_gui.presets.tool_presets import ItemViewHandler, ViewSignals, WidgetHandler, WidgetSignals
 from bsdd_parser.utils import bsdd_dictionary as dict_util
 from bsdd_parser.utils import bsdd_class as cl_util
 from bsdd_parser.utils import bsdd_class_property as prop_util
@@ -23,16 +23,48 @@ if TYPE_CHECKING:
 from bsdd_gui.module.relationship_editor import ui, trigger, models
 
 
-class Signaller(ViewSignals):
+class Signaller(ViewSignals, WidgetSignals):
     pass
 
 
-class RelationshipEditor(ItemViewHandler):
+class RelationshipEditor(WidgetHandler, ItemViewHandler):
     signaller = Signaller()
 
     @classmethod
     def get_properties(cls) -> RelationshipEditorProperties:
         return bsdd_gui.RelationshipEditorProperties
+
+    @classmethod
+    def _get_model_class(cls) -> Type[models.RelationshipModel]:
+        return models.RelationshipModel
+
+    @classmethod
+    def _get_proxy_model_class(cls) -> Type[models.SortModel]:
+        return models.SortModel
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def delete_selection(view: QTreeView):
+        # TODO
+        return None
+
+    @classmethod
+    def add_class_columns_to_table(cls, model: models.RelationshipModel):
+        cls.add_column_to_table(model, "RelationType", lambda cr: cr.RelationType)
+        cls.add_column_to_table(model, "RelatedClassUri", lambda cr: cr.RelatedClassUri)
+        cls.add_column_to_table(model, "RelatedClassName", lambda cr: cr.RelatedClassName)
+        cls.add_column_to_table(model, "Fraction", lambda cr: cr.Fraction)
+        cls.add_column_to_table(model, "OwnedUri", lambda cr: cr.OwnedUri)
+
+    @classmethod
+    def add_property_columns_to_table(cls, model: models.RelationshipModel):
+        cls.add_column_to_table(model, "RelationType", lambda cr: cr.RelationType)
+        cls.add_column_to_table(model, "RelatedPropertyUri", lambda cr: cr.RelatedPropertyUri)
+        cls.add_column_to_table(model, "RelatedPropertyName", lambda cr: cr.RelatedPropertyName)
+        cls.add_column_to_table(model, "OwnedUri", lambda cr: cr.OwnedUri)
 
     @classmethod
     def init_widget(
@@ -42,10 +74,6 @@ class RelationshipEditor(ItemViewHandler):
         mode: Literal["dialog"] | Literal["live"] = "dialog",
     ):
         trigger.widget_created(widget, data, mode)
-
-    @classmethod
-    def connect_internal_signals(cls):
-        pass
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
@@ -82,28 +110,6 @@ class RelationshipEditor(ItemViewHandler):
         return True
 
     @classmethod
-    def create_model(cls, data: BsddClass | BsddProperty, mode):
-        data_model = models.RelationshipModel(data, mode)
-        proxy_model = models.SortModel()
-        proxy_model.setSourceModel(data_model)
-        return proxy_model
-
-    @classmethod
-    def add_class_columns_to_table(cls, model: models.RelationshipModel):
-        cls.add_column_to_table(model, "RelationType", lambda cr: cr.RelationType)
-        cls.add_column_to_table(model, "RelatedClassUri", lambda cr: cr.RelatedClassUri)
-        cls.add_column_to_table(model, "RelatedClassName", lambda cr: cr.RelatedClassName)
-        cls.add_column_to_table(model, "Fraction", lambda cr: cr.Fraction)
-        cls.add_column_to_table(model, "OwnedUri", lambda cr: cr.OwnedUri)
-
-    @classmethod
-    def add_property_columns_to_table(cls, model: models.RelationshipModel):
-        cls.add_column_to_table(model, "RelationType", lambda cr: cr.RelationType)
-        cls.add_column_to_table(model, "RelatedPropertyUri", lambda cr: cr.RelatedPropertyUri)
-        cls.add_column_to_table(model, "RelatedPropertyName", lambda cr: cr.RelatedPropertyName)
-        cls.add_column_to_table(model, "OwnedUri", lambda cr: cr.OwnedUri)
-
-    @classmethod
     def set_fractions_visible_if_is_material(cls, widget: ui.RelationshipWidget):
         visible = widget.cb_relation_type.currentText() == "HasMaterial"
 
@@ -112,7 +118,7 @@ class RelationshipEditor(ItemViewHandler):
         widget.ds_fraction.setVisible(visible)
 
     @classmethod
-    def get_widgets(cls) -> set[ui.RelationshipWidget | QTreeView]:
+    def get_widgets(cls) -> set[ui.RelationshipWidget]:
         return super().get_widgets()
 
     @classmethod

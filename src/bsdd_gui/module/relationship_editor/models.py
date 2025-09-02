@@ -28,13 +28,12 @@ class RelationshipModel(ItemModel):
     def __init__(
         self,
         data: BsddClass | BsddProperty,
-        mode: Literal["dialog"] | Literal["live"],
         *args,
         **kwargs,
     ):
         super().__init__(tool.RelationshipEditor, data, *args, **kwargs)
         self.bsdd_data: BsddClass | BsddProperty
-        self.mode: Literal["dialog"] | Literal["live"] = mode
+        self.mode: Literal["dialog"] | Literal["live"] = None
         self.virtual_append: list[BsddClassRelation | BsddPropertyRelation] = []
         self.virtual_remove: list[BsddClassRelation | BsddPropertyRelation] = []
 

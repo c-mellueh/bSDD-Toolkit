@@ -191,8 +191,6 @@ def delete_selection(
 
 
 def reset_models(property_table: Type[tool.ClassPropertyTable], project: Type[tool.Project]):
-    for bsdd_dictionary, model in property_table.get_models_dict().items():
+    for model in property_table.get_models():
         model.bsdd_data = project.get()
-        property_table.get_models_dict().pop(bsdd_dictionary)
-        property_table.get_models_dict()[project.get()] = model
     property_table.reset_views()

@@ -46,5 +46,5 @@ class ViewProperties:
         super().__init__()
         self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()
         self.columns: dict[QAbstractItemModel, list[tuple[str, callable]]] = dict()
-        self.models: dict[object, ItemModel] = dict()
+        self.models: set[ItemModel] = set()
         self.views: set[ItemViewType] = set()

@@ -379,7 +379,7 @@ class ItemViewHandler(BaseHandler):
     @classmethod
     def create_model(cls, data: object) -> QSortFilterProxyModel:
         model = cls._get_model_class()(data)
-        cls.get_properties().models[data] = model
+        cls.get_properties().models.add(model)
         proxy_model = cls._get_proxy_model_class()()
         proxy_model.setSourceModel(model)
         proxy_model.setDynamicSortFilter(True)
@@ -387,16 +387,21 @@ class ItemViewHandler(BaseHandler):
 
     @classmethod
     def get_model(cls, data: object) -> ItemModel | None:
-        return cls.get_properties().models.get(data)
+        model_list = [m for m in cls.get_models() if m.bsdd_data == data]
+        if not model_list:
+            return None
+        if len(model_list) > 1:
+            logging.info("Multiple Models for the Same Value found!")
+        return model_list[-1]
 
     @classmethod
-    def get_models_dict(cls) -> dict[object, ItemModel]:
+    def get_models(cls) -> set[ItemModel]:
         return cls.get_properties().models
 
     @classmethod
     def remove_model(cls, model: ItemModel):
-        if model.bsdd_data in cls.get_properties().models:
-            cls.get_properties().models.pop(model.bsdd_data)
+        if model in cls.get_models():
+            cls.get_properties().models.remove(model)
 
     @classmethod
     def register_view(cls, view: ItemViewType):

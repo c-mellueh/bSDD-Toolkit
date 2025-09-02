@@ -111,7 +111,6 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
     @classmethod
     def create_property_model(cls):
         model = models.PropertyTableModel()
-        cls.get_properties().models["property"] = model
         proxy_model = models.SortModel()
         proxy_model.setSourceModel(model)
         proxy_model.setDynamicSortFilter(True)
@@ -120,7 +119,6 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
     @classmethod
     def create_class_model(cls):
         model = models.ClassTableModel()
-        cls.get_properties().models["class"] = model
         proxy_model = models.SortModel()
         proxy_model.setSourceModel(model)
         proxy_model.setDynamicSortFilter(True)
