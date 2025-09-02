@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 import logging
 
 from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
@@ -8,7 +8,7 @@ import bsdd_gui
 from bsdd_parser.models import BsddClassProperty, BsddClass
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 
-from bsdd_gui.module.class_property_table import ui, models
+from bsdd_gui.module.class_property_table import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ItemViewHandler, ViewSignals
 
 if TYPE_CHECKING:
@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
 class Signaller(ViewSignals):
     property_info_requested = Signal(BsddClassProperty)
-    reset_all_property_tables_requested = Signal()
 
 
 class ClassPropertyTable(ItemViewHandler):
@@ -28,19 +27,29 @@ class ClassPropertyTable(ItemViewHandler):
         return bsdd_gui.ClassPropertyTableProperties
 
     @classmethod
-    def create_model(cls):
-        model = models.ClassPropertyTableModel()
-        sort_filter_model = models.SortModel()
-        sort_filter_model.setSourceModel(model)
-        return sort_filter_model
+    def _get_model_class(cls) -> Type[models.ClassPropertyTableModel]:
+        return models.ClassPropertyTableModel
 
     @classmethod
-    def on_current_changed(cls, view: ui.ClassPropertyTable, curr: QModelIndex, prev):
-        proxy_model = view.model()
-        if not curr.isValid():
-            return
-        index = proxy_model.mapToSource(curr)
-        cls.signaller.selection_changed.emit(view, index.internalPointer())
+    def _get_proxy_model_class(cls) -> Type[models.SortModel]:
+        return models.SortModel
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def delete_selection(view: ui.ClassPropertyTable):
+        # TODO
+        return None
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+
+    @classmethod
+    def connect_view_signals(cls, view: ui.ClassPropertyTable):
+        super().connect_view_signals(view)
 
     @classmethod
     def filter_properties_by_pset(

@@ -325,7 +325,9 @@ class WidgetHandler(FieldHandler):
 
 
 class ItemViewHandler(BaseHandler):
+
     signaller = ViewSignals()  # TODO: rename to signals
+    # TODO: make info_requested a signal for all handlers
 
     @classmethod
     @abstractmethod

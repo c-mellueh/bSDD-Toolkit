@@ -12,19 +12,37 @@ if TYPE_CHECKING:
 
 def connect_signals(
     property_table: Type[tool.ClassPropertyTable],
-    main_window: Type[tool.MainWindow],
-    property_set_table: Type[tool.PropertySetTable],
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
+    property_table.connect_internal_signals()
     class_property_editor.signaller.new_class_property_created.connect(
-        lambda *_: property_table.signaller.reset_all_property_tables_requested.emit()
+        lambda *_: property_table.reset_views()
     )
 
-    def reset():
-        for table in property_table.get_widgets():
-            property_table.reset_view(table)
 
-    property_table.signaller.reset_all_property_tables_requested.connect(reset)
+def retranslate_ui(property_table: Type[tool.ClassPropertyTable]):
+    pass
+
+
+def register_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTable]):
+    property_table.register_view(view)
+
+
+def add_columns_to_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTable]):
+
+    sort_model, model = property_table.create_model(None)
+    property_table.add_column_to_table(model, "Name", lambda a: a.Code)
+    property_table.add_column_to_table(model, "Datatype", cp_utils.get_datatype)
+    property_table.add_column_to_table(model, "Unit", cp_utils.get_units)
+    property_table.add_column_to_table(model, "Values", property_table.get_allowed_values)
+    property_table.add_column_to_table(model, "Is Required", lambda a: a.IsRequired)
+    view.setModel(sort_model)
+
+
+def add_context_menu_to_view(
+    view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTable]
+):
+    pass  # TODO
 
 
 def connect_view(
@@ -39,7 +57,7 @@ def connect_view(
             return
         property_table.signaller.property_info_requested.emit(bsdd_class_property)
 
-    property_table.register_view(view)
+    property_table.connect_view_signals(view)
     view.doubleClicked.connect(emit_info_requested)
 
 
@@ -69,13 +87,8 @@ def connect_to_main_window(
             row_index = 0
         property_table.select_row(property_view, row_index or 0)
 
-    model = main_window.get_property_view().model().sourceModel()
     property_view = main_window.get_property_view()
-    property_table.add_column_to_table(model, "Name", lambda a: a.Code)
-    property_table.add_column_to_table(model, "Datatype", cp_utils.get_datatype)
-    property_table.add_column_to_table(model, "Unit", cp_utils.get_units)
-    property_table.add_column_to_table(model, "Values", property_table.get_allowed_values)
-    property_table.add_column_to_table(model, "Is Required", lambda a: a.IsRequired)
+
     property_table.signaller.selection_changed.connect(
         lambda v, n: (main_window.set_active_property(n) if v == property_view else None)
     )
