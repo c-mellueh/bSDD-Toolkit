@@ -89,7 +89,7 @@ class FieldHandler(BaseHandler):
             field,
             lambda e, v, vn=variable_name: setattr(e, vn, v if v is not None else None),
         )
-        if hasattr(widget, "data"):
+        if hasattr(widget, "bsdd_data"):
             cls.sync_from_model(widget, widget.bsdd_data, explicit_field=field)
         else:
             logging.info(f"Attribute 'data' not set for {widget}")
@@ -357,6 +357,7 @@ class ItemViewHandler(BaseHandler):
     def connect_internal_signals(cls):
         cls.signaller.delete_selection_requested.connect(cls.delete_selection)
         cls.signaller.model_refresh_requested.connect(cls.reset_views)
+        cls.signaller.selection_changed.connect(lambda v, d: logging.info(f"Selection changed {v}"))
 
     @classmethod
     def connect_view_signals(cls, view: QAbstractItemView) -> None:
@@ -367,9 +368,9 @@ class ItemViewHandler(BaseHandler):
         sel_model.currentChanged.connect(lambda s, d: cls.on_current_changed(view, s, d))
 
     @classmethod
-    def get_selected(cls, view: QAbstractItemView) -> list[object]:
+    def get_selected(cls, view: ItemViewType) -> list[object]:
         selected_values = list()
-        for proxy_index in view.selectedIndexes():
+        for proxy_index in view.selectionModel().selectedIndexes():
             source_index = view.model().mapToSource(proxy_index)
             value = source_index.internalPointer()
             if value not in selected_values:
@@ -621,3 +622,7 @@ class ItemViewHandler(BaseHandler):
             return
         index = proxy_model.mapToSource(curr)
         cls.signaller.selection_changed.emit(view, index.internalPointer())
+
+    @classmethod
+    def request_delete_selection(cls, view):
+        cls.signaller.delete_selection_requested.emit(view)

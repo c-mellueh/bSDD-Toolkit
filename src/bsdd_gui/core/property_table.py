@@ -78,7 +78,7 @@ def add_context_menu_to_view(
         property_table.add_context_menu_entry(
             view,
             lambda: QCoreApplication.translate("PropertySet", "Delete"),
-            lambda: property_table.signaller.delete_selection_requested.emit(view),
+            lambda: property_table.request_delete_selection(view),
             True,
             True,
             True,
@@ -87,7 +87,7 @@ def add_context_menu_to_view(
         property_table.add_context_menu_entry(
             view,
             lambda: QCoreApplication.translate("PropertySet", "Delete Properties"),
-            lambda: property_table.signaller.delete_selection_requested.emit(view),
+            lambda: property_table.request_delete_selection(view),
             True,
             True,
             True,
@@ -149,7 +149,7 @@ def create_widget(
 
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTable]):
-    property_table.register_view(widget)
+    property_table.register_widget(widget)
     property_table.connect_widget_signals(widget)
 
 

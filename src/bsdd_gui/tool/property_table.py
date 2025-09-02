@@ -66,7 +66,6 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
         cls.signaller.widget_requested.connect(lambda _, p: trigger.create_widget(p))
         cls.signaller.widget_created.connect(trigger.widget_created)
         cls.signaller.selection_changed.connect(cls.on_selection_change)
-
         cls.signaller.search_requested.connect(trigger.search_requested)
 
     @classmethod
@@ -130,17 +129,19 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
 
     @classmethod
     def on_selection_change(cls, view: views.ClassTable | views.PropertyTable, value: BsddProperty):
-        def reset_class_views(cls):
+
+        def reset_class_views():
             for view in cls.get_views():
                 if isinstance(view, views.ClassTable):
                     cls.reset_view(view)
 
-        if isinstance(view, PropertyTable):
+        if isinstance(view, views.PropertyTable):
             cls.get_properties().active_property = value
             cls.signaller.active_property_changed.emit(value)
             reset_class_views()
             code = value.Code if value else ""
-            view.parent().lb_property_name.setText(code)
+            widget: ui.PropertyWidget = view.window()
+            widget.lb_property_name.setText(code)
 
     @classmethod
     def select_property(

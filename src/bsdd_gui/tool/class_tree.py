@@ -78,7 +78,7 @@ class ClassTree(ItemViewHandler):
 
     @classmethod
     def delete_class(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
-        model: ClassTreeModel = cls.get_properties().models.get(bsdd_dictionary)
+        model: ClassTreeModel = cls.get_model(bsdd_dictionary)
         parent = class_utils.get_parent(bsdd_class)
         for child in class_utils.get_children(bsdd_class):
             model.move_row(child, parent)

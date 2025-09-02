@@ -17,9 +17,6 @@ def register_widget(widget: ui.DictionaryEditor, dictionary_editor: Type[tool.Di
     dictionary_editor.register_widget(widget)
     dictionary_editor.connect_widget_to_internal_signals(widget)
 
-    # dictionary_editor.fill_dictionary_widget(widget)
-    # dictionary_editor.color_required_fields(widget)
-
 
 def unregister_widget(
     widget: ui.DictionaryEditor,
@@ -108,7 +105,6 @@ def remove_widget(
             f" {missing_text}\n".join(missing_inputs) + f" {missing_text}", None, text
         )
     else:
-        dictionary_editor.unregister_widget(widget)
         event.accept()
 
 
