@@ -57,7 +57,7 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
         return trigger
 
     @classmethod
-    def delete_selection(view: views.ClassTable | views.PropertyTable):
+    def delete_selection(cls, view: views.ClassTable | views.PropertyTable):
         trigger.delete_selection(view)
 
     @classmethod

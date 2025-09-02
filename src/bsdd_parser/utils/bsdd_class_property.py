@@ -44,6 +44,8 @@ def get_data_type(class_property: BsddClassProperty):
 
     if not is_external_ref(class_property):
         prop = get_internal_property(class_property)
+        if not prop:
+            return None
         return prop.DataType
 
 

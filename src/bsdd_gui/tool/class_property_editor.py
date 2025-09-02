@@ -268,7 +268,7 @@ class ClassPropertyEditor(WidgetHandler):
             blueprint = {
                 "Code": code,
                 "Name": code,
-                "DataType": cp_utils.get_data_type(bsdd_class_property),
+                "DataType": cp_utils.get_data_type(bsdd_class_property) or "String",
             }
             cls.signaller.create_bsdd_property_requested.emit(blueprint)
 
