@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.allowed_values_table.prop import AllowedValuesTableProperties
     from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
 
-from bsdd_gui.presets.tool_presets import ItemViewHandler, BaseHandler, ViewSignals
+from bsdd_gui.presets.tool_presets import ItemViewHandler, ViewSignals
 from bsdd_parser import BsddClassProperty, BsddProperty, BsddAllowedValue
 from bsdd_gui.module.allowed_values_table import models, ui, trigger
 from bsdd_gui import tool
@@ -19,7 +19,7 @@ class Signaller(ViewSignals):
     pass
 
 
-class AllowedValuesTable(BaseHandler, ItemViewHandler):
+class AllowedValuesTable(ItemViewHandler):
     signaller = Signaller()
 
     @classmethod

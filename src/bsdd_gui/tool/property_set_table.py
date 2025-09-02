@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 import logging
-
+from types import ModuleType
 import bsdd_gui
 from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
 from bsdd_gui.module.property_set_table import ui, models, trigger
@@ -27,25 +27,41 @@ class PropertySetTable(ItemViewHandler):
         return bsdd_gui.PropertySetTableProperties
 
     @classmethod
-    def connect_signals(cls):
-        cls.signaller.new_property_set_requested.connect(trigger.create_new_property_set)
-        cls.signaller.model_refresh_requested.connect(trigger.reset_views)
-        cls.signaller.delete_selection_requested.connect(trigger.delete_selection)
-        cls.signaller.rename_selection_requested.connect(trigger.rename_selection)
+    def _get_model_class(cls) -> Type[models.PsetTableModel]:
+        return models.ItemModel
+
+    @classmethod
+    def _get_trigger(cls) -> ModuleType:
+        return trigger
+
+    @classmethod
+    def delete_selection(cls, view: ui.PsetTableView):
+        trigger.delete_selection(view)
+
+    @classmethod
+    def _get_proxy_model_class(cls) -> Type[models.SortModel]:
+        return models.SortModel
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signaller.new_property_set_requested.connect(trigger.new_property_set_requested)
+        cls.signaller.rename_selection_requested.connect(
+            lambda view: view.edit([i for i in view.selectedIndexes() if i.column() == 0][0])
+        )
 
     @classmethod
     def connect_view_signals(cls, view: ui.PsetTableView):
-        view.customContextMenuRequested.connect(lambda p, v=view: trigger.create_context_menu(v, p))
+        super().connect_view_signals(view)
 
     @classmethod
-    def create_model(cls, bsdd_dictionary: BsddDictionary):
-        model = models.PsetTableModel(bsdd_dictionary)
-        sort_filter_model = models.SortModel()
-        sort_filter_model.setSourceModel(model)
-        return sort_filter_model
+    def create_model(
+        cls, bsdd_dictionary: BsddDictionary
+    ) -> tuple[models.SortModel | models.ItemModel]:
+        return super().create_model(bsdd_dictionary)
 
     @classmethod
-    def on_current_changed(cls, view: ui.PsetTableView, curr: QModelIndex, prev):
+    def on_current_changed(cls, view: ui.PsetTableView, curr: QModelIndex, prev: QModelIndex):
         proxy_model = view.model()
         if not curr.isValid():
             return
@@ -53,7 +69,11 @@ class PropertySetTable(ItemViewHandler):
         cls.signaller.selection_changed.emit(view, index.data(Qt.ItemDataRole.DisplayRole))
 
     @classmethod
-    def get_pset_list(cls, bsdd_class: BsddClass) -> list[str]:
+    def request_new_property_set(cls, bsdd_class: BsddClass):
+        cls.signaller.new_property_set_requested.emit(bsdd_class)
+
+    @classmethod
+    def get_pset_names_with_temporary(cls, bsdd_class: BsddClass) -> list[str]:
         bsdd_properties = list()
         for cp in bsdd_class.ClassProperties:
             if cp.PropertySet not in bsdd_properties:
@@ -80,10 +100,6 @@ class PropertySetTable(ItemViewHandler):
             if name == pset_name:
                 return row
         return None
-
-    @classmethod
-    def request_new_property_set(cls, bsdd_class: BsddClass):
-        cls.signaller.new_property_set_requested.emit(bsdd_class)
 
     @classmethod
     def add_temporary_pset(cls, bsdd_class: BsddClass, name: str):

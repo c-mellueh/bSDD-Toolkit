@@ -14,7 +14,14 @@ from PySide6.QtWidgets import (
     QAbstractButton,
     QTreeView,
 )
-from PySide6.QtCore import QObject, Signal, Qt, QSortFilterProxyModel, QModelIndex
+from PySide6.QtCore import (
+    QObject,
+    Signal,
+    Qt,
+    QSortFilterProxyModel,
+    QModelIndex,
+    QItemSelectionModel,
+)
 from PySide6.QtGui import QAction
 from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
 from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow
@@ -48,7 +55,7 @@ class BaseHandler(ABC):
         return None
 
 
-class ActionsHandler(ABC):
+class ActionsHandler(BaseHandler):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> WidgetHandlerProperties:
@@ -68,7 +75,7 @@ class ActionsHandler(ABC):
         return cls.get_properties().actions[widget][name]
 
 
-class FieldHandler(ABC):
+class FieldHandler(BaseHandler):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> FieldHandlerProperties:
@@ -317,7 +324,7 @@ class WidgetHandler(FieldHandler):
         cls.signaller.widget_requested.emit(data, parent)
 
 
-class ItemViewHandler(ABC):
+class ItemViewHandler(BaseHandler):
     signaller = ViewSignals()  # TODO: rename to signals
 
     @classmethod
@@ -354,6 +361,8 @@ class ItemViewHandler(ABC):
         view.customContextMenuRequested.connect(
             lambda p: cls._get_trigger().context_menu_requested(view, p)
         )
+        sel_model = view.selectionModel()
+        sel_model.currentChanged.connect(lambda s, d: cls.on_current_changed(view, s, d))
 
     @classmethod
     def get_selected(cls, view: QAbstractItemView) -> list[object]:
@@ -597,3 +606,11 @@ class ItemViewHandler(ABC):
         sel_model.select(proxy_index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
         view.scrollTo(proxy_index, QAbstractItemView.PositionAtCenter)
         return True
+
+    @classmethod
+    def on_current_changed(cls, view: ItemViewType, curr: QModelIndex, prev: QModelIndex):
+        proxy_model = view.model()
+        if not curr.isValid():
+            return
+        index = proxy_model.mapToSource(curr)
+        cls.signaller.selection_changed.emit(view, index.internalPointer())

@@ -11,7 +11,7 @@ from . import trigger
 class PsetTableView(QTableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        trigger.table_view_created(self)
+        trigger.view_created(self)
 
     def model(self) -> SortModel:
         return super().model()

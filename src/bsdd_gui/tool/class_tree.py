@@ -65,14 +65,6 @@ class ClassTree(ItemViewHandler):
         cls.signaller.search_requested.emit(view)
 
     @classmethod
-    def on_current_changed(cls, view: ui.ClassView, curr, prev):
-        proxy_model = view.model()
-        if not curr.isValid():
-            return
-        index = proxy_model.mapToSource(curr)
-        cls.signaller.selection_changed.emit(view, index.internalPointer())
-
-    @classmethod
     def add_class_to_dictionary(cls, new_class: BsddClass, bsdd_dictionary: BsddDictionary):
         model = cls.get_properties().models.get(bsdd_dictionary)
         if not model:

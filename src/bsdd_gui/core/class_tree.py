@@ -119,8 +119,6 @@ def add_context_menu_to_view(
 
 def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree]):
     class_tree.connect_view_signals(view)
-    sel_model = view.selectionModel()
-    sel_model.currentChanged.connect(lambda s, d: class_tree.on_current_changed(view, s, d))
 
 
 def connect_to_main_window(

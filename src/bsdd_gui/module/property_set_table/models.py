@@ -17,11 +17,8 @@ from bsdd_gui.presets.models_presets import ItemModel
 class PsetTableModel(ItemModel):
 
     def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
+        self.bsdd_data = bsdd_dictionary
         super().__init__(tool.PropertySetTable, *args, **kwargs)
-
-    @property
-    def bsdd_dictionary(self):
-        return tool.Project.get()
 
     @property
     def active_class(self):
@@ -31,7 +28,7 @@ class PsetTableModel(ItemModel):
         if not self.active_class:
             return 0
         if not parent.isValid():
-            return len(tool.PropertySetTable.get_pset_list(self.active_class))
+            return len(tool.PropertySetTable.get_pset_names_with_temporary(self.active_class))
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         if parent.isValid():
@@ -40,7 +37,7 @@ class PsetTableModel(ItemModel):
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
 
-        pset_name = tool.PropertySetTable.get_pset_list(self.active_class)[row]
+        pset_name = tool.PropertySetTable.get_pset_names_with_temporary(self.active_class)[row]
         index = self.createIndex(row, column, pset_name)
         return index
 

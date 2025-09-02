@@ -40,10 +40,6 @@ def connect_view(
         property_table.signaller.property_info_requested.emit(bsdd_class_property)
 
     property_table.register_view(view)
-    model = property_table.create_model()
-    view.setModel(model)
-    sel_model = view.selectionModel()
-    sel_model.currentChanged.connect(lambda s, d: property_table.on_current_changed(view, s, d))
     view.doubleClicked.connect(emit_info_requested)
 
 
