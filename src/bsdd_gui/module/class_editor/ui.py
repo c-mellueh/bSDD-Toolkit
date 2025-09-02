@@ -22,7 +22,7 @@ from .qt import ui_ClassEditor
 
 class ClassEditor(QWidget, ui_ClassEditor.Ui_ClassEditor):
     def __init__(self, bsdd_class: BsddClass):
-        self.data = bsdd_class
+        self.bsdd_data = bsdd_class
         super().__init__()
         self.setupUi(self)
         self.setWindowIcon(get_icon())

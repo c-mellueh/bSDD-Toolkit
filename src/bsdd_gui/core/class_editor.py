@@ -71,7 +71,7 @@ def register_widget(
         widget.ti_related_ifc_entity,
         lambda e, v, w=widget: setattr(e, "RelatedIfcEntityNamesList", v),
     )
-    relationship_editor.init_widget(widget.relationship_editor, widget.data, mode="dialog")
+    relationship_editor.init_widget(widget.relationship_editor, widget.bsdd_data, mode="dialog")
 
 
 def connect_signals(class_editor: Type[tool.ClassEditor], project: Type[tool.Project]):

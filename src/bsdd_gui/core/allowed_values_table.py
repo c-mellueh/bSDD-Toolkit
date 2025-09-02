@@ -34,7 +34,7 @@ def register_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.A
 def add_columns_to_view(
     view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]
 ):
-    prop: BsddClassProperty | BsddProperty = view.data
+    prop: BsddClassProperty | BsddProperty = view.bsdd_data
 
     sort_model, model = allowed_values_table.create_model(prop)
     allowed_values_table.add_column_to_table(

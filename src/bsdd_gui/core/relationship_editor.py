@@ -41,7 +41,7 @@ def connect_signals(
 def retranslate_ui(relationship_editor: Type[tool.RelationshipEditor]):
     for widget in relationship_editor.get_widgets():
         widget.retranslateUi(widget)
-        if isinstance(widget.data, BsddClass):
+        if isinstance(widget.bsdd_data, BsddClass):
             text = QCoreApplication.translate("RelationshipEditor", "Related Class")
         else:
             text = QCoreApplication.translate("RelationshipEditor", "Related Property")
@@ -94,7 +94,7 @@ def connect_widget(
     project: Type[tool.Project],
 ):
 
-    widget.data = data
+    widget.bsdd_data = data
     widget.mode = mode
     relationship_editor.connect_widget_signals(widget, project.get())
 
@@ -115,7 +115,7 @@ def add_field_validators(
     relationship_editor.set_fractions_visible_if_is_material(widget)
     relationship_editor.update_owned_uri_visibility(widget, project.get())
     relationship_editor.update_code_completer(widget, project.get())
-    if isinstance(widget.data, BsddClass):
+    if isinstance(widget.bsdd_data, BsddClass):
         elements = [
             "HasMaterial",
             "HasReference",

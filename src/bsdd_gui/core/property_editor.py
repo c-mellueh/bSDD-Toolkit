@@ -111,14 +111,14 @@ def add_fields_to_widget(
     property_editor.register_basic_field(widget, widget.sb_version_number, "VersionNumber")
 
     # Allowed Values Table
-    table = allowed_values_table.create_view(widget.data)
+    table = allowed_values_table.create_view(widget.bsdd_data)
     widget.vl_values.addWidget(table)
-    relationship_editor.init_widget(widget.relationship_widget, widget.data, mode="live")
+    relationship_editor.init_widget(widget.relationship_widget, widget.bsdd_data, mode="live")
     widget.pb_new_value.clicked.connect(
         lambda w=widget: allowed_values_table.append_new_value(table)
     )
 
-    if widget.data.Description:
+    if widget.bsdd_data.Description:
         widget.cb_description.setChecked(True)
     property_editor.update_description_visiblility(widget)
 

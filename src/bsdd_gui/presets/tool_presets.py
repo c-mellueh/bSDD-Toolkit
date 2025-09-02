@@ -312,7 +312,7 @@ class WidgetHandler(FieldHandler):
 
     @classmethod
     def get_widget(cls, data: object) -> QWidget:
-        widgets = [widget for widget in cls.get_widgets() if widget.data == data]
+        widgets = [widget for widget in cls.get_widgets() if widget.bsdd_data == data]
         if len(widgets) > 1:
             logging.warning(f"Multiple Widgets found for the same data")
         elif not widgets:

@@ -65,7 +65,7 @@ class ClassEditor(WidgetHandler):
     def is_code_valid(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
         if not code:
             return False
-        bsdd_class = widget.data
+        bsdd_class = widget.bsdd_data
         for c in bsdd_dict.Classes:
             if c.Code == code and c != bsdd_class:
                 return False

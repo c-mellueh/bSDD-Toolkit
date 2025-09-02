@@ -216,7 +216,7 @@
            <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
           </property>
           <property name="editTriggers">
-           <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+           <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::SelectedClicked</set>
           </property>
           <property name="selectionMode">
            <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>

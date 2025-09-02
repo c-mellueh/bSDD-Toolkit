@@ -25,7 +25,6 @@ def register_view(view: ui.PsetTableView, property_set_table: Type[tool.Property
     view.setSelectionBehavior(QListView.SelectionBehavior.SelectRows)
     view.setSelectionMode(QListView.SelectionMode.SingleSelection)
     view.setAlternatingRowColors(True)
-    view.setEditTriggers(view.EditTrigger.DoubleClicked | view.EditTrigger.SelectedClicked)
 
 
 def add_columns_to_view(

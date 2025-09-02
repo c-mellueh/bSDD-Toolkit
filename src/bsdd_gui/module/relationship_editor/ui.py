@@ -22,7 +22,7 @@ class RelationshipWidget(QWidget, Ui_Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data = None
+        self.bsdd_data = None
         self.mode: Literal["dialog"] | Literal["live"] = None
         self.setWindowIcon(get_icon())
         self.setupUi(self)

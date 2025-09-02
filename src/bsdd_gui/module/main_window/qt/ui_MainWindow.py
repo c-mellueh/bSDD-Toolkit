@@ -188,7 +188,11 @@ class Ui_MainWindow(object):
         self.table_pset.setSizePolicy(sizePolicy3)
         self.table_pset.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.table_pset.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.table_pset.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table_pset.setEditTriggers(
+            QAbstractItemView.EditTrigger.AnyKeyPressed
+            | QAbstractItemView.EditTrigger.DoubleClicked
+            | QAbstractItemView.EditTrigger.SelectedClicked
+        )
         self.table_pset.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.table_pset.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table_pset.setSortingEnabled(True)

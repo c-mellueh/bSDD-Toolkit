@@ -49,7 +49,7 @@ def add_fields_to_widget(
         lambda e, v, p=project: class_property_editor.set_property_reference(e, v, p.get()),
     )
     class_property_editor.register_field_listener(widget, widget.le_property_reference)
-    table = allowed_values_table.create_view(widget.data)
+    table = allowed_values_table.create_view(widget.bsdd_data)
     widget.vl_values.addWidget(table)
 
 
@@ -63,7 +63,7 @@ def add_validators_to_widget(
         widget,
         widget.le_property_reference,
         lambda v, w, p=project: class_property_editor.is_property_reference_valid(
-            v, w.data, p.get()
+            v, w.bsdd_data, p.get()
         ),
         lambda w, v: util.set_invalid(w, not v),
     )
@@ -72,7 +72,7 @@ def add_validators_to_widget(
         widget,
         widget.le_property_reference,
         lambda v, w, p=project: class_property_editor.is_property_reference_valid(
-            v, w.data, p.get()
+            v, w.bsdd_data, p.get()
         ),
         lambda f, v, w=widget: class_property_editor.handle_property_reference_button(w, f, v),
     )
@@ -144,12 +144,12 @@ def connect_signals(
 
     def handle_field_changed(parent_widget: property_editor_ui.PropertyEditor, field):
         for widget in class_property_editor.get_widgets():
-            bsdd_class_property: BsddClassProperty = widget.data
+            bsdd_class_property: BsddClassProperty = widget.bsdd_data
             internal_prop = cp_utils.get_internal_property(bsdd_class_property)
             if not internal_prop:
                 continue
 
-            if parent_widget.data == internal_prop:
+            if parent_widget.bsdd_data == internal_prop:
                 class_property_editor.request_property_specific_redraw(widget)
 
     property_editor.signaller.field_changed.connect(handle_field_changed)

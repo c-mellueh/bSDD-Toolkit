@@ -99,13 +99,13 @@ class RelationshipEditor(WidgetHandler, ItemViewHandler):
     ):
         if dict_util.is_uri(value):
             return True
-        if isinstance(widget.data, BsddClass):
+        if isinstance(widget.bsdd_data, BsddClass):
             element = cl_util.get_class_by_code(bsdd_dictionary, value)
-        elif isinstance(widget.data, BsddProperty):
+        elif isinstance(widget.bsdd_data, BsddProperty):
             element = prop_util.get_property_by_code(value, bsdd_dictionary)
         if element is None:
             return False
-        if element == widget.data:
+        if element == widget.bsdd_data:
             return False
         return True
 
@@ -134,7 +134,7 @@ class RelationshipEditor(WidgetHandler, ItemViewHandler):
         widget: ui.RelationshipWidget,
         bsdd_dictionary: BsddDictionary,
     ):
-        if isinstance(widget.data, BsddClass):
+        if isinstance(widget.bsdd_data, BsddClass):
             codes = [c.Code for c in bsdd_dictionary.Classes]
             if widget.cb_relation_type.currentText() == "HasMaterial":
                 codes = [c.Code for c in bsdd_dictionary.Classes if c.ClassType == "Material"]

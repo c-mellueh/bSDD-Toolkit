@@ -135,7 +135,9 @@ class ClassPropertyEditor(WidgetHandler):
     @classmethod
     def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
         windows = [
-            widget for widget in cls.get_properties().widgets if widget.data == bsdd_class_property
+            widget
+            for widget in cls.get_properties().widgets
+            if widget.bsdd_data == bsdd_class_property
         ]
         if len(windows) > 1:
             logging.warning(f"Multiple PropertyWindows")
@@ -227,7 +229,7 @@ class ClassPropertyEditor(WidgetHandler):
         cls, widget: ui.ClassPropertyEditor, field: LineEditWithButton, is_valid: bool
     ):
         value = field.text()
-        bsdd_class_property = widget.data
+        bsdd_class_property = widget.bsdd_data
         bsdd_class = bsdd_class_property.parent()
         bsdd_dictionary = bsdd_class.parent() if bsdd_class else None
         line_edit = widget.le_property_reference
@@ -258,10 +260,10 @@ class ClassPropertyEditor(WidgetHandler):
         if line_edit.button_mode == BUTTON_MODE_VIEW:
             pass  # TODO Open Website
         elif line_edit.button_mode == BUTTON_MODE_EDIT:
-            bsdd_property = cp_utils.get_internal_property(widget.data)
+            bsdd_property = cp_utils.get_internal_property(widget.bsdd_data)
             cls.signaller.edit_bsdd_property_requested.emit(bsdd_property)
         elif line_edit.button_mode == BUTTON_MODE_NEW:
-            bsdd_class_property: BsddClassProperty = widget.data
+            bsdd_class_property: BsddClassProperty = widget.bsdd_data
             code = widget.le_property_reference.text()
             blueprint = {
                 "Code": code,
@@ -272,7 +274,7 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def update_allowed_units(cls, widget: ui.ClassPropertyEditor):
-        bsdd_class_property = widget.data
+        bsdd_class_property = widget.bsdd_data
         allowed_units = cp_utils.get_units(bsdd_class_property)
         current_unit = widget.cb_unit.currentText()
         index = allowed_units.index(current_unit) if current_unit in allowed_units else 0
@@ -283,7 +285,7 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def update_description_placeholder(cls, widget: ui.ClassPropertyEditor):
-        bsdd_class_property = widget.data
+        bsdd_class_property = widget.bsdd_data
         if cp_utils.is_external_ref(bsdd_class_property):
             class_property = cp_utils.get_external_property(bsdd_class_property)
         else:
@@ -300,7 +302,7 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def update_value_view(cls, widget: ui.ClassPropertyEditor):
-        bsdd_class_property = widget.data
+        bsdd_class_property = widget.bsdd_data
         if cp_utils.is_external_ref(bsdd_class_property):
             bsdd_property = cp_utils.get_external_property(bsdd_class_property)
         else:

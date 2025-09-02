@@ -16,7 +16,7 @@ class DictionaryEditor(QWidget, Ui_DictionaryForm):
     def __init__(self, bsdd_dictionary: BsddDictionary, parent, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
-        self.data = bsdd_dictionary
+        self.bsdd_data = bsdd_dictionary
         self.setLayout(QFormLayout())
         self.setWindowIcon(get_icon())
 

@@ -125,7 +125,7 @@ class AllowedValuesTable(ItemViewHandler):
     def get_view_from_property_editor(cls, widget: ClassPropertyEditor):
         views = list()
         for table_view in cls.get_views():
-            if widget.data == table_view.data:
+            if widget.bsdd_data == table_view.bsdd_data:
                 views.append(table_view)
         if len(views) > 1:
             logging.warning("Multiple Views!")
@@ -141,7 +141,7 @@ class AllowedValuesTable(ItemViewHandler):
     @classmethod
     def create_view(cls, bsdd_property: BsddClassProperty | BsddProperty):
         view = ui.AllowedValuesTable(bsdd_property)
-        cls._get_trigger.table_view_created(view)
+        trigger.view_created(view)
         return view
 
     @classmethod

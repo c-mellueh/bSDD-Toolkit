@@ -104,7 +104,7 @@ class PropertyEditor(WidgetHandler):
     def is_code_valid(cls, code: str, widget: ui.PropertyEditor, bsdd_dictionary: BsddDictionary):
         if not code:
             return False
-        bsdd_property = widget.data
+        bsdd_property = widget.bsdd_data
         for prop in bsdd_dictionary.Properties:
             if prop.Code == code and prop != bsdd_property:
                 return False
@@ -126,7 +126,7 @@ class PropertyEditor(WidgetHandler):
     def update_description_visiblility(cls, widget: ui.PropertyEditor):
         if widget.cb_description.isChecked():
             widget.te_description.setVisible(True)
-            widget.data.Description = widget.te_description.toPlainText()
+            widget.bsdd_data.Description = widget.te_description.toPlainText()
         else:
             widget.te_description.setVisible(False)
-            widget.data.Description = None
+            widget.bsdd_data.Description = None
