@@ -9,12 +9,12 @@ from PySide6.QtCore import (
 )
 from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty
 from bsdd_gui import tool
-from bsdd_gui.presets.tool_presets import ItemModelHandler
+from bsdd_gui.presets.tool_presets import AbstractItemModelHandler
 
 
 class ItemModel(QAbstractItemModel):
 
-    def __init__(self, tool: ItemModelHandler, *args, **kwargs):
+    def __init__(self, tool: AbstractItemModelHandler, *args, **kwargs):
         self.tool = tool
         super().__init__(*args, **kwargs)
 

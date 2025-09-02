@@ -5,7 +5,7 @@ from PySide6.QtCore import Signal, QCoreApplication
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit, QDialogButtonBox
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import WidgetSignaller, WidgetHandler
+from bsdd_gui.presets.tool_presets import WidgetSignals, WidgetHandler
 from bsdd_parser import BsddClass, BsddDictionary
 from bsdd_gui.module.class_editor import trigger, ui
 from bsdd_gui.presets.ui_presets import label_tags_input
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_editor.prop import ClassEditorProperties
 
 
-class Signaller(WidgetSignaller):
+class Signaller(WidgetSignals):
     edit_class_requested = Signal(BsddClass)
     copy_class_requested = Signal(BsddClass)  # Class To Copy
     new_class_requested = Signal(BsddClass)  # Parent Class

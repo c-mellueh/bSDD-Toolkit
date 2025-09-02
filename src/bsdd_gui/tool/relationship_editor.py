@@ -12,7 +12,7 @@ from bsdd_parser import (
     BsddClassRelation,
     BsddPropertyRelation,
 )
-from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignaller, ItemModelHandler
+from bsdd_gui.presets.tool_presets import ViewHandler, ViewSignals, AbstractItemModelHandler
 from bsdd_parser.utils import bsdd_dictionary as dict_util
 from bsdd_parser.utils import bsdd_class as cl_util
 from bsdd_parser.utils import bsdd_class_property as prop_util
@@ -23,11 +23,11 @@ if TYPE_CHECKING:
 from bsdd_gui.module.relationship_editor import ui, trigger, models
 
 
-class Signaller(ViewSignaller):
+class Signaller(ViewSignals):
     pass
 
 
-class RelationshipEditor(ViewHandler, ItemModelHandler):
+class RelationshipEditor(ViewHandler, AbstractItemModelHandler):
     signaller = Signaller()
 
     @classmethod

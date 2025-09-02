@@ -8,7 +8,7 @@ from bsdd_gui.module.class_property_editor import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor import trigger
-from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignaller
+from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignals
 from urllib.parse import urlparse
 from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 
-class Signaller(WidgetSignaller):
+class Signaller(WidgetSignals):
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
     new_class_property_created = Signal(BsddClassProperty)

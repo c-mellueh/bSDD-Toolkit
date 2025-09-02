@@ -4,7 +4,7 @@ from types import NoneType  # Python 3.10+
 import logging
 import re
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import WidgetHandler, ModuleHandler, WidgetSignaller
+from bsdd_gui.presets.tool_presets import WidgetHandler, ModuleHandler, WidgetSignals
 from PySide6.QtCore import Qt, QDateTime, QObject, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor.prop import DictionaryEditorProperties
 
 
-class Signaller(WidgetSignaller):
+class Signaller(WidgetSignals):
     pass
 
 

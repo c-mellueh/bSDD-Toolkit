@@ -20,16 +20,16 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_table.prop import PropertyTableProperties
 
 from bsdd_gui.presets.tool_presets import (
-    ItemModelHandler,
+    AbstractItemModelHandler,
     ViewHandler,
-    ViewSignaller,
-    WidgetSignaller,
+    ViewSignals,
+    WidgetSignals,
     WidgetHandler,
     ModuleHandler,
 )
 
 
-class Signaller(ViewSignaller, WidgetSignaller):
+class Signaller(ViewSignals, WidgetSignals):
     property_info_requested = Signal(BsddProperty, ui.PropertyWidget)
     reset_all_property_tables_requested = Signal()
     new_property_requested = Signal()
@@ -38,7 +38,7 @@ class Signaller(ViewSignaller, WidgetSignaller):
     search_requested = Signal(QWidget)
 
 
-class PropertyTable(ItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler):
+class PropertyTable(AbstractItemModelHandler, ViewHandler, ModuleHandler, WidgetHandler):
     signaller = Signaller()
 
     @classmethod

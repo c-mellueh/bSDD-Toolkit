@@ -17,6 +17,7 @@ from PySide6.QtGui import QAction
 from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
 from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow
 import logging
+from .signal_presets import WidgetSignals, FieldSignals, ViewSignals
 
 if TYPE_CHECKING:
     from .prop_presets import (
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
     )
 
 
-class ItemModelHandler(ABC):
+class AbstractItemModelHandler(ABC):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> ItemModelHandlerProperties:
@@ -97,12 +98,6 @@ class ModuleHandler(ABC):
     @classmethod
     def get_action(cls, widget, name):
         return cls.get_properties().actions[widget][name]
-
-
-class FieldSignaller(QObject):
-    field_changed = Signal(
-        QWidget, QWidget
-    )  # Widget in which the field is embedded and Fieldwidget itself
 
 
 class FieldHandler(ABC):
@@ -311,14 +306,8 @@ class FieldHandler(ABC):
         return invalid_inputs
 
 
-class WidgetSignaller(FieldSignaller):
-    widget_requested = Signal(object, QWidget)  # data, parent
-    widget_created = Signal(QWidget)
-    widget_closed = Signal(QWidget)
-
-
 class WidgetHandler(FieldHandler):
-    signaller = WidgetSignaller()
+    signaller = WidgetSignals()
 
     @classmethod
     @abstractmethod
@@ -358,13 +347,6 @@ class WidgetHandler(FieldHandler):
     @classmethod
     def request_widget(cls, data: object, parent=None):
         cls.signaller.widget_requested.emit(data, parent)
-
-
-class ViewSignaller(WidgetSignaller):
-    model_refresh_requested = Signal()
-    selection_changed = Signal(QWidget, Any)
-    delete_selection_requested = Signal(QWidget)
-    item_deleted = Signal([object])  # Write BsddClass, BsddProperty etc not QModelIndex in Signal
 
 
 class ViewHandler(WidgetHandler):
