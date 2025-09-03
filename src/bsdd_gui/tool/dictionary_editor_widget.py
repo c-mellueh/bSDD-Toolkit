@@ -37,7 +37,6 @@ class DictionaryEditorWidget(WidgetTool, ActionTool):
     @classmethod
     def connect_internal_signals(cls):
         cls.signals.widget_requested.connect(trigger.create_widget)
-        cls.signals.widget_created.connect(trigger.widget_created)
         cls.signals.widget_closed.connect(trigger.widget_closed)
         cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
@@ -52,7 +51,6 @@ class DictionaryEditorWidget(WidgetTool, ActionTool):
         prop = cls.get_properties()
         widget = ui.DictionaryEditor(bsdd_dictionary, parent_widget)
         prop.widgets.add(widget)
-        cls.signals.widget_created.emit(widget)
         return widget
 
     @classmethod

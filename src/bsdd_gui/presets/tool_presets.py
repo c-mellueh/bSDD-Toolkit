@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QAbstractButton,
     QTreeView,
+    QLayout,
 )
 from PySide6.QtCore import (
     QObject,
@@ -304,8 +305,11 @@ class WidgetTool(FieldTool):
 
     @classmethod
     @abstractmethod
-    def create_widget(cls, data: object, parent: QWidget):
-        return
+    def create_widget(cls, data: object, parent: QWidget) -> BaseWidget:
+        widget = BaseWidget(data, parent)
+        cls.get_properties().widgets.add(widget)
+        cls.add_plugins_to_widget(widget)
+        return widget
 
     @classmethod
     def connect_internal_signals(cls):
@@ -348,8 +352,27 @@ class WidgetTool(FieldTool):
         return widgets[0]
 
     @classmethod
+    def show_widget(cls, data, parent, *args, **kwargs):
+        if widget := cls.get_widget(data):
+            if widget.isHidden():
+                widget.close()
+                widget = cls.create_widget(data, parent, *args, **kwargs)
+        else:
+            widget = cls.create_widget(data, parent, *args, **kwargs)
+        widget.show()
+        widget.activateWindow()
+        widget.showNormal()
+
+    @classmethod
     def request_widget(cls, data: object, parent=None):
         cls.signals.widget_requested.emit(data, parent)
+
+    @classmethod
+    def add_plugins_to_widget(cls, widget):
+        for plugin in cls.get_properties().plugin_widget_list:
+            layout: QLayout = getattr(widget, plugin.layout_name)
+            layout.insertWidget(plugin.index, plugin.widget())
+            setattr(cls.get_properties(), plugin.key, plugin.value_getter)
 
 
 class DialogTool(WidgetTool):
@@ -367,7 +390,6 @@ class DialogTool(WidgetTool):
         dialog = BaseDialog(widget, parent)
         cls.sync_from_model(widget, data)
         dialog._layout.insertWidget(0, widget)
-        dialog._widget = widget
         # dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
         cls.get_properties().dialog = dialog
         return dialog

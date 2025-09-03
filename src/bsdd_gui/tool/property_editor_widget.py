@@ -30,8 +30,6 @@ class PropertyEditorWidget(WidgetTool):
     @classmethod
     def connect_internal_signals(cls):
         cls.signals.widget_requested.connect(trigger.create_window)
-        cls.signals.widget_created.connect(trigger.widget_created)
-        cls.signals.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_data))
         cls.signals.widget_closed.connect(trigger.widget_closed)
         cls.signals.new_property_requested.connect(trigger.create_property_creator)
         # Autoupdate Values
@@ -70,7 +68,6 @@ class PropertyEditorWidget(WidgetTool):
 
         title = cls.create_window_title(bsdd_property)
         cls.get_widget(bsdd_property).setWindowTitle(title)  # TODO: Update Name Getter
-        cls.signals.widget_created.emit(window)
         return window
 
     @classmethod

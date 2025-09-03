@@ -15,16 +15,13 @@ from bsdd_parser import BsddClassProperty
 from . import trigger
 from bsdd_gui import tool
 from .qt.ui_Widget import Ui_Form
+from bsdd_gui.presets.ui_presets import BaseWidget
 
 
-class PropertyWidget(QWidget, Ui_Form):
-    closed = Signal()
+class PropertyWidget(BaseWidget, Ui_Form):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(None, *args, **kwargs)
         self.setWindowIcon(get_icon())
         self.setupUi(self)
-
-    def closeEvent(self, event):
-        self.closed.emit()
-        return super().closeEvent(event)
+        trigger.widget_created(self)

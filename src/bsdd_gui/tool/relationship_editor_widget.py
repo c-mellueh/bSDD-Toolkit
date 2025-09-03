@@ -17,6 +17,7 @@ from bsdd_parser.utils import bsdd_dictionary as dict_util
 from bsdd_parser.utils import bsdd_class as cl_util
 from bsdd_parser.utils import bsdd_class_property as prop_util
 from bsdd_gui.module.class_editor_widget import ui as class_editor_ui
+from bsdd_gui.presets.ui_presets import BaseDialog
 
 if TYPE_CHECKING:
     from bsdd_gui.module.relationship_editor_widget.prop import RelationshipEditorWidgetProperties
@@ -223,7 +224,8 @@ class RelationshipEditorWidget(WidgetTool, ItemViewTool):
         clear_inputs()
 
     @classmethod
-    def transform_virtual_relationships_to_real(cls, widget: QWidget):
+    def transform_virtual_relationships_to_real(cls, dialog: BaseDialog):
+        widget = dialog._widget
         if isinstance(widget, class_editor_ui.ClassEditor):
             table_view = widget.relationship_editor.tv_relations
             model: models.RelationshipModel = table_view.model().sourceModel()

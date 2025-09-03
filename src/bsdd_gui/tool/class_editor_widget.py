@@ -33,6 +33,10 @@ class ClassEditorWidget(DialogTool):
         return bsdd_gui.ClassEditorWidgetProperties
 
     @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
     def create_dialog(cls, bsdd_class: BsddClass, parent_widget: QWidget):
         widget = cls.create_widget(bsdd_class, None)
         dialog = ui.EditDialog(
@@ -49,6 +53,8 @@ class ClassEditorWidget(DialogTool):
     @classmethod
     def create_widget(cls, bsdd_class: BsddClass, parent):
         widget = ui.ClassEditor(bsdd_class, parent)
+        cls.get_properties().widgets.add(widget)
+        cls.add_plugins_to_widget(widget)
         return widget
 
     @classmethod

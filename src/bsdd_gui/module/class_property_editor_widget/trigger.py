@@ -24,23 +24,7 @@ def connect():
     # core.create_context_menu_builders(tool.PropertyWidget)
 
 
-def create_class_property_creator():
-    core.create_class_property_creator(
-        tool.ClassPropertyEditorWidget,
-        tool.MainWindowWidget,
-        tool.Project,
-        tool.PropertySetTableView,
-    )
-
-
-def update_property_specific_fields(window: ui.ClassPropertyEditor):
-    core.update_property_specific_fields(
-        window, tool.ClassPropertyEditorWidget, tool.AllowedValuesTableView
-    )
-
-
 def retranslate_ui():
-    return  # TODO
     core.retranslate_ui(tool.ClassPropertyEditorWidget)
 
 
@@ -48,27 +32,34 @@ def on_new_project():
     pass
 
 
-def property_info_requested(som_property: BsddClassProperty):
-    core.open_edit_window(
+def open_widget(som_property: BsddClassProperty):
+    # edit Property Widget
+    core.open_widget(
         som_property, tool.ClassPropertyEditorWidget, tool.MainWindowWidget, tool.Project
     )
 
 
-def widget_created(window: ui.ClassPropertyEditor):
-    core.register_widget(window, tool.ClassPropertyEditorWidget)
-    core.add_fields_to_widget(
-        window,
+def open_dialog():
+    # new Property Dialog
+    core.open_dialog(
         tool.ClassPropertyEditorWidget,
+        tool.MainWindowWidget,
         tool.Project,
+        tool.PropertySetTableView,
     )
-    core.add_validators_to_widget(window, tool.ClassPropertyEditorWidget, tool.Project, tool.Util)
+
+
+def widget_created(widget: ui.ClassPropertyEditor):
+    core.register_widget(widget, tool.ClassPropertyEditorWidget)
+    core.register_fields(widget, tool.ClassPropertyEditorWidget, tool.Project)
+    core.register_validators(widget, tool.ClassPropertyEditorWidget, tool.Project, tool.Util)
+    core.connect_widget(widget, tool.ClassPropertyEditorWidget)
+
+
+def update_property_specific_fields(window: ui.ClassPropertyEditor):
     core.update_property_specific_fields(
         window, tool.ClassPropertyEditorWidget, tool.AllowedValuesTableView
     )
-
-
-def window_closed(window: ui.ClassPropertyEditor):
-    core.unregister_widget(window, tool.ClassPropertyEditorWidget, tool.AllowedValuesTableView)
 
 
 def update_window(window: ui.ClassPropertyEditor):

@@ -14,7 +14,6 @@ class FieldSignals(QObject):
 
 class WidgetSignals(FieldSignals):
     widget_requested = Signal(object, BaseWidget)  # data, parent
-    widget_created = Signal(BaseWidget)
     widget_closed = Signal(BaseWidget)
 
 

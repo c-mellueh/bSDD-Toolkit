@@ -9,7 +9,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtWidgets import QWidget, QWidget, QDialog, QDialogButtonBox, QVBoxLayout
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QPalette, QIcon
-
+from bsdd_gui.presets.ui_presets import BaseDialog, BaseWidget
 from bsdd_gui.resources.icons import get_icon, get_link_icon
 from bsdd_parser import BsddClassProperty
 from . import trigger
@@ -31,16 +31,9 @@ class PropertyCreator(QDialog):
         self.new_button = self.button_box.addButton("Create", QDialogButtonBox.ActionRole)
 
 
-class PropertyEditor(QWidget, Ui_PropertyWindow):
-    closed = Signal()
-
-    def __init__(self, bsdd_property: BsddClassProperty, *args, mode="edit", **kwargs):
+class PropertyEditor(BaseWidget, Ui_PropertyWindow):
+    def __init__(self, *args, mode="edit", **kwargs):
         super().__init__(*args, **kwargs)
-        self.setWindowIcon(get_icon())
         self.setupUi(self)
         self.mode = mode  # edit or new
-        self.bsdd_data = bsdd_property
-
-    def closeEvent(self, event):
-        self.closed.emit()
-        return super().closeEvent(event)
+        trigger.widget_created(self)

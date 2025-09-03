@@ -64,7 +64,6 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     def connect_internal_signals(cls):
         super().connect_internal_signals()
         cls.signals.widget_requested.connect(lambda _, p: trigger.create_widget(p))
-        cls.signals.widget_created.connect(trigger.widget_created)
         cls.signals.selection_changed.connect(cls.on_selection_change)
         cls.signals.search_requested.connect(trigger.search_requested)
 
@@ -102,7 +101,6 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     def create_widget(cls):
         widget = ui.PropertyWidget()
         cls.get_properties().widgets.add(widget)
-        cls.signals.widget_created.emit(widget)
         return widget
 
     @classmethod

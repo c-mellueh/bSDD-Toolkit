@@ -18,8 +18,8 @@ def retranslate_ui(widget_tool: Type[tool.WidgetTool]):
     pass
 
 
-def open_widget(data: object, parent, widget_tool: Type[tool.WidgetTool]):
-    widget_tool.create_widget(data, parent)
+def open_widget(data, parent, widget_tool: Type[tool.WidgetTool]):
+    widget_tool.show_widget(data, parent)
 
 
 def open_dialog(data: object, parent, dialog_tool: Type[tool.DialogTool]):
@@ -34,11 +34,11 @@ def open_dialog(data: object, parent, dialog_tool: Type[tool.DialogTool]):
 
 
 def register_widget(widget: BaseWidget, widget_tool: Type[tool.WidgetTool]):
-    widget_tool.register_view(widget)
+    widget_tool.register_widget(widget)
 
 
 def register_fields(widget: BaseWidget, widget_Tool: Type[tool.WidgetTool]):
-    widget.register_basic_field(widget, widget.le_name, "Name")
+    widget_Tool.register_basic_field(widget, widget.le_name, "Name")
 
 
 def register_validators(widget, widget_tool: Type[tool.WidgetTool], util: Type[tool.Util]):

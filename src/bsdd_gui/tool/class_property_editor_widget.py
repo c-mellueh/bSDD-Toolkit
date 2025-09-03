@@ -8,10 +8,10 @@ from bsdd_gui.module.class_property_editor_widget import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor_widget import trigger
-from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
+from bsdd_gui.presets.tool_presets import DialogTool, DialogSignals
 from urllib.parse import urlparse
 from bsdd_gui.module.allowed_values_table_view.ui import AllowedValuesTable
-
+from bsdd_gui.module.property_editor_widget import ui as property_editor_ui
 from bsdd_parser.utils.bsdd_dictionary import is_uri
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 from bsdd_gui.module.class_property_editor_widget.constants import (
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 
-class Signals(WidgetSignals):
+class Signals(DialogSignals):
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
     new_class_property_created = Signal(BsddClassProperty)
@@ -40,7 +40,7 @@ class Signals(WidgetSignals):
     property_specific_redraw_requested = Signal(ui.ClassPropertyEditor)
 
 
-class ClassPropertyEditorWidget(WidgetTool):
+class ClassPropertyEditorWidget(DialogTool):
     signals = Signals()
 
     @classmethod
@@ -48,29 +48,37 @@ class ClassPropertyEditorWidget(WidgetTool):
         return bsdd_gui.ClassPropertyEditorWidgetProperties
 
     @classmethod
+    def _get_trigger(cls):
+        print("HIER")
+        return trigger
+
+    @classmethod
     def request_property_specific_redraw(cls, widget: ui.ClassPropertyEditor):
         cls.signals.property_specific_redraw_requested.emit(widget)
 
     @classmethod
     def connect_internal_signals(cls):
+        super().connect_internal_signals()
+
+        #
         cls.signals.paste_clipboard.connect(trigger.paste_clipboard)
-        cls.signals.widget_created.connect(trigger.widget_created)
-        cls.signals.widget_closed.connect(trigger.window_closed)
-        cls.signals.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_data))
         cls.signals.property_reference_changed.connect(
-            lambda cp: cls.request_property_specific_redraw(cls.get_window(cp))
+            lambda cp: cls.request_property_specific_redraw(cls.get_widget(cp))
         )
-        cls.signals.create_new_class_property_requested.connect(
-            trigger.create_class_property_creator
-        )
+        cls.signals.create_new_class_property_requested.connect(trigger.open_dialog)
         # Autoupdate Values
         cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
         cls.signals.property_specific_redraw_requested.connect(
             trigger.update_property_specific_fields
         )
 
+        # unregister
+        cls.signals.widget_closed.connect(cls.unregister_widget)
+        cls.signals.widget_closed.connect(lambda w: cls.unregister_widget(w.tv_allowed_values))
+
     @classmethod
-    def connect_widget_to_internal_signals(cls, widget: ui.ClassPropertyEditor):
+    def connect_widget_signals(cls, widget: ui.ClassPropertyEditor):
+        super().connect_widget_signals(widget)
         widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
         widget.le_property_reference.button.clicked.connect(
             lambda _, w=widget: cls.handle_pr_button_press(w)
@@ -81,51 +89,44 @@ class ClassPropertyEditorWidget(WidgetTool):
         )
 
     @classmethod
-    def create_create_dialog(cls, bsdd_class_property, parent, bsdd_dictionary: BsddDictionary):
-        def validate_inputs(dial: ui.ClassPropertyCreator):
-            widget = dial._editor_widget
-            if cls.all_inputs_are_valid(widget):
-                dial.accept()
-            else:
-                pass
-
-        dialog = ui.ClassPropertyCreator(bsdd_class_property)
-        cls.get_properties().dialog = dialog
-        widget = cls.create_edit_widget(
-            bsdd_class_property, parent, mode="new", bsdd_dictionary=bsdd_dictionary
+    def create_dialog(
+        cls,
+        bsdd_class_property: BsddClassProperty,
+        parent: QWidget,
+        bsdd_dictionary: BsddDictionary,
+    ):
+        widget = cls.create_widget(
+            bsdd_class_property, None, mode="new", bsdd_dictionary=bsdd_dictionary
         )
+        dialog = ui.ClassPropertyCreator(widget, parent)
         cls.sync_from_model(widget, bsdd_class_property)
         dialog._layout.insertWidget(0, widget)
-        dialog._editor_widget = widget
-        dialog.new_button.clicked.connect(lambda _, d=dialog: validate_inputs(d))
 
+        dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
+        cls.get_properties().dialog = dialog
         return dialog
 
     @classmethod
-    def create_edit_widget(
+    def create_widget(
         cls,
         bsdd_class_property: BsddClassProperty,
         parent: QWidget,
         mode="edit",
         bsdd_dictionary=None,
     ) -> ui.ClassPropertyEditor:
+
         prop = cls.get_properties()
-        window = ui.ClassPropertyEditor(bsdd_class_property, parent, mode=mode)
-        window.setWindowFlag(Qt.Tool)
-        prop.widgets.add(window)
+        widget = ui.ClassPropertyEditor(bsdd_class_property, parent, mode=mode)
+        widget.setWindowFlag(Qt.Tool)
+        prop.widgets.add(widget)
+
         if bsdd_dictionary:
             completer = cls.create_property_code_completer(bsdd_dictionary)
-            window.le_property_reference.setCompleter(completer)
-        for plugin in prop.plugin_widget_list:
-            layout: QLayout = getattr(window, plugin.layout_name)
-            layout.insertWidget(plugin.index, plugin.widget())
-            setattr(prop, plugin.key, plugin.value_getter)
+            widget.le_property_reference.setCompleter(completer)
 
-        title = cls.create_window_title(bsdd_class_property)
-        cls.get_window(bsdd_class_property).setWindowTitle(title)  # TODO: Update Name Getter
-
-        cls.signals.widget_created.emit(window)
-        return window
+        cls.add_plugins_to_widget(widget)
+        widget.setWindowTitle(cls.create_window_title(bsdd_class_property))
+        return widget
 
     @classmethod
     def create_property_code_completer(cls, bsdd_dictionary: BsddDictionary):
@@ -133,19 +134,6 @@ class ClassPropertyEditorWidget(WidgetTool):
         completer = QCompleter(all_codes)
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         return completer
-
-    @classmethod
-    def get_window(cls, bsdd_class_property: BsddClassProperty) -> ui.ClassPropertyEditor:
-        windows = [
-            widget
-            for widget in cls.get_properties().widgets
-            if widget.bsdd_data == bsdd_class_property
-        ]
-        if len(windows) > 1:
-            logging.warning(f"Multiple PropertyWindows")
-        elif not windows:
-            return None
-        return windows[0]
 
     @classmethod
     def create_window_title(cls, bsdd_class_property: BsddClassProperty):
@@ -162,30 +150,7 @@ class ClassPropertyEditorWidget(WidgetTool):
 
     @classmethod
     def show_property_info(cls, bsdd_class_property: BsddClassProperty):
-        trigger.property_info_requested(bsdd_class_property)
-
-    ### Settings Window
-    @classmethod
-    def set_splitter_settings_widget(cls, widget: ui.SplitterSettings):
-        cls.get_properties().splitter_settings = widget
-
-    @classmethod
-    def get_splitter_settings_widget(cls) -> ui.SplitterSettings:
-        return cls.get_properties().splitter_settings
-
-    @classmethod
-    def connect_splitter_widget(cls, widget: ui.SplitterSettings):
-        widget.ui.check_box_seperator.checkStateChanged.connect(
-            lambda: trigger.splitter_checkstate_changed(widget)
-        )
-
-    @classmethod
-    def get_splitter_settings_checkstate(cls, widget: ui.SplitterSettings) -> bool:
-        return widget.ui.check_box_seperator.isChecked()
-
-    @classmethod
-    def get_splitter_settings_text(cls, widget: ui.SplitterSettings) -> str:
-        return widget.ui.line_edit_seperator.text()
+        trigger.open_widget(bsdd_class_property)
 
     @classmethod
     def get_property_reference(cls, bsdd_class_property: BsddClassProperty):
@@ -320,3 +285,46 @@ class ClassPropertyEditorWidget(WidgetTool):
                 value_kind == "Single" or value_kind is None
             ):
                 widget.setHidden(False)
+
+    @classmethod
+    def handle_field_changed(cls, parent_widget: property_editor_ui.PropertyEditor, field):
+        for widget in cls.get_widgets():
+            bsdd_class_property: BsddClassProperty = widget.bsdd_data
+            internal_prop = cp_utils.get_internal_property(bsdd_class_property)
+            if not internal_prop:
+                continue
+            if parent_widget.bsdd_data == internal_prop:
+                cls.request_property_specific_redraw(widget)
+
+    @classmethod
+    def create_temporary_property(cls, property_set, bsdd_class):
+        code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
+        bsdd_class_property = BsddClassProperty.model_validate(
+            {"Code": code, "PropertyCode": code, "PropertyUri": None, "IsRequired": True}
+        )
+        bsdd_class_property.PropertySet = property_set
+        bsdd_class_property._set_parent(bsdd_class)
+        return bsdd_class_property
+
+    ### Settings Window
+    @classmethod
+    def set_splitter_settings_widget(cls, widget: ui.SplitterSettings):
+        cls.get_properties().splitter_settings = widget
+
+    @classmethod
+    def get_splitter_settings_widget(cls) -> ui.SplitterSettings:
+        return cls.get_properties().splitter_settings
+
+    @classmethod
+    def connect_splitter_widget(cls, widget: ui.SplitterSettings):
+        widget.ui.check_box_seperator.checkStateChanged.connect(
+            lambda: trigger.splitter_checkstate_changed(widget)
+        )
+
+    @classmethod
+    def get_splitter_settings_checkstate(cls, widget: ui.SplitterSettings) -> bool:
+        return widget.ui.check_box_seperator.isChecked()
+
+    @classmethod
+    def get_splitter_settings_text(cls, widget: ui.SplitterSettings) -> str:
+        return widget.ui.line_edit_seperator.text()

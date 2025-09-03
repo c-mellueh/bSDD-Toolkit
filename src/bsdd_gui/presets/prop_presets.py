@@ -4,6 +4,7 @@ from PySide6.QtGui import QAction
 from typing import TypedDict, Callable, TypeAlias
 from bsdd_gui.presets.ui_presets import ItemViewType
 from .models_presets import ItemModel
+from dataclasses import dataclass
 
 
 class ContextMenuDict(TypedDict):
@@ -35,10 +36,23 @@ class FieldProperties:
         ] = dict()
 
 
+@dataclass
+class PluginProperty:
+    key: str
+    layout_name: str
+    widget: QWidget
+    index: int
+    value_getter: Callable
+    value_setter: Callable
+    widget_value_setter: Callable
+    value_test: Callable
+
+
 class WidgetProperties(FieldProperties):
     def __init__(self):
         super().__init__()
         self.widgets = set()
+        self.plugin_widget_list: list[PluginProperty] = list()
 
 
 class DialogProperties(WidgetProperties):
