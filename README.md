@@ -1,4 +1,4 @@
-# bsdd-creator
+# bSDD-Toolkit
 
 Visual editor and Python toolkit for working with buildingSMART Data Dictionary (bSDD) JSON.
 
@@ -66,6 +66,19 @@ open_path           Optional path to a bSDD JSON file
 -l, --log-level     Integer log level (e.g. 10=DEBUG, 20=INFO)
 --open_last_project Open the last project on startup
 ```
+
+
+## Screenshots
+
+Add the PNGs to `docs/images/` with the names below. They will render automatically in GitHub once added.
+
+### Main Window
+![Main UI](docs/images/main-ui.png)
+
+### Editors
+| Edit Properties | Edit Classes |
+| --- | --- |
+| <img src="docs/images/edit-properties.png" alt="Editing Properties" width="400"> | <img src="docs/images/edit-classes.png" alt="Editing Classes" width="400"> |
 
 
 ## Use the Data Model (Python)
