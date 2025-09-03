@@ -44,6 +44,7 @@ from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
     QFormLayout,
+    QFrame,
     QGroupBox,
     QHBoxLayout,
     QHeaderView,
@@ -74,6 +75,8 @@ class Ui_PropertyWindow(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QTabWidget(PropertyWindow)
         self.tabWidget.setObjectName("tabWidget")
+        self.tabWidget.setAutoFillBackground(False)
+        self.tabWidget.setStyleSheet("")
         self.tab_basics = QWidget()
         self.tab_basics.setObjectName("tab_basics")
         self.verticalLayout_6 = QVBoxLayout(self.tab_basics)
@@ -230,22 +233,31 @@ class Ui_PropertyWindow(object):
         self.gb_relations = QGroupBox(self.splitter_2)
         self.gb_relations.setObjectName("gb_relations")
         self.verticalLayout_4 = QVBoxLayout(self.gb_relations)
-        self.verticalLayout_4.setSpacing(0)
+        self.verticalLayout_4.setSpacing(6)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_4.setContentsMargins(6, 6, 6, 6)
         self.relationship_widget = RelationshipWidget(self.gb_relations)
         self.relationship_widget.setObjectName("relationship_widget")
 
         self.verticalLayout_4.addWidget(self.relationship_widget)
+
+        self.line = QFrame(self.gb_relations)
+        self.line.setObjectName("line")
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_4.addWidget(self.line)
 
         self.splitter_2.addWidget(self.gb_relations)
         self.gb_description = QGroupBox(self.splitter_2)
         self.gb_description.setObjectName("gb_description")
         self.verticalLayout_3 = QVBoxLayout(self.gb_description)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_3.setContentsMargins(6, 6, 6, 6)
         self.te_definition = QTextEdit(self.gb_description)
         self.te_definition.setObjectName("te_definition")
+        self.te_definition.setAutoFillBackground(True)
+        self.te_definition.setStyleSheet("background-color: rgba(0, 0, 0,10);")
 
         self.verticalLayout_3.addWidget(self.te_definition)
 
@@ -271,6 +283,7 @@ class Ui_PropertyWindow(object):
 
         self.te_description = QTextEdit(self.gb_description)
         self.te_description.setObjectName("te_description")
+        self.te_description.setStyleSheet("background-color: rgba(0, 0, 0,10);")
 
         self.verticalLayout_3.addWidget(self.te_description)
 
@@ -469,7 +482,7 @@ class Ui_PropertyWindow(object):
 
         self.retranslateUi(PropertyWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
         QMetaObject.connectSlotsByName(PropertyWindow)
 

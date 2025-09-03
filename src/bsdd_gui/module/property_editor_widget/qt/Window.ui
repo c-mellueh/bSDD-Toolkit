@@ -16,8 +16,14 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_basics">
       <attribute name="title">
@@ -99,8 +105,7 @@
              </widget>
             </item>
             <item row="2" column="1">
-                                                    <widget class="TagInput" name="ti_units"
-                                                        native="true">
+             <widget class="TagInput" name="ti_units" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -340,22 +345,29 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="leftMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <item>
             <widget class="RelationshipWidget" name="relationship_widget" native="true"/>
+           </item>
+           <item>
+            <widget class="Line" name="line">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -365,19 +377,26 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="leftMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <item>
-            <widget class="QTextEdit" name="te_definition"/>
+            <widget class="QTextEdit" name="te_definition">
+             <property name="autoFillBackground">
+              <bool>true</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgba(0, 0, 0,10);</string>
+             </property>
+            </widget>
            </item>
            <item>
             <layout class="QHBoxLayout" name="hl_defintion">
@@ -411,7 +430,11 @@
             </layout>
            </item>
            <item>
-            <widget class="QTextEdit" name="te_description"/>
+            <widget class="QTextEdit" name="te_description">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgba(0, 0, 0,10);</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -457,7 +480,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-                                <widget class="TagInput" name="ti_connect_properties" native="true" />
+        <widget class="TagInput" name="ti_connect_properties" native="true"/>
        </item>
        <item row="6" column="0">
         <widget class="QLabel" name="lb_country_use">
@@ -471,7 +494,7 @@
         </widget>
        </item>
        <item row="6" column="1">
-                                <widget class="TagInput" name="ti_countries" native="true" />
+        <widget class="TagInput" name="ti_countries" native="true"/>
        </item>
        <item row="7" column="0">
         <widget class="QLabel" name="lb_country_origin">
@@ -556,10 +579,10 @@
         </widget>
        </item>
        <item row="11" column="1">
-                                <widget class="TagInput" name="ti_replaced_objects" native="true" />
+        <widget class="TagInput" name="ti_replaced_objects" native="true"/>
        </item>
        <item row="12" column="1">
-                                <widget class="TagInput" name="ti_replacing_objects" native="true" />
+        <widget class="TagInput" name="ti_replacing_objects" native="true"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="lb_revision_date">
@@ -580,7 +603,7 @@
         </widget>
        </item>
        <item row="13" column="1">
-                                <widget class="TagInput" name="ti_subdivision" native="true" />
+        <widget class="TagInput" name="ti_subdivision" native="true"/>
        </item>
        <item row="14" column="0">
         <widget class="QLabel" name="lb_text_format">
@@ -658,16 +681,16 @@
   </layout>
  </widget>
  <customwidgets>
-        <customwidget>
+  <customwidget>
    <class>DateTimeWithNow</class>
    <extends>QWidget</extends>
-            <header>bsdd_gui.presets.ui_presets</header>
+   <header>bsdd_gui.presets.ui_presets</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>RelationshipWidget</class>
    <extends>QWidget</extends>
-            <header>bsdd_gui.module.relationship_editor_widget.ui</header>
+   <header>bsdd_gui.module.relationship_editor_widget.ui</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -678,13 +701,13 @@
   <customwidget>
    <class>AllowedValuesTable</class>
    <extends>QTableView</extends>
-            <header>bsdd_gui.module.allowed_values_table_view.ui</header>
-        </customwidget>
-        <customwidget>
-            <class>TagInput</class>
-            <extends>QWidget</extends>
-            <header>bsdd_gui.presets.ui_presets</header>
-            <container>1</container>
+   <header>bsdd_gui.module.allowed_values_table_view.ui</header>
+  </customwidget>
+  <customwidget>
+   <class>TagInput</class>
+   <extends>QWidget</extends>
+   <header>bsdd_gui.presets.ui_presets</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

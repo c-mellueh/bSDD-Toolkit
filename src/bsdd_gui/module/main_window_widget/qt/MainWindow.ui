@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1468</width>
-    <height>740</height>
+    <height>822</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -320,19 +320,13 @@
      <x>0</x>
      <y>0</y>
      <width>1468</width>
-     <height>22</height>
+     <height>33</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuExport">
-     <property name="title">
-      <string>Export</string>
-     </property>
-    </widget>
-    <addaction name="menuExport"/>
    </widget>
    <widget class="QMenu" name="menuData">
     <property name="title">
@@ -359,17 +353,17 @@
   <customwidget>
    <class>ClassView</class>
    <extends>QTreeView</extends>
-            <header>bsdd_gui.module.class_tree_view.ui</header>
+   <header>bsdd_gui.module.class_tree_view.ui</header>
   </customwidget>
   <customwidget>
    <class>PsetTableView</class>
    <extends>QTableView</extends>
-            <header>bsdd_gui.module.property_set_table_view.ui</header>
+   <header>bsdd_gui.module.property_set_table_view.ui</header>
   </customwidget>
   <customwidget>
    <class>ClassPropertyTable</class>
    <extends>QTableView</extends>
-            <header>bsdd_gui.module.class_property_table_view.ui</header>
+   <header>bsdd_gui.module.class_property_table_view.ui</header>
   </customwidget>
  </customwidgets>
  <tabstops>

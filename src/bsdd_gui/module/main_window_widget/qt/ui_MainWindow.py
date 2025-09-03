@@ -69,7 +69,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1468, 740)
+        MainWindow.resize(1468, 822)
         MainWindow.setMinimumSize(QSize(0, 0))
         self.actiondqwd = QAction(MainWindow)
         self.actiondqwd.setObjectName("actiondqwd")
@@ -253,11 +253,9 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.verticalLayout_main)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName("menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1468, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1468, 33))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
-        self.menuExport = QMenu(self.menuFile)
-        self.menuExport.setObjectName("menuExport")
         self.menuData = QMenu(self.menubar)
         self.menuData.setObjectName("menuData")
         self.menuModels = QMenu(self.menubar)
@@ -274,7 +272,6 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuData.menuAction())
         self.menubar.addAction(self.menuModels.menuAction())
-        self.menuFile.addAction(self.menuExport.menuAction())
 
         self.retranslateUi(MainWindow)
 
@@ -296,7 +293,6 @@ class Ui_MainWindow(object):
         self.label_property_name.setText("")
         self.button_property_add.setText(QCoreApplication.translate("MainWindow", "New", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", "File", None))
-        self.menuExport.setTitle(QCoreApplication.translate("MainWindow", "Export", None))
         self.menuData.setTitle(QCoreApplication.translate("MainWindow", "Edit", None))
         self.menuModels.setTitle(QCoreApplication.translate("MainWindow", "Data", None))
 
