@@ -75,6 +75,8 @@ class PropertySetTable(ItemViewTool):
     @classmethod
     def get_pset_names_with_temporary(cls, bsdd_class: BsddClass) -> list[str]:
         bsdd_properties = list()
+        if bsdd_class is None:
+            return bsdd_properties
         for cp in bsdd_class.ClassProperties:
             if cp.PropertySet not in bsdd_properties:
                 bsdd_properties.append(cp.PropertySet)

@@ -99,3 +99,15 @@ def connect_to_main_window(
         lambda c: property_table.reset_view(property_view)
     )
     main_window.signals.active_pset_changed.connect(reset_property)
+
+
+def reset_models(
+    property_table: Type[tool.ClassPropertyTable],
+    project: Type[tool.Project],
+    main_window: Type[tool.MainWindow],
+):
+    for model in property_table.get_models():
+        model.bsdd_data = project.get()
+    main_window.set_active_property(None)
+
+    property_table.reset_views()

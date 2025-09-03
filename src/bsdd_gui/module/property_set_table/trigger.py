@@ -21,7 +21,7 @@ def retranslate_ui():
 
 
 def on_new_project():
-    core.reset_models(tool.PropertyTable, tool.Project)
+    core.reset_models(tool.PropertySetTable, tool.Project, tool.MainWindow)
 
 
 def view_created(view: ui.PsetTableView):

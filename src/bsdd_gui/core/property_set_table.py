@@ -187,7 +187,12 @@ def delete_selection(
     property_set_table.signals.model_refresh_requested.emit()
 
 
-def reset_models(property_table: Type[tool.ClassPropertyTable], project: Type[tool.Project]):
+def reset_models(
+    property_table: Type[tool.PropertySetTable],
+    project: Type[tool.Project],
+    main_window: Type[tool.MainWindow],
+):
     for model in property_table.get_models():
         model.bsdd_data = project.get()
+    main_window.set_active_pset(None)
     property_table.reset_views()

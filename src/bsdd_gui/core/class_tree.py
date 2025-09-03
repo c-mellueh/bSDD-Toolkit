@@ -203,7 +203,12 @@ def search_class(
     class_tree.select_and_expand(cl, view)
 
 
-def reset_models(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
+def reset_models(
+    class_tree: Type[tool.ClassTree],
+    project: Type[tool.Project],
+    main_window: Type[tool.MainWindow],
+):
     for model in class_tree.get_models():
         model.bsdd_data = project.get()
+    main_window.set_active_class(None)
     class_tree.reset_views()

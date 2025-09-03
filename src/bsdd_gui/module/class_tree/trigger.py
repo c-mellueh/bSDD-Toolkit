@@ -16,7 +16,7 @@ def connect():
 
 
 def on_new_project():
-    core.reset_models(tool.ClassTree, tool.Project)
+    core.reset_models(tool.ClassTree, tool.Project, tool.MainWindow)
 
 
 def retranslate_ui():

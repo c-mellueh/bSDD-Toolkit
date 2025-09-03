@@ -19,7 +19,7 @@ def retranslate_ui():
 
 
 def on_new_project():
-    pass
+    core.reset_models(tool.ClassPropertyTable, tool.Project, tool.MainWindow)
 
 
 def context_menu_requested(view: ui.ClassPropertyTable, pos: QPoint):
