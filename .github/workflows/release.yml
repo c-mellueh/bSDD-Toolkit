@@ -1,0 +1,125 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check_version:
+    name: Check version and release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      should_release: ${{ steps.get_version.outputs.should_release }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version from pyproject.toml
+        id: get_version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const core = require('@actions/core');
+            const toml = fs.readFileSync('pyproject.toml', 'utf8');
+            const match = toml.match(/^version\s*=\s*"([^"]+)"/m);
+            if (!match) {
+              core.setFailed('Could not parse version from pyproject.toml');
+              return;
+            }
+            const version = match[1];
+            core.setOutput('version', version);
+            // Check if a release with this tag already exists
+            const tag = `v${version}`;
+            try {
+              await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag,
+              });
+              core.info(`Release for ${tag} already exists.`);
+              core.setOutput('should_release', 'false');
+            } catch (e) {
+              if (e.status === 404) {
+                core.info(`No release for ${tag}; will create.`);
+                core.setOutput('should_release', 'true');
+              } else {
+                throw e;
+              }
+            }
+
+  build:
+    name: Build (${{ matrix.os }})
+    needs: check_version
+    if: needs.check_version.outputs.should_release == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          cd src
+          pyinstaller main.spec -y
+
+      - name: Package artifact (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p artifacts
+          cd src/dist
+          zip -r ../../artifacts/BSDD-Toolkit-linux-x86_64-v${{ needs.check_version.outputs.version }}.zip BSDD-Toolkit
+
+      - name: Package artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          Compress-Archive -Path src\dist\BSDD-Toolkit\* -DestinationPath artifacts\BSDD-Toolkit-windows-x86_64-v${{ needs.check_version.outputs.version }}.zip -Force
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BSDD-Toolkit-${{ runner.os }}-v${{ needs.check_version.outputs.version }}
+          path: artifacts/*
+
+  release:
+    name: Create GitHub Release
+    needs: [check_version, build]
+    if: needs.check_version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release_assets
+
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.check_version.outputs.version }}
+          name: v${{ needs.check_version.outputs.version }}
+          generate_release_notes: true
+          files: |
+            release_assets/**
