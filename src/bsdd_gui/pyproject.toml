@@ -3,33 +3,32 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bsdd-tools"
-version = "0.1.0"
-description = "BSDD JSON parser & GUI"
-readme = "README.md"
+name = "bsdd_gui"
+version = "0.1.1"
+description = "bSDD GUI"
 requires-python = ">=3.10"
 authors = [{ name = "Christoph Mellüh" }]
 license = { text = "MIT" }
 dependencies = [
   "pydantic>=2.7",
-  "typer>=0.12",
   "rich>=13",
   "PySide6>=6.7",
   "bsdd",
   "appdirs",
   "pyqtconsole",
   "thefuzz",
+  "bsdd_json>=0.1.1",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-qt", "mypy", "ruff", "black","pyinstaller"]
+dev = ["pytest", "pytest-qt", "mypy", "ruff", "black", "pyinstaller"]
 
 [project.scripts]
-bsdd = "bsdd_json.cli:app"          # CLI: `bsdd ...`
-bsdd-gui = "bsdd_gui.app:main"        # GUI: `bsdd-gui`
+bsdd-gui = "bsdd_gui.__main__:main"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+packages = ["bsdd_gui"]
+package-dir = { bsdd_gui = "." }
 
 [tool.ruff]
 line-length = 100
@@ -40,3 +39,4 @@ line-length = 100
 [tool.mypy]
 python_version = "3.10"
 strict = true
+
