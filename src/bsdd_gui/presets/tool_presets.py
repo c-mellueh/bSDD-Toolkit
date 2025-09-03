@@ -57,7 +57,7 @@ from bsdd_gui.presets.ui_presets import (
     BaseDialog,
     ItemViewType,
 )
-from bsdd_parser import *
+from bsdd_json import *
 import logging
 from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals
 from .models_presets import ItemModel

@@ -1,9 +1,9 @@
 from __future__ import annotations
 from PySide6.QtCore import QModelIndex, QCoreApplication
 from typing import TYPE_CHECKING, Type
-from bsdd_parser import BsddClass
+from bsdd_json import BsddClass
 import logging
-from bsdd_parser.utils import bsdd_class as class_utils
+from bsdd_json.utils import bsdd_class as class_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool

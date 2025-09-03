@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable
 from dataclasses import dataclass
 from PySide6.QtWidgets import QWidget
 from . import ui
-from bsdd_parser import BsddClassProperty
+from bsdd_json import BsddClassProperty
 from bsdd_gui.presets.prop_presets import FieldProperties
 
 

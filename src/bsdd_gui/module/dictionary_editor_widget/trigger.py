@@ -2,7 +2,7 @@ from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import dictionary_editor_widget as core
-from bsdd_parser import BsddDictionary
+from bsdd_json import BsddDictionary
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import QWidget
 from typing import TYPE_CHECKING

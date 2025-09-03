@@ -4,7 +4,7 @@ import logging
 import os
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool
-from bsdd_parser import BsddDictionary, BsddClass, BsddProperty
+from bsdd_json import BsddDictionary, BsddClass, BsddProperty
 from bsdd_gui.module.project import ui
 from PySide6.QtCore import QObject, Signal
 

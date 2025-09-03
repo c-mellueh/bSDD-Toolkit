@@ -2,7 +2,7 @@
 
 block_cipher = None
 added_files = [
-    ("bsdd_parser", "bsdd_parser"),
+    ("bsdd_json", "bsdd_json"),
     ("bsdd_gui/resources", "bsdd_gui/resources"),
     ("bsdd_gui/plugins", "bsdd_gui/plugins"),
 ]

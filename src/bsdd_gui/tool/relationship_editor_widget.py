@@ -5,7 +5,7 @@ import logging
 from PySide6.QtWidgets import QTreeView, QCompleter, QWidget
 from PySide6.QtCore import Qt
 import bsdd_gui
-from bsdd_parser import (
+from bsdd_json import (
     BsddProperty,
     BsddClass,
     BsddDictionary,
@@ -13,9 +13,9 @@ from bsdd_parser import (
     BsddPropertyRelation,
 )
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals, FieldTool, FieldSignals
-from bsdd_parser.utils import bsdd_dictionary as dict_util
-from bsdd_parser.utils import bsdd_class as cl_util
-from bsdd_parser.utils import bsdd_class_property as prop_util
+from bsdd_json.utils import bsdd_dictionary as dict_util
+from bsdd_json.utils import bsdd_class as cl_util
+from bsdd_json.utils import bsdd_class_property as prop_util
 from bsdd_gui.module.class_editor_widget import ui as class_editor_ui
 from bsdd_gui.presets.ui_presets import BaseDialog
 

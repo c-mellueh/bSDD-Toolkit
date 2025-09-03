@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from bsdd_parser import BsddClassProperty
+from bsdd_json import BsddClassProperty
 from bsdd_gui.module.class_property_editor_widget.constants import (
     SEPERATOR_SECTION,
     SEPERATOR,
@@ -9,7 +9,7 @@ from bsdd_gui.module.class_property_editor_widget.constants import (
 )
 from PySide6.QtCore import QCoreApplication
 from bsdd_gui.module.class_property_editor_widget import ui
-from bsdd_parser.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool

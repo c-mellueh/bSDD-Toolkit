@@ -118,7 +118,7 @@ class BsddClass(CaseInsensitiveModel):
             c._set_parent(self)
 
     def _apply_code_side_effects(self, code: str) -> None:
-        from bsdd_parser.utils import bsdd_class as class_utils
+        from bsdd_json.utils import bsdd_class as class_utils
 
         if not code.strip():
             logging.info("Empty Code is not allowed")

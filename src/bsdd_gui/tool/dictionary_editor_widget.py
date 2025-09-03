@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
 from datetime import datetime
 from bsdd_gui import tool
 from bsdd_gui.module.dictionary_editor_widget import constants, ui, trigger
-from bsdd_parser import BsddDictionary
+from bsdd_json import BsddDictionary
 
 if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor_widget.prop import DictionaryEditorWidgetProperties

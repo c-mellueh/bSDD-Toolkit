@@ -5,13 +5,13 @@ from typing import TypedDict
 
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QMenu
-import bsdd_parser
+import bsdd_json
 from bsdd_gui.presets.prop_presets import ActionsProperties
 
 if TYPE_CHECKING:
     from bsdd_gui.module.main_window_widget.ui import MainWindow
     from bsdd_gui.module.main_window_widget.qt.ui_MainWindow import Ui_MainWindow
-    from bsdd_parser.models import BsddClass, BsddClassProperty
+    from bsdd_json.models import BsddClass, BsddClassProperty
 
 
 class MainWindowWidgetProperties(ActionsProperties):

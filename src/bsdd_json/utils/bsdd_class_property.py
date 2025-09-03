@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from bsdd_parser import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass
+from bsdd_json import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass
 import bsdd
 from bsdd import Client
 from . import bsdd_dictionary as dict_util
@@ -14,7 +14,7 @@ class Cache:
     def get_external_property(
         cls, property_uri: str, client: bsdd.Client | None
     ) -> BsddClassProperty | None:
-        from bsdd_parser.utils import bsdd_class_property as cp_utils
+        from bsdd_json.utils import bsdd_class_property as cp_utils
 
         def _make_request():
             if not dict_util.is_uri(property_uri):

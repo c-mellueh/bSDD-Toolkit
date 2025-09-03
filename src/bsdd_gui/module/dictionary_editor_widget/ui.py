@@ -5,7 +5,7 @@ from typing import Any
 from . import trigger
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui.presets.ui_presets import DateTimeWithNow as DTN, FieldWidget
-from bsdd_parser import BsddDictionary
+from bsdd_json import BsddDictionary
 from .qt.ui_DictionaryEditor import Ui_DictionaryForm
 
 

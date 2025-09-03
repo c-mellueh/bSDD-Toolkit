@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type, Literal
-from bsdd_parser import BsddProperty, BsddClass
+from bsdd_json import BsddProperty, BsddClass
 from PySide6.QtWidgets import QWidget, QTreeView
 from PySide6.QtCore import QCoreApplication
 from bsdd_gui.module.relationship_editor_widget import ui

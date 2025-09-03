@@ -4,7 +4,7 @@ from bsdd_gui.presets.prop_presets import (
     ViewProperties,
     FieldProperties,
 )
-from bsdd_parser import BsddProperty
+from bsdd_json import BsddProperty
 
 
 class PropertyTableWidgetProperties(ActionsProperties, FieldProperties, ViewProperties):

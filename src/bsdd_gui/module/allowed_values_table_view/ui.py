@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt
 from . import trigger
-from bsdd_parser import BsddClassProperty, BsddProperty
+from bsdd_json import BsddClassProperty, BsddProperty
 from bsdd_gui.presets.ui_presets import TableItemView
 
 if TYPE_CHECKING:

@@ -2,12 +2,12 @@ from __future__ import annotations
 from PySide6.QtWidgets import QApplication, QTableView
 from typing import Type, TYPE_CHECKING
 from PySide6.QtCore import QModelIndex
-from bsdd_parser.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.class_property_table_view import ui
-    from bsdd_parser.models import BsddClass
+    from bsdd_json.models import BsddClass
 
 
 def connect_signals(

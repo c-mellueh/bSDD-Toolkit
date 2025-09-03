@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import logging
 
 import bsdd_gui
-from bsdd_parser import BsddClassProperty, BsddDictionary, BsddProperty
+from bsdd_json import BsddClassProperty, BsddDictionary, BsddProperty
 from bsdd_gui.module.class_property_editor_widget import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
@@ -12,8 +12,8 @@ from bsdd_gui.presets.tool_presets import DialogTool, DialogSignals
 from urllib.parse import urlparse
 from bsdd_gui.module.allowed_values_table_view.ui import AllowedValuesTable
 from bsdd_gui.module.property_editor_widget import ui as property_editor_ui
-from bsdd_parser.utils.bsdd_dictionary import is_uri
-from bsdd_parser.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils.bsdd_dictionary import is_uri
+from bsdd_json.utils import bsdd_class_property as cp_utils
 from bsdd_gui.module.class_property_editor_widget.constants import (
     BUTTON_MODE_EDIT,
     BUTTON_MODE_NEW,

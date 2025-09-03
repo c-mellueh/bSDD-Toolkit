@@ -7,7 +7,7 @@ from PySide6.QtCore import (
     QModelIndex,
     QSortFilterProxyModel,
 )
-from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty
+from bsdd_json.models import BsddDictionary, BsddClass, BsddClassProperty
 from bsdd_gui import tool
 from typing import TYPE_CHECKING
 

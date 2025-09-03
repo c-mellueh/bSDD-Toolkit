@@ -10,7 +10,7 @@ from PySide6.QtCore import (
 from PySide6.QtWidgets import QWidget, QWidget, QDialog, QDialogButtonBox, QVBoxLayout
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QPalette, QIcon
 from bsdd_gui.presets.ui_presets import BaseDialog, FieldWidget
-from bsdd_parser import BsddClassProperty
+from bsdd_json import BsddClassProperty
 from . import trigger
 from bsdd_gui import tool
 from .qt.ui_SplitterSettings import Ui_SplitterSettings

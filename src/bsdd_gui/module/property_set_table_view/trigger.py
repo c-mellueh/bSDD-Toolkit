@@ -1,6 +1,6 @@
 from __future__ import annotations
 import bsdd_gui
-from bsdd_parser import BsddClass
+from bsdd_json import BsddClass
 from bsdd_gui import tool
 from bsdd_gui.core import property_set_table_view as core
 from typing import TYPE_CHECKING

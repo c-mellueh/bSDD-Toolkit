@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QWidget, QWidget, QDialog, QDialogButtonBox, QVBox
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QPalette, QIcon
 
 from bsdd_gui.resources.icons import get_icon, get_link_icon
-from bsdd_parser import BsddClassProperty
+from bsdd_json import BsddClassProperty
 from . import trigger
 from bsdd_gui import tool
 from .qt.ui_Widget import Ui_Form

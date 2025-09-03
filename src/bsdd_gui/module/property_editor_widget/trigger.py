@@ -3,7 +3,7 @@ import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import property_editor_widget as core
 from typing import TYPE_CHECKING
-from bsdd_parser import BsddProperty
+from bsdd_json import BsddProperty
 from PySide6.QtWidgets import QWidget
 from . import ui
 

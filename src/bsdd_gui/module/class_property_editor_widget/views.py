@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QWidget, QWidget, QGridLayout, QApplication, QLine
 from PySide6.QtGui import QStyleHints, QStandardItem, QPalette, QIcon
 from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
 from bsdd_gui.resources.icons import get_icon, get_link_icon
-from bsdd_parser import BsddClassProperty
+from bsdd_json import BsddClassProperty
 from . import trigger
 from bsdd_gui import tool
 from .qt.ui_SplitterSettings import Ui_SplitterSettings

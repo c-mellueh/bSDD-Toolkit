@@ -5,7 +5,7 @@ from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtWidgets import QWidget
 
 from PySide6.QtGui import QCloseEvent
-from bsdd_parser import BsddDictionary
+from bsdd_json import BsddDictionary
 from bsdd_gui.module.dictionary_editor_widget.constants import LANGUAGE_ISO_CODES
 
 if TYPE_CHECKING:

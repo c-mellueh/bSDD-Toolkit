@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
-from bsdd_parser import BsddClassProperty, BsddProperty, BsddAllowedValue
+from bsdd_json import BsddClassProperty, BsddProperty, BsddAllowedValue
 from bsdd_gui.module.allowed_values_table_view import models, ui, trigger
 from bsdd_gui import tool
 

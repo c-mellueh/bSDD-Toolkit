@@ -3,7 +3,7 @@ import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import class_property_editor_widget as core
 from typing import TYPE_CHECKING
-from bsdd_parser import BsddClassProperty
+from bsdd_json import BsddClassProperty
 from PySide6.QtGui import QKeySequence
 from .constants import SEPERATOR_SECTION, SEPERATOR_STATUS
 from . import ui, views

@@ -2,13 +2,13 @@ from __future__ import annotations
 from PySide6.QtWidgets import QTreeView
 from PySide6.QtCore import QPoint, QCoreApplication, Qt
 from typing import Type, TYPE_CHECKING
-from bsdd_parser.utils import bsdd_class as class_utils
+from bsdd_json.utils import bsdd_class as class_utils
 import logging
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.class_tree_view import ui
-    from bsdd_parser.models import BsddClass
+    from bsdd_json.models import BsddClass
 
 
 def connect_signals(class_tree: Type[tool.ClassTreeView], project: Type[tool.Project]):

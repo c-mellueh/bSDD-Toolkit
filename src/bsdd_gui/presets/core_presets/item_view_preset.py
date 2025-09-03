@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from bsdd_parser import BsddClassProperty, BsddProperty
+from bsdd_json import BsddClassProperty, BsddProperty
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 

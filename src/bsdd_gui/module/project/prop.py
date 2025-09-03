@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from bsdd_gui.presets.prop_presets import ActionsProperties
 
 if TYPE_CHECKING:
-    from bsdd_parser.models import BsddDictionary
+    from bsdd_json.models import BsddDictionary
 
 
 class ProjectProperties(ActionsProperties):

@@ -6,10 +6,10 @@ from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit, QDialogButtonBox
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import DialogSignals, DialogTool
-from bsdd_parser import BsddClass, BsddDictionary
+from bsdd_json import BsddClass, BsddDictionary
 from bsdd_gui.module.class_editor_widget import trigger, ui
 from bsdd_gui.presets.ui_presets import label_tags_input
-from bsdd_parser.utils import bsdd_class as class_utils
+from bsdd_json.utils import bsdd_class as class_utils
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_editor_widget.prop import ClassEditorWidgetProperties

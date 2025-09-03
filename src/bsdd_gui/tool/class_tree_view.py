@@ -8,8 +8,8 @@ from PySide6.QtWidgets import QWidget, QAbstractItemView
 
 import bsdd_gui
 
-from bsdd_parser.models import BsddDictionary, BsddClass
-from bsdd_parser.utils import bsdd_class as class_utils
+from bsdd_json.models import BsddDictionary, BsddClass
+from bsdd_json.utils import bsdd_class as class_utils
 from bsdd_gui.module.class_tree_view import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
 

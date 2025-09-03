@@ -7,10 +7,10 @@ from PySide6.QtCore import (
     QModelIndex,
     QSortFilterProxyModel,
 )
-from bsdd_parser.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils import bsdd_class_property as cp_utils
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_parser.models import BsddDictionary, BsddClass, BsddClassProperty, BsddProperty
+from bsdd_json.models import BsddDictionary, BsddClass, BsddClassProperty, BsddProperty
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
 

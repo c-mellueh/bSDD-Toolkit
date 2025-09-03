@@ -11,9 +11,9 @@ from PySide6.QtCore import (
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_parser.models import BsddDictionary, BsddClass, BsddProperty
-from bsdd_parser.utils import bsdd_class as cl_util
-from bsdd_parser.utils import bsdd_class_property as cl_prop_utils
+from bsdd_json.models import BsddDictionary, BsddClass, BsddProperty
+from bsdd_json.utils import bsdd_class as cl_util
+from bsdd_json.utils import bsdd_class_property as cl_prop_utils
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
 from PySide6.QtTest import QAbstractItemModelTester

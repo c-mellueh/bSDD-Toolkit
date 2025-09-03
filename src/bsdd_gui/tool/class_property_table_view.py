@@ -5,8 +5,8 @@ import logging
 from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
 
 import bsdd_gui
-from bsdd_parser.models import BsddClassProperty, BsddClass
-from bsdd_parser.utils import bsdd_class_property as cp_utils
+from bsdd_json.models import BsddClassProperty, BsddClass
+from bsdd_json.utils import bsdd_class_property as cp_utils
 
 from bsdd_gui.module.class_property_table_view import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals

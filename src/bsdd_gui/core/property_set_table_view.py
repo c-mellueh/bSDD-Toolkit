@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 from bsdd_gui.module.property_set_table_view import ui
 from PySide6.QtCore import QCoreApplication, QPoint, QModelIndex
 from PySide6.QtWidgets import QApplication, QListView
-from bsdd_parser.models import BsddClass
+from bsdd_json.models import BsddClass
 
 
 def connect_signals(property_set_table: Type[tool.PropertySetTableView]):

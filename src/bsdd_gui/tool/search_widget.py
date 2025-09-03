@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 from bsdd_gui.module.search_widget import ui
 from thefuzz import fuzz
 from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
-from bsdd_parser import BsddClass, BsddClassProperty, BsddProperty
+from bsdd_json import BsddClass, BsddClassProperty, BsddProperty
 
 
 class Signals(WidgetSignals):

@@ -1,9 +1,9 @@
 from __future__ import annotations
-from bsdd_parser import BsddClassProperty, BsddProperty
+from bsdd_json import BsddClassProperty, BsddProperty
 from typing import TYPE_CHECKING, Type
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QCoreApplication
-from bsdd_parser.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool

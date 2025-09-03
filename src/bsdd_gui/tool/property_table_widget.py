@@ -12,7 +12,7 @@ from PySide6.QtCore import (
     QItemSelectionModel,
 )
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QTreeView
-from bsdd_parser.models import BsddClassProperty, BsddClass, BsddProperty
+from bsdd_json.models import BsddClassProperty, BsddClass, BsddProperty
 from bsdd_gui.module.property_table_widget import ui, models, trigger, views
 
 

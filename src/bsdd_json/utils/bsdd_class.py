@@ -4,7 +4,7 @@ import logging
 from . import bsdd_dictionary as dict_util
 import bsdd
 
-from bsdd_parser.models import BsddDictionary, BsddClass
+from bsdd_json.models import BsddDictionary, BsddClass
 
 
 class Cache:
@@ -14,7 +14,7 @@ class Cache:
     def get_external_class(
         cls, class_uri: str, client: bsdd.Client | None = None
     ) -> BsddClass | None:
-        from bsdd_parser.utils import bsdd_class_property as cp_utils
+        from bsdd_json.utils import bsdd_class_property as cp_utils
 
         def _make_request():
             if not dict_util.is_uri(class_uri):

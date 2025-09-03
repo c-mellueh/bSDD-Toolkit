@@ -3,7 +3,7 @@
 Visual editor and Python toolkit for working with buildingSMART Data Dictionary (bSDD) JSON.
 
 This repository contains:
-- A validated data model for bSDD JSON (Pydantic v2) under `src/bsdd_parser`.
+- A validated data model for bSDD JSON (Pydantic v2) under `src/bsdd_json`.
 - A PySide6 GUI to create, view, and edit bSDD dictionaries under `src/bsdd_gui`.
 
 
@@ -86,7 +86,7 @@ Add the PNGs to `docs/images/` with the names below. They will render automatica
 Load, inspect, and write bSDD JSON using the Pydantic models:
 
 ```python
-from bsdd_parser import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
+from bsdd_json import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
 
 # Load and validate an existing dictionary (see som-0.2.0.json)
 d = BsddDictionary.load("example.json")
@@ -126,7 +126,7 @@ new_d.save("example.json")
 
 ## Project Structure
 
-- `src/bsdd_parser` — Pydantic models and helpers for bSDD JSON.
+- `src/bsdd_json` — Pydantic models and helpers for bSDD JSON.
 - `src/bsdd_gui` — PySide6 GUI application (run with `python -m bsdd_gui`).
   - `__main__.py` — entry point for the GUI launcher.
   - `module/` — feature modules (class tree, property tables, search, etc.).
