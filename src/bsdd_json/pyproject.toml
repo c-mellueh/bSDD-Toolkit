@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bsdd_json"
+version = "0.1.0"
+description = "bSDD JSON data models and utilities"
+requires-python = ">=3.10"
+authors = [{ name = "Christoph Mellüh" }]
+license = { text = "MIT" }
+dependencies = [
+  "pydantic>=2.7",
+]
+
+[tool.setuptools]
+packages = ["bsdd_json"]
+package-dir = { bsdd_json = "." }
+
