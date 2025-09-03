@@ -12,15 +12,15 @@ from PySide6.QtWidgets import QApplication, QListView
 from bsdd_parser.models import BsddClass
 
 
-def connect_signals(property_set_table: Type[tool.PropertySetTable]):
+def connect_signals(property_set_table: Type[tool.PropertySetTableView]):
     property_set_table.connect_internal_signals()
 
 
-def retranslate_ui(property_set_table: Type[tool.PropertySetTable]):
+def retranslate_ui(property_set_table: Type[tool.PropertySetTableView]):
     return  # TODO
 
 
-def register_view(view: ui.PsetTableView, property_set_table: Type[tool.PropertySetTable]):
+def register_view(view: ui.PsetTableView, property_set_table: Type[tool.PropertySetTableView]):
     property_set_table.register_view(view)
     view.setSelectionBehavior(QListView.SelectionBehavior.SelectRows)
     view.setSelectionMode(QListView.SelectionMode.SingleSelection)
@@ -29,9 +29,9 @@ def register_view(view: ui.PsetTableView, property_set_table: Type[tool.Property
 
 def add_columns_to_view(
     view: ui.PsetTableView,
-    property_set_table: Type[tool.PropertySetTable],
+    property_set_table: Type[tool.PropertySetTableView],
     project: Type[tool.Project],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
     util: Type[tool.Util],
 ):
 
@@ -62,7 +62,7 @@ def add_columns_to_view(
 
 def add_context_menu_to_view(
     view: ui.PsetTableView,
-    property_set_table: Type[tool.PropertySetTable],
+    property_set_table: Type[tool.PropertySetTableView],
 ):
     # TODO
     pass
@@ -70,9 +70,9 @@ def add_context_menu_to_view(
 
 def connect_view(
     view: ui.PsetTableView,
-    property_set_table: Type[tool.PropertySetTable],
+    property_set_table: Type[tool.PropertySetTableView],
     project: Type[tool.Project],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
 
     main_window.signals.active_class_changed.connect(lambda c: property_set_table.reset_view(view))
@@ -80,8 +80,8 @@ def connect_view(
 
 
 def connect_to_main_window(
-    property_set_table: Type[tool.PropertySetTable],
-    main_window: Type[tool.MainWindow],
+    property_set_table: Type[tool.PropertySetTableView],
+    main_window: Type[tool.MainWindowWidget],
 ):
     def reset_pset(new_class: BsddClass):
         """
@@ -111,7 +111,9 @@ def connect_to_main_window(
 
 
 def create_new_property_set(
-    bsdd_class: BsddClass, property_set_table: Type[tool.PropertySetTable], util: Type[tool.Util]
+    bsdd_class: BsddClass,
+    property_set_table: Type[tool.PropertySetTableView],
+    util: Type[tool.Util],
 ):
     existings_psets = property_set_table.get_pset_names_with_temporary(bsdd_class)
     new_name = util.get_unique_name(
@@ -122,7 +124,7 @@ def create_new_property_set(
 
 
 def define_context_menu(
-    main_window: Type[tool.MainWindow], property_set_table: Type[tool.PropertySetTable]
+    main_window: Type[tool.MainWindowWidget], property_set_table: Type[tool.PropertySetTableView]
 ):
 
     view = main_window.get_pset_view()
@@ -147,7 +149,7 @@ def define_context_menu(
 
 
 def create_context_menu(
-    view: ui.PsetTableView, pos: QPoint, property_set_table: Type[tool.PropertySetTable]
+    view: ui.PsetTableView, pos: QPoint, property_set_table: Type[tool.PropertySetTableView]
 ):
     selected_psets = property_set_table.get_selected(view)
     menu = property_set_table.create_context_menu(view, selected_psets)
@@ -157,9 +159,9 @@ def create_context_menu(
 
 def delete_selection(
     view: ui.PsetTableView,
-    property_set_table: Type[tool.PropertySetTable],
-    property_table: Type[tool.ClassPropertyTable],
-    main_window: Type[tool.MainWindow],
+    property_set_table: Type[tool.PropertySetTableView],
+    property_table: Type[tool.ClassPropertyTableView],
+    main_window: Type[tool.MainWindowWidget],
 ):
     """_summary_
     this function seperates between virtual psets and real psets and deletes them accordingly
@@ -188,9 +190,9 @@ def delete_selection(
 
 
 def reset_models(
-    property_table: Type[tool.PropertySetTable],
+    property_table: Type[tool.PropertySetTableView],
     project: Type[tool.Project],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     for model in property_table.get_models():
         model.bsdd_data = project.get()

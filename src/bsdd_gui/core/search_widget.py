@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.search_widget.ui import SearchDialog
 
 
-def connect_signals(search: Type[tool.Search]):
+def connect_signals(search: Type[tool.SearchWidget]):
     search.connect_signals()
 
 
@@ -20,7 +20,7 @@ def set_strict_state(state: bool, appdata: Type[tool.Appdata]):
     appdata.set_setting(SEARCH_SECTION, STRICT_SETTING, state)
 
 
-def update_filter_table(dialog: SearchDialog, search: Type[tool.Search]):
+def update_filter_table(dialog: SearchDialog, search: Type[tool.SearchWidget]):
     """
     filters output Table to search_text
     :param search: Tool
@@ -52,13 +52,13 @@ def update_filter_table(dialog: SearchDialog, search: Type[tool.Search]):
     table_widget.resizeColumnsToContents()
 
 
-def save_selected_element(dialog: SearchDialog, search: Type[tool.Search]):
+def save_selected_element(dialog: SearchDialog, search: Type[tool.SearchWidget]):
     item = search.get_selected_item(dialog)
     dialog.return_value = search.get_info_from_item(item)
     dialog.accept()
 
 
-def retranslate_ui(search: Type[tool.Search]):
+def retranslate_ui(search: Type[tool.SearchWidget]):
     """
     Retranslate the Search Widget
     :return:

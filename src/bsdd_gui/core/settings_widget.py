@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 def create_main_menu_actions(
-    settings: Type[tool.Settings], main_window: Type[tool.MainWindow]
+    settings: Type[tool.SettingsWidget], main_window: Type[tool.MainWindowWidget]
 ) -> None:
     from bsdd_gui.module.settings_widget import trigger
 
@@ -20,7 +20,7 @@ def create_main_menu_actions(
     settings.set_action("open_window", action)
 
 
-def retranslate_ui(settings: Type[tool.Settings], util: Type[tool.Util]):
+def retranslate_ui(settings: Type[tool.SettingsWidget], util: Type[tool.Util]):
     open_window_action = settings.get_action("open_window")
     title = QCoreApplication.translate("Settings", "Settings")
 
@@ -31,7 +31,7 @@ def retranslate_ui(settings: Type[tool.Settings], util: Type[tool.Util]):
         widget.setWindowTitle(util.get_window_title(title))
 
 
-def open_window(settings: Type[tool.Settings]):
+def open_window(settings: Type[tool.SettingsWidget]):
     logging.info(f"Opening Settings Window")
     dialog = settings.create_dialog()
     from bsdd_gui.module.settings_widget import trigger

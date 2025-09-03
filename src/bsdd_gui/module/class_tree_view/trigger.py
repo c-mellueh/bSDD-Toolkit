@@ -11,12 +11,12 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.ClassTree, tool.Project)
-    core.connect_to_main_window(tool.ClassTree, tool.MainWindow, tool.Util)
+    core.connect_signals(tool.ClassTreeView, tool.Project)
+    core.connect_to_main_window(tool.ClassTreeView, tool.MainWindowWidget, tool.Util)
 
 
 def on_new_project():
-    core.reset_models(tool.ClassTree, tool.Project, tool.MainWindow)
+    core.reset_models(tool.ClassTreeView, tool.Project, tool.MainWindowWidget)
 
 
 def retranslate_ui():
@@ -28,27 +28,27 @@ def close_event(event):
 
 
 def class_view_created(view: ui.ClassView):
-    core.register_view(view, tool.ClassTree)
-    core.add_columns_to_view(view, tool.ClassTree, tool.Project, tool.Util)
-    core.add_context_menu_to_view(view, tool.ClassTree, tool.ClassEditor)
-    core.connect_view(view, tool.ClassTree)
+    core.register_view(view, tool.ClassTreeView)
+    core.add_columns_to_view(view, tool.ClassTreeView, tool.Project, tool.Util)
+    core.add_context_menu_to_view(view, tool.ClassTreeView, tool.ClassEditorWidget)
+    core.connect_view(view, tool.ClassTreeView)
 
 
 def copy_selected_class(view: ui.ClassView):
-    core.copy_selected_class(view, tool.ClassTree, tool.ClassEditor)
+    core.copy_selected_class(view, tool.ClassTreeView, tool.ClassEditorWidget)
 
 
 def context_menu_requested(view: ui.ClassView, pos):
-    core.create_context_menu(view, pos, tool.ClassTree)
+    core.create_context_menu(view, pos, tool.ClassTreeView)
 
 
 def delete_selection(view: ui.ClassView):
-    core.delete_selection(view, tool.ClassTree, tool.Popups, tool.Project)
+    core.delete_selection(view, tool.ClassTreeView, tool.Popups, tool.Project)
 
 
 def group_selection(view: ui.ClassView):
-    core.group_selection(view, tool.ClassTree, tool.ClassEditor)
+    core.group_selection(view, tool.ClassTreeView, tool.ClassEditorWidget)
 
 
 def search_class(view: ui.ClassView):
-    core.search_class(view, tool.Search, tool.ClassTree, tool.Project)
+    core.search_class(view, tool.SearchWidget, tool.ClassTreeView, tool.Project)

@@ -10,32 +10,38 @@ from . import ui, views
 
 
 def connect():
-    tool.Settings.add_page_to_toolbox(
+    tool.SettingsWidget.add_page_to_toolbox(
         views.SplitterSettings,
         "pageSplitter",
-        lambda: core.splitter_settings_accepted(tool.ClassPropertyEditor, tool.Appdata),
+        lambda: core.splitter_settings_accepted(tool.ClassPropertyEditorWidget, tool.Appdata),
     )
     core.connect_signals(
-        tool.ClassPropertyEditor, tool.ClassPropertyTable, tool.MainWindow, tool.PropertyEditor
+        tool.ClassPropertyEditorWidget,
+        tool.ClassPropertyTableView,
+        tool.MainWindowWidget,
+        tool.PropertyEditorWidget,
     )
     # core.create_context_menu_builders(tool.PropertyWidget)
 
 
 def create_class_property_creator():
     core.create_class_property_creator(
-        tool.ClassPropertyEditor, tool.MainWindow, tool.Project, tool.PropertySetTable
+        tool.ClassPropertyEditorWidget,
+        tool.MainWindowWidget,
+        tool.Project,
+        tool.PropertySetTableView,
     )
 
 
 def update_property_specific_fields(window: ui.ClassPropertyEditor):
     core.update_property_specific_fields(
-        window, tool.ClassPropertyEditor, tool.AllowedValuesTableView
+        window, tool.ClassPropertyEditorWidget, tool.AllowedValuesTableView
     )
 
 
 def retranslate_ui():
     return  # TODO
-    core.retranslate_ui(tool.ClassPropertyEditor)
+    core.retranslate_ui(tool.ClassPropertyEditorWidget)
 
 
 def on_new_project():
@@ -43,48 +49,50 @@ def on_new_project():
 
 
 def property_info_requested(som_property: BsddClassProperty):
-    core.open_edit_window(som_property, tool.ClassPropertyEditor, tool.MainWindow, tool.Project)
+    core.open_edit_window(
+        som_property, tool.ClassPropertyEditorWidget, tool.MainWindowWidget, tool.Project
+    )
 
 
 def widget_created(window: ui.ClassPropertyEditor):
-    core.register_widget(window, tool.ClassPropertyEditor)
+    core.register_widget(window, tool.ClassPropertyEditorWidget)
     core.add_fields_to_widget(
         window,
-        tool.ClassPropertyEditor,
+        tool.ClassPropertyEditorWidget,
         tool.Project,
     )
-    core.add_validators_to_widget(window, tool.ClassPropertyEditor, tool.Project, tool.Util)
+    core.add_validators_to_widget(window, tool.ClassPropertyEditorWidget, tool.Project, tool.Util)
     core.update_property_specific_fields(
-        window, tool.ClassPropertyEditor, tool.AllowedValuesTableView
+        window, tool.ClassPropertyEditorWidget, tool.AllowedValuesTableView
     )
 
 
 def window_closed(window: ui.ClassPropertyEditor):
-    core.unregister_widget(window, tool.ClassPropertyEditor, tool.AllowedValuesTableView)
+    core.unregister_widget(window, tool.ClassPropertyEditorWidget, tool.AllowedValuesTableView)
 
 
 def update_window(window: ui.ClassPropertyEditor):
     return  # TODO
 
-    core.update_window(window, tool.ClassPropertyEditor, tool.Util, tool.Units)
+    core.update_window(window, tool.ClassPropertyEditorWidget, tool.Util, tool.Units)
 
 
 def value_context_menu_request(pos, table_view: ui.ValueView):
     return  # TODO
 
-    core.value_context_menu_request(pos, table_view, tool.ClassPropertyEditor, tool.Util)
+    core.value_context_menu_request(pos, table_view, tool.ClassPropertyEditorWidget, tool.Util)
 
 
 def paste_clipboard(table_view: ui.ValueView):
     return  # TODO
 
-    core.handle_paste_event(table_view, tool.ClassPropertyEditor, tool.Appdata)
+    core.handle_paste_event(table_view, tool.ClassPropertyEditorWidget, tool.Appdata)
 
 
 def copy_table_content(table_view: ui.ValueView):
     return  # TODO
 
-    core.handle_copy_event(table_view, tool.ClassPropertyEditor, tool.Appdata)
+    core.handle_copy_event(table_view, tool.ClassPropertyEditorWidget, tool.Appdata)
 
 
 # Settings Window
@@ -93,10 +101,10 @@ def copy_table_content(table_view: ui.ValueView):
 def splitter_settings_created(widget: ui.SplitterSettings):
     return  # TODO
 
-    core.fill_splitter_settings(widget, tool.ClassPropertyEditor, tool.Appdata)
+    core.fill_splitter_settings(widget, tool.ClassPropertyEditorWidget, tool.Appdata)
 
 
 def splitter_checkstate_changed(widget: ui.SplitterSettings):
     return  # TODO
 
-    core.update_splitter_enabled_state(widget, tool.ClassPropertyEditor)
+    core.update_splitter_enabled_state(widget, tool.ClassPropertyEditorWidget)

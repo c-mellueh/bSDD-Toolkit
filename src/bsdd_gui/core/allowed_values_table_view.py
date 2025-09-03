@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 def connect_signals(
     allowed_values_table: Type[tool.AllowedValuesTableView],
-    class_property_editor: Type[tool.ClassPropertyEditor],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
 ):
     class_property_editor.signals.new_value_requested.connect(
         allowed_values_table.handle_new_value_request

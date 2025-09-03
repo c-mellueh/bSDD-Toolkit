@@ -11,10 +11,10 @@ if TYPE_CHECKING:
 
 
 def connect_signals(
-    property_table: Type[tool.PropertyTable],
-    property_editor: Type[tool.PropertyEditor],
-    main_window: Type[tool.MainWindow],
-    class_tree: Type[tool.ClassTree],
+    property_table: Type[tool.PropertyTableWidget],
+    property_editor: Type[tool.PropertyEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
+    class_tree: Type[tool.ClassTreeView],
     project: Type[tool.Project],
 ):
     property_table.signals.property_info_requested.connect(property_editor.request_widget)
@@ -30,8 +30,8 @@ def connect_signals(
 
 
 def retranslate_ui(
-    property_table: Type[tool.PropertyTable],
-    main_window: Type[tool.MainWindow],
+    property_table: Type[tool.PropertyTableWidget],
+    main_window: Type[tool.MainWindowWidget],
     util: Type[tool.Util],
 ):
     """Retranslates the UI elements of dictionary Editor. and the Actions."""
@@ -44,14 +44,14 @@ def retranslate_ui(
 
 
 def register_view(
-    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTable]
+    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTableWidget]
 ):
     property_table.register_view(view)
 
 
 def add_columns_to_view(
     view: views.PropertyTable | views.ClassTable,
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.PropertyTableWidget],
 ):
 
     if isinstance(view, views.PropertyTable):
@@ -71,7 +71,7 @@ def add_columns_to_view(
 
 def add_context_menu_to_view(
     view: views.PropertyTable | views.ClassTable,
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.PropertyTableWidget],
 ):
 
     if isinstance(view, views.PropertyTable):
@@ -96,7 +96,7 @@ def add_context_menu_to_view(
 
 def connect_view(
     view: views.PropertyTable | views.ClassTable,
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.PropertyTableWidget],
     util: Type[tool.Util],
 ):
     property_table.connect_view_signals(view)
@@ -111,7 +111,7 @@ def connect_view(
 def create_context_menu(
     view: views.PropertyTable | views.ClassTable,
     pos: QPoint,
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.PropertyTableWidget],
 ):
     bsdd_allowed_values = property_table.get_selected(view)
     menu = property_table.create_context_menu(view, bsdd_allowed_values)
@@ -120,14 +120,14 @@ def create_context_menu(
 
 
 def remove_view(
-    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTable]
+    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTableWidget]
 ):
     property_table.remove_model(view.model().sourceModel())
 
 
 def connect_to_main_menu(
-    property_table: Type[tool.PropertyTable],
-    main_window: Type[tool.MainWindow],
+    property_table: Type[tool.PropertyTableWidget],
+    main_window: Type[tool.MainWindowWidget],
 ) -> None:
     action = main_window.add_action(
         "menuModels",
@@ -139,31 +139,31 @@ def connect_to_main_menu(
 
 def create_widget(
     parent: QWidget,
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.PropertyTableWidget],
     util: Type[tool.Util],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     widget = property_table.create_widget()
     widget.show()
     retranslate_ui(property_table, main_window, util)
 
 
-def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTable]):
+def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTableWidget]):
     property_table.register_widget(widget)
     property_table.connect_widget_signals(widget)
 
 
 def unregister_widget(
     widget: ui.PropertyWidget,
-    property_table: Type[tool.PropertyTable],
+    property_table: Type[tool.PropertyTableWidget],
 ):
     property_table.unregister_widget(widget)
 
 
 def search_property(
     view: QTreeView,
-    property_table: Type[tool.PropertyTable],
-    search: Type[tool.Search],
+    property_table: Type[tool.PropertyTableWidget],
+    search: Type[tool.SearchWidget],
     project: Type[tool.Project],
 ):
     bsdd_properties = project.get().Properties
@@ -175,7 +175,7 @@ def search_property(
 
 
 def delete_selection(
-    view: QTreeView, property_table: Type[tool.PropertyTable], project: Type[tool.Project]
+    view: QTreeView, property_table: Type[tool.PropertyTableWidget], project: Type[tool.Project]
 ):
     selected_elements = property_table.get_selected(view)
     if not selected_elements:

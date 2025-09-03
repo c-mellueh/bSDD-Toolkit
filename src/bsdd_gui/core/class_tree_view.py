@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from bsdd_parser.models import BsddClass
 
 
-def connect_signals(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
+def connect_signals(class_tree: Type[tool.ClassTreeView], project: Type[tool.Project]):
     class_tree.connect_internal_signals()
     project.signals.class_added.connect(
         lambda c: class_tree.add_class_to_dictionary(c, project.get())
@@ -19,11 +19,11 @@ def connect_signals(class_tree: Type[tool.ClassTree], project: Type[tool.Project
     class_tree.signals.item_deleted.connect(project.signals.class_removed.emit)
 
 
-def retranslate_ui(class_tree: Type[tool.ClassTree]):
+def retranslate_ui(class_tree: Type[tool.ClassTreeView]):
     pass
 
 
-def register_view(view: ui.ClassView, class_tree: Type[tool.ClassTree]):
+def register_view(view: ui.ClassView, class_tree: Type[tool.ClassTreeView]):
     class_tree.register_view(view)
     view.setSelectionBehavior(QTreeView.SelectRows)
     view.setSelectionMode(QTreeView.ExtendedSelection)
@@ -38,7 +38,7 @@ def register_view(view: ui.ClassView, class_tree: Type[tool.ClassTree]):
 
 def add_columns_to_view(
     view: ui.ClassView,
-    class_tree: Type[tool.ClassTree],
+    class_tree: Type[tool.ClassTreeView],
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
@@ -52,8 +52,8 @@ def add_columns_to_view(
 
 def add_context_menu_to_view(
     view: ui.ClassView,
-    class_tree: Type[tool.ClassTree],
-    class_editor: Type[tool.ClassEditor],
+    class_tree: Type[tool.ClassTreeView],
+    class_editor: Type[tool.ClassEditorWidget],
 ):
     def get_first_selection(v: ui.ClassView):
         bsdd_classes = class_tree.get_selected(v)
@@ -119,12 +119,14 @@ def add_context_menu_to_view(
     )
 
 
-def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTree]):
+def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTreeView]):
     class_tree.connect_view_signals(view)
 
 
 def connect_to_main_window(
-    class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow], util: Type[tool.Util]
+    class_tree: Type[tool.ClassTreeView],
+    main_window: Type[tool.MainWindowWidget],
+    util: Type[tool.Util],
 ):
     view = main_window.get_class_view()
     util.add_shortcut("Del", view, lambda: class_tree.signals.delete_selection_requested.emit(view))
@@ -144,7 +146,7 @@ def connect_to_main_window(
     )
 
 
-def create_context_menu(view: ui.ClassView, pos: QPoint, class_tree: Type[tool.ClassTree]):
+def create_context_menu(view: ui.ClassView, pos: QPoint, class_tree: Type[tool.ClassTreeView]):
     bsdd_classes = class_tree.get_selected(view)
     menu = class_tree.create_context_menu(view, bsdd_classes)
     menu_pos = view.viewport().mapToGlobal(pos)
@@ -153,7 +155,7 @@ def create_context_menu(view: ui.ClassView, pos: QPoint, class_tree: Type[tool.C
 
 def delete_selection(
     view: ui.ClassView,
-    class_tree: Type[tool.ClassTree],
+    class_tree: Type[tool.ClassTreeView],
     popups: Type[tool.Popups],
     project: Type[tool.Project],
 ):
@@ -173,8 +175,8 @@ def delete_selection(
 
 def group_selection(
     view: ui.ClassView,
-    class_tree: Type[tool.ClassTree],
-    class_editor: Type[tool.ClassEditor],
+    class_tree: Type[tool.ClassTreeView],
+    class_editor: Type[tool.ClassEditorWidget],
 ):
     bsdd_classes = class_tree.get_selected(
         view,
@@ -192,8 +194,8 @@ def copy_selected_class(
 
 def search_class(
     view: ui.ClassView,
-    search: Type[tool.Search],
-    class_tree: Type[tool.ClassTree],
+    search: Type[tool.SearchWidget],
+    class_tree: Type[tool.ClassTreeView],
     project: Type[tool.Project],
 ):
 
@@ -204,9 +206,9 @@ def search_class(
 
 
 def reset_models(
-    class_tree: Type[tool.ClassTree],
+    class_tree: Type[tool.ClassTreeView],
     project: Type[tool.Project],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     for model in class_tree.get_models():
         model.bsdd_data = project.get()

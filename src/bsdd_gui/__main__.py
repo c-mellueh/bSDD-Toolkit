@@ -34,7 +34,7 @@ def main(initial_file: PathLike | None = None, log_level=None, open_last_project
     app = QApplication(sys.argv)
     bsdd_gui.core.main_window_widget.create_main_window(
         app,
-        tool.MainWindow,
+        tool.MainWindowWidget,
     )
     bsdd_gui.load_ui_triggers()
 

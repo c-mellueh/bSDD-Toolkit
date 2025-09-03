@@ -13,21 +13,23 @@ if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor_widget import ui
 
 
-def register_widget(widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditor]):
+def register_widget(
+    widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditorWidget]
+):
     dictionary_editor.register_widget(widget)
     dictionary_editor.connect_widget_to_internal_signals(widget)
 
 
 def unregister_widget(
     widget: ui.DictionaryEditor,
-    dictionary_editor: Type[tool.DictionaryEditor],
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
 ):
     dictionary_editor.unregister_widget(widget)
 
 
 def create_main_menu_actions(
-    dictionary_editor: Type[tool.DictionaryEditor],
-    main_window: Type[tool.MainWindow],
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ) -> None:
     action = main_window.add_action(
@@ -37,8 +39,8 @@ def create_main_menu_actions(
 
 
 def retranslate_ui(
-    dictionary_editor: Type[tool.DictionaryEditor],
-    main_window: Type[tool.MainWindow],
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     util: Type[tool.Util],
 ):
     """Retranslates the UI elements of dictionary Editor. and the Actions."""
@@ -55,8 +57,8 @@ def retranslate_ui(
 def open_widget(
     bsdd_dictionary: BsddDictionary,
     parent_widget: QWidget | None,
-    dictionary_editor: Type[tool.DictionaryEditor],
-    main_window: Type[tool.MainWindow],
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     util: Type[tool.Util],
 ):
     if parent_widget is None:
@@ -79,7 +81,9 @@ def open_widget(
     retranslate_ui(dictionary_editor, main_window, util)
 
 
-def connect_signals(dictionary_editor: Type[tool.DictionaryEditor], project: Type[tool.Project]):
+def connect_signals(
+    dictionary_editor: Type[tool.DictionaryEditorWidget], project: Type[tool.Project]
+):
     dictionary_editor.connect_internal_signals()
 
     def handle_field_change(widget, field):
@@ -93,7 +97,7 @@ def connect_signals(dictionary_editor: Type[tool.DictionaryEditor], project: Typ
 def remove_widget(
     widget: ui.DictionaryEditor,
     event: QCloseEvent,
-    dictionary_editor: Type[tool.DictionaryEditor],
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
     popups: Type[tool.Popups],
 ):
     if not dictionary_editor.all_inputs_are_valid(widget):
@@ -110,7 +114,7 @@ def remove_widget(
 
 def add_fields_to_widget(
     widget: ui.DictionaryEditor,
-    dictionary_editor: Type[tool.DictionaryEditor],
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
 ):
 
     dictionary_editor.register_basic_field(widget, widget.le_org_code, "OrganizationCode")
@@ -144,7 +148,7 @@ def add_fields_to_widget(
 
 def add_validator_functions_to_widget(
     widget: ui.DictionaryEditor,
-    dictionary_editor: Type[tool.DictionaryEditor],
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
     util: Type[tool.Util],
 ):
     dictionary_editor.add_validator(

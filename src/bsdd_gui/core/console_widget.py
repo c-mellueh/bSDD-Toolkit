@@ -8,7 +8,9 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
 
 
-def create_console_trigger(main_menu: Type[tool.MainWindow], console: Type[tool.Console]):
+def create_console_trigger(
+    main_menu: Type[tool.MainWindowWidget], console: Type[tool.ConsoleWidget]
+):
     status_bar = main_menu.get_statusbar()
     button = QPushButton("C")
     button.setMaximumWidth(24)
@@ -16,9 +18,9 @@ def create_console_trigger(main_menu: Type[tool.MainWindow], console: Type[tool.
     button.clicked.connect(lambda: show(console))
 
 
-def show(console: Type[tool.Console]):
+def show(console: Type[tool.ConsoleWidget]):
     console.create_console()
 
 
-def close(console: Type[tool.Console]):
+def close(console: Type[tool.ConsoleWidget]):
     console.close_console()

@@ -26,7 +26,7 @@ class Signals(WidgetSignals):
     dialog_accepted = Signal(ui.ClassEditor)
 
 
-class ClassEditor(WidgetTool):
+class ClassEditorWidget(WidgetTool):
     signals = Signals()
 
     @classmethod

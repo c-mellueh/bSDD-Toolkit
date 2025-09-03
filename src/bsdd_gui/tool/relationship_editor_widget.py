@@ -27,7 +27,7 @@ class Signals(ViewSignals, WidgetSignals):
     pass
 
 
-class RelationshipEditor(WidgetTool, ItemViewTool):
+class RelationshipEditorWidget(WidgetTool, ItemViewTool):
     signals = Signals()
 
     @classmethod

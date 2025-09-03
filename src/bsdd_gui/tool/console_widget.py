@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.console_widget.prop import ConsoleWidgetProperties
 
 
-class Console:
+class ConsoleWidget:
     @classmethod
     def get_properties(cls) -> ConsoleWidgetProperties:
         return bsdd_gui.ConsoleProperties

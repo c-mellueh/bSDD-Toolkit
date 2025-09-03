@@ -25,7 +25,7 @@ class Signals(WidgetSignals):
     strict_state_changed = Signal(bool)
 
 
-class Search(WidgetTool):
+class SearchWidget(WidgetTool):
     signals = Signals()
 
     @classmethod

@@ -10,24 +10,24 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.ClassPropertyTable, tool.ClassPropertyEditor)
-    core.connect_to_main_window(tool.ClassPropertyTable, tool.MainWindow)
+    core.connect_signals(tool.ClassPropertyTableView, tool.ClassPropertyEditorWidget)
+    core.connect_to_main_window(tool.ClassPropertyTableView, tool.MainWindowWidget)
 
 
 def retranslate_ui():
-    core.rentranslate_ui(tool.ClassPropertyTable)
+    core.rentranslate_ui(tool.ClassPropertyTableView)
 
 
 def on_new_project():
-    core.reset_models(tool.ClassPropertyTable, tool.Project, tool.MainWindow)
+    core.reset_models(tool.ClassPropertyTableView, tool.Project, tool.MainWindowWidget)
 
 
 def context_menu_requested(view: ui.ClassPropertyTable, pos: QPoint):
-    core.create_context_menu(view, pos, tool.ClassPropertyTable)
+    core.create_context_menu(view, pos, tool.ClassPropertyTableView)
 
 
 def view_created(view: ui.ClassPropertyTable):
-    core.register_view(view, tool.ClassPropertyTable)
-    core.add_columns_to_view(view, tool.ClassPropertyTable)
-    core.add_context_menu_to_view(view, tool.ClassPropertyTable)
-    core.connect_view(view, tool.ClassPropertyTable)
+    core.register_view(view, tool.ClassPropertyTableView)
+    core.add_columns_to_view(view, tool.ClassPropertyTableView)
+    core.add_context_menu_to_view(view, tool.ClassPropertyTableView)
+    core.connect_view(view, tool.ClassPropertyTableView)

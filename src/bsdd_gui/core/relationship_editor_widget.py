@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 
 
 def connect_signals(
-    relationship_editor: Type[tool.RelationshipEditor],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
     project: Type[tool.Project],
-    class_editor: Type[tool.ClassEditor],
+    class_editor: Type[tool.ClassEditorWidget],
 ):
     project.signals.data_changed.connect(
         lambda n, v: relationship_editor.update_on_dict_change(n, v, project.get())
@@ -38,7 +38,7 @@ def connect_signals(
     relationship_editor.connect_internal_signals()
 
 
-def retranslate_ui(relationship_editor: Type[tool.RelationshipEditor]):
+def retranslate_ui(relationship_editor: Type[tool.RelationshipEditorWidget]):
     for widget in relationship_editor.get_widgets():
         widget.retranslateUi(widget)
         if isinstance(widget.bsdd_data, BsddClass):
@@ -48,7 +48,7 @@ def retranslate_ui(relationship_editor: Type[tool.RelationshipEditor]):
             widget.lb_related_class.setText(text)
 
 
-def register_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditor]):
+def register_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]):
     relationship_editor.register_view(view)
 
 
@@ -56,7 +56,7 @@ def add_columns_to_view(
     view: QTreeView,
     data: BsddClass | BsddProperty,
     mode: Literal["dialog"] | Literal["live"],
-    relationship_editor: Type[tool.RelationshipEditor],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
 ):
 
     proxy_model, model = relationship_editor.create_model(data)
@@ -68,20 +68,22 @@ def add_columns_to_view(
     view.setModel(proxy_model)
 
 
-def add_context_menu_to_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditor]):
+def add_context_menu_to_view(
+    view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]
+):
     pass  # TODO:
 
 
-def connect_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditor]):
+def connect_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]):
     pass
 
 
-def remove_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditor]):
+def remove_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]):
     relationship_editor.unregister_view(view)
 
 
 def register_widget(
-    widget: ui.RelationshipWidget, relationship_editor: Type[tool.RelationshipEditor]
+    widget: ui.RelationshipWidget, relationship_editor: Type[tool.RelationshipEditorWidget]
 ):
     relationship_editor.register_widget(widget)
 
@@ -90,7 +92,7 @@ def connect_widget(
     widget: ui.RelationshipWidget,
     data: BsddClass | BsddProperty,
     mode: Literal["dialog"] | Literal["live"],
-    relationship_editor: Type[tool.RelationshipEditor],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
     project: Type[tool.Project],
 ):
 
@@ -101,7 +103,7 @@ def connect_widget(
 
 def add_field_validators(
     widget: ui.RelationshipWidget,
-    relationship_editor: Type[tool.RelationshipEditor],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
     util: Type[tool.Util],
     project: Type[tool.Project],
 ):
@@ -134,6 +136,6 @@ def add_field_validators(
 
 def remove_widget(
     widget: ui.RelationshipWidget,
-    relationship_editor: Type[tool.RelationshipEditor],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
 ):
     relationship_editor.unregister_widget(widget)

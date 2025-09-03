@@ -26,7 +26,7 @@ class Signals(ViewSignals):
     collapse_selection_requested = Signal(ui.ClassView)
 
 
-class ClassTree(ItemViewTool):
+class ClassTreeView(ItemViewTool):
     signals = Signals()
 
     @classmethod

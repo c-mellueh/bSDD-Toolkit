@@ -9,7 +9,7 @@ from . import ui
 
 
 def connect():
-    core.connect_signals(tool.PropertyEditor, tool.ClassPropertyEditor, tool.Project)
+    core.connect_signals(tool.PropertyEditorWidget, tool.ClassPropertyEditorWidget, tool.Project)
 
 
 def retranslate_ui():
@@ -22,21 +22,28 @@ def on_new_project():
 
 def create_property_creator(blueprint: dict):
     core.create_property_creator(
-        blueprint, tool.PropertyEditor, tool.MainWindow, tool.Project, tool.Util
+        blueprint, tool.PropertyEditorWidget, tool.MainWindowWidget, tool.Project, tool.Util
     )
 
 
 def create_window(bsdd_property: BsddProperty, parent: QWidget | None):
-    core.open_edit_window(bsdd_property, parent, tool.PropertyEditor, tool.MainWindow, tool.Project)
+    core.open_edit_window(
+        bsdd_property, parent, tool.PropertyEditorWidget, tool.MainWindowWidget, tool.Project
+    )
 
 
 def widget_created(widget: ui.PropertyEditor):
-    core.register_widget(widget, tool.PropertyEditor, tool.AllowedValuesTableView)
+    core.register_widget(widget, tool.PropertyEditorWidget, tool.AllowedValuesTableView)
     core.add_fields_to_widget(
-        widget, tool.PropertyEditor, tool.AllowedValuesTableView, tool.RelationshipEditor
+        widget,
+        tool.PropertyEditorWidget,
+        tool.AllowedValuesTableView,
+        tool.RelationshipEditorWidget,
     )
-    core.add_validator_functions_to_widget(widget, tool.PropertyEditor, tool.Util, tool.Project)
+    core.add_validator_functions_to_widget(
+        widget, tool.PropertyEditorWidget, tool.Util, tool.Project
+    )
 
 
 def widget_closed(widget: ui.PropertyEditor):
-    core.unregister_widget(widget, tool.PropertyEditor, tool.AllowedValuesTableView)
+    core.unregister_widget(widget, tool.PropertyEditorWidget, tool.AllowedValuesTableView)

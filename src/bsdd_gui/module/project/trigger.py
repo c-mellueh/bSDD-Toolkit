@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING
 
 
 def connect():
-    core.create_main_menu_actions(tool.Project, tool.MainWindow)
+    core.create_main_menu_actions(tool.Project, tool.MainWindowWidget)
     core.connect_signals(tool.Project)
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.Project, tool.MainWindow)
+    core.retranslate_ui(tool.Project, tool.MainWindowWidget)
 
 
 def on_new_project():
@@ -19,12 +19,16 @@ def on_new_project():
 
 
 def new_clicked():
-    core.new_file_clicked(tool.Project, tool.DictionaryEditor, tool.Popups, tool.MainWindow)
+    core.new_file_clicked(
+        tool.Project, tool.DictionaryEditorWidget, tool.Popups, tool.MainWindowWidget
+    )
     pass
 
 
 def open_clicked():
-    core.open_file_clicked(tool.Project, tool.Appdata, tool.MainWindow, tool.Popups, tool.Plugins)
+    core.open_file_clicked(
+        tool.Project, tool.Appdata, tool.MainWindowWidget, tool.Popups, tool.Plugins
+    )
     pass
 
 
@@ -34,10 +38,10 @@ def add_clicked():
 
 
 def save_clicked():
-    core.save_clicked(tool.Project, tool.Popups, tool.Appdata, tool.MainWindow)
+    core.save_clicked(tool.Project, tool.Popups, tool.Appdata, tool.MainWindowWidget)
     pass
 
 
 def save_as_clicked():
-    core.save_as_clicked(tool.Project, tool.Popups, tool.Appdata, tool.MainWindow)
+    core.save_as_clicked(tool.Project, tool.Popups, tool.Appdata, tool.MainWindowWidget)
     pass

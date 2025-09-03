@@ -19,7 +19,7 @@ class Signals(ViewSignals):
     property_info_requested = Signal(BsddClassProperty)
 
 
-class ClassPropertyTable(ItemViewTool):
+class ClassPropertyTableView(ItemViewTool):
     signals = Signals()
 
     @classmethod

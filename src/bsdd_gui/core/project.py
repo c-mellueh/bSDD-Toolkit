@@ -34,7 +34,7 @@ def open_project(path, project: Type[tool.Project]):
     return proj
 
 
-def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool.MainWindow]):
+def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool.MainWindowWidget]):
     from bsdd_gui.module.project import trigger
 
     mw_ui = main_window.get()
@@ -54,7 +54,7 @@ def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool
     project.set_action(mw_ui, "save_as_clicked", action)
 
 
-def retranslate_ui(project: Type[tool.Project], main_window: Type[tool.MainWindow]):
+def retranslate_ui(project: Type[tool.Project], main_window: Type[tool.MainWindowWidget]):
     mw_ui = main_window.get()
 
     action = project.get_action(mw_ui, "new")
@@ -84,9 +84,9 @@ def retranslate_ui(project: Type[tool.Project], main_window: Type[tool.MainWindo
 
 def new_file_clicked(
     project: Type[tool.Project],
-    dictionary_editor: Type[tool.DictionaryEditor],
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
     popups: Type[tool.Popups],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     def validate():
         if dictionary_editor.all_inputs_are_valid(widget):
@@ -115,7 +115,7 @@ def new_file_clicked(
 def open_file_clicked(
     project_tool: Type[tool.Project],
     appdata: Type[tool.Appdata],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
     popups: Type[tool.Popups],
     plugins: Type[tool.Plugins],
 ):
@@ -138,7 +138,7 @@ def save_clicked(
     proejct: Type[tool.Project],
     popups: Type[tool.Popups],
     appdata: Type[tool.Appdata],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     save_path = appdata.get_path(SAVE_PATH)
     if not os.path.exists(save_path) or not save_path.endswith("json"):
@@ -151,7 +151,7 @@ def save_as_clicked(
     project: Type[tool.Project],
     popups: Type[tool.Popups],
     appdata: Type[tool.Appdata],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     path = appdata.get_path(SAVE_PATH)
     title = QCoreApplication.translate("Project", "Save Project")

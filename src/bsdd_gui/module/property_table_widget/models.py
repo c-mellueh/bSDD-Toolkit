@@ -18,7 +18,7 @@ from bsdd_gui.presets.models_presets import ItemModel
 class PropertyTableModel(ItemModel):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(tool.PropertyTable, None, *args, **kwargs)
+        super().__init__(tool.PropertyTableWidget, None, *args, **kwargs)
 
     @property
     def bsdd_dictionary(self):
@@ -48,7 +48,7 @@ class PropertyTableModel(ItemModel):
 class ClassTableModel(ItemModel):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(tool.PropertyTable, None, *args, **kwargs)
+        super().__init__(tool.PropertyTableWidget, None, *args, **kwargs)
         self._data = None
 
     @property
@@ -57,7 +57,7 @@ class ClassTableModel(ItemModel):
 
     @property
     def active_property(self) -> BsddProperty:
-        return tool.PropertyTable.get_active_property()
+        return tool.PropertyTableWidget.get_active_property()
 
     @property
     def active_classes(self) -> list[BsddClass]:

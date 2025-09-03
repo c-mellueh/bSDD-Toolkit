@@ -40,7 +40,7 @@ class Signals(WidgetSignals):
     property_specific_redraw_requested = Signal(ui.ClassPropertyEditor)
 
 
-class ClassPropertyEditor(WidgetTool):
+class ClassPropertyEditorWidget(WidgetTool):
     signals = Signals()
 
     @classmethod

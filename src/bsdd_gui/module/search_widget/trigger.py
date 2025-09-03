@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 
 def connect():
-    core.connect_signals(tool.Search)
+    core.connect_signals(tool.SearchWidget)
 
 
 def on_new_project():
@@ -14,15 +14,15 @@ def on_new_project():
 
 
 def refresh_window(dialog):
-    core.update_filter_table(dialog, tool.Search)
+    core.update_filter_table(dialog, tool.SearchWidget)
 
 
 def item_double_clicked(dialog):
-    core.save_selected_element(dialog, tool.Search)
+    core.save_selected_element(dialog, tool.SearchWidget)
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.Search)
+    core.retranslate_ui(tool.SearchWidget)
 
 
 def set_strict_state(state: bool):

@@ -15,7 +15,7 @@ from bsdd_gui.module.logging import constants
 def create_logger(
     logging_tool: Type[tool.Logging],
     util: Type[tool.Util],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     log_dir_path = logging_tool.get_logging_directory()
     if not os.path.exists(log_dir_path):

@@ -20,7 +20,7 @@ class Signals(WidgetSignals):
     new_property_requested = Signal(object)  # blueprint: dict[] with property values
 
 
-class PropertyEditor(WidgetTool):
+class PropertyEditorWidget(WidgetTool):
     signals = Signals()
 
     @classmethod

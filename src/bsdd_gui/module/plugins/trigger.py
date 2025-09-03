@@ -6,7 +6,7 @@ from . import ui
 
 
 def connect():
-    tool.Settings.add_page_to_toolbox(
+    tool.SettingsWidget.add_page_to_toolbox(
         ui.SettingsWidget,
         "pagePlugins",
         lambda: core.settings_accepted(tool.Plugins),

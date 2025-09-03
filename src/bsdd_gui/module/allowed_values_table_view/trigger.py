@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.AllowedValuesTableView, tool.ClassPropertyEditor)
+    core.connect_signals(tool.AllowedValuesTableView, tool.ClassPropertyEditorWidget)
 
 
 def retranslate_ui():

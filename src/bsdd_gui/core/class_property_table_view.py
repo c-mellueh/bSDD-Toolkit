@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 
 def connect_signals(
-    property_table: Type[tool.ClassPropertyTable],
-    class_property_editor: Type[tool.ClassPropertyEditor],
+    property_table: Type[tool.ClassPropertyTableView],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
 ):
     property_table.connect_internal_signals()
     class_property_editor.signals.new_class_property_created.connect(
@@ -20,15 +20,17 @@ def connect_signals(
     )
 
 
-def rentranslate_ui(property_table: Type[tool.ClassPropertyTable]):
+def rentranslate_ui(property_table: Type[tool.ClassPropertyTableView]):
     pass
 
 
-def register_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTable]):
+def register_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]):
     property_table.register_view(view)
 
 
-def add_columns_to_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTable]):
+def add_columns_to_view(
+    view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]
+):
 
     sort_model, model = property_table.create_model(None)
     property_table.add_column_to_table(model, "Name", lambda a: a.Code)
@@ -40,18 +42,20 @@ def add_columns_to_view(view: ui.ClassPropertyTable, property_table: Type[tool.C
 
 
 def add_context_menu_to_view(
-    view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTable]
+    view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]
 ):
     pass  # TODO
 
 
-def create_context_menu(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTable]):
+def create_context_menu(
+    view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]
+):
     pass
 
 
 def connect_view(
     view: ui.ClassPropertyTable,
-    property_table: Type[tool.ClassPropertyTable],
+    property_table: Type[tool.ClassPropertyTableView],
 ):
     def emit_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)
@@ -64,13 +68,13 @@ def connect_view(
     view.doubleClicked.connect(emit_info_requested)
 
 
-def reset_views(property_table: Type[tool.ClassPropertyTable], project: Type[tool.Project]):
+def reset_views(property_table: Type[tool.ClassPropertyTableView], project: Type[tool.Project]):
     for view in property_table.get_widgets():
         property_table.reset_view(view)
 
 
 def connect_to_main_window(
-    property_table: Type[tool.ClassPropertyTable], main_window: Type[tool.MainWindow]
+    property_table: Type[tool.ClassPropertyTableView], main_window: Type[tool.MainWindowWidget]
 ):
 
     def reset_property(new_pset_name: str):
@@ -102,9 +106,9 @@ def connect_to_main_window(
 
 
 def reset_models(
-    property_table: Type[tool.ClassPropertyTable],
+    property_table: Type[tool.ClassPropertyTableView],
     project: Type[tool.Project],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     for model in property_table.get_models():
         model.bsdd_data = project.get()

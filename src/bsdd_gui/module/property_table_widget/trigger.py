@@ -10,54 +10,58 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_to_main_menu(tool.PropertyTable, tool.MainWindow)
+    core.connect_to_main_menu(tool.PropertyTableWidget, tool.MainWindowWidget)
     core.connect_signals(
-        tool.PropertyTable, tool.PropertyEditor, tool.MainWindow, tool.ClassTree, tool.Project
+        tool.PropertyTableWidget,
+        tool.PropertyEditorWidget,
+        tool.MainWindowWidget,
+        tool.ClassTreeView,
+        tool.Project,
     )
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.PropertyTable, tool.MainWindow, tool.Util)
+    core.retranslate_ui(tool.PropertyTableWidget, tool.MainWindowWidget, tool.Util)
     pass
 
 
 def create_widget(parent_widget):
-    core.create_widget(parent_widget, tool.PropertyTable, tool.Util, tool.MainWindow)
+    core.create_widget(parent_widget, tool.PropertyTableWidget, tool.Util, tool.MainWindowWidget)
 
 
 def widget_created(widget: ui.PropertyWidget):
 
     view = widget.tv_properties
-    core.register_view(view, tool.PropertyTable)
-    core.add_columns_to_view(view, tool.PropertyTable)
-    core.add_context_menu_to_view(view, tool.PropertyTable)
-    core.connect_view(view, tool.PropertyTable, tool.Util)
+    core.register_view(view, tool.PropertyTableWidget)
+    core.add_columns_to_view(view, tool.PropertyTableWidget)
+    core.add_context_menu_to_view(view, tool.PropertyTableWidget)
+    core.connect_view(view, tool.PropertyTableWidget, tool.Util)
 
     view = widget.tv_classes
-    core.register_view(view, tool.PropertyTable)
-    core.add_columns_to_view(view, tool.PropertyTable)
-    core.add_context_menu_to_view(view, tool.PropertyTable)
-    core.connect_view(view, tool.PropertyTable, tool.Util)
+    core.register_view(view, tool.PropertyTableWidget)
+    core.add_columns_to_view(view, tool.PropertyTableWidget)
+    core.add_context_menu_to_view(view, tool.PropertyTableWidget)
+    core.connect_view(view, tool.PropertyTableWidget, tool.Util)
 
-    core.register_widget(widget, tool.PropertyTable)
+    core.register_widget(widget, tool.PropertyTableWidget)
 
 
 def widget_removed(widget: ui.PropertyWidget):
-    core.unregister_widget(widget, tool.PropertyTable)
-    core.remove_view(widget.tv_properties, tool.PropertyTable)
-    core.remove_view(widget.tv_classes, tool.PropertyTable)
+    core.unregister_widget(widget, tool.PropertyTableWidget)
+    core.remove_view(widget.tv_properties, tool.PropertyTableWidget)
+    core.remove_view(widget.tv_classes, tool.PropertyTableWidget)
 
 
 def search_requested(view: QTreeView):
-    core.search_property(view, tool.PropertyTable, tool.Search, tool.Project)
+    core.search_property(view, tool.PropertyTableWidget, tool.SearchWidget, tool.Project)
 
 
 def context_menu_requested(view: views.PropertyTable | views.ClassTable, pos):
-    core.create_context_menu(view, pos, tool.PropertyTable)
+    core.create_context_menu(view, pos, tool.PropertyTableWidget)
 
 
 def delete_selection(view: QTreeView):
-    core.delete_selection(view, tool.PropertyTable, tool.Project)
+    core.delete_selection(view, tool.PropertyTableWidget, tool.Project)
 
 
 def on_new_project():

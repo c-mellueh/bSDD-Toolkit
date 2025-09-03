@@ -24,12 +24,12 @@ class Signals(QObject):
     new_property_requested = Signal()
 
 
-class MainWindow:
+class MainWindowWidget:
     signals = Signals()
 
     @classmethod
     def get_properties(cls) -> MainWindowWidgetProperties:
-        return bsdd_gui.MainWindowProperties
+        return bsdd_gui.MainWindowWidgetProperties
 
     @classmethod
     def connect_internal_signals(cls):

@@ -4,7 +4,7 @@ from . import ui
 
 
 def connect():
-    core.create_logger(tool.Logging, tool.Util, tool.MainWindow)
+    core.create_logger(tool.Logging, tool.Util, tool.MainWindowWidget)
     # tool.Settings.add_page_to_toolbox(
     #     ui.SettingsWidget,
     #     "pageLogging",

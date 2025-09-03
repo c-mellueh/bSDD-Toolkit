@@ -3,7 +3,7 @@ from bsdd_gui.core import console_widget as core
 
 
 def connect():
-    core.create_console_trigger(tool.MainWindow, tool.Console)
+    core.create_console_trigger(tool.MainWindowWidget, tool.ConsoleWidget)
 
 
 def on_new_project():
@@ -15,4 +15,4 @@ def retranslate_ui():
 
 
 def close_console():
-    core.close(tool.Console)
+    core.close(tool.ConsoleWidget)

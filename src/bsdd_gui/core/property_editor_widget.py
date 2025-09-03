@@ -13,8 +13,8 @@ if TYPE_CHECKING:
 def open_edit_window(
     bsdd_property: BsddClassProperty,
     parent_widget: QWidget | None,
-    property_editor: Type[tool.PropertyEditor],
-    main_window: Type[tool.MainWindow],
+    property_editor: Type[tool.PropertyEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ):
     if parent_widget is None:
@@ -37,8 +37,8 @@ def open_edit_window(
 
 
 def connect_signals(
-    property_editor: Type[tool.PropertyEditor],
-    class_property_editor: Type[tool.ClassPropertyEditor],
+    property_editor: Type[tool.PropertyEditorWidget],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
     project: Type[tool.Project],
 ):
     property_editor.connect_internal_signals()
@@ -54,7 +54,7 @@ def connect_signals(
 
 def unregister_widget(
     widget: ui.PropertyEditor,
-    property_editor: Type[tool.PropertyEditor],
+    property_editor: Type[tool.PropertyEditorWidget],
     allowed_values_table: Type[tool.AllowedValuesTableView],
 ):
     property_editor.unregister_widget(widget)
@@ -63,7 +63,7 @@ def unregister_widget(
 
 def register_widget(
     widget: ui.PropertyEditor,
-    property_editor: Type[tool.PropertyEditor],
+    property_editor: Type[tool.PropertyEditorWidget],
     allowed_values_table: Type[tool.AllowedValuesTableView],
 ):
     property_editor.register_widget(widget)
@@ -73,9 +73,9 @@ def register_widget(
 
 def add_fields_to_widget(
     widget: ui.PropertyEditor,
-    property_editor: Type[tool.PropertyEditor],
+    property_editor: Type[tool.PropertyEditorWidget],
     allowed_values_table: Type[tool.AllowedValuesTableView],
-    relationship_editor: Type[tool.RelationshipEditor],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
 ):
     property_editor.register_basic_field(widget, widget.le_code, "Code")
     property_editor.register_basic_field(widget, widget.le_name, "Name")
@@ -127,7 +127,7 @@ def add_fields_to_widget(
 
 def add_validator_functions_to_widget(
     widget: ui.PropertyEditor,
-    property_editor: Type[tool.PropertyEditor],
+    property_editor: Type[tool.PropertyEditorWidget],
     util: Type[tool.Util],
     project: Type[tool.Project],
 ):
@@ -153,8 +153,8 @@ def add_validator_functions_to_widget(
 
 def create_property_creator(
     blueprint: dict,
-    property_editor: Type[tool.PropertyEditor],
-    main_window: Type[tool.MainWindow],
+    property_editor: Type[tool.PropertyEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):

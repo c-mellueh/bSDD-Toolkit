@@ -10,34 +10,38 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.PropertySetTable)
-    core.connect_to_main_window(tool.PropertySetTable, tool.MainWindow)
-    core.define_context_menu(tool.MainWindow, tool.PropertySetTable)
+    core.connect_signals(tool.PropertySetTableView)
+    core.connect_to_main_window(tool.PropertySetTableView, tool.MainWindowWidget)
+    core.define_context_menu(tool.MainWindowWidget, tool.PropertySetTableView)
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.PropertySetTable)
+    core.retranslate_ui(tool.PropertySetTableView)
     pass
 
 
 def on_new_project():
-    core.reset_models(tool.PropertySetTable, tool.Project, tool.MainWindow)
+    core.reset_models(tool.PropertySetTableView, tool.Project, tool.MainWindowWidget)
 
 
 def view_created(view: ui.PsetTableView):
-    core.register_view(view, tool.PropertySetTable)
-    core.add_columns_to_view(view, tool.PropertySetTable, tool.Project, tool.MainWindow, tool.Util)
-    core.add_context_menu_to_view(view, tool.PropertySetTable)
-    core.connect_view(view, tool.PropertySetTable, tool.Project, tool.MainWindow)
+    core.register_view(view, tool.PropertySetTableView)
+    core.add_columns_to_view(
+        view, tool.PropertySetTableView, tool.Project, tool.MainWindowWidget, tool.Util
+    )
+    core.add_context_menu_to_view(view, tool.PropertySetTableView)
+    core.connect_view(view, tool.PropertySetTableView, tool.Project, tool.MainWindowWidget)
 
 
 def new_property_set_requested(bsdd_class: BsddClass):
-    core.create_new_property_set(bsdd_class, tool.PropertySetTable, tool.Util)
+    core.create_new_property_set(bsdd_class, tool.PropertySetTableView, tool.Util)
 
 
 def context_menu_requested(view: ui.PsetTableView, pos):
-    core.create_context_menu(view, pos, tool.PropertySetTable)
+    core.create_context_menu(view, pos, tool.PropertySetTableView)
 
 
 def delete_selection(view: ui.PsetTableView):
-    core.delete_selection(view, tool.PropertySetTable, tool.ClassPropertyTable, tool.MainWindow)
+    core.delete_selection(
+        view, tool.PropertySetTableView, tool.ClassPropertyTableView, tool.MainWindowWidget
+    )

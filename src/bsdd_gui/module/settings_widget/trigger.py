@@ -5,11 +5,11 @@ from bsdd_gui.core import settings_widget as core
 
 
 def connect():
-    core.create_main_menu_actions(tool.Settings, tool.MainWindow)
+    core.create_main_menu_actions(tool.SettingsWidget, tool.MainWindowWidget)
 
 
 def open_window():
-    core.open_window(tool.Settings)
+    core.open_window(tool.SettingsWidget)
 
 
 def on_new_project():
@@ -17,4 +17,4 @@ def on_new_project():
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.Settings, tool.Util)
+    core.retranslate_ui(tool.SettingsWidget, tool.Util)

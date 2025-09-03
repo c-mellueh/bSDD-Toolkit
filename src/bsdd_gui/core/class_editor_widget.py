@@ -12,10 +12,10 @@ if TYPE_CHECKING:
 
 def register_widget(
     widget: ui.ClassEditor,
-    class_editor: Type[tool.ClassEditor],
+    class_editor: Type[tool.ClassEditorWidget],
     project: Type[tool.Project],
     util: Type[tool.Util],
-    relationship_editor: Type[tool.RelationshipEditor],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
 ):
     class_editor.register_widget(widget)
     class_editor.register_basic_field(widget, widget.le_name, "Name")
@@ -74,14 +74,14 @@ def register_widget(
     relationship_editor.init_widget(widget.relationship_editor, widget.bsdd_data, mode="dialog")
 
 
-def connect_signals(class_editor: Type[tool.ClassEditor], project: Type[tool.Project]):
+def connect_signals(class_editor: Type[tool.ClassEditorWidget], project: Type[tool.Project]):
     class_editor.connect_signals()
     class_editor.signals.new_class_created.connect(project.signals.class_added.emit)
 
 
 def connect_to_main_window(
-    class_editor: Type[tool.ClassEditor],
-    main_window: Type[tool.MainWindow],
+    class_editor: Type[tool.ClassEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ):
     def emit_class_info_requested(index: QModelIndex):
@@ -106,8 +106,8 @@ def connect_to_main_window(
 
 def create_new_class(
     parent: BsddClass | None,
-    class_editor: Type[tool.ClassEditor],
-    main_window: Type[tool.MainWindow],
+    class_editor: Type[tool.ClassEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
 ):
 
     new_class = BsddClass(Code="Code", Name="Name", ClassType="Class")
@@ -125,8 +125,8 @@ def create_new_class(
 
 def copy_class(
     old_class: BsddClass,
-    class_editor: Type[tool.ClassEditor],
-    main_window: Type[tool.MainWindow],
+    class_editor: Type[tool.ClassEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
 ):
     if not old_class:
         return
@@ -143,7 +143,9 @@ def copy_class(
 
 
 def open_class_editor(
-    bsdd_class: BsddClass, class_editor: Type[tool.ClassEditor], main_window: Type[tool.MainWindow]
+    bsdd_class: BsddClass,
+    class_editor: Type[tool.ClassEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
 ):
     dialog = class_editor.create_class_editor_dialog(bsdd_class, main_window.get())
     widget = dialog._editor_widget
@@ -157,10 +159,10 @@ def open_class_editor(
 
 def group_classes(
     bsdd_classes: list[BsddClass],
-    class_editor: Type[tool.ClassEditor],
-    main_window: Type[tool.MainWindow],
+    class_editor: Type[tool.ClassEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
-    class_tree: Type[tool.ClassTree],
+    class_tree: Type[tool.ClassTreeView],
 ):
     new_class = BsddClass(Code="GroupCode", Name="GroupName", ClassType="Class")
     parent = class_utils.shared_parent(bsdd_classes, dictionary=project.get(), mode="lowest")

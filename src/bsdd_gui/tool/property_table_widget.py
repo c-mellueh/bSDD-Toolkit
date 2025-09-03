@@ -17,7 +17,7 @@ from bsdd_gui.module.property_table_widget import ui, models, trigger, views
 
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_table_widget.prop import PropertyTableViewProperties
+    from bsdd_gui.module.property_table_widget.prop import PropertyTableWidgetProperties
 
 from bsdd_gui.presets.tool_presets import (
     ItemViewTool,
@@ -38,11 +38,11 @@ class Signals(ViewSignals, WidgetSignals):
     search_requested = Signal(QWidget)
 
 
-class PropertyTable(ItemViewTool, ActionTool, WidgetTool):
+class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> PropertyTableViewProperties:
+    def get_properties(cls) -> PropertyTableWidgetProperties:
         return bsdd_gui.PropertyTableProperties
 
     @classmethod

@@ -26,11 +26,11 @@ class AllowedValuesModel(ItemModel):
 
     @property
     def active_class(self):
-        return tool.MainWindow.get_active_class()
+        return tool.MainWindowWidget.get_active_class()
 
     @property
     def active_pset(self):
-        return tool.MainWindow.get_active_pset()
+        return tool.MainWindowWidget.get_active_pset()
 
     def columnCount(self, /, parent=...):
         res = super().columnCount(parent)

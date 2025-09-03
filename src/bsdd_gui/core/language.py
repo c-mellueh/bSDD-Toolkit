@@ -32,7 +32,7 @@ def set_language(
     code: str | None,
     language: Type[tool.Language],
     appdata: Type[tool.Appdata],
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
     plugings: Type[tool.Plugins],
 ):
     """

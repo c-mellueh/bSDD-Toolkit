@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 def unregister_widget(
     widget: ui.ClassPropertyEditor,
-    class_property_editor: Type[tool.ClassPropertyEditor],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
     allowed_table_view: Type[tool.AllowedValuesTableView],
 ):
     class_property_editor.unregister_widget(widget)
@@ -26,7 +26,7 @@ def unregister_widget(
 
 
 def register_widget(
-    widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditor]
+    widget: ui.ClassPropertyEditor, class_property_editor: Type[tool.ClassPropertyEditorWidget]
 ):
     class_property_editor.register_widget(widget)
     widget.tv_allowed_values.model().sourceModel().bsdd_data = widget.bsdd_data
@@ -35,7 +35,7 @@ def register_widget(
 
 def add_fields_to_widget(
     widget: ui.ClassPropertyEditor,
-    class_property_editor: Type[tool.ClassPropertyEditor],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
     project: Type[tool.Project],
 ):
     class_property_editor.register_basic_field(widget, widget.le_code, "Code")
@@ -56,7 +56,7 @@ def add_fields_to_widget(
 
 def add_validators_to_widget(
     widget: ui.ClassPropertyEditor,
-    class_property_editor: Type[tool.ClassPropertyEditor],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
@@ -81,7 +81,7 @@ def add_validators_to_widget(
 
 def update_property_specific_fields(
     widget: ui.ClassPropertyEditor,
-    class_property_editor: Type[tool.ClassPropertyEditor],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
     allowed_value_table: Type[tool.AllowedValuesTableView],
 ):
     if not widget:
@@ -94,8 +94,8 @@ def update_property_specific_fields(
 
 def open_edit_window(
     bsdd_class_property: BsddClassProperty,
-    class_property_editor: Type[tool.ClassPropertyEditor],
-    main_window: Type[tool.MainWindow],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ):
     if window := class_property_editor.get_window(bsdd_class_property):
@@ -114,7 +114,7 @@ def open_edit_window(
 
 
 def splitter_settings_accepted(
-    class_property_editor: Type[tool.ClassPropertyEditor], appdata: Type[tool.Appdata]
+    class_property_editor: Type[tool.ClassPropertyEditorWidget], appdata: Type[tool.Appdata]
 ):
     widget = class_property_editor.get_splitter_settings_widget()
     return  # TODO:fix
@@ -130,10 +130,10 @@ def splitter_settings_accepted(
 
 
 def connect_signals(
-    class_property_editor: Type[tool.ClassPropertyEditor],
-    property_table: Type[tool.ClassPropertyTable],
-    main_window: Type[tool.MainWindow],
-    property_editor: Type[tool.PropertyEditor],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
+    property_table: Type[tool.ClassPropertyTableView],
+    main_window: Type[tool.MainWindowWidget],
+    property_editor: Type[tool.PropertyEditorWidget],
 ):
     property_table.signals.property_info_requested.connect(class_property_editor.show_property_info)
     class_property_editor.connect_internal_signals()
@@ -155,10 +155,10 @@ def connect_signals(
 
 
 def create_class_property_creator(
-    class_property_editor: Type[tool.ClassPropertyEditor],
-    main_window: Type[tool.MainWindow],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
-    property_set_table: Type[tool.PropertySetTable],
+    property_set_table: Type[tool.PropertySetTableView],
 ):
     code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
     bsdd_class = main_window.get_active_class()

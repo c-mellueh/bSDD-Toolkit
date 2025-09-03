@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 # list all modules which are defined in the modules folder
 module = importlib.import_module("bsdd_gui.module")
 # define Modules which should be initialized before the other Modules
-preregister = ["main_window"]
+preregister = ["main_window_widget"]
 
 # Import Modules
 modules: list[tuple[str, ModuleType]] = list()

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.settings_widget.prop import SettingsWidgetProperties
 
 
-class Settings:
+class SettingsWidget:
     @classmethod
     def get_properties(cls) -> SettingsWidgetProperties:
         return bsdd_gui.SettingsProperties

@@ -12,11 +12,11 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.RelationshipEditor, tool.Project, tool.ClassEditor)
+    core.connect_signals(tool.RelationshipEditorWidget, tool.Project, tool.ClassEditorWidget)
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.RelationshipEditor)
+    core.retranslate_ui(tool.RelationshipEditorWidget)
 
 
 def on_new_project():
@@ -29,21 +29,21 @@ def widget_created(
     mode: Literal["dialog"] | Literal["live"],
 ):
     view = widget.tv_relations
-    core.register_view(view, tool.RelationshipEditor)
-    core.add_columns_to_view(view, data, mode, tool.RelationshipEditor)
-    core.add_context_menu_to_view(view, tool.RelationshipEditor)
-    core.connect_view(view, tool.RelationshipEditor)
+    core.register_view(view, tool.RelationshipEditorWidget)
+    core.add_columns_to_view(view, data, mode, tool.RelationshipEditorWidget)
+    core.add_context_menu_to_view(view, tool.RelationshipEditorWidget)
+    core.connect_view(view, tool.RelationshipEditorWidget)
 
-    core.register_widget(widget, tool.RelationshipEditor)
-    core.connect_widget(widget, data, mode, tool.RelationshipEditor, tool.Project)
-    core.add_field_validators(widget, tool.RelationshipEditor, tool.Util, tool.Project)
-    core.retranslate_ui(tool.RelationshipEditor)
+    core.register_widget(widget, tool.RelationshipEditorWidget)
+    core.connect_widget(widget, data, mode, tool.RelationshipEditorWidget, tool.Project)
+    core.add_field_validators(widget, tool.RelationshipEditorWidget, tool.Util, tool.Project)
+    core.retranslate_ui(tool.RelationshipEditorWidget)
 
 
 def context_menu_requested(view: QTableView, pos: QPoint):
-    core.create_context_menu(view, pos, tool.RelationshipEditor)
+    core.create_context_menu(view, pos, tool.RelationshipEditorWidget)
 
 
 def widget_closed(widget: ui.RelationshipWidget):
-    core.remove_widget(widget, tool.RelationshipEditor)
-    core.remove_view(widget.tv_relations, tool.RelationshipEditor)
+    core.remove_widget(widget, tool.RelationshipEditorWidget)
+    core.remove_view(widget.tv_relations, tool.RelationshipEditorWidget)

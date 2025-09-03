@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_to_main_window(tool.ClassEditor, tool.MainWindow, tool.Project)
-    core.connect_signals(tool.ClassEditor, tool.Project)
+    core.connect_to_main_window(tool.ClassEditorWidget, tool.MainWindowWidget, tool.Project)
+    core.connect_signals(tool.ClassEditorWidget, tool.Project)
 
 
 def retranslate_ui():
@@ -23,24 +23,28 @@ def on_new_project():
 
 
 def open_class_editor(bsdd_class: BsddClass):
-    core.open_class_editor(bsdd_class, tool.ClassEditor, tool.MainWindow)
+    core.open_class_editor(bsdd_class, tool.ClassEditorWidget, tool.MainWindowWidget)
 
 
 def copy_class(bsdd_class: BsddClass):
-    core.copy_class(bsdd_class, tool.ClassEditor, tool.MainWindow)
+    core.copy_class(bsdd_class, tool.ClassEditorWidget, tool.MainWindowWidget)
 
 
 def create_new_class(parent_class: BsddClass | None):
-    core.create_new_class(parent_class, tool.ClassEditor, tool.MainWindow)
+    core.create_new_class(parent_class, tool.ClassEditorWidget, tool.MainWindowWidget)
 
 
 def group_classes(bsdd_classes: list[BsddClass]):
     core.group_classes(
-        bsdd_classes, tool.ClassEditor, tool.MainWindow, tool.Project, tool.ClassTree
+        bsdd_classes,
+        tool.ClassEditorWidget,
+        tool.MainWindowWidget,
+        tool.Project,
+        tool.ClassTreeView,
     )
 
 
 def class_editor_created(class_editor: ui.ClassEditor):
     core.register_widget(
-        class_editor, tool.ClassEditor, tool.Project, tool.Util, tool.RelationshipEditor
+        class_editor, tool.ClassEditorWidget, tool.Project, tool.Util, tool.RelationshipEditorWidget
     )

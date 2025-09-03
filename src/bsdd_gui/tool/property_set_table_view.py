@@ -19,7 +19,7 @@ class Signals(ViewSignals):
     rename_selection_requested = Signal(ui.PsetTableView)
 
 
-class PropertySetTable(ItemViewTool):
+class PropertySetTableView(ItemViewTool):
     signals = Signals()
 
     @classmethod

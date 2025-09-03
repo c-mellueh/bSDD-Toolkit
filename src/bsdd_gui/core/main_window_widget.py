@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 def create_main_window(
     application: QApplication,
-    main_window: Type[tool.MainWindow],
+    main_window: Type[tool.MainWindowWidget],
 ):
     """
     Creates the main window from the given application and hides the console.
@@ -22,7 +22,9 @@ def create_main_window(
     main_window.install_validation_styles(application)
 
 
-def connect_main_window(main_window: Type[tool.MainWindow], class_tree: Type[tool.ClassTree]):
+def connect_main_window(
+    main_window: Type[tool.MainWindowWidget], class_tree: Type[tool.ClassTreeView]
+):
     main_window.signals.active_class_changed.connect(
         lambda c: main_window.set_class_text(c.Name if c is not None else "")
     )

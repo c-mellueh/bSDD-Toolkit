@@ -31,7 +31,7 @@ class RelationshipModel(ItemModel):
         *args,
         **kwargs,
     ):
-        super().__init__(tool.RelationshipEditor, data, *args, **kwargs)
+        super().__init__(tool.RelationshipEditorWidget, data, *args, **kwargs)
         self.bsdd_data: BsddClass | BsddProperty
         self.mode: Literal["dialog"] | Literal["live"] = None
         self.virtual_append: list[BsddClassRelation | BsddPropertyRelation] = []

@@ -17,7 +17,7 @@ from bsdd_gui.presets.models_presets import ItemModel
 class ClassPropertyTableModel(ItemModel):
 
     def __init__(self, bsdd_data, *args, **kwargs):
-        super().__init__(tool.ClassPropertyTable, bsdd_data, *args, **kwargs)
+        super().__init__(tool.ClassPropertyTableView, bsdd_data, *args, **kwargs)
 
     @property
     def bsdd_dictionary(self):
@@ -25,11 +25,11 @@ class ClassPropertyTableModel(ItemModel):
 
     @property
     def active_class(self):
-        return tool.MainWindow.get_active_class()
+        return tool.MainWindowWidget.get_active_class()
 
     @property
     def active_pset(self):
-        return tool.MainWindow.get_active_pset()
+        return tool.MainWindowWidget.get_active_pset()
 
     def rowCount(self, parent=QModelIndex()):
         if not self.active_class:
@@ -39,7 +39,9 @@ class ClassPropertyTableModel(ItemModel):
         if parent.isValid():
             return 0
         rc = len(
-            tool.ClassPropertyTable.filter_properties_by_pset(self.active_class, self.active_pset)
+            tool.ClassPropertyTableView.filter_properties_by_pset(
+                self.active_class, self.active_pset
+            )
         )
         return rc
 
@@ -49,7 +51,7 @@ class ClassPropertyTableModel(ItemModel):
 
         if 0 > row >= len(self.rowCount()):
             return QModelIndex()
-        bsdd_properties = tool.ClassPropertyTable.filter_properties_by_pset(
+        bsdd_properties = tool.ClassPropertyTableView.filter_properties_by_pset(
             self.active_class, self.active_pset
         )
         bsdd_property = bsdd_properties[row]

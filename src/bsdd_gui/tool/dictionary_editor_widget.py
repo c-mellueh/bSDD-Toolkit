@@ -27,7 +27,7 @@ class Signals(WidgetSignals):
     pass
 
 
-class DictionaryEditor(WidgetTool, ActionTool):
+class DictionaryEditorWidget(WidgetTool, ActionTool):
     signals = Signals()
 
     @classmethod
