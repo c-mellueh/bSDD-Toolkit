@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 import logging
 
 import bsdd_gui
@@ -24,7 +24,7 @@ from bsdd_gui.presets.tool_presets import (
     ItemViewTool,
     ViewSignals,
     FieldSignals,
-    FieldTool,
+    WidgetTool,
     ActionTool,
 )
 
@@ -38,7 +38,7 @@ class Signals(ViewSignals, FieldSignals):
     search_requested = Signal(QWidget)
 
 
-class PropertyTableWidget(ItemViewTool, ActionTool, FieldTool):
+class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     signals = Signals()
 
     @classmethod
@@ -57,29 +57,29 @@ class PropertyTableWidget(ItemViewTool, ActionTool, FieldTool):
         return trigger
 
     @classmethod
+    def _get_widget_class(cls) -> Type[ui.PropertyWidget]:
+        return ui.PropertyWidget
+
+    @classmethod
     def delete_selection(cls, view: views.ClassTable | views.PropertyTable):
         trigger.delete_selection(view)
 
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.widget_requested.connect(lambda _, p: trigger.create_widget(p))
         cls.signals.selection_changed.connect(cls.on_selection_change)
         cls.signals.search_requested.connect(trigger.search_requested)
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.PropertyWidget):
-
+        super().connect_widget_signals(widget)
         w = widget
 
-        def handle_double_click(index: QModelIndex):
+        def handle_property_double_click(index: QModelIndex):
             proxy_model: models.SortModel = w.tv_properties.model()
             i = proxy_model.mapToSource(index)
             bsdd_property = i.siblingAtColumn(0).internalPointer()
             cls.signals.property_info_requested.emit(bsdd_property, w)
-
-        widget.tv_properties.doubleClicked.connect(handle_double_click)
-        widget.tb_new.clicked.connect(lambda _, w=widget: cls.signals.new_property_requested.emit())
 
         def handle_class_double_click(index: QModelIndex):
             proxy_model: models.SortModel = w.tv_classes.model()
@@ -87,8 +87,10 @@ class PropertyTableWidget(ItemViewTool, ActionTool, FieldTool):
             bsdd_class = i.siblingAtColumn(0).internalPointer()
             cls.signals.bsdd_class_double_clicked.emit(bsdd_class)
 
+        widget.tv_properties.doubleClicked.connect(handle_property_double_click)
         w.tv_classes.doubleClicked.connect(handle_class_double_click)
-        w.closed.connect(lambda w=widget: trigger.widget_removed(w))
+
+        widget.tb_new.clicked.connect(lambda _, w=widget: cls.signals.new_property_requested.emit())
         w.tv_properties.customContextMenuRequested.connect(
             lambda p: trigger.context_menu_requested(w.tv_properties, p)
         )
@@ -96,12 +98,6 @@ class PropertyTableWidget(ItemViewTool, ActionTool, FieldTool):
         w.tv_classes.customContextMenuRequested.connect(
             lambda p: trigger.context_menu_requested(w.tv_classes, p)
         )
-
-    @classmethod
-    def create_widget(cls):
-        widget = ui.PropertyWidget()
-        cls.get_properties().widgets.add(widget)
-        return widget
 
     @classmethod
     def create_property_model(cls):

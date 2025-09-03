@@ -22,6 +22,9 @@ def connect():
 
 def retranslate_ui():
     core.retranslate_ui(tool.PropertyTableWidget, tool.MainWindowWidget, tool.Util)
+
+
+def on_new_project():
     pass
 
 
@@ -44,14 +47,10 @@ def widget_created(widget: ui.PropertyWidget):
     core.connect_view(view, tool.PropertyTableWidget, tool.Util)
 
     core.register_widget(widget, tool.PropertyTableWidget)
+    core.connect_widget(widget, tool.PropertyTableWidget)
 
 
-def widget_removed(widget: ui.PropertyWidget):
-    core.unregister_widget(widget, tool.PropertyTableWidget)
-    core.remove_view(widget.tv_properties, tool.PropertyTableWidget)
-    core.remove_view(widget.tv_classes, tool.PropertyTableWidget)
-
-
+### Module Specific Triggers
 def search_requested(view: QTreeView):
     core.search_property(view, tool.PropertyTableWidget, tool.SearchWidget, tool.Project)
 
@@ -62,7 +61,3 @@ def context_menu_requested(view: views.PropertyTable | views.ClassTable, pos):
 
 def delete_selection(view: QTreeView):
     core.delete_selection(view, tool.PropertyTableWidget, tool.Project)
-
-
-def on_new_project():
-    pass

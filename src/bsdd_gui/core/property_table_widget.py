@@ -43,6 +43,33 @@ def retranslate_ui(
         widget.setWindowTitle(title)
 
 
+def create_widget(
+    parent: QWidget,
+    property_table: Type[tool.PropertyTableWidget],
+    util: Type[tool.Util],
+    main_window: Type[tool.MainWindowWidget],
+):
+    if property_table.get_widgets():
+        widget = list(property_table.get_widgets())[-1]
+    else:
+        widget = property_table.create_widget(None)
+
+    widget.setParent(parent)
+    widget.show()
+    widget.activateWindow()
+    retranslate_ui(property_table, main_window, util)
+
+
+def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTableWidget]):
+    property_table.register_widget(widget)
+
+
+def connect_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTableWidget]):
+    property_table.connect_widget_signals(widget)
+    widget.closed.connect(lambda w=widget: property_table.unregister_view(w.tv_classes))
+    widget.closed.connect(lambda w=widget: property_table.unregister_view(w.tv_properties))
+
+
 def register_view(
     view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTableWidget]
 ):
@@ -135,29 +162,6 @@ def connect_to_main_menu(
         lambda: property_table.request_widget(None, main_window.get()),
     )
     property_table.set_action(main_window.get(), "open_window", action)
-
-
-def create_widget(
-    parent: QWidget,
-    property_table: Type[tool.PropertyTableWidget],
-    util: Type[tool.Util],
-    main_window: Type[tool.MainWindowWidget],
-):
-    widget = property_table.create_widget()
-    widget.show()
-    retranslate_ui(property_table, main_window, util)
-
-
-def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTableWidget]):
-    property_table.register_widget(widget)
-    property_table.connect_widget_signals(widget)
-
-
-def unregister_widget(
-    widget: ui.PropertyWidget,
-    property_table: Type[tool.PropertyTableWidget],
-):
-    property_table.unregister_widget(widget)
 
 
 def search_property(
