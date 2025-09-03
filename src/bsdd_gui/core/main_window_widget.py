@@ -42,3 +42,7 @@ def connect_main_window(
         lambda _: class_tree.request_search(main_window.get_class_view())
     )
     main_window.connect_internal_signals()
+
+
+def retranslate_ui(main_window: Type[tool.MainWindowWidget]):
+    main_window.get().retranslateUi(main_window.get())

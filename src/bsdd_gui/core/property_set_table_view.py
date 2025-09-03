@@ -115,6 +115,8 @@ def create_new_property_set(
     property_set_table: Type[tool.PropertySetTableView],
     util: Type[tool.Util],
 ):
+    if not bsdd_class:
+        return
     existings_psets = property_set_table.get_pset_names_with_temporary(bsdd_class)
     new_name = util.get_unique_name(
         QCoreApplication.translate("PropertySetTable", "New PropertySet"), existings_psets
