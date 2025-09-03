@@ -41,6 +41,12 @@ class WidgetProperties(FieldProperties):
         self.widgets = set()
 
 
+class DialogProperties(WidgetProperties):
+    def __init__(self):
+        super().__init__()
+        self.dialog = None
+
+
 class ViewProperties:
     def __init__(self):
         super().__init__()

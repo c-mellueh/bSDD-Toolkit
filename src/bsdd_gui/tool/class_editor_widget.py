@@ -33,6 +33,25 @@ class ClassEditorWidget(DialogTool):
         return bsdd_gui.ClassEditorWidgetProperties
 
     @classmethod
+    def create_dialog(cls, bsdd_class: BsddClass, parent_widget: QWidget):
+        widget = cls.create_widget(bsdd_class, None)
+        dialog = ui.EditDialog(
+            widget,
+            parent_widget,
+        )
+        cls.sync_from_model(widget, bsdd_class)
+        dialog._layout.insertWidget(0, widget)
+        dialog._widget = widget
+        dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
+        cls.get_properties().dialog = dialog
+        return dialog
+
+    @classmethod
+    def create_widget(cls, bsdd_class: BsddClass, parent):
+        widget = ui.ClassEditor(bsdd_class, parent)
+        return widget
+
+    @classmethod
     def connect_signals(cls):
         cls.signals.edit_class_requested.connect(trigger.open_widget)
         cls.signals.copy_class_requested.connect(trigger.copy_class)
@@ -74,21 +93,3 @@ class ClassEditorWidget(DialogTool):
     @classmethod
     def copy_class(cls, bsdd_class: BsddClass):
         return BsddClass(**bsdd_class.model_dump())
-
-    @classmethod
-    def create_widget(cls, bsdd_class: BsddClass, parent):
-        widget = ui.ClassEditor(bsdd_class, parent)
-        return widget
-
-    @classmethod
-    def create_dialog(cls, bsdd_class: BsddClass, parent_widget: QWidget):
-        widget = cls.create_widget(bsdd_class, None)
-        dialog = ui.EditDialog(
-            widget,
-            parent_widget,
-        )
-        cls.sync_from_model(widget, bsdd_class)
-        dialog._layout.insertWidget(0, widget)
-        dialog._widget = widget
-        dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
-        return dialog

@@ -44,6 +44,7 @@ if TYPE_CHECKING:
         ViewProperties,
         WidgetProperties,
         FieldProperties,
+        DialogProperties,
         ContextMenuDict,
     )
 
@@ -356,6 +357,11 @@ class DialogTool(WidgetTool):
 
     @classmethod
     @abstractmethod
+    def get_properties(cls) -> DialogProperties:
+        return None
+
+    @classmethod
+    @abstractmethod
     def create_dialog(cls, data: object, parent: QWidget) -> BaseDialog:
         widget = cls.create_widget(data, None)
         dialog = BaseDialog(widget, parent)
@@ -363,15 +369,8 @@ class DialogTool(WidgetTool):
         dialog._layout.insertWidget(0, widget)
         dialog._widget = widget
         # dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
+        cls.get_properties().dialog = dialog
         return dialog
-
-    @classmethod
-    @abstractmethod
-    def validate_dialog(cls, dialog: BaseDialog) -> None:
-        if cls.all_inputs_are_valid(dialog._widget):
-            dialog.accept()
-        else:
-            pass
 
     @classmethod
     def connect_internal_signals(cls):
@@ -386,6 +385,13 @@ class DialogTool(WidgetTool):
     @classmethod
     def connect_dialog_signals(cls, dialog: BaseDialog):
         pass
+
+    @classmethod
+    def validate_dialog(cls, dialog: BaseDialog) -> None:
+        if cls.all_inputs_are_valid(dialog._widget):
+            dialog.accept()
+        else:
+            pass
 
 
 class ItemViewTool(BaseTool):
