@@ -11,9 +11,12 @@ authors = [{ name = "Christoph Mellüh" }]
 license = { text = "MIT" }
 dependencies = [
   "pydantic>=2.7",
+  "bsdd",
 ]
 
 [tool.setuptools]
-packages = ["bsdd_json"]
+packages = [
+  "bsdd_json",
+  "bsdd_json.utils",
+]
 package-dir = { bsdd_json = "." }
-
