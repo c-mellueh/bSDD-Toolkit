@@ -33,8 +33,8 @@ def create_widget(data: object, parent: FieldWidget):
     core.create_widget(data, parent, tool.WidgetTool)
 
 
-def open_dialog(data: object, parent: FieldWidget):
-    core.open_dialog(data, parent, tool.DialogTool)
+def create_dialog(data: object, parent: FieldWidget):
+    core.create_dialog(data, parent, tool.DialogTool)
 
 
 def widget_created(widget: FieldWidget):

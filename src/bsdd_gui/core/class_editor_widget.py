@@ -19,7 +19,7 @@ def retranslate_ui(class_editor: Type[tool.ClassEditorWidget]):
     pass  # TODO
 
 
-def open_dialog(
+def create_dialog(
     bsdd_class: BsddClass,
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],

@@ -22,7 +22,7 @@ def create_widget(data, parent, widget_tool: Type[tool.FieldTool]):
     widget_tool.show_widget(data, parent)
 
 
-def open_dialog(data: object, parent, dialog_tool: Type[tool.DialogTool]):
+def create_dialog(data: object, parent, dialog_tool: Type[tool.DialogTool]):
     dialog = dialog_tool.create_dialog(data, parent)
     text = QCoreApplication.translate("Preset", "Example Title")
     dialog.setWindowTitle(text)

@@ -39,9 +39,9 @@ def create_widget(som_property: BsddClassProperty):
     )
 
 
-def open_dialog():
+def create_dialog():
     # new Property Dialog
-    core.open_dialog(
+    core.create_dialog(
         tool.ClassPropertyEditorWidget,
         tool.MainWindowWidget,
         tool.Project,

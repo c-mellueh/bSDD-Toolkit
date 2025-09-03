@@ -29,9 +29,9 @@ class PropertyEditorWidget(FieldTool):
 
     @classmethod
     def connect_internal_signals(cls):
-        cls.signals.widget_requested.connect(trigger.create_window)
+        cls.signals.widget_requested.connect(trigger.create_widget)
         cls.signals.widget_closed.connect(trigger.widget_closed)
-        cls.signals.new_property_requested.connect(trigger.create_property_creator)
+        cls.signals.new_property_requested.connect(trigger.create_dialog)
         # Autoupdate Values
         cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 

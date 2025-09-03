@@ -13,21 +13,21 @@ def connect():
 
 
 def retranslate_ui():
-    pass
+    core.retranslate_ui(tool.PropertyEditorWidget)
 
 
 def on_new_project():
     pass
 
 
-def create_property_creator(blueprint: dict):
+def create_dialog(blueprint: dict):
     core.create_property_creator(
         blueprint, tool.PropertyEditorWidget, tool.MainWindowWidget, tool.Project, tool.Util
     )
 
 
-def create_window(bsdd_property: BsddProperty, parent: QWidget | None):
-    core.open_edit_window(
+def create_widget(bsdd_property: BsddProperty, parent: QWidget | None):
+    core.create_widget(
         bsdd_property, parent, tool.PropertyEditorWidget, tool.MainWindowWidget, tool.Project
     )
 

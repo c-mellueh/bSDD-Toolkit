@@ -136,7 +136,7 @@ def splitter_settings_accepted(
         appdata.set_setting(SEPERATOR_SECTION, SEPERATOR_STATUS, False)
 
 
-def open_dialog(
+def create_dialog(
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
     main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],

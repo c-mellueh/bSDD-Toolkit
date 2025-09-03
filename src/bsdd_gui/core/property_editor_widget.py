@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_editor_widget import ui
 
 
-def open_edit_window(
+def create_widget(
     bsdd_property: BsddClassProperty,
     parent_widget: QWidget | None,
     property_editor: Type[tool.PropertyEditorWidget],
