@@ -22,6 +22,7 @@ class Signals(QObject):
     copy_active_class_requested = Signal()
     new_property_set_requested = Signal()
     new_property_requested = Signal()
+    refresh_status_bar_requested = Signal()
 
 
 class MainWindowWidget:
@@ -33,7 +34,7 @@ class MainWindowWidget:
 
     @classmethod
     def connect_internal_signals(cls):
-        pass
+        cls.signals.refresh_status_bar_requested.connect(trigger.refresh_status_bar)
 
     @classmethod
     def create(cls, application: QApplication) -> ui.MainWindow:
@@ -177,3 +178,7 @@ class MainWindowWidget:
     @classmethod
     def get_statusbar(cls) -> QStatusBar:
         return cls.get().statusbar
+
+    @classmethod
+    def set_status_bar_text(cls, text: str):
+        cls.get_statusbar().showMessage(text)

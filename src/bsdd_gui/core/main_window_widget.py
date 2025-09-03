@@ -1,6 +1,8 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QCoreApplication
 from typing import Type, TYPE_CHECKING
+import bsdd_gui
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -46,3 +48,24 @@ def connect_main_window(
 
 def retranslate_ui(main_window: Type[tool.MainWindowWidget]):
     main_window.get().retranslateUi(main_window.get())
+    main_window.get().setWindowTitle(f"bSDD-Toolkit v{bsdd_gui.__version__}")
+
+
+def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[tool.Project]):
+    """bl
+    refresh Statusbar-Text and Window-Title
+    :param main_window_tool:
+    :param project_tool:
+    :return:
+    """
+    bsdd_dictionary = project.get()
+    version = f'{QCoreApplication.translate("MainWindow", "Version")}: {bsdd_dictionary.DictionaryVersion}'
+    status = " | ".join(
+        [
+            bsdd_dictionary.OrganizationCode,
+            bsdd_dictionary.DictionaryCode,
+            bsdd_dictionary.DictionaryName,
+            version,
+        ]
+    )
+    main_window.set_status_bar_text(status)

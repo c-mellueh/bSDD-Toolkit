@@ -11,7 +11,7 @@ def connect():
 
 
 def on_new_project():
-    pass
+    core.refresh_status_bar(tool.MainWindowWidget, tool.Project)
 
 
 def retranslate_ui():
@@ -20,3 +20,7 @@ def retranslate_ui():
 
 def close_event(event):
     pass
+
+
+def refresh_status_bar():
+    core.refresh_status_bar(tool.MainWindowWidget, tool.Project)
