@@ -9,7 +9,7 @@ from PySide6.QtCore import QPoint
 
 from bsdd_gui.presets.core_presets import widget_preset as core  # <- modify to fit your need
 from bsdd_gui.presets import tool_presets as tool  # <- modify to fit your need
-from bsdd_gui.presets.ui_presets import BaseWidget
+from bsdd_gui.presets.ui_presets import FieldWidget
 
 if TYPE_CHECKING:
     from . import ui
@@ -29,15 +29,15 @@ def on_new_project():
     pass
 
 
-def open_widget(data: object, parent: BaseWidget):
+def open_widget(data: object, parent: FieldWidget):
     core.open_widget(data, parent, tool.WidgetTool)
 
 
-def open_dialog(data: object, parent: BaseWidget):
+def open_dialog(data: object, parent: FieldWidget):
     core.open_dialog(data, parent, tool.DialogTool)
 
 
-def widget_created(widget: BaseWidget):
+def widget_created(widget: FieldWidget):
     core.register_widget(widget, tool.ItemViewTool)
     core.register_fields(widget, tool.ItemViewTool)
     core.register_validators(widget, tool.ItemViewTool, tool.Util)

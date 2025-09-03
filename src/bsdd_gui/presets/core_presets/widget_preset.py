@@ -7,7 +7,7 @@ from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 
 if TYPE_CHECKING:
     from bsdd_gui.presets import tool_presets as tool
-    from bsdd_gui.presets.ui_presets.base_widgets import BaseWidget
+    from bsdd_gui.presets.ui_presets.base_widgets import FieldWidget
 
 
 def connect_signals(widget_tool: Type[tool.WidgetTool]):
@@ -33,11 +33,11 @@ def open_dialog(data: object, parent, dialog_tool: Type[tool.DialogTool]):
         dialog_tool.signals.dialog_declined.emit(dialog)
 
 
-def register_widget(widget: BaseWidget, widget_tool: Type[tool.WidgetTool]):
+def register_widget(widget: FieldWidget, widget_tool: Type[tool.WidgetTool]):
     widget_tool.register_widget(widget)
 
 
-def register_fields(widget: BaseWidget, widget_Tool: Type[tool.WidgetTool]):
+def register_fields(widget: FieldWidget, widget_Tool: Type[tool.WidgetTool]):
     widget_Tool.register_basic_field(widget, widget.le_name, "Name")
 
 
@@ -50,5 +50,5 @@ def register_validators(widget, widget_tool: Type[tool.WidgetTool], util: Type[t
     )
 
 
-def connect_widget(widget: BaseWidget, widget_tool: Type[tool.WidgetTool]):
+def connect_widget(widget: FieldWidget, widget_tool: Type[tool.WidgetTool]):
     widget_tool.connect_widget_signals(widget)

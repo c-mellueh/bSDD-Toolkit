@@ -49,8 +49,15 @@ class ClassPropertyEditorWidget(DialogTool):
 
     @classmethod
     def _get_trigger(cls):
-        print("HIER")
         return trigger
+
+    @classmethod
+    def _get_dialog_class(cls):
+        return ui.ClassPropertyCreator
+
+    @classmethod
+    def _get_widget_class(cls):
+        return ui.ClassPropertyEditor
 
     @classmethod
     def request_property_specific_redraw(cls, widget: ui.ClassPropertyEditor):
@@ -115,16 +122,14 @@ class ClassPropertyEditorWidget(DialogTool):
         bsdd_dictionary=None,
     ) -> ui.ClassPropertyEditor:
 
-        prop = cls.get_properties()
-        widget = ui.ClassPropertyEditor(bsdd_class_property, parent, mode=mode)
+        widget: ui.ClassPropertyEditor = super().create_widget(
+            bsdd_class_property, parent, mode=mode
+        )
         widget.setWindowFlag(Qt.Tool)
-        prop.widgets.add(widget)
 
         if bsdd_dictionary:
             completer = cls.create_property_code_completer(bsdd_dictionary)
             widget.le_property_reference.setCompleter(completer)
-
-        cls.add_plugins_to_widget(widget)
         widget.setWindowTitle(cls.create_window_title(bsdd_class_property))
         return widget
 

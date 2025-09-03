@@ -4,12 +4,12 @@ from PySide6.QtGui import QCloseEvent
 from typing import Any
 from . import trigger
 from bsdd_gui.resources.icons import get_icon
-from bsdd_gui.presets.ui_presets import DateTimeWithNow as DTN, BaseWidget
+from bsdd_gui.presets.ui_presets import DateTimeWithNow as DTN, FieldWidget
 from bsdd_parser import BsddDictionary
 from .qt.ui_DictionaryEditor import Ui_DictionaryForm
 
 
-class DictionaryEditor(BaseWidget, Ui_DictionaryForm):
+class DictionaryEditor(FieldWidget, Ui_DictionaryForm):
     value_changed = Signal(str, Any)
 
     def __init__(self, bsdd_dictionary: BsddDictionary, parent, *args, **kwargs):

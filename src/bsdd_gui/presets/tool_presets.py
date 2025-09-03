@@ -27,10 +27,10 @@ from PySide6.QtGui import QAction
 from bsdd_gui.presets.ui_presets import (
     TagInput,
     DateTimeWithNow,
-    ItemViewType,
+    FieldWidget,
     TreeItemView,
     BaseDialog,
-    BaseWidget,
+    ItemViewType,
 )
 from bsdd_parser import *
 import logging
@@ -98,8 +98,14 @@ class WidgetTool(BaseTool):
 
     @classmethod
     @abstractmethod
-    def create_widget(cls, data: object, parent: QWidget) -> BaseWidget:
-        widget = BaseWidget(data, parent)
+    def _get_widget_class(cls) -> Type[FieldWidget]:
+        logging.error(f"This function needs to be subclassed")
+        return None
+
+    @classmethod
+    @abstractmethod
+    def create_widget(cls, *args, **kwargs) -> FieldWidget:
+        widget = cls._get_widget_class()(*args, **kwargs)
         cls.get_properties().widgets.add(widget)
         cls.add_plugins_to_widget(widget)
         return widget
@@ -111,29 +117,51 @@ class WidgetTool(BaseTool):
         cls.signals.widget_closed.connect(cls.unregister_widget)
 
     @classmethod
-    def connect_widget_signals(cls, widget: BaseWidget):
+    def connect_widget_signals(cls, widget: FieldWidget):
         widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
 
     @classmethod
-    def register_widget(cls, widget: BaseWidget):
+    def register_widget(cls, widget: FieldWidget):
         logging.info(f"Register {widget}")
 
         cls.get_properties().widgets.add(widget)
-        cls.get_properties().field_getter[widget] = dict()
-        cls.get_properties().field_setter[widget] = dict()
 
     @classmethod
-    def unregister_widget(cls, view: ItemViewType):
-        logging.info(f"Unregister {view}")
-        if not view in cls.get_properties().widgets:
-            return
-        cls.get_properties().widgets.remove(view)
-        cls.get_properties().field_getter.pop(view)
-        cls.get_properties().field_setter.pop(view)
+    def unregister_widget(cls, widget: FieldWidget):
+        logging.info(f"Unregister {widget}")
+        if not widget in cls.get_properties().widgets:
+            return False
+        cls.get_properties().widgets.remove(widget)
+        return True
 
     @classmethod
     def get_widgets(cls):
         return cls.get_properties().widgets
+
+    @classmethod
+    def request_widget(cls, *args, **kwargs):
+        cls.signals.widget_requested.emit(*args, **kwargs)
+
+    @classmethod
+    def add_plugins_to_widget(cls, widget):
+        for plugin in cls.get_properties().plugin_widget_list:
+            layout: QLayout = getattr(widget, plugin.layout_name)
+            layout.insertWidget(plugin.index, plugin.widget())
+            setattr(cls.get_properties(), plugin.key, plugin.value_getter)
+
+
+class FieldTool(WidgetTool):
+    signals = FieldSignals()
+
+    @classmethod
+    @abstractmethod
+    def get_properties(cls) -> FieldProperties:
+        return None
+
+    @classmethod
+    @abstractmethod
+    def create_widget(cls, *args, **kwargs) -> ItemViewType:
+        return super().create_widget(*args, **kwargs)
 
     @classmethod
     def get_widget(cls, data: object) -> ItemViewType:
@@ -157,27 +185,20 @@ class WidgetTool(BaseTool):
         widget.showNormal()
 
     @classmethod
-    def request_widget(cls, data: object, parent=None):
-        cls.signals.widget_requested.emit(data, parent)
+    def register_widget(cls, widget: FieldWidget):
+        super().register_widget(widget)
+        cls.get_properties().field_getter[widget] = dict()
+        cls.get_properties().field_setter[widget] = dict()
 
     @classmethod
-    def add_plugins_to_widget(cls, widget):
-        for plugin in cls.get_properties().plugin_widget_list:
-            layout: QLayout = getattr(widget, plugin.layout_name)
-            layout.insertWidget(plugin.index, plugin.widget())
-            setattr(cls.get_properties(), plugin.key, plugin.value_getter)
-
-
-class FieldTool(WidgetTool):
-    signals = FieldSignals()
+    def unregister_widget(cls, widget: FieldWidget):
+        if not super().unregister_widget(widget):
+            return
+        cls.get_properties().field_getter.pop(widget)
+        cls.get_properties().field_setter.pop(widget)
 
     @classmethod
-    @abstractmethod
-    def get_properties(cls) -> FieldProperties:
-        return None
-
-    @classmethod
-    def register_basic_field(cls, widget: BaseWidget, field: ItemViewType, variable_name: str):
+    def register_basic_field(cls, widget: FieldWidget, field: QWidget, variable_name: str):
         cls.register_field_getter(widget, field, lambda e, vn=variable_name: getattr(e, vn))
         cls.register_field_setter(
             widget,
@@ -191,7 +212,7 @@ class FieldTool(WidgetTool):
         cls.register_field_listener(widget, field)
 
     @classmethod
-    def register_field_getter(cls, widget: BaseWidget, field: ItemViewType, getter_func: callable):
+    def register_field_getter(cls, widget: FieldWidget, field: QWidget, getter_func: callable):
         """_summary_
 
         Args:
@@ -205,13 +226,13 @@ class FieldTool(WidgetTool):
         cls.get_properties().field_getter[widget][field] = getter_func
 
     @classmethod
-    def register_field_setter(cls, widget: BaseWidget, field: ItemViewType, setter_func: callable):
+    def register_field_setter(cls, widget: FieldWidget, field: QWidget, setter_func: callable):
         if not widget in cls.get_properties().field_setter:
             cls.get_properties().field_setter[widget] = dict()
         cls.get_properties().field_setter[widget][field] = setter_func
 
     @classmethod
-    def register_field_listener(cls, widget: BaseWidget, field: ItemViewType):
+    def register_field_listener(cls, widget: FieldWidget, field: QWidget):
         f = field
         w = widget
         if isinstance(f, QLineEdit):
@@ -296,7 +317,7 @@ class FieldTool(WidgetTool):
             func(f.isChecked())
 
     @classmethod
-    def get_value_from_field(cls, field: ItemViewType):
+    def get_value_from_field(cls, field: QWidget):
         if isinstance(field, QLineEdit):
             value = field.text()
         elif isinstance(field, QComboBox):
@@ -316,7 +337,7 @@ class FieldTool(WidgetTool):
         return value
 
     @classmethod
-    def sync_from_model(cls, widget: BaseWidget, data, explicit_field=None):
+    def sync_from_model(cls, widget: FieldWidget, data, explicit_field=None):
 
         for field, getter_func in cls.get_properties().field_getter[widget].items():
             if explicit_field is not None and explicit_field != field:
@@ -340,7 +361,7 @@ class FieldTool(WidgetTool):
                 field.setChecked(value)
 
     @classmethod
-    def sync_to_model(cls, widget: BaseWidget, element, explicit_field: ItemViewType = None):
+    def sync_to_model(cls, widget: FieldWidget, element, explicit_field: QWidget = None):
         field_dict = cls.get_properties().field_setter.get(widget) or dict()
         for field, setter_func in field_dict.items():
             if explicit_field is not None and explicit_field != field:
@@ -349,7 +370,7 @@ class FieldTool(WidgetTool):
             setter_func(element, value)
 
     @classmethod
-    def all_inputs_are_valid(cls, widget: BaseWidget):
+    def all_inputs_are_valid(cls, widget: FieldWidget):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
             logging.info(f"No Validator Functions found for widget {widget}")
@@ -363,7 +384,7 @@ class FieldTool(WidgetTool):
         return True
 
     @classmethod
-    def get_invalid_inputs(cls, widget: BaseWidget):
+    def get_invalid_inputs(cls, widget: FieldWidget):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
             return []
@@ -386,9 +407,14 @@ class DialogTool(FieldTool):
 
     @classmethod
     @abstractmethod
+    def _get_dialog_class(cls) -> Type[BaseDialog]:
+        logging.error(f"This function needs to be subclassed")
+        return BaseDialog
+
+    @classmethod
     def create_dialog(cls, data: object, parent: QWidget) -> BaseDialog:
         widget = cls.create_widget(data, None)
-        dialog = BaseDialog(widget, parent)
+        dialog = cls._get_dialog_class()(widget, parent)
         cls.sync_from_model(widget, data)
         dialog._layout.insertWidget(0, widget)
         # dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
@@ -402,7 +428,7 @@ class DialogTool(FieldTool):
         cls.signals.dialog_declined.connect(lambda dialog: dialog._widget.closed.emit())
 
     @classmethod
-    def connect_widget_signals(cls, widget: BaseWidget):
+    def connect_widget_signals(cls, widget: FieldWidget):
         super().connect_widget_signals(widget)
 
     @classmethod

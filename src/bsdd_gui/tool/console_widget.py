@@ -23,15 +23,21 @@ class ConsoleWidget(WidgetTool):
         return trigger
 
     @classmethod
-    def create_widget(cls, data, parent):
-        if cls.get_properties().console is None:
-            console = ui.Console()
-            console.show()
-            console.eval_in_thread()
-            cls.get_properties().console = console
-        return cls.get_properties().console
+    def _get_widget_class(cls):
+        return ui.Console
 
     @classmethod
-    def close_console(cls):
-        logging.debug("Close Console")
-        cls.get_properties().console = None
+    def get_widget(cls):
+        if not cls.get_widgets():
+            return None
+        return list(cls.get_widgets())[-1]
+
+    @classmethod
+    def create_widget(cls):
+        if not cls.get_widgets():
+            widget: ui.Console = super().create_widget()
+            widget.show()
+            widget.eval_in_thread()
+            cls.register_widget(widget)
+            cls.connect_widget_signals(widget)
+        return cls.get_widget()

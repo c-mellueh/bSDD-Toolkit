@@ -19,16 +19,12 @@ def connect_to_main_window(
     button = QPushButton("C")
     button.setMaximumWidth(24)
     status_bar.addPermanentWidget(button)
-    button.clicked.connect(lambda *_: console.signals.widget_requested(None, main_menu.get()))
+    button.clicked.connect(lambda *_: console.signals.widget_requested.emit())
 
 
 def retranslate_ui(console: Type[tool.ConsoleWidget]):
     return
 
 
-def open_widget(console: Type[tool.ConsoleWidget]):
-    console.create_widget()
-
-
 def close_widget(console: Type[tool.ConsoleWidget]):
-    console.close_console()
+    console.unregister_widget(console)

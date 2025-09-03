@@ -37,25 +37,18 @@ class ClassEditorWidget(DialogTool):
         return trigger
 
     @classmethod
-    def create_dialog(cls, bsdd_class: BsddClass, parent_widget: QWidget):
-        widget = cls.create_widget(bsdd_class, None)
-        dialog = ui.EditDialog(
-            widget,
-            parent_widget,
-        )
-        cls.sync_from_model(widget, bsdd_class)
-        dialog._layout.insertWidget(0, widget)
-        dialog._widget = widget
-        dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
-        cls.get_properties().dialog = dialog
-        return dialog
+    def _get_widget_class(cls):
+        return ui.ClassEditor
 
     @classmethod
-    def create_widget(cls, bsdd_class: BsddClass, parent):
-        widget = ui.ClassEditor(bsdd_class, parent)
-        cls.get_properties().widgets.add(widget)
-        cls.add_plugins_to_widget(widget)
-        return widget
+    def _get_dialog_class(cls):
+        return ui.EditDialog
+
+    @classmethod
+    def create_dialog(cls, bsdd_class: BsddClass, parent_widget: QWidget):
+        dialog: ui.EditDialog = super().create_dialog(bsdd_class, parent_widget)
+        dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
+        return dialog
 
     @classmethod
     def connect_signals(cls):

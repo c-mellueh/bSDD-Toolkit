@@ -5,7 +5,7 @@ from PySide6.QtCore import QCoreApplication, Qt
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_parser import BsddClass
-from bsdd_gui.presets.ui_presets import TagInput, BaseWidget, BaseDialog
+from bsdd_gui.presets.ui_presets import TagInput, FieldWidget, BaseDialog
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
 from PySide6.QtCore import QRect
 
@@ -20,7 +20,7 @@ class IfcTagInput(TagInput):
 from .qt import ui_ClassEditor
 
 
-class ClassEditor(BaseWidget, ui_ClassEditor.Ui_ClassEditor):
+class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
 
     def __init__(self, bsdd_class: BsddClass, *args, **kwargs):
         super().__init__(bsdd_class, *args, **kwargs)

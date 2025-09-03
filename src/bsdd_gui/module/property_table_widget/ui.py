@@ -15,10 +15,10 @@ from bsdd_parser import BsddClassProperty
 from . import trigger
 from bsdd_gui import tool
 from .qt.ui_Widget import Ui_Form
-from bsdd_gui.presets.ui_presets import BaseWidget
+from bsdd_gui.presets.ui_presets import FieldWidget
 
 
-class PropertyWidget(BaseWidget, Ui_Form):
+class PropertyWidget(FieldWidget, Ui_Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(None, *args, **kwargs)
