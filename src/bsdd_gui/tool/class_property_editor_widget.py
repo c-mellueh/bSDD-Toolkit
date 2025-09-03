@@ -331,3 +331,9 @@ class ClassPropertyEditorWidget(DialogTool):
     @classmethod
     def get_splitter_settings_text(cls, widget: ui.SplitterSettings) -> str:
         return widget.ui.line_edit_seperator.text()
+
+    @classmethod
+    def validate_widgets(cls):
+        for widget in cls.get_widgets():
+            widget: ui.ClassPropertyEditor
+            cls.validate_all_fields(widget)

@@ -387,9 +387,10 @@ class FieldTool(WidgetTool):
 
         if not widget in cls.get_properties().validator_functions:
             cls.get_properties().validator_functions[widget] = dict()
-        cls.get_properties().validator_functions[widget][field] = (
-            validator_function,
-            result_function,
+        if not field in cls.get_properties().validator_functions[widget]:
+            cls.get_properties().validator_functions[widget][field] = list()
+        cls.get_properties().validator_functions[widget][field].append(
+            (validator_function, result_function)
         )
         rf, vf, f, w = result_function, validator_function, field, widget
         if isinstance(f, QLineEdit):
@@ -420,6 +421,8 @@ class FieldTool(WidgetTool):
             func = lambda state: rf(f, vf(state, w))
             f.toggled.connect(func)
             func(f.isChecked())
+        else:
+            logging.info("ClassType not Found")
 
     @classmethod
     def get_value_from_field(cls, field: QWidget):
@@ -481,11 +484,12 @@ class FieldTool(WidgetTool):
             logging.info(f"No Validator Functions found for widget {widget}")
             return True
 
-        for f, (validator_function, result_function) in function_dict.items():
-            value = cls.get_value_from_field(f)
-            is_valid = validator_function(value, widget)
-            if not is_valid:
-                return False
+        for f, validator in function_dict.items():
+            for validator_function, result_function in validator:
+                value = cls.get_value_from_field(f)
+                is_valid = validator_function(value, widget)
+                if not is_valid:
+                    return False
         return True
 
     @classmethod
@@ -494,12 +498,28 @@ class FieldTool(WidgetTool):
         if not function_dict:
             return []
         invalid_inputs = list()
-        for f, (validator_function, result_function) in function_dict.items():
-            value = cls.get_value_from_field(f)
-            is_valid = validator_function(value, widget)
+        for f, validator in function_dict.items():
+            is_valid = True
+            for validator_function, result_function in validator:
+                value = cls.get_value_from_field(f)
+                if not validator_function(value, widget):
+                    is_valid = False
             if not is_valid:
                 invalid_inputs.append(f.objectName())
-        return invalid_inputs
+        return invalid_inputsbla
+
+    @classmethod
+    def validate_all_fields(cls, widget: FieldWidget):
+        function_dict = cls.get_properties().validator_functions.get(widget)
+        if not function_dict:
+            logging.info(f"No Validator Functions found for widget {widget}")
+            return True
+
+        for f, validator in function_dict.items():
+            for validator_function, result_function in validator:
+                value = cls.get_value_from_field(f)
+                is_valid = validator_function(value, widget)
+                result_function(f, is_valid)
 
 
 class DialogTool(FieldTool):

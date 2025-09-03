@@ -51,7 +51,7 @@ class FieldProperties(WidgetProperties):
             dict()
         )  # getter function for widgets of Window
         self.validator_functions: dict[
-            ItemViewType, dict[ItemViewType, tuple[callable, callable]]
+            ItemViewType, dict[ItemViewType, list[tuple[callable, callable]]]
         ] = dict()
 
 

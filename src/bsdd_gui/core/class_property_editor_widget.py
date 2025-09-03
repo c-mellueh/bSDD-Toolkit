@@ -30,6 +30,9 @@ def connect_signals(
         class_property_editor.signals.create_new_class_property_requested.emit
     )
     property_editor.signals.field_changed.connect(class_property_editor.handle_field_changed)
+    property_editor.signals.new_property_created.connect(
+        lambda _: class_property_editor.validate_widgets()
+    )
 
 
 def retranslate_ui(class_property_editor: Type[tool.ClassPropertyEditorWidget]):
@@ -80,9 +83,10 @@ def register_validators(
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
+    wi = widget
     class_property_editor.add_validator(
-        widget,
-        widget.le_property_reference,
+        wi,
+        wi.le_property_reference,
         lambda v, w, p=project: class_property_editor.is_property_reference_valid(
             v, w.bsdd_data, p.get()
         ),
@@ -90,13 +94,15 @@ def register_validators(
     )
 
     class_property_editor.add_validator(
-        widget,
-        widget.le_property_reference,
+        wi,
+        wi.le_property_reference,
         lambda v, w, p=project: class_property_editor.is_property_reference_valid(
             v, w.bsdd_data, p.get()
         ),
-        lambda f, v, w=widget: class_property_editor.handle_property_reference_button(w, f, v),
+        lambda f, v, w=wi: class_property_editor.handle_property_reference_button(w, f, v),
     )
+    funcs = class_property_editor.get_properties().validator_functions.get(wi)
+    print(funcs)
 
 
 def connect_widget(
