@@ -25,7 +25,6 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const core = require('@actions/core');
             const toml = fs.readFileSync('pyproject.toml', 'utf8');
             const match = toml.match(/^version\s*=\s*"([^"]+)"/m);
             if (!match) {
