@@ -3,7 +3,7 @@ from PySide6.QtCore import QModelIndex, QCoreApplication
 from typing import TYPE_CHECKING, Type
 from bsdd_json import BsddClass
 import logging
-from bsdd_json.utils import bsdd_class as class_utils
+from bsdd_json.utils import class_utils as cl_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -117,7 +117,7 @@ def connect_to_main_window(
 
     main_window.signals.new_class_requested.connect(
         lambda: class_editor.request_new_class(
-            class_utils.get_parent(main_window.get_active_class())
+            cl_utils.get_parent(main_window.get_active_class())
         )
     )
     main_window.signals.copy_active_class_requested.connect(
@@ -176,7 +176,7 @@ def group_classes(
     class_tree: Type[tool.ClassTreeView],
 ):
     new_class = BsddClass(Code="GroupCode", Name="GroupName", ClassType="Class")
-    parent = class_utils.shared_parent(bsdd_classes, dictionary=project.get(), mode="lowest")
+    parent = cl_utils.shared_parent(bsdd_classes, dictionary=project.get(), mode="lowest")
     parent_code = None if parent is None else parent.Code
     new_class.ParentClassCode = parent_code
     dialog = class_editor.create_dialog(new_class, main_window.get())

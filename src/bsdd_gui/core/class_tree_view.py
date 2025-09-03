@@ -2,7 +2,6 @@ from __future__ import annotations
 from PySide6.QtWidgets import QTreeView
 from PySide6.QtCore import QPoint, QCoreApplication, Qt
 from typing import Type, TYPE_CHECKING
-from bsdd_json.utils import bsdd_class as class_utils
 import logging
 
 if TYPE_CHECKING:

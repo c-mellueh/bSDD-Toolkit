@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from bsdd_json import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass
 import bsdd
 from bsdd import Client
-from . import bsdd_dictionary as dict_util
+from . import dictionary_utils as dict_utils
 
 
 class Cache:
@@ -14,10 +14,10 @@ class Cache:
     def get_external_property(
         cls, property_uri: str, client: bsdd.Client | None
     ) -> BsddClassProperty | None:
-        from bsdd_json.utils import bsdd_class_property as cp_utils
+        from bsdd_json.utils import property_utils as prop_utils
 
         def _make_request():
-            if not dict_util.is_uri(property_uri):
+            if not dict_utils.is_uri(property_uri):
                 return dict()
             c = Client() if client is None else client
             result = c.get_property(property_uri)
@@ -120,7 +120,7 @@ def get_classes_with_bsdd_property(property_code: str, bsdd_dictionary: BsddDict
 
 
 def get_property_by_code(code: str, bsdd_dictionary: BsddDictionary) -> BsddProperty | None:
-    if dict_util.is_uri(code):
+    if dict_utils.is_uri(code):
         prop = Cache.get_external_property(code)
     else:
         prop = get_property_code_dict(bsdd_dictionary).get(code)
@@ -132,12 +132,12 @@ def update_relations_to_new_uri(bsdd_proeprty: BsddProperty, bsdd_dictionary: Bs
     version = bsdd_dictionary.DictionaryVersion
 
     for relationship in bsdd_proeprty.PropertyRelations:
-        old_uri = dict_util.parse_bsdd_url(relationship.RelatedPropertyUri)
+        old_uri = dict_utils.parse_bsdd_url(relationship.RelatedPropertyUri)
         new_uri = dict(old_uri)
         new_uri["namespace"] = namespace
         new_uri["version"] = version
         if old_uri != new_uri:
-            relationship.RelatedPropertyUri = dict_util.build_bsdd_url(new_uri)
+            relationship.RelatedPropertyUri = dict_utils.build_bsdd_url(new_uri)
 
 
 def build_bsdd_uri(bsdd_property: BsddProperty, bsdd_dictionary: BsddDictionary):
@@ -150,4 +150,4 @@ def build_bsdd_uri(bsdd_property: BsddProperty, bsdd_dictionary: BsddDictionary)
     if bsdd_dictionary.UseOwnUri:
         data["host"] = bsdd_dictionary.DictionaryUri
 
-    return dict_util.build_bsdd_url(data)
+    return dict_utils.build_bsdd_url(data)

@@ -4,7 +4,6 @@ from PySide6.QtWidgets import QWidget, QTreeView
 from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.property_table_widget import views, ui, models
 from bsdd_json import BsddProperty, BsddClass
-from bsdd_json.utils import bsdd_class as cl_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool

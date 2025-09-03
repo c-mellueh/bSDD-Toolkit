@@ -3,7 +3,7 @@ from bsdd_json import BsddClassProperty, BsddProperty
 from typing import TYPE_CHECKING, Type
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QCoreApplication
-from bsdd_json.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils import property_utils as prop_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -51,7 +51,7 @@ def create_dialog(
 ):
     # create_virtual Property
     code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
-    existing_names = cp_utils.get_property_code_dict(project.get()).keys()
+    existing_names = prop_utils.get_property_code_dict(project.get()).keys()
     code = util.get_unique_name(code, existing_names)
     bsdd_property = property_editor.generate_virtual_property(code, blueprint)
     bsdd_property._set_parent(project.get())

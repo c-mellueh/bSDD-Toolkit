@@ -7,7 +7,7 @@ from PySide6.QtCore import (
     QModelIndex,
     QSortFilterProxyModel,
 )
-from bsdd_json.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_json.models import BsddDictionary, BsddClass, BsddClassProperty, BsddProperty
@@ -65,7 +65,7 @@ class ClassTableModel(ItemModel):
         if not ap:
             return []
         if self._data is None:
-            self._data = cp_utils.get_classes_with_bsdd_property(ap.Code, self.bsdd_dictionary)
+            self._data = prop_utils.get_classes_with_bsdd_property(ap.Code, self.bsdd_dictionary)
         return self._data
 
     def rowCount(self, parent=QModelIndex()):

@@ -8,8 +8,6 @@ import bsdd_gui
 from bsdd_gui.presets.tool_presets import DialogSignals, DialogTool
 from bsdd_json import BsddClass, BsddDictionary
 from bsdd_gui.module.class_editor_widget import trigger, ui
-from bsdd_gui.presets.ui_presets import label_tags_input
-from bsdd_json.utils import bsdd_class as class_utils
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_editor_widget.prop import ClassEditorWidgetProperties

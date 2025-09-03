@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QWidget, QAbstractItemView
 import bsdd_gui
 
 from bsdd_json.models import BsddDictionary, BsddClass
-from bsdd_json.utils import bsdd_class as class_utils
+from bsdd_json.utils import class_utils as cl_utils
 from bsdd_gui.module.class_tree_view import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
 
@@ -79,8 +79,8 @@ class ClassTreeView(ItemViewTool):
     @classmethod
     def delete_class(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
         model: ClassTreeModel = cls.get_model(bsdd_dictionary)
-        parent = class_utils.get_parent(bsdd_class)
-        for child in class_utils.get_children(bsdd_class):
+        parent = cl_utils.get_parent(bsdd_class)
+        for child in cl_utils.get_children(bsdd_class):
             model.move_row(child, parent)
         model.remove_row(bsdd_class)
         cls.signals.item_deleted.emit(bsdd_class)
@@ -100,7 +100,7 @@ class ClassTreeView(ItemViewTool):
         while stack:
             n = stack.pop()
             to_delete.append(n)
-            stack.extend(class_utils.get_children(n))
+            stack.extend(cl_utils.get_children(n))
 
         for node in reversed(to_delete):
             model.remove_row(node)

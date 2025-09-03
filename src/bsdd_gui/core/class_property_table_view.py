@@ -2,7 +2,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import QApplication, QTableView
 from typing import Type, TYPE_CHECKING
 from PySide6.QtCore import QModelIndex
-from bsdd_json.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils import property_utils as prop_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -34,8 +34,8 @@ def add_columns_to_view(
 
     sort_model, model = property_table.create_model(None)
     property_table.add_column_to_table(model, "Name", lambda a: a.Code)
-    property_table.add_column_to_table(model, "Datatype", cp_utils.get_datatype)
-    property_table.add_column_to_table(model, "Unit", cp_utils.get_units)
+    property_table.add_column_to_table(model, "Datatype", prop_utils.get_datatype)
+    property_table.add_column_to_table(model, "Unit", prop_utils.get_units)
     property_table.add_column_to_table(model, "Values", property_table.get_allowed_values)
     property_table.add_column_to_table(model, "Is Required", lambda a: a.IsRequired)
     view.setModel(sort_model)

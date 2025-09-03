@@ -12,8 +12,8 @@ from bsdd_gui.presets.tool_presets import DialogTool, DialogSignals
 from urllib.parse import urlparse
 from bsdd_gui.module.allowed_values_table_view.ui import AllowedValuesTable
 from bsdd_gui.module.property_editor_widget import ui as property_editor_ui
-from bsdd_json.utils.bsdd_dictionary import is_uri
-from bsdd_json.utils import bsdd_class_property as cp_utils
+from bsdd_json.utils.dictionary_utils import is_uri
+from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.class_property_editor_widget.constants import (
     BUTTON_MODE_EDIT,
     BUTTON_MODE_NEW,
@@ -137,7 +137,7 @@ class ClassPropertyEditorWidget(DialogTool):
 
     @classmethod
     def create_property_code_completer(cls, bsdd_dictionary: BsddDictionary):
-        all_codes = cp_utils.get_property_code_dict(bsdd_dictionary)
+        all_codes = prop_utils.get_property_code_dict(bsdd_dictionary)
         completer = QCompleter(all_codes)
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         return completer
@@ -184,7 +184,7 @@ class ClassPropertyEditorWidget(DialogTool):
             return True  # Todo: check if this really exists
 
         # Code doesn't exist
-        if not value in cp_utils.get_property_code_dict(bsdd_dictionary):
+        if not value in prop_utils.get_property_code_dict(bsdd_dictionary):
             return False
 
         bsdd_class = bsdd_class_property.parent()
@@ -215,7 +215,7 @@ class ClassPropertyEditorWidget(DialogTool):
             line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "Edit"))
         elif not bsdd_dictionary:
             line_edit.show_button(False)
-        elif value in cp_utils.get_property_code_dict(bsdd_dictionary):
+        elif value in prop_utils.get_property_code_dict(bsdd_dictionary):
             line_edit.show_button(True)
             line_edit.set_button_mode(BUTTON_MODE_EDIT)
             line_edit.set_button_text(QCoreApplication.translate("ClassPropertyEditor", "Edit"))
@@ -230,7 +230,7 @@ class ClassPropertyEditorWidget(DialogTool):
         if line_edit.button_mode == BUTTON_MODE_VIEW:
             pass  # TODO Open Website
         elif line_edit.button_mode == BUTTON_MODE_EDIT:
-            bsdd_property = cp_utils.get_internal_property(widget.bsdd_data)
+            bsdd_property = prop_utils.get_internal_property(widget.bsdd_data)
             cls.signals.edit_bsdd_property_requested.emit(bsdd_property, widget)
         elif line_edit.button_mode == BUTTON_MODE_NEW:
             bsdd_class_property: BsddClassProperty = widget.bsdd_data
@@ -238,14 +238,14 @@ class ClassPropertyEditorWidget(DialogTool):
             blueprint = {
                 "Code": code,
                 "Name": code,
-                "DataType": cp_utils.get_data_type(bsdd_class_property) or "String",
+                "DataType": prop_utils.get_data_type(bsdd_class_property) or "String",
             }
             cls.signals.create_bsdd_property_requested.emit(blueprint)
 
     @classmethod
     def update_allowed_units(cls, widget: ui.ClassPropertyEditor):
         bsdd_class_property = widget.bsdd_data
-        allowed_units = cp_utils.get_units(bsdd_class_property)
+        allowed_units = prop_utils.get_units(bsdd_class_property)
         current_unit = widget.cb_unit.currentText()
         index = allowed_units.index(current_unit) if current_unit in allowed_units else 0
         widget.cb_unit.clear()
@@ -256,10 +256,10 @@ class ClassPropertyEditorWidget(DialogTool):
     @classmethod
     def update_description_placeholder(cls, widget: ui.ClassPropertyEditor):
         bsdd_class_property = widget.bsdd_data
-        if cp_utils.is_external_ref(bsdd_class_property):
-            class_property = cp_utils.get_external_property(bsdd_class_property)
+        if prop_utils.is_external_ref(bsdd_class_property):
+            class_property = prop_utils.get_external_property(bsdd_class_property)
         else:
-            class_property = cp_utils.get_internal_property(bsdd_class_property)
+            class_property = prop_utils.get_internal_property(bsdd_class_property)
         if not class_property:
             text = ""
         elif class_property.Description:
@@ -273,10 +273,10 @@ class ClassPropertyEditorWidget(DialogTool):
     @classmethod
     def update_value_view(cls, widget: ui.ClassPropertyEditor):
         bsdd_class_property = widget.bsdd_data
-        if cp_utils.is_external_ref(bsdd_class_property):
-            bsdd_property = cp_utils.get_external_property(bsdd_class_property)
+        if prop_utils.is_external_ref(bsdd_class_property):
+            bsdd_property = prop_utils.get_external_property(bsdd_class_property)
         else:
-            bsdd_property = cp_utils.get_internal_property(bsdd_class_property)
+            bsdd_property = prop_utils.get_internal_property(bsdd_class_property)
         if not bsdd_property:
             return
         value_kind = bsdd_property.PropertyValueKind
@@ -293,7 +293,7 @@ class ClassPropertyEditorWidget(DialogTool):
     def handle_field_changed(cls, parent_widget: property_editor_ui.PropertyEditor, field):
         for widget in cls.get_widgets():
             bsdd_class_property: BsddClassProperty = widget.bsdd_data
-            internal_prop = cp_utils.get_internal_property(bsdd_class_property)
+            internal_prop = prop_utils.get_internal_property(bsdd_class_property)
             if not internal_prop:
                 continue
             if parent_widget.bsdd_data == internal_prop:

@@ -4,7 +4,6 @@ import bsdd
 
 if TYPE_CHECKING:
     from bsdd_json.models import BsddClassProperty
-import bsdd_json.utils.bsdd_class_property as cp_utils
 from .constants import IFC_URI
 from requests.exceptions import ReadTimeout
 from bsdd_gui.resources.data import get_ifc_classes as ifc_backup

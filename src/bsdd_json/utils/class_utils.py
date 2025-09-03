@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Iterable, Optional, Literal, Dict, List, Set
 import logging
-from . import bsdd_dictionary as dict_util
+from . import dictionary_utils as dict_utils
 import bsdd
 
 from bsdd_json.models import BsddDictionary, BsddClass
@@ -14,10 +14,10 @@ class Cache:
     def get_external_class(
         cls, class_uri: str, client: bsdd.Client | None = None
     ) -> BsddClass | None:
-        from bsdd_json.utils import bsdd_class_property as cp_utils
+        from bsdd_json.utils import property_utils as prop_utils
 
         def _make_request():
-            if not dict_util.is_uri(class_uri):
+            if not dict_utils.is_uri(class_uri):
                 return dict()
             c = bsdd.Client() if client is None else client
             result = c.get_class(
@@ -83,7 +83,7 @@ def get_parent(bsdd_class: BsddClass) -> BsddClass | None:
 
 
 def get_class_by_code(bsdd_dictionary: BsddDictionary, code: str) -> BsddClass | None:
-    if dict_util.is_uri(code):
+    if dict_utils.is_uri(code):
         bsdd_class = Cache.get_external_class(code)
     else:
         bsdd_class = get_all_class_codes(bsdd_dictionary).get(code)
@@ -170,12 +170,12 @@ def update_relations_to_new_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDict
     namespace = f"{bsdd_dictionary.OrganizationCode}/{bsdd_dictionary.DictionaryCode}"
     version = bsdd_dictionary.DictionaryVersion
     for relationship in bsdd_class.ClassRelations:
-        old_uri = dict_util.parse_bsdd_url(relationship.RelatedClassUri)
+        old_uri = dict_utils.parse_bsdd_url(relationship.RelatedClassUri)
         new_uri = dict(old_uri)
         new_uri["namespace"] = namespace
         new_uri["version"] = version
         if old_uri != new_uri:
-            relationship.RelatedClassUri = dict_util.build_bsdd_url(new_uri)
+            relationship.RelatedClassUri = dict_utils.build_bsdd_url(new_uri)
 
 
 def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
@@ -188,4 +188,4 @@ def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
     if bsdd_dictionary.UseOwnUri:
         data["host"] = bsdd_dictionary.DictionaryUri
 
-    return dict_util.build_bsdd_url(data)
+    return dict_utils.build_bsdd_url(data)

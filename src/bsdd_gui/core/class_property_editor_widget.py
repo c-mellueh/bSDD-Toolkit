@@ -9,7 +9,6 @@ from bsdd_gui.module.class_property_editor_widget.constants import (
 )
 from PySide6.QtCore import QCoreApplication
 from bsdd_gui.module.class_property_editor_widget import ui
-from bsdd_json.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool

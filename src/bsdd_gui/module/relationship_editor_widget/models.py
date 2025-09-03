@@ -8,7 +8,6 @@ from PySide6.QtCore import (
     QSortFilterProxyModel,
 )
 from typing import Literal
-from bsdd_json.utils import bsdd_class_property as cp_utils
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_json.models import (

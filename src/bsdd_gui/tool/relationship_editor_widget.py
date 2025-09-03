@@ -13,9 +13,9 @@ from bsdd_json import (
     BsddPropertyRelation,
 )
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals, FieldTool, FieldSignals
-from bsdd_json.utils import bsdd_dictionary as dict_util
-from bsdd_json.utils import bsdd_class as cl_util
-from bsdd_json.utils import bsdd_class_property as prop_util
+from bsdd_json.utils import dictionary_utils as dict_utils
+from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.class_editor_widget import ui as class_editor_ui
 from bsdd_gui.presets.ui_presets import BaseDialog
 
@@ -100,12 +100,12 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
     def is_related_class_valid(
         cls, value, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary
     ):
-        if dict_util.is_uri(value):
+        if dict_utils.is_uri(value):
             return True
         if isinstance(widget.bsdd_data, BsddClass):
-            element = cl_util.get_class_by_code(bsdd_dictionary, value)
+            element = cl_utils.get_class_by_code(bsdd_dictionary, value)
         elif isinstance(widget.bsdd_data, BsddProperty):
-            element = prop_util.get_property_by_code(value, bsdd_dictionary)
+            element = prop_utils.get_property_by_code(value, bsdd_dictionary)
         if element is None:
             return False
         if element == widget.bsdd_data:
@@ -159,9 +159,9 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
                 cls.update_owned_uri_visibility(widget, bsdd_dictionary)
         if field_name in ["DictionaryVersion", "OrganizationCode", "DictionaryCode"]:
             for cl in bsdd_dictionary.Classes:
-                cl_util.update_relations_to_new_uri(cl, bsdd_dictionary)
+                cl_utils.update_relations_to_new_uri(cl, bsdd_dictionary)
             for prop in bsdd_dictionary.Properties:
-                prop_util.update_relations_to_new_uri(prop, bsdd_dictionary)
+                prop_utils.update_relations_to_new_uri(prop, bsdd_dictionary)
 
     @classmethod
     def update_all_completers(cls, bsdd_dictionary: BsddDictionary):
@@ -186,14 +186,14 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
         if model_kind == "class":
             code = widget.le_related_element.text()
-            related_class = cl_util.get_class_by_code(bsdd_dictionary, code)
+            related_class = cl_utils.get_class_by_code(bsdd_dictionary, code)
             if not related_class:
                 clear_inputs()
                 return
-            if dict_util.is_uri(code):
+            if dict_utils.is_uri(code):
                 data_dict["RelatedClassUri"] = code
             else:
-                data_dict["RelatedClassUri"] = cl_util.build_bsdd_uri(
+                data_dict["RelatedClassUri"] = cl_utils.build_bsdd_uri(
                     related_class, bsdd_dictionary
                 )
             data_dict["RelatedClassName"] = related_class.Name
@@ -206,14 +206,14 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             relation = BsddClassRelation.model_validate(data_dict)
         else:
             code = widget.le_related_element.text()
-            related_property = prop_util.get_property_by_code(code, bsdd_dictionary)
+            related_property = prop_utils.get_property_by_code(code, bsdd_dictionary)
             if not related_property:
                 clear_inputs()
                 return
-            if dict_util.is_uri(code):
+            if dict_utils.is_uri(code):
                 data_dict["RelatedPropertyUri"] = code
             else:
-                data_dict["RelatedPropertyUri"] = prop_util.build_bsdd_uri(
+                data_dict["RelatedPropertyUri"] = prop_utils.build_bsdd_uri(
                     related_property, bsdd_dictionary
                 )
             data_dict["RelatedPropertyName"] = related_property.Name
