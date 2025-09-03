@@ -209,4 +209,4 @@ __marimo__/
 .pre-commit-config.yaml
 test*
 
-.vscode
+.vscode*
