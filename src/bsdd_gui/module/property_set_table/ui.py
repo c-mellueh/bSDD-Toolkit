@@ -6,9 +6,10 @@ if TYPE_CHECKING:
 from PySide6.QtCore import QModelIndex, Qt, Signal
 from PySide6.QtWidgets import QStyledItemDelegate, QTableView, QWidget, QListView
 from . import trigger
+from bsdd_gui.presets.ui_presets import TableItemView
 
 
-class PsetTableView(QTableView):
+class PsetTableView(TableItemView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         trigger.view_created(self)

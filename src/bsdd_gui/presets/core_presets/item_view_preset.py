@@ -7,7 +7,7 @@ from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
 
 if TYPE_CHECKING:
     from bsdd_gui.presets import tool_presets as tool
-    from bsdd_gui.presets.view_presets import ItemViewType
+    from bsdd_gui.presets.ui_presets import ItemViewType
 
 
 def connect_signals(item_view_handler: Type[tool.ItemViewTool]):
@@ -23,8 +23,7 @@ def register_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewTool]
 
 
 def add_columns_to_view(view: ItemViewType, item_view_handler: Type[tool.ItemViewTool]):
-    prop: BsddClassProperty | BsddProperty = view.bsdd_data
-    sort_model, model = item_view_handler.create_model(prop)
+    sort_model, model = item_view_handler.create_model(None)
     item_view_handler.add_column_to_table(
         model, "Value", lambda av: av.Value, item_view_handler.set_value
     )

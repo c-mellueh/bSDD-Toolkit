@@ -4,7 +4,7 @@
 from __future__ import annotations
 import bsdd_gui
 from typing import TYPE_CHECKING
-from bsdd_gui.presets.view_presets import ItemViewType
+from bsdd_gui.presets.ui_presets import ItemViewType
 from PySide6.QtCore import QPoint
 
 from bsdd_gui.presets.core_presets import item_view_preset as core  # <- modify to fit your need

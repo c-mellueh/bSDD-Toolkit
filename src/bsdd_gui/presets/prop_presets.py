@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QAbstractItemView, QWidget
 from PySide6.QtCore import QAbstractItemModel
 from PySide6.QtGui import QAction
 from typing import TypedDict, Callable, TypeAlias
-from .view_presets import ItemViewType
+from bsdd_gui.presets.ui_presets import ItemViewType
 from .models_presets import ItemModel
 
 

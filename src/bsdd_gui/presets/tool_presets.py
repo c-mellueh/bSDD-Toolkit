@@ -23,13 +23,18 @@ from PySide6.QtCore import (
     QItemSelectionModel,
 )
 from PySide6.QtGui import QAction
-from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
-from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow
+from bsdd_gui.presets.ui_presets import (
+    TagInput,
+    DateTimeWithNow,
+    ItemViewType,
+    TreeItemView,
+    TableItemView,
+    BaseWidget,
+)
 from bsdd_parser import *
 import logging
 from .signal_presets import WidgetSignals, FieldSignals, ViewSignals
 from .models_presets import ItemModel
-from .view_presets import ItemViewType, TreeItemView, TableItemView
 
 BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassProperty
 
@@ -82,7 +87,7 @@ class FieldTool(BaseTool):
         return None
 
     @classmethod
-    def register_basic_field(cls, widget: ItemViewType, field: ItemViewType, variable_name: str):
+    def register_basic_field(cls, widget: BaseWidget, field: ItemViewType, variable_name: str):
         cls.register_field_getter(widget, field, lambda e, vn=variable_name: getattr(e, vn))
         cls.register_field_setter(
             widget,
@@ -96,9 +101,7 @@ class FieldTool(BaseTool):
         cls.register_field_listener(widget, field)
 
     @classmethod
-    def register_field_getter(
-        cls, widget: ItemViewType, field: ItemViewType, getter_func: callable
-    ):
+    def register_field_getter(cls, widget: BaseWidget, field: ItemViewType, getter_func: callable):
         """_summary_
 
         Args:
@@ -112,15 +115,13 @@ class FieldTool(BaseTool):
         cls.get_properties().field_getter[widget][field] = getter_func
 
     @classmethod
-    def register_field_setter(
-        cls, widget: ItemViewType, field: ItemViewType, setter_func: callable
-    ):
+    def register_field_setter(cls, widget: BaseWidget, field: ItemViewType, setter_func: callable):
         if not widget in cls.get_properties().field_setter:
             cls.get_properties().field_setter[widget] = dict()
         cls.get_properties().field_setter[widget][field] = setter_func
 
     @classmethod
-    def register_field_listener(cls, widget: ItemViewType, field: ItemViewType):
+    def register_field_listener(cls, widget: BaseWidget, field: ItemViewType):
         f = field
         w = widget
         if isinstance(f, QLineEdit):
@@ -225,7 +226,7 @@ class FieldTool(BaseTool):
         return value
 
     @classmethod
-    def sync_from_model(cls, widget: ItemViewType, data, explicit_field=None):
+    def sync_from_model(cls, widget: BaseWidget, data, explicit_field=None):
 
         for field, getter_func in cls.get_properties().field_getter[widget].items():
             if explicit_field is not None and explicit_field != field:
@@ -249,7 +250,7 @@ class FieldTool(BaseTool):
                 field.setChecked(value)
 
     @classmethod
-    def sync_to_model(cls, widget: ItemViewType, element, explicit_field: ItemViewType = None):
+    def sync_to_model(cls, widget: BaseWidget, element, explicit_field: ItemViewType = None):
         field_dict = cls.get_properties().field_setter.get(widget) or dict()
         for field, setter_func in field_dict.items():
             if explicit_field is not None and explicit_field != field:
@@ -258,7 +259,7 @@ class FieldTool(BaseTool):
             setter_func(element, value)
 
     @classmethod
-    def all_inputs_are_valid(cls, widget: ItemViewType):
+    def all_inputs_are_valid(cls, widget: BaseWidget):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
             logging.info(f"No Validator Functions found for widget {widget}")
@@ -272,7 +273,7 @@ class FieldTool(BaseTool):
         return True
 
     @classmethod
-    def get_invalid_inputs(cls, widget: ItemViewType):
+    def get_invalid_inputs(cls, widget: BaseWidget):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
             return []
@@ -294,7 +295,7 @@ class WidgetTool(FieldTool):
         return None
 
     @classmethod
-    def register_widget(cls, widget: ItemViewType):
+    def register_widget(cls, widget: BaseWidget):
         logging.info(f"Register {widget}")
 
         cls.get_properties().widgets.add(widget)

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt
 from . import trigger
 from bsdd_parser import BsddClassProperty, BsddProperty
-from bsdd_gui.presets.view_presets import TableItemView
+from bsdd_gui.presets.ui_presets import TableItemView
 
 if TYPE_CHECKING:
     from . import models
