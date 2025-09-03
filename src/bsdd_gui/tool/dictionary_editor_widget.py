@@ -32,7 +32,7 @@ class DictionaryEditorWidget(WidgetTool, ActionTool):
 
     @classmethod
     def get_properties(cls) -> DictionaryEditorWidgetProperties:
-        return bsdd_gui.DictionaryEditorProperties
+        return bsdd_gui.DictionaryEditorWidgetProperties
 
     @classmethod
     def connect_internal_signals(cls):

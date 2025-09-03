@@ -31,7 +31,7 @@ class ClassEditorWidget(WidgetTool):
 
     @classmethod
     def get_properties(cls) -> ClassEditorWidgetProperties:
-        return bsdd_gui.ClassEditorProperties
+        return bsdd_gui.ClassEditorWidgetProperties
 
     @classmethod
     def connect_signals(cls):

@@ -32,7 +32,7 @@ class RelationshipEditorWidget(WidgetTool, ItemViewTool):
 
     @classmethod
     def get_properties(cls) -> RelationshipEditorWidgetProperties:
-        return bsdd_gui.RelationshipEditorProperties
+        return bsdd_gui.RelationshipEditorWidgetProperties
 
     @classmethod
     def _get_model_class(cls) -> Type[models.RelationshipModel]:

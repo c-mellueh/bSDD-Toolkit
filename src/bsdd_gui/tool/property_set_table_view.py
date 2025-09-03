@@ -24,7 +24,7 @@ class PropertySetTableView(ItemViewTool):
 
     @classmethod
     def get_properties(cls) -> PropertySetTableViewProperties:
-        return bsdd_gui.PropertySetTableProperties
+        return bsdd_gui.PropertySetTableViewProperties
 
     @classmethod
     def _get_model_class(cls) -> Type[models.PsetTableModel]:

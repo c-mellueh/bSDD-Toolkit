@@ -43,7 +43,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
 
     @classmethod
     def get_properties(cls) -> PropertyTableWidgetProperties:
-        return bsdd_gui.PropertyTableProperties
+        return bsdd_gui.PropertyTableWidgetProperties
 
     @classmethod
     def create_model(cls, data):

@@ -24,7 +24,7 @@ class ClassPropertyTableView(ItemViewTool):
 
     @classmethod
     def get_properties(cls) -> ClassPropertyTableViewProperties:
-        return bsdd_gui.ClassPropertyTableProperties
+        return bsdd_gui.ClassPropertyTableViewProperties
 
     @classmethod
     def _get_model_class(cls) -> Type[models.ClassPropertyTableModel]:

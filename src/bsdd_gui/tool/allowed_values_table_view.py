@@ -24,7 +24,7 @@ class AllowedValuesTableView(ItemViewTool):
 
     @classmethod
     def get_properties(cls) -> AllowedValuesTableViewProperties:
-        return bsdd_gui.AllowedValuesViewProperties
+        return bsdd_gui.AllowedValuesTableViewProperties
 
     @classmethod
     def connect_internal_signals(cls):

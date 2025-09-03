@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class SettingsWidget:
     @classmethod
     def get_properties(cls) -> SettingsWidgetProperties:
-        return bsdd_gui.SettingsProperties
+        return bsdd_gui.SettingsWidgetProperties
 
     @classmethod
     def set_action(cls, name: str, action: QAction):

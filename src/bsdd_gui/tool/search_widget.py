@@ -30,7 +30,7 @@ class SearchWidget(WidgetTool):
 
     @classmethod
     def get_properties(cls) -> SearchWidgetProperties:
-        return bsdd_gui.SearchProperties
+        return bsdd_gui.SearchWidgetProperties
 
     @classmethod
     def connect_signals(cls):

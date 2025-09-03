@@ -25,7 +25,7 @@ class PropertyEditorWidget(WidgetTool):
 
     @classmethod
     def get_properties(cls) -> PropertyEditorWidgetProperties:
-        return bsdd_gui.PropertyEditorProperties
+        return bsdd_gui.PropertyEditorWidgetProperties
 
     @classmethod
     def connect_internal_signals(cls):

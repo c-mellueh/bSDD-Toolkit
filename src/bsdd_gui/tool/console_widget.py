@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class ConsoleWidget:
     @classmethod
     def get_properties(cls) -> ConsoleWidgetProperties:
-        return bsdd_gui.ConsoleProperties
+        return bsdd_gui.ConsoleWidgetProperties
 
     @classmethod
     def create_console(cls):

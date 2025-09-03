@@ -45,7 +45,7 @@ class ClassPropertyEditorWidget(WidgetTool):
 
     @classmethod
     def get_properties(cls) -> ClassPropertyEditorWidgetProperties:
-        return bsdd_gui.ClassPropertyEditorProperties
+        return bsdd_gui.ClassPropertyEditorWidgetProperties
 
     @classmethod
     def request_property_specific_redraw(cls, widget: ui.ClassPropertyEditor):

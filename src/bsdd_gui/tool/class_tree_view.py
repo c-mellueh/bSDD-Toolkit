@@ -31,7 +31,7 @@ class ClassTreeView(ItemViewTool):
 
     @classmethod
     def get_properties(cls) -> ClassTreeViewProperties:
-        return bsdd_gui.ClassTreeProperties
+        return bsdd_gui.ClassTreeViewProperties
 
     @classmethod
     def _get_model_class(cls) -> Type[models.ClassTreeModel]:
