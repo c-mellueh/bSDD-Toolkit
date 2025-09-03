@@ -8,13 +8,17 @@ version = "0.1.0"
 description = "BSDD JSON parser & GUI"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "Your Name" }]
+authors = [{ name = "Christoph Mellüh" }]
 license = { text = "MIT" }
 dependencies = [
   "pydantic>=2.7",
   "typer>=0.12",
   "rich>=13",
   "PySide6>=6.7",
+  "bsdd",
+  "appdirs",
+  "pyqtconsole",
+  "thefuzz",
 ]
 
 [project.optional-dependencies]
