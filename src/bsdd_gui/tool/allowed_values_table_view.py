@@ -19,7 +19,7 @@ class Signals(ViewSignals):
     pass
 
 
-class AllowedValuesView(ItemViewTool):
+class AllowedValuesTableView(ItemViewTool):
     signals = Signals()
 
     @classmethod

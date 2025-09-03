@@ -31,12 +31,12 @@ def create_window(bsdd_property: BsddProperty, parent: QWidget | None):
 
 
 def widget_created(widget: ui.PropertyEditor):
-    core.register_widget(widget, tool.PropertyEditor, tool.AllowedValuesView)
+    core.register_widget(widget, tool.PropertyEditor, tool.AllowedValuesTableView)
     core.add_fields_to_widget(
-        widget, tool.PropertyEditor, tool.AllowedValuesView, tool.RelationshipEditor
+        widget, tool.PropertyEditor, tool.AllowedValuesTableView, tool.RelationshipEditor
     )
     core.add_validator_functions_to_widget(widget, tool.PropertyEditor, tool.Util, tool.Project)
 
 
 def widget_closed(widget: ui.PropertyEditor):
-    core.unregister_widget(widget, tool.PropertyEditor, tool.AllowedValuesView)
+    core.unregister_widget(widget, tool.PropertyEditor, tool.AllowedValuesTableView)

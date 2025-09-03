@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.AllowedValuesView, tool.ClassPropertyEditor)
+    core.connect_signals(tool.AllowedValuesTableView, tool.ClassPropertyEditor)
 
 
 def retranslate_ui():
@@ -21,11 +21,11 @@ def on_new_project():
 
 
 def context_menu_requested(view, pos):
-    core.create_context_menu(view, pos, tool.AllowedValuesView)
+    core.create_context_menu(view, pos, tool.AllowedValuesTableView)
 
 
 def view_created(view: ui.AllowedValuesTable):
-    core.register_view(view, tool.AllowedValuesView)
-    core.add_columns_to_view(view, tool.AllowedValuesView)
-    core.add_context_menu_to_view(view, tool.AllowedValuesView)
-    core.connect_view(view, tool.AllowedValuesView)
+    core.register_view(view, tool.AllowedValuesTableView)
+    core.add_columns_to_view(view, tool.AllowedValuesTableView)
+    core.add_context_menu_to_view(view, tool.AllowedValuesTableView)
+    core.connect_view(view, tool.AllowedValuesTableView)

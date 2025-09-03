@@ -28,7 +28,9 @@ def create_class_property_creator():
 
 
 def update_property_specific_fields(window: ui.ClassPropertyEditor):
-    core.update_property_specific_fields(window, tool.ClassPropertyEditor, tool.AllowedValuesView)
+    core.update_property_specific_fields(
+        window, tool.ClassPropertyEditor, tool.AllowedValuesTableView
+    )
 
 
 def retranslate_ui():
@@ -52,11 +54,13 @@ def widget_created(window: ui.ClassPropertyEditor):
         tool.Project,
     )
     core.add_validators_to_widget(window, tool.ClassPropertyEditor, tool.Project, tool.Util)
-    core.update_property_specific_fields(window, tool.ClassPropertyEditor, tool.AllowedValuesView)
+    core.update_property_specific_fields(
+        window, tool.ClassPropertyEditor, tool.AllowedValuesTableView
+    )
 
 
 def window_closed(window: ui.ClassPropertyEditor):
-    core.unregister_widget(window, tool.ClassPropertyEditor, tool.AllowedValuesView)
+    core.unregister_widget(window, tool.ClassPropertyEditor, tool.AllowedValuesTableView)
 
 
 def update_window(window: ui.ClassPropertyEditor):
