@@ -22,6 +22,10 @@ def create_main_window(
     mw.show()
     main_window.hide_console()
     main_window.install_validation_styles(application)
+    toggle_console_action = main_window.add_action(
+        "menuEdit", "ToggleConsole", main_window.signals.toggle_console_requested.emit
+    )
+    main_window.set_action(mw, "toggle_console", toggle_console_action)
 
 
 def connect_main_window(
@@ -49,6 +53,12 @@ def connect_main_window(
 def retranslate_ui(main_window: Type[tool.MainWindowWidget]):
     main_window.get().retranslateUi(main_window.get())
     main_window.get().setWindowTitle(f"bSDD-Toolkit v{bsdd_gui.__version__}")
+    action = main_window.get_action(main_window.get(), "toggle_console")
+
+    if main_window.is_console_visible():
+        action.setText(QCoreApplication.translate("MainWindow", "Hide Console"))
+    else:
+        action.setText(QCoreApplication.translate("MainWindow", "Show Console"))
 
 
 def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[tool.Project]):
@@ -69,3 +79,7 @@ def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[t
         ]
     )
     main_window.set_status_bar_text(status)
+
+
+def toggle_console(main_window: Type[tool.MainWindowWidget]):
+    main_window.toggle_console()

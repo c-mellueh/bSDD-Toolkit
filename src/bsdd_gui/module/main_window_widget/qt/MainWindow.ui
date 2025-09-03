@@ -328,19 +328,19 @@
      <string>File</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuData">
+   <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuModels">
+   <widget class="QMenu" name="menuData">
     <property name="title">
      <string>Data</string>
     </property>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuData"/>
-   <addaction name="menuModels"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actiondqwd">

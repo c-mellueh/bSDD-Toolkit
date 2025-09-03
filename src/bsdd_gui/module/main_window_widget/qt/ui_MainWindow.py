@@ -256,10 +256,10 @@ class Ui_MainWindow(object):
         self.menubar.setGeometry(QRect(0, 0, 1468, 33))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
+        self.menuEdit = QMenu(self.menubar)
+        self.menuEdit.setObjectName("menuEdit")
         self.menuData = QMenu(self.menubar)
         self.menuData.setObjectName("menuData")
-        self.menuModels = QMenu(self.menubar)
-        self.menuModels.setObjectName("menuModels")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -270,8 +270,8 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.button_Pset_add, self.table_property)
 
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuEdit.menuAction())
         self.menubar.addAction(self.menuData.menuAction())
-        self.menubar.addAction(self.menuModels.menuAction())
 
         self.retranslateUi(MainWindow)
 
@@ -293,7 +293,7 @@ class Ui_MainWindow(object):
         self.label_property_name.setText("")
         self.button_property_add.setText(QCoreApplication.translate("MainWindow", "New", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", "File", None))
-        self.menuData.setTitle(QCoreApplication.translate("MainWindow", "Edit", None))
-        self.menuModels.setTitle(QCoreApplication.translate("MainWindow", "Data", None))
+        self.menuEdit.setTitle(QCoreApplication.translate("MainWindow", "Edit", None))
+        self.menuData.setTitle(QCoreApplication.translate("MainWindow", "Data", None))
 
     # retranslateUi

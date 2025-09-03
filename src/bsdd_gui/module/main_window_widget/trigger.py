@@ -24,3 +24,8 @@ def close_event(event):
 
 def refresh_status_bar():
     core.refresh_status_bar(tool.MainWindowWidget, tool.Project)
+
+
+def toggle_console():
+    core.toggle_console(tool.MainWindowWidget)
+    core.retranslate_ui(tool.MainWindowWidget)

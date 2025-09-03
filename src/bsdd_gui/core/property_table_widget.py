@@ -157,7 +157,7 @@ def connect_to_main_menu(
     main_window: Type[tool.MainWindowWidget],
 ) -> None:
     action = main_window.add_action(
-        "menuModels",
+        "menuData",
         "bSDD Properties",
         lambda: property_table.request_widget(None, main_window.get()),
     )

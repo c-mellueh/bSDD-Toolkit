@@ -9,6 +9,7 @@ from bsdd_parser.models import BsddClass, BsddClassProperty
 from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
 from PySide6.QtGui import QAction
 from bsdd_gui.module.main_window_widget import trigger
+from bsdd_gui.presets.tool_presets import ActionTool
 
 if TYPE_CHECKING:
     from bsdd_gui.module.main_window_widget.prop import MainWindowWidgetProperties
@@ -23,9 +24,10 @@ class Signals(QObject):
     new_property_set_requested = Signal()
     new_property_requested = Signal()
     refresh_status_bar_requested = Signal()
+    toggle_console_requested = Signal()
 
 
-class MainWindowWidget:
+class MainWindowWidget(ActionTool):
     signals = Signals()
 
     @classmethod
@@ -35,6 +37,7 @@ class MainWindowWidget:
     @classmethod
     def connect_internal_signals(cls):
         cls.signals.refresh_status_bar_requested.connect(trigger.refresh_status_bar)
+        cls.signals.toggle_console_requested.connect(trigger.toggle_console)
 
     @classmethod
     def create(cls, application: QApplication) -> ui.MainWindow:
@@ -56,17 +59,6 @@ class MainWindowWidget:
     @classmethod
     def get_app(cls) -> QApplication:
         return cls.get_properties().application
-
-    @classmethod
-    def hide_console(cls):
-        """
-        hide Console Window (Works only for Windows so far)
-        :return:
-        """
-        return
-        hWnd = ctypes.windll.kernel32.GetConsoleWindow()
-        if hWnd != 0:
-            ctypes.windll.user32.ShowWindow(hWnd, 0)
 
     @classmethod
     def get_active_class(cls) -> BsddClass | None:
@@ -182,3 +174,38 @@ class MainWindowWidget:
     @classmethod
     def set_status_bar_text(cls, text: str):
         cls.get_statusbar().showMessage(text)
+
+    @classmethod
+    def toggle_console(cls):
+        active_window = cls.get_app().activeWindow()
+        if cls.is_console_visible():
+            cls.hide_console()
+        elif ctypes.windll.kernel32.GetConsoleWindow() != 0:
+            cls.show_console()
+        active_window.activateWindow()
+
+    @classmethod
+    def hide_console(cls):
+        """
+        hide Console Window (Works only for Windows so far)
+        :return:
+        """
+        hWnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hWnd != 0:
+            ctypes.windll.user32.ShowWindow(hWnd, 0)
+
+    @classmethod
+    def show_console(cls):
+        console_window = ctypes.windll.kernel32.GetConsoleWindow()
+        if console_window != 0:
+            # Check if the console is visible
+            ctypes.windll.user32.ShowWindow(console_window, 5)  # Show the console
+
+    @classmethod
+    def is_console_visible(cls):
+        hWnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hWnd == 0:
+            return False
+        if ctypes.windll.user32.IsWindowVisible(hWnd):
+            return True
+        return False
