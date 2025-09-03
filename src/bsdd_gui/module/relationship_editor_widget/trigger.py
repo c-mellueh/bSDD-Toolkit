@@ -38,9 +38,11 @@ def widget_created(
     core.add_context_menu_to_view(view, tool.RelationshipEditorWidget)
     core.connect_view(view, tool.RelationshipEditorWidget)
 
-    core.register_widget(widget, tool.RelationshipEditorWidget)
+    core.register_widget(widget, data, tool.RelationshipEditorWidget)
+    core.register_fields(widget, tool.RelationshipEditorWidget)
+    core.register_validators(widget, tool.RelationshipEditorWidget, tool.Util, tool.Project)
     core.connect_widget(widget, data, mode, tool.RelationshipEditorWidget, tool.Project)
-    core.add_field_validators(widget, tool.RelationshipEditorWidget, tool.Util, tool.Project)
+
     core.retranslate_ui(tool.RelationshipEditorWidget)
 
 

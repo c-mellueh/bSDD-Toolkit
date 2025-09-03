@@ -48,6 +48,15 @@ def retranslate_ui(relationship_editor: Type[tool.RelationshipEditorWidget]):
             widget.lb_related_class.setText(text)
 
 
+def register_widget(
+    widget: ui.RelationshipWidget,
+    data: BsddClass | BsddProperty,
+    relationship_editor: Type[tool.RelationshipEditorWidget],
+):
+    widget.bsdd_data = data
+    relationship_editor.register_widget(widget)
+
+
 def register_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]):
     relationship_editor.register_view(view)
 
@@ -82,10 +91,10 @@ def remove_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEdit
     relationship_editor.unregister_view(view)
 
 
-def register_widget(
+def register_fields(
     widget: ui.RelationshipWidget, relationship_editor: Type[tool.RelationshipEditorWidget]
 ):
-    relationship_editor.register_widget(widget)
+    return
 
 
 def connect_widget(
@@ -101,7 +110,7 @@ def connect_widget(
     relationship_editor.connect_widget_signals(widget, project.get())
 
 
-def add_field_validators(
+def register_validators(
     widget: ui.RelationshipWidget,
     relationship_editor: Type[tool.RelationshipEditorWidget],
     util: Type[tool.Util],

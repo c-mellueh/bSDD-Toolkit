@@ -78,8 +78,10 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
+        super().connect_widget_signals(widget)
         w = widget
-        widget.closed.connect(lambda: trigger.widget_closed(w))
+        widget.closed.connect(lambda: cls.unregister_view(w.tv_relations))
+
         widget.cb_fraction.toggled.connect(
             lambda: w.ds_fraction.setEnabled(w.cb_fraction.isChecked())
         )
