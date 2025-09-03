@@ -52,7 +52,7 @@ class ClassEditorWidget(DialogTool):
 
     @classmethod
     def connect_signals(cls):
-        cls.signals.edit_class_requested.connect(trigger.create_widget)
+        cls.signals.edit_class_requested.connect(trigger.create_dialog)
         cls.signals.copy_class_requested.connect(trigger.copy_class)
         cls.signals.new_class_requested.connect(trigger.create_new_class)
         cls.signals.grouping_requested.connect(trigger.group_classes)

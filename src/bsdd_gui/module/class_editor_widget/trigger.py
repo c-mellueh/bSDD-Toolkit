@@ -4,6 +4,7 @@ from bsdd_gui import tool
 from bsdd_gui.core import class_editor_widget as core
 from bsdd_parser import BsddClass
 from typing import TYPE_CHECKING
+import logging
 
 if TYPE_CHECKING:
     from . import ui
@@ -24,7 +25,11 @@ def on_new_project():
     pass
 
 
-def create_widget(bsdd_class: BsddClass):
+def create_widget(*args, **kwargs):
+    logging.error(f"Function not defined!")
+
+
+def create_dialog(bsdd_class: BsddClass):
     core.create_dialog(bsdd_class, tool.ClassEditorWidget, tool.MainWindowWidget)
 
 

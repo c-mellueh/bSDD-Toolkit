@@ -17,7 +17,9 @@ if TYPE_CHECKING:
 
 class Signals(FieldSignals):
     new_property_created = Signal(object)
-    new_property_requested = Signal(object)  # blueprint: dict[] with property values
+    new_property_requested = Signal(
+        object, QWidget
+    )  # blueprint: dict[] with property values, ParentWidget
 
 
 class PropertyEditorWidget(FieldTool):
@@ -29,20 +31,19 @@ class PropertyEditorWidget(FieldTool):
 
     @classmethod
     def connect_internal_signals(cls):
-        cls.signals.widget_requested.connect(trigger.create_widget)
-        cls.signals.widget_closed.connect(trigger.widget_closed)
+        super().connect_internal_signals()
         cls.signals.new_property_requested.connect(trigger.create_dialog)
         # Autoupdate Values
         cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
     @classmethod
-    def request_new_property(cls, blueprint: dict = None):
-        cls.signals.new_property_requested.emit(blueprint)
+    def request_new_property(cls, blueprint: dict = None, parent=None):
+        cls.signals.new_property_requested.emit(blueprint, parent)
 
     @classmethod
-    def connect_widget_to_internal_signals(cls, widget: ui.PropertyEditor):
+    def connect_widget_signals(cls, widget: ui.PropertyEditor):
+        super().connect_widget_signals(widget)
         w = widget
-        w.closed.connect(lambda: cls.signals.widget_closed.emit(w))
         w.cb_description.toggled.connect(lambda: cls.update_description_visiblility(w))
 
     @classmethod

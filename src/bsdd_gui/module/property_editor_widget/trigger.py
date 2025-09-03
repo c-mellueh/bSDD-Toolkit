@@ -20,30 +20,23 @@ def on_new_project():
     pass
 
 
-def create_dialog(blueprint: dict):
-    core.create_property_creator(
+def create_widget(bsdd_property: BsddProperty, parent: QWidget | None):
+    core.create_widget(bsdd_property, parent, tool.PropertyEditorWidget, tool.MainWindowWidget)
+
+
+def create_dialog(blueprint: dict, parent: QWidget):
+    core.create_dialog(
         blueprint, tool.PropertyEditorWidget, tool.MainWindowWidget, tool.Project, tool.Util
     )
 
 
-def create_widget(bsdd_property: BsddProperty, parent: QWidget | None):
-    core.create_widget(
-        bsdd_property, parent, tool.PropertyEditorWidget, tool.MainWindowWidget, tool.Project
-    )
-
-
 def widget_created(widget: ui.PropertyEditor):
-    core.register_widget(widget, tool.PropertyEditorWidget, tool.AllowedValuesTableView)
-    core.add_fields_to_widget(
+    core.register_widget(widget, tool.PropertyEditorWidget)
+    core.register_fields(
         widget,
         tool.PropertyEditorWidget,
         tool.AllowedValuesTableView,
         tool.RelationshipEditorWidget,
     )
-    core.add_validator_functions_to_widget(
-        widget, tool.PropertyEditorWidget, tool.Util, tool.Project
-    )
-
-
-def widget_closed(widget: ui.PropertyEditor):
-    core.unregister_widget(widget, tool.PropertyEditorWidget, tool.AllowedValuesTableView)
+    core.register_validators(widget, tool.PropertyEditorWidget, tool.Util, tool.Project)
+    core.connect_widget(widget, tool.PropertyEditorWidget)

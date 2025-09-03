@@ -10,32 +10,6 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_editor_widget import ui
 
 
-def create_widget(
-    bsdd_property: BsddClassProperty,
-    parent_widget: QWidget | None,
-    property_editor: Type[tool.PropertyEditorWidget],
-    main_window: Type[tool.MainWindowWidget],
-    project: Type[tool.Project],
-):
-    if parent_widget is None:
-        parent_widget = main_window.get()
-    if window := property_editor.get_widget(bsdd_property):
-        if window.isHidden():
-            window.close()
-            window = property_editor.create_edit_widget(
-                bsdd_property,
-                parent_widget,
-            )
-    else:
-        window = property_editor.create_edit_widget(
-            bsdd_property,
-            parent_widget,
-        )
-    window.show()
-    window.activateWindow()
-    window.showNormal()
-
-
 def connect_signals(
     property_editor: Type[tool.PropertyEditorWidget],
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
@@ -52,26 +26,62 @@ def connect_signals(
     property_editor.signals.new_property_created.connect(project.signals.property_added.emit)
 
 
-def unregister_widget(
-    widget: ui.PropertyEditor,
+def retranslate_ui(property_editor: Type[tool.PropertyEditorWidget]):
+    pass  # TODO
+
+
+def create_widget(
+    bsdd_property: BsddClassProperty,
+    parent_widget: QWidget | None,
     property_editor: Type[tool.PropertyEditorWidget],
-    allowed_values_table: Type[tool.AllowedValuesTableView],
+    main_window: Type[tool.MainWindowWidget],
 ):
-    property_editor.unregister_widget(widget)
-    allowed_values_table.unregister_view(widget.tv_allowed_values)
+    if parent_widget is None:
+        parent_widget = main_window.get()
+    property_editor.show_widget(bsdd_property, parent_widget)
+
+
+def create_dialog(
+    blueprint: dict,
+    parent_widget: QWidget,
+    property_editor: Type[tool.PropertyEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+):
+    code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
+    existing_names = cp_utils.get_property_code_dict(project.get()).keys()
+    code = util.get_unique_name(code, existing_names)
+    model_dict = dict() if not blueprint else blueprint
+    if "Code" not in model_dict:
+        model_dict["Code"] = code
+    if "Name" not in model_dict:
+        model_dict["Name"] = code
+    if "DataType" not in model_dict:
+        model_dict["DataType"] = "String"
+    bsdd_property = BsddProperty.model_validate(model_dict)
+    bsdd_property._set_parent(project.get())
+
+    dialog = property_editor.create_create_dialog(bsdd_property, main_window.get())
+    widget = dialog._editor_widget
+    text = QCoreApplication.translate("ClassPropertyEditor", "Create New Property")
+    dialog.setWindowTitle(text)
+    if dialog.exec():
+        property_editor.sync_to_model(widget, bsdd_property)
+        project.get().Properties.append(bsdd_property)
+        property_editor.signals.new_property_created.emit(bsdd_property)
+    widget.closed.emit()
 
 
 def register_widget(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditorWidget],
-    allowed_values_table: Type[tool.AllowedValuesTableView],
 ):
     property_editor.register_widget(widget)
     widget.tv_allowed_values.model().sourceModel().bsdd_data = widget.bsdd_data
-    property_editor.connect_widget_to_internal_signals(widget)
 
 
-def add_fields_to_widget(
+def register_fields(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditorWidget],
     allowed_values_table: Type[tool.AllowedValuesTableView],
@@ -125,7 +135,7 @@ def add_fields_to_widget(
     property_editor.update_description_visiblility(widget)
 
 
-def add_validator_functions_to_widget(
+def register_validators(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditorWidget],
     util: Type[tool.Util],
@@ -151,35 +161,15 @@ def add_validator_functions_to_widget(
     )
 
 
-def create_property_creator(
-    blueprint: dict,
+def connect_widget(
+    widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditorWidget],
-    main_window: Type[tool.MainWindowWidget],
-    project: Type[tool.Project],
-    util: Type[tool.Util],
+    allowed_values_table: Type[tool.AllowedValuesTableView],
 ):
-    code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
-    existing_names = cp_utils.get_property_code_dict(project.get()).keys()
-    code = util.get_unique_name(code, existing_names)
-    model_dict = dict() if not blueprint else blueprint
-    if "Code" not in model_dict:
-        model_dict["Code"] = code
-    if "Name" not in model_dict:
-        model_dict["Name"] = code
-    if "DataType" not in model_dict:
-        model_dict["DataType"] = "String"
-    bsdd_property = BsddProperty.model_validate(model_dict)
-    bsdd_property._set_parent(project.get())
-
-    dialog = property_editor.create_create_dialog(bsdd_property, main_window.get())
-    widget = dialog._editor_widget
-    text = QCoreApplication.translate("ClassPropertyEditor", "Create New Property")
-    dialog.setWindowTitle(text)
-    if dialog.exec():
-        property_editor.sync_to_model(widget, bsdd_property)
-        project.get().Properties.append(bsdd_property)
-        property_editor.signals.new_property_created.emit(bsdd_property)
-    widget.closed.emit()
+    property_editor.connect_widget_signals(widget)
+    widget.closed.connect(
+        lambda w=widget: allowed_values_table.unregister_view(w.tv_allowed_values)
+    )
 
 
 # TODO: add tablevalue add/remove function
