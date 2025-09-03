@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import ctypes
+import sys
 
 from PySide6.QtWidgets import QApplication, QMenu, QMenuBar, QStatusBar
 import bsdd_gui
@@ -178,34 +179,47 @@ class MainWindowWidget(ActionTool):
     @classmethod
     def toggle_console(cls):
         active_window = cls.get_app().activeWindow()
+        # Cross-platform toggle: on Windows, show/hide OS console window;
+        # on non-Windows, open/close the embedded ShellWidget.
         if cls.is_console_visible():
             cls.hide_console()
-        elif ctypes.windll.kernel32.GetConsoleWindow() != 0:
+        else:
             cls.show_console()
         active_window.activateWindow()
 
     @classmethod
     def hide_console(cls):
         """
-        hide Console Window (Works only for Windows so far)
+        Hide console.
+        - Windows: hide the OS console window.
+        - Other OS: close the embedded ShellWidget if open.
         :return:
         """
-        hWnd = ctypes.windll.kernel32.GetConsoleWindow()
-        if hWnd != 0:
-            ctypes.windll.user32.ShowWindow(hWnd, 0)
+        if sys.platform.startswith("win"):
+            hWnd = ctypes.windll.kernel32.GetConsoleWindow()
+            if hWnd != 0:
+                ctypes.windll.user32.ShowWindow(hWnd, 0)
+        else:
+            # Ignore if not on Windows
+            pass
 
     @classmethod
     def show_console(cls):
-        console_window = ctypes.windll.kernel32.GetConsoleWindow()
-        if console_window != 0:
-            # Check if the console is visible
-            ctypes.windll.user32.ShowWindow(console_window, 5)  # Show the console
+        if sys.platform.startswith("win"):
+            console_window = ctypes.windll.kernel32.GetConsoleWindow()
+            if console_window != 0:
+                ctypes.windll.user32.ShowWindow(console_window, 5)  # Show the console
+        else:
+            # Ignore if not on Windows
+            pass
 
     @classmethod
     def is_console_visible(cls):
-        hWnd = ctypes.windll.kernel32.GetConsoleWindow()
-        if hWnd == 0:
+        if sys.platform.startswith("win"):
+            hWnd = ctypes.windll.kernel32.GetConsoleWindow()
+            if hWnd == 0:
+                return False
+            return bool(ctypes.windll.user32.IsWindowVisible(hWnd))
+        else:
+            # Ignore if not on Windows
             return False
-        if ctypes.windll.user32.IsWindowVisible(hWnd):
-            return True
-        return False
