@@ -149,6 +149,7 @@ def create_dialog(
         return
 
     # Create Placeholder Class Property
+    pset_was_temporary = property_set_table.is_temporary_pset(bsdd_class, property_set)
     bsdd_class_property = class_property_editor.create_temporary_property(property_set, bsdd_class)
 
     # Create Dialog
@@ -157,14 +158,14 @@ def create_dialog(
     )
     text = QCoreApplication.translate("ClassPropertyEditor", "Create New Class Property")
     dialog.setWindowTitle(text)
+
     if dialog.exec():
         class_property_editor.sync_to_model(dialog._widget, bsdd_class_property)
-
         # add ClassProperty to Class
         bsdd_class_property.parent().ClassProperties.append(bsdd_class_property)
         class_property_editor.signals.new_class_property_created.emit(bsdd_class_property)
 
-        if property_set_table.is_temporary_pset(bsdd_class, property_set):
+        if pset_was_temporary:
             property_set_table.remove_temporary_pset(bsdd_class_property.parent(), property_set)
             property_set_table.signals.model_refresh_requested.emit()
 
