@@ -15,7 +15,7 @@ def on_new_project():
 
 
 def retranslate_ui():
-    pass
+    core.retranslate_ui(tool.MainWindowWidget)
 
 
 def close_event(event):
