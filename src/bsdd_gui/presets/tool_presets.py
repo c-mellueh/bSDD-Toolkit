@@ -381,11 +381,11 @@ class DialogTool(WidgetTool):
 
     @classmethod
     def connect_widget_signals(cls, widget: BaseWidget):
-        super().connect_widget_signals()
+        super().connect_widget_signals(widget)
 
     @classmethod
-    def connect_dialog_signals(cls, widget: BaseWidget):
-        super().connect_widget_signals()
+    def connect_dialog_signals(cls, dialog: BaseDialog):
+        pass
 
 
 class ItemViewTool(BaseTool):

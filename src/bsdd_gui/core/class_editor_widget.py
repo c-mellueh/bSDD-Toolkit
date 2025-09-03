@@ -34,17 +34,50 @@ def open_dialog(
         class_editor.signals.dialog_declined.emit(dialog)
 
 
-def register_widget(
-    widget: ui.ClassEditor,
-    class_editor: Type[tool.ClassEditorWidget],
-    project: Type[tool.Project],
-    util: Type[tool.Util],
-    relationship_editor: Type[tool.RelationshipEditorWidget],
-):
+def register_widget(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorWidget]):
     class_editor.register_widget(widget)
+
+    ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
+    widget.cb_class_type.addItems(ct_combobox_items)
+    st_combobox_items = ["Preview", "Active", "Inactive"]
+    widget.cb_status.addItems(st_combobox_items)
+
+
+def register_fields(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorWidget]):
     class_editor.register_basic_field(widget, widget.le_name, "Name")
     class_editor.register_basic_field(widget, widget.te_definition, "Definition")
 
+    class_editor.register_field_getter(widget, widget.le_code, lambda c: c.Code)
+    class_editor.register_field_setter(widget, widget.le_code, lambda e, v: e.set_code(v))
+
+    class_editor.register_field_getter(widget, widget.cb_class_type, lambda c: c.ClassType)
+    class_editor.register_field_setter(
+        widget, widget.cb_class_type, lambda e, v: setattr(e, "ClassType", v)
+    )
+
+    class_editor.register_field_getter(widget, widget.cb_status, lambda c: c.Status)
+    class_editor.register_field_setter(
+        widget,
+        widget.cb_status,
+        lambda e, v: setattr(e, "Status", v),
+    )
+
+    class_editor.register_field_getter(
+        widget, widget.ti_related_ifc_entity, lambda c: c.RelatedIfcEntityNamesList
+    )
+    class_editor.register_field_setter(
+        widget,
+        widget.ti_related_ifc_entity,
+        lambda e, v, w=widget: setattr(e, "RelatedIfcEntityNamesList", v),
+    )
+
+
+def register_validators(
+    widget,
+    class_editor: Type[tool.ClassEditorWidget],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+):
     class_editor.add_validator(
         widget,
         widget.le_code,
@@ -58,50 +91,19 @@ def register_widget(
         lambda w, v: util.set_invalid(w, not v),
     )
 
-    class_editor.register_field_getter(widget, widget.le_code, lambda c: c.Code)
-    class_editor.register_field_setter(
-        widget,
-        widget.le_code,
-        lambda e, v: e.set_code(v),
-    )
 
-    ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
-    widget.cb_class_type.addItems(ct_combobox_items)
-
-    # Combo Boxes
-    class_editor.register_field_getter(widget, widget.cb_class_type, lambda c: c.ClassType)
-    class_editor.register_field_setter(
-        widget,
-        widget.cb_class_type,
-        lambda e, v: setattr(e, "ClassType", v),
-    )
-
-    st_combobox_items = ["Preview", "Active", "Inactive"]
-    widget.cb_status.addItems(st_combobox_items)
-
-    class_editor.register_field_getter(widget, widget.cb_status, lambda c: c.Status)
-    class_editor.register_field_setter(
-        widget,
-        widget.cb_status,
-        lambda e, v: setattr(e, "Status", v),
-    )
-
-    # Tags
-    class_editor.register_field_getter(
-        widget, widget.ti_related_ifc_entity, lambda c: c.RelatedIfcEntityNamesList
-    )
-    class_editor.register_field_setter(
-        widget,
-        widget.ti_related_ifc_entity,
-        lambda e, v, w=widget: setattr(e, "RelatedIfcEntityNamesList", v),
-    )
+def connect_widget(
+    widget: ui.ClassEditor,
+    class_editor: Type[tool.ClassEditorWidget],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
+):
+    class_editor.connect_widget_signals(widget)
     relationship_editor.init_widget(widget.relationship_editor, widget.bsdd_data, mode="dialog")
 
 
 def connect_to_main_window(
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],
-    project: Type[tool.Project],
 ):
     def emit_class_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)

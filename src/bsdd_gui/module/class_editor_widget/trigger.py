@@ -8,9 +8,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from . import ui
 
+### Basic Triggers
+
 
 def connect():
-    core.connect_to_main_window(tool.ClassEditorWidget, tool.MainWindowWidget, tool.Project)
+    core.connect_to_main_window(tool.ClassEditorWidget, tool.MainWindowWidget)
     core.connect_signals(tool.ClassEditorWidget, tool.Project)
 
 
@@ -26,10 +28,14 @@ def open_widget(bsdd_class: BsddClass):
     core.open_dialog(bsdd_class, tool.ClassEditorWidget, tool.MainWindowWidget)
 
 
-def widget_created(class_editor: ui.ClassEditor):
-    core.register_widget(
-        class_editor, tool.ClassEditorWidget, tool.Project, tool.Util, tool.RelationshipEditorWidget
-    )
+def widget_created(widget: ui.ClassEditor):
+    core.register_widget(widget, tool.ClassEditorWidget)
+    core.register_fields(widget, tool.ClassEditorWidget)
+    core.register_validators(widget, tool.ClassEditorWidget, tool.Project, tool.Util)
+    core.connect_widget(widget, tool.ClassEditorWidget, tool.RelationshipEditorWidget)
+
+
+### Module Specific Triggers
 
 
 def copy_class(bsdd_class: BsddClass):

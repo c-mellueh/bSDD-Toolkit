@@ -37,45 +37,18 @@ def register_widget(widget: BaseWidget, widget_tool: Type[tool.WidgetTool]):
     widget_tool.register_view(widget)
 
 
-def add_columns_to_view(view: BaseWidget, widget_tool: Type[tool.WidgetTool]):
-    prop: BsddClassProperty | BsddProperty = view.bsdd_data
-    sort_model, model = widget_tool.create_model(prop)
-    widget_tool.add_column_to_table(model, "Value", lambda av: av.Value, widget_tool.set_value)
-    widget_tool.add_column_to_table(model, "Code", lambda av: av.Code, widget_tool.set_code)
-    widget_tool.add_column_to_table(
-        model, "Description", lambda av: av.Description, widget_tool.set_description
-    )
-    widget_tool.add_column_to_table(
-        model, "SortNumber", lambda av: av.SortNumber, widget_tool.set_sort_number
-    )
-    widget_tool.add_column_to_table(
-        model, "OwnedUri", lambda av: av.OwnedUri, widget_tool.set_owned_uri
-    )
-    view.setModel(sort_model)
+def register_fields(widget: BaseWidget, widget_Tool: Type[tool.WidgetTool]):
+    widget.register_basic_field(widget, widget.le_name, "Name")
 
 
-def add_context_menu_to_view(view: BaseWidget, widget_tool: Type[tool.WidgetTool]):
-    widget_tool.clear_context_menu_list(view)
-    widget_tool.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("AllowedValuesTable", "Delete"),
-        lambda: widget_tool.signals.delete_selection_requested.emit(view),
-        True,
-        True,
-        True,
+def register_validators(widget, widget_tool: Type[tool.WidgetTool], util: Type[tool.Util]):
+    widget_tool.add_validator(
+        widget,
+        widget.le_code,
+        lambda v, w,: widget_tool.is_code_valid(v, w),
+        lambda w, v: util.set_invalid(w, not v),
     )
 
 
-def connect_view(view: BaseWidget, widget_tool: Type[tool.WidgetTool]):
-    widget_tool.connect_view_signals(view)
-
-
-def create_context_menu(view: BaseWidget, pos: QPoint, widget_tool: Type[tool.WidgetTool]):
-    bsdd_allowed_values = widget_tool.get_selected(view)
-    menu = widget_tool.create_context_menu(view, bsdd_allowed_values)
-    menu_pos = view.viewport().mapToGlobal(pos)
-    menu.exec(menu_pos)
-
-
-def remove_view(view: BaseWidget, widget_tool: Type[tool.WidgetTool]):
-    widget_tool.remove_model(view.model().sourceModel())
+def connect_widget(widget: BaseWidget, widget_tool: Type[tool.WidgetTool]):
+    widget_tool.connect_widget_signals(widget)

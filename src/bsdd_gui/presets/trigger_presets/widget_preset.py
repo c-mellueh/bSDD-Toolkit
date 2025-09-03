@@ -14,6 +14,8 @@ from bsdd_gui.presets.ui_presets import BaseWidget
 if TYPE_CHECKING:
     from . import ui
 
+### Basic Triggers
+
 
 def connect():
     core.connect_signals(tool.ItemViewTool)
@@ -37,6 +39,9 @@ def open_dialog(data: object, parent: BaseWidget):
 
 def widget_created(widget: BaseWidget):
     core.register_widget(widget, tool.ItemViewTool)
-    core.add_columns_to_view(widget, tool.ItemViewTool)
-    core.add_context_menu_to_view(widget, tool.ItemViewTool)
-    core.connect_view(widget, tool.ItemViewTool)
+    core.register_fields(widget, tool.ItemViewTool)
+    core.register_validators(widget, tool.ItemViewTool, tool.Util)
+    core.connect_widget(widget, tool.ItemViewTool)
+
+
+### Module Specific Triggers
