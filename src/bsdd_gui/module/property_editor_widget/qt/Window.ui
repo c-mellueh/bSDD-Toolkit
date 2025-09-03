@@ -99,7 +99,8 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="UnitTagInput" name="ti_units" native="true">
+                                                    <widget class="TagInput" name="ti_units"
+                                                        native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -456,7 +457,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="ConnectedPropertyTag" name="ti_connect_properties" native="true"/>
+                                <widget class="TagInput" name="ti_connect_properties" native="true" />
        </item>
        <item row="6" column="0">
         <widget class="QLabel" name="lb_country_use">
@@ -470,7 +471,7 @@
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="ContryTagInput" name="ti_countries" native="true"/>
+                                <widget class="TagInput" name="ti_countries" native="true" />
        </item>
        <item row="7" column="0">
         <widget class="QLabel" name="lb_country_origin">
@@ -555,10 +556,10 @@
         </widget>
        </item>
        <item row="11" column="1">
-        <widget class="ReplacedObjectTagInput" name="ti_replaced_objects" native="true"/>
+                                <widget class="TagInput" name="ti_replaced_objects" native="true" />
        </item>
        <item row="12" column="1">
-        <widget class="ReplacingObjectTagInput" name="ti_replacing_objects" native="true"/>
+                                <widget class="TagInput" name="ti_replacing_objects" native="true" />
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="lb_revision_date">
@@ -579,7 +580,7 @@
         </widget>
        </item>
        <item row="13" column="1">
-        <widget class="SubdivisionTagInput" name="ti_subdivision" native="true"/>
+                                <widget class="TagInput" name="ti_subdivision" native="true" />
        </item>
        <item row="14" column="0">
         <widget class="QLabel" name="lb_text_format">
@@ -657,52 +658,16 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>UnitTagInput</class>
-   <extends>QWidget</extends>
-   <header>bsdd_gui.module.property_editor.widgets</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ConnectedPropertyTag</class>
-   <extends>QWidget</extends>
-   <header>bsdd_gui.module.property_editor.widgets</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ContryTagInput</class>
-   <extends>QWidget</extends>
-   <header>bsdd_gui.module.property_editor.widgets</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ReplacedObjectTagInput</class>
-   <extends>QWidget</extends>
-   <header>bsdd_gui.module.property_editor.widgets</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ReplacingObjectTagInput</class>
-   <extends>QWidget</extends>
-   <header>bsdd_gui.module.property_editor.widgets</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>SubdivisionTagInput</class>
-   <extends>QWidget</extends>
-   <header>bsdd_gui.module.property_editor.widgets</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
+        <customwidget>
    <class>DateTimeWithNow</class>
    <extends>QWidget</extends>
-   <header>bsdd_gui.presets.ui_presets.datetime_now</header>
+            <header>bsdd_gui.presets.ui_presets</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>RelationshipWidget</class>
    <extends>QWidget</extends>
-   <header>bsdd_gui.module.relationship_editor.ui</header>
+            <header>bsdd_gui.module.relationship_editor_widget.ui</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -713,7 +678,13 @@
   <customwidget>
    <class>AllowedValuesTable</class>
    <extends>QTableView</extends>
-   <header>bsdd_gui.module.allowed_values_table.ui</header>
+            <header>bsdd_gui.module.allowed_values_table_view.ui</header>
+        </customwidget>
+        <customwidget>
+            <class>TagInput</class>
+            <extends>QWidget</extends>
+            <header>bsdd_gui.presets.ui_presets</header>
+            <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

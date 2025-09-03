@@ -107,12 +107,12 @@
   <customwidget>
    <class>PropertyTable</class>
    <extends>QTableView</extends>
-   <header>bsdd_gui.module.property_table.views</header>
+   <header>bsdd_gui.module.property_table_widget.views</header>
   </customwidget>
   <customwidget>
    <class>ClassTable</class>
    <extends>QTableView</extends>
-   <header>bsdd_gui.module.property_table.views</header>
+   <header>bsdd_gui.module.property_table_widget.views</header>
   </customwidget>
  </customwidgets>
  <resources/>

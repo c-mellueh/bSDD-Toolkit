@@ -359,17 +359,17 @@
   <customwidget>
    <class>ClassView</class>
    <extends>QTreeView</extends>
-   <header>bsdd_gui.module.class_tree.ui</header>
+            <header>bsdd_gui.module.class_tree_view.ui</header>
   </customwidget>
   <customwidget>
    <class>PsetTableView</class>
    <extends>QTableView</extends>
-   <header>bsdd_gui.module.property_set_table.ui</header>
+            <header>bsdd_gui.module.property_set_table_view.ui</header>
   </customwidget>
   <customwidget>
    <class>ClassPropertyTable</class>
    <extends>QTableView</extends>
-   <header>bsdd_gui.module.class_property_table.ui</header>
+            <header>bsdd_gui.module.class_property_table_view.ui</header>
   </customwidget>
  </customwidgets>
  <tabstops>

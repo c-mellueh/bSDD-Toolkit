@@ -65,7 +65,7 @@ class Ui_PropertyWindow(object):
     def setupUi(self, PropertyWindow):
         if not PropertyWindow.objectName():
             PropertyWindow.setObjectName("PropertyWindow")
-        PropertyWindow.resize(649, 695)
+        PropertyWindow.resize(655, 713)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.vl_values = QVBoxLayout()

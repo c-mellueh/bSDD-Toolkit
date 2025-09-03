@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>649</width>
-    <height>695</height>
+                <width>655</width>
+                <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -168,7 +168,7 @@
   <customwidget>
    <class>AllowedValuesTable</class>
    <extends>QTableView</extends>
-   <header>bsdd_gui.module.allowed_values_table.ui</header>
+            <header>bsdd_gui.module.allowed_values_table_view.ui</header>
   </customwidget>
  </customwidgets>
  <resources/>

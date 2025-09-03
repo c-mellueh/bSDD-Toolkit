@@ -61,17 +61,8 @@ from PySide6.QtWidgets import (
 )
 
 from bsdd_gui.module.allowed_values_table_view.ui import AllowedValuesTable
-from bsdd_gui.module.property_editor_widget.widgets import (
-    ConnectedPropertyTag,
-    ContryTagInput,
-    ReplacedObjectTagInput,
-    ReplacingObjectTagInput,
-    SubdivisionTagInput,
-    UnitTagInput,
-)
 from bsdd_gui.module.relationship_editor_widget.ui import RelationshipWidget
-from bsdd_gui.presets.ui_presets import ToggleSwitch
-from bsdd_gui.presets.ui_presets.datetime_now import DateTimeWithNow
+from bsdd_gui.presets.ui_presets import DateTimeWithNow, TagInput, ToggleSwitch
 
 
 class Ui_PropertyWindow(object):
@@ -129,7 +120,7 @@ class Ui_PropertyWindow(object):
 
         self.fl_code.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_unit)
 
-        self.ti_units = UnitTagInput(self.gb_basics)
+        self.ti_units = TagInput(self.gb_basics)
         self.ti_units.setObjectName("ti_units")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(1)
@@ -312,7 +303,7 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(5, QFormLayout.ItemRole.LabelRole, self.lb_connected_properties)
 
-        self.ti_connect_properties = ConnectedPropertyTag(self.tab_advanced)
+        self.ti_connect_properties = TagInput(self.tab_advanced)
         self.ti_connect_properties.setObjectName("ti_connect_properties")
 
         self.formLayout.setWidget(5, QFormLayout.ItemRole.FieldRole, self.ti_connect_properties)
@@ -322,7 +313,7 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(6, QFormLayout.ItemRole.LabelRole, self.lb_country_use)
 
-        self.ti_countries = ContryTagInput(self.tab_advanced)
+        self.ti_countries = TagInput(self.tab_advanced)
         self.ti_countries.setObjectName("ti_countries")
 
         self.formLayout.setWidget(6, QFormLayout.ItemRole.FieldRole, self.ti_countries)
@@ -382,12 +373,12 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(12, QFormLayout.ItemRole.LabelRole, self.lb_replacing_objects)
 
-        self.ti_replaced_objects = ReplacedObjectTagInput(self.tab_advanced)
+        self.ti_replaced_objects = TagInput(self.tab_advanced)
         self.ti_replaced_objects.setObjectName("ti_replaced_objects")
 
         self.formLayout.setWidget(11, QFormLayout.ItemRole.FieldRole, self.ti_replaced_objects)
 
-        self.ti_replacing_objects = ReplacingObjectTagInput(self.tab_advanced)
+        self.ti_replacing_objects = TagInput(self.tab_advanced)
         self.ti_replacing_objects.setObjectName("ti_replacing_objects")
 
         self.formLayout.setWidget(12, QFormLayout.ItemRole.FieldRole, self.ti_replacing_objects)
@@ -402,7 +393,7 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(13, QFormLayout.ItemRole.LabelRole, self.lb_subdivision)
 
-        self.ti_subdivision = SubdivisionTagInput(self.tab_advanced)
+        self.ti_subdivision = TagInput(self.tab_advanced)
         self.ti_subdivision.setObjectName("ti_subdivision")
 
         self.formLayout.setWidget(13, QFormLayout.ItemRole.FieldRole, self.ti_subdivision)

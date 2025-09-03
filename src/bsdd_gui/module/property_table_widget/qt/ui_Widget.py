@@ -53,7 +53,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from bsdd_gui.module.property_table_view.views import ClassTable, PropertyTable
+from bsdd_gui.module.property_table_widget.views import ClassTable, PropertyTable
 
 
 class Ui_Form(object):
