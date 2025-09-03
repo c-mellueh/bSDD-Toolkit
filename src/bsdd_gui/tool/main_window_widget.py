@@ -89,7 +89,6 @@ class MainWindowWidget(ActionTool):
         cls.signals.active_property_changed.emit(value)
 
     @classmethod
-    @classmethod
     def get_class_view(cls):
         return cls.get().tree_class
 
