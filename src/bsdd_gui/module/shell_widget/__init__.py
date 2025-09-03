@@ -3,7 +3,7 @@ from . import ui, prop, trigger
 
 
 def register():
-    bsdd_gui.ConsoleWidgetProperties = prop.ConsoleWidgetProperties()
+    bsdd_gui.ShellWidgetProperties = prop.ShellWidgetProperties()
 
 
 def retranslate_ui():

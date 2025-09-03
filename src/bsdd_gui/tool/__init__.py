@@ -13,7 +13,7 @@ from .plugins import Plugins
 from .settings_widget import SettingsWidget
 from .popups import Popups
 from .dictionary_editor_widget import DictionaryEditorWidget
-from .console_widget import ConsoleWidget
+from .console_widget import ShellWidget
 from .class_property_editor_widget import ClassPropertyEditorWidget
 from .allowed_values_table_view import AllowedValuesTableView
 from .property_editor_widget import PropertyEditorWidget

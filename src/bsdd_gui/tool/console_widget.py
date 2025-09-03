@@ -3,20 +3,20 @@ from typing import TYPE_CHECKING
 import logging
 
 import bsdd_gui
-from bsdd_gui.module.console_widget import ui, trigger
+from bsdd_gui.module.shell_widget import ui, trigger
 from bsdd_gui.presets.tool_presets import WidgetTool
 from bsdd_gui.presets.signal_presets import WidgetSignals
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.console_widget.prop import ConsoleWidgetProperties
+    from bsdd_gui.module.shell_widget.prop import ShellWidgetProperties
 
 
-class ConsoleWidget(WidgetTool):
+class ShellWidget(WidgetTool):
     signals = WidgetSignals()
 
     @classmethod
-    def get_properties(cls) -> ConsoleWidgetProperties:
-        return bsdd_gui.ConsoleWidgetProperties
+    def get_properties(cls) -> ShellWidgetProperties:
+        return bsdd_gui.ShellWidgetProperties
 
     @classmethod
     def _get_trigger(cls):
@@ -24,7 +24,7 @@ class ConsoleWidget(WidgetTool):
 
     @classmethod
     def _get_widget_class(cls):
-        return ui.Console
+        return ui.Shell
 
     @classmethod
     def get_widget(cls):
@@ -35,7 +35,7 @@ class ConsoleWidget(WidgetTool):
     @classmethod
     def create_widget(cls):
         if not cls.get_widgets():
-            widget: ui.Console = super().create_widget()
+            widget: ui.Shell = super().create_widget()
             widget.show()
             widget.eval_in_thread()
             cls.register_widget(widget)

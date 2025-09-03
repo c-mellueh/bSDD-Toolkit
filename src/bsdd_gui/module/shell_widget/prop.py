@@ -3,8 +3,8 @@ from bsdd_gui.presets.prop_presets import WidgetProperties
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ui import Console
+    from .ui import Shell
 
 
-class ConsoleWidgetProperties(WidgetProperties):
-    console: Console = None
+class ShellWidgetProperties(WidgetProperties):
+    pass

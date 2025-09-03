@@ -6,12 +6,12 @@ from . import trigger
 from PySide6.QtCore import Signal
 
 
-class Console(PythonConsole):
+class Shell(PythonConsole):
     closed = Signal()
     opened = Signal()
 
     def __init__(self, *args, **kwds):
-        super(Console, self).__init__(*args, **kwds)
+        super(Shell, self).__init__(*args, **kwds)
         self.setWindowIcon(get_icon())
         self.setWindowTitle(tool.Util.get_window_title("Console"))
 
