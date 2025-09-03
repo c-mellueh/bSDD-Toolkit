@@ -49,28 +49,24 @@ def create_dialog(
     project: Type[tool.Project],
     util: Type[tool.Util],
 ):
+    # create_virtual Property
     code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
     existing_names = cp_utils.get_property_code_dict(project.get()).keys()
     code = util.get_unique_name(code, existing_names)
-    model_dict = dict() if not blueprint else blueprint
-    if "Code" not in model_dict:
-        model_dict["Code"] = code
-    if "Name" not in model_dict:
-        model_dict["Name"] = code
-    if "DataType" not in model_dict:
-        model_dict["DataType"] = "String"
-    bsdd_property = BsddProperty.model_validate(model_dict)
+    bsdd_property = property_editor.generate_virtual_property(code, blueprint)
     bsdd_property._set_parent(project.get())
 
-    dialog = property_editor.create_create_dialog(bsdd_property, main_window.get())
-    widget = dialog._editor_widget
+    parent_widget = parent_widget if parent_widget is None else main_window.get()
+    dialog = property_editor.create_dialog(bsdd_property, parent_widget)
     text = QCoreApplication.translate("ClassPropertyEditor", "Create New Property")
     dialog.setWindowTitle(text)
+
     if dialog.exec():
-        property_editor.sync_to_model(widget, bsdd_property)
         project.get().Properties.append(bsdd_property)
         property_editor.signals.new_property_created.emit(bsdd_property)
-    widget.closed.emit()
+        property_editor.signals.dialog_accepted.emit(dialog)
+    else:
+        property_editor.signals.dialog_declined.emit(dialog)
 
 
 def register_widget(

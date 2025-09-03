@@ -26,7 +26,7 @@ def create_widget(bsdd_property: BsddProperty, parent: QWidget | None):
 
 def create_dialog(blueprint: dict, parent: QWidget):
     core.create_dialog(
-        blueprint, tool.PropertyEditorWidget, tool.MainWindowWidget, tool.Project, tool.Util
+        blueprint, parent, tool.PropertyEditorWidget, tool.MainWindowWidget, tool.Project, tool.Util
     )
 
 
@@ -39,4 +39,4 @@ def widget_created(widget: ui.PropertyEditor):
         tool.RelationshipEditorWidget,
     )
     core.register_validators(widget, tool.PropertyEditorWidget, tool.Util, tool.Project)
-    core.connect_widget(widget, tool.PropertyEditorWidget)
+    core.connect_widget(widget, tool.PropertyEditorWidget, tool.AllowedValuesTableView)

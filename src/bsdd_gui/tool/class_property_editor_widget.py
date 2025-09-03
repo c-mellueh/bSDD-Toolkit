@@ -35,7 +35,9 @@ class Signals(DialogSignals):
 
     new_value_requested = Signal(object)
     create_new_class_property_requested = Signal()
-    edit_bsdd_property_requested = Signal(BsddProperty)  # BsddProperty not BsddClassProperty
+    edit_bsdd_property_requested = Signal(
+        BsddProperty, QWidget
+    )  # BsddProperty not BsddClassProperty,parentWidget
     create_bsdd_property_requested = Signal(object)  # BsddProperty not BsddClassProperty
     property_specific_redraw_requested = Signal(ui.ClassPropertyEditor)
 
@@ -229,7 +231,7 @@ class ClassPropertyEditorWidget(DialogTool):
             pass  # TODO Open Website
         elif line_edit.button_mode == BUTTON_MODE_EDIT:
             bsdd_property = cp_utils.get_internal_property(widget.bsdd_data)
-            cls.signals.edit_bsdd_property_requested.emit(bsdd_property)
+            cls.signals.edit_bsdd_property_requested.emit(bsdd_property, widget)
         elif line_edit.button_mode == BUTTON_MODE_NEW:
             bsdd_class_property: BsddClassProperty = widget.bsdd_data
             code = widget.le_property_reference.text()
