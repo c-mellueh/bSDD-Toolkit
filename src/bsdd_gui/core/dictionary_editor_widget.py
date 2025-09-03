@@ -81,7 +81,9 @@ def connect_to_main_window(
     project: Type[tool.Project],
 ) -> None:
     action = main_window.add_action(
-        "menuModels", "Dictionary Data", lambda: dictionary_editor.request_widget(project.get())
+        "menuModels",
+        "Dictionary Data",
+        lambda: dictionary_editor.request_widget(project.get(), main_window.get()),
     )
     dictionary_editor.set_action(main_window.get(), "open_window", action)
 

@@ -24,7 +24,7 @@ def connect_signals(
 ):
     class_property_editor.connect_internal_signals()
     property_table.signals.property_info_requested.connect(
-        lambda d: class_property_editor.signals.widget_requested.emit(main_window.get(), d)
+        lambda d: class_property_editor.signals.widget_requested.emit(d, main_window.get())
     )
     main_window.signals.new_property_requested.connect(
         class_property_editor.signals.create_new_class_property_requested.emit
