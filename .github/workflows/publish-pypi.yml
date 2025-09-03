@@ -85,6 +85,6 @@ jobs:
       - name: Publish to PyPI via OIDC
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          # Use the GitHub Actions OIDC token; PyPI must have this GitHub publisher accepted.
-          use-oidc: 'true'
-          packages-dir:
+          # Uses GitHub OIDC automatically (no password input required)
+          # Point to the dist/ created in src/bsdd_json
+          packages-dir: src/bsdd_json/dist/
