@@ -82,7 +82,7 @@ class FieldTool(BaseTool):
         return None
 
     @classmethod
-    def register_basic_field(cls, widget: QWidget, field: QWidget, variable_name: str):
+    def register_basic_field(cls, widget: ItemViewType, field: ItemViewType, variable_name: str):
         cls.register_field_getter(widget, field, lambda e, vn=variable_name: getattr(e, vn))
         cls.register_field_setter(
             widget,
@@ -96,7 +96,9 @@ class FieldTool(BaseTool):
         cls.register_field_listener(widget, field)
 
     @classmethod
-    def register_field_getter(cls, widget: QWidget, field: QWidget, getter_func: callable):
+    def register_field_getter(
+        cls, widget: ItemViewType, field: ItemViewType, getter_func: callable
+    ):
         """_summary_
 
         Args:
@@ -110,13 +112,15 @@ class FieldTool(BaseTool):
         cls.get_properties().field_getter[widget][field] = getter_func
 
     @classmethod
-    def register_field_setter(cls, widget: QWidget, field: QWidget, setter_func: callable):
+    def register_field_setter(
+        cls, widget: ItemViewType, field: ItemViewType, setter_func: callable
+    ):
         if not widget in cls.get_properties().field_setter:
             cls.get_properties().field_setter[widget] = dict()
         cls.get_properties().field_setter[widget][field] = setter_func
 
     @classmethod
-    def register_field_listener(cls, widget: QWidget, field: QWidget):
+    def register_field_listener(cls, widget: ItemViewType, field: ItemViewType):
         f = field
         w = widget
         if isinstance(f, QLineEdit):
@@ -201,7 +205,7 @@ class FieldTool(BaseTool):
             func(f.isChecked())
 
     @classmethod
-    def get_value_from_field(cls, field: QWidget):
+    def get_value_from_field(cls, field: ItemViewType):
         if isinstance(field, QLineEdit):
             value = field.text()
         elif isinstance(field, QComboBox):
@@ -221,7 +225,7 @@ class FieldTool(BaseTool):
         return value
 
     @classmethod
-    def sync_from_model(cls, widget: QWidget, data, explicit_field=None):
+    def sync_from_model(cls, widget: ItemViewType, data, explicit_field=None):
 
         for field, getter_func in cls.get_properties().field_getter[widget].items():
             if explicit_field is not None and explicit_field != field:
@@ -245,7 +249,7 @@ class FieldTool(BaseTool):
                 field.setChecked(value)
 
     @classmethod
-    def sync_to_model(cls, widget: QWidget, element, explicit_field: QWidget = None):
+    def sync_to_model(cls, widget: ItemViewType, element, explicit_field: ItemViewType = None):
         field_dict = cls.get_properties().field_setter.get(widget) or dict()
         for field, setter_func in field_dict.items():
             if explicit_field is not None and explicit_field != field:
@@ -254,7 +258,7 @@ class FieldTool(BaseTool):
             setter_func(element, value)
 
     @classmethod
-    def all_inputs_are_valid(cls, widget: QWidget):
+    def all_inputs_are_valid(cls, widget: ItemViewType):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
             logging.info(f"No Validator Functions found for widget {widget}")
@@ -268,7 +272,7 @@ class FieldTool(BaseTool):
         return True
 
     @classmethod
-    def get_invalid_inputs(cls, widget: QWidget):
+    def get_invalid_inputs(cls, widget: ItemViewType):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
             return []
@@ -290,7 +294,7 @@ class WidgetTool(FieldTool):
         return None
 
     @classmethod
-    def register_widget(cls, widget: QWidget):
+    def register_widget(cls, widget: ItemViewType):
         logging.info(f"Register {widget}")
 
         cls.get_properties().widgets.add(widget)
@@ -298,7 +302,7 @@ class WidgetTool(FieldTool):
         cls.get_properties().field_setter[widget] = dict()
 
     @classmethod
-    def unregister_widget(cls, view: QWidget):
+    def unregister_widget(cls, view: ItemViewType):
         logging.info(f"Unregister {view}")
         if not view in cls.get_properties().widgets:
             return
@@ -311,7 +315,7 @@ class WidgetTool(FieldTool):
         return cls.get_properties().widgets
 
     @classmethod
-    def get_widget(cls, data: object) -> QWidget:
+    def get_widget(cls, data: object) -> ItemViewType:
         widgets = [widget for widget in cls.get_widgets() if widget.bsdd_data == data]
         if len(widgets) > 1:
             logging.warning(f"Multiple Widgets found for the same data")

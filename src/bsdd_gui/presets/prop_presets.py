@@ -24,13 +24,15 @@ class ActionsProperties:
 class FieldProperties:
     def __init__(self):
         super().__init__()
-        self.field_getter: dict[QWidget, dict[QWidget, callable]] = (
+        self.field_getter: dict[ItemViewType, dict[ItemViewType, callable]] = (
             dict()
         )  # getter function for widgets of Window
-        self.field_setter: dict[QWidget, dict[QWidget, callable]] = (
+        self.field_setter: dict[ItemViewType, dict[ItemViewType, callable]] = (
             dict()
         )  # getter function for widgets of Window
-        self.validator_functions: dict[QWidget, dict[QWidget, tuple[callable, callable]]] = dict()
+        self.validator_functions: dict[
+            ItemViewType, dict[ItemViewType, tuple[callable, callable]]
+        ] = dict()
 
 
 class WidgetProperties(FieldProperties):

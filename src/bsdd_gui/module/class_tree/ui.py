@@ -6,11 +6,13 @@ from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 
+from bsdd_gui.presets.ui_presets import TreeItemView
+
 if TYPE_CHECKING:
     from .models import SortModel
 
 
-class ClassView(QTreeView):
+class ClassView(TreeItemView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
