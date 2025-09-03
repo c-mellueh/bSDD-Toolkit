@@ -189,7 +189,7 @@ Artifacts:
 Notes:
 
 - The spec (`src/main.spec`) bundles resources and sets the app name and icon.
-- To hide the console window, change `console=True` to `False` in `src/main.spec` and rebuild.
+- To hide the console window, change `console=True` to `False` in `src/main.spec` and rebuild. On Windows you can toggle the console using the UI
 - VS Code users can also run the `Build` launch config, which executes `src/build.ps1`.
 
 ### 2) Extend the GUI (Create a Module)

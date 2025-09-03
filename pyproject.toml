@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-qt", "mypy", "ruff", "black"]
+dev = ["pytest", "pytest-qt", "mypy", "ruff", "black","pyinstaller"]
 
 [project.scripts]
 bsdd = "bsdd_json.cli:app"          # CLI: `bsdd ...`
