@@ -11,7 +11,7 @@
             "module": "bsdd_gui",
             "cwd": "${workspaceFolder}/src",
             "args": [
-                "/home/christoph/Schreibtisch/test_bsdd.json",
+                "C:/Users/melluehc/Desktop/hw.json",
                 "-l 10"
             ],
         },

@@ -82,6 +82,7 @@ class BaseTool(ABC):
     Subclasses provide a typed Properties object via get_properties(), and
     connect_internal_signals() to wire their signals to triggers/handlers.
     """
+
     @classmethod
     @abstractmethod
     def get_properties(cls) -> object:
@@ -110,6 +111,7 @@ class ActionTool(BaseTool):
     - Use connect_internal_signals() to hook up action-related signals if
       needed and call super() in overrides.
     """
+
     @classmethod
     @abstractmethod
     def get_properties(cls) -> ActionsProperties:
@@ -152,6 +154,7 @@ class WidgetTool(BaseTool):
     - add_plugins_to_widget(widget): Insert plugin widgets into a target
       layout on the produced widget.
     """
+
     signals = WidgetSignals()
 
     @classmethod
@@ -248,6 +251,7 @@ class FieldTool(WidgetTool):
       data object; recreate hidden widgets to refresh state.
     - get_widget(data): Look up the existing widget for a given data object.
     """
+
     signals = FieldSignals()
 
     @classmethod
@@ -523,6 +527,7 @@ class DialogTool(FieldTool):
     - Prefer DialogTool when users should review changes and explicitly
       confirm them, as opposed to live-editing fields.
     """
+
     signals = DialogSignals()
 
     @classmethod
