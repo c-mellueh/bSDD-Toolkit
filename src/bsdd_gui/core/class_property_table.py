@@ -15,7 +15,7 @@ def connect_signals(
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
     property_table.connect_internal_signals()
-    class_property_editor.signaller.new_class_property_created.connect(
+    class_property_editor.signals.new_class_property_created.connect(
         lambda *_: property_table.reset_views()
     )
 
@@ -58,7 +58,7 @@ def connect_view(
         bsdd_class_property = index.internalPointer()
         if not bsdd_class_property:
             return
-        property_table.signaller.property_info_requested.emit(bsdd_class_property)
+        property_table.signals.property_info_requested.emit(bsdd_class_property)
 
     property_table.connect_view_signals(view)
     view.doubleClicked.connect(emit_info_requested)
@@ -92,10 +92,10 @@ def connect_to_main_window(
 
     property_view = main_window.get_property_view()
 
-    property_table.signaller.selection_changed.connect(
+    property_table.signals.selection_changed.connect(
         lambda v, n: (main_window.set_active_property(n) if v == property_view else None)
     )
-    main_window.signaller.active_pset_changed.connect(
+    main_window.signals.active_pset_changed.connect(
         lambda c: property_table.reset_view(property_view)
     )
-    main_window.signaller.active_pset_changed.connect(reset_property)
+    main_window.signals.active_pset_changed.connect(reset_property)

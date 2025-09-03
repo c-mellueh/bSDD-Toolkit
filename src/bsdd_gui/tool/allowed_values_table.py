@@ -15,12 +15,12 @@ from bsdd_gui.module.allowed_values_table import models, ui, trigger
 from bsdd_gui import tool
 
 
-class Signaller(ViewSignals):
+class Signals(ViewSignals):
     pass
 
 
 class AllowedValuesTable(ItemViewHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> AllowedValuesTableProperties:

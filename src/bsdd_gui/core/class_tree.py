@@ -13,10 +13,10 @@ if TYPE_CHECKING:
 
 def connect_signals(class_tree: Type[tool.ClassTree], project: Type[tool.Project]):
     class_tree.connect_internal_signals()
-    project.signaller.class_added.connect(
+    project.signals.class_added.connect(
         lambda c: class_tree.add_class_to_dictionary(c, project.get())
     )
-    class_tree.signaller.item_deleted.connect(project.signaller.class_removed.emit)
+    class_tree.signals.item_deleted.connect(project.signals.class_removed.emit)
 
 
 def retranslate_ui(class_tree: Type[tool.ClassTree]):
@@ -71,7 +71,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Delete"),
-        lambda: class_tree.signaller.delete_selection_requested.emit(view),
+        lambda: class_tree.signals.delete_selection_requested.emit(view),
         True,
         True,
         True,
@@ -79,7 +79,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Extend"),
-        lambda: class_tree.signaller.expand_selection_requested.emit(view),
+        lambda: class_tree.signals.expand_selection_requested.emit(view),
         True,
         True,
         True,
@@ -87,7 +87,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Collapse"),
-        lambda: class_tree.signaller.collapse_selection_requested.emit(view),
+        lambda: class_tree.signals.collapse_selection_requested.emit(view),
         True,
         True,
         True,
@@ -95,7 +95,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Group"),
-        lambda: class_tree.signaller.group_selection_requested.emit(view),
+        lambda: class_tree.signals.group_selection_requested.emit(view),
         True,
         True,
         True,
@@ -112,7 +112,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Reset View"),
-        lambda: class_tree.signaller.model_refresh_requested.emit(),
+        lambda: class_tree.signals.model_refresh_requested.emit(),
         False,
         True,
         True,
@@ -127,21 +127,19 @@ def connect_to_main_window(
     class_tree: Type[tool.ClassTree], main_window: Type[tool.MainWindow], util: Type[tool.Util]
 ):
     view = main_window.get_class_view()
+    util.add_shortcut("Del", view, lambda: class_tree.signals.delete_selection_requested.emit(view))
     util.add_shortcut(
-        "Del", view, lambda: class_tree.signaller.delete_selection_requested.emit(view)
+        "Ctrl+G", view, lambda: class_tree.signals.group_selection_requested.emit(view)
     )
+    util.add_shortcut("Ctrl+F", view, lambda: class_tree.signals.search_requested.emit(view))
     util.add_shortcut(
-        "Ctrl+G", view, lambda: class_tree.signaller.group_selection_requested.emit(view)
-    )
-    util.add_shortcut("Ctrl+F", view, lambda: class_tree.signaller.search_requested.emit(view))
-    util.add_shortcut(
-        "Ctrl+C", view, lambda: main_window.signaller.copy_active_class_requested.emit()
+        "Ctrl+C", view, lambda: main_window.signals.copy_active_class_requested.emit()
     )
 
-    util.add_shortcut("Ctrl+N", view, lambda: main_window.signaller.new_class_requested.emit())
+    util.add_shortcut("Ctrl+N", view, lambda: main_window.signals.new_class_requested.emit())
 
     util.add_shortcut("Ctrl+E", view, view.expandAll)
-    class_tree.signaller.selection_changed.connect(
+    class_tree.signals.selection_changed.connect(
         lambda v, n: (main_window.set_active_class(n) if v == view else None)
     )
 

@@ -75,9 +75,7 @@ def connect_view(
     main_window: Type[tool.MainWindow],
 ):
 
-    main_window.signaller.active_class_changed.connect(
-        lambda c: property_set_table.reset_view(view)
-    )
+    main_window.signals.active_class_changed.connect(lambda c: property_set_table.reset_view(view))
     property_set_table.connect_view_signals(view)
 
 
@@ -103,11 +101,11 @@ def connect_to_main_window(
         property_set_table.select_row(pset_view, row_index)
 
     pset_view = main_window.get_pset_view()
-    main_window.signaller.active_class_changed.connect(reset_pset)
-    property_set_table.signaller.selection_changed.connect(
+    main_window.signals.active_class_changed.connect(reset_pset)
+    property_set_table.signals.selection_changed.connect(
         lambda v, n: (main_window.set_active_pset(n) if v == main_window.get_pset_view() else None)
     )
-    main_window.signaller.new_property_set_requested.connect(
+    main_window.signals.new_property_set_requested.connect(
         lambda: property_set_table.request_new_property_set(main_window.get_active_class())
     )
 
@@ -120,7 +118,7 @@ def create_new_property_set(
         QCoreApplication.translate("PropertySetTable", "New PropertySet"), existings_psets
     )
     property_set_table.add_temporary_pset(bsdd_class, new_name)
-    property_set_table.signaller.model_refresh_requested.emit()
+    property_set_table.signals.model_refresh_requested.emit()
 
 
 def define_context_menu(
@@ -132,7 +130,7 @@ def define_context_menu(
     property_set_table.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("PropertySet", "Delete"),
-        lambda: property_set_table.signaller.delete_selection_requested.emit(view),
+        lambda: property_set_table.signals.delete_selection_requested.emit(view),
         True,
         True,
         True,
@@ -141,7 +139,7 @@ def define_context_menu(
     property_set_table.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("PropertySet", "Rename"),
-        lambda: property_set_table.signaller.rename_selection_requested.emit(view),
+        lambda: property_set_table.signals.rename_selection_requested.emit(view),
         True,
         True,
         False,
@@ -180,13 +178,13 @@ def delete_selection(
     for pset in selected_psets:
         if property_set_table.is_temporary_pset(bsdd_class, pset):
             property_set_table.remove_temporary_pset(bsdd_class, pset)
-        property_set_table.signaller.property_set_deleted.emit(bsdd_class, pset)
+        property_set_table.signals.property_set_deleted.emit(bsdd_class, pset)
         if bsdd_class == main_window.get_active_class() and pset == main_window.get_active_pset():
             main_window.set_active_pset(None)
             main_window.set_active_property(None)
 
-    property_table.signaller.model_refresh_requested.emit()
-    property_set_table.signaller.model_refresh_requested.emit()
+    property_table.signals.model_refresh_requested.emit()
+    property_set_table.signals.model_refresh_requested.emit()
 
 
 def reset_models(property_table: Type[tool.ClassPropertyTable], project: Type[tool.Project]):

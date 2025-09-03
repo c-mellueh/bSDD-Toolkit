@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_set_table.prop import PropertySetTableProperties
 
 
-class Signaller(ViewSignals):
+class Signals(ViewSignals):
     new_property_set_requested = Signal(BsddClass)
     delete_selection_requested = Signal(ui.PsetTableView)
     property_set_deleted = Signal(BsddClass, str)
@@ -20,7 +20,7 @@ class Signaller(ViewSignals):
 
 
 class PropertySetTable(ItemViewHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> PropertySetTableProperties:
@@ -45,8 +45,8 @@ class PropertySetTable(ItemViewHandler):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signaller.new_property_set_requested.connect(trigger.new_property_set_requested)
-        cls.signaller.rename_selection_requested.connect(
+        cls.signals.new_property_set_requested.connect(trigger.new_property_set_requested)
+        cls.signals.rename_selection_requested.connect(
             lambda view: view.edit([i for i in view.selectedIndexes() if i.column() == 0][0])
         )
 
@@ -66,11 +66,11 @@ class PropertySetTable(ItemViewHandler):
         if not curr.isValid():
             return
         index = proxy_model.mapToSource(curr)
-        cls.signaller.selection_changed.emit(view, index.data(Qt.ItemDataRole.DisplayRole))
+        cls.signals.selection_changed.emit(view, index.data(Qt.ItemDataRole.DisplayRole))
 
     @classmethod
     def request_new_property_set(cls, bsdd_class: BsddClass):
-        cls.signaller.new_property_set_requested.emit(bsdd_class)
+        cls.signals.new_property_set_requested.emit(bsdd_class)
 
     @classmethod
     def get_pset_names_with_temporary(cls, bsdd_class: BsddClass) -> list[str]:

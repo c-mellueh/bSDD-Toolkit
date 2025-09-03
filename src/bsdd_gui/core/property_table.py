@@ -17,13 +17,13 @@ def connect_signals(
     class_tree: Type[tool.ClassTree],
     project: Type[tool.Project],
 ):
-    property_table.signaller.property_info_requested.connect(property_editor.request_widget)
-    property_table.signaller.new_property_requested.connect(property_editor.request_new_property)
-    project.signaller.property_added.connect(lambda _: property_table.reset_views())
-    property_table.signaller.bsdd_class_double_clicked.connect(
+    property_table.signals.property_info_requested.connect(property_editor.request_widget)
+    property_table.signals.new_property_requested.connect(property_editor.request_new_property)
+    project.signals.property_added.connect(lambda _: property_table.reset_views())
+    property_table.signals.bsdd_class_double_clicked.connect(
         lambda c: class_tree.select_and_expand(c, main_window.get_class_view())
     )
-    property_table.signaller.bsdd_class_double_clicked.connect(
+    property_table.signals.bsdd_class_double_clicked.connect(
         lambda c: main_window.get().activateWindow()
     )
     property_table.connect_internal_signals()
@@ -104,7 +104,7 @@ def connect_view(
         util.add_shortcut(
             "Ctrl+F",
             view,
-            lambda: property_table.signaller.search_requested.emit(view),
+            lambda: property_table.signals.search_requested.emit(view),
         )
 
 
@@ -191,5 +191,5 @@ def delete_selection(
             for bsdd_class_property in list(cl.ClassProperties):
                 if bsdd_class_property.PropertyCode == active_prop.Code:
                     cl.ClassProperties.remove(bsdd_class_property)
-                    project.signaller.property_removed.emit(bsdd_class_property)
+                    project.signals.property_removed.emit(bsdd_class_property)
     property_table.reset_view(view)

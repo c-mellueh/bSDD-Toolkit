@@ -75,8 +75,8 @@ def register_widget(
 
 
 def connect_signals(class_editor: Type[tool.ClassEditor], project: Type[tool.Project]):
-    class_editor.connect_signaller()
-    class_editor.signaller.new_class_created.connect(project.signaller.class_added.emit)
+    class_editor.connect_signals()
+    class_editor.signals.new_class_created.connect(project.signals.class_added.emit)
 
 
 def connect_to_main_window(
@@ -89,17 +89,17 @@ def connect_to_main_window(
         bsdd_class = index.internalPointer()
         if not bsdd_class:
             return
-        class_editor.signaller.edit_class_requested.emit(bsdd_class)
+        class_editor.signals.edit_class_requested.emit(bsdd_class)
 
     view = main_window.get_class_view()
     view.doubleClicked.connect(emit_class_info_requested)
 
-    main_window.signaller.new_class_requested.connect(
+    main_window.signals.new_class_requested.connect(
         lambda: class_editor.request_new_class(
             class_utils.get_parent(main_window.get_active_class())
         )
     )
-    main_window.signaller.copy_active_class_requested.connect(
+    main_window.signals.copy_active_class_requested.connect(
         lambda: class_editor.request_class_copy(main_window.get_active_class())
     )
 
@@ -118,8 +118,8 @@ def create_new_class(
     dialog.setWindowTitle(text)
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
-        class_editor.signaller.new_class_created.emit(new_class)
-        class_editor.signaller.dialog_accepted.emit(widget)
+        class_editor.signals.new_class_created.emit(new_class)
+        class_editor.signals.dialog_accepted.emit(widget)
     class_editor.unregister_widget(widget)
 
 
@@ -137,8 +137,8 @@ def copy_class(
     dialog.setWindowTitle(text)
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
-        class_editor.signaller.new_class_created.emit(new_class)
-        class_editor.signaller.dialog_accepted.emit(widget)
+        class_editor.signals.new_class_created.emit(new_class)
+        class_editor.signals.dialog_accepted.emit(widget)
     class_editor.unregister_widget(widget)
 
 
@@ -151,7 +151,7 @@ def open_class_editor(
     dialog.setWindowTitle(text)
     if dialog.exec():
         class_editor.sync_to_model(widget, bsdd_class)
-        class_editor.signaller.dialog_accepted.emit(widget)
+        class_editor.signals.dialog_accepted.emit(widget)
     class_editor.unregister_widget(widget)
 
 
@@ -172,7 +172,7 @@ def group_classes(
     dialog.setWindowTitle(text)
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
-        class_editor.signaller.new_class_created.emit(new_class)
-        class_editor.signaller.dialog_accepted.emit(widget)
+        class_editor.signals.new_class_created.emit(new_class)
+        class_editor.signals.dialog_accepted.emit(widget)
         for child_class in bsdd_classes:
             class_tree.move_class(child_class, new_class, tool.Project)

@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 
-class Signaller(WidgetSignals):
+class Signals(WidgetSignals):
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
     new_class_property_created = Signal(BsddClassProperty)
@@ -39,7 +39,7 @@ class Signaller(WidgetSignals):
 
 
 class ClassPropertyEditor(WidgetHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> ClassPropertyEditorProperties:
@@ -47,35 +47,35 @@ class ClassPropertyEditor(WidgetHandler):
 
     @classmethod
     def request_property_specific_redraw(cls, widget: ui.ClassPropertyEditor):
-        cls.signaller.property_specific_redraw_requested.emit(widget)
+        cls.signals.property_specific_redraw_requested.emit(widget)
 
     @classmethod
     def connect_internal_signals(cls):
-        cls.signaller.paste_clipboard.connect(trigger.paste_clipboard)
-        cls.signaller.widget_created.connect(trigger.widget_created)
-        cls.signaller.widget_closed.connect(trigger.window_closed)
-        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_data))
-        cls.signaller.property_reference_changed.connect(
+        cls.signals.paste_clipboard.connect(trigger.paste_clipboard)
+        cls.signals.widget_created.connect(trigger.widget_created)
+        cls.signals.widget_closed.connect(trigger.window_closed)
+        cls.signals.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_data))
+        cls.signals.property_reference_changed.connect(
             lambda cp: cls.request_property_specific_redraw(cls.get_window(cp))
         )
-        cls.signaller.create_new_class_property_requested.connect(
+        cls.signals.create_new_class_property_requested.connect(
             trigger.create_class_property_creator
         )
         # Autoupdate Values
-        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
-        cls.signaller.property_specific_redraw_requested.connect(
+        cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
+        cls.signals.property_specific_redraw_requested.connect(
             trigger.update_property_specific_fields
         )
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.ClassPropertyEditor):
-        widget.closed.connect(lambda w=widget: cls.signaller.widget_closed.emit(w))
+        widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
         widget.le_property_reference.button.clicked.connect(
             lambda _, w=widget: cls.handle_pr_button_press(w)
         )
 
         widget.pb_new_value.clicked.connect(
-            lambda _, w=widget: cls.signaller.new_value_requested.emit(w)
+            lambda _, w=widget: cls.signals.new_value_requested.emit(w)
         )
 
     @classmethod
@@ -122,7 +122,7 @@ class ClassPropertyEditor(WidgetHandler):
         title = cls.create_window_title(bsdd_class_property)
         cls.get_window(bsdd_class_property).setWindowTitle(title)  # TODO: Update Name Getter
 
-        cls.signaller.widget_created.emit(window)
+        cls.signals.widget_created.emit(window)
         return window
 
     @classmethod
@@ -204,7 +204,7 @@ class ClassPropertyEditor(WidgetHandler):
         else:
             bsdd_class_property.PropertyCode = value
             bsdd_class_property.PropertyUri = None
-        cls.signaller.property_reference_changed.emit(bsdd_class_property)
+        cls.signals.property_reference_changed.emit(bsdd_class_property)
 
     @classmethod
     def is_property_reference_valid(
@@ -261,7 +261,7 @@ class ClassPropertyEditor(WidgetHandler):
             pass  # TODO Open Website
         elif line_edit.button_mode == BUTTON_MODE_EDIT:
             bsdd_property = cp_utils.get_internal_property(widget.bsdd_data)
-            cls.signaller.edit_bsdd_property_requested.emit(bsdd_property)
+            cls.signals.edit_bsdd_property_requested.emit(bsdd_property)
         elif line_edit.button_mode == BUTTON_MODE_NEW:
             bsdd_class_property: BsddClassProperty = widget.bsdd_data
             code = widget.le_property_reference.text()
@@ -270,7 +270,7 @@ class ClassPropertyEditor(WidgetHandler):
                 "Name": code,
                 "DataType": cp_utils.get_data_type(bsdd_class_property) or "String",
             }
-            cls.signaller.create_bsdd_property_requested.emit(blueprint)
+            cls.signals.create_bsdd_property_requested.emit(blueprint)
 
     @classmethod
     def update_allowed_units(cls, widget: ui.ClassPropertyEditor):

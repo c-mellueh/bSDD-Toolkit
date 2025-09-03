@@ -13,11 +13,11 @@ def connect_signals(
     allowed_values_table: Type[tool.AllowedValuesTable],
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
-    class_property_editor.signaller.new_value_requested.connect(
+    class_property_editor.signals.new_value_requested.connect(
         allowed_values_table.handle_new_value_request
     )
     allowed_values_table.connect_internal_signals()
-    class_property_editor.signaller.widget_closed.connect(
+    class_property_editor.signals.widget_closed.connect(
         allowed_values_table.remove_view_by_property_editor
     )
 
@@ -63,7 +63,7 @@ def add_context_menu_to_view(
     allowed_values_table.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("AllowedValuesTable", "Delete"),
-        lambda: allowed_values_table.signaller.delete_selection_requested.emit(view),
+        lambda: allowed_values_table.signals.delete_selection_requested.emit(view),
         True,
         True,
         True,

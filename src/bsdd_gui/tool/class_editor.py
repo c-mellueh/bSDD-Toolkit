@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_editor.prop import ClassEditorProperties
 
 
-class Signaller(WidgetSignals):
+class Signals(WidgetSignals):
     edit_class_requested = Signal(BsddClass)
     copy_class_requested = Signal(BsddClass)  # Class To Copy
     new_class_requested = Signal(BsddClass)  # Parent Class
@@ -27,34 +27,34 @@ class Signaller(WidgetSignals):
 
 
 class ClassEditor(WidgetHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> ClassEditorProperties:
         return bsdd_gui.ClassEditorProperties
 
     @classmethod
-    def connect_signaller(cls):
-        cls.signaller.edit_class_requested.connect(trigger.open_class_editor)
-        cls.signaller.copy_class_requested.connect(trigger.copy_class)
-        cls.signaller.new_class_requested.connect(trigger.create_new_class)
-        cls.signaller.grouping_requested.connect(trigger.group_classes)
+    def connect_signals(cls):
+        cls.signals.edit_class_requested.connect(trigger.open_class_editor)
+        cls.signals.copy_class_requested.connect(trigger.copy_class)
+        cls.signals.new_class_requested.connect(trigger.create_new_class)
+        cls.signals.grouping_requested.connect(trigger.group_classes)
 
     @classmethod
     def request_class_editor(cls, bsdd_class: BsddClass):
-        cls.signaller.edit_class_requested.emit(bsdd_class)
+        cls.signals.edit_class_requested.emit(bsdd_class)
 
     @classmethod
     def request_class_copy(cls, bsdd_class: BsddClass):
-        cls.signaller.copy_class_requested.emit(bsdd_class)
+        cls.signals.copy_class_requested.emit(bsdd_class)
 
     @classmethod
     def request_new_class(cls, parent=None):
-        cls.signaller.new_class_requested.emit(parent)
+        cls.signals.new_class_requested.emit(parent)
 
     @classmethod
     def request_class_grouping(cls, bsdd_classes: list[BsddClass]):
-        cls.signaller.grouping_requested.emit(bsdd_classes)
+        cls.signals.grouping_requested.emit(bsdd_classes)
 
     @classmethod
     def create_widget(cls, bsdd_class: BsddClass):

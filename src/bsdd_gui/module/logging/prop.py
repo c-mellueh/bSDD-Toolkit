@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from bsdd_gui.tool.logging import Signaller
+    from bsdd_gui.tool.logging import Signals
     from . import ui
 
 
@@ -13,5 +13,5 @@ class LoggingProperties:
     log_level = None
     custom_formatter = None
     ignore_texts = list()
-    signaller: Signaller = None
+    signals: Signals = None
     settings_widget: ui.SettingsWidget = None

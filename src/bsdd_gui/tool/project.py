@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.project.prop import ProjectProperties
 
 
-class Signaller(QObject):
+class Signals(QObject):
     data_changed = Signal(str, object)  # name of datafield, new_value
     class_added = Signal(BsddClass)
     class_removed = Signal(BsddClass)
@@ -21,7 +21,7 @@ class Signaller(QObject):
 
 
 class Project(ActionsHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> ProjectProperties:

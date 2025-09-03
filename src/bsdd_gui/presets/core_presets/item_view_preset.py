@@ -48,7 +48,7 @@ def add_context_menu_to_view(view: ItemViewType, item_view_handler: Type[tool.It
     item_view_handler.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("AllowedValuesTable", "Delete"),
-        lambda: item_view_handler.signaller.delete_selection_requested.emit(view),
+        lambda: item_view_handler.signals.delete_selection_requested.emit(view),
         True,
         True,
         True,

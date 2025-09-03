@@ -120,20 +120,20 @@ class FieldHandler(BaseHandler):
         f = field
         w = widget
         if isinstance(f, QLineEdit):
-            f.textChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.textChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
         elif isinstance(f, QComboBox):
-            f.currentTextChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.currentTextChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
         elif isinstance(f, QTextEdit):
-            f.textChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.textChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
         elif isinstance(f, QCheckBox):
-            f.checkStateChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.checkStateChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
         elif isinstance(f, TagInput):
-            f.tagsChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.tagsChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
         elif isinstance(f, DateTimeWithNow):
-            f.dt_edit.dateTimeChanged.connect(lambda: cls.signaller.field_changed.emit(w, f))
-            f.active_toggle.toggled.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.dt_edit.dateTimeChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
+            f.active_toggle.toggled.connect(lambda: cls.signals.field_changed.emit(w, f))
         elif isinstance(f, QAbstractButton):
-            f.toggled.connect(lambda: cls.signaller.field_changed.emit(w, f))
+            f.toggled.connect(lambda: cls.signals.field_changed.emit(w, f))
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
@@ -282,7 +282,7 @@ class FieldHandler(BaseHandler):
 
 
 class WidgetHandler(FieldHandler):
-    signaller = WidgetSignals()
+    signals = WidgetSignals()
 
     @classmethod
     @abstractmethod
@@ -321,12 +321,12 @@ class WidgetHandler(FieldHandler):
 
     @classmethod
     def request_widget(cls, data: object, parent=None):
-        cls.signaller.widget_requested.emit(data, parent)
+        cls.signals.widget_requested.emit(data, parent)
 
 
 class ItemViewHandler(BaseHandler):
 
-    signaller = ViewSignals()  # TODO: rename to signals
+    signals = ViewSignals()  # TODO: rename to signals
     # TODO: make info_requested a signal for all handlers
 
     @classmethod
@@ -355,9 +355,9 @@ class ItemViewHandler(BaseHandler):
 
     @classmethod
     def connect_internal_signals(cls):
-        cls.signaller.delete_selection_requested.connect(cls.delete_selection)
-        cls.signaller.model_refresh_requested.connect(cls.reset_views)
-        cls.signaller.selection_changed.connect(lambda v, d: logging.info(f"Selection changed {v}"))
+        cls.signals.delete_selection_requested.connect(cls.delete_selection)
+        cls.signals.model_refresh_requested.connect(cls.reset_views)
+        cls.signals.selection_changed.connect(lambda v, d: logging.info(f"Selection changed {v}"))
 
     @classmethod
     def connect_view_signals(cls, view: QAbstractItemView) -> None:
@@ -621,8 +621,8 @@ class ItemViewHandler(BaseHandler):
         if not curr.isValid():
             return
         index = proxy_model.mapToSource(curr)
-        cls.signaller.selection_changed.emit(view, index.internalPointer())
+        cls.signals.selection_changed.emit(view, index.internalPointer())
 
     @classmethod
     def request_delete_selection(cls, view):
-        cls.signaller.delete_selection_requested.emit(view)
+        cls.signals.delete_selection_requested.emit(view)

@@ -29,7 +29,7 @@ from bsdd_gui.presets.tool_presets import (
 )
 
 
-class Signaller(ViewSignals, WidgetSignals):
+class Signals(ViewSignals, WidgetSignals):
     property_info_requested = Signal(BsddProperty, ui.PropertyWidget)
     reset_all_property_tables_requested = Signal()
     new_property_requested = Signal()
@@ -39,7 +39,7 @@ class Signaller(ViewSignals, WidgetSignals):
 
 
 class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> PropertyTableProperties:
@@ -63,10 +63,10 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signaller.widget_requested.connect(lambda _, p: trigger.create_widget(p))
-        cls.signaller.widget_created.connect(trigger.widget_created)
-        cls.signaller.selection_changed.connect(cls.on_selection_change)
-        cls.signaller.search_requested.connect(trigger.search_requested)
+        cls.signals.widget_requested.connect(lambda _, p: trigger.create_widget(p))
+        cls.signals.widget_created.connect(trigger.widget_created)
+        cls.signals.selection_changed.connect(cls.on_selection_change)
+        cls.signals.search_requested.connect(trigger.search_requested)
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.PropertyWidget):
@@ -77,18 +77,16 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
             proxy_model: models.SortModel = w.tv_properties.model()
             i = proxy_model.mapToSource(index)
             bsdd_property = i.siblingAtColumn(0).internalPointer()
-            cls.signaller.property_info_requested.emit(bsdd_property, w)
+            cls.signals.property_info_requested.emit(bsdd_property, w)
 
         widget.tv_properties.doubleClicked.connect(handle_double_click)
-        widget.tb_new.clicked.connect(
-            lambda _, w=widget: cls.signaller.new_property_requested.emit()
-        )
+        widget.tb_new.clicked.connect(lambda _, w=widget: cls.signals.new_property_requested.emit())
 
         def handle_class_double_click(index: QModelIndex):
             proxy_model: models.SortModel = w.tv_classes.model()
             i: QModelIndex = proxy_model.mapToSource(index)
             bsdd_class = i.siblingAtColumn(0).internalPointer()
-            cls.signaller.bsdd_class_double_clicked.emit(bsdd_class)
+            cls.signals.bsdd_class_double_clicked.emit(bsdd_class)
 
         w.tv_classes.doubleClicked.connect(handle_class_double_click)
         w.closed.connect(lambda w=widget: trigger.widget_removed(w))
@@ -104,7 +102,7 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
     def create_widget(cls):
         widget = ui.PropertyWidget()
         cls.get_properties().widgets.add(widget)
-        cls.signaller.widget_created.emit(widget)
+        cls.signals.widget_created.emit(widget)
         return widget
 
     @classmethod
@@ -137,7 +135,7 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
 
         if isinstance(view, views.PropertyTable):
             cls.get_properties().active_property = value
-            cls.signaller.active_property_changed.emit(value)
+            cls.signals.active_property_changed.emit(value)
             reset_class_views()
             code = value.Code if value else ""
             widget: ui.PropertyWidget = view.window()
@@ -211,4 +209,4 @@ class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
 
     @classmethod
     def request_new_property(cls):
-        cls.signaller.new_property_requested.emit()
+        cls.signals.new_property_requested.emit()

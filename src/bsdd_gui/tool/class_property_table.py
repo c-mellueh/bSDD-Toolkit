@@ -15,12 +15,12 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_property_table.prop import ClassPropertyTableProperties
 
 
-class Signaller(ViewSignals):
+class Signals(ViewSignals):
     property_info_requested = Signal(BsddClassProperty)
 
 
 class ClassPropertyTable(ItemViewHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> ClassPropertyTableProperties:

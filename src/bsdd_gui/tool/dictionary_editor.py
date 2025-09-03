@@ -23,12 +23,12 @@ if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor.prop import DictionaryEditorProperties
 
 
-class Signaller(WidgetSignals):
+class Signals(WidgetSignals):
     pass
 
 
 class DictionaryEditor(WidgetHandler, ActionsHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> DictionaryEditorProperties:
@@ -36,14 +36,14 @@ class DictionaryEditor(WidgetHandler, ActionsHandler):
 
     @classmethod
     def connect_internal_signals(cls):
-        cls.signaller.widget_requested.connect(trigger.create_widget)
-        cls.signaller.widget_created.connect(trigger.widget_created)
-        cls.signaller.widget_closed.connect(trigger.widget_closed)
-        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
+        cls.signals.widget_requested.connect(trigger.create_widget)
+        cls.signals.widget_created.connect(trigger.widget_created)
+        cls.signals.widget_closed.connect(trigger.widget_closed)
+        cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.DictionaryEditor):
-        widget.closed.connect(lambda w=widget: cls.signaller.widget_closed.emit(w))
+        widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
 
     @classmethod
     def create_widget(
@@ -52,7 +52,7 @@ class DictionaryEditor(WidgetHandler, ActionsHandler):
         prop = cls.get_properties()
         widget = ui.DictionaryEditor(bsdd_dictionary, parent_widget)
         prop.widgets.add(widget)
-        cls.signaller.widget_created.emit(widget)
+        cls.signals.widget_created.emit(widget)
         return widget
 
     @classmethod

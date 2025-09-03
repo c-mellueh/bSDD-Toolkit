@@ -44,7 +44,7 @@ class CustomFormatter(logging.Formatter):
         return super().format(record)
 
 
-class Signaller(QObject):
+class Signals(QObject):
     error = Signal(logging.LogRecord, str)
 
 
@@ -52,12 +52,12 @@ class PopupHandler(logging.Handler):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        self.signaller = tool.Logging.get_signaller()
+        self.signals = tool.Logging.get_signals()
 
     def emit(self, record):
         if record.levelno >= logging.WARNING:
             msg = self.format(record)
-            self.signaller.error.emit(record, msg)
+            self.signals.error.emit(record, msg)
 
 
 class Logging:
@@ -96,11 +96,11 @@ class Logging:
             cls.get_properties().ignore_texts.append(identifier)
 
     @classmethod
-    def get_signaller(cls):
-        if cls.get_properties().signaller is None:
-            cls.get_properties().signaller = Signaller()
-            cls.get_properties().signaller.error.connect(cls.show_popup)
-        return cls.get_properties().signaller
+    def get_signals(cls):
+        if cls.get_properties().signals is None:
+            cls.get_properties().signals = Signals()
+            cls.get_properties().signals.error.connect(cls.show_popup)
+        return cls.get_properties().signals
 
     @classmethod
     def get_log_level(cls):

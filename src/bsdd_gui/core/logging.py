@@ -24,7 +24,7 @@ def create_logger(
     logger = logging_tool.get_logger()
     logger.setLevel(logging_tool.get_log_level())
 
-    logging_tool.get_signaller()  # create signaller
+    logging_tool.get_signals()  # create signals
     for handler in logger.handlers:
         logger.removeHandler(handler)
 

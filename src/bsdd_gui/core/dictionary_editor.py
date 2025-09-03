@@ -85,9 +85,9 @@ def connect_signals(dictionary_editor: Type[tool.DictionaryEditor], project: Typ
     def handle_field_change(widget, field):
         name = dictionary_editor.get_name_from_field(widget, field)
         value = dictionary_editor.get_value_from_field(field)
-        project.signaller.data_changed.emit(name, value)
+        project.signals.data_changed.emit(name, value)
 
-    dictionary_editor.signaller.field_changed.connect(handle_field_change)
+    dictionary_editor.signals.field_changed.connect(handle_field_change)
 
 
 def remove_widget(

@@ -15,13 +15,13 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_editor.prop import PropertyEditorProperties
 
 
-class Signaller(WidgetSignals):
+class Signals(WidgetSignals):
     new_property_created = Signal(object)
     new_property_requested = Signal(object)  # blueprint: dict[] with property values
 
 
 class PropertyEditor(WidgetHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> PropertyEditorProperties:
@@ -29,22 +29,22 @@ class PropertyEditor(WidgetHandler):
 
     @classmethod
     def connect_internal_signals(cls):
-        cls.signaller.widget_requested.connect(trigger.create_window)
-        cls.signaller.widget_created.connect(trigger.widget_created)
-        cls.signaller.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_data))
-        cls.signaller.widget_closed.connect(trigger.widget_closed)
-        cls.signaller.new_property_requested.connect(trigger.create_property_creator)
+        cls.signals.widget_requested.connect(trigger.create_window)
+        cls.signals.widget_created.connect(trigger.widget_created)
+        cls.signals.widget_created.connect(lambda w: cls.sync_from_model(w, w.bsdd_data))
+        cls.signals.widget_closed.connect(trigger.widget_closed)
+        cls.signals.new_property_requested.connect(trigger.create_property_creator)
         # Autoupdate Values
-        cls.signaller.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
+        cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
     @classmethod
     def request_new_property(cls, blueprint: dict = None):
-        cls.signaller.new_property_requested.emit(blueprint)
+        cls.signals.new_property_requested.emit(blueprint)
 
     @classmethod
     def connect_widget_to_internal_signals(cls, widget: ui.PropertyEditor):
         w = widget
-        w.closed.connect(lambda: cls.signaller.widget_closed.emit(w))
+        w.closed.connect(lambda: cls.signals.widget_closed.emit(w))
         w.cb_description.toggled.connect(lambda: cls.update_description_visiblility(w))
 
     @classmethod
@@ -70,7 +70,7 @@ class PropertyEditor(WidgetHandler):
 
         title = cls.create_window_title(bsdd_property)
         cls.get_widget(bsdd_property).setWindowTitle(title)  # TODO: Update Name Getter
-        cls.signaller.widget_created.emit(window)
+        cls.signals.widget_created.emit(window)
         return window
 
     @classmethod

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 def connect_signals(project: Type[tool.Project]):
-    project.signaller.data_changed.connect(lambda n, v: logging.debug(f"'{n}' changed to '{v}'"))
+    project.signals.data_changed.connect(lambda n, v: logging.debug(f"'{n}' changed to '{v}'"))
 
 
 def create_project(project: Type[tool.Project]):

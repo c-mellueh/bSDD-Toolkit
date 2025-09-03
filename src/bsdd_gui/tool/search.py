@@ -20,13 +20,13 @@ from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignals
 from bsdd_parser import BsddClass, BsddClassProperty, BsddProperty
 
 
-class Signaller(WidgetSignals):
+class Signals(WidgetSignals):
     update_requested = Signal(ui.SearchDialog)
     strict_state_changed = Signal(bool)
 
 
 class Search(WidgetHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> SearchProperties:
@@ -34,8 +34,8 @@ class Search(WidgetHandler):
 
     @classmethod
     def connect_signals(cls):
-        cls.signaller.update_requested.connect(trigger.refresh_window)
-        cls.signaller.strict_state_changed.connect(trigger.set_strict_state)
+        cls.signals.update_requested.connect(trigger.refresh_window)
+        cls.signals.strict_state_changed.connect(trigger.set_strict_state)
 
     @classmethod
     def _search(cls, search_mode: int, search_items: list, data_getters: list[Callable]):
@@ -54,7 +54,7 @@ class Search(WidgetHandler):
         cls.fill_table(search_dialog, search_items, data_getters)
         cls.retranslate_title(search_dialog, search_mode)
         search_dialog.lineEdit.textChanged.connect(
-            lambda: cls.signaller.update_requested.emit(search_dialog)
+            lambda: cls.signals.update_requested.emit(search_dialog)
         )
         check_box = search_dialog.checkBox_strict
         check_state = tool.Appdata.get_bool_setting(
@@ -64,10 +64,10 @@ class Search(WidgetHandler):
             check_box.setChecked(check_state)
 
         check_box.checkStateChanged.connect(
-            lambda: cls.signaller.update_requested.emit(search_dialog)
+            lambda: cls.signals.update_requested.emit(search_dialog)
         )
         check_box.checkStateChanged.connect(
-            lambda: cls.signaller.strict_state_changed.emit(check_box.isChecked())
+            lambda: cls.signals.strict_state_changed.emit(check_box.isChecked())
         )
 
         if not search_dialog.exec_():

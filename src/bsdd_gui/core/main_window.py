@@ -23,18 +23,18 @@ def create_main_window(
 
 
 def connect_main_window(main_window: Type[tool.MainWindow], class_tree: Type[tool.ClassTree]):
-    main_window.signaller.active_class_changed.connect(
+    main_window.signals.active_class_changed.connect(
         lambda c: main_window.set_class_text(c.Name if c is not None else "")
     )
-    main_window.signaller.active_pset_changed.connect(main_window.set_pset_text)
-    main_window.signaller.active_property_changed.connect(
+    main_window.signals.active_pset_changed.connect(main_window.set_pset_text)
+    main_window.signals.active_property_changed.connect(
         lambda p: main_window.set_property_text(p.Code if p is not None else "")
     )
-    signaller = main_window.signaller
+    signals = main_window.signals
     ui = main_window.get()
-    ui.button_classes_add.clicked.connect(signaller.new_class_requested.emit)
-    ui.button_Pset_add.clicked.connect(signaller.new_property_set_requested.emit)
-    ui.button_property_add.clicked.connect(signaller.new_property_requested.emit)
+    ui.button_classes_add.clicked.connect(signals.new_class_requested.emit)
+    ui.button_Pset_add.clicked.connect(signals.new_property_set_requested.emit)
+    ui.button_property_add.clicked.connect(signals.new_property_requested.emit)
 
     ui.button_search.clicked.connect(
         lambda _: class_tree.request_search(main_window.get_class_view())

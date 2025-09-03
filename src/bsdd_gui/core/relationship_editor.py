@@ -17,22 +17,22 @@ def connect_signals(
     project: Type[tool.Project],
     class_editor: Type[tool.ClassEditor],
 ):
-    project.signaller.data_changed.connect(
+    project.signals.data_changed.connect(
         lambda n, v: relationship_editor.update_on_dict_change(n, v, project.get())
     )
-    project.signaller.class_added.connect(
+    project.signals.class_added.connect(
         lambda _: relationship_editor.update_all_completers(project.get())
     )
-    project.signaller.class_removed.connect(
+    project.signals.class_removed.connect(
         lambda _: relationship_editor.update_all_completers(project.get())
     )
-    project.signaller.property_added.connect(
+    project.signals.property_added.connect(
         lambda _: relationship_editor.update_all_completers(project.get())
     )
-    project.signaller.property_removed.connect(
+    project.signals.property_removed.connect(
         lambda _: relationship_editor.update_all_completers(project.get())
     )
-    class_editor.signaller.dialog_accepted.connect(
+    class_editor.signals.dialog_accepted.connect(
         relationship_editor.transform_virtual_relationships_to_real
     )
     relationship_editor.connect_internal_signals()

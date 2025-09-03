@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_tree.models import ClassTreeModel
 
 
-class Signaller(ViewSignals):
+class Signals(ViewSignals):
     copy_selection_requested = Signal(ui.ClassView)
     group_selection_requested = Signal(ui.ClassView)
     search_requested = Signal(ui.ClassView)
@@ -27,7 +27,7 @@ class Signaller(ViewSignals):
 
 
 class ClassTree(ItemViewHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> ClassTreeProperties:
@@ -48,9 +48,9 @@ class ClassTree(ItemViewHandler):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signaller.copy_selection_requested.connect(trigger.copy_selected_class)
-        cls.signaller.group_selection_requested.connect(trigger.group_selection)
-        cls.signaller.search_requested.connect(trigger.search_class)
+        cls.signals.copy_selection_requested.connect(trigger.copy_selected_class)
+        cls.signals.group_selection_requested.connect(trigger.group_selection)
+        cls.signals.search_requested.connect(trigger.search_class)
 
     @classmethod
     def get_selected(cls, view: ui.ClassView) -> list[BsddClass]:
@@ -62,7 +62,7 @@ class ClassTree(ItemViewHandler):
 
     @classmethod
     def request_search(cls, view: ui.ClassView):
-        cls.signaller.search_requested.emit(view)
+        cls.signals.search_requested.emit(view)
 
     @classmethod
     def add_class_to_dictionary(cls, new_class: BsddClass, bsdd_dictionary: BsddDictionary):
@@ -83,7 +83,7 @@ class ClassTree(ItemViewHandler):
         for child in class_utils.get_children(bsdd_class):
             model.move_row(child, parent)
         model.remove_row(bsdd_class)
-        cls.signaller.item_deleted.emit(bsdd_class)
+        cls.signals.item_deleted.emit(bsdd_class)
 
     @classmethod
     def move_class(
@@ -104,4 +104,4 @@ class ClassTree(ItemViewHandler):
 
         for node in reversed(to_delete):
             model.remove_row(node)
-            cls.signaller.item_deleted.emit(node)
+            cls.signals.item_deleted.emit(node)

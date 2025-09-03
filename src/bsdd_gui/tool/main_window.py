@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.main_window.prop import MainWindowProperties
 
 
-class Signaller(QObject):
+class Signals(QObject):
     active_class_changed = Signal(BsddClass)
     active_pset_changed = Signal(str)
     active_property_changed = Signal(BsddClassProperty)
@@ -25,7 +25,7 @@ class Signaller(QObject):
 
 
 class MainWindow:
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> MainWindowProperties:
@@ -82,17 +82,17 @@ class MainWindow:
     @classmethod
     def set_active_class(cls, value: BsddClass):
         cls.get_properties().active_class = value
-        cls.signaller.active_class_changed.emit(cls.get_properties().active_class)
+        cls.signals.active_class_changed.emit(cls.get_properties().active_class)
 
     @classmethod
     def set_active_pset(cls, value: str):
         cls.get_properties().active_pset = value
-        cls.signaller.active_pset_changed.emit(value)
+        cls.signals.active_pset_changed.emit(value)
 
     @classmethod
     def set_active_property(cls, value: BsddClassProperty):
         cls.get_properties().active_property = value
-        cls.signaller.active_property_changed.emit(value)
+        cls.signals.active_property_changed.emit(value)
 
     @classmethod
     @classmethod

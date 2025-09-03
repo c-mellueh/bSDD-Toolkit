@@ -23,12 +23,12 @@ if TYPE_CHECKING:
 from bsdd_gui.module.relationship_editor import ui, trigger, models
 
 
-class Signaller(ViewSignals, WidgetSignals):
+class Signals(ViewSignals, WidgetSignals):
     pass
 
 
 class RelationshipEditor(WidgetHandler, ItemViewHandler):
-    signaller = Signaller()
+    signals = Signals()
 
     @classmethod
     def get_properties(cls) -> RelationshipEditorProperties:

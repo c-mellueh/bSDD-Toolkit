@@ -42,14 +42,14 @@ def connect_signals(
     project: Type[tool.Project],
 ):
     property_editor.connect_internal_signals()
-    class_property_editor.signaller.edit_bsdd_property_requested.connect(
+    class_property_editor.signals.edit_bsdd_property_requested.connect(
         property_editor.request_widget
     )
-    class_property_editor.signaller.create_bsdd_property_requested.connect(
+    class_property_editor.signals.create_bsdd_property_requested.connect(
         property_editor.request_new_property
     )
 
-    property_editor.signaller.new_property_created.connect(project.signaller.property_added.emit)
+    property_editor.signals.new_property_created.connect(project.signals.property_added.emit)
 
 
 def unregister_widget(
@@ -178,7 +178,7 @@ def create_property_creator(
     if dialog.exec():
         property_editor.sync_to_model(widget, bsdd_property)
         project.get().Properties.append(bsdd_property)
-        property_editor.signaller.new_property_created.emit(bsdd_property)
+        property_editor.signals.new_property_created.emit(bsdd_property)
     widget.closed.emit()
 
 
