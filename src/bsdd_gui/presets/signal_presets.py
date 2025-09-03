@@ -6,18 +6,18 @@ from PySide6.QtCore import QObject, Signal
 from bsdd_gui.presets.ui_presets import BaseWidget, BaseDialog
 
 
-class FieldSignals(QObject):
+class WidgetSignals(QObject):
+    widget_requested = Signal(object, BaseWidget)  # data, parent
+    widget_closed = Signal(BaseWidget)
+
+
+class FieldSignals(WidgetSignals):
     field_changed = Signal(
         BaseWidget, QWidget
     )  # Widget in which the field is embedded and Fieldwidget itself
 
 
-class WidgetSignals(FieldSignals):
-    widget_requested = Signal(object, BaseWidget)  # data, parent
-    widget_closed = Signal(BaseWidget)
-
-
-class DialogSignals(WidgetSignals):
+class DialogSignals(FieldSignals):
     dialog_accepted = Signal(BaseDialog)
     dialog_declined = Signal(BaseDialog)
 

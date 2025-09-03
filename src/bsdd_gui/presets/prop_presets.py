@@ -22,7 +22,26 @@ class ActionsProperties:
         self.actions = dict()
 
 
-class FieldProperties:
+@dataclass
+class PluginProperty:
+    key: str
+    layout_name: str
+    widget: QWidget
+    index: int
+    value_getter: Callable
+    value_setter: Callable
+    widget_value_setter: Callable
+    value_test: Callable
+
+
+class WidgetProperties:
+    def __init__(self):
+        super().__init__()
+        self.widgets = set()
+        self.plugin_widget_list: list[PluginProperty] = list()
+
+
+class FieldProperties(WidgetProperties):
     def __init__(self):
         super().__init__()
         self.field_getter: dict[ItemViewType, dict[ItemViewType, callable]] = (
@@ -36,26 +55,7 @@ class FieldProperties:
         ] = dict()
 
 
-@dataclass
-class PluginProperty:
-    key: str
-    layout_name: str
-    widget: QWidget
-    index: int
-    value_getter: Callable
-    value_setter: Callable
-    widget_value_setter: Callable
-    value_test: Callable
-
-
-class WidgetProperties(FieldProperties):
-    def __init__(self):
-        super().__init__()
-        self.widgets = set()
-        self.plugin_widget_list: list[PluginProperty] = list()
-
-
-class DialogProperties(WidgetProperties):
+class DialogProperties(FieldProperties):
     def __init__(self):
         super().__init__()
         self.dialog = None

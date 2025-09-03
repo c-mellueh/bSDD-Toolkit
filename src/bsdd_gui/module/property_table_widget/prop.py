@@ -2,12 +2,12 @@ from __future__ import annotations
 from bsdd_gui.presets.prop_presets import (
     ActionsProperties,
     ViewProperties,
-    WidgetProperties,
+    FieldProperties,
 )
 from bsdd_parser import BsddProperty
 
 
-class PropertyTableWidgetProperties(ActionsProperties, WidgetProperties, ViewProperties):
+class PropertyTableWidgetProperties(ActionsProperties, FieldProperties, ViewProperties):
     def __init__(self):
         super().__init__()
         self.active_property: BsddProperty = None

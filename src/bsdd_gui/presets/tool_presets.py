@@ -41,6 +41,7 @@ BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassP
 
 if TYPE_CHECKING:
     from .prop_presets import (
+        ActionsProperties,
         ViewProperties,
         ViewProperties,
         WidgetProperties,
@@ -65,7 +66,7 @@ class BaseTool(ABC):
 class ActionTool(BaseTool):
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> WidgetProperties:
+    def get_properties(cls) -> ActionsProperties:
         return None
 
     @classmethod
@@ -82,7 +83,92 @@ class ActionTool(BaseTool):
         return cls.get_properties().actions[widget][name]
 
 
-class FieldTool(BaseTool):
+class WidgetTool(BaseTool):
+    signals = WidgetSignals()
+
+    @classmethod
+    @abstractmethod
+    def get_properties(cls) -> WidgetProperties:
+        return None
+
+    @classmethod
+    @abstractmethod
+    def _get_trigger(cls) -> ModuleType:
+        return None
+
+    @classmethod
+    @abstractmethod
+    def create_widget(cls, data: object, parent: QWidget) -> BaseWidget:
+        widget = BaseWidget(data, parent)
+        cls.get_properties().widgets.add(widget)
+        cls.add_plugins_to_widget(widget)
+        return widget
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.widget_requested.connect(cls.create_widget)
+        cls.signals.widget_closed.connect(cls.unregister_widget)
+
+    @classmethod
+    def connect_widget_signals(cls, widget: BaseWidget):
+        widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
+
+    @classmethod
+    def register_widget(cls, widget: BaseWidget):
+        logging.info(f"Register {widget}")
+
+        cls.get_properties().widgets.add(widget)
+        cls.get_properties().field_getter[widget] = dict()
+        cls.get_properties().field_setter[widget] = dict()
+
+    @classmethod
+    def unregister_widget(cls, view: ItemViewType):
+        logging.info(f"Unregister {view}")
+        if not view in cls.get_properties().widgets:
+            return
+        cls.get_properties().widgets.remove(view)
+        cls.get_properties().field_getter.pop(view)
+        cls.get_properties().field_setter.pop(view)
+
+    @classmethod
+    def get_widgets(cls):
+        return cls.get_properties().widgets
+
+    @classmethod
+    def get_widget(cls, data: object) -> ItemViewType:
+        widgets = [widget for widget in cls.get_widgets() if widget.bsdd_data == data]
+        if len(widgets) > 1:
+            logging.warning(f"Multiple Widgets found for the same data")
+        elif not widgets:
+            return None
+        return widgets[0]
+
+    @classmethod
+    def show_widget(cls, data, parent, *args, **kwargs):
+        if widget := cls.get_widget(data):
+            if widget.isHidden():
+                widget.close()
+                widget = cls.create_widget(data, parent, *args, **kwargs)
+        else:
+            widget = cls.create_widget(data, parent, *args, **kwargs)
+        widget.show()
+        widget.activateWindow()
+        widget.showNormal()
+
+    @classmethod
+    def request_widget(cls, data: object, parent=None):
+        cls.signals.widget_requested.emit(data, parent)
+
+    @classmethod
+    def add_plugins_to_widget(cls, widget):
+        for plugin in cls.get_properties().plugin_widget_list:
+            layout: QLayout = getattr(widget, plugin.layout_name)
+            layout.insertWidget(plugin.index, plugin.widget())
+            setattr(cls.get_properties(), plugin.key, plugin.value_getter)
+
+
+class FieldTool(WidgetTool):
     signals = FieldSignals()
 
     @classmethod
@@ -290,92 +376,7 @@ class FieldTool(BaseTool):
         return invalid_inputs
 
 
-class WidgetTool(FieldTool):
-    signals = WidgetSignals()
-
-    @classmethod
-    @abstractmethod
-    def get_properties(cls) -> WidgetProperties:
-        return None
-
-    @classmethod
-    @abstractmethod
-    def _get_trigger(cls) -> ModuleType:
-        return None
-
-    @classmethod
-    @abstractmethod
-    def create_widget(cls, data: object, parent: QWidget) -> BaseWidget:
-        widget = BaseWidget(data, parent)
-        cls.get_properties().widgets.add(widget)
-        cls.add_plugins_to_widget(widget)
-        return widget
-
-    @classmethod
-    def connect_internal_signals(cls):
-        super().connect_internal_signals()
-        cls.signals.widget_requested.connect(cls.create_widget)
-        cls.signals.widget_closed.connect(cls.unregister_widget)
-
-    @classmethod
-    def connect_widget_signals(cls, widget: BaseWidget):
-        widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
-
-    @classmethod
-    def register_widget(cls, widget: BaseWidget):
-        logging.info(f"Register {widget}")
-
-        cls.get_properties().widgets.add(widget)
-        cls.get_properties().field_getter[widget] = dict()
-        cls.get_properties().field_setter[widget] = dict()
-
-    @classmethod
-    def unregister_widget(cls, view: ItemViewType):
-        logging.info(f"Unregister {view}")
-        if not view in cls.get_properties().widgets:
-            return
-        cls.get_properties().widgets.remove(view)
-        cls.get_properties().field_getter.pop(view)
-        cls.get_properties().field_setter.pop(view)
-
-    @classmethod
-    def get_widgets(cls):
-        return cls.get_properties().widgets
-
-    @classmethod
-    def get_widget(cls, data: object) -> ItemViewType:
-        widgets = [widget for widget in cls.get_widgets() if widget.bsdd_data == data]
-        if len(widgets) > 1:
-            logging.warning(f"Multiple Widgets found for the same data")
-        elif not widgets:
-            return None
-        return widgets[0]
-
-    @classmethod
-    def show_widget(cls, data, parent, *args, **kwargs):
-        if widget := cls.get_widget(data):
-            if widget.isHidden():
-                widget.close()
-                widget = cls.create_widget(data, parent, *args, **kwargs)
-        else:
-            widget = cls.create_widget(data, parent, *args, **kwargs)
-        widget.show()
-        widget.activateWindow()
-        widget.showNormal()
-
-    @classmethod
-    def request_widget(cls, data: object, parent=None):
-        cls.signals.widget_requested.emit(data, parent)
-
-    @classmethod
-    def add_plugins_to_widget(cls, widget):
-        for plugin in cls.get_properties().plugin_widget_list:
-            layout: QLayout = getattr(widget, plugin.layout_name)
-            layout.insertWidget(plugin.index, plugin.widget())
-            setattr(cls.get_properties(), plugin.key, plugin.value_getter)
-
-
-class DialogTool(WidgetTool):
+class DialogTool(FieldTool):
     signals = DialogSignals()
 
     @classmethod

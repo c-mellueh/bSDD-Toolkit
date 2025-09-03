@@ -1,6 +1,6 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import WidgetProperties, ActionsProperties
+from bsdd_gui.presets.prop_presets import FieldProperties, ActionsProperties
 
 
-class DictionaryEditorWidgetProperties(WidgetProperties, ActionsProperties):
+class DictionaryEditorWidgetProperties(FieldProperties, ActionsProperties):
     pass

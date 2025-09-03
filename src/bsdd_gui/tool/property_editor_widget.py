@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import logging
 
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
+from bsdd_gui.presets.tool_presets import FieldTool, FieldSignals
 from bsdd_parser import BsddClassProperty, BsddDictionary, BsddProperty
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 from bsdd_gui.module.property_editor_widget import ui
@@ -15,12 +15,12 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_editor_widget.prop import PropertyEditorWidgetProperties
 
 
-class Signals(WidgetSignals):
+class Signals(FieldSignals):
     new_property_created = Signal(object)
     new_property_requested = Signal(object)  # blueprint: dict[] with property values
 
 
-class PropertyEditorWidget(WidgetTool):
+class PropertyEditorWidget(FieldTool):
     signals = Signals()
 
     @classmethod

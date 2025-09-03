@@ -1,6 +1,6 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import ViewProperties, WidgetProperties
+from bsdd_gui.presets.prop_presets import ViewProperties, FieldProperties
 
 
-class RelationshipEditorWidgetProperties(ViewProperties, WidgetProperties):
+class RelationshipEditorWidgetProperties(ViewProperties, FieldProperties):
     pass

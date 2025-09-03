@@ -8,19 +8,27 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
 
 
-def create_console_trigger(
+def connect_signals(console: Type[tool.ConsoleWidget]):
+    console.connect_internal_signals()
+
+
+def connect_to_main_window(
     main_menu: Type[tool.MainWindowWidget], console: Type[tool.ConsoleWidget]
 ):
     status_bar = main_menu.get_statusbar()
     button = QPushButton("C")
     button.setMaximumWidth(24)
     status_bar.addPermanentWidget(button)
-    button.clicked.connect(lambda: show(console))
+    button.clicked.connect(lambda *_: console.signals.widget_requested(None, main_menu.get()))
 
 
-def show(console: Type[tool.ConsoleWidget]):
-    console.create_console()
+def retranslate_ui(console: Type[tool.ConsoleWidget]):
+    return
 
 
-def close(console: Type[tool.ConsoleWidget]):
+def open_widget(console: Type[tool.ConsoleWidget]):
+    console.create_widget()
+
+
+def close_widget(console: Type[tool.ConsoleWidget]):
     console.close_console()

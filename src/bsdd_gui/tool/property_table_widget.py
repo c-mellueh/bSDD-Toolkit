@@ -23,13 +23,13 @@ from bsdd_gui.presets.tool_presets import (
     ItemViewTool,
     ItemViewTool,
     ViewSignals,
-    WidgetSignals,
-    WidgetTool,
+    FieldSignals,
+    FieldTool,
     ActionTool,
 )
 
 
-class Signals(ViewSignals, WidgetSignals):
+class Signals(ViewSignals, FieldSignals):
     property_info_requested = Signal(BsddProperty, ui.PropertyWidget)
     reset_all_property_tables_requested = Signal()
     new_property_requested = Signal()
@@ -38,7 +38,7 @@ class Signals(ViewSignals, WidgetSignals):
     search_requested = Signal(QWidget)
 
 
-class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
+class PropertyTableWidget(ItemViewTool, ActionTool, FieldTool):
     signals = Signals()
 
     @classmethod

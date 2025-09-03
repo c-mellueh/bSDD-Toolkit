@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from PySide6.QtWidgets import QWidget
 from . import ui
 from bsdd_parser import BsddClassProperty
-from bsdd_gui.presets.prop_presets import WidgetProperties
+from bsdd_gui.presets.prop_presets import FieldProperties
 
 
-class ClassPropertyEditorWidgetProperties(WidgetProperties):
+class ClassPropertyEditorWidgetProperties(FieldProperties):
 
     def __init__(self):
         super().__init__()

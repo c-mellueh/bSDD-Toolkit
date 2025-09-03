@@ -3,16 +3,18 @@ from bsdd_gui.core import console_widget as core
 
 
 def connect():
-    core.create_console_trigger(tool.MainWindowWidget, tool.ConsoleWidget)
+    core.connect_signals(tool.ConsoleWidget)
+    core.connect_to_main_window(tool.MainWindowWidget, tool.ConsoleWidget)
+
+
+def retranslate_ui():
+    core.retranslate_ui(tool.ConsoleWidget)
+    pass
 
 
 def on_new_project():
     pass
 
 
-def retranslate_ui():
-    pass
-
-
 def close_console():
-    core.close(tool.ConsoleWidget)
+    core.close_widget(tool.ConsoleWidget)
