@@ -66,7 +66,7 @@ class ClassTree(ItemViewTool):
 
     @classmethod
     def add_class_to_dictionary(cls, new_class: BsddClass, bsdd_dictionary: BsddDictionary):
-        model = cls.get_properties().models.get(bsdd_dictionary)
+        model = cls.get_model(bsdd_dictionary)
         if not model:
             logging.info(f"no Model found")
             return
@@ -89,12 +89,12 @@ class ClassTree(ItemViewTool):
     def move_class(
         cls, bsdd_class: BsddClass, new_parent: BsddClass | None, bsdd_dictionary: BsddDictionary
     ):
-        model: ClassTreeModel = cls.get_properties().models.get(bsdd_dictionary)
+        model: ClassTreeModel = cls.get_model(bsdd_dictionary)
         model.move_row(bsdd_class, new_parent)
 
     @classmethod
     def delete_class_with_children(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
-        model: ClassTreeModel = cls.get_properties().models.get(bsdd_dictionary)
+        model: ClassTreeModel = cls.get_model(bsdd_dictionary)
         to_delete = []
         stack = [bsdd_class]
         while stack:
