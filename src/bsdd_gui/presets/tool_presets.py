@@ -1,3 +1,28 @@
+"""
+Tool preset base classes for bsdd_gui.
+
+These presets standardize how tools create widgets, manage actions, wire
+signals, and synchronize data between the UI and the underlying model.
+
+At a glance
+- ActionTool: Centralizes QAction creation and lookup per widget. Useful for
+  menu bars and toolbars, and for translation/retitling of actions.
+- WidgetTool: Base for tools that create and manage widgets. Provides
+  registration, lifetime, and plugin injection for created widgets.
+- FieldTool: Extends WidgetTool for widgets that expose editable fields.
+  Adds bidirectional data sync (model ↔ UI), field registration, and
+  validation helpers for live editing.
+- DialogTool: Extends FieldTool for non-live editing via modal dialogs.
+  Hosts a field widget inside a dialog and applies changes on accept.
+
+Notes
+- Each concrete tool subclass must implement get_properties() to return its
+  corresponding Properties object (e.g. ActionsProperties, WidgetProperties,
+  FieldProperties, DialogProperties) used to hold runtime state.
+- Tools expose Signals (see signal_presets) that are connected in
+  connect_internal_signals(). Subclasses should call super() when overriding.
+"""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable, TYPE_CHECKING, Any, Iterable, Type, TypeAlias
@@ -52,6 +77,11 @@ if TYPE_CHECKING:
 
 
 class BaseTool(ABC):
+    """Abstract base for all tool presets.
+
+    Subclasses provide a typed Properties object via get_properties(), and
+    connect_internal_signals() to wire their signals to triggers/handlers.
+    """
     @classmethod
     @abstractmethod
     def get_properties(cls) -> object:
@@ -64,6 +94,22 @@ class BaseTool(ABC):
 
 
 class ActionTool(BaseTool):
+    """Preset to standardize QAction management.
+
+    Purpose
+    - Store and retrieve QActions per widget, enabling consistent wiring
+      and translation/retitling across the application (e.g., menu bars).
+
+    Implement in subclasses
+    - get_properties() -> ActionsProperties with an "actions" dict-like
+      attribute: { widget: { action_name: QAction } }.
+
+    Usage
+    - Call set_action(widget, name, action) after creating an action so it
+      can be translated and later retrieved via get_action().
+    - Use connect_internal_signals() to hook up action-related signals if
+      needed and call super() in overrides.
+    """
     @classmethod
     @abstractmethod
     def get_properties(cls) -> ActionsProperties:
@@ -84,6 +130,28 @@ class ActionTool(BaseTool):
 
 
 class WidgetTool(BaseTool):
+    """Preset for creating and managing widgets.
+
+    Purpose
+    - Provide a standard way to construct widgets, register/unregister them,
+      wire core signals, and inject optional plugin widgets into layouts.
+
+    Implement in subclasses
+    - get_properties() -> WidgetProperties with:
+      * widgets: set[FieldWidget]
+      * plugin_widget_list: iterable of plugin descriptors
+    - _get_trigger() -> module with functions used by signals (e.g.,
+      create_widget()).
+    - _get_widget_class() -> Type[FieldWidget] to instantiate in create_widget.
+
+    Key methods
+    - create_widget(...): Instantiates, registers, and augments the widget
+      with plugin widgets.
+    - register_widget/unregister_widget(): Track widget lifetime.
+    - request_widget(...): Emit a signal to create a widget via the trigger.
+    - add_plugins_to_widget(widget): Insert plugin widgets into a target
+      layout on the produced widget.
+    """
     signals = WidgetSignals()
 
     @classmethod
@@ -151,6 +219,35 @@ class WidgetTool(BaseTool):
 
 
 class FieldTool(WidgetTool):
+    """Preset for widgets that edit fields with live synchronization.
+
+    Purpose
+    - Extend WidgetTool with a consistent pattern to register UI fields,
+      read/write values to a model object, listen for changes, and validate
+      inputs. Intended for live editing of data.
+
+    Implement in subclasses
+    - get_properties() -> FieldProperties with:
+      * field_getter/field_setter: dict[widget][field] -> callable
+      * validator_functions: dict[widget][field] -> (validator, result_handler)
+
+    Key methods
+    - register_basic_field(widget, field, variable_name): Quick mapping of a
+      model attribute to a field (getter/setter + listener + initial sync).
+    - register_field_getter/register_field_setter(...): Custom value access.
+    - register_field_listener(widget, field): Wire change signals per type.
+    - sync_from_model(widget, model, explicit_field=None): Model → UI sync.
+    - sync_to_model(widget, model, explicit_field=None): UI → Model sync.
+    - add_validator(widget, field, validator, result_handler): Per-field
+      validation with immediate feedback.
+    - all_inputs_are_valid(widget) / get_invalid_inputs(widget): Validation
+      utilities for enabling/guarding actions.
+
+    Convenience
+    - show_widget(data, parent, ...): Ensure a single visible widget per
+      data object; recreate hidden widgets to refresh state.
+    - get_widget(data): Look up the existing widget for a given data object.
+    """
     signals = FieldSignals()
 
     @classmethod
@@ -402,6 +499,30 @@ class FieldTool(WidgetTool):
 
 
 class DialogTool(FieldTool):
+    """Preset for dialog-based (non-live) editing.
+
+    Purpose
+    - Reuse FieldTool field management inside a modal dialog. Changes are
+      gathered on the widget embedded in the dialog and applied on accept
+      rather than immediately.
+
+    Implement in subclasses
+    - get_properties() -> DialogProperties with a place to hold the active
+      dialog if desired.
+    - _get_dialog_class() -> Type[BaseDialog] used to host the field widget.
+
+    Key methods
+    - create_dialog(data, parent): Create a field widget and embed it as the
+      dialog's content; pre-fill via sync_from_model().
+    - validate_dialog(dialog): Check validators via all_inputs_are_valid()
+      and accept if OK. Override to add custom validation/feedback.
+    - connect_internal_signals(): Ensures the embedded widget is closed when
+      the dialog is accepted/declined.
+
+    When to use
+    - Prefer DialogTool when users should review changes and explicitly
+      confirm them, as opposed to live-editing fields.
+    """
     signals = DialogSignals()
 
     @classmethod
