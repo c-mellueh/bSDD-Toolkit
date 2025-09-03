@@ -13,11 +13,11 @@ from PySide6.QtCore import (
 )
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QTreeView
 from bsdd_parser.models import BsddClassProperty, BsddClass, BsddProperty
-from bsdd_gui.module.property_table import ui, models, trigger, views
+from bsdd_gui.module.property_table_view import ui, models, trigger, views
 
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_table.prop import PropertyTableProperties
+    from bsdd_gui.module.property_table_view.prop import PropertyTableViewProperties
 
 from bsdd_gui.presets.tool_presets import (
     ItemViewTool,
@@ -42,7 +42,7 @@ class PropertyTable(ItemViewTool, ActionTool, WidgetTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> PropertyTableProperties:
+    def get_properties(cls) -> PropertyTableViewProperties:
         return bsdd_gui.PropertyTableProperties
 
     @classmethod

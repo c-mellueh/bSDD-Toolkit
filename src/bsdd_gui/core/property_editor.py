@@ -7,7 +7,7 @@ from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.property_editor import ui
+    from bsdd_gui.module.property_editor_widget import ui
 
 
 def open_edit_window(

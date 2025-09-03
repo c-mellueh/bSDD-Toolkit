@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def create_main_menu_actions(
     settings: Type[tool.Settings], main_window: Type[tool.MainWindow]
 ) -> None:
-    from bsdd_gui.module.settings import trigger
+    from bsdd_gui.module.settings_widget import trigger
 
     action = main_window.add_action("menuData", "Settings", trigger.open_window)
     settings.set_action("open_window", action)
@@ -34,7 +34,7 @@ def retranslate_ui(settings: Type[tool.Settings], util: Type[tool.Util]):
 def open_window(settings: Type[tool.Settings]):
     logging.info(f"Opening Settings Window")
     dialog = settings.create_dialog()
-    from bsdd_gui.module.settings import trigger
+    from bsdd_gui.module.settings_widget import trigger
 
     trigger.retranslate_ui()
     if dialog.exec():

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClassProperty, BsddProperty
 from PySide6.QtCore import QCoreApplication, QPoint
-from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
+from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 
 if TYPE_CHECKING:
     from bsdd_gui.presets import tool_presets as tool

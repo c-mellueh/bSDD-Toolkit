@@ -8,13 +8,13 @@ from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 import bsdd_gui
 from bsdd_gui import __version__ as version
 from bsdd_gui import tool
-from bsdd_gui.module import search
+from bsdd_gui.module import search_widget
 from bsdd_gui.module.project.constants import CLASS_REFERENCE
-from bsdd_gui.module.search import trigger, constants
+from bsdd_gui.module.search_widget import trigger, constants
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.search.prop import SearchProperties
-from bsdd_gui.module.search import ui
+    from bsdd_gui.module.search_widget.prop import SearchWidgetProperties
+from bsdd_gui.module.search_widget import ui
 from thefuzz import fuzz
 from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
 from bsdd_parser import BsddClass, BsddClassProperty, BsddProperty
@@ -29,7 +29,7 @@ class Search(WidgetTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> SearchProperties:
+    def get_properties(cls) -> SearchWidgetProperties:
         return bsdd_gui.SearchProperties
 
     @classmethod

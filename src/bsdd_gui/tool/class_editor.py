@@ -7,12 +7,12 @@ from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit, 
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetSignals, WidgetTool
 from bsdd_parser import BsddClass, BsddDictionary
-from bsdd_gui.module.class_editor import trigger, ui
+from bsdd_gui.module.class_editor_widget import trigger, ui
 from bsdd_gui.presets.ui_presets import label_tags_input
 from bsdd_parser.utils import bsdd_class as class_utils
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.class_editor.prop import ClassEditorProperties
+    from bsdd_gui.module.class_editor_widget.prop import ClassEditorWidgetProperties
 
 
 class Signals(WidgetSignals):
@@ -30,7 +30,7 @@ class ClassEditor(WidgetTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> ClassEditorProperties:
+    def get_properties(cls) -> ClassEditorWidgetProperties:
         return bsdd_gui.ClassEditorProperties
 
     @classmethod

@@ -7,15 +7,15 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QTabWidget, QToolBox, QWidget
 
 import bsdd_gui
-from bsdd_gui.module.settings import ui
+from bsdd_gui.module.settings_widget import ui
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.settings.prop import SettingsProperties
+    from bsdd_gui.module.settings_widget.prop import SettingsWidgetProperties
 
 
 class Settings:
     @classmethod
-    def get_properties(cls) -> SettingsProperties:
+    def get_properties(cls) -> SettingsWidgetProperties:
         return bsdd_gui.SettingsProperties
 
     @classmethod

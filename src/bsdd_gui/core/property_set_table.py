@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Type
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.property_set_table.models import PsetTableModel
+    from bsdd_gui.module.property_set_table_view.models import PsetTableModel
 
-from bsdd_gui.module.property_set_table import ui
+from bsdd_gui.module.property_set_table_view import ui
 from PySide6.QtCore import QCoreApplication, QPoint, QModelIndex
 from PySide6.QtWidgets import QApplication, QListView
 from bsdd_parser.models import BsddClass

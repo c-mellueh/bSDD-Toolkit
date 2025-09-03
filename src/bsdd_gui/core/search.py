@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import Qt
 
 from bsdd_gui.module.project.constants import UMLAUT_DICT
-from bsdd_gui.module.search.constants import SEARCH_SECTION, STRICT_SETTING
+from bsdd_gui.module.search_widget.constants import SEARCH_SECTION, STRICT_SETTING
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.search.ui import SearchDialog
+    from bsdd_gui.module.search_widget.ui import SearchDialog
 
 
 def connect_signals(search: Type[tool.Search]):

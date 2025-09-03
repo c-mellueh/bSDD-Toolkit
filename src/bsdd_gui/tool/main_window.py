@@ -4,14 +4,14 @@ import ctypes
 
 from PySide6.QtWidgets import QApplication, QMenu, QMenuBar, QStatusBar
 import bsdd_gui
-from bsdd_gui.module.main_window import ui
+from bsdd_gui.module.main_window_widget import ui
 from bsdd_parser.models import BsddClass, BsddClassProperty
 from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
 from PySide6.QtGui import QAction
-from bsdd_gui.module.main_window import trigger
+from bsdd_gui.module.main_window_widget import trigger
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.main_window.prop import MainWindowProperties
+    from bsdd_gui.module.main_window_widget.prop import MainWindowWidgetProperties
 
 
 class Signals(QObject):
@@ -28,7 +28,7 @@ class MainWindow:
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> MainWindowProperties:
+    def get_properties(cls) -> MainWindowWidgetProperties:
         return bsdd_gui.MainWindowProperties
 
     @classmethod

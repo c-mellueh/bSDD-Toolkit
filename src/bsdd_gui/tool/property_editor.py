@@ -6,13 +6,13 @@ import bsdd_gui
 from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
 from bsdd_parser import BsddClassProperty, BsddDictionary, BsddProperty
 from bsdd_parser.utils import bsdd_class_property as cp_utils
-from bsdd_gui.module.property_editor import ui
+from bsdd_gui.module.property_editor_widget import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
-from bsdd_gui.module.property_editor import trigger
+from bsdd_gui.module.property_editor_widget import trigger
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_editor.prop import PropertyEditorProperties
+    from bsdd_gui.module.property_editor_widget.prop import PropertyEditorWidgetProperties
 
 
 class Signals(WidgetSignals):
@@ -24,7 +24,7 @@ class PropertyEditor(WidgetTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> PropertyEditorProperties:
+    def get_properties(cls) -> PropertyEditorWidgetProperties:
         return bsdd_gui.PropertyEditorProperties
 
     @classmethod

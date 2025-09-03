@@ -4,17 +4,17 @@ import logging
 
 import bsdd_gui
 from bsdd_parser import BsddClassProperty, BsddDictionary, BsddProperty
-from bsdd_gui.module.class_property_editor import ui
+from bsdd_gui.module.class_property_editor_widget import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
-from bsdd_gui.module.class_property_editor import trigger
+from bsdd_gui.module.class_property_editor_widget import trigger
 from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
 from urllib.parse import urlparse
-from bsdd_gui.module.allowed_values_view.ui import AllowedValuesTable
+from bsdd_gui.module.allowed_values_table_view.ui import AllowedValuesTable
 
 from bsdd_parser.utils.bsdd_dictionary import is_uri
 from bsdd_parser.utils import bsdd_class_property as cp_utils
-from bsdd_gui.module.class_property_editor.constants import (
+from bsdd_gui.module.class_property_editor_widget.constants import (
     BUTTON_MODE_EDIT,
     BUTTON_MODE_NEW,
     BUTTON_MODE_VIEW,
@@ -22,7 +22,9 @@ from bsdd_gui.module.class_property_editor.constants import (
 
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.class_property_editor.prop import ClassPropertyEditorProperties
+    from bsdd_gui.module.class_property_editor_widget.prop import (
+        ClassPropertyEditorWidgetProperties,
+    )
     from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 
@@ -42,7 +44,7 @@ class ClassPropertyEditor(WidgetTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> ClassPropertyEditorProperties:
+    def get_properties(cls) -> ClassPropertyEditorWidgetProperties:
         return bsdd_gui.ClassPropertyEditorProperties
 
     @classmethod

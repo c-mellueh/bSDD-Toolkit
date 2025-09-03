@@ -4,12 +4,12 @@ import logging
 from types import ModuleType
 import bsdd_gui
 from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
-from bsdd_gui.module.property_set_table import ui, models, trigger
+from bsdd_gui.module.property_set_table_view import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals, ItemViewTool
 from bsdd_parser.models import BsddDictionary, BsddClass
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_set_table.prop import PropertySetTableProperties
+    from bsdd_gui.module.property_set_table_view.prop import PropertySetTableViewProperties
 
 
 class Signals(ViewSignals):
@@ -23,7 +23,7 @@ class PropertySetTable(ItemViewTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> PropertySetTableProperties:
+    def get_properties(cls) -> PropertySetTableViewProperties:
         return bsdd_gui.PropertySetTableProperties
 
     @classmethod

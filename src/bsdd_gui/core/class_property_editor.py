@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClassProperty
-from bsdd_gui.module.class_property_editor.constants import (
+from bsdd_gui.module.class_property_editor_widget.constants import (
     SEPERATOR_SECTION,
     SEPERATOR,
     SEPERATOR_STATUS,
 )
 from PySide6.QtCore import QCoreApplication
-from bsdd_gui.module.class_property_editor import ui
+from bsdd_gui.module.class_property_editor_widget import ui
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.property_editor import ui as property_editor_ui
+    from bsdd_gui.module.property_editor_widget import ui as property_editor_ui
 
 
 def unregister_widget(

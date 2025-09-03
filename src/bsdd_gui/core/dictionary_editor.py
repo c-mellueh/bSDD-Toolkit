@@ -6,11 +6,11 @@ from PySide6.QtWidgets import QWidget
 
 from PySide6.QtGui import QCloseEvent
 from bsdd_parser import BsddDictionary
-from bsdd_gui.module.dictionary_editor.constants import LANGUAGE_ISO_CODES
+from bsdd_gui.module.dictionary_editor_widget.constants import LANGUAGE_ISO_CODES
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.dictionary_editor import ui
+    from bsdd_gui.module.dictionary_editor_widget import ui
 
 
 def register_widget(widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditor]):

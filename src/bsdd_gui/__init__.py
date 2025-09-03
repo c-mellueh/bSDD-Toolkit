@@ -11,7 +11,7 @@ import importlib
 import pkgutil
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.main_window.ui import MainWindow
+    from bsdd_gui.module.main_window_widget.ui import MainWindow
     from types import ModuleType
 
 

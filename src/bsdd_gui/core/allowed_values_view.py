@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClassProperty, BsddProperty
-from bsdd_gui.module.allowed_values_view import ui
+from bsdd_gui.module.allowed_values_table_view import ui
 from PySide6.QtCore import QCoreApplication, QPoint
 
 if TYPE_CHECKING:

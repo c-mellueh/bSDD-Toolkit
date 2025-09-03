@@ -7,7 +7,7 @@ import logging
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.class_tree import ui
+    from bsdd_gui.module.class_tree_view import ui
     from bsdd_parser.models import BsddClass
 
 

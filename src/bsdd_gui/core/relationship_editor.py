@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, Type, Literal
 from bsdd_parser import BsddProperty, BsddClass
 from PySide6.QtWidgets import QWidget, QTreeView
 from PySide6.QtCore import QCoreApplication
-from bsdd_gui.module.relationship_editor import ui
+from bsdd_gui.module.relationship_editor_widget import ui
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.dictionary_editor import ui as ui_dict
+    from bsdd_gui.module.dictionary_editor_widget import ui as ui_dict
     from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 

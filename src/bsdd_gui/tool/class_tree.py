@@ -10,12 +10,12 @@ import bsdd_gui
 
 from bsdd_parser.models import BsddDictionary, BsddClass
 from bsdd_parser.utils import bsdd_class as class_utils
-from bsdd_gui.module.class_tree import ui, models, trigger
+from bsdd_gui.module.class_tree_view import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.class_tree.prop import ClassTreeProperties
-    from bsdd_gui.module.class_tree.models import ClassTreeModel
+    from bsdd_gui.module.class_tree_view.prop import ClassTreeViewProperties
+    from bsdd_gui.module.class_tree_view.models import ClassTreeModel
 
 
 class Signals(ViewSignals):
@@ -30,7 +30,7 @@ class ClassTree(ItemViewTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> ClassTreeProperties:
+    def get_properties(cls) -> ClassTreeViewProperties:
         return bsdd_gui.ClassTreeProperties
 
     @classmethod

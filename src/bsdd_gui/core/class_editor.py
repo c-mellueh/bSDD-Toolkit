@@ -7,7 +7,7 @@ from bsdd_parser.utils import bsdd_class as class_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.class_editor import ui
+    from bsdd_gui.module.class_editor_widget import ui
 
 
 def register_widget(
