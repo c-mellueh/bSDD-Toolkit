@@ -22,8 +22,14 @@ def on_new_project():
     pass
 
 
-def open_class_editor(bsdd_class: BsddClass):
-    core.open_class_editor(bsdd_class, tool.ClassEditorWidget, tool.MainWindowWidget)
+def open_widget(bsdd_class: BsddClass):
+    core.open_dialog(bsdd_class, tool.ClassEditorWidget, tool.MainWindowWidget)
+
+
+def widget_created(class_editor: ui.ClassEditor):
+    core.register_widget(
+        class_editor, tool.ClassEditorWidget, tool.Project, tool.Util, tool.RelationshipEditorWidget
+    )
 
 
 def copy_class(bsdd_class: BsddClass):
@@ -41,10 +47,4 @@ def group_classes(bsdd_classes: list[BsddClass]):
         tool.MainWindowWidget,
         tool.Project,
         tool.ClassTreeView,
-    )
-
-
-def class_editor_created(class_editor: ui.ClassEditor):
-    core.register_widget(
-        class_editor, tool.ClassEditorWidget, tool.Project, tool.Util, tool.RelationshipEditorWidget
     )

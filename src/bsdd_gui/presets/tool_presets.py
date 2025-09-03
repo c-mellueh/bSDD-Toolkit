@@ -28,12 +28,12 @@ from bsdd_gui.presets.ui_presets import (
     DateTimeWithNow,
     ItemViewType,
     TreeItemView,
-    TableItemView,
+    BaseDialog,
     BaseWidget,
 )
 from bsdd_parser import *
 import logging
-from .signal_presets import WidgetSignals, FieldSignals, ViewSignals
+from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals
 from .models_presets import ItemModel
 
 BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassProperty
@@ -81,6 +81,8 @@ class ActionTool(BaseTool):
 
 
 class FieldTool(BaseTool):
+    signals = FieldSignals()
+
     @classmethod
     @abstractmethod
     def get_properties(cls) -> FieldProperties:
@@ -295,6 +297,26 @@ class WidgetTool(FieldTool):
         return None
 
     @classmethod
+    @abstractmethod
+    def _get_trigger(cls) -> ModuleType:
+        return None
+
+    @classmethod
+    @abstractmethod
+    def create_widget(cls, data: object, parent: QWidget):
+        return
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.widget_requested.connect(cls.create_widget)
+        cls.signals.widget_closed.connect(cls.unregister_widget)
+
+    @classmethod
+    def connect_widget_signals(cls, widget: BaseWidget):
+        widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
+
+    @classmethod
     def register_widget(cls, widget: BaseWidget):
         logging.info(f"Register {widget}")
 
@@ -329,6 +351,43 @@ class WidgetTool(FieldTool):
         cls.signals.widget_requested.emit(data, parent)
 
 
+class DialogTool(WidgetTool):
+    signals = DialogSignals()
+
+    @classmethod
+    @abstractmethod
+    def create_dialog(cls, data: object, parent: QWidget) -> BaseDialog:
+        widget = cls.create_widget(data, None)
+        dialog = BaseDialog(widget, parent)
+        cls.sync_from_model(widget, data)
+        dialog._layout.insertWidget(0, widget)
+        dialog._widget = widget
+        # dialog.new_button.clicked.connect(lambda _, d=dialog: cls.validate_dialog(d))
+        return dialog
+
+    @classmethod
+    @abstractmethod
+    def validate_dialog(cls, dialog: BaseDialog) -> None:
+        if cls.all_inputs_are_valid(dialog._widget):
+            dialog.accept()
+        else:
+            pass
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.dialog_accepted.connect(lambda dialog: dialog._widget.closed.emit())
+        cls.signals.dialog_declined.connect(lambda dialog: dialog._widget.closed.emit())
+
+    @classmethod
+    def connect_widget_signals(cls, widget: BaseWidget):
+        super().connect_widget_signals()
+
+    @classmethod
+    def connect_dialog_signals(cls, widget: BaseWidget):
+        super().connect_widget_signals()
+
+
 class ItemViewTool(BaseTool):
 
     signals = ViewSignals()  # TODO: rename to signals
@@ -360,6 +419,7 @@ class ItemViewTool(BaseTool):
 
     @classmethod
     def connect_internal_signals(cls):
+        super().connect_internal_signals()
         cls.signals.delete_selection_requested.connect(cls.delete_selection)
         cls.signals.model_refresh_requested.connect(cls.reset_views)
         cls.signals.selection_changed.connect(lambda v, d: logging.info(f"Selection changed {v}"))

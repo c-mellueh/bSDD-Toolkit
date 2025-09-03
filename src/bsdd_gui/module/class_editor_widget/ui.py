@@ -5,7 +5,7 @@ from PySide6.QtCore import QCoreApplication, Qt
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_parser import BsddClass
-from bsdd_gui.presets.ui_presets.label_tags_input import TagInput
+from bsdd_gui.presets.ui_presets import TagInput, BaseWidget, BaseDialog
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
 from PySide6.QtCore import QRect
 
@@ -20,13 +20,14 @@ class IfcTagInput(TagInput):
 from .qt import ui_ClassEditor
 
 
-class ClassEditor(QWidget, ui_ClassEditor.Ui_ClassEditor):
-    def __init__(self, bsdd_class: BsddClass):
-        self.bsdd_data = bsdd_class
-        super().__init__()
+class ClassEditor(BaseWidget, ui_ClassEditor.Ui_ClassEditor):
+
+    def __init__(self, bsdd_class: BsddClass, *args, **kwargs):
+        super().__init__(bsdd_class, *args, **kwargs)
         self.setupUi(self)
         self.setWindowIcon(get_icon())
-        trigger.class_editor_created(self)
+        self.bsdd_data: BsddClass
+        trigger.widget_created(self)
 
     # Open / Close windows
     def closeEvent(self, event):
@@ -38,18 +39,14 @@ class ClassEditor(QWidget, ui_ClassEditor.Ui_ClassEditor):
         super().paintEvent(event)
 
 
-class EditDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+class EditDialog(BaseDialog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.setWindowIcon(get_icon())
         # Create button box
-        self.button_box = QDialogButtonBox(Qt.Horizontal)
-        # Layout
-        self._layout = QVBoxLayout(self)
-        self._layout.addWidget(self.button_box)
         self.setLayout(self._layout)
         self.resize(680, 750)
-        self._editor_widget: ClassEditor = None
+        self._widget: ClassEditor = None
         self.new_button = self.button_box.addButton("Ok", QDialogButtonBox.ActionRole)
         # Prevent pressing Enter/Return from auto-activating this button
         self.new_button.setAutoDefault(False)

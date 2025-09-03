@@ -7,8 +7,9 @@ from typing import TYPE_CHECKING
 from bsdd_gui.presets.ui_presets import ItemViewType
 from PySide6.QtCore import QPoint
 
-from bsdd_gui.presets.core_presets import item_view_preset as core  # <- modify to fit your need
+from bsdd_gui.presets.core_presets import widget_preset as core  # <- modify to fit your need
 from bsdd_gui.presets import tool_presets as tool  # <- modify to fit your need
+from bsdd_gui.presets.ui_presets import BaseWidget
 
 if TYPE_CHECKING:
     from . import ui
@@ -26,12 +27,16 @@ def on_new_project():
     pass
 
 
-def context_menu_requested(view: ItemViewType, pos: QPoint):
-    core.create_context_menu(view, pos, tool.ItemViewTool)
+def open_widget(data: object, parent: BaseWidget):
+    core.open_widget(data, parent, tool.WidgetTool)
 
 
-def view_created(view: ItemViewType):
-    core.register_view(view, tool.ItemViewTool)
-    core.add_columns_to_view(view, tool.ItemViewTool)
-    core.add_context_menu_to_view(view, tool.ItemViewTool)
-    core.connect_view(view, tool.ItemViewTool)
+def open_dialog(data: object, parent: BaseWidget):
+    core.open_dialog(data, parent, tool.DialogTool)
+
+
+def widget_created(widget: BaseWidget):
+    core.register_widget(widget, tool.ItemViewTool)
+    core.add_columns_to_view(widget, tool.ItemViewTool)
+    core.add_context_menu_to_view(widget, tool.ItemViewTool)
+    core.connect_view(widget, tool.ItemViewTool)

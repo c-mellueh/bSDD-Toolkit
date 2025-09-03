@@ -3,7 +3,7 @@ from typing import Any
 from PySide6.QtWidgets import QWidget, QAbstractItemView
 
 from PySide6.QtCore import QObject, Signal
-from bsdd_gui.presets.ui_presets import BaseWidget
+from bsdd_gui.presets.ui_presets import BaseWidget, BaseDialog
 
 
 class FieldSignals(QObject):
@@ -16,6 +16,11 @@ class WidgetSignals(FieldSignals):
     widget_requested = Signal(object, BaseWidget)  # data, parent
     widget_created = Signal(BaseWidget)
     widget_closed = Signal(BaseWidget)
+
+
+class DialogSignals(WidgetSignals):
+    dialog_accepted = Signal(BaseDialog)
+    dialog_declined = Signal(BaseDialog)
 
 
 class ViewSignals(QObject):
