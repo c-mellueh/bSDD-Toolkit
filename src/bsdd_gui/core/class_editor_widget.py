@@ -134,7 +134,7 @@ def create_new_class(
     new_class = BsddClass(Code="Code", Name="Name", ClassType="Class")
     new_class.ParentClassCode = parent.Code if parent is not None else None
     dialog = class_editor.create_dialog(new_class, main_window.get())
-    widget = dialog._editor_widget
+    widget = dialog._widget
     text = QCoreApplication.translate("ClassEditor", "Create New Class")
     dialog.setWindowTitle(text)
     if dialog.exec():
@@ -156,7 +156,7 @@ def copy_class(
         return
     new_class = class_editor.copy_class(old_class)
     dialog = class_editor.create_dialog(new_class, main_window.get())
-    widget = dialog._editor_widget
+    widget = dialog._widget
     text = QCoreApplication.translate("ClassEditor", "Copy Class")
     dialog.setWindowTitle(text)
     if dialog.exec():
@@ -180,7 +180,7 @@ def group_classes(
     parent_code = None if parent is None else parent.Code
     new_class.ParentClassCode = parent_code
     dialog = class_editor.create_dialog(new_class, main_window.get())
-    widget = dialog._editor_widget
+    widget = dialog._widget
     text = QCoreApplication.translate("ClassEditor", "Group Classes")
     dialog.setWindowTitle(text)
     if dialog.exec():

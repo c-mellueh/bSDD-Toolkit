@@ -46,7 +46,6 @@ class EditDialog(BaseDialog):
         # Create button box
         self.setLayout(self._layout)
         self.resize(680, 750)
-        self._widget: ClassEditor = None
         self.new_button = self.button_box.addButton("Ok", QDialogButtonBox.ActionRole)
         # Prevent pressing Enter/Return from auto-activating this button
         self.new_button.setAutoDefault(False)
