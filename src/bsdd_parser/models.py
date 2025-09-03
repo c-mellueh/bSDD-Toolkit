@@ -21,11 +21,11 @@ class CaseInsensitiveModel(BaseModel):
 class BsddDictionary(CaseInsensitiveModel):
     OrganizationCode: str
     DictionaryCode: str
-    DictionaryName: str
     DictionaryVersion: str
     LanguageIsoCode: str
     LanguageOnly: bool
     UseOwnUri: bool
+    DictionaryName: Optional[str] = None
     DictionaryUri: Optional[str] = None
     License: Optional[str] = "MIT"
     LicenseUrl: Optional[str] = None
@@ -62,6 +62,10 @@ class BsddDictionary(CaseInsensitiveModel):
             raw = json.load(f)
         # The model_validator(before) handles list/dict/nested shapes
         return cls.model_validate(raw)
+
+    def save(self, path):
+        with open(path, "w") as file:
+            json.dump(self.model_dump(mode="json", exclude_none=True), file)
 
     def model_post_init(self, context):
         for c in self.Classes:
@@ -170,8 +174,8 @@ class BsddPropertyRelation(CaseInsensitiveModel):
 
 class BsddClassProperty(CaseInsensitiveModel):
     Code: str
-    PropertyCode: str
-    PropertyUri: str | None
+    PropertyCode: Optional[str] = None
+    PropertyUri: Optional[str] = None
     Description: Optional[str] = None
     PropertySet: Optional[str] = None
     Unit: Optional[str] = None
@@ -195,6 +199,31 @@ class BsddClassProperty(CaseInsensitiveModel):
 
     def parent(self) -> Optional[BsddClass]:
         return self._parent_ref() if self._parent_ref is not None else None
+
+    @model_validator(mode="after")
+    def _validate_property_code_or_uri(self):
+        # normalize whitespace
+        code = (
+            self.PropertyCode.strip()
+            if self.PropertyCode and isinstance(self.PropertyCode, str)
+            else None
+        )
+        uri = (
+            self.PropertyUri.strip()
+            if self.PropertyUri and isinstance(self.PropertyUri, str)
+            else None
+        )
+
+        # XOR: exactly one must be provided
+        if bool(code) == bool(uri):
+            raise ValueError(
+                "Exactly one of PropertyCode or PropertyUri must be provided (not both, not neither)"
+            )
+
+        # assign normalized values back
+        object.__setattr__(self, "PropertyCode", code)
+        object.__setattr__(self, "PropertyUri", uri)
+        return self
 
 
 class BsddProperty(CaseInsensitiveModel):
