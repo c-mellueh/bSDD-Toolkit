@@ -151,6 +151,90 @@ mypy src
 python -m bsdd_gui
 ```
 
+## Build Your Own GUI
+
+There are two typical ways to “build your own GUI” with this project:
+
+1) Package this app as a standalone executable (no Python required for end users)
+2) Extend the GUI with your own modules/widgets
+
+### 1) Package a Standalone App (PyInstaller)
+
+Prerequisites:
+
+- Python 3.10+
+- A virtual environment with the project installed
+- PyInstaller installed: `pip install pyinstaller`
+
+Build (Windows, PowerShell):
+
+```powershell
+# from the repo root
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -U pip
+pip install .
+pip install pyinstaller
+
+# run the build from src/ so relative paths in the spec resolve
+cd src
+pyinstaller main.spec -y
+```
+
+Artifacts:
+
+- Windows: `src/dist/BSDD-Toolkit/BSDD-Toolkit.exe`
+- macOS/Linux: `src/dist/BSDD-Toolkit/` binary in the same folder
+
+Notes:
+
+- The spec (`src/main.spec`) bundles resources and sets the app name and icon.
+- To hide the console window, change `console=True` to `False` in `src/main.spec` and rebuild.
+- VS Code users can also run the `Build` launch config, which executes `src/build.ps1`.
+
+### 2) Extend the GUI (Create a Module)
+
+Scaffold a new module that plugs into the app:
+
+```bash
+# from the repo root
+python src/bsdd_gui/_add_module.py my_feature
+```
+
+This generates files under:
+
+- `src/bsdd_gui/core/my_feature.py` – core hooks/logic
+- `src/bsdd_gui/tool/my_feature.py` – convenience accessors to properties/state
+- `src/bsdd_gui/module/my_feature/` – UI, triggers, and properties
+
+One manual step is required: expose the new tool in
+`src/bsdd_gui/tool/__init__.py` by adding an import line, e.g.
+
+```python
+from .my_feature import MyFeature
+```
+
+UI workflow (optional):
+
+- Design Qt forms with Qt Designer and save `.ui` files under
+  `src/bsdd_gui/module/my_feature/qt/`.
+- Compile them to Python with `pyside6-uic`, for example:
+
+  ```bash
+  pyside6-uic src/bsdd_gui/module/my_feature/qt/Widget.ui \
+    -o src/bsdd_gui/module/my_feature/qt/ui_Widget.py
+  ```
+
+Run and iterate:
+
+```bash
+python -m bsdd_gui -l 10
+```
+
+Tip: Look at existing modules in `src/bsdd_gui/module/` (for example,
+`class_editor_widget` or `main_window_widget`) as reference implementations
+for wiring `ui.py`, `trigger.py`, `core/*.py` and `tool/*.py` together.
+
 ## License
 
 MIT — see `LICENSE` for details.
