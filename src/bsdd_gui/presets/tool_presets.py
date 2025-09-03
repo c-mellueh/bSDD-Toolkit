@@ -113,7 +113,7 @@ class WidgetTool(BaseTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.widget_requested.connect(cls.create_widget)
+        cls.signals.widget_requested.connect(cls._get_trigger().create_widget)
         cls.signals.widget_closed.connect(cls.unregister_widget)
 
     @classmethod
@@ -196,6 +196,10 @@ class FieldTool(WidgetTool):
             return
         cls.get_properties().field_getter.pop(widget)
         cls.get_properties().field_setter.pop(widget)
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
 
     @classmethod
     def register_basic_field(cls, widget: FieldWidget, field: QWidget, variable_name: str):

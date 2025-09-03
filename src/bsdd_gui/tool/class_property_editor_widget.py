@@ -154,10 +154,6 @@ class ClassPropertyEditorWidget(DialogTool):
         return bsdd_class.Name + SEPERATOR + text
 
     @classmethod
-    def show_property_info(cls, bsdd_class_property: BsddClassProperty):
-        trigger.open_widget(bsdd_class_property)
-
-    @classmethod
     def get_property_reference(cls, bsdd_class_property: BsddClassProperty):
         if bsdd_class_property.PropertyCode:
             return bsdd_class_property.PropertyCode

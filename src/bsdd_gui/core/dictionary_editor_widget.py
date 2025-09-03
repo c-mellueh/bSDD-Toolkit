@@ -13,29 +13,17 @@ if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor_widget import ui
 
 
-def register_widget(
-    widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditorWidget]
+def connect_signals(
+    dictionary_editor: Type[tool.DictionaryEditorWidget], project: Type[tool.Project]
 ):
-    dictionary_editor.register_widget(widget)
-    dictionary_editor.connect_widget_to_internal_signals(widget)
+    dictionary_editor.connect_internal_signals()
 
+    def handle_field_change(widget, field):
+        name = dictionary_editor.get_name_from_field(widget, field)
+        value = dictionary_editor.get_value_from_field(field)
+        project.signals.data_changed.emit(name, value)
 
-def unregister_widget(
-    widget: ui.DictionaryEditor,
-    dictionary_editor: Type[tool.DictionaryEditorWidget],
-):
-    dictionary_editor.unregister_widget(widget)
-
-
-def create_main_menu_actions(
-    dictionary_editor: Type[tool.DictionaryEditorWidget],
-    main_window: Type[tool.MainWindowWidget],
-    project: Type[tool.Project],
-) -> None:
-    action = main_window.add_action(
-        "menuModels", "Dictionary Data", lambda: dictionary_editor.request_widget(project.get())
-    )
-    dictionary_editor.set_action(main_window.get(), "open_window", action)
+    dictionary_editor.signals.field_changed.connect(handle_field_change)
 
 
 def retranslate_ui(
@@ -54,7 +42,7 @@ def retranslate_ui(
         widget.setWindowTitle(title)
 
 
-def open_widget(
+def create_widget(
     bsdd_dictionary: BsddDictionary,
     parent_widget: QWidget | None,
     dictionary_editor: Type[tool.DictionaryEditorWidget],
@@ -81,38 +69,24 @@ def open_widget(
     retranslate_ui(dictionary_editor, main_window, util)
 
 
-def connect_signals(
-    dictionary_editor: Type[tool.DictionaryEditorWidget], project: Type[tool.Project]
+def register_widget(
+    widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditorWidget]
 ):
-    dictionary_editor.connect_internal_signals()
-
-    def handle_field_change(widget, field):
-        name = dictionary_editor.get_name_from_field(widget, field)
-        value = dictionary_editor.get_value_from_field(field)
-        project.signals.data_changed.emit(name, value)
-
-    dictionary_editor.signals.field_changed.connect(handle_field_change)
+    dictionary_editor.register_widget(widget)
 
 
-def remove_widget(
-    widget: ui.DictionaryEditor,
-    event: QCloseEvent,
+def connect_to_main_window(
     dictionary_editor: Type[tool.DictionaryEditorWidget],
-    popups: Type[tool.Popups],
-):
-    if not dictionary_editor.all_inputs_are_valid(widget):
-        event.ignore()
-        text = QCoreApplication.translate("Project", "Required Inputs are missing!")
-        missing_text = QCoreApplication.translate("Project", "is mssing")
-        missing_inputs = dictionary_editor.get_invalid_inputs(widget)
-        popups.create_warning_popup(
-            f" {missing_text}\n".join(missing_inputs) + f" {missing_text}", None, text
-        )
-    else:
-        event.accept()
+    main_window: Type[tool.MainWindowWidget],
+    project: Type[tool.Project],
+) -> None:
+    action = main_window.add_action(
+        "menuModels", "Dictionary Data", lambda: dictionary_editor.request_widget(project.get())
+    )
+    dictionary_editor.set_action(main_window.get(), "open_window", action)
 
 
-def add_fields_to_widget(
+def register_fields(
     widget: ui.DictionaryEditor,
     dictionary_editor: Type[tool.DictionaryEditorWidget],
 ):
@@ -146,7 +120,7 @@ def add_fields_to_widget(
     dictionary_editor.register_basic_field(widget, widget.cb_language_iso, "LanguageIsoCode")
 
 
-def add_validator_functions_to_widget(
+def register_validators(
     widget: ui.DictionaryEditor,
     dictionary_editor: Type[tool.DictionaryEditorWidget],
     util: Type[tool.Util],
@@ -194,3 +168,27 @@ def add_validator_functions_to_widget(
         lambda _, w: dictionary_editor.is_dictionary_uri_valid(w.le_dictionary_uri.text(), w),
         lambda _, v, w=widget.le_dictionary_uri: util.set_invalid(w, not v),
     )
+
+
+def connect_widget(
+    widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditorWidget]
+):
+    dictionary_editor.connect_widget_signals(widget)
+
+
+def remove_widget(
+    widget: ui.DictionaryEditor,
+    event: QCloseEvent,
+    dictionary_editor: Type[tool.DictionaryEditorWidget],
+    popups: Type[tool.Popups],
+):
+    if not dictionary_editor.all_inputs_are_valid(widget):
+        event.ignore()
+        text = QCoreApplication.translate("Project", "Required Inputs are missing!")
+        missing_text = QCoreApplication.translate("Project", "is mssing")
+        missing_inputs = dictionary_editor.get_invalid_inputs(widget)
+        popups.create_warning_popup(
+            f" {missing_text}\n".join(missing_inputs) + f" {missing_text}", None, text
+        )
+    else:
+        event.accept()

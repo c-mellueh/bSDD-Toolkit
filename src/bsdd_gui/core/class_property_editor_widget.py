@@ -23,7 +23,9 @@ def connect_signals(
     property_editor: Type[tool.PropertyEditorWidget],
 ):
     class_property_editor.connect_internal_signals()
-    property_table.signals.property_info_requested.connect(class_property_editor.show_property_info)
+    property_table.signals.property_info_requested.connect(
+        lambda d: class_property_editor.signals.widget_requested.emit(main_window.get(), d)
+    )
     main_window.signals.new_property_requested.connect(
         class_property_editor.signals.create_new_class_property_requested.emit
     )
@@ -35,7 +37,7 @@ def retranslate_ui(class_property_editor: Type[tool.ClassPropertyEditorWidget]):
     pass
 
 
-def open_widget(
+def create_widget(
     bsdd_class_property: BsddClassProperty,
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
     main_window: Type[tool.MainWindowWidget],

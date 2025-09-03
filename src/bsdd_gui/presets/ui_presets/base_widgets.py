@@ -5,7 +5,7 @@ from typing import TypeAlias
 from bsdd_gui.resources.icons import get_icon
 
 
-class BaseWidget(QObject):
+class BaseWidget(QWidget):
     closed = Signal()
     opened = Signal()
 

@@ -35,67 +35,27 @@ class DictionaryEditorWidget(FieldTool, ActionTool):
         return bsdd_gui.DictionaryEditorWidgetProperties
 
     @classmethod
-    def connect_internal_signals(cls):
-        cls.signals.widget_requested.connect(trigger.create_widget)
-        cls.signals.widget_closed.connect(trigger.widget_closed)
-        cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
+    def _get_trigger(cls):
+        return trigger
 
     @classmethod
-    def connect_widget_to_internal_signals(cls, widget: ui.DictionaryEditor):
-        widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
+    def _get_widget_class(cls):
+        return ui.DictionaryEditor
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
     @classmethod
     def create_widget(
         cls, bsdd_dictionary: BsddDictionary, parent_widget: QWidget
     ) -> ui.DictionaryEditor:
-        prop = cls.get_properties()
-        widget = ui.DictionaryEditor(bsdd_dictionary, parent_widget)
-        prop.widgets.add(widget)
-        return widget
+        return super().create_widget(bsdd_dictionary, parent_widget)
 
     @classmethod
     def get_widget(cls, bsdd_dictionary: BsddDictionary) -> ui.DictionaryEditor:
         return super().get_widget(bsdd_dictionary)
-
-    @classmethod
-    def is_dictionary_code_valid(cls, value, widget):
-        if value:
-            return True
-        return False
-
-    @classmethod
-    def is_org_code_valid(cls, value, widget):
-        if value:
-            return True
-        return False
-
-    @classmethod
-    def is_dictionary_name_valid(cls, value, widget):
-        if value:
-            return True
-        return False
-
-    @classmethod
-    def is_dictionary_version_valid(cls, value, widget):
-        _version_pattern = re.compile(r"^(0|[1-9]\d*)(?:\.(0|[1-9]\d*)){0,2}$")
-        return bool(_version_pattern.match(value))
-
-    @classmethod
-    def is_language_iso_valid(cls, value, widget):
-        if value:
-            return True
-        return False
-
-    @classmethod
-    def is_dictionary_uri_valid(cls, value, widget: ui.DictionaryEditor):
-        if widget.cb_use_own_uri.isChecked():
-            if not value:
-                return False
-            return True
-        else:
-            if value:
-                return False
-            return True
 
     @classmethod
     def get_name_from_field(cls, widget: ui.DictionaryEditor, field: QWidget):
@@ -136,3 +96,43 @@ class DictionaryEditorWidget(FieldTool, ActionTool):
             if not is_valid:
                 invalid_inputs.append(cls.get_name_from_field(widget, f))
         return invalid_inputs
+
+    @classmethod
+    def is_dictionary_code_valid(cls, value, widget):
+        if value:
+            return True
+        return False
+
+    @classmethod
+    def is_org_code_valid(cls, value, widget):
+        if value:
+            return True
+        return False
+
+    @classmethod
+    def is_dictionary_name_valid(cls, value, widget):
+        if value:
+            return True
+        return False
+
+    @classmethod
+    def is_dictionary_version_valid(cls, value, widget):
+        _version_pattern = re.compile(r"^(0|[1-9]\d*)(?:\.(0|[1-9]\d*)){0,2}$")
+        return bool(_version_pattern.match(value))
+
+    @classmethod
+    def is_language_iso_valid(cls, value, widget):
+        if value:
+            return True
+        return False
+
+    @classmethod
+    def is_dictionary_uri_valid(cls, value, widget: ui.DictionaryEditor):
+        if widget.cb_use_own_uri.isChecked():
+            if not value:
+                return False
+            return True
+        else:
+            if value:
+                return False
+            return True

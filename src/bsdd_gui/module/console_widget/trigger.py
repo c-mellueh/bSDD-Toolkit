@@ -16,5 +16,9 @@ def on_new_project():
     pass
 
 
+def create_widget():
+    core.create_widget(tool.ConsoleWidget)
+
+
 def close_console():
     core.close_widget(tool.ConsoleWidget)

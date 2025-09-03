@@ -29,8 +29,8 @@ def on_new_project():
     pass
 
 
-def open_widget(data: object, parent: FieldWidget):
-    core.open_widget(data, parent, tool.WidgetTool)
+def create_widget(data: object, parent: FieldWidget):
+    core.create_widget(data, parent, tool.WidgetTool)
 
 
 def open_dialog(data: object, parent: FieldWidget):

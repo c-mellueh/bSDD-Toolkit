@@ -23,6 +23,10 @@ def on_new_project():
     pass
 
 
+def create_widget(*args, **kwargs):
+    pass
+
+
 def widget_created(
     widget: ui.RelationshipWidget,
     data: BsddClass | BsddProperty,

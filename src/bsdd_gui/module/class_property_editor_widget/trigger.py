@@ -32,9 +32,9 @@ def on_new_project():
     pass
 
 
-def open_widget(som_property: BsddClassProperty):
+def create_widget(som_property: BsddClassProperty):
     # edit Property Widget
-    core.open_widget(
+    core.create_widget(
         som_property, tool.ClassPropertyEditorWidget, tool.MainWindowWidget, tool.Project
     )
 

@@ -24,7 +24,7 @@ def on_new_project():
     pass
 
 
-def open_widget(bsdd_class: BsddClass):
+def create_widget(bsdd_class: BsddClass):
     core.open_dialog(bsdd_class, tool.ClassEditorWidget, tool.MainWindowWidget)
 
 
