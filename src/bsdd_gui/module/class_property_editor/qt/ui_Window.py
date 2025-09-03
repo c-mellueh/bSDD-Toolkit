@@ -57,7 +57,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
+from bsdd_gui.module.allowed_values_view.ui import AllowedValuesTable
 from bsdd_gui.presets.ui_presets.line_edit_with_button import LineEditWithButton
 
 

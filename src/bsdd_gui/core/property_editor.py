@@ -55,7 +55,7 @@ def connect_signals(
 def unregister_widget(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditor],
-    allowed_values_table: Type[tool.AllowedValuesTable],
+    allowed_values_table: Type[tool.AllowedValuesView],
 ):
     property_editor.unregister_widget(widget)
     allowed_values_table.unregister_view(widget.tv_allowed_values)
@@ -64,7 +64,7 @@ def unregister_widget(
 def register_widget(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditor],
-    allowed_values_table: Type[tool.AllowedValuesTable],
+    allowed_values_table: Type[tool.AllowedValuesView],
 ):
     property_editor.register_widget(widget)
     widget.tv_allowed_values.model().sourceModel().bsdd_data = widget.bsdd_data
@@ -74,7 +74,7 @@ def register_widget(
 def add_fields_to_widget(
     widget: ui.PropertyEditor,
     property_editor: Type[tool.PropertyEditor],
-    allowed_values_table: Type[tool.AllowedValuesTable],
+    allowed_values_table: Type[tool.AllowedValuesView],
     relationship_editor: Type[tool.RelationshipEditor],
 ):
     property_editor.register_basic_field(widget, widget.le_code, "Code")

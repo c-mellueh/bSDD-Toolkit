@@ -10,7 +10,7 @@ from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor import trigger
 from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
 from urllib.parse import urlparse
-from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
+from bsdd_gui.module.allowed_values_view.ui import AllowedValuesTable
 
 from bsdd_parser.utils.bsdd_dictionary import is_uri
 from bsdd_parser.utils import bsdd_class_property as cp_utils

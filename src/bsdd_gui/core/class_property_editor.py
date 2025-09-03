@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 def unregister_widget(
     widget: ui.ClassPropertyEditor,
     class_property_editor: Type[tool.ClassPropertyEditor],
-    allowed_table_view: Type[tool.AllowedValuesTable],
+    allowed_table_view: Type[tool.AllowedValuesView],
 ):
     class_property_editor.unregister_widget(widget)
     allowed_table_view.unregister_view(widget.tv_allowed_values)
@@ -82,7 +82,7 @@ def add_validators_to_widget(
 def update_property_specific_fields(
     widget: ui.ClassPropertyEditor,
     class_property_editor: Type[tool.ClassPropertyEditor],
-    allowed_value_table: Type[tool.AllowedValuesTable],
+    allowed_value_table: Type[tool.AllowedValuesView],
 ):
     if not widget:
         return

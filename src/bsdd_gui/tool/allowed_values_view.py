@@ -6,12 +6,12 @@ from PySide6.QtCore import Qt, QModelIndex, QCoreApplication, Signal
 import bsdd_gui
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.allowed_values_table.prop import AllowedValuesTableProperties
+    from bsdd_gui.module.allowed_values_view.prop import AllowedValuesViewProperties
     from bsdd_gui.module.class_property_editor.ui import ClassPropertyEditor
 
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
 from bsdd_parser import BsddClassProperty, BsddProperty, BsddAllowedValue
-from bsdd_gui.module.allowed_values_table import models, ui, trigger
+from bsdd_gui.module.allowed_values_view import models, ui, trigger
 from bsdd_gui import tool
 
 
@@ -19,12 +19,12 @@ class Signals(ViewSignals):
     pass
 
 
-class AllowedValuesTable(ItemViewTool):
+class AllowedValuesView(ItemViewTool):
     signals = Signals()
 
     @classmethod
-    def get_properties(cls) -> AllowedValuesTableProperties:
-        return bsdd_gui.AllowedValuesTableProperties
+    def get_properties(cls) -> AllowedValuesViewProperties:
+        return bsdd_gui.AllowedValuesViewProperties
 
     @classmethod
     def connect_internal_signals(cls):

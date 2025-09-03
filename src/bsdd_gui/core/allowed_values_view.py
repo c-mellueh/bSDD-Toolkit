@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from bsdd_parser import BsddClassProperty, BsddProperty
-from bsdd_gui.module.allowed_values_table import ui
+from bsdd_gui.module.allowed_values_view import ui
 from PySide6.QtCore import QCoreApplication, QPoint
 
 if TYPE_CHECKING:
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def connect_signals(
-    allowed_values_table: Type[tool.AllowedValuesTable],
+    allowed_values_table: Type[tool.AllowedValuesView],
     class_property_editor: Type[tool.ClassPropertyEditor],
 ):
     class_property_editor.signals.new_value_requested.connect(
@@ -22,16 +22,16 @@ def connect_signals(
     )
 
 
-def retranslate_ui(allowed_values_table: Type[tool.AllowedValuesTable]):
+def retranslate_ui(allowed_values_table: Type[tool.AllowedValuesView]):
     pass
 
 
-def register_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
+def register_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesView]):
     allowed_values_table.register_view(view)
 
 
 def add_columns_to_view(
-    view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]
+    view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesView]
 ):
     prop: BsddClassProperty | BsddProperty = view.bsdd_data
 
@@ -57,7 +57,7 @@ def add_columns_to_view(
 
 
 def add_context_menu_to_view(
-    view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]
+    view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesView]
 ):
     allowed_values_table.clear_context_menu_list(view)
     allowed_values_table.add_context_menu_entry(
@@ -70,12 +70,12 @@ def add_context_menu_to_view(
     )
 
 
-def connect_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
+def connect_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesView]):
     allowed_values_table.connect_view_signals(view)
 
 
 def create_context_menu(
-    view: ui.AllowedValuesTable, pos: QPoint, allowed_values_table: Type[tool.AllowedValuesTable]
+    view: ui.AllowedValuesTable, pos: QPoint, allowed_values_table: Type[tool.AllowedValuesView]
 ):
     bsdd_allowed_values = allowed_values_table.get_selected(view)
     menu = allowed_values_table.create_context_menu(view, bsdd_allowed_values)
@@ -83,5 +83,5 @@ def create_context_menu(
     menu.exec(menu_pos)
 
 
-def remove_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTable]):
+def remove_view(view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesView]):
     allowed_values_table.remove_model(view.model().sourceModel())

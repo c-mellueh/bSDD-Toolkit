@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from . import ui, models
 
 
-class AllowedValuesTableProperties(ViewProperties):
+class AllowedValuesViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()
         self.model: list[models.AllowedValuesModel] = list()

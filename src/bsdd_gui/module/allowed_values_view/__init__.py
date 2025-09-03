@@ -3,7 +3,7 @@ from . import ui, prop, trigger
 
 
 def register():
-    bsdd_gui.AllowedValuesTableProperties = prop.AllowedValuesTableProperties()
+    bsdd_gui.AllowedValuesViewProperties = prop.AllowedValuesViewProperties()
 
 
 def retranslate_ui():

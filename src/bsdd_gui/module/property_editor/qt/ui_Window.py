@@ -60,7 +60,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
+from bsdd_gui.module.allowed_values_view.ui import AllowedValuesTable
 from bsdd_gui.module.property_editor.widgets import (
     ConnectedPropertyTag,
     ContryTagInput,
