@@ -12,7 +12,7 @@ from bsdd_parser import (
     BsddClassRelation,
     BsddPropertyRelation,
 )
-from bsdd_gui.presets.tool_presets import ItemViewHandler, ViewSignals, WidgetHandler, WidgetSignals
+from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals, WidgetTool, WidgetSignals
 from bsdd_parser.utils import bsdd_dictionary as dict_util
 from bsdd_parser.utils import bsdd_class as cl_util
 from bsdd_parser.utils import bsdd_class_property as prop_util
@@ -27,7 +27,7 @@ class Signals(ViewSignals, WidgetSignals):
     pass
 
 
-class RelationshipEditor(WidgetHandler, ItemViewHandler):
+class RelationshipEditor(WidgetTool, ItemViewTool):
     signals = Signals()
 
     @classmethod

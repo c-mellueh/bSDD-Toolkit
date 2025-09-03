@@ -31,7 +31,3 @@ def view_created(view: ui.ClassPropertyTable):
     core.add_columns_to_view(view, tool.ClassPropertyTable)
     core.add_context_menu_to_view(view, tool.ClassPropertyTable)
     core.connect_view(view, tool.ClassPropertyTable)
-
-
-def view_closed(view: ui.ClassPropertyTable):
-    core.remove_view(view, tool.ClassPropertyTable)

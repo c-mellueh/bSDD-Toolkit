@@ -2,10 +2,8 @@ from PySide6.QtWidgets import QAbstractItemView, QWidget
 from PySide6.QtCore import QAbstractItemModel
 from PySide6.QtGui import QAction
 from typing import TypedDict, Callable, TypeAlias
-from .view_presets import TreeItemView, TableItemView
+from .view_presets import ItemViewType
 from .models_presets import ItemModel
-
-ItemViewType: TypeAlias = TreeItemView | TableItemView
 
 
 class ContextMenuDict(TypedDict):

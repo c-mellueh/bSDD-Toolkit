@@ -21,7 +21,3 @@ class AllowedValuesTable(TableItemView):
 
     def model(self) -> models.SortModel:
         return super().model()
-
-    def closeEvent(self, event):
-        trigger.view_closed(self)
-        return super().closeEvent(event)

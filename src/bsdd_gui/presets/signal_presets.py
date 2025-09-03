@@ -18,8 +18,7 @@ class WidgetSignals(FieldSignals):
     widget_closed = Signal(QWidget)
 
 
-class ViewSignals(WidgetSignals):
-    view_closed = Signal(object)
+class ViewSignals(QObject):
     model_refresh_requested = Signal()
     selection_changed = Signal(QWidget, Any)
     delete_selection_requested = Signal(Any)  # ItemViewType

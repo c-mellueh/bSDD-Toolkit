@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.search.prop import SearchProperties
 from bsdd_gui.module.search import ui
 from thefuzz import fuzz
-from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignals
+from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
 from bsdd_parser import BsddClass, BsddClassProperty, BsddProperty
 
 
@@ -25,7 +25,7 @@ class Signals(WidgetSignals):
     strict_state_changed = Signal(bool)
 
 
-class Search(WidgetHandler):
+class Search(WidgetTool):
     signals = Signals()
 
     @classmethod

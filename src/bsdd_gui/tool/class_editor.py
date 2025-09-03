@@ -5,7 +5,7 @@ from PySide6.QtCore import Signal, QCoreApplication
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit, QDialogButtonBox
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import WidgetSignals, WidgetHandler
+from bsdd_gui.presets.tool_presets import WidgetSignals, WidgetTool
 from bsdd_parser import BsddClass, BsddDictionary
 from bsdd_gui.module.class_editor import trigger, ui
 from bsdd_gui.presets.ui_presets import label_tags_input
@@ -26,7 +26,7 @@ class Signals(WidgetSignals):
     dialog_accepted = Signal(ui.ClassEditor)
 
 
-class ClassEditor(WidgetHandler):
+class ClassEditor(WidgetTool):
     signals = Signals()
 
     @classmethod

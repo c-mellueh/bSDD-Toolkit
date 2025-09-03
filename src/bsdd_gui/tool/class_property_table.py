@@ -9,7 +9,7 @@ from bsdd_parser.models import BsddClassProperty, BsddClass
 from bsdd_parser.utils import bsdd_class_property as cp_utils
 
 from bsdd_gui.module.class_property_table import ui, models, trigger
-from bsdd_gui.presets.tool_presets import ItemViewHandler, ViewSignals
+from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_property_table.prop import ClassPropertyTableProperties
@@ -19,7 +19,7 @@ class Signals(ViewSignals):
     property_info_requested = Signal(BsddClassProperty)
 
 
-class ClassPropertyTable(ItemViewHandler):
+class ClassPropertyTable(ItemViewTool):
     signals = Signals()
 
     @classmethod

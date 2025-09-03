@@ -15,11 +15,11 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.ItemViewHandler)
+    core.connect_signals(tool.ItemViewTool)
 
 
 def retranslate_ui():
-    core.rentranslate_ui(tool.ItemViewHandler)
+    core.retranslate_ui(tool.ItemViewTool)
 
 
 def on_new_project():
@@ -27,15 +27,11 @@ def on_new_project():
 
 
 def context_menu_requested(view: ItemViewType, pos: QPoint):
-    core.create_context_menu(view, pos, tool.ItemViewHandler)
+    core.create_context_menu(view, pos, tool.ItemViewTool)
 
 
 def view_created(view: ItemViewType):
-    core.register_view(view, tool.ItemViewHandler)
-    core.add_columns_to_view(view, tool.ItemViewHandler)
-    core.add_context_menu_to_view(view, tool.ItemViewHandler)
-    core.connect_view(view, tool.ItemViewHandler)
-
-
-def view_closed(view: ItemViewType):
-    core.remove_view(view, tool.ItemViewHandler)
+    core.register_view(view, tool.ItemViewTool)
+    core.add_columns_to_view(view, tool.ItemViewTool)
+    core.add_context_menu_to_view(view, tool.ItemViewTool)
+    core.connect_view(view, tool.ItemViewTool)

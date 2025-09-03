@@ -20,12 +20,12 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_table.prop import PropertyTableProperties
 
 from bsdd_gui.presets.tool_presets import (
-    ItemViewHandler,
-    ItemViewHandler,
+    ItemViewTool,
+    ItemViewTool,
     ViewSignals,
     WidgetSignals,
-    WidgetHandler,
-    ActionsHandler,
+    WidgetTool,
+    ActionTool,
 )
 
 
@@ -38,7 +38,7 @@ class Signals(ViewSignals, WidgetSignals):
     search_requested = Signal(QWidget)
 
 
-class PropertyTable(ItemViewHandler, ActionsHandler, WidgetHandler):
+class PropertyTable(ItemViewTool, ActionTool, WidgetTool):
     signals = Signals()
 
     @classmethod

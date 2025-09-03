@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     )
 
 
-class BaseHandler(ABC):
+class BaseTool(ABC):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> object:
@@ -55,7 +55,7 @@ class BaseHandler(ABC):
         return None
 
 
-class ActionsHandler(BaseHandler):
+class ActionTool(BaseTool):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> WidgetProperties:
@@ -75,7 +75,7 @@ class ActionsHandler(BaseHandler):
         return cls.get_properties().actions[widget][name]
 
 
-class FieldHandler(BaseHandler):
+class FieldTool(BaseTool):
     @classmethod
     @abstractmethod
     def get_properties(cls) -> FieldProperties:
@@ -281,7 +281,7 @@ class FieldHandler(BaseHandler):
         return invalid_inputs
 
 
-class WidgetHandler(FieldHandler):
+class WidgetTool(FieldTool):
     signals = WidgetSignals()
 
     @classmethod
@@ -324,7 +324,7 @@ class WidgetHandler(FieldHandler):
         cls.signals.widget_requested.emit(data, parent)
 
 
-class ItemViewHandler(BaseHandler):
+class ItemViewTool(BaseTool):
 
     signals = ViewSignals()  # TODO: rename to signals
     # TODO: make info_requested a signal for all handlers

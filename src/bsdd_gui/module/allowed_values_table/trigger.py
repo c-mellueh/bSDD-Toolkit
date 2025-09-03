@@ -29,7 +29,3 @@ def view_created(view: ui.AllowedValuesTable):
     core.add_columns_to_view(view, tool.AllowedValuesTable)
     core.add_context_menu_to_view(view, tool.AllowedValuesTable)
     core.connect_view(view, tool.AllowedValuesTable)
-
-
-def view_closed(view: ui.AllowedValuesTable):
-    core.remove_view(view, tool.AllowedValuesTable)

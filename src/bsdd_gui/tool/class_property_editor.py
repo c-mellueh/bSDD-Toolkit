@@ -8,7 +8,7 @@ from bsdd_gui.module.class_property_editor import ui
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor import trigger
-from bsdd_gui.presets.tool_presets import WidgetHandler, WidgetSignals
+from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
 from urllib.parse import urlparse
 from bsdd_gui.module.allowed_values_table.ui import AllowedValuesTable
 
@@ -38,7 +38,7 @@ class Signals(WidgetSignals):
     property_specific_redraw_requested = Signal(ui.ClassPropertyEditor)
 
 
-class ClassPropertyEditor(WidgetHandler):
+class ClassPropertyEditor(WidgetTool):
     signals = Signals()
 
     @classmethod
