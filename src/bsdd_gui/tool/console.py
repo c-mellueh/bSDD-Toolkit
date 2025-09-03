@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 import logging
 
 import bsdd_gui
-from bsdd_gui.module.console import ui
+from bsdd_gui.module.console_widget import ui
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.console.prop import ConsoleProperties
+    from bsdd_gui.module.console_widget.prop import ConsoleWidgetProperties
 
 
 class Console:
     @classmethod
-    def get_properties(cls) -> ConsoleProperties:
+    def get_properties(cls) -> ConsoleWidgetProperties:
         return bsdd_gui.ConsoleProperties
 
     @classmethod

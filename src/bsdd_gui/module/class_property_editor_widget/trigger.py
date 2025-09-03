@@ -1,7 +1,7 @@
 from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
-from bsdd_gui.core import class_property_editor as core
+from bsdd_gui.core import class_property_editor_widget as core
 from typing import TYPE_CHECKING
 from bsdd_parser import BsddClassProperty
 from PySide6.QtGui import QKeySequence

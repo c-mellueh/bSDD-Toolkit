@@ -1,7 +1,7 @@
 from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
-from bsdd_gui.core import search as core
+from bsdd_gui.core import search_widget as core
 from typing import TYPE_CHECKING
 
 

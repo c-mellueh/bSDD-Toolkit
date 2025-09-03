@@ -6,5 +6,5 @@ if TYPE_CHECKING:
     from .ui import Console
 
 
-class ConsoleProperties:
+class ConsoleWidgetProperties:
     console: Console = None

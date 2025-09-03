@@ -1,7 +1,7 @@
 from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
-from bsdd_gui.core import allowed_values_view as core
+from bsdd_gui.core import allowed_values_table_view as core
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

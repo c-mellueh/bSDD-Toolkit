@@ -1,7 +1,7 @@
 from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
-from bsdd_gui.core import relationship_editor as core
+from bsdd_gui.core import relationship_editor_widget as core
 from typing import TYPE_CHECKING, Literal
 from bsdd_parser import BsddClass, BsddProperty
 from PySide6.QtWidgets import QTableView

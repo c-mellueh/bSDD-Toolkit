@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from bsdd_gui import tool
-from bsdd_gui.core import settings as core
+from bsdd_gui.core import settings_widget as core
 
 
 def connect():

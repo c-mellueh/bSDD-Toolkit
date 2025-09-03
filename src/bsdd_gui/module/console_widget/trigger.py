@@ -1,5 +1,5 @@
 from bsdd_gui import tool
-from bsdd_gui.core import console as core
+from bsdd_gui.core import console_widget as core
 
 
 def connect():

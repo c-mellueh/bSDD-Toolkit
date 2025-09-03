@@ -7,11 +7,11 @@ if TYPE_CHECKING:
     from os import PathLike
 
 from bsdd_gui import core, tool
-import bsdd_gui.core.main_window
+import bsdd_gui.core.main_window_widget
 import importlib
 from bsdd_gui.module.project.constants import OPEN_PATH
 import bsdd_gui.core.project
-import bsdd_gui.core.main_window
+import bsdd_gui.core.main_window_widget
 from bsdd_gui.module.language.trigger import set_language
 
 
@@ -32,7 +32,7 @@ def main(initial_file: PathLike | None = None, log_level=None, open_last_project
 
     # Create UI
     app = QApplication(sys.argv)
-    bsdd_gui.core.main_window.create_main_window(
+    bsdd_gui.core.main_window_widget.create_main_window(
         app,
         tool.MainWindow,
     )
