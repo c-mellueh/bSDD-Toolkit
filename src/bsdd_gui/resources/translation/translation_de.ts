@@ -7,7 +7,7 @@
       <location filename="../../core/allowed_values_table_view.py" line="67" />
       <location filename="../../presets/core_presets/item_view_preset.py" line="49" />
       <source>Delete</source>
-      <translation>LÃ¶schen</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <location filename="../../tool/allowed_values_table_view.py" line="117" />
@@ -28,7 +28,7 @@
     <message>
       <location filename="../../core/class_tree_view.py" line="73" />
       <source>Delete</source>
-      <translation>LÃ¶schen</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <location filename="../../core/class_tree_view.py" line="81" />
@@ -53,7 +53,7 @@
     <message>
       <location filename="../../core/class_tree_view.py" line="114" />
       <source>Reset View</source>
-      <translation>Ansicht zurÃ¼cksetzen</translation>
+      <translation>Ansicht zurücksetzen</translation>
     </message>
   </context>
   <context>
@@ -89,7 +89,7 @@
     <message>
       <location filename="../../module/class_editor_widget/qt/ClassEditor.ui" line="20" />
       <source>Required</source>
-      <translation>BenÃ¶tigt</translation>
+      <translation>Benötigt</translation>
     </message>
     <message>
       <location filename="../../module/class_editor_widget/qt/ClassEditor.ui" line="28" />
@@ -119,7 +119,7 @@
     <message>
       <location filename="../../module/class_editor_widget/qt/ClassEditor.ui" line="97" />
       <source>Related IFC Entities</source>
-      <translation>Verwandte IFC EntitÃ¤ten</translation>
+      <translation>Verwandte IFC Entitäten</translation>
     </message>
     <message>
       <location filename="../../module/class_editor_widget/qt/ClassEditor.ui" line="109" />
@@ -190,7 +190,7 @@
     <message>
       <location filename="../../module/popups/qt/DeleteRequest.ui" line="20" />
       <source>delete the following entities?</source>
-      <translation>Folgende EntitÃ¤ten lÃ¶schen?</translation>
+      <translation>Folgende Entitäten löschen?</translation>
     </message>
     <message>
       <location filename="../../module/popups/qt/DeleteRequest.ui" line="30" />
@@ -260,184 +260,154 @@
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="68" />
       <source>DictionaryVersion *</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Bibliotheksversion *</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="75" />
       <source>Version format: up to three dot-separated numbers. Examples: 12, 10.1, 1.2.3.</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Versionsformat: bis zu drei punktgetrennte Zahlen. Beispiele: 12, 10.1, 1.2.3.</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="78" />
       <source>e.g. 1.0.1</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>z.B. 1.0.1</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="85" />
       <source>LanguageIsoCode *</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Sprach-ISO-Code *</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="92" />
       <source>LanguageOnly *</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Nur Sprache *</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="99" />
       <source>True if JSON contains only language-specific info.</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Wahr, wenn JSON nur sprachspezifische Informationen enthält.</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="106" />
       <source>UseOwnUri *</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Eigene URIs verwenden *</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="113" />
       <source>Use your own URIs for globally unique identification. Default: false.</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Eigene URIs für global eindeutige Identifikation verwenden. Standard: false.</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="120" />
       <source>DictionaryUri *</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Bibliotheks-URI *</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="127" />
       <source>Required if UseOwnUri = true. First part of all Class/Property URIs.</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Erforderlich, wenn UseOwnUri = true. Erster Teil aller Klassen-/Merkmals-URIs.</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="130" />
       <source>urn:mycompany:mydictionary or https://mycompany.com/mydictionary</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>urn:mycompany:mydictionary oder https://mycompany.com/mydictionary</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="137" />
       <source>License</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Lizenz</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="144" />
       <source>SPDX or well-known license identifier.</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>SPDX- oder bekannter Lizenz-Identifikator.</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="147" />
       <source>e.g. MIT, CC-BY-4.0</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>z.B. MIT, CC-BY-4.0</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="154" />
       <source>LicenseUrl</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Lizenz-URL</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="161" />
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="196" />
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="224" />
       <source>https://...</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>https://...</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="168" />
       <source>ChangeRequestEmailAddress</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>E-Mail-Adresse für Änderungsanfragen</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="175" />
       <source>name@example.com</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>name@example.com</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="182" />
       <source>ModelVersion</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Modellversion</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="189" />
       <source>MoreInfoUrl</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>URL mit weiteren Informationen</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="203" />
       <source>QualityAssuranceProcedure</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Qualitätssicherungsverfahren</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="210" />
       <source>e.g. bSI process, ETIM international</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>z.B. bSI-Prozess, ETIM International</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="217" />
       <source>QualityAssuranceProcedureUrl</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>URL zum Qualitätssicherungsverfahren</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="231" />
       <source>ReleaseDate</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Veröffentlichungsdatum</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="238" />
       <source>Status</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Status</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="252" />
       <source>1.0</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>1.0</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="257" />
       <source>2.0</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>2.0</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="266" />
       <source>Preview</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Vorschau</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="271" />
       <source>Active</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Aktiv</translation>
     </message>
     <message>
       <location filename="../../module/dictionary_editor_widget/qt/DictionaryEditor.ui" line="276" />
       <source>Inactive</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Inaktiv</translation>
     </message>
   </context>
   <context>
@@ -472,31 +442,27 @@
     <message>
       <location filename="../../module/relationship_editor_widget/qt/Widget.ui" line="37" />
       <source>RelationType</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Relationstyp</translation>
     </message>
     <message>
       <location filename="../../module/relationship_editor_widget/qt/Widget.ui" line="51" />
       <source>Fraction</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Anteil</translation>
     </message>
     <message>
       <location filename="../../module/relationship_editor_widget/qt/Widget.ui" line="72" />
       <source>OwnedUri</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Eigene URI</translation>
     </message>
     <message>
       <location filename="../../module/relationship_editor_widget/qt/Widget.ui" line="79" />
       <source>RelatedClass</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Zugehörige Klasse</translation>
     </message>
     <message>
       <location filename="../../module/relationship_editor_widget/qt/Widget.ui" line="106" />
       <source>Add</source>
-      <translation>HinzufÃ¼gen</translation>
+      <translation>Hinzufügen</translation>
     </message>
   </context>
   <context>
@@ -606,47 +572,47 @@
     <message>
       <location filename="../../tool/popups.py" line="31" />
       <source>Warning! All unsaved changes will be lost!</source>
-      <translation>Achtung! Alle nicht gespeicherten Ã„nderungen gehen verloren!</translation>
+      <translation>Achtung! Alle nicht gespeicherten Änderungen gehen verloren!</translation>
     </message>
     <message>
       <location filename="../../tool/popups.py" line="105" />
       <source>Delete Class?</source>
-      <translation>Klasse lÃ¶schen?</translation>
+      <translation>Klasse löschen?</translation>
     </message>
     <message>
       <location filename="../../tool/popups.py" line="107" />
       <source>Delete Node?</source>
-      <translation>Node LÃ¶schen?</translation>
+      <translation>Node Löschen?</translation>
     </message>
     <message>
       <location filename="../../tool/popups.py" line="109" />
       <source>Delete PropertySet?</source>
-      <translation>PropertySet LÃ¶schen?</translation>
+      <translation>PropertySet Löschen?</translation>
     </message>
     <message>
       <location filename="../../tool/popups.py" line="111" />
       <source>Delete Property?</source>
-      <translation>Merkmal lÃ¶schen?</translation>
+      <translation>Merkmal löschen?</translation>
     </message>
     <message>
       <location filename="../../tool/popups.py" line="114" />
       <source>Delete Classes?</source>
-      <translation>Klassen lÃ¶schen?</translation>
+      <translation>Klassen löschen?</translation>
     </message>
     <message>
       <location filename="../../tool/popups.py" line="120" />
       <source>Delete Properties?</source>
-      <translation>Merkmale lÃ¶schen?</translation>
+      <translation>Merkmale löschen?</translation>
     </message>
     <message>
       <location filename="../../tool/popups.py" line="116" />
       <source>Delete Nodes?</source>
-      <translation>Nodes LÃ¶schen?</translation>
+      <translation>Nodes Löschen?</translation>
     </message>
     <message>
       <location filename="../../tool/popups.py" line="118" />
       <source>Delete PropertySets?</source>
-      <translation>PropertySets LÃ¶schen?</translation>
+      <translation>PropertySets Löschen?</translation>
     </message>
   </context>
   <context>
@@ -657,7 +623,7 @@
     <message>
       <location filename="../../presets/core_presets/widget_preset.py" line="28" />
       <source>Example Title</source>
-      <translation type="unfinished">Beispiel Titel</translation>
+      <translation>Beispiel Titel</translation>
     </message>
   </context>
   <context>
@@ -670,12 +636,12 @@
     <message>
       <location filename="../../core/project.py" line="64" />
       <source>Open</source>
-      <translation>Ã–ffnen</translation>
+      <translation>Öffnen</translation>
     </message>
     <message>
       <location filename="../../core/project.py" line="67" />
       <source>Add Project</source>
-      <translation>Projekt hinzufÃ¼gen</translation>
+      <translation>Projekt hinzufügen</translation>
     </message>
     <message>
       <location filename="../../core/project.py" line="70" />
@@ -690,13 +656,12 @@
     <message>
       <location filename="../../core/project.py" line="97" />
       <source>is missing</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>fehlt</translation>
     </message>
     <message>
       <location filename="../../core/project.py" line="107" />
       <source>New Project</source>
-      <translation type="unfinished">Neues Projekt</translation>
+      <translation>Neues Projekt</translation>
     </message>
     <message>
       <location filename="../../core/project.py" line="158" />
@@ -706,26 +671,23 @@
     <message>
       <location filename="../../core/project.py" line="124" />
       <source>Open Project</source>
-      <translation>Projekt Ã–ffnen</translation>
+      <translation>Projekt Öffnen</translation>
     </message>
     <message>
       <location filename="../../core/dictionary_editor_widget.py" line="190" />
       <location filename="../../core/project.py" line="96" />
       <source>Required Inputs are missing!</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Erforderliche Eingaben fehlen!</translation>
     </message>
     <message>
       <location filename="../../core/dictionary_editor_widget.py" line="191" />
       <source>is mssing</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>fehlt</translation>
     </message>
     <message>
       <location filename="../../module/project/ui.py" line="13" />
       <source>Create New Project</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Neues Projekt erstellen</translation>
     </message>
   </context>
   <context>
@@ -746,7 +708,7 @@
       <location filename="../../core/property_set_table_view.py" line="134" />
       <location filename="../../core/property_table_widget.py" line="107" />
       <source>Delete</source>
-      <translation>LÃ¶schen</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <location filename="../../core/property_set_table_view.py" line="143" />
@@ -756,8 +718,7 @@
     <message>
       <location filename="../../core/property_table_widget.py" line="116" />
       <source>Delete Properties</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Merkmale löschen</translation>
     </message>
   </context>
   <context>
@@ -765,7 +726,7 @@
     <message>
       <location filename="../../core/property_set_table_view.py" line="120" />
       <source>New PropertySet</source>
-      <translation type="unfinished">Neues PropertySet</translation>
+      <translation>Neues PropertySet</translation>
     </message>
   </context>
   <context>
@@ -780,8 +741,7 @@
       <location filename="../../core/property_table_widget.py" line="40" />
       <location filename="../../core/property_table_widget.py" line="41" />
       <source>Properties Data</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Merkmalsdaten</translation>
     </message>
   </context>
   <context>
@@ -795,15 +755,14 @@
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="30" />
       <source>Basics</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Grundlagen</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="60" />
       <source>Name of the Property
                                                                 Example: "IsExternal"</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Name des Merkmals
+                                                                Beispiel: "IsExternal"</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="64" />
@@ -828,50 +787,49 @@
                                                                 or want to have the QUDT units
                                                                 in the API output, please let us
                                                                 know.</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Die Einheiten stellen eine Skala dar,
+                                                                mit der ein Wert gemessen werden kann (ISO 80000 oder ISO 4217,
+                                                                oder ISO 8601). Liste von Werten.
+                                                                Siehe Referenzliste (JSON) units.
+                                                                Wir arbeiten an der Unterstützung des QUDT-Vokabulars.
+                                                                Wenn Sie mit QUDT-Einheiten importieren möchten
+                                                                oder die QUDT-Einheiten in der API-Ausgabe benötigen, lassen Sie es uns
+                                                                wissen.</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="103" />
       <source>Units:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Einheiten:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="136" />
       <source>Boolean</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Boolesch</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="141" />
       <source>Character</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Zeichen</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="146" />
       <source>Integer</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Ganzzahl</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="151" />
       <source>Real</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Reell</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="156" />
       <source>String</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Zeichenkette</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="161" />
       <source>Time</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Zeit</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="169" />
@@ -890,62 +848,56 @@
                                                                         assembling properties),
                                                                         ComplexList (list of
                                                                         complex values).</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Muss eine der folgenden Optionen sein:
+                                                                        Einzelwert (ein Wert; Standard), Bereich (zwei Werte), Liste (mehrere Werte),
+                                                                        Komplex (weder Einzelwert/Bereich/Liste, z. B. ein Objekt wie IfcActor
+                                                                        oder eine Aggregation verbundener Merkmale – siehe „assembling properties“),
+                                                                        Komplexliste (Liste komplexer Werte).</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="185" />
       <source>Property Value Kind:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Art des Merkmalswerts:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="215" />
       <source>Single</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Einzelwert</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="220" />
       <source>Range</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Bereich</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="225" />
       <source>List</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Liste</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="230" />
       <source>Complex</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Komplex</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="235" />
       <source>ComplexList</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Komplexliste</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="243" />
       <source>Status:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Status:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="257" />
       <source>Active</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Aktiv</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="262" />
       <source>Inactive</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Inaktiv</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="272" />
@@ -954,229 +906,202 @@
                                                                 Example:
                                                                 "abc-00123-01" or
                                                                 "SpecialWidth".</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Eindeutige Kennung des
+                                                                Merkmals innerhalb der Bibliothek.
+                                                                Beispiel:
+                                                                "abc-00123-01" oder
+                                                                "SpecialWidth".</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="291" />
       <source>Allowed Values</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Zulässige Werte</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="334" />
       <source>Definitions and Relations</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Definitionen und Relationen</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="344" />
       <source>PropertyRelations</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Merkmalsrelationen</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="376" />
       <source>Definition</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Definition</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="447" />
       <source>Advanced</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Erweitert</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="453" />
       <source>Example value of the Property</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Beispielwert des Merkmals</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="456" />
       <source>Example:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Beispiel:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="466" />
       <source>Activation Date:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Aktivierungsdatum:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="473" />
       <source> List of codes of one or more connected properties.
-                                            Can also be full URI instead of code, in case it is a
-                                            property of another dictionary.</source>
-      <translation type="unfinished">
-      </translation>
+                                             Can also be full URI instead of code, in case it is a
+                                             property of another dictionary.</source>
+      <translation> Liste der Codes eines oder mehrerer verbundener Merkmale.
+                                             Kann auch eine vollständige URI statt eines Codes sein, falls es sich um
+                                             ein Merkmal einer anderen Bibliothek handelt.</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="478" />
       <source>Connected Property Codes:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Codes verbundener Merkmale:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="488" />
       <source>List of country ISO codes this Property is being
-                                            used.</source>
-      <translation type="unfinished">
-      </translation>
+                                             used.</source>
+      <translation>Liste der ISO-Ländercodes, in denen dieses Merkmal verwendet wird.</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="492" />
       <source>Countries of Use:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Verwendungsländer:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="502" />
       <source>ISO Country Code of the country of origin of this
-                                            Property</source>
-      <translation type="unfinished">
-      </translation>
+                                             Property</source>
+      <translation>ISO-Ländercode des Herkunftslands dieses Merkmals</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="506" />
       <source>Country of origin:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Herkunftsland:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="516" />
       <source>Language ISO code of the creator. </source>
-      <translation type="unfinished">
-      </translation>
+      <translation>ISO-Sprachcode des Erstellers.</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="519" />
       <source>Creator Language IsoCode:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>ISO-Sprachcode des Erstellers:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="529" />
       <source>De Activation Date:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Deaktivierungsdatum:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="536" />
       <source>Reference to document with the full or official
-                                            definition of the Property</source>
-      <translation type="unfinished">
-      </translation>
+                                             definition of the Property</source>
+      <translation>Verweis auf ein Dokument mit der vollständigen oder offiziellen Definition des Merkmals</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="540" />
       <source>Document Reference:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Dokumentenverweis:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="550" />
       <source>Example: "Thermal transmittance according to
-                                            ISO 10077-1"</source>
-      <translation type="unfinished">
-      </translation>
+                                             ISO 10077-1"</source>
+      <translation>Beispiel: "Wärmedurchgang gemäß ISO 10077-1"</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="554" />
       <source>Method of Measurement:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Messmethode:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="564" />
       <source>List of Property Codes this Property replaces</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Liste der Merkmalscodes, die dieses Merkmal ersetzt</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="567" />
       <source>Replaced Object Codes:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Ersetzte Objektcodes:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="574" />
       <source>List of Property Codes this Property is replaced by</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Liste der Merkmalscodes, durch die dieses Merkmal ersetzt wird</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="577" />
       <source>Replacing Object Codes:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Ersetzende Objektcodes:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="590" />
       <source>Revision Date:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Revisionsdatum:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="597" />
       <source>List of geographical regions of use Example:
-                                            "US-MT"</source>
-      <translation type="unfinished">
-      </translation>
+                                             "US-MT"</source>
+      <translation>Liste geografischer Nutzungsregionen, Beispiel:
+                                             "US-MT"</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="601" />
       <source>Subdivision of Use:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Nutzungsunterregion:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="611" />
       <source>Pair for text type (encoding, number of characters)
-                                            The encoding is set according to "Name of encoding
-                                            standard" of IANA, RFC 2978, Example:
-                                            "(UTF-8,32)"</source>
-      <translation type="unfinished">
-      </translation>
+                                             The encoding is set according to "Name of encoding
+                                             standard" of IANA, RFC 2978, Example:
+                                             "(UTF-8,32)"</source>
+      <translation>Paar für den Texttyp (Kodierung, Zeichenanzahl)
+                                             Die Kodierung wird gemäß "Name of encoding standard" der IANA, RFC 2978, festgelegt.
+                                             Beispiel: "(UTF-8,32)"</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="617" />
       <source>Text Format:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Textformat:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="627" />
       <source>Unique identification (ID), in case the URI is not
-                                            enough.</source>
-      <translation type="unfinished">
-      </translation>
+                                             enough.</source>
+      <translation>Eindeutige Kennung (ID), falls die URI nicht ausreicht.</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="631" />
       <source>Uid:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>UID:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="641" />
       <source>Version Date:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Versionsdatum:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="648" />
       <source>Version number:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Versionsnummer:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="658" />
       <source>Visual Representation:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Visuelle Darstellung:</translation>
     </message>
     <message>
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="122" />
@@ -1187,27 +1112,23 @@
       <location filename="../../module/class_property_editor_widget/qt/Window.ui" line="31" />
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="279" />
       <source>Code:</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Code:</translation>
     </message>
     <message>
       <location filename="../../module/class_property_editor_widget/qt/Window.ui" line="50" />
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="47" />
       <source>Code</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Code</translation>
     </message>
     <message>
       <location filename="../../module/class_property_editor_widget/qt/Window.ui" line="57" />
       <source>Property Reference</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Merkmalsreferenz</translation>
     </message>
     <message>
       <location filename="../../module/class_property_editor_widget/qt/Window.ui" line="64" />
       <source>Property Code or URI</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Merkmalscode oder URI</translation>
     </message>
     <message>
       <location filename="../../module/class_property_editor_widget/qt/Window.ui" line="71" />
@@ -1228,14 +1149,13 @@
     <message>
       <location filename="../../module/class_property_editor_widget/qt/Window.ui" line="114" />
       <source>Is Required</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Erforderlich</translation>
     </message>
     <message>
       <location filename="../../module/class_property_editor_widget/qt/Window.ui" line="126" />
       <location filename="../../module/property_editor_widget/qt/Window.ui" line="413" />
       <source>Description:</source>
-      <translation type="unfinished">Beschreibung:</translation>
+      <translation>Beschreibung:</translation>
     </message>
     <message>
       <location filename="../../module/class_property_editor_widget/qt/Window.ui" line="155" />
@@ -1252,14 +1172,12 @@
     <message>
       <location filename="../../core/relationship_editor_widget.py" line="46" />
       <source>Related Class</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Zugehörige Klasse</translation>
     </message>
     <message>
       <location filename="../../core/relationship_editor_widget.py" line="48" />
       <source>Related Property</source>
-      <translation type="unfinished">
-      </translation>
+      <translation>Zugehöriges Merkmal</translation>
     </message>
   </context>
   <context>
@@ -1277,7 +1195,7 @@
     <message>
       <location filename="../../tool/search_widget.py" line="120" />
       <source>Abbreviation</source>
-      <translation>AbkÃ¼rzung</translation>
+      <translation>Abkürzung</translation>
     </message>
     <message>
       <location filename="../../tool/search_widget.py" line="124" />
