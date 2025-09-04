@@ -68,7 +68,6 @@ if TYPE_CHECKING:
     from .prop_presets import (
         ActionsProperties,
         ViewProperties,
-        ViewProperties,
         WidgetProperties,
         FieldProperties,
         DialogProperties,
@@ -313,7 +312,7 @@ class FieldTool(WidgetTool):
         if hasattr(widget, "bsdd_data"):
             cls.sync_from_model(widget, widget.bsdd_data, explicit_field=field)
         else:
-            logging.info(f"Attribute 'data' not set for {widget}")
+            logging.info(f"Attribute 'bsdd_data' not set for {widget}")
         cls.register_field_listener(widget, field)
 
     @classmethod
@@ -412,7 +411,7 @@ class FieldTool(WidgetTool):
         elif isinstance(f, TagInput):
             func = lambda: rf(f, vf(f.tags(), w))
             f.tagsChanged.connect(func)
-            func
+            func()
         elif isinstance(f, DateTimeWithNow):
             func = lambda: rf(f, vf(f.get_time(), w))
             f.dt_edit.dateTimeChanged.connect(func)
@@ -648,7 +647,7 @@ class ItemViewTool(BaseTool):
         return selected_values
 
     @classmethod
-    def create_model(cls, data: object) -> QSortFilterProxyModel:
+    def create_model(cls, data: object) -> tuple[QSortFilterProxyModel, ItemModel]:
         model = cls._get_model_class()(data)
         cls.get_properties().models.add(model)
         proxy_model = cls._get_proxy_model_class()()
