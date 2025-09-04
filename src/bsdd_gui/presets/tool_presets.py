@@ -506,7 +506,7 @@ class FieldTool(WidgetTool):
                     is_valid = False
             if not is_valid:
                 invalid_inputs.append(f.objectName())
-        return invalid_inputsbla
+        return invalid_inputs
 
     @classmethod
     def validate_all_fields(cls, widget: FieldWidget):
