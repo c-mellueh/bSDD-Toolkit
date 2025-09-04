@@ -626,13 +626,6 @@ class GraphWindow(QMainWindow):
         self.tg_nodes_class.clicked.connect(self._apply_filters)
         tb.addWidget(self.tg_nodes_class)
 
-        self.tg_nodes_classprop = QToolButton()
-        self.tg_nodes_classprop.setText("ClassProps")
-        self.tg_nodes_classprop.setCheckable(True)
-        self.tg_nodes_classprop.setChecked(False)
-        self.tg_nodes_classprop.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_nodes_classprop)
-
         self.tg_nodes_prop = QToolButton()
         self.tg_nodes_prop.setText("Properties")
         self.tg_nodes_prop.setCheckable(True)
@@ -647,30 +640,16 @@ class GraphWindow(QMainWindow):
         self.tg_edge_class_rel = QToolButton()
         self.tg_edge_class_rel.setText("Class↔Class")
         self.tg_edge_class_rel.setCheckable(True)
-        self.tg_edge_class_rel.setChecked(False)
+        self.tg_edge_class_rel.setChecked(True)
         self.tg_edge_class_rel.clicked.connect(self._apply_filters)
         tb.addWidget(self.tg_edge_class_rel)
 
         self.tg_edge_prop_rel = QToolButton()
         self.tg_edge_prop_rel.setText("Prop↔Prop")
         self.tg_edge_prop_rel.setCheckable(True)
-        self.tg_edge_prop_rel.setChecked(False)
+        self.tg_edge_prop_rel.setChecked(True)
         self.tg_edge_prop_rel.clicked.connect(self._apply_filters)
         tb.addWidget(self.tg_edge_prop_rel)
-
-        self.tg_edge_class_to_cp = QToolButton()
-        self.tg_edge_class_to_cp.setText("Class→CP")
-        self.tg_edge_class_to_cp.setCheckable(True)
-        self.tg_edge_class_to_cp.setChecked(False)
-        self.tg_edge_class_to_cp.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_edge_class_to_cp)
-
-        self.tg_edge_cp_to_prop = QToolButton()
-        self.tg_edge_cp_to_prop.setText("CP→Prop")
-        self.tg_edge_cp_to_prop.setCheckable(True)
-        self.tg_edge_cp_to_prop.setChecked(False)
-        self.tg_edge_cp_to_prop.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_edge_cp_to_prop)
 
         self.tg_edge_cl_to_prop = QToolButton()
         self.tg_edge_cl_to_prop.setText("Class→Prop")
@@ -741,11 +720,10 @@ class GraphWindow(QMainWindow):
         self._populate_from_bsdd(bsdd_dict)
 
     def _populate_from_bsdd(self, bsdd_dict: BsddDictionary):
-        # Build graph from bSDD model: Classes (red), ClassProperties (green), Properties (blue)
+        # Build graph from bSDD model: Classes (red), Properties (blue)
         self.scene.clear_graph()
 
         CLASS_COLOR = QColor(220, 60, 60)  # red
-        CLPROP_COLOR = QColor(60, 170, 60)  # green
         PROP_COLOR = QColor(60, 120, 220)  # blue
 
         # Node registries
@@ -753,7 +731,6 @@ class GraphWindow(QMainWindow):
         class_by_uri: Dict[str, Node] = {}
         prop_by_code: Dict[str, Node] = {}
         prop_by_uri: Dict[str, Node] = {}
-        classprop_nodes: List[Tuple[BsddClassProperty, Node]] = []
 
         # 1) Classes
         for c in bsdd_dict.Classes:
@@ -784,20 +761,32 @@ class GraphWindow(QMainWindow):
             if getattr(p, "OwnedUri", None):
                 prop_by_uri[p.OwnedUri] = n
 
-        # 3) ClassProperties and edges: Class -> ClassProperty
+        # 3) Class → Property edges via ClassProperties
         for c in bsdd_dict.Classes:
             cnode = class_by_code.get(c.Code)
             if not cnode:
                 continue
             for cp in c.ClassProperties:
-                label = cp.Code or cp.PropertyCode or "ClassProperty"
-                cp_node = self.scene.add_node(
-                    label, color=CLPROP_COLOR, node_type="classprop"
-                )
-                self.scene.add_edge(
-                    cnode, cp_node, weight=1.0, edge_type="class_to_classprop"
-                )
-                classprop_nodes.append((cp, cp_node))
+                target_node = None
+                # Prefer PropertyUri mapping
+                if getattr(cp, "PropertyUri", None):
+                    target_node = prop_by_uri.get(cp.PropertyUri)
+                    if target_node is None:
+                        # try parse to code
+                        try:
+                            parsed = dict_utils.parse_bsdd_url(cp.PropertyUri)
+                            code = parsed.get("resource_id")
+                            if code:
+                                target_node = prop_by_code.get(code)
+                        except Exception:
+                            pass
+                # Fallback to PropertyCode
+                if target_node is None and getattr(cp, "PropertyCode", None):
+                    target_node = prop_by_code.get(cp.PropertyCode)
+                if target_node is not None:
+                    self.scene.add_edge(
+                        cnode, target_node, weight=1.0, edge_type="class_to_prop"
+                    )
 
         # 4) ClassRelations edges (Class -> Class)
         for c in bsdd_dict.Classes:
@@ -805,8 +794,7 @@ class GraphWindow(QMainWindow):
             if not src_node:
                 continue
             for rel in c.ClassRelations:
-                # dst_node = class_by_uri.get(rel.RelatedClassUri)
-                dst_node = class_by_code.get(c.ParentClassCode)
+                dst_node = class_by_uri.get(rel.RelatedClassUri)
                 if dst_node is not None:
                     self.scene.add_edge(
                         src_node, dst_node, weight=1.0, edge_type="class_rel"
@@ -831,33 +819,7 @@ class GraphWindow(QMainWindow):
                 if dst is not None:
                     self.scene.add_edge(src_node, dst, weight=1.0, edge_type="prop_rel")
 
-        # 6) Edges ClassProperty -> Property (link class property to its property)
-        for cp, cp_node in classprop_nodes:
-            parent_class = cp._parent_ref()
-            class_node = class_by_code(parent_class.Code)
-            target_node = None
-            # Prefer PropertyUri mapping
-            if getattr(cp, "PropertyUri", None):
-                target_node = prop_by_uri.get(cp.PropertyUri)
-                if target_node is None:
-                    # try parse to code
-                    try:
-                        parsed = dict_utils.parse_bsdd_url(cp.PropertyUri)
-                        code = parsed.get("resource_id")
-                        if code:
-                            target_node = prop_by_code.get(code)
-                    except Exception:
-                        pass
-            # Fallback to PropertyCode
-            if target_node is None and getattr(cp, "PropertyCode", None):
-                target_node = prop_by_code.get(cp.PropertyCode)
-            if target_node is not None:
-                self.scene.add_edge(
-                    cp_node, target_node, weight=1.0, edge_type="classprop_to_prop"
-                )
-                self.scene.add_edge(
-                    cp_node, class_node, weight=1.0, edge_type="class_to_prop"
-                )
+        # No ClassProperty nodes are created; edges Class→Property were added above.
 
         # Apply current filters to the newly created graph
         self._apply_filters()
@@ -867,11 +829,6 @@ class GraphWindow(QMainWindow):
             "class": (
                 self.tg_nodes_class.isChecked()
                 if hasattr(self, "tg_nodes_class")
-                else True
-            ),
-            "classprop": (
-                self.tg_nodes_classprop.isChecked()
-                if hasattr(self, "tg_nodes_classprop")
                 else True
             ),
             "property": (
@@ -889,16 +846,6 @@ class GraphWindow(QMainWindow):
             "prop_rel": (
                 self.tg_edge_prop_rel.isChecked()
                 if hasattr(self, "tg_edge_prop_rel")
-                else True
-            ),
-            "class_to_classprop": (
-                self.tg_edge_class_to_cp.isChecked()
-                if hasattr(self, "tg_edge_class_to_cp")
-                else True
-            ),
-            "classprop_to_prop": (
-                self.tg_edge_cp_to_prop.isChecked()
-                if hasattr(self, "tg_edge_cp_to_prop")
                 else True
             ),
             "class_to_prop": (
