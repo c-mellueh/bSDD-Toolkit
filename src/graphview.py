@@ -793,12 +793,18 @@ class GraphWindow(QMainWindow):
             src_node = class_by_code.get(c.Code)
             if not src_node:
                 continue
-            for rel in c.ClassRelations:
-                dst_node = class_by_uri.get(rel.RelatedClassUri)
-                if dst_node is not None:
-                    self.scene.add_edge(
+            dst_node = class_by_code.get(c.ParentClassCode)
+            if not dst_node:
+                continue
+            self.scene.add_edge(
                         src_node, dst_node, weight=1.0, edge_type="class_rel"
                     )
+            # for rel in c.ClassRelations:
+            #     dst_node = class_by_uri.get(rel.RelatedClassUri)
+            #     if dst_node is not None:
+            #         self.scene.add_edge(
+            #             src_node, dst_node, weight=1.0, edge_type="class_rel"
+            #         )
 
         # 5) PropertyRelations edges (Property -> Property)
         for p in bsdd_dict.Properties:
