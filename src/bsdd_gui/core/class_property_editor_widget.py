@@ -100,8 +100,6 @@ def register_validators(
         ),
         lambda f, v, w=wi: class_property_editor.handle_property_reference_button(w, f, v),
     )
-    funcs = class_property_editor.get_properties().validator_functions.get(wi)
-    print(funcs)
 
 
 def connect_widget(
