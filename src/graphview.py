@@ -1,5 +1,7 @@
 from __future__ import annotations
 from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import property_utils as prop_utils
+from bsdd_json.utils import dictionary_utils as dict_utils
 from bsdd_json import *
 import math
 import random
@@ -48,11 +50,15 @@ class EdgeData:
 
 
 class Edge(QGraphicsPathItem):
-    def __init__(self, a: "Node", b: "Node", weight: float = 1.0):
+
+    def __init__(
+        self, a: "Node", b: "Node", weight: float = 1.0, edge_type: str = "generic"
+    ):
         super().__init__()
         self.a = a
         self.b = b
         self.weight = weight
+        self.edge_type = edge_type
         self.setZValue(-1)
         pen = QPen(QColor(130, 130, 150), 1.5)
         pen.setCosmetic(True)
@@ -67,7 +73,14 @@ class Edge(QGraphicsPathItem):
 
 
 class Node(QGraphicsObject):
-    def __init__(self, label: str, radius: float = 12.0, color: QColor | None = None):
+
+    def __init__(
+        self,
+        label: str,
+        radius: float = 12.0,
+        color: QColor | None = None,
+        node_type: str = "generic",
+    ):
         super().__init__()
         self.label = label
         # radius retained for backward-compat, not used for drawing
@@ -76,6 +89,7 @@ class Node(QGraphicsObject):
         self.brush = QBrush(self.color)
         self.border = QPen(QColor(40, 60, 90), 1.2)
         self.border.setCosmetic(True)
+        self.node_type = node_type
 
         self.velocity = QPointF(0.0, 0.0)
         self.fixed = False
@@ -324,7 +338,7 @@ class Physics:
         # Tunables (good defaults)
         self.k_repulsion = 1600.0  # Coulomb-like constant
         self.k_spring = 0.08       # Hooke spring constant
-        self.spring_length = 80.0  # ideal edge length (px)
+        self.spring_length = 500.0  # ideal edge length (px)
         self.damping = 0.85        # velocity damping [0..1]
         self.max_step = 30.0       # clamp max displacement per tick
         self.gravity_center = QPointF(0.0, 0.0)
@@ -334,7 +348,6 @@ class Physics:
         self.use_barnes_hut = True
         self.bh_theta = 0.7          # smaller = more accurate, slower
         self.bh_min_size = 12        # switch to BH when nodes >= this
-
 
     def _build_quadtree(self, nodes: List[Node]) -> Optional["Physics.QuadNode"]:
         if not nodes:
@@ -459,23 +472,40 @@ class GraphScene(QGraphicsScene):
         if not self.running or not self.nodes:
             return
         self.physics.gravity_center = self.sceneRect().center()
-        self.physics.step(self.nodes, self.edges, dt=1.0)
-        for e in self.edges:
+        # Only simulate visible items
+        vis_nodes = [n for n in self.nodes if n.isVisible()]
+        vis_edges = [
+            e
+            for e in self.edges
+            if e.isVisible() and e.a.isVisible() and e.b.isVisible()
+        ]
+        if vis_nodes:
+            self.physics.step(vis_nodes, vis_edges, dt=1.0)
+        # Update visible edges' geometry
+        for e in vis_edges:
             e.update_path()
 
     def set_running(self, run: bool):
         self.running = run
 
-    def add_node(self, label: str, pos: Optional[QPointF] = None, color: Optional[QColor] = None) -> Node:
-        n = Node(label, color=color)
+    def add_node(
+        self,
+        label: str,
+        pos: Optional[QPointF] = None,
+        color: Optional[QColor] = None,
+        node_type: str = "generic",
+    ) -> Node:
+        n = Node(label, color=color, node_type=node_type)
         p = pos if pos is not None else QPointF(random.uniform(-150, 150), random.uniform(-150, 150))
         n.setPos(p)
         self.addItem(n)
         self.nodes.append(n)
         return n
 
-    def add_edge(self, a: Node, b: Node, weight: float = 1.0) -> Edge:
-        e = Edge(a, b, weight)
+    def add_edge(
+        self, a: Node, b: Node, weight: float = 1.0, edge_type: str = "generic"
+    ) -> Edge:
+        e = Edge(a, b, weight, edge_type=edge_type)
         self.addItem(e)
         self.edges.append(e)
         return e
@@ -489,14 +519,29 @@ class GraphScene(QGraphicsScene):
         self.edges.clear()
 
     def auto_scene_rect(self):
-        if not self.nodes:
+        # Fit to visible nodes if any
+        vis = [n for n in self.nodes if n.isVisible()]
+        items = vis if vis else self.nodes
+        if not items:
             self.setSceneRect(QRectF(-200, -200, 400, 400))
             return
-        xs = [n.pos().x() for n in self.nodes]
-        ys = [n.pos().y() for n in self.nodes]
+        xs = [n.pos().x() for n in items]
+        ys = [n.pos().y() for n in items]
         minx, maxx = min(xs) - 120, max(xs) + 120
         miny, maxy = min(ys) - 120, max(ys) + 120
         self.setSceneRect(QRectF(minx, miny, maxx - minx, maxy - miny))
+
+    # Apply visibility filters for nodes and edges
+    def apply_filters(self, node_flags: Dict[str, bool], edge_flags: Dict[str, bool]):
+        for n in self.nodes:
+            show = node_flags.get(n.node_type, True)
+            n.setVisible(show)
+        for e in self.edges:
+            show_edge = edge_flags.get(e.edge_type, True)
+            show_edge = show_edge and e.a.isVisible() and e.b.isVisible()
+            e.setVisible(show_edge)
+        # Update scene rect after visibility changes
+        self.auto_scene_rect()
 
 
 class GraphWindow(QMainWindow):
@@ -551,7 +596,7 @@ class GraphWindow(QMainWindow):
         # Spring length slider
         tb.addWidget(QLabel("L₀:"))
         self.spring_slider = QSlider(Qt.Horizontal)
-        self.spring_slider.setRange(500, 5000)
+        self.spring_slider.setRange(30, 200)
         self.spring_slider.setValue(int(self.scene.physics.spring_length))
         self.spring_slider.valueChanged.connect(lambda v: setattr(self.scene.physics, "spring_length", float(v)))
         tb.addWidget(self.spring_slider)
@@ -570,40 +615,109 @@ class GraphWindow(QMainWindow):
         self.repulse_slider.valueChanged.connect(lambda v: setattr(self.scene.physics, "k_repulsion", float(v)))
         tb.addWidget(self.repulse_slider)
 
+        tb.addSeparator()
+
+        # Node toggles
+        tb.addWidget(QLabel("Nodes:"))
+        self.tg_nodes_class = QToolButton()
+        self.tg_nodes_class.setText("Classes")
+        self.tg_nodes_class.setCheckable(True)
+        self.tg_nodes_class.setChecked(True)
+        self.tg_nodes_class.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_nodes_class)
+
+        self.tg_nodes_classprop = QToolButton()
+        self.tg_nodes_classprop.setText("ClassProps")
+        self.tg_nodes_classprop.setCheckable(True)
+        self.tg_nodes_classprop.setChecked(False)
+        self.tg_nodes_classprop.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_nodes_classprop)
+
+        self.tg_nodes_prop = QToolButton()
+        self.tg_nodes_prop.setText("Properties")
+        self.tg_nodes_prop.setCheckable(True)
+        self.tg_nodes_prop.setChecked(True)
+        self.tg_nodes_prop.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_nodes_prop)
+
+        tb.addSeparator()
+
+        # Edge toggles
+        tb.addWidget(QLabel("Edges:"))
+        self.tg_edge_class_rel = QToolButton()
+        self.tg_edge_class_rel.setText("Class↔Class")
+        self.tg_edge_class_rel.setCheckable(True)
+        self.tg_edge_class_rel.setChecked(False)
+        self.tg_edge_class_rel.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_edge_class_rel)
+
+        self.tg_edge_prop_rel = QToolButton()
+        self.tg_edge_prop_rel.setText("Prop↔Prop")
+        self.tg_edge_prop_rel.setCheckable(True)
+        self.tg_edge_prop_rel.setChecked(False)
+        self.tg_edge_prop_rel.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_edge_prop_rel)
+
+        self.tg_edge_class_to_cp = QToolButton()
+        self.tg_edge_class_to_cp.setText("Class→CP")
+        self.tg_edge_class_to_cp.setCheckable(True)
+        self.tg_edge_class_to_cp.setChecked(False)
+        self.tg_edge_class_to_cp.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_edge_class_to_cp)
+
+        self.tg_edge_cp_to_prop = QToolButton()
+        self.tg_edge_cp_to_prop.setText("CP→Prop")
+        self.tg_edge_cp_to_prop.setCheckable(True)
+        self.tg_edge_cp_to_prop.setChecked(False)
+        self.tg_edge_cp_to_prop.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_edge_cp_to_prop)
+
+        self.tg_edge_cl_to_prop = QToolButton()
+        self.tg_edge_cl_to_prop.setText("Class→Prop")
+        self.tg_edge_cl_to_prop.setCheckable(True)
+        self.tg_edge_cl_to_prop.setChecked(True)
+        self.tg_edge_cl_to_prop.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_edge_cl_to_prop)
+
     # ---- Actions ----
     def _toggle_running(self):
         self.scene.set_running(not self.scene.running)
         self.btn_play.setText("Pause" if self.scene.running else "Play")
-        #print(f"[DEBUG] GraphWindow._toggle_running: now running={self.scene.running}")
+        # print(f"[DEBUG] GraphWindow._toggle_running: now running={self.scene.running}")
 
     def _center_view(self):
         self.scene.auto_scene_rect()
         self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
-        #print("[DEBUG] GraphWindow._center_view: view centered on scene rect")
+        # print("[DEBUG] GraphWindow._center_view: view centered on scene rect")
 
     def _clear(self):
         self.scene.clear_graph()
-        #print("[DEBUG] GraphWindow._clear: scene cleared")
+        # print("[DEBUG] GraphWindow._clear: scene cleared")
 
     def _populate_demo(self):
         # Build a small random-ish graph (Erdos–Renyi style)
-        #print("[DEBUG] GraphWindow._populate_demo: building demo graph")
+        # print("[DEBUG] GraphWindow._populate_demo: building demo graph")
         self.scene.clear_graph()
         random.seed()
         colors = [QColor(80, 140, 255), QColor(140, 200, 90), QColor(250, 150, 90), QColor(200, 120, 220)]
         N = 18
-        nodes = [self.scene.add_node(str(i), color=random.choice(colors)) for i in range(N)]
+        nodes = [
+            self.scene.add_node(str(i), color=random.choice(colors), node_type="demo")
+            for i in range(N)
+        ]
         # connect with probability p
         p = 0.13
         for i in range(N):
             for j in range(i + 1, N):
                 if random.random() < p:
-                    self.scene.add_edge(nodes[i], nodes[j], weight=1.0)
+                    self.scene.add_edge(
+                        nodes[i], nodes[j], weight=1.0, edge_type="demo"
+                    )
         # Ensure connectivity roughly: connect each node to a previous one
         for i in range(1, N):
-            self.scene.add_edge(nodes[i - 1], nodes[i], weight=1.0)
+            self.scene.add_edge(nodes[i - 1], nodes[i], weight=1.0, edge_type="demo")
         self.scene.auto_scene_rect()
-        #print(f"[DEBUG] GraphWindow._populate_demo: demo graph built with {len(nodes)} nodes and {len(self.scene.edges)} edges")
+        # print(f"[DEBUG] GraphWindow._populate_demo: demo graph built with {len(nodes)} nodes and {len(self.scene.edges)} edges")
 
     # ---- bSDD integration ----
     def _load_bsdd_json(self):
@@ -614,72 +728,188 @@ class GraphWindow(QMainWindow):
             "JSON Files (*.json);;All Files (*)",
         )
         if not path:
-            #print("[DEBUG] GraphWindow._load_bsdd_json: canceled by user")
+            # print("[DEBUG] GraphWindow._load_bsdd_json: canceled by user")
             return
         try:
             bsdd_dict = BsddDictionary.load(path)
         except Exception as e:
-            #print(f"[DEBUG] GraphWindow._load_bsdd_json: failed to load '{path}': {e}")
+            # print(f"[DEBUG] GraphWindow._load_bsdd_json: failed to load '{path}': {e}")
             return
-        #print(
+            # print(
             f"[DEBUG] GraphWindow._load_bsdd_json: loaded dictionary '{bsdd_dict.DictionaryName or bsdd_dict.DictionaryCode}' with {len(bsdd_dict.Classes)} classes"
-        #)
+        # )
         self._populate_from_bsdd(bsdd_dict)
 
     def _populate_from_bsdd(self, bsdd_dict: BsddDictionary):
-        #print("[DEBUG] GraphWindow._populate_from_bsdd: building graph from bSDD model")
+        # Build graph from bSDD model: Classes (red), ClassProperties (green), Properties (blue)
         self.scene.clear_graph()
 
-        # Pre-compute a mapping from class URI -> node for internal relations
-        # Use bSDD URI schema so we match against RelatedClassUri
-        uri_to_node: Dict[str, Node] = {}
-        code_to_node: Dict[str, Node] = {}
+        CLASS_COLOR = QColor(220, 60, 60)  # red
+        CLPROP_COLOR = QColor(60, 170, 60)  # green
+        PROP_COLOR = QColor(60, 120, 220)  # blue
 
-        # Simple color palette per top-level class to add some visual variety
-        palette = [
-            QColor(80, 140, 255),
-            QColor(140, 200, 90),
-            QColor(250, 150, 90),
-            QColor(200, 120, 220),
-            QColor(120, 200, 220),
-            QColor(220, 120, 160),
-        ]
-        color_by_root: Dict[str, QColor] = {}
+        # Node registries
+        class_by_code: Dict[str, Node] = {}
+        class_by_uri: Dict[str, Node] = {}
+        prop_by_code: Dict[str, Node] = {}
+        prop_by_uri: Dict[str, Node] = {}
+        classprop_nodes: List[Tuple[BsddClassProperty, Node]] = []
 
-        # Create nodes
+        # 1) Classes
         for c in bsdd_dict.Classes:
-            # Determine a color bucket by root ancestor
-            # Fallback to a random color if ancestry cannot be resolved
-            try:
-                ancestry = cl_utils.shared_parent([c], dictionary=bsdd_dict)
-                root_code = ancestry.Code if ancestry else c.Code
-            except Exception:
-                root_code = c.Code
-            if root_code not in color_by_root:
-                color_by_root[root_code] = palette[len(color_by_root) % len(palette)]
-
-            n = self.scene.add_node(c.Code or c.Name or "Class", color=color_by_root[root_code])
-            code_to_node[c.Code] = n
+            n = self.scene.add_node(
+                c.Code or c.Name or "Class", color=CLASS_COLOR, node_type="class"
+            )
+            class_by_code[c.Code] = n
             try:
                 uri = cl_utils.build_bsdd_uri(c, bsdd_dict)
-                uri_to_node[uri] = n
+                if uri:
+                    class_by_uri[uri] = n
             except Exception:
-                # If URI cannot be built, skip URI mapping (relations using URIs won't match)
                 pass
 
-        # Create edges from ClassRelations (internal only)
-        edge_count = 0
+        # 2) Properties (dictionary-level)
+        for p in bsdd_dict.Properties:
+            n = self.scene.add_node(
+                p.Code or p.Name or "Property", color=PROP_COLOR, node_type="property"
+            )
+            prop_by_code[p.Code] = n
+            # Map canonical bsDD URI and any owned URI
+            try:
+                uri = prop_utils.build_bsdd_uri(p, bsdd_dict)
+                if uri:
+                    prop_by_uri[uri] = n
+            except Exception:
+                pass
+            if getattr(p, "OwnedUri", None):
+                prop_by_uri[p.OwnedUri] = n
+
+        # 3) ClassProperties and edges: Class -> ClassProperty
         for c in bsdd_dict.Classes:
-            src_node = code_to_node.get(c.Code)
+            cnode = class_by_code.get(c.Code)
+            if not cnode:
+                continue
+            for cp in c.ClassProperties:
+                label = cp.Code or cp.PropertyCode or "ClassProperty"
+                cp_node = self.scene.add_node(
+                    label, color=CLPROP_COLOR, node_type="classprop"
+                )
+                self.scene.add_edge(
+                    cnode, cp_node, weight=1.0, edge_type="class_to_classprop"
+                )
+                classprop_nodes.append((cp, cp_node))
+
+        # 4) ClassRelations edges (Class -> Class)
+        for c in bsdd_dict.Classes:
+            src_node = class_by_code.get(c.Code)
             if not src_node:
                 continue
             for rel in c.ClassRelations:
-                dst_node = uri_to_node.get(rel.RelatedClassUri)
-                if dst_node is None:
-                    # Relation may target external class or unmatched URI; skip
-                    continue
-                self.scene.add_edge(src_node, dst_node, weight=1.0)
-                edge_count += 1
+                # dst_node = class_by_uri.get(rel.RelatedClassUri)
+                dst_node = class_by_code.get(c.ParentClassCode)
+                if dst_node is not None:
+                    self.scene.add_edge(
+                        src_node, dst_node, weight=1.0, edge_type="class_rel"
+                    )
+
+        # 5) PropertyRelations edges (Property -> Property)
+        for p in bsdd_dict.Properties:
+            src_node = prop_by_code.get(p.Code)
+            if not src_node:
+                continue
+            for rel in p.PropertyRelations:
+                dst = prop_by_uri.get(rel.RelatedPropertyUri)
+                if dst is None:
+                    # Fallback: parse URI to code
+                    try:
+                        parsed = dict_utils.parse_bsdd_url(rel.RelatedPropertyUri)
+                        code = parsed.get("resource_id")
+                        if code and code in prop_by_code:
+                            dst = prop_by_code[code]
+                    except Exception:
+                        pass
+                if dst is not None:
+                    self.scene.add_edge(src_node, dst, weight=1.0, edge_type="prop_rel")
+
+        # 6) Edges ClassProperty -> Property (link class property to its property)
+        for cp, cp_node in classprop_nodes:
+            parent_class = cp._parent_ref()
+            class_node = class_by_code(parent_class.Code)
+            target_node = None
+            # Prefer PropertyUri mapping
+            if getattr(cp, "PropertyUri", None):
+                target_node = prop_by_uri.get(cp.PropertyUri)
+                if target_node is None:
+                    # try parse to code
+                    try:
+                        parsed = dict_utils.parse_bsdd_url(cp.PropertyUri)
+                        code = parsed.get("resource_id")
+                        if code:
+                            target_node = prop_by_code.get(code)
+                    except Exception:
+                        pass
+            # Fallback to PropertyCode
+            if target_node is None and getattr(cp, "PropertyCode", None):
+                target_node = prop_by_code.get(cp.PropertyCode)
+            if target_node is not None:
+                self.scene.add_edge(
+                    cp_node, target_node, weight=1.0, edge_type="classprop_to_prop"
+                )
+                self.scene.add_edge(
+                    cp_node, class_node, weight=1.0, edge_type="class_to_prop"
+                )
+
+        # Apply current filters to the newly created graph
+        self._apply_filters()
+
+    def _apply_filters(self):
+        node_flags = {
+            "class": (
+                self.tg_nodes_class.isChecked()
+                if hasattr(self, "tg_nodes_class")
+                else True
+            ),
+            "classprop": (
+                self.tg_nodes_classprop.isChecked()
+                if hasattr(self, "tg_nodes_classprop")
+                else True
+            ),
+            "property": (
+                self.tg_nodes_prop.isChecked()
+                if hasattr(self, "tg_nodes_prop")
+                else True
+            ),
+        }
+        edge_flags = {
+            "class_rel": (
+                self.tg_edge_class_rel.isChecked()
+                if hasattr(self, "tg_edge_class_rel")
+                else True
+            ),
+            "prop_rel": (
+                self.tg_edge_prop_rel.isChecked()
+                if hasattr(self, "tg_edge_prop_rel")
+                else True
+            ),
+            "class_to_classprop": (
+                self.tg_edge_class_to_cp.isChecked()
+                if hasattr(self, "tg_edge_class_to_cp")
+                else True
+            ),
+            "classprop_to_prop": (
+                self.tg_edge_cp_to_prop.isChecked()
+                if hasattr(self, "tg_edge_cp_to_prop")
+                else True
+            ),
+            "class_to_prop": (
+                self.tg_edge_cl_to_prop.isChecked()
+                if hasattr(self, "tg_edge_cl_to_prop")
+                else True
+            ),
+            # default types (e.g., demo) remain visible by default
+        }
+        # Apply to scene
+        self.scene.apply_filters(node_flags, edge_flags)
 
         self.scene.auto_scene_rect()
 
