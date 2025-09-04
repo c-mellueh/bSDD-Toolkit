@@ -34,8 +34,17 @@ class ShellWidget(WidgetTool):
 
     @classmethod
     def create_widget(cls):
+        from bsdd_gui.tool import Project, MainWindowWidget
+        from bsdd_json.utils import class_utils, property_utils, dictionary_utils
+
         if not cls.get_widgets():
             widget: ui.Shell = super().create_widget()
+            widget.push_local_ns("tool", bsdd_gui.tool)
+            widget.push_local_ns("P", Project)
+            widget.push_local_ns("MW", MainWindowWidget)
+            widget.push_local_ns("cl_utils", class_utils)
+            widget.push_local_ns("prop_utils", property_utils)
+            widget.push_local_ns("dict_utils", dictionary_utils)
             widget.show()
             widget.eval_in_thread()
             cls.register_widget(widget)
