@@ -15,7 +15,6 @@ from bsdd_json.models import BsddClass
 def connect_signals(property_set_table: Type[tool.PropertySetTableView]):
     property_set_table.connect_internal_signals()
 
-
 def retranslate_ui(property_set_table: Type[tool.PropertySetTableView]):
     return  # TODO
 
@@ -172,6 +171,7 @@ def delete_selection(
         main_window (Type[tool.MainWindow]): _description_
     """
 
+    #TODO: improve item handling add signaller to project
     bsdd_class = view.model().sourceModel().active_class
     selected_psets = property_set_table.get_selected(view)
     for prop in list(bsdd_class.ClassProperties):

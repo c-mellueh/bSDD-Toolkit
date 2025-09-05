@@ -14,12 +14,14 @@ def connect_signals(
     property_table: Type[tool.ClassPropertyTableView],
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
     main_window: Type[tool.MainWindowWidget],
+    project:Type[tool.Project]
 ):
     property_table.connect_internal_signals()
     class_property_editor.signals.new_class_property_created.connect(
         lambda p: property_table.add_property(p, main_window.get_property_view())
     )
-
+    property_table.signals.item_added.connect(project.signals.class_property_added.emit)
+    property_table.signals.item_deleted.connect(project.signals.class_property_removed.emit)
 
 def rentranslate_ui(property_table: Type[tool.ClassPropertyTableView]):
     pass
