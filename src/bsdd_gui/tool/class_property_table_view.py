@@ -93,7 +93,14 @@ class ClassPropertyTableView(ItemViewTool):
 
     @classmethod
     def remove_property(cls, bsdd_class: BsddClass, class_property: BsddClassProperty):
+        """_summary_
+        Remove Property without using the View Model
+        Args:
+            bsdd_class (BsddClass): _description_
+            class_property (BsddClassProperty): _description_
+        """
         if class_property in bsdd_class.ClassProperties:
             bsdd_class.ClassProperties.remove(class_property)
+            cls.signals.item_removed(class_property)
         else:
             logging.info(f"class_property '{class_property.Code}' not in class '{bsdd_class.Code}'")

@@ -171,7 +171,6 @@ def delete_selection(
         main_window (Type[tool.MainWindow]): _description_
     """
 
-    #TODO: improve item handling add signaller to project
     bsdd_class = view.model().sourceModel().active_class
     selected_psets = property_set_table.get_selected(view)
     for prop in list(bsdd_class.ClassProperties):
