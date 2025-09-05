@@ -29,5 +29,5 @@ class ViewSignals(QObject):
         QAbstractItemView, Any
     )  # View in which the selection changed, new selection
     delete_selection_requested = Signal(Any)  # ItemViewType
-    item_deleted = Signal(object)  # Write BsddClass, BsddProperty etc not QModelIndex in Signal
+    item_removed = Signal(object)  # Write BsddClass, BsddProperty etc not QModelIndex in Signal
     item_added = Signal(object)  # Write BsddClass, BsddProperty etc not QModelIndex in Signal

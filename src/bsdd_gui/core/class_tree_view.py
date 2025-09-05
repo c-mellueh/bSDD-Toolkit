@@ -20,7 +20,7 @@ def connect_signals(
         lambda c: class_tree.add_class_to_dictionary(c, project.get())
     )
 
-    class_tree.signals.item_deleted.connect(project.signals.class_removed.emit)
+    class_tree.signals.item_removed.connect(project.signals.class_removed.emit)
     class_tree.signals.item_added.connect(project.signals.class_added.emit)
 
 

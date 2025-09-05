@@ -84,7 +84,7 @@ class ClassTreeView(ItemViewTool):
         for child in cl_utils.get_children(bsdd_class):
             model.move_class(child, parent)
         model.remove_class(bsdd_class)
-        cls.signals.item_deleted.emit(bsdd_class)
+        cls.signals.item_removed.emit(bsdd_class)
 
     @classmethod
     def move_class(
@@ -104,5 +104,6 @@ class ClassTreeView(ItemViewTool):
             stack.extend(cl_utils.get_children(n))
 
         for node in reversed(to_delete):
+            cls.signals.item_removed
             model.remove_class(node)
-            cls.signals.item_deleted.emit(node)
+            cls.signals.item_removed.emit(node)

@@ -51,7 +51,7 @@ class ClassPropertyTableView(ItemViewTool):
         model = view.model().sourceModel()
         for prop in class_properties:
             model.remove_property(prop)
-            cls.signals.item_deleted.emit(prop)
+            cls.signals.item_removed.emit(prop)
 
     @classmethod
     def connect_internal_signals(cls):

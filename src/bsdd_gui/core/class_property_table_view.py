@@ -21,7 +21,7 @@ def connect_signals(
         lambda p: class_property_table.add_class_property(p, main_window.get_property_view())
     )
     class_property_table.signals.item_added.connect(project.signals.class_property_added.emit)
-    class_property_table.signals.item_deleted.connect(project.signals.class_property_removed.emit)
+    class_property_table.signals.item_removed.connect(project.signals.class_property_removed.emit)
 
 
 def rentranslate_ui(property_table: Type[tool.ClassPropertyTableView]):
