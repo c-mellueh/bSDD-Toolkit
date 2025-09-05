@@ -70,7 +70,7 @@ class ClassTreeView(ItemViewTool):
         if not model:
             logging.info(f"no Model found")
             return
-        model.append_row(new_class)
+        model.append_class(new_class)
         cls.signals.item_added.emit(new_class)
 
     @classmethod
@@ -82,8 +82,8 @@ class ClassTreeView(ItemViewTool):
         model: ClassTreeModel = cls.get_model(bsdd_dictionary)
         parent = cl_utils.get_parent(bsdd_class)
         for child in cl_utils.get_children(bsdd_class):
-            model.move_row(child, parent)
-        model.remove_row(bsdd_class)
+            model.move_class(child, parent)
+        model.remove_class(bsdd_class)
         cls.signals.item_deleted.emit(bsdd_class)
 
     @classmethod
@@ -91,7 +91,7 @@ class ClassTreeView(ItemViewTool):
         cls, bsdd_class: BsddClass, new_parent: BsddClass | None, bsdd_dictionary: BsddDictionary
     ):
         model: ClassTreeModel = cls.get_model(bsdd_dictionary)
-        model.move_row(bsdd_class, new_parent)
+        model.move_class(bsdd_class, new_parent)
 
     @classmethod
     def delete_class_with_children(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
@@ -104,5 +104,5 @@ class ClassTreeView(ItemViewTool):
             stack.extend(cl_utils.get_children(n))
 
         for node in reversed(to_delete):
-            model.remove_row(node)
+            model.remove_class(node)
             cls.signals.item_deleted.emit(node)

@@ -113,7 +113,7 @@ class ClassTreeModel(ItemModel):
             parent_index = QModelIndex()
         return parent_index
 
-    def append_row(self, bsdd_class: BsddClass):
+    def append_class(self, bsdd_class: BsddClass):
         parent_index = self._get_current_parent_index(bsdd_class)
 
         insert_row = self.rowCount(parent_index)  # current child count
@@ -134,7 +134,7 @@ class ClassTreeModel(ItemModel):
         # Root-Fall
         return QModelIndex(), cl_utils.get_root_classes(self.bsdd_dictionary)
 
-    def remove_row(self, bsdd_class: BsddClass) -> bool:
+    def remove_class(self, bsdd_class: BsddClass) -> bool:
         old_index = self._index_for_class(bsdd_class)
         parent_index, siblings = self._parent_and_siblings(bsdd_class)
         row = old_index.row()
@@ -144,7 +144,7 @@ class ClassTreeModel(ItemModel):
         self.endRemoveRows()
         return True
 
-    def move_row(self, bsdd_class: BsddClass, new_parent: BsddClass | None):
+    def move_class(self, bsdd_class: BsddClass, new_parent: BsddClass | None):
         old_parent_index = self._get_current_parent_index(bsdd_class)
         new_parent_index = (
             QModelIndex() if new_parent is None else self._index_for_class(new_parent)
@@ -369,7 +369,7 @@ class ClassTreeModel(ItemModel):
                 continue
 
             # insert with proper signals (parent must exist now)
-            self.append_row(node)  # your append_row sets _parent_ref and signals insert
+            self.append_class(node)  # your append_row sets _parent_ref and signals insert
 
         # 4) Insert Properties
         #
