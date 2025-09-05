@@ -112,16 +112,6 @@ class ClassTreeModel(ItemModel):
             parent_index = QModelIndex()
         return parent_index
 
-    def append_class(self, bsdd_class: BsddClass):
-        parent_index = self._get_current_parent_index(bsdd_class)
-
-        insert_row = self.rowCount(parent_index)  # current child count
-        self.beginInsertRows(parent_index, insert_row, insert_row)
-        # mutate your data
-        self.bsdd_dictionary.Classes.append(bsdd_class)
-        bsdd_class._set_parent(self.bsdd_dictionary)
-        self.endInsertRows()
-
     def _parent_and_siblings(self, c: BsddClass) -> tuple[QModelIndex, list[BsddClass]]:
         """Ermittle *aktuellen* Parent-Index und die *aktuelle* Geschwisterliste von c."""
         if c.ParentClassCode:

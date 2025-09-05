@@ -296,7 +296,7 @@ def handle_mime_copy(
         if node is None:
             continue
         # insert with proper signals (parent must exist now)
-        class_tree.add_class_to_dictionary(node, bsdd_dictionary)
+        class_tree.add_class(node, bsdd_dictionary)
 
     # 4) Insert Properties
     #

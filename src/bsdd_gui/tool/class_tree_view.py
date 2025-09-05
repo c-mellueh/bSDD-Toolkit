@@ -71,7 +71,14 @@ class ClassTreeView(ItemViewTool):
         if not model:
             logging.info(f"no Model found")
             return
-        model.append_class(new_class)
+        parent_index = model._get_current_parent_index(new_class)
+
+        insert_row = model.rowCount(parent_index)  # current child count
+        model.beginInsertRows(parent_index, insert_row, insert_row)
+        # mutate your data
+        model.bsdd_dictionary.Classes.append(new_class)
+        new_class._set_parent(model.bsdd_dictionary)
+        model.endInsertRows()
         cls.signals.item_added.emit(new_class)
 
     @classmethod
