@@ -38,6 +38,7 @@ def create_widget(
         if parent is None:
             parent = main_window.get()
         w = graph_view.create_widget(parent)
+        graph_view.register_widget(w)
         # Show as independent window
     w.show()
     w.activateWindow()
@@ -54,6 +55,7 @@ def connect_widget(widget, graph_view: Type[tool.GraphViewWidget]):
 
 
 def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
+    
     widget = graph_view.get_widget()
     if widget is None:
         return
