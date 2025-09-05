@@ -12,7 +12,7 @@ from PySide6.QtCore import (
     QItemSelectionModel,
 )
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QTreeView
-from bsdd_json.models import BsddClassProperty, BsddClass, BsddProperty
+from bsdd_json.models import BsddClassProperty, BsddClass, BsddProperty, BsddDictionary
 from bsdd_gui.module.property_table_widget import ui, models, trigger, views
 
 
@@ -204,6 +204,13 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         cls.signals.new_property_requested.emit()
 
     @classmethod
-    def add_property_to_model(cls, view: views.PropertyTable):
+    def add_property_to_dictionary(cls, bsdd_property, bsdd_dictionary: BsddDictionary):
+        # TODO: Model handling
+        bsdd_dictionary.Properties.append(bsdd_property)
+        cls.signals.item_added.emit(bsdd_property)
+        cls.reset_views()
+
+    @classmethod
+    def add_property_to_model(cls, bsdd_propert, view: views.PropertyTable):
         model = view.model().sourceModel()
-        model.append_property()
+        model.append_property(bsdd_propert)

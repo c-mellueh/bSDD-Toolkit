@@ -4,6 +4,7 @@ from bsdd_gui import tool
 from bsdd_gui.core import class_tree_view as core
 from PySide6.QtCore import QModelIndex
 from PySide6.QtGui import QDropEvent
+from bsdd_json import BsddDictionary
 
 TOOGLE_CONSOLE_ACTION = "toggle_console"
 if TYPE_CHECKING:
@@ -52,3 +53,13 @@ def group_selection(view: ui.ClassView):
 
 def search_class(view: ui.ClassView):
     core.search_class(view, tool.SearchWidget, tool.ClassTreeView, tool.Project)
+
+
+def mime_move_event(bsdd_dictionary: BsddDictionary, data, row, parent):
+    core.handle_mime_move(bsdd_dictionary, data, row, parent, tool.ClassTreeView)
+
+
+def mime_copy_event(bsdd_dictionary: BsddDictionary, data, parent):
+    core.handle_mime_copy(
+        bsdd_dictionary, data, parent, tool.ClassTreeView, tool.Util, tool.PropertyTableWidget
+    )

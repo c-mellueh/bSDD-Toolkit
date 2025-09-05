@@ -1,13 +1,19 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QTreeView
-from PySide6.QtCore import QPoint, QCoreApplication, Qt
+from PySide6.QtCore import QPoint, QCoreApplication, Qt, QModelIndex
 from typing import Type, TYPE_CHECKING
 import logging
+import json
+from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import property_utils as prop_utils
+
+from bsdd_gui.module.class_tree_view.constants import JSON_MIME, CODES_MIME
+from bsdd_json.models import BsddClass, BsddDictionary, BsddProperty
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.class_tree_view import ui
-    from bsdd_json.models import BsddClass
+    from bsdd_gui.module.class_tree_view import models
 
 
 def connect_signals(
@@ -215,3 +221,94 @@ def reset_models(
         model.bsdd_data = project.get()
     main_window.set_active_class(None)
     class_tree.reset_views()
+
+
+def handle_mime_move(
+    bsdd_dictionary: BsddDictionary, data, row, parent, class_tree: Type[tool.ClassTreeView]
+):
+    # destination parent
+    model: models.ClassTreeModel = class_tree.get_model(bsdd_dictionary)
+    dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
+    dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
+
+    codes = json.loads(bytes(data.data(CODES_MIME)).decode("utf-8"))
+    if not codes:
+        return False
+    # one-at-a-time move (extend to multi later if needed)
+    code = codes[0]
+    node = cl_utils.get_class_by_code(model.bsdd_dictionary, code)
+    if node is None:
+        return False
+    # destination row (append)
+    dest_parent_index = (
+        QModelIndex() if dest_parent_node is None else model._index_for_class(dest_parent_node)
+    )
+    dest_row = model.rowCount(dest_parent_index) if row == -1 else row
+    return class_tree.move_class(node, dest_parent_node, model.bsdd_data, dest_row)
+
+
+def handle_mime_copy(
+    bsdd_dictionary: BsddDictionary,
+    data,
+    parent,
+    class_tree: Type[tool.ClassTreeView],
+    util: Type[tool.Util],
+    property_table: Type[tool.PropertyTableWidget],
+):
+    # destination parent
+    dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
+    dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
+    payload = class_tree.get_payload_from_data(data)
+    if payload is None:
+        return
+    if payload.get("kind") != "BsddClassTransfer" or "classes" not in payload:
+        return
+
+    raw_classes = payload["classes"]
+    raw_properties = payload["properties"]
+    root_codes = set(payload.get("roots", []))
+
+    # 1) build code -> raw map; compute depth to sort parents before children
+    class_code_dict = {
+        rc["Code"]: rc for rc in raw_classes if isinstance(rc, dict) and "Code" in rc
+    }
+    property_code_dict = {
+        rp["Code"]: rp for rp in raw_properties if isinstance(rp, dict) and "Code" in rp
+    }
+
+    ordered_class_codes = sorted(
+        class_code_dict.keys(), key=lambda c, ccd=class_code_dict: class_tree.depth_of(c, ccd)
+    )  # parents first
+
+    # 2) conflict-safe code mapping
+    existing_classes = set(cl_utils.get_all_class_codes(bsdd_dictionary))
+    existing_properties = set(prop_utils.get_property_code_dict(bsdd_dictionary))
+
+    old2new = {}
+
+    # 3) create & insert classes (parents first), adjusting codes/parents
+    for class_code in ordered_class_codes:
+        rc = dict(class_code_dict[class_code])  # copy
+        # new code (unique in target)
+        new_code = util.get_unique_name(rc["Code"], old2new)
+        old2new[rc["Code"]] = new_code
+        node = class_tree.create_class_from_mime(rc, new_code, old2new, root_codes, dest_parent_node)
+        if node is None:
+            continue
+        # insert with proper signals (parent must exist now)
+        class_tree.add_class_to_dictionary(node, bsdd_dictionary)
+
+    # 4) Insert Properties
+    #
+    # that don't exist so far
+    for property_code, property_json in property_code_dict.items():
+
+        if property_code in existing_properties:
+            continue
+        try:
+            node = BsddProperty.model_validate(property_json)
+            property_table.add_property_to_dictionary(node, bsdd_dictionary)
+        except Exception:
+            # if invalid, skip this one (or log)
+            continue
+    return True

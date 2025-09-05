@@ -19,8 +19,7 @@ from bsdd_gui.presets.models_presets import ItemModel
 from PySide6.QtTest import QAbstractItemModelTester
 import json
 
-JSON_MIME = "application/bsdd-class+json;v=1"
-CODES_MIME = "application/x-bsdd-classcode"  # for fast internal moves
+from .constants import JSON_MIME, CODES_MIME
 
 
 class ClassTreeModel(ItemModel):
@@ -209,50 +208,15 @@ class ClassTreeModel(ItemModel):
         return False
 
     def dropMimeData(self, data, action, row, column, parent: QModelIndex) -> bool:
-        # destination parent
         dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
         dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
 
         if action == Qt.MoveAction and data.hasFormat(CODES_MIME):
-            # internal MOVE within this dictionary
-            codes = json.loads(bytes(data.data(CODES_MIME)).decode("utf-8"))
-            if not codes:
-                return False
-            # one-at-a-time move (extend to multi later if needed)
-            code = codes[0]
-            node = cl_utils.get_class_by_code(self.bsdd_dictionary, code)
-            if node is None:
-                return False
-            # destination row (append)
-            dest_parent_index = (
-                QModelIndex()
-                if dest_parent_node is None
-                else self._index_for_class(dest_parent_node)
-            )
-            dest_row = self.rowCount(dest_parent_index) if row == -1 else row
-            return self._move_row_to(node, dest_parent_node, dest_row)
-
-        # COPY: external (or internal copy via Ctrl)
-        if action in (
-            Qt.CopyAction,
-            Qt.IgnoreAction,
-        ):  # some platforms give Ignore before acceptProposedAction
-            payload = None
-            for fmt in (JSON_MIME, "application/json", "text/plain"):
-                if data.hasFormat(fmt):
-                    try:
-                        b = bytes(data.data(fmt))
-                        if fmt == "text/plain":
-                            b = b.strip()
-                        payload = json.loads(b.decode("utf-8"))
-                        break
-                    except Exception:
-                        pass
-            if payload is None:
-                return False
-            return self._import_classes_payload(payload, dest_parent_node, row)
-        return False
-
+            trigger.mime_move_event(self.bsdd_data, data, row, parent)
+        elif action in (Qt.CopyAction, Qt.IgnoreAction):
+            trigger.mime_copy_event(self.bsdd_data, data, parent)
+        return True
+    
     def _is_descendant(self, maybe_ancestor: BsddClass, node: BsddClass) -> bool:
         cur = node
         while cur and cur.ParentClassCode:
@@ -260,144 +224,6 @@ class ClassTreeModel(ItemModel):
                 return True
             cur = cl_utils.get_class_by_code(self.bsdd_dictionary, cur.ParentClassCode)
         return False
-
-    def _import_classes_payload(
-        self, payload: dict, dest_parent: BsddClass | None, row_hint: int
-    ) -> bool:
-        """
-        Import a flat list of classes (with ParentClassCode links) into *this* dictionary.
-        - Fix code conflicts by renaming.
-        - Rewire ParentClassCode for imported roots to dest_parent.
-        - Insert in topological order; signal inserts incrementally.
-        """
-        if payload.get("kind") != "BsddClassTransfer" or "classes" not in payload:
-            return False
-
-        raw_classes = payload["classes"]
-        raw_properties = payload["properties"]
-        root_codes = set(payload.get("roots", []))
-
-        # 1) build code -> raw map; compute depth to sort parents before children
-        class_code_dict = {
-            rc["Code"]: rc for rc in raw_classes if isinstance(rc, dict) and "Code" in rc
-        }
-        property_code_dict = {
-            rp["Code"]: rp for rp in raw_properties if isinstance(rp, dict) and "Code" in rp
-        }
-
-        def depth_of(code: str) -> int:
-            d = 0
-            seen = set()
-            c = class_code_dict.get(code)
-            while (
-                c
-                and c.get("ParentClassCode") in class_code_dict
-                and c.get("ParentClassCode") not in seen
-            ):
-                seen.add(c["Code"])
-                c = class_code_dict.get(c.get("ParentClassCode"))
-                d += 1
-            return d
-
-        ordered_class_codes = sorted(class_code_dict.keys(), key=depth_of)  # parents first
-
-        # 2) conflict-safe code mapping
-        existing_classes = set(cl_utils.get_all_class_codes(self.bsdd_dictionary))
-        existing_properties = set(prop_utils.get_property_code_dict(self.bsdd_dictionary))
-
-        old2new = {}
-
-        def unique_code(wish: str, existing_classes) -> str:
-            if wish not in existing_classes and wish not in old2new.values():
-                existing_classes.add(wish)
-                return wish
-            base = wish
-            i = 2
-            while True:
-                cand = f"{base} ({i})"
-                if cand not in existing_classes and cand not in old2new.values():
-                    existing_classes.add(cand)
-                    return cand
-                i += 1
-
-        # 3) create & insert classes (parents first), adjusting codes/parents
-        for class_code in ordered_class_codes:
-            rc = dict(class_code_dict[class_code])  # copy
-            # new code (unique in target)
-            new_code = unique_code(rc["Code"])
-            old2new[rc["Code"]] = new_code
-            rc["Code"] = new_code
-
-            # fix ParentClassCode:
-            p = rc.get("ParentClassCode")
-            if p in old2new:
-                rc["ParentClassCode"] = old2new[p]
-            else:
-                # imported root -> attach to dest_parent in this dictionary (or stay root)
-                if rc["Code"] in (old2new[c] for c in root_codes):
-                    rc["ParentClassCode"] = dest_parent.Code if dest_parent is not None else None
-                else:
-                    # parent outside import and not destination: make it root
-                    rc["ParentClassCode"] = None
-
-            # build model instance
-            try:
-                node = BsddClass.model_validate(rc)
-            except Exception:
-                # if invalid, skip this one (or log)
-                continue
-
-            # insert with proper signals (parent must exist now)
-            self.append_class(node)  # your append_row sets _parent_ref and signals insert
-
-        # 4) Insert Properties
-        #
-        # that don't exist so far
-        for property_code, property_json in property_code_dict.items():
-
-            if property_code in existing_properties:
-                continue
-            try:
-                node = BsddProperty.model_validate(property_json)
-                self.bsdd_dictionary.Properties.append(node)
-            except Exception:
-                # if invalid, skip this one (or log)
-                continue
-        return True
-
-    def _move_row_to(
-        self, bsdd_class: BsddClass, new_parent: BsddClass | None, dest_row: int
-    ) -> bool:
-        """Move one row (with subtree) to new_parent at dest_row using beginMoveRows/endMoveRows."""
-        old_parent_index = self._get_current_parent_index(bsdd_class)
-        new_parent_index = (
-            QModelIndex() if new_parent is None else self._index_for_class(new_parent)
-        )
-
-        # current position of the node among its siblings
-        siblings_src = (
-            cl_utils.get_root_classes(self.bsdd_dictionary)
-            if not bsdd_class.ParentClassCode
-            else cl_utils.get_children(
-                cl_utils.get_class_by_code(self.bsdd_dictionary, bsdd_class.ParentClassCode)
-            )
-        )
-        try:
-            src_row = siblings_src.index(bsdd_class)
-        except ValueError:
-            return False
-
-        # Clamp destination
-        dest_row = max(0, min(dest_row, self.rowCount(new_parent_index)))
-
-        if not self.beginMoveRows(old_parent_index, src_row, src_row, new_parent_index, dest_row):
-            return False
-
-        # Mutate data model: reparent
-        bsdd_class.ParentClassCode = None if new_parent is None else new_parent.Code
-
-        self.endMoveRows()
-        return True
 
     def _collect_subtree(self, root: BsddClass) -> list[BsddClass]:
         out, stack = [], [root]
