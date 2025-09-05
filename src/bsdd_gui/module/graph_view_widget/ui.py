@@ -31,13 +31,13 @@ from PySide6.QtWidgets import (
     QGraphicsView,
     QLabel,
     QMainWindow,
-    QSlider,
     QToolBar,
     QToolButton,
     QFileDialog,
 )
 
 from bsdd_gui.module.graph_view_widget.view import GraphScene, GraphView
+from bsdd_gui.module.graph_view_widget.settings_widget import GraphSettingsWidget
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -95,37 +95,11 @@ class GraphWindow(QMainWindow):
         btn_load.clicked.connect(self._load_bsdd_json)
         tb.addWidget(btn_load)
 
-        tb.addSeparator()
-
-        # Spring length slider
-        tb.addWidget(QLabel("L₀:"))
-        self.spring_slider = QSlider(Qt.Horizontal)
-        self.spring_slider.setRange(100, 1000)
-        self.spring_slider.setValue(int(self.scene.physics.spring_length))
-        self.spring_slider.valueChanged.connect(
-            lambda v: setattr(self.scene.physics, "spring_length", float(v))
-        )
-        tb.addWidget(self.spring_slider)
-
-        tb.addWidget(QLabel("k_spring:"))
-        self.k_slider = QSlider(Qt.Horizontal)
-        self.k_slider.setRange(0.01, 10)
-        self.k_slider.setValue(int(self.scene.physics.k_spring * 100))
-        self.k_slider.valueChanged.connect(
-            lambda v: setattr(self.scene.physics, "k_spring", float(v) / 100.0)
-        )
-
-        self.k_slider.valueChanged.connect(print)
-        tb.addWidget(self.k_slider)
-
-        tb.addWidget(QLabel("repulse:"))
-        self.repulse_slider = QSlider(Qt.Horizontal)
-        self.repulse_slider.setRange(100, 5000)
-        self.repulse_slider.setValue(int(self.scene.physics.k_repulsion))
-        self.repulse_slider.valueChanged.connect(
-            lambda v: setattr(self.scene.physics, "k_repulsion", float(v))
-        )
-        tb.addWidget(self.repulse_slider)
+        # Settings button
+        btn_settings = QToolButton()
+        btn_settings.setText("Settings")
+        btn_settings.clicked.connect(self._open_settings)
+        tb.addWidget(btn_settings)
 
         tb.addSeparator()
 
@@ -184,6 +158,18 @@ class GraphWindow(QMainWindow):
     def _clear(self):
         self.scene.clear_graph()
         # print("[DEBUG] GraphWindow._clear: scene cleared")
+
+    def _open_settings(self):
+        try:
+            w = self._settings_widget
+        except AttributeError:
+            w = None
+        if w is None or not w.isVisible():
+            self._settings_widget = GraphSettingsWidget(self.scene.physics, self)
+            w = self._settings_widget
+        w.show()
+        w.raise_()
+        w.activateWindow()
 
     def _populate_demo(self):
         # Build a small random-ish graph (Erdos–Renyi style)
