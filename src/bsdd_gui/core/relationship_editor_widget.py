@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type, Literal
-from bsdd_json import BsddProperty, BsddClass
+from bsdd_json import BsddProperty, BsddClass, BsddClassRelation, BsddPropertyRelation
 from PySide6.QtWidgets import QWidget, QTableView
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.relationship_editor_widget import ui
@@ -36,6 +36,23 @@ def connect_signals(
         relationship_editor.transform_virtual_relations_to_real
     )
     relationship_editor.connect_internal_signals()
+
+    def handle_item_remove(item):
+        if isinstance(item, BsddClassRelation):
+            project.signals.class_relation_removed.emit(item)
+        elif isinstance(item, BsddPropertyRelation):
+            project.signals.property_relation_removed.emit(item)
+
+    def handle_item_add(item):
+        if isinstance(item, BsddClassRelation):
+            project.signals.class_relation_added.emit(item)
+        elif isinstance(item, BsddPropertyRelation):
+            project.signals.property_relation_added.emit(item)
+
+    
+    relationship_editor.signals.item_added.connect(handle_item_add)
+    relationship_editor.signals.item_removed.connect(handle_item_remove)
+    
     relationship_editor.signals.class_relation_added.connect(project.signals.class_relation_added)
     relationship_editor.signals.class_relation_removed.connect(
         project.signals.class_relation_removed

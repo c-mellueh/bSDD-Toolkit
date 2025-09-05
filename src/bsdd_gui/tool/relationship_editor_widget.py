@@ -223,11 +223,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
         model.append_relation(relation)
         if model.mode == "live":
-            if isinstance(model.bsdd_data, BsddClass):
-                cls.signals.class_relation_added.emit(relation)
-            else:
-                cls.signals.property_relation_added.emit(relation)
-
+            cls.signals.item_added.emit(relation)
         clear_inputs()
 
     @classmethod
@@ -236,10 +232,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         for relation in cls.get_selected(view):
             model.remove_relation(relation)
             if model.mode == "live":
-                if isinstance(model.bsdd_data, BsddClass):
-                    cls.signals.class_relation_removed.emit(relation)
-                else:
-                    cls.signals.property_relation_removed.emit(relation)
+                cls.signals.item_removed.emit(relation)
 
     @classmethod
     def transform_virtual_relations_to_real(cls, dialog: BaseDialog):
@@ -251,22 +244,18 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             for relation in list(model.virtual_remove):
                 if isinstance(model.bsdd_data, BsddClass):
                     model.bsdd_data.ClassRelations.remove(relation)  # type: ignore[arg-type]
-                    cls.signals.class_relation_removed.emit(relation)
-
                 else:
                     model.bsdd_data.PropertyRelations.remove(relation)  # type: ignore[arg-type]
-                cls.signals.property_relation_removed.emit(relation)
+                cls.signals.item_removed.emit(relation)
 
                 model.virtual_remove.remove(relation)
 
             for relation in list(model.virtual_append):
                 if isinstance(model.bsdd_data, BsddClass):
                     model.bsdd_data.ClassRelations.append(relation)  # type: ignore[arg-type]
-                    cls.signals.class_relation_added.emit(relation)
-
                 else:
                     model.bsdd_data.PropertyRelations.append(relation)  # type: ignore[arg-type]
-                    cls.signals.property_relation_added.emit(relation)
+                cls.signals.item_added.emit(relation)
 
                 model.virtual_append.remove(relation)
             model.endResetModel()
