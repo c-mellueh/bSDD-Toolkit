@@ -104,6 +104,5 @@ class ClassTreeView(ItemViewTool):
             stack.extend(cl_utils.get_children(n))
 
         for node in reversed(to_delete):
-            cls.signals.item_removed
             model.remove_class(node)
             cls.signals.item_removed.emit(node)
