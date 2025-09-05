@@ -233,7 +233,7 @@ class Physics:
     def __init__(self):
         # Tunables (good defaults)
         self.k_repulsion = 1600.0  # Coulomb-like constant
-        self.k_spring = 0.08  # Hooke spring constant
+        self.k_spring = 0.01  # Hooke spring constant
         self.spring_length = 200.0  # ideal edge length (px)
         self.damping = 0.85  # velocity damping [0..1]
         self.max_step = 30.0  # clamp max displacement per tick

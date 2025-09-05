@@ -39,7 +39,7 @@ from PySide6.QtWidgets import (
 
 from typing import TYPE_CHECKING
 from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
-from bsdd_gui.module.graph_view_widget.calculation import Physics
+from bsdd_gui.module.graph_view_widget.physics import Physics
 
 
 class GraphView(QGraphicsView):

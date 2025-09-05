@@ -114,6 +114,8 @@ class GraphWindow(QMainWindow):
         self.k_slider.valueChanged.connect(
             lambda v: setattr(self.scene.physics, "k_spring", float(v) / 100.0)
         )
+
+        self.k_slider.valueChanged.connect(print)
         tb.addWidget(self.k_slider)
 
         tb.addWidget(QLabel("repulse:"))
