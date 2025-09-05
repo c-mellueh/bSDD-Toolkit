@@ -206,7 +206,7 @@ class ClassTreeModel(ItemModel):
         elif action in (Qt.CopyAction, Qt.IgnoreAction):
             trigger.mime_copy_event(self.bsdd_data, data, parent)
         return True
-    
+
     def _is_descendant(self, maybe_ancestor: BsddClass, node: BsddClass) -> bool:
         cur = node
         while cur and cur.ParentClassCode:

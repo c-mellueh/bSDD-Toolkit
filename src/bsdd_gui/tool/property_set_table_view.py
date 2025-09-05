@@ -9,7 +9,9 @@ from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals, ItemViewToo
 from bsdd_json.models import BsddDictionary, BsddClass
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_set_table_view.prop import PropertySetTableViewProperties
+    from bsdd_gui.module.property_set_table_view.prop import (
+        PropertySetTableViewProperties,
+    )
 
 
 class Signals(ViewSignals):

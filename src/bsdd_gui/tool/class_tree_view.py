@@ -30,6 +30,7 @@ class Signals(ViewSignals):
 
 class ClassTreeView(ItemViewTool):
     signals = Signals()
+
     @classmethod
     def get_properties(cls) -> ClassTreeViewProperties:
         return bsdd_gui.ClassTreeViewProperties

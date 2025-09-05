@@ -292,7 +292,9 @@ def handle_mime_copy(
         # new code (unique in target)
         new_code = util.get_unique_name(rc["Code"], old2new)
         old2new[rc["Code"]] = new_code
-        node = class_tree.create_class_from_mime(rc, new_code, old2new, root_codes, dest_parent_node)
+        node = class_tree.create_class_from_mime(
+            rc, new_code, old2new, root_codes, dest_parent_node
+        )
         if node is None:
             continue
         # insert with proper signals (parent must exist now)

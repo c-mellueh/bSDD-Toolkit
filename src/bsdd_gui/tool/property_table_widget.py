@@ -61,8 +61,59 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         return ui.PropertyWidget
 
     @classmethod
+    def add_property_to_dictionary(cls, bsdd_property, bsdd_dictionary: BsddDictionary):
+        # TODO: Model handling
+        affected_models = [
+            m
+            for m in cls.get_models()
+            if m.bsdd_dictionary == bsdd_dictionary and isinstance(m, models.PropertyTableModel)
+        ]
+        for model in affected_models:
+            row = model.rowCount()
+            model.beginInsertRows(QModelIndex(), row, row)
+
+        bsdd_dictionary.Properties.append(bsdd_property)
+        for model in affected_models:
+            model.endInsertRows()
+        cls.signals.item_added.emit(bsdd_property)
+
+    @classmethod
     def delete_selection(cls, view: views.ClassTable | views.PropertyTable):
-        trigger.delete_selection(view)
+
+        selected_elements = cls.get_selected(view)
+        if not selected_elements:
+            return
+        bsdd_dictionary = view.model().sourceModel().bsdd_dictionary
+        affected_models = [m for m in cls.get_models() if m.bsdd_dictionary == bsdd_dictionary]
+
+        if isinstance(selected_elements[0], BsddProperty):
+            affected_models = [
+                m for m in affected_models if isinstance(m, models.PropertyTableModel)
+            ]
+            for bsdd_property in selected_elements:
+                for model in affected_models:
+                    row = model.get_row_for_data(bsdd_property)
+                    model.beginRemoveRows(QModelIndex(), row, row)
+                bsdd_dictionary.Properties.remove(bsdd_property)
+                cls.signals.item_removed.emit(bsdd_property)
+                for model in affected_models:
+                    model.endRemoveRows()
+
+        elif isinstance(selected_elements[0], BsddClass):
+            affected_models = [m for m in affected_models if isinstance(m, models.ClassTableModel)]
+            selected_elements: list[BsddClass]
+            active_prop = cls.get_active_property()
+            for bsdd_class in selected_elements:
+                for model in affected_models:
+                    row = model.get_row_for_data(bsdd_class)
+                    model.beginRemoveRows(QModelIndex(), row, row)
+                    model._data = None
+                for bsdd_class_property in list(bsdd_class.ClassProperties):
+                    if bsdd_class_property.PropertyCode == active_prop.Code:
+                        bsdd_class.ClassProperties.remove(bsdd_class_property)
+                        cls.signals.item_removed.emit(bsdd_class_property)
+                for model in affected_models:
+                    model.endRemoveRows()
 
     @classmethod
     def connect_internal_signals(cls):
@@ -105,6 +156,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         proxy_model = models.SortModel()
         proxy_model.setSourceModel(model)
         proxy_model.setDynamicSortFilter(True)
+        cls.get_properties().models.add(model)
         return proxy_model, model
 
     @classmethod
@@ -113,6 +165,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         proxy_model = models.SortModel()
         proxy_model.setSourceModel(model)
         proxy_model.setDynamicSortFilter(True)
+        cls.get_properties().models.add(model)
         return proxy_model, model
 
     @classmethod
@@ -202,15 +255,3 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     @classmethod
     def request_new_property(cls):
         cls.signals.new_property_requested.emit()
-
-    @classmethod
-    def add_property_to_dictionary(cls, bsdd_property, bsdd_dictionary: BsddDictionary):
-        # TODO: Model handling
-        bsdd_dictionary.Properties.append(bsdd_property)
-        cls.signals.item_added.emit(bsdd_property)
-        cls.reset_views()
-
-    @classmethod
-    def add_property_to_model(cls, bsdd_propert, view: views.PropertyTable):
-        model = view.model().sourceModel()
-        model.append_property(bsdd_propert)
