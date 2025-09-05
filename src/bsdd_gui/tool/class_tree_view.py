@@ -25,7 +25,6 @@ class Signals(ViewSignals):
     expand_selection_requested = Signal(ui.ClassView)
     collapse_selection_requested = Signal(ui.ClassView)
 
-
 class ClassTreeView(ItemViewTool):
     signals = Signals()
 
@@ -66,11 +65,12 @@ class ClassTreeView(ItemViewTool):
 
     @classmethod
     def add_class_to_dictionary(cls, new_class: BsddClass, bsdd_dictionary: BsddDictionary):
-        model = cls.get_model(bsdd_dictionary)
+        model: models.ClassTreeModel = cls.get_model(bsdd_dictionary)
         if not model:
             logging.info(f"no Model found")
             return
         model.append_row(new_class)
+        cls.signals.item_added.emit(new_class)
 
     @classmethod
     def delete_selection(cls, view: ui.ClassView):

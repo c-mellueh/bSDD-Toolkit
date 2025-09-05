@@ -10,12 +10,18 @@ if TYPE_CHECKING:
     from bsdd_json.models import BsddClass
 
 
-def connect_signals(class_tree: Type[tool.ClassTreeView], project: Type[tool.Project]):
+def connect_signals(
+    class_tree: Type[tool.ClassTreeView],
+    project: Type[tool.Project],
+    class_editor: Type[tool.ClassEditorWidget],
+):
     class_tree.connect_internal_signals()
-    project.signals.class_added.connect(
+    class_editor.signals.new_class_created.connect(
         lambda c: class_tree.add_class_to_dictionary(c, project.get())
     )
+
     class_tree.signals.item_deleted.connect(project.signals.class_removed.emit)
+    class_tree.signals.item_added.connect(project.signals.class_added.emit)
 
 
 def retranslate_ui(class_tree: Type[tool.ClassTreeView]):
