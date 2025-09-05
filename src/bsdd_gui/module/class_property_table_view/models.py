@@ -49,7 +49,7 @@ class ClassPropertyTableModel(ItemModel):
         if parent.isValid():
             return QModelIndex()
 
-        if 0 > row >= len(self.rowCount()):
+        if 0 < row >= self.rowCount():
             return QModelIndex()
         bsdd_properties = tool.ClassPropertyTableView.filter_properties_by_pset(
             self.active_class, self.active_pset
@@ -62,7 +62,7 @@ class ClassPropertyTableModel(ItemModel):
         return False
 
     def get_row_from_property(self, bsdd_property: BsddClassProperty):
-        for row in self.rowCount():
+        for row in range(self.rowCount()):
             if self.index(row, 0).internalPointer() == bsdd_property:
                 return row
         return -1
@@ -83,7 +83,7 @@ class ClassPropertyTableModel(ItemModel):
             return
         self.beginRemoveRows(QModelIndex(), row, row)
         bsdd_class.ClassProperties.remove(bsdd_property)
-        self.endInsertRows()
+        self.endRemoveRows()
 
 
 # typing
