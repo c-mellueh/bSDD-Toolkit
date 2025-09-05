@@ -32,6 +32,7 @@ class Signals(QObject):
     property_relation_added = Signal(BsddPropertyRelation)
     property_relation_removed = Signal(BsddPropertyRelation)
 
+
 class Project(ActionTool):
     signals = Signals()
 

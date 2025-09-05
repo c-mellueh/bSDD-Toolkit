@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Type
 import logging
 
-from PySide6.QtWidgets import QTreeView, QCompleter, QWidget
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QTreeView, QCompleter, QTableView
+from PySide6.QtCore import Qt, Signal
 import bsdd_gui
 from bsdd_json import (
     BsddProperty,
@@ -25,7 +25,8 @@ from bsdd_gui.module.relationship_editor_widget import ui, trigger, models
 
 
 class Signals(ViewSignals, FieldSignals):
-    pass
+    relationship_added = Signal(object)
+    relationship_removed = Signal(object)
 
 
 class RelationshipEditorWidget(FieldTool, ItemViewTool):
@@ -91,9 +92,11 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         widget.cb_relation_type.currentTextChanged.connect(
             lambda _w=widget: cls.update_code_completer(widget, bsdd_dictionary)
         )
-        widget.tb_add.clicked.connect(lambda _, w=widget: cls.add_row_to_model(w, bsdd_dictionary))
+        widget.tb_add.clicked.connect(
+            lambda _, w=widget: cls.add_relationship_to_model(w, bsdd_dictionary)
+        )
         widget.le_related_element.returnPressed.connect(
-            lambda w=widget: cls.add_row_to_model(w, bsdd_dictionary)
+            lambda w=widget: cls.add_relationship_to_model(w, bsdd_dictionary)
         )
 
     @classmethod
@@ -167,7 +170,9 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             cls.update_code_completer(widget, bsdd_dictionary)
 
     @classmethod
-    def add_row_to_model(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
+    def add_relationship_to_model(
+        cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary
+    ):
         def clear_inputs():
             widget.le_owned_uri.clear()
             widget.le_related_element.clear()
@@ -215,11 +220,18 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             data_dict["RelatedPropertyName"] = related_property.Name
             relation = BsddPropertyRelation.model_validate(data_dict)
 
-        if model.mode == "dialog":
-            model.append_row(relation)
-        else:
-            model.append_row(relation)
+        model.append_relationship(relation)
+        if model.mode == "live":
+            cls.signals.relationship_added.emit(relation)
         clear_inputs()
+
+    @classmethod
+    def delete_selection(cls, view: QTableView):
+        model: models.RelationshipModel = view.model().sourceModel()
+        for rel in cls.get_selected(view):
+            model.remove_relationship(rel)
+            if model.mode == "live":
+                cls.signals.relationship_removed.emit(rel)
 
     @classmethod
     def transform_virtual_relationships_to_real(cls, dialog: BaseDialog):
@@ -233,6 +245,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
                     model.bsdd_data.ClassRelations.remove(relationship)  # type: ignore[arg-type]
                 else:
                     model.bsdd_data.PropertyRelations.remove(relationship)  # type: ignore[arg-type]
+                cls.signals.relationship_removed.emit(relationship)
                 model.virtual_remove.remove(relationship)
 
             for relationship in list(model.virtual_append):
@@ -241,4 +254,5 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
                 else:
                     model.bsdd_data.PropertyRelations.append(relationship)  # type: ignore[arg-type]
                 model.virtual_append.remove(relationship)
+                cls.signals.relationship_added.emit(relationship)
             model.endResetModel()

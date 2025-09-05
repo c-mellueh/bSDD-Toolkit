@@ -124,6 +124,9 @@
    </item>
    <item>
     <widget class="QTableView" name="tv_relations">
+     <property name="contextMenuPolicy">
+      <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+     </property>
      <property name="sortingEnabled">
       <bool>true</bool>
      </property>

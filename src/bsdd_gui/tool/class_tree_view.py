@@ -25,6 +25,7 @@ class Signals(ViewSignals):
     expand_selection_requested = Signal(ui.ClassView)
     collapse_selection_requested = Signal(ui.ClassView)
 
+
 class ClassTreeView(ItemViewTool):
     signals = Signals()
 

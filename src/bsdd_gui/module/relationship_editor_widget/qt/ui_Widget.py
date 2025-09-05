@@ -142,6 +142,7 @@ class Ui_Form(object):
 
         self.tv_relations = QTableView(Form)
         self.tv_relations.setObjectName("tv_relations")
+        self.tv_relations.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tv_relations.setSortingEnabled(True)
         self.tv_relations.horizontalHeader().setStretchLastSection(True)
 
@@ -160,6 +161,6 @@ class Ui_Form(object):
         self.lb_fraction.setText(QCoreApplication.translate("Form", "Fraction", None))
         self.lb_owned_uri.setText(QCoreApplication.translate("Form", "OwnedUri", None))
         self.lb_related_class.setText(QCoreApplication.translate("Form", "RelatedClass", None))
-        self.tb_add.setText(QCoreApplication.translate("Form", "New", None))
+        self.tb_add.setText(QCoreApplication.translate("Form", "Add", None))
 
     # retranslateUi
