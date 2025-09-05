@@ -42,6 +42,43 @@ from PySide6.QtWidgets import (
 # ----------------------------
 # Data structures
 # ----------------------------
+"""
+Styling registries for easy expansion of visuals.
+
+- EDGE_STYLE_MAP: per edge_type pen style
+- NODE_COLOR_MAP: per node_type fill color
+- NODE_SHAPE_MAP: per node_type shape keyword (rect, roundrect, ellipse)
+"""
+
+# Edge pen styles
+EDGE_STYLE_DEFAULT = {
+    "style": Qt.SolidLine,
+    "width": 1.5,
+    "color": QColor(130, 130, 150),
+}
+
+EDGE_STYLE_MAP: Dict[str, Dict[str, object]] = {
+    "class_rel": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
+    "class_to_prop": {"style": Qt.DotLine, "width": 1.5, "color": QColor(130, 130, 150)},
+    "prop_rel": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
+    "demo": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
+}
+
+# Node colors and shapes
+NODE_COLOR_DEFAULT = QColor(80, 140, 255)
+NODE_COLOR_MAP: Dict[str, QColor] = {
+    "class": QColor(220, 60, 60),     # red
+    "property": QColor(60, 120, 220), # blue
+    "demo": QColor(140, 200, 90),
+    "generic": NODE_COLOR_DEFAULT,
+}
+
+NODE_SHAPE_MAP: Dict[str, str] = {
+    "class": "rect",
+    "property": "roundrect",
+    "demo": "rect",
+    "generic": "rect",
+}
 @dataclass
 class EdgeData:
     a: "Node"
@@ -60,9 +97,7 @@ class Edge(QGraphicsPathItem):
         self.weight = weight
         self.edge_type = edge_type
         self.setZValue(-1)
-        pen = QPen(QColor(130, 130, 150), 1.5)
-        pen.setCosmetic(True)
-        self.setPen(pen)
+        self.update_pen()
         self.update_path()
 
     def update_path(self):
@@ -70,6 +105,20 @@ class Edge(QGraphicsPathItem):
         path.moveTo(self.a.pos())
         path.lineTo(self.b.pos())
         self.setPath(path)
+
+    def update_pen(self):
+        # Style edges using registry; falls back to default
+        cfg = EDGE_STYLE_MAP.get(self.edge_type, EDGE_STYLE_DEFAULT)
+        color = cfg.get("color", EDGE_STYLE_DEFAULT["color"])  # type: ignore[index]
+        width = float(cfg.get("width", EDGE_STYLE_DEFAULT["width"]))
+        style = cfg.get("style", EDGE_STYLE_DEFAULT["style"])  # type: ignore[index]
+        pen = QPen(color if isinstance(color, QColor) else QColor(130, 130, 150), width)
+        pen.setCosmetic(True)
+        try:
+            pen.setStyle(style)  # type: ignore[arg-type]
+        except Exception:
+            pen.setStyle(Qt.SolidLine)
+        self.setPen(pen)
 
 
 class Node(QGraphicsObject):
@@ -85,11 +134,14 @@ class Node(QGraphicsObject):
         self.label = label
         # radius retained for backward-compat, not used for drawing
         self.radius = radius
-        self.color = color or QColor(80, 140, 255)
+        self.node_type = node_type
+        # Resolve color and shape from registries unless explicitly provided
+        resolved_color = color or NODE_COLOR_MAP.get(node_type, NODE_COLOR_DEFAULT)
+        self.color = resolved_color
         self.brush = QBrush(self.color)
         self.border = QPen(QColor(40, 60, 90), 1.2)
         self.border.setCosmetic(True)
-        self.node_type = node_type
+        self.node_shape = NODE_SHAPE_MAP.get(node_type, NODE_SHAPE_MAP.get("generic", "rect"))
 
         self.velocity = QPointF(0.0, 0.0)
         self.fixed = False
@@ -121,7 +173,12 @@ class Node(QGraphicsObject):
 
     def shape(self) -> QPainterPath:
         path = QPainterPath()
-        path.addRect(QRectF(-self._w / 2, -self._h / 2, self._w, self._h))
+        if self.node_shape == "ellipse":
+            path.addEllipse(QRectF(-self._w / 2, -self._h / 2, self._w, self._h))
+        elif self.node_shape == "roundrect":
+            path.addRoundedRect(QRectF(-self._w / 2, -self._h / 2, self._w, self._h), 6, 6)
+        else:  # rect
+            path.addRect(QRectF(-self._w / 2, -self._h / 2, self._w, self._h))
         return path
 
     def _update_size_for_text(self, painter: Optional[QPainter] = None):
@@ -146,7 +203,12 @@ class Node(QGraphicsObject):
         painter.setPen(self.border)
         painter.setBrush(self.brush if not self.isSelected() else QBrush(QColor(255, 180, 90)))
         rect = QRectF(-self._w / 2, -self._h / 2, self._w, self._h)
-        painter.drawRect(rect)
+        if self.node_shape == "ellipse":
+            painter.drawEllipse(rect)
+        elif self.node_shape == "roundrect":
+            painter.drawRoundedRect(rect, 6, 6)
+        else:
+            painter.drawRect(rect)
         painter.setPen(QPen(QColor(20, 20, 30)))
         painter.drawText(rect, Qt.AlignCenter, self.label)
 
@@ -338,11 +400,11 @@ class Physics:
         # Tunables (good defaults)
         self.k_repulsion = 1600.0  # Coulomb-like constant
         self.k_spring = 0.08       # Hooke spring constant
-        self.spring_length = 500.0  # ideal edge length (px)
+        self.spring_length = 200.0  # ideal edge length (px)
         self.damping = 0.85        # velocity damping [0..1]
         self.max_step = 30.0       # clamp max displacement per tick
         self.gravity_center = QPointF(0.0, 0.0)
-        self.gravity_strength = 0.01  # weak pull to scene center
+        self.gravity_strength = 0.0  # no pull to scene center (spread out)
 
         # Barnes–Hut parameters
         self.use_barnes_hut = True
@@ -406,10 +468,11 @@ class Physics:
             forces[a] += QPointF(fx, fy)
             forces[b] -= QPointF(fx, fy)
 
-        # Weak gravity towards center
-        for n in nodes:
-            delta = self.gravity_center - n.pos()
-            forces[n] += QPointF(delta.x() * self.gravity_strength, delta.y() * self.gravity_strength)
+        # Optional gravity towards center (disabled by default)
+        if self.gravity_strength != 0.0:
+            for n in nodes:
+                delta = self.gravity_center - n.pos()
+                forces[n] += QPointF(delta.x() * self.gravity_strength, delta.y() * self.gravity_strength)
 
         # Integrate velocities and positions
         for n in nodes:
@@ -552,7 +615,9 @@ class GraphWindow(QMainWindow):
         self.view = GraphView(self.scene)
         self.setCentralWidget(self.view)
         self._build_toolbar()
-        self._populate_demo()
+        #self._populate_demo()
+        self.bsdd_dict = BsddDictionary.load(r"/home/christoph/Github/bSDD-Toolkit/test_bsdd_reduced_v2.json")
+        self._populate_from_bsdd(self.bsdd_dict )
         self.scene.auto_scene_rect()
         self.resize(1000, 700)
 
@@ -596,14 +661,14 @@ class GraphWindow(QMainWindow):
         # Spring length slider
         tb.addWidget(QLabel("L₀:"))
         self.spring_slider = QSlider(Qt.Horizontal)
-        self.spring_slider.setRange(30, 200)
+        self.spring_slider.setRange(100, 1000)
         self.spring_slider.setValue(int(self.scene.physics.spring_length))
         self.spring_slider.valueChanged.connect(lambda v: setattr(self.scene.physics, "spring_length", float(v)))
         tb.addWidget(self.spring_slider)
 
         tb.addWidget(QLabel("k_spring:"))
         self.k_slider = QSlider(Qt.Horizontal)
-        self.k_slider.setRange(1, 200)
+        self.k_slider.setRange(0.01, 10)
         self.k_slider.setValue(int(self.scene.physics.k_spring * 100))
         self.k_slider.valueChanged.connect(lambda v: setattr(self.scene.physics, "k_spring", float(v) / 100.0))
         tb.addWidget(self.k_slider)
@@ -720,11 +785,8 @@ class GraphWindow(QMainWindow):
         self._populate_from_bsdd(bsdd_dict)
 
     def _populate_from_bsdd(self, bsdd_dict: BsddDictionary):
-        # Build graph from bSDD model: Classes (red), Properties (blue)
+        # Build graph from bSDD model: Classes and Properties
         self.scene.clear_graph()
-
-        CLASS_COLOR = QColor(220, 60, 60)  # red
-        PROP_COLOR = QColor(60, 120, 220)  # blue
 
         # Node registries
         class_by_code: Dict[str, Node] = {}
@@ -734,9 +796,7 @@ class GraphWindow(QMainWindow):
 
         # 1) Classes
         for c in bsdd_dict.Classes:
-            n = self.scene.add_node(
-                c.Code or c.Name or "Class", color=CLASS_COLOR, node_type="class"
-            )
+            n = self.scene.add_node(c.Code or c.Name or "Class", node_type="class")
             class_by_code[c.Code] = n
             try:
                 uri = cl_utils.build_bsdd_uri(c, bsdd_dict)
@@ -747,9 +807,7 @@ class GraphWindow(QMainWindow):
 
         # 2) Properties (dictionary-level)
         for p in bsdd_dict.Properties:
-            n = self.scene.add_node(
-                p.Code or p.Name or "Property", color=PROP_COLOR, node_type="property"
-            )
+            n = self.scene.add_node(p.Code or p.Name or "Property", node_type="property")
             prop_by_code[p.Code] = n
             # Map canonical bsDD URI and any owned URI
             try:
@@ -823,7 +881,7 @@ class GraphWindow(QMainWindow):
                     except Exception:
                         pass
                 if dst is not None:
-                    self.scene.add_edge(src_node, dst, weight=1.0, edge_type="prop_rel")
+                    self.scene.add_edge(src_node, dst, weight=0., edge_type="prop_rel")
 
         # No ClassProperty nodes are created; edges Class→Property were added above.
 
