@@ -24,11 +24,11 @@ class Signals(ViewSignals):
     search_requested = Signal(ui.ClassView)
     expand_selection_requested = Signal(ui.ClassView)
     collapse_selection_requested = Signal(ui.ClassView)
+    class_parent_changed = Signal(BsddClass)
 
 
 class ClassTreeView(ItemViewTool):
     signals = Signals()
-
     @classmethod
     def get_properties(cls) -> ClassTreeViewProperties:
         return bsdd_gui.ClassTreeViewProperties
@@ -79,11 +79,18 @@ class ClassTreeView(ItemViewTool):
 
     @classmethod
     def delete_class(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
-        model: ClassTreeModel = cls.get_model(bsdd_dictionary)
+
         parent = cl_utils.get_parent(bsdd_class)
         for child in cl_utils.get_children(bsdd_class):
-            model.move_class(child, parent)
-        model.remove_class(bsdd_class)
+            cls.move_class(child, parent, bsdd_dictionary)
+
+        model: ClassTreeModel = cls.get_model(bsdd_dictionary)
+        row = model._index_for_class(bsdd_class).row()
+        parent_index, siblings = model._parent_and_siblings(bsdd_class)
+        model.beginRemoveRows(parent_index, row, row)
+        cl_utils.remove_class(bsdd_class)
+        model.endRemoveRows()
+
         cls.signals.item_removed.emit(bsdd_class)
 
     @classmethod
@@ -91,7 +98,16 @@ class ClassTreeView(ItemViewTool):
         cls, bsdd_class: BsddClass, new_parent: BsddClass | None, bsdd_dictionary: BsddDictionary
     ):
         model: ClassTreeModel = cls.get_model(bsdd_dictionary)
-        model.move_class(bsdd_class, new_parent)
+        old_parent_index = model._get_current_parent_index(bsdd_class)
+        new_parent_index = (
+            QModelIndex() if new_parent is None else model._index_for_class(new_parent)
+        )
+        row = cl_utils.get_row_index(bsdd_class)
+        new_row_count = model.rowCount(new_parent_index)
+        model.beginMoveRows(old_parent_index, row, row, new_parent_index, new_row_count)
+        bsdd_class.ParentClassCode = None if new_parent is None else new_parent.Code
+        model.endMoveRows()
+        cls.signals.class_parent_changed(bsdd_class)
 
     @classmethod
     def delete_class_with_children(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
@@ -104,5 +120,4 @@ class ClassTreeView(ItemViewTool):
             stack.extend(cl_utils.get_children(n))
 
         for node in reversed(to_delete):
-            model.remove_class(node)
-            cls.signals.item_removed.emit(node)
+            cls.delete_class(bsdd_class, bsdd_dictionary)

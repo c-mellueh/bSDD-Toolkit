@@ -134,27 +134,6 @@ class ClassTreeModel(ItemModel):
         # Root-Fall
         return QModelIndex(), cl_utils.get_root_classes(self.bsdd_dictionary)
 
-    def remove_class(self, bsdd_class: BsddClass) -> bool:
-        old_index = self._index_for_class(bsdd_class)
-        parent_index, siblings = self._parent_and_siblings(bsdd_class)
-        row = old_index.row()
-
-        self.beginRemoveRows(parent_index, row, row)
-        cl_utils.remove_class(bsdd_class)  # entfernt das Objekt aus bsdd_dictionary.Classes
-        self.endRemoveRows()
-        return True
-
-    def move_class(self, bsdd_class: BsddClass, new_parent: BsddClass | None):
-        old_parent_index = self._get_current_parent_index(bsdd_class)
-        new_parent_index = (
-            QModelIndex() if new_parent is None else self._index_for_class(new_parent)
-        )
-        row = cl_utils.get_row_index(bsdd_class)
-        new_row_count = self.rowCount(new_parent_index)
-        self.beginMoveRows(old_parent_index, row, row, new_parent_index, new_row_count)
-        bsdd_class.ParentClassCode = None if new_parent is None else new_parent.Code
-        self.endMoveRows()
-
     def _index_for_class(self, cls: BsddClass) -> QModelIndex:
         """Return the QModelIndex for an existing class object."""
         # find its parent chain to build the index properly
