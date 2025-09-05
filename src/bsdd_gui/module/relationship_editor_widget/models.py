@@ -69,7 +69,7 @@ class RelationshipModel(ItemModel):
         self._data = None
         return super().beginResetModel()
 
-    def append_relationship(self, relation: BsddClassRelation | BsddPropertyRelation):
+    def append_relation(self, relation: BsddClassRelation | BsddPropertyRelation):
         # Prevent duplicates for class relations (preserve previous ClassModel behavior)
         if isinstance(self.bsdd_data, BsddClass):
             if relation in self.bsdd_data.ClassRelations:
@@ -98,7 +98,7 @@ class RelationshipModel(ItemModel):
                 return row
         return -1
 
-    def remove_relationship(self, relation: BsddClassRelation | BsddPropertyRelation):
+    def remove_relation(self, relation: BsddClassRelation | BsddPropertyRelation):
         # Prevent duplicates for class relations (preserve previous ClassModel behavior)
         if isinstance(self.bsdd_data, BsddClass):
             if relation not in self.bsdd_data.ClassRelations:

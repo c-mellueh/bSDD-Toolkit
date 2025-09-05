@@ -33,10 +33,19 @@ def connect_signals(
         lambda _: relationship_editor.update_all_completers(project.get())
     )
     class_editor.signals.dialog_accepted.connect(
-        relationship_editor.transform_virtual_relationships_to_real
+        relationship_editor.transform_virtual_relations_to_real
     )
     relationship_editor.connect_internal_signals()
-
+    relationship_editor.signals.class_relation_added.connect(project.signals.class_relation_added)
+    relationship_editor.signals.class_relation_removed.connect(
+        project.signals.class_relation_removed
+    )
+    relationship_editor.signals.property_relation_added.connect(
+        project.signals.property_relation_added
+    )
+    relationship_editor.signals.property_relation_removed.connect(
+        project.signals.property_relation_removed
+    )
 
 def retranslate_ui(relationship_editor: Type[tool.RelationshipEditorWidget]):
     for widget in relationship_editor.get_widgets():

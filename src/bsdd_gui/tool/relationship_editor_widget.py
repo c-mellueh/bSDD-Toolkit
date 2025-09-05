@@ -25,8 +25,11 @@ from bsdd_gui.module.relationship_editor_widget import ui, trigger, models
 
 
 class Signals(ViewSignals, FieldSignals):
-    relationship_added = Signal(object)
-    relationship_removed = Signal(object)
+    class_relation_added = Signal(BsddClassRelation)
+    class_relation_removed = Signal(BsddClassRelation)
+
+    property_relation_added = Signal(BsddPropertyRelation)
+    property_relation_removed = Signal(BsddPropertyRelation)
 
 
 class RelationshipEditorWidget(FieldTool, ItemViewTool):
@@ -93,10 +96,10 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             lambda _w=widget: cls.update_code_completer(widget, bsdd_dictionary)
         )
         widget.tb_add.clicked.connect(
-            lambda _, w=widget: cls.add_relationship_to_model(w, bsdd_dictionary)
+            lambda _, w=widget: cls.add_relation_to_model(w, bsdd_dictionary)
         )
         widget.le_related_element.returnPressed.connect(
-            lambda w=widget: cls.add_relationship_to_model(w, bsdd_dictionary)
+            lambda w=widget: cls.add_relation_to_model(w, bsdd_dictionary)
         )
 
     @classmethod
@@ -170,9 +173,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             cls.update_code_completer(widget, bsdd_dictionary)
 
     @classmethod
-    def add_relationship_to_model(
-        cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary
-    ):
+    def add_relation_to_model(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
         def clear_inputs():
             widget.le_owned_uri.clear()
             widget.le_related_element.clear()
@@ -220,39 +221,52 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             data_dict["RelatedPropertyName"] = related_property.Name
             relation = BsddPropertyRelation.model_validate(data_dict)
 
-        model.append_relationship(relation)
+        model.append_relation(relation)
         if model.mode == "live":
-            cls.signals.relationship_added.emit(relation)
+            if isinstance(model.bsdd_data, BsddClass):
+                cls.signals.class_relation_added.emit(relation)
+            else:
+                cls.signals.property_relation_added.emit(relation)
+
         clear_inputs()
 
     @classmethod
     def delete_selection(cls, view: QTableView):
         model: models.RelationshipModel = view.model().sourceModel()
-        for rel in cls.get_selected(view):
-            model.remove_relationship(rel)
+        for relation in cls.get_selected(view):
+            model.remove_relation(relation)
             if model.mode == "live":
-                cls.signals.relationship_removed.emit(rel)
+                if isinstance(model.bsdd_data, BsddClass):
+                    cls.signals.class_relation_removed.emit(relation)
+                else:
+                    cls.signals.property_relation_removed.emit(relation)
 
     @classmethod
-    def transform_virtual_relationships_to_real(cls, dialog: BaseDialog):
+    def transform_virtual_relations_to_real(cls, dialog: BaseDialog):
         widget = dialog._widget
         if isinstance(widget, class_editor_ui.ClassEditor):
             table_view = widget.relationship_editor.tv_relations
             model: models.RelationshipModel = table_view.model().sourceModel()
             model.beginResetModel()
-            for relationship in list(model.virtual_remove):
+            for relation in list(model.virtual_remove):
                 if isinstance(model.bsdd_data, BsddClass):
-                    model.bsdd_data.ClassRelations.remove(relationship)  # type: ignore[arg-type]
-                else:
-                    model.bsdd_data.PropertyRelations.remove(relationship)  # type: ignore[arg-type]
-                cls.signals.relationship_removed.emit(relationship)
-                model.virtual_remove.remove(relationship)
+                    model.bsdd_data.ClassRelations.remove(relation)  # type: ignore[arg-type]
+                    cls.signals.class_relation_removed.emit(relation)
 
-            for relationship in list(model.virtual_append):
-                if isinstance(model.bsdd_data, BsddClass):
-                    model.bsdd_data.ClassRelations.append(relationship)  # type: ignore[arg-type]
                 else:
-                    model.bsdd_data.PropertyRelations.append(relationship)  # type: ignore[arg-type]
-                model.virtual_append.remove(relationship)
-                cls.signals.relationship_added.emit(relationship)
+                    model.bsdd_data.PropertyRelations.remove(relation)  # type: ignore[arg-type]
+                cls.signals.property_relation_removed.emit(relation)
+
+                model.virtual_remove.remove(relation)
+
+            for relation in list(model.virtual_append):
+                if isinstance(model.bsdd_data, BsddClass):
+                    model.bsdd_data.ClassRelations.append(relation)  # type: ignore[arg-type]
+                    cls.signals.class_relation_added.emit(relation)
+
+                else:
+                    model.bsdd_data.PropertyRelations.append(relation)  # type: ignore[arg-type]
+                    cls.signals.property_relation_added.emit(relation)
+
+                model.virtual_append.remove(relation)
             model.endResetModel()
