@@ -43,6 +43,8 @@ class GraphWindow(QMainWindow):
         # self._populate_demo()
         self.scene.auto_scene_rect()
         self.resize(1000, 700)
+        # Track whether we auto-paused due to the window being hidden
+        self._auto_paused = False
 
     def _build_toolbar(self):
         tb = QToolBar("Controls")
@@ -166,6 +168,26 @@ class GraphWindow(QMainWindow):
         self.scene.apply_filters(node_flags, edge_flags)
 
         self.scene.auto_scene_rect()
+
+    # ---- Visibility handling ----
+    def hideEvent(self, event):
+        # Auto-pause physics when the window is hidden to save CPU
+        if self.scene.running:
+            self.scene.set_running(False)
+            self._auto_paused = True
+            # Keep play button label consistent with state
+            if hasattr(self, "btn_play"):
+                self.btn_play.setText("Play")
+        return super().hideEvent(event)
+
+    def showEvent(self, event):
+        # Resume physics only if we paused it due to being hidden
+        if getattr(self, "_auto_paused", False):
+            self.scene.set_running(True)
+            self._auto_paused = False
+            if hasattr(self, "btn_play"):
+                self.btn_play.setText("Pause")
+        return super().showEvent(event)
 
 
 if __name__ == "__main__":
