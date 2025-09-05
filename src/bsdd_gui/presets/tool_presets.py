@@ -176,7 +176,7 @@ class WidgetTool(BaseTool):
     @abstractmethod
     def create_widget(cls, *args, **kwargs) -> FieldWidget:
         widget = cls._get_widget_class()(*args, **kwargs)
-        cls.get_properties().widgets.append(widget)
+        #cls.get_properties().widgets.append(widget) register widget does the same
         cls.add_plugins_to_widget(widget)
         return widget
 
