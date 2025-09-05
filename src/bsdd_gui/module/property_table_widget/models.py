@@ -44,6 +44,24 @@ class PropertyTableModel(ItemModel):
     def setData(self, index, value, /, role=...):
         return False
 
+    def get_row_from_property(self, bsdd_property: BsddProperty):
+        for row in range(self.rowCount()):
+            if self.index(row, 0).internalPointer() == bsdd_property:
+                return row
+        return -1
+
+    def append_property(self, bsdd_property: BsddProperty):
+        row = self.rowCount()
+        self.beginInsertRows(QModelIndex(), row, row)
+        self.bsdd_dictionary.Properties.append(bsdd_property)
+        self.endInsertRows()
+
+    def remove_property(self, bsdd_property: BsddProperty):
+        row = self.get_row_from_property(bsdd_property)
+        self.beginRemoveRows(QModelIndex(), row, row)
+        self.bsdd_dictionary.Properties.remove(bsdd_property)
+        self.endRemoveRows()
+
 
 class ClassTableModel(ItemModel):
 
@@ -92,6 +110,8 @@ class ClassTableModel(ItemModel):
     def beginResetModel(self):
         self._data = None
         return super().beginResetModel()
+
+
 
 
 # typing

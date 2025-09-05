@@ -202,3 +202,8 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     @classmethod
     def request_new_property(cls):
         cls.signals.new_property_requested.emit()
+
+    @classmethod
+    def add_property_to_model(cls,view:views.PropertyTable):
+        model = view.model().sourceModel()
+        model.append_property()

@@ -177,6 +177,7 @@ def search_property(
 def delete_selection(
     view: QTreeView, property_table: Type[tool.PropertyTableWidget], project: Type[tool.Project]
 ):
+    
     selected_elements = property_table.get_selected(view)
     if not selected_elements:
         return
