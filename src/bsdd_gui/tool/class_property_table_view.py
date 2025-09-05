@@ -38,7 +38,7 @@ class ClassPropertyTableView(ItemViewTool):
         return trigger
 
     @classmethod
-    def add_property(cls, class_property: BsddClassProperty, view: ui.ClassPropertyTable):
+    def add_class_property(cls, class_property: BsddClassProperty, view: ui.ClassPropertyTable):
         model = view.model().sourceModel()
         if class_property._parent_ref() and class_property._parent_ref() != model.active_class:
             return
