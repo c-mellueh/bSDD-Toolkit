@@ -38,7 +38,7 @@ def register_view(view: ui.ClassView, class_tree: Type[tool.ClassTreeView]):
     view.setDropIndicatorShown(True)
     view.setDefaultDropAction(Qt.MoveAction)
     view.setDragDropMode(QTreeView.DragDropMode.DragDrop)  # internal DnD
-    logging.info(f"register View {view} done!")
+    logging.info(f"register View {type(view).__name__} done!")
 
 
 def add_columns_to_view(

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QApplication, QTableView
 from typing import Type, TYPE_CHECKING
-from PySide6.QtCore import QModelIndex
+from PySide6.QtCore import QModelIndex,QCoreApplication,QPoint
 from bsdd_json.utils import property_utils as prop_utils
 
 if TYPE_CHECKING:
@@ -13,10 +13,11 @@ if TYPE_CHECKING:
 def connect_signals(
     property_table: Type[tool.ClassPropertyTableView],
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
 ):
     property_table.connect_internal_signals()
     class_property_editor.signals.new_class_property_created.connect(
-        lambda *_: property_table.reset_views()
+        lambda p: property_table.add_property(p, main_window.get_property_view())
     )
 
 
@@ -44,13 +45,24 @@ def add_columns_to_view(
 def add_context_menu_to_view(
     view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]
 ):
-    pass  # TODO
+    property_table.clear_context_menu_list(view)
+    property_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("ClassPropertyTable", "Delete"),
+        lambda: property_table.signals.delete_selection_requested.emit(view),
+        True,
+        True,
+        True,
+    )
 
 
 def create_context_menu(
-    view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]
+    view: ui.ClassPropertyTable, pos: QPoint, property_table: Type[tool.ClassPropertyTableView]
 ):
-    pass
+    bsdd_allowed_values = property_table.get_selected(view)
+    menu = property_table.create_context_menu(view, bsdd_allowed_values)
+    menu_pos = view.viewport().mapToGlobal(pos)
+    menu.exec(menu_pos)
 
 
 def connect_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]):

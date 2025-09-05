@@ -38,9 +38,20 @@ class ClassPropertyTableView(ItemViewTool):
         return trigger
 
     @classmethod
-    def delete_selection(view: ui.ClassPropertyTable):
-        # TODO
-        return None
+    def add_property(cls, class_property: BsddClassProperty, view: ui.ClassPropertyTable):
+        model = view.model().sourceModel()
+        if class_property._parent_ref() and class_property._parent_ref() != model.active_class:
+            return
+        model.append_property(class_property)
+        cls.signals.item_added.emit(class_property)
+
+    @classmethod
+    def delete_selection(cls, view: ui.ClassPropertyTable):
+        class_properties = cls.get_selected(view)
+        model = view.model().sourceModel()
+        for prop in class_properties:
+            model.remove_property(prop)
+            cls.signals.item_deleted.emit(prop)
 
     @classmethod
     def connect_internal_signals(cls):

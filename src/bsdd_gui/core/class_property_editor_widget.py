@@ -165,8 +165,8 @@ def create_dialog(
     if dialog.exec():
         class_property_editor.sync_to_model(dialog._widget, bsdd_class_property)
         # add ClassProperty to Class
-        bsdd_class_property.parent().ClassProperties.append(bsdd_class_property)
         class_property_editor.signals.new_class_property_created.emit(bsdd_class_property)
+        # bsdd_class_property.parent().ClassProperties.append(bsdd_class_property)
 
         if pset_was_temporary:
             property_set_table.remove_temporary_pset(bsdd_class_property.parent(), property_set)
