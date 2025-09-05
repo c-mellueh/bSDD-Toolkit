@@ -21,7 +21,6 @@ from PySide6.QtGui import (
     QPainter,
     QPainterPath,
     QPen,
-
 )
 from PySide6.QtWidgets import (
     QApplication,
@@ -35,11 +34,11 @@ from PySide6.QtWidgets import (
     QSlider,
     QToolBar,
     QToolButton,
-    QFileDialog
+    QFileDialog,
 )
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.graph_view_widget.graphics_items import Node,Edge
+    from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
 
 
 class QuadTree:
@@ -122,7 +121,19 @@ class QuadTree:
 # ----------------------------
 class Physics:
     class QuadNode:
-        __slots__ = ("cx", "cy", "half", "mass", "com_x", "com_y", "body", "nw", "ne", "sw", "se")
+        __slots__ = (
+            "cx",
+            "cy",
+            "half",
+            "mass",
+            "com_x",
+            "com_y",
+            "body",
+            "nw",
+            "ne",
+            "sw",
+            "se",
+        )
 
         def __init__(self, cx: float, cy: float, half: float):
             self.cx = cx
@@ -140,9 +151,7 @@ class Physics:
         def _child_for(self, x: float, y: float):
             east = x >= self.cx
             north = y < self.cy
-            return (
-                ("ne" if east else "nw") if north else ("se" if east else "sw")
-            )
+            return ("ne" if east else "nw") if north else ("se" if east else "sw")
 
         def _ensure_child(self, quadrant: str):
             h2 = self.half * 0.5
@@ -187,7 +196,15 @@ class Physics:
             self._ensure_child(quadrant)
             getattr(self, quadrant).insert(node, x, y, m)
 
-        def compute_force(self, target: Node, tx: float, ty: float, theta: float, k_repulsion: float, eps: float = 0.01) -> Tuple[float, float]:
+        def compute_force(
+            self,
+            target: Node,
+            tx: float,
+            ty: float,
+            theta: float,
+            k_repulsion: float,
+            eps: float = 0.01,
+        ) -> Tuple[float, float]:
             if self.mass == 0.0:
                 return 0.0, 0.0
             # If this region is just the target itself, ignore
@@ -216,17 +233,17 @@ class Physics:
     def __init__(self):
         # Tunables (good defaults)
         self.k_repulsion = 1600.0  # Coulomb-like constant
-        self.k_spring = 0.08       # Hooke spring constant
+        self.k_spring = 0.08  # Hooke spring constant
         self.spring_length = 200.0  # ideal edge length (px)
-        self.damping = 0.85        # velocity damping [0..1]
-        self.max_step = 30.0       # clamp max displacement per tick
+        self.damping = 0.85  # velocity damping [0..1]
+        self.max_step = 30.0  # clamp max displacement per tick
         self.gravity_center = QPointF(0.0, 0.0)
         self.gravity_strength = 0.0  # no pull to scene center (spread out)
 
         # Barnes–Hut parameters
         self.use_barnes_hut = True
-        self.bh_theta = 0.7          # smaller = more accurate, slower
-        self.bh_min_size = 12        # switch to BH when nodes >= this
+        self.bh_theta = 0.7  # smaller = more accurate, slower
+        self.bh_min_size = 12  # switch to BH when nodes >= this
 
     def _build_quadtree(self, nodes: List[Node]) -> Optional["Physics.QuadNode"]:
         if not nodes:
@@ -255,7 +272,9 @@ class Physics:
             if root is not None:
                 for n in nodes:
                     p = n.pos()
-                    fx, fy = root.compute_force(n, p.x(), p.y(), self.bh_theta, self.k_repulsion, eps=0.01)
+                    fx, fy = root.compute_force(
+                        n, p.x(), p.y(), self.bh_theta, self.k_repulsion, eps=0.01
+                    )
                     forces[n] += QPointF(fx, fy)
         else:
             # Pairwise O(N^2)
@@ -289,7 +308,9 @@ class Physics:
         if self.gravity_strength != 0.0:
             for n in nodes:
                 delta = self.gravity_center - n.pos()
-                forces[n] += QPointF(delta.x() * self.gravity_strength, delta.y() * self.gravity_strength)
+                forces[n] += QPointF(
+                    delta.x() * self.gravity_strength, delta.y() * self.gravity_strength
+                )
 
         # Integrate velocities and positions
         for n in nodes:

@@ -20,7 +20,6 @@ from PySide6.QtGui import (
     QPainter,
     QPainterPath,
     QPen,
-
 )
 from PySide6.QtWidgets import (
     QApplication,
@@ -34,22 +33,20 @@ from PySide6.QtWidgets import (
     QSlider,
     QToolBar,
     QToolButton,
-    QFileDialog
+    QFileDialog,
 )
+
 
 @dataclass
 class EdgeData:
     a: "Node"
     b: "Node"
     weight: float = 1.0
-    
 
 
 class Edge(QGraphicsPathItem):
 
-    def __init__(
-        self, a: "Node", b: "Node", weight: float = 1.0, edge_type: str = "generic"
-    ):
+    def __init__(self, a: "Node", b: "Node", weight: float = 1.0, edge_type: str = "generic"):
         super().__init__()
         self.a = a
         self.b = b
@@ -128,7 +125,12 @@ class Node(QGraphicsObject):
     def boundingRect(self) -> QRectF:
         # Include a small margin for the border
         margin = 2.0
-        return QRectF(-self._w / 2 - margin, -self._h / 2 - margin, self._w + 2 * margin, self._h + 2 * margin)
+        return QRectF(
+            -self._w / 2 - margin,
+            -self._h / 2 - margin,
+            self._w + 2 * margin,
+            self._h + 2 * margin,
+        )
 
     def shape(self) -> QPainterPath:
         path = QPainterPath()
@@ -179,4 +181,3 @@ class Node(QGraphicsObject):
                     if isinstance(edge, Edge) and (edge.a is self or edge.b is self):
                         edge.update_path()
         return super().itemChange(change, value)
-

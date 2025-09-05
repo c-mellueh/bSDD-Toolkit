@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
@@ -22,7 +21,6 @@ from PySide6.QtGui import (
     QPainter,
     QPainterPath,
     QPen,
-
 )
 from PySide6.QtWidgets import (
     QApplication,
@@ -36,14 +34,14 @@ from PySide6.QtWidgets import (
     QSlider,
     QToolBar,
     QToolButton,
-    QFileDialog
+    QFileDialog,
 )
 
 from typing import TYPE_CHECKING
-from bsdd_gui.module.graph_view_widget.graphics_items import Node,Edge
+from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
 from bsdd_gui.module.graph_view_widget.calculation import Physics
 
-    
+
 class GraphView(QGraphicsView):
     def __init__(self, scene: QGraphicsScene):
         super().__init__(scene)
@@ -92,11 +90,7 @@ class GraphScene(QGraphicsScene):
         self.physics.gravity_center = self.sceneRect().center()
         # Only simulate visible items
         vis_nodes = [n for n in self.nodes if n.isVisible()]
-        vis_edges = [
-            e
-            for e in self.edges
-            if e.isVisible() and e.a.isVisible() and e.b.isVisible()
-        ]
+        vis_edges = [e for e in self.edges if e.isVisible() and e.a.isVisible() and e.b.isVisible()]
         if vis_nodes:
             self.physics.step(vis_nodes, vis_edges, dt=1.0)
         # Update visible edges' geometry
@@ -114,15 +108,17 @@ class GraphScene(QGraphicsScene):
         node_type: str = "generic",
     ) -> Node:
         n = Node(label, color=color, node_type=node_type)
-        p = pos if pos is not None else QPointF(random.uniform(-150, 150), random.uniform(-150, 150))
+        p = (
+            pos
+            if pos is not None
+            else QPointF(random.uniform(-150, 150), random.uniform(-150, 150))
+        )
         n.setPos(p)
         self.addItem(n)
         self.nodes.append(n)
         return n
 
-    def add_edge(
-        self, a: Node, b: Node, weight: float = 1.0, edge_type: str = "generic"
-    ) -> Edge:
+    def add_edge(self, a: Node, b: Node, weight: float = 1.0, edge_type: str = "generic") -> Edge:
         e = Edge(a, b, weight, edge_type=edge_type)
         self.addItem(e)
         self.edges.append(e)
@@ -160,4 +156,3 @@ class GraphScene(QGraphicsScene):
             e.setVisible(show_edge)
         # Update scene rect after visibility changes
         self.auto_scene_rect()
-

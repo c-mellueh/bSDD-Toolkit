@@ -45,8 +45,8 @@ if TYPE_CHECKING:
 
 
 class GraphWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.setWindowTitle("Force‑Directed Graph — PySide6 (Barnes–Hut)")
         self.scene = GraphScene()
         self.view = GraphView(self.scene)

@@ -21,7 +21,6 @@ from PySide6.QtGui import (
     QPainter,
     QPainterPath,
     QPen,
-
 )
 from PySide6.QtWidgets import (
     QApplication,
@@ -35,7 +34,7 @@ from PySide6.QtWidgets import (
     QSlider,
     QToolBar,
     QToolButton,
-    QFileDialog
+    QFileDialog,
 )
 
 # Edge pen styles
@@ -47,7 +46,11 @@ EDGE_STYLE_DEFAULT = {
 
 EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
     "class_rel": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
-    "class_to_prop": {"style": Qt.DotLine, "width": 1.5, "color": QColor(130, 130, 150)},
+    "class_to_prop": {
+        "style": Qt.DotLine,
+        "width": 1.5,
+        "color": QColor(130, 130, 150),
+    },
     "prop_rel": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
     "demo": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
 }
@@ -55,8 +58,8 @@ EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
 # Node colors and shapes
 NODE_COLOR_DEFAULT = QColor(80, 140, 255)
 NODE_COLOR_MAP: dict[str, QColor] = {
-    "class": QColor(220, 60, 60),     # red
-    "property": QColor(60, 120, 220), # blue
+    "class": QColor(220, 60, 60),  # red
+    "property": QColor(60, 120, 220),  # blue
     "demo": QColor(140, 200, 90),
     "generic": NODE_COLOR_DEFAULT,
 }
