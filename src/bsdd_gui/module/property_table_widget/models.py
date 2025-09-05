@@ -112,8 +112,6 @@ class ClassTableModel(ItemModel):
         return super().beginResetModel()
 
 
-
-
 # typing
 class SortModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwargs):

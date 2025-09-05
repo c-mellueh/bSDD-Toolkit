@@ -10,7 +10,12 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.ClassPropertyTableView, tool.ClassPropertyEditorWidget,tool.MainWindowWidget,tool.Project)
+    core.connect_signals(
+        tool.ClassPropertyTableView,
+        tool.ClassPropertyEditorWidget,
+        tool.MainWindowWidget,
+        tool.Project,
+    )
     core.connect_to_main_window(tool.ClassPropertyTableView, tool.MainWindowWidget)
 
 

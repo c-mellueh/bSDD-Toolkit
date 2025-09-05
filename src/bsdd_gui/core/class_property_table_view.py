@@ -1,7 +1,7 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QApplication, QTableView
 from typing import Type, TYPE_CHECKING
-from PySide6.QtCore import QModelIndex,QCoreApplication,QPoint
+from PySide6.QtCore import QModelIndex, QCoreApplication, QPoint
 from bsdd_json.utils import property_utils as prop_utils
 
 if TYPE_CHECKING:
@@ -18,7 +18,7 @@ def connect_signals(
 ):
     class_property_table.connect_internal_signals()
     class_property_editor.signals.new_class_property_created.connect(
-        lambda p: class_property_table.add_class_property(p, main_window.get_property_view())
+        lambda p: class_property_table.add_class_property(p, main_window.get_active_class())
     )
     class_property_table.signals.item_added.connect(project.signals.class_property_added.emit)
     class_property_table.signals.item_removed.connect(project.signals.class_property_removed.emit)

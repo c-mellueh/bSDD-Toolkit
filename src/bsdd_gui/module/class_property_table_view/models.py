@@ -61,30 +61,6 @@ class ClassPropertyTableModel(ItemModel):
     def setData(self, index, value, /, role=...):
         return False
 
-    def get_row_from_property(self, bsdd_property: BsddClassProperty):
-        for row in range(self.rowCount()):
-            if self.index(row, 0).internalPointer() == bsdd_property:
-                return row
-        return -1
-
-    def append_property(self, bsdd_property: BsddClassProperty):
-        bsdd_class = self.active_class
-        if bsdd_property in bsdd_class.ClassProperties:
-            return
-        row = self.rowCount()
-        self.beginInsertRows(QModelIndex(), row, row)
-        bsdd_class.ClassProperties.append(bsdd_property)
-        self.endInsertRows()
-
-    def remove_property(self, bsdd_property: BsddClassProperty):
-        row = self.get_row_from_property(bsdd_property)
-        bsdd_class = self.active_class
-        if bsdd_property not in bsdd_class.ClassProperties:
-            return
-        self.beginRemoveRows(QModelIndex(), row, row)
-        bsdd_class.ClassProperties.remove(bsdd_property)
-        self.endRemoveRows()
-
 
 # typing
 class SortModel(QSortFilterProxyModel):

@@ -15,6 +15,7 @@ from bsdd_json.models import BsddClass
 def connect_signals(property_set_table: Type[tool.PropertySetTableView]):
     property_set_table.connect_internal_signals()
 
+
 def retranslate_ui(property_set_table: Type[tool.PropertySetTableView]):
     return  # TODO
 
