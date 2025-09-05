@@ -57,4 +57,3 @@ def search_requested(view: QTreeView):
 
 def context_menu_requested(view: views.PropertyTable | views.ClassTable, pos):
     core.create_context_menu(view, pos, tool.PropertyTableWidget)
-

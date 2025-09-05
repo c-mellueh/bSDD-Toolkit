@@ -49,10 +49,9 @@ def connect_signals(
         elif isinstance(item, BsddPropertyRelation):
             project.signals.property_relation_added.emit(item)
 
-    
     relationship_editor.signals.item_added.connect(handle_item_add)
     relationship_editor.signals.item_removed.connect(handle_item_remove)
-    
+
     relationship_editor.signals.class_relation_added.connect(project.signals.class_relation_added)
     relationship_editor.signals.class_relation_removed.connect(
         project.signals.class_relation_removed

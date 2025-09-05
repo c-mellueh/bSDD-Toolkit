@@ -25,6 +25,7 @@ def connect_signals(
     property_table.signals.bsdd_class_double_clicked.connect(
         lambda c: main_window.get().activateWindow()
     )
+
     def handle_item_remove(item):
         if isinstance(item, BsddProperty):
             project.signals.property_removed.emit(item)
@@ -186,4 +187,3 @@ def search_property(
         return
     # Select the found property in the view and scroll to it
     property_table.select_property(bsdd_property, view)
-
