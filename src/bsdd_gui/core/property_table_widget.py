@@ -3,7 +3,7 @@ from PySide6.QtCore import QCoreApplication, Qt, QPoint
 from PySide6.QtWidgets import QWidget, QTreeView
 from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.property_table_widget import views, ui, models
-from bsdd_json import BsddProperty, BsddClass
+from bsdd_json import BsddProperty, BsddClass, BsddClassProperty
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -25,6 +25,20 @@ def connect_signals(
     property_table.signals.bsdd_class_double_clicked.connect(
         lambda c: main_window.get().activateWindow()
     )
+    def handle_item_remove(item):
+        if isinstance(item, BsddProperty):
+            project.signals.property_removed.emit(item)
+        elif isinstance(item, BsddClassProperty):
+            project.signals.class_property_removed.emit(item)
+
+    def handle_item_add(item):
+        if isinstance(item, BsddProperty):
+            project.signals.property_added.emit(item)
+        elif isinstance(item, BsddClassProperty):
+            project.signals.class_property_added.emit(item)
+
+    property_table.signals.item_added.connect(handle_item_add)
+    property_table.signals.item_removed.connect(handle_item_remove)
     property_table.connect_internal_signals()
 
 
@@ -173,24 +187,3 @@ def search_property(
     # Select the found property in the view and scroll to it
     property_table.select_property(bsdd_property, view)
 
-
-def delete_selection(
-    view: QTreeView, property_table: Type[tool.PropertyTableWidget], project: Type[tool.Project]
-):
-
-    selected_elements = property_table.get_selected(view)
-    if not selected_elements:
-        return
-    bsdd_dictionary = project.get()
-    if isinstance(selected_elements[0], BsddProperty):
-        for bsdd_property in selected_elements:
-            bsdd_dictionary.Properties.remove(bsdd_property)
-    elif isinstance(selected_elements[0], BsddClass):
-        selected_elements: list[BsddClass]
-        active_prop = property_table.get_active_property()
-        for cl in selected_elements:
-            for bsdd_class_property in list(cl.ClassProperties):
-                if bsdd_class_property.PropertyCode == active_prop.Code:
-                    cl.ClassProperties.remove(bsdd_class_property)
-                    project.signals.property_removed.emit(bsdd_class_property)
-    property_table.reset_view(view)
