@@ -132,11 +132,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         widget.le_owned_uri.setVisible(bsdd_dictionary.UseOwnUri)
 
     @classmethod
-    def update_code_completer(
-        cls,
-        widget: ui.RelationshipWidget,
-        bsdd_dictionary: BsddDictionary,
-    ):
+    def update_code_completer(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
         if isinstance(widget.bsdd_data, BsddClass):
             codes = [c.Code for c in bsdd_dictionary.Classes]
             if widget.cb_relation_type.currentText() == "HasMaterial":

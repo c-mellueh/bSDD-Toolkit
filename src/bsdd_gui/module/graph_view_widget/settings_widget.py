@@ -62,7 +62,9 @@ class GraphSettingsWidget(QWidget):
         btn_row.addWidget(self.btn_close)
         layout.addLayout(btn_row)
 
-    def _add_row(self, parent_layout: QVBoxLayout, label: QLabel, slider: QSlider, value_label: QLabel):
+    def _add_row(
+        self, parent_layout: QVBoxLayout, label: QLabel, slider: QSlider, value_label: QLabel
+    ):
         row = QHBoxLayout()
         row.addWidget(label)
         row.addWidget(slider, 1)
@@ -103,4 +105,3 @@ class GraphSettingsWidget(QWidget):
     def _on_rep_changed(self, v: int):
         self.physics.k_repulsion = float(v)
         self._update_value_labels()
-

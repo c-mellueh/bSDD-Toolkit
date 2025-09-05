@@ -41,7 +41,11 @@ class BsddDictionary(CaseInsensitiveModel):
 
     @property
     def base(self) -> str:
-        return self.DictionaryUri if self.UseOwnUri else "https://identifier.buildingsmart.org"
+        return (
+            self.DictionaryUri
+            if self.UseOwnUri
+            else "https://identifier.buildingsmart.org"
+        )
 
     @property
     def uri(self) -> str:
@@ -105,7 +109,9 @@ class BsddClass(CaseInsensitiveModel):
     ClassProperties: List[BsddClassProperty] = Field(default_factory=list)
     ClassRelations: List[BsddClassRelation] = Field(default_factory=list)
 
-    _parent_ref: Optional[weakref.ReferenceType["BsddDictionary"]] = PrivateAttr(default=None)
+    _parent_ref: Optional[weakref.ReferenceType["BsddDictionary"]] = PrivateAttr(
+        default=None
+    )
 
     def _set_parent(self, parent: "BsddDictionary") -> None:
         self._parent_ref = weakref.ref(parent)
@@ -192,7 +198,9 @@ class BsddClassProperty(CaseInsensitiveModel):
     SortNumber: Optional[int] = None
     Symbol: Optional[str] = None
     AllowedValues: List[BsddAllowedValue] = Field(default_factory=list)
-    _parent_ref: Optional[weakref.ReferenceType["BsddClass"]] = PrivateAttr(default=None)
+    _parent_ref: Optional[weakref.ReferenceType["BsddClass"]] = PrivateAttr(
+        default=None
+    )
 
     def _set_parent(self, parent: "BsddClass") -> None:
         self._parent_ref = weakref.ref(parent)
@@ -274,7 +282,9 @@ class BsddProperty(CaseInsensitiveModel):
     VisualRepresentationUri: Optional[str] = None
     PropertyRelations: List[BsddPropertyRelation] = Field(default_factory=list)
     AllowedValues: List[BsddAllowedValue] = Field(default_factory=list)
-    _parent_ref: Optional[weakref.ReferenceType["BsddDictionary"]] = PrivateAttr(default=None)
+    _parent_ref: Optional[weakref.ReferenceType["BsddDictionary"]] = PrivateAttr(
+        default=None
+    )
 
     def _set_parent(self, parent: "BsddDictionary") -> None:
         self._parent_ref = weakref.ref(parent)

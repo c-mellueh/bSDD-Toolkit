@@ -176,7 +176,7 @@ class WidgetTool(BaseTool):
     @abstractmethod
     def create_widget(cls, *args, **kwargs) -> FieldWidget:
         widget = cls._get_widget_class()(*args, **kwargs)
-        cls.get_properties().widgets.add(widget)
+        cls.get_properties().widgets.append(widget)
         cls.add_plugins_to_widget(widget)
         return widget
 
@@ -194,7 +194,7 @@ class WidgetTool(BaseTool):
     def register_widget(cls, widget: FieldWidget):
         logging.info(f"Register {widget}")
 
-        cls.get_properties().widgets.add(widget)
+        cls.get_properties().widgets.append(widget)
 
     @classmethod
     def unregister_widget(cls, widget: FieldWidget):

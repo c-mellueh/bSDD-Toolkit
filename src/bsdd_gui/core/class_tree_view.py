@@ -177,17 +177,13 @@ def group_selection(
     class_tree: Type[tool.ClassTreeView],
     class_editor: Type[tool.ClassEditorWidget],
 ):
-    bsdd_classes = class_tree.get_selected(
-        view,
-    )
+    bsdd_classes = class_tree.get_selected(view)
     if not bsdd_classes:
         return
     class_editor.request_class_grouping(bsdd_classes)
 
 
-def copy_selected_class(
-    view: ui.ClassView,
-):
+def copy_selected_class(view: ui.ClassView):
     pass  # TODO
 
 

@@ -208,7 +208,10 @@ class ClassTreeModel(ItemModel):
             sel.append(node)
 
         md = QMimeData()
-        md.setData(JSON_MIME, QByteArray(self._classes_to_json_bytes(sel, include_subtree=True)))
+        md.setData(
+            JSON_MIME,
+            QByteArray(self._classes_to_json_bytes(sel, include_subtree=True)),
+        )
         md.setData(CODES_MIME, QByteArray(json.dumps([c.Code for c in sel]).encode("utf-8")))
         md.setText(json.dumps([c.Code for c in sel], ensure_ascii=False))
         return md

@@ -40,14 +40,7 @@ from PySide6.QtGui import (
     QRadialGradient,
     QTransform,
 )
-from PySide6.QtWidgets import (
-    QApplication,
-    QComboBox,
-    QFormLayout,
-    QLabel,
-    QSizePolicy,
-    QWidget,
-)
+from PySide6.QtWidgets import QApplication, QComboBox, QFormLayout, QLabel, QSizePolicy, QWidget
 
 
 class Ui_Settings(object):

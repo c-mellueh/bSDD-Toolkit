@@ -303,7 +303,12 @@ class ClassPropertyEditorWidget(DialogTool):
     def create_temporary_property(cls, property_set, bsdd_class):
         code = QCoreApplication.translate("ClassPropertyEditor", "New Code")
         bsdd_class_property = BsddClassProperty.model_validate(
-            {"Code": code, "PropertyCode": code, "PropertyUri": None, "IsRequired": True}
+            {
+                "Code": code,
+                "PropertyCode": code,
+                "PropertyUri": None,
+                "IsRequired": True,
+            }
         )
         bsdd_class_property.PropertySet = property_set
         bsdd_class_property._set_parent(bsdd_class)

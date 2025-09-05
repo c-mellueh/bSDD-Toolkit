@@ -144,7 +144,6 @@ def register_validators(
 
 
 def remove_widget(
-    widget: ui.RelationshipWidget,
-    relationship_editor: Type[tool.RelationshipEditorWidget],
+    widget: ui.RelationshipWidget, relationship_editor: Type[tool.RelationshipEditorWidget]
 ):
     relationship_editor.unregister_widget(widget)

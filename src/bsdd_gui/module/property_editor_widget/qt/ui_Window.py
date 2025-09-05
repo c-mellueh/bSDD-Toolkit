@@ -750,7 +750,9 @@ class Ui_PropertyWindow(object):
         # if QT_CONFIG(tooltip)
         self.lb_replacing_objects.setToolTip(
             QCoreApplication.translate(
-                "PropertyWindow", "List of Property Codes this Property is replaced by", None
+                "PropertyWindow",
+                "List of Property Codes this Property is replaced by",
+                None,
             )
         )
         # endif // QT_CONFIG(tooltip)

@@ -133,7 +133,11 @@ class ToggleSwitch(QAbstractButton):
             pen = QPen(self.palette().color(QPalette.ColorRole.Highlight), 1.5, Qt.SolidLine)
         else:
             # Normal: fester Rahmen, z. B. MidText-Farbe
-            pen = QPen(self.palette().color(QPalette.ColorRole.AlternateBase), 1.2, Qt.SolidLine)
+            pen = QPen(
+                self.palette().color(QPalette.ColorRole.AlternateBase),
+                1.2,
+                Qt.SolidLine,
+            )
 
         p.setPen(pen)
         p.setBrush(Qt.NoBrush)

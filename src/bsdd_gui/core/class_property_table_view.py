@@ -53,10 +53,7 @@ def create_context_menu(
     pass
 
 
-def connect_view(
-    view: ui.ClassPropertyTable,
-    property_table: Type[tool.ClassPropertyTableView],
-):
+def connect_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]):
     def emit_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)
         bsdd_class_property = index.internalPointer()

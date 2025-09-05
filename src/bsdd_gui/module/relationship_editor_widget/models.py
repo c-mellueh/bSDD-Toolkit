@@ -24,12 +24,7 @@ from bsdd_gui.presets.models_presets import ItemModel
 
 class RelationshipModel(ItemModel):
 
-    def __init__(
-        self,
-        data: BsddClass | BsddProperty,
-        *args,
-        **kwargs,
-    ):
+    def __init__(self, data: BsddClass | BsddProperty, *args, **kwargs):
         super().__init__(tool.RelationshipEditorWidget, data, *args, **kwargs)
         self.bsdd_data: BsddClass | BsddProperty
         self.mode: Literal["dialog"] | Literal["live"] = None

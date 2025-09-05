@@ -53,9 +53,7 @@ class Appdata:
             config_parser.write(f)
 
     @classmethod
-    def _get_config(
-        cls,
-    ) -> CustomConfigParser:
+    def _get_config(cls) -> CustomConfigParser:
         ConfigParser()
         config = CustomConfigParser()
         config_path = cls.get_ini_path()

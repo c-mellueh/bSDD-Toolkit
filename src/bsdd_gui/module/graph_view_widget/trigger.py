@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 def connect():
     core.connect_signals(tool.GraphViewWidget)
     core.connect_to_main_window(tool.GraphViewWidget, tool.MainWindowWidget)
+    w = core.create_widget(tool.MainWindowWidget.get(), tool.GraphViewWidget, tool.MainWindowWidget)
+    w.hide()
 
 
 def retranslate_ui():
@@ -16,7 +18,7 @@ def retranslate_ui():
 
 
 def on_new_project():
-    pass
+    core.popuplate_widget(tool.GraphViewWidget, tool.Project)
 
 
 def widget_created(widget):

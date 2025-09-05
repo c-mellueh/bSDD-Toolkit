@@ -137,9 +137,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
 
     @classmethod
     def select_property(
-        cls,
-        bsdd_property: BsddProperty,
-        view: QAbstractItemView | None = None,
+        cls, bsdd_property: BsddProperty, view: QAbstractItemView | None = None
     ) -> bool:
         """
         Select the given BsddProperty in the properties table and scroll it into view.

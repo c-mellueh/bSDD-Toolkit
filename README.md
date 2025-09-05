@@ -100,8 +100,7 @@ new_d = BsddDictionary(
     DictionaryVersion="0.1.0",
     LanguageIsoCode="en-US",
     LanguageOnly=False,
-    UseOwnUri=False,
-)
+    UseOwnUri=False)
 # Create and add Classes
 class_1 = BsddClass(Code="Wall", Name="Wall", ClassType="Class")
 class_2 = BsddClass(Code="Slab", Name="Slab", ClassType="Class")

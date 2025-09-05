@@ -6,14 +6,7 @@ import re
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import FieldTool, ActionTool, FieldSignals
 from PySide6.QtCore import Qt, QDateTime, QObject, Signal
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QComboBox,
-    QFormLayout,
-    QWidget,
-    QLineEdit,
-    QLabel,
-)
+from PySide6.QtWidgets import QCheckBox, QComboBox, QFormLayout, QWidget, QLineEdit, QLabel
 from datetime import datetime
 from bsdd_gui import tool
 from bsdd_gui.module.dictionary_editor_widget import constants, ui, trigger

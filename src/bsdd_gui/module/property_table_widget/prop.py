@@ -1,9 +1,5 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import (
-    ActionsProperties,
-    ViewProperties,
-    FieldProperties,
-)
+from bsdd_gui.presets.prop_presets import ActionsProperties, ViewProperties, FieldProperties
 from bsdd_json import BsddProperty
 
 

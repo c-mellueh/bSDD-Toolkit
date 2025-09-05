@@ -95,11 +95,7 @@ class PropertyEditorWidget(DialogTool):
         return True
 
     @classmethod
-    def is_name_valid(
-        cls,
-        name: str,
-        widget: ui.PropertyEditor,
-    ):
+    def is_name_valid(cls, name: str, widget: ui.PropertyEditor):
         return bool(name)
 
     @classmethod

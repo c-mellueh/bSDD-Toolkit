@@ -30,7 +30,7 @@ class ShellWidget(WidgetTool):
     def get_widget(cls):
         if not cls.get_widgets():
             return None
-        return list(cls.get_widgets())[-1]
+        return cls.get_widgets()[-1]
 
     @classmethod
     def create_widget(cls):

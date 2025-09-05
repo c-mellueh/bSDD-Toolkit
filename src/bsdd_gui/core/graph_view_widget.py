@@ -13,8 +13,7 @@ def connect_signals(graph_view: Type[tool.GraphViewWidget]):
 
 
 def connect_to_main_window(
-    graph_view: Type[tool.GraphViewWidget],
-    main_window: Type[tool.MainWindowWidget],
+    graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
 ):
     # Action uses the WidgetTool request to allow trigger routing
     action = main_window.add_action("menuData", "Graph View", lambda: graph_view.request_widget())
@@ -22,8 +21,7 @@ def connect_to_main_window(
 
 
 def retranslate_ui(
-    graph_view: Type[tool.GraphViewWidget],
-    main_window: Type[tool.MainWindowWidget],
+    graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
 ):
     action = graph_view.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("GraphView", "Graph View"))
@@ -35,10 +33,12 @@ def create_widget(
     main_window: Type[tool.MainWindowWidget],
 ):
     # Default parent to the main window if not provided
-    if parent is None:
-        parent = main_window.get()
-    w = graph_view.create_widget(parent)
-    # Show as independent window
+    w = graph_view.get_widget()
+    if w is None:
+        if parent is None:
+            parent = main_window.get()
+        w = graph_view.create_widget(parent)
+        # Show as independent window
     w.show()
     w.activateWindow()
     w.raise_()
@@ -51,3 +51,10 @@ def register_widget(widget, graph_view: Type[tool.GraphViewWidget]):
 
 def connect_widget(widget, graph_view: Type[tool.GraphViewWidget]):
     graph_view.connect_widget_signals(widget)
+
+
+def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
+    widget = graph_view.get_widget()
+    if widget is None:
+        return
+    graph_view.populate_from_bsdd(widget, project.get())

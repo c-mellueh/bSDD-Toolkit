@@ -143,7 +143,9 @@ def shared_parent(
         first = cls_list[0]
         dictionary = first.parent()
         if dictionary is None:
-            raise ValueError("shared_parent: dictionary not provided and parent is not set.")
+            raise ValueError(
+                "shared_parent: dictionary not provided and parent is not set."
+            )
 
     # Build top-down ancestor path for the first class and an index by Code -> depth
     path0 = _ancestors_topdown(cls_list[0], dictionary)
@@ -159,9 +161,13 @@ def shared_parent(
 
     # Choose highest (min depth) or lowest (max depth) among the shared set
     if mode == "highest":
-        code, _ = min(((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1])
+        code, _ = min(
+            ((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1]
+        )
     else:  # "lowest"
-        code, _ = max(((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1])
+        code, _ = max(
+            ((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1]
+        )
 
     return get_class_by_code(dictionary, code)
 

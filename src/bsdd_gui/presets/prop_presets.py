@@ -37,7 +37,7 @@ class PluginProperty:
 class WidgetProperties:
     def __init__(self):
         super().__init__()
-        self.widgets = set()
+        self.widgets = list()
         self.plugin_widget_list: list[PluginProperty] = list()
 
 

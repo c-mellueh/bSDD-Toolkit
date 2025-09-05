@@ -57,9 +57,7 @@ def register_fields(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorW
 
     class_editor.register_field_getter(widget, widget.cb_status, lambda c: c.Status)
     class_editor.register_field_setter(
-        widget,
-        widget.cb_status,
-        lambda e, v: setattr(e, "Status", v),
+        widget, widget.cb_status, lambda e, v: setattr(e, "Status", v)
     )
 
     class_editor.register_field_getter(
@@ -102,8 +100,7 @@ def connect_widget(
 
 
 def connect_to_main_window(
-    class_editor: Type[tool.ClassEditorWidget],
-    main_window: Type[tool.MainWindowWidget],
+    class_editor: Type[tool.ClassEditorWidget], main_window: Type[tool.MainWindowWidget]
 ):
     def emit_class_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)

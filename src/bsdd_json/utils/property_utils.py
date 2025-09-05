@@ -75,7 +75,9 @@ def get_internal_property(
             return p
 
 
-def get_external_property(class_property: BsddClassProperty, client=None) -> BsddProperty | None:
+def get_external_property(
+    class_property: BsddClassProperty, client=None
+) -> BsddProperty | None:
     return Cache.get_external_property(class_property.PropertyUri, client)
 
 
@@ -119,7 +121,9 @@ def get_classes_with_bsdd_property(property_code: str, bsdd_dictionary: BsddDict
     return list(filter(_has_prop, bsdd_dictionary.Classes))
 
 
-def get_property_by_code(code: str, bsdd_dictionary: BsddDictionary) -> BsddProperty | None:
+def get_property_by_code(
+    code: str, bsdd_dictionary: BsddDictionary
+) -> BsddProperty | None:
     if dict_utils.is_uri(code):
         prop = Cache.get_external_property(code)
     else:
@@ -127,7 +131,9 @@ def get_property_by_code(code: str, bsdd_dictionary: BsddDictionary) -> BsddProp
     return prop
 
 
-def update_relations_to_new_uri(bsdd_proeprty: BsddProperty, bsdd_dictionary: BsddDictionary):
+def update_relations_to_new_uri(
+    bsdd_proeprty: BsddProperty, bsdd_dictionary: BsddDictionary
+):
     namespace = f"{bsdd_dictionary.OrganizationCode}/{bsdd_dictionary.DictionaryCode}"
     version = bsdd_dictionary.DictionaryVersion
 

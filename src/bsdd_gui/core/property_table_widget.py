@@ -49,7 +49,7 @@ def create_widget(
     main_window: Type[tool.MainWindowWidget],
 ):
     if property_table.get_widgets():
-        widget = list(property_table.get_widgets())[-1]
+        widget = property_table.get_widgets()[-1]
     else:
         widget = property_table.create_widget(None)
 
@@ -76,8 +76,7 @@ def register_view(
 
 
 def add_columns_to_view(
-    view: views.PropertyTable | views.ClassTable,
-    property_table: Type[tool.PropertyTableWidget],
+    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTableWidget]
 ):
 
     if isinstance(view, views.PropertyTable):
@@ -96,8 +95,7 @@ def add_columns_to_view(
 
 
 def add_context_menu_to_view(
-    view: views.PropertyTable | views.ClassTable,
-    property_table: Type[tool.PropertyTableWidget],
+    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTableWidget]
 ):
 
     if isinstance(view, views.PropertyTable):
@@ -152,8 +150,7 @@ def remove_view(
 
 
 def connect_to_main_menu(
-    property_table: Type[tool.PropertyTableWidget],
-    main_window: Type[tool.MainWindowWidget],
+    property_table: Type[tool.PropertyTableWidget], main_window: Type[tool.MainWindowWidget]
 ) -> None:
     action = main_window.add_action(
         "menuData",

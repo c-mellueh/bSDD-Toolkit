@@ -61,8 +61,7 @@ def add_columns_to_view(
 
 
 def add_context_menu_to_view(
-    view: ui.PsetTableView,
-    property_set_table: Type[tool.PropertySetTableView],
+    view: ui.PsetTableView, property_set_table: Type[tool.PropertySetTableView]
 ):
     # TODO
     pass
@@ -80,8 +79,7 @@ def connect_view(
 
 
 def connect_to_main_window(
-    property_set_table: Type[tool.PropertySetTableView],
-    main_window: Type[tool.MainWindowWidget],
+    property_set_table: Type[tool.PropertySetTableView], main_window: Type[tool.MainWindowWidget]
 ):
     def reset_pset(new_class: BsddClass):
         """

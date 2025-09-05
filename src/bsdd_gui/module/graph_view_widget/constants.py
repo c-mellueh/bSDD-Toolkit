@@ -8,20 +8,8 @@ Styling registries for easy expansion of visuals.
 - NODE_SHAPE_MAP: per node_type shape keyword (rect, roundrect, ellipse)
 """
 
-from PySide6.QtCore import (
-    QPointF,
-    QRectF,
-    Qt,
-    QTimer,
-)
-from PySide6.QtGui import (
-    QBrush,
-    QColor,
-    QFontMetrics,
-    QPainter,
-    QPainterPath,
-    QPen,
-)
+from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
+from PySide6.QtGui import QBrush, QColor, QFontMetrics, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QApplication,
     QGraphicsItem,

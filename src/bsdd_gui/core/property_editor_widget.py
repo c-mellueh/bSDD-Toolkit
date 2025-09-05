@@ -69,10 +69,7 @@ def create_dialog(
         property_editor.signals.dialog_declined.emit(dialog)
 
 
-def register_widget(
-    widget: ui.PropertyEditor,
-    property_editor: Type[tool.PropertyEditorWidget],
-):
+def register_widget(widget: ui.PropertyEditor, property_editor: Type[tool.PropertyEditorWidget]):
     property_editor.register_widget(widget)
     widget.tv_allowed_values.model().sourceModel().bsdd_data = widget.bsdd_data
 

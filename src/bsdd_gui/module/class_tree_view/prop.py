@@ -9,7 +9,5 @@ if TYPE_CHECKING:
     from . import ui, models
 
 
-class ClassTreeViewProperties(
-    ViewProperties,
-):
+class ClassTreeViewProperties(ViewProperties):
     models: dict[BsddDictionary, models.ClassTreeModel]
