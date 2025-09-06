@@ -45,7 +45,7 @@ class GraphWindow(QMainWindow):
         self.resize(1000, 700)
         # Track whether we auto-paused due to the window being hidden
         self._auto_paused = False
-
+        self._settings_widget = None
     def _build_toolbar(self):
         tb = QToolBar("Controls")
         tb.setMovable(False)
@@ -134,10 +134,7 @@ class GraphWindow(QMainWindow):
         # print("[DEBUG] GraphWindow._clear: scene cleared")
 
     def _open_settings(self):
-        try:
-            w = self._settings_widget
-        except AttributeError:
-            w = None
+        w = self._settings_widget
         if w is None or not w.isVisible():
             self._settings_widget = GraphSettingsWidget(self.scene.physics, self)
             w = self._settings_widget

@@ -34,20 +34,28 @@ class EdgeData:
 
 class Edge(QGraphicsPathItem):
 
-    def __init__(self, a: "Node", b: "Node", weight: float = 1.0, edge_type: str = "generic"):
+    def __init__(
+        self,
+        start_node: "Node",
+        end_node: "Node",
+        weight: float = 1.0,
+        edge_type: str = "generic",
+        edge_data=None,
+    ):
         super().__init__()
-        self.a = a
-        self.b = b
+        self.start_node = start_node
+        self.end_node = end_node
         self.weight = weight
         self.edge_type = edge_type
         self.setZValue(-1)
         self.update_pen()
         self.update_path()
+        self.edge_data = edge_data
 
     def update_path(self):
         path = QPainterPath()
-        path.moveTo(self.a.pos())
-        path.lineTo(self.b.pos())
+        path.moveTo(self.start_node.pos())
+        path.lineTo(self.end_node.pos())
         self.setPath(path)
 
     def update_pen(self):
@@ -177,6 +185,8 @@ class Node(QGraphicsObject):
             sc = self.scene()
             if sc:
                 for edge in sc.items():
-                    if isinstance(edge, Edge) and (edge.a is self or edge.b is self):
+                    if isinstance(edge, Edge) and (
+                        edge.start_node is self or edge.end_node is self
+                    ):
                         edge.update_path()
         return super().itemChange(change, value)

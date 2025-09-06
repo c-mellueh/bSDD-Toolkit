@@ -30,9 +30,51 @@ from PySide6.QtWidgets import (
 PROPERTY_DRAG = "property_drag"
 CLASS_DRAG = "class_drag"
 ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
+
+# Node Types
 PROPERTY_NODE_TYPE = "property"
 CLASS_NODE_TYPE = "bsdd_class"
 GENERIC_NODE_TYPE = "generic"
+
+# Edge Type
+CLASS_PROPERTY_REL = "ClassProperty"
+MATERIAL_REL = "HasMaterial"
+REFERENCE_REL = "HasReference"
+IS_EQUAL_REL = "IsEqualTo"
+IS_SIMILAR_REL = "IsSimilarTo"
+IS_PARENT_REL = "IsParentOf"
+IS_CHILD_REL = "IsChildOf"
+HAS_PART_REL = "HasPart"
+IS_PART_REL = "IsPartOf"
+PARENT_CLASS = "ParentClassCode"
+GENERIC_REL = "generic"
+
+ALLOWED_EDGE_TYPES = [
+    CLASS_PROPERTY_REL,
+    MATERIAL_REL,
+    REFERENCE_REL,
+    IS_EQUAL_REL,
+    IS_SIMILAR_REL,
+    IS_PARENT_REL,
+    IS_CHILD_REL,
+    HAS_PART_REL,
+    IS_PART_REL,
+    PARENT_CLASS,
+    GENERIC_REL,
+]
+ALLOWED_EDGE_TYPES_TYPING = Literal[
+    "ClassProperty",
+    "HasMaterial",
+    "HasReference",
+    "IsEqualTo",
+    "IsSimilarTo",
+    "IsParentOf",
+    "IsChildOf",
+    "HasPart",
+    "IsPartOf",
+    "ParentClassCode",
+    "generic",
+]
 
 # Edge pen styles
 EDGE_STYLE_DEFAULT = {

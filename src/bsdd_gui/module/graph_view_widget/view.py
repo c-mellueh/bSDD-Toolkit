@@ -122,7 +122,11 @@ class GraphScene(QGraphicsScene):
         self.physics.gravity_center = self.sceneRect().center()
         # Only simulate visible items
         vis_nodes = [n for n in self.nodes if n.isVisible()]
-        vis_edges = [e for e in self.edges if e.isVisible() and e.a.isVisible() and e.b.isVisible()]
+        vis_edges = [
+            e
+            for e in self.edges
+            if e.isVisible() and e.start_node.isVisible() and e.end_node.isVisible()
+        ]
         if vis_nodes:
             self.physics.step(vis_nodes, vis_edges, dt=1.0)
         # Update visible edges' geometry
@@ -131,31 +135,6 @@ class GraphScene(QGraphicsScene):
 
     def set_running(self, run: bool):
         self.running = run
-
-    def add_node(
-        self,
-        bsdd_data: BsddClass | BsddProperty,
-        pos: Optional[QPointF] = None,
-        color: Optional[QColor] = None,
-    ) -> Node:
-
-        n = Node(bsdd_data, color=color)
-
-        p = (
-            pos
-            if pos is not None
-            else QPointF(random.uniform(-150, 150), random.uniform(-150, 150))
-        )
-        n.setPos(p)
-        self.addItem(n)
-        self.nodes.append(n)
-        return n
-
-    def add_edge(self, a: Node, b: Node, weight: float = 1.0, edge_type: str = "generic") -> Edge:
-        e = Edge(a, b, weight, edge_type=edge_type)
-        self.addItem(e)
-        self.edges.append(e)
-        return e
 
     def clear_graph(self):
         for e in self.edges:
@@ -185,7 +164,7 @@ class GraphScene(QGraphicsScene):
             n.setVisible(show)
         for e in self.edges:
             show_edge = edge_flags.get(e.edge_type, True)
-            show_edge = show_edge and e.a.isVisible() and e.b.isVisible()
+            show_edge = show_edge and e.start_node.isVisible() and e.end_node.isVisible()
             e.setVisible(show_edge)
         # Update scene rect after visibility changes
         self.auto_scene_rect()

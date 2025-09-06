@@ -283,7 +283,7 @@ class Physics:
 
         # Edge springs
         for e in edges:
-            a, b = e.a, e.b
+            a, b = e.start_node, e.end_node
             delta = b.pos() - a.pos()
             d = math.hypot(delta.x(), delta.y()) or 0.0001
             force_mag = self.k_spring * (d - self.spring_length) * e.weight

@@ -7,7 +7,8 @@ from PySide6.QtGui import QDropEvent
 from bsdd_gui.module.graph_view_widget import constants
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.graph_view_widget.view import GraphView
+    from bsdd_gui.module.graph_view_widget.view import GraphView, GraphScene
+    from bsdd_gui.module.graph_view_widget import graphics_items
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -99,10 +100,34 @@ def handle_drop_event(
         return
 
     scene = view.scene()
-    graph_view.insert_classes_in_scene(scene, classes_to_add, scene_pos)
-    graph_view.insert_properties_in_scene(scene, properties_to_add, scene_pos)
+    new_class_nodes = graph_view.insert_classes_in_scene(scene, classes_to_add, scene_pos)
+    new_property_nodes = graph_view.insert_properties_in_scene(scene, properties_to_add, scene_pos)
+    recalculate_relationships(view, graph_view, project)
     try:
         scene.auto_scene_rect()
     except Exception:
         pass
     event.acceptProposedAction()
+
+
+def recalculate_relationships(
+    view: GraphView, graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]
+):
+    bsdd_dictionary = project.get()
+
+    scene: GraphScene = view.scene()
+    if not scene:
+        return
+    nodes = scene.nodes
+    edges = scene.edges
+    class_codes, full_class_uris, property_codes, full_property_uris, relations_dict = (
+        graph_view.get_code_dicts(scene, bsdd_dictionary)
+    )
+    new_edges = graph_view.find_class_relations(nodes, class_codes, full_class_uris, relations_dict)
+    new_edges += graph_view.find_class_property_relations(nodes, property_codes, relations_dict)
+    new_edges += graph_view.find_property_relations(
+        nodes, property_codes, full_property_uris, relations_dict
+    )
+    for edge in new_edges:
+        graph_view.add_edge(scene, edge)
+        relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node)] = edge
