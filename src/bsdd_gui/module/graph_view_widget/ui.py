@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (
 
 from bsdd_gui.module.graph_view_widget.view import GraphScene, GraphView
 from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES
-from bsdd_gui.module.graph_view_widget.edge_type_settings import EdgeTypeSettingsWidget
+from bsdd_gui.module.graph_view_widget.edge_type_settings import EdgeSettingsSidebar
 from bsdd_gui.module.graph_view_widget.settings_widget import GraphSettingsWidget
 from typing import TYPE_CHECKING
 
@@ -51,16 +51,21 @@ class GraphWindow(QMainWindow):
         # Edge type visibility state and overlay settings panel
         self._edge_type_flags: Dict[str, bool] = {et: True for et in ALLOWED_EDGE_TYPES}
         try:
-            self._edge_settings = EdgeTypeSettingsWidget(
+            self._edge_sidebar = EdgeSettingsSidebar(
                 allowed_edge_types=ALLOWED_EDGE_TYPES,
                 on_toggle=self._on_edge_type_toggled,
                 parent=self.view.viewport(),
             )
-            self._edge_settings.show()
+            # Reposition when the sidebar is expanded/collapsed
+            try:
+                self._edge_sidebar.expandedChanged.connect(lambda _: self._position_edge_settings())
+            except Exception:
+                pass
+            self._edge_sidebar.show()
             self._position_edge_settings()
         except Exception:
             # Fail-safe: if overlay can't be created (e.g., headless), skip
-            self._edge_settings = None
+            self._edge_sidebar = None
     def _build_toolbar(self):
         tb = QToolBar("Controls")
         tb.setMovable(False)
@@ -91,6 +96,29 @@ class GraphWindow(QMainWindow):
         tb.addWidget(btn_settings)
 
         tb.addSeparator()
+
+        # Edge toggles (legacy/demo groupings)
+        tb.addWidget(QLabel("Edges:"))
+        self.tg_edge_class_rel = QToolButton()
+        self.tg_edge_class_rel.setText("Class↔Class")
+        self.tg_edge_class_rel.setCheckable(True)
+        self.tg_edge_class_rel.setChecked(True)
+        self.tg_edge_class_rel.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_edge_class_rel)
+
+        self.tg_edge_prop_rel = QToolButton()
+        self.tg_edge_prop_rel.setText("Prop↔Prop")
+        self.tg_edge_prop_rel.setCheckable(True)
+        self.tg_edge_prop_rel.setChecked(True)
+        self.tg_edge_prop_rel.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_edge_prop_rel)
+
+        self.tg_edge_cl_to_prop = QToolButton()
+        self.tg_edge_cl_to_prop.setText("Class→Prop")
+        self.tg_edge_cl_to_prop.setCheckable(True)
+        self.tg_edge_cl_to_prop.setChecked(True)
+        self.tg_edge_cl_to_prop.clicked.connect(self._apply_filters)
+        tb.addWidget(self.tg_edge_cl_to_prop)
 
         # Node toggles
         tb.addWidget(QLabel("Nodes:"))
@@ -168,20 +196,14 @@ class GraphWindow(QMainWindow):
         self._apply_filters()
 
     def _position_edge_settings(self) -> None:
-        if not hasattr(self, "_edge_settings") or self._edge_settings is None:
+        if not hasattr(self, "_edge_sidebar") or self._edge_sidebar is None:
             return
         try:
             vp = self.view.viewport()
             if vp is None:
                 return
-            margin = 10
-            # Ensure correct size before positioning
-            self._edge_settings.adjustSize()
-            w = self._edge_settings.width()
-            h = self._edge_settings.height()
-            x = max(0, vp.width() - w - margin)
-            y = max(0, vp.height() - h - margin)
-            self._edge_settings.move(x, y)
+            margin = 6
+            self._edge_sidebar.position_and_resize(vp.width(), vp.height(), margin=margin)
         except Exception:
             pass
 

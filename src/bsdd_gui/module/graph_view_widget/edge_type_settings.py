@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from typing import Callable, Dict, Iterable
 
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
     QFrame,
+    QToolButton,
+    QSizePolicy,
+    QScrollArea,
 )
 from PySide6.QtGui import QPainter, QPen, QColor
 
@@ -60,6 +63,8 @@ class EdgeTypeSettingsWidget(QFrame):
         root = QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
         root.setSpacing(6)
+        # Ensure it can stretch vertically when hosted in a sidebar
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
         title = QLabel("Edge Types")
         title.setObjectName("titleLabel")
@@ -138,3 +143,98 @@ class _EdgeLegendIcon(QWidget):
         pen = self._pen_for_edge()
         p.setPen(pen)
         p.drawLine(int(x1), int(y), int(x2), int(y))
+
+
+class EdgeSettingsSidebar(QWidget):
+    """Right-side overlay that hosts the EdgeTypeSettingsWidget and a
+    collapsible arrow button. Intended to be parented to a QGraphicsView's
+    viewport so it can overlay and match the viewport height.
+    """
+
+    # Emitted when expanded/collapsed state changes so the owner can reposition
+    expandedChanged = Signal(bool)
+
+    def __init__(
+        self,
+        allowed_edge_types: Iterable[str],
+        on_toggle: Callable[[str, bool], None],
+        parent: QWidget | None = None,
+        expanded_width: int = 240,
+    ) -> None:
+        super().__init__(parent)
+        self._expanded_width = max(160, int(expanded_width))
+        self._expanded = True
+
+        self.setObjectName("EdgeSettingsSidebar")
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setStyleSheet(
+            """
+            QWidget#EdgeSettingsSidebar {
+                background: transparent;
+            }
+            """
+        )
+
+        root = QHBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
+
+        # Collapse/Expand handle
+        self._btn = QToolButton(self)
+        self._btn.setArrowType(Qt.RightArrow)
+        self._btn.setCheckable(True)
+        self._btn.setChecked(True)
+        self._btn.clicked.connect(self._on_toggle_clicked)
+        self._btn.setToolTip("Show/Hide edge types")
+        self._btn.setFixedWidth(18)
+        self._btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        root.addWidget(self._btn)
+
+        # Scroll area hosting the settings panel
+        self._scroll = QScrollArea(self)
+        self._scroll.setFrameShape(QFrame.NoFrame)
+        self._scroll.setWidgetResizable(True)
+        self._content = EdgeTypeSettingsWidget(allowed_edge_types, on_toggle, parent=None)
+        self._scroll.setWidget(self._content)
+        root.addWidget(self._scroll, 1)
+
+        self._apply_expanded_state()
+
+    # Public API
+    def get_flags(self) -> Dict[str, bool]:
+        return self._content.get_flags()
+
+    def set_flag(self, edge_type: str, value: bool) -> None:
+        self._content.set_flag(edge_type, value)
+
+    def set_expanded(self, expanded: bool) -> None:
+        if self._expanded == bool(expanded):
+            return
+        self._expanded = bool(expanded)
+        self._btn.setChecked(self._expanded)
+        self._apply_expanded_state()
+        # Notify owner (e.g., GraphWindow) to re-anchor on the right edge
+        try:
+            self.expandedChanged.emit(self._expanded)
+        except Exception:
+            pass
+
+    def toggle(self) -> None:
+        self.set_expanded(not self._expanded)
+
+    def position_and_resize(self, viewport_width: int, viewport_height: int, margin: int = 0) -> None:
+        """Anchor to top-right of the given viewport size and stretch to full height."""
+        width = self._btn.width() + (self._expanded_width if self._expanded else 0)
+        x = max(0, viewport_width - width - margin)
+        y = margin
+        h = max(0, viewport_height - 2 * margin)
+        self.setGeometry(x, y, width, h)
+
+    # Internal
+    def _apply_expanded_state(self) -> None:
+        self._scroll.setVisible(self._expanded)
+        self._btn.setArrowType(Qt.RightArrow if not self._expanded else Qt.LeftArrow)
+        self.updateGeometry()
+
+    def _on_toggle_clicked(self):
+        self.set_expanded(self._btn.isChecked())
