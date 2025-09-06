@@ -84,14 +84,21 @@ EDGE_STYLE_DEFAULT = {
 }
 
 EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
-    "class_rel": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
-    "class_to_prop": {
-        "style": Qt.DotLine,
+    PARENT_CLASS: {"style": Qt.PenStyle.DotLine, "width": 1.5, "color": QColor(130, 130, 0)},
+    CLASS_PROPERTY_REL: {
+        "style": Qt.PenStyle.DashDotDotLine,
         "width": 1.5,
-        "color": QColor(130, 130, 150),
+        "color": QColor(130, 130, 20),
     },
-    "prop_rel": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
-    "demo": {"style": Qt.SolidLine, "width": 1.5, "color": QColor(130, 130, 150)},
+    MATERIAL_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 40)},
+    REFERENCE_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 60)},
+    IS_EQUAL_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 80)},
+    IS_SIMILAR_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 100)},
+    IS_PARENT_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 120)},
+    IS_CHILD_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 140)},
+    HAS_PART_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 160)},
+    IS_PART_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 180)},
+    GENERIC_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 220)},
 }
 
 # Node colors and shapes

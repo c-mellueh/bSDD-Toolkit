@@ -25,6 +25,8 @@ from PySide6.QtWidgets import (
 )
 
 from bsdd_gui.module.graph_view_widget.view import GraphScene, GraphView
+from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES
+from bsdd_gui.module.graph_view_widget.edge_type_settings import EdgeTypeSettingsWidget
 from bsdd_gui.module.graph_view_widget.settings_widget import GraphSettingsWidget
 from typing import TYPE_CHECKING
 
@@ -46,6 +48,19 @@ class GraphWindow(QMainWindow):
         # Track whether we auto-paused due to the window being hidden
         self._auto_paused = False
         self._settings_widget = None
+        # Edge type visibility state and overlay settings panel
+        self._edge_type_flags: Dict[str, bool] = {et: True for et in ALLOWED_EDGE_TYPES}
+        try:
+            self._edge_settings = EdgeTypeSettingsWidget(
+                allowed_edge_types=ALLOWED_EDGE_TYPES,
+                on_toggle=self._on_edge_type_toggled,
+                parent=self.view.viewport(),
+            )
+            self._edge_settings.show()
+            self._position_edge_settings()
+        except Exception:
+            # Fail-safe: if overlay can't be created (e.g., headless), skip
+            self._edge_settings = None
     def _build_toolbar(self):
         tb = QToolBar("Controls")
         tb.setMovable(False)
@@ -149,7 +164,7 @@ class GraphWindow(QMainWindow):
                 self.tg_nodes_prop.isChecked() if hasattr(self, "tg_nodes_prop") else True
             ),
         }
-        edge_flags = {
+        edge_flags: Dict[str, bool] = {
             "class_rel": (
                 self.tg_edge_class_rel.isChecked() if hasattr(self, "tg_edge_class_rel") else True
             ),
@@ -161,10 +176,37 @@ class GraphWindow(QMainWindow):
             ),
             # default types (e.g., demo) remain visible by default
         }
+        # Merge per-edge-type toggles from the overlay
+        try:
+            edge_flags.update(self._edge_type_flags)
+        except Exception:
+            pass
         # Apply to scene
         self.scene.apply_filters(node_flags, edge_flags)
 
         self.scene.auto_scene_rect()
+
+    def _on_edge_type_toggled(self, edge_type: str, checked: bool) -> None:
+        self._edge_type_flags[edge_type] = checked
+        self._apply_filters()
+
+    def _position_edge_settings(self) -> None:
+        if not hasattr(self, "_edge_settings") or self._edge_settings is None:
+            return
+        try:
+            vp = self.view.viewport()
+            if vp is None:
+                return
+            margin = 10
+            # Ensure correct size before positioning
+            self._edge_settings.adjustSize()
+            w = self._edge_settings.width()
+            h = self._edge_settings.height()
+            x = max(0, vp.width() - w - margin)
+            y = max(0, vp.height() - h - margin)
+            self._edge_settings.move(x, y)
+        except Exception:
+            pass
 
     # ---- Visibility handling ----
     def hideEvent(self, event):
@@ -184,7 +226,14 @@ class GraphWindow(QMainWindow):
             self._auto_paused = False
             if hasattr(self, "btn_play"):
                 self.btn_play.setText("Pause")
+        # Keep overlay anchored
+        self._position_edge_settings()
         return super().showEvent(event)
+
+    def resizeEvent(self, event):
+        # Re-anchor the overlay in the bottom-right corner of the viewport
+        self._position_edge_settings()
+        return super().resizeEvent(event)
 
 
 if __name__ == "__main__":
