@@ -24,8 +24,23 @@ from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
 if TYPE_CHECKING:
     from .ui import GraphWindow
     from .view import GraphScene
+SETTINGS_STYLE_SHEET = """
+            QFrame#EdgeTypeSettingsWidget {
+                background: rgba(30, 30, 35, 200);
+                border: 1px solid rgba(90, 90, 120, 140);
+                border-radius: 6px;
+            }
+            QLabel#titleLabel {
+                color: #ddd;
+                font-weight: bold;
+            }
+            QLabel {
+                color: #ddd;
+            }
+            """
 
-class GraphSettingsWidget(QWidget):
+
+class GraphSettingsWidget(QFrame):
     """Floating settings panel for Graph physics sliders."""
 
     def __init__(self, physics, parent=None):
@@ -35,10 +50,17 @@ class GraphSettingsWidget(QWidget):
 
         self._build_ui()
         self._sync_from_physics()
+        self.setFrameShape(QFrame.StyledPanel)
+        self.setFrameShadow(QFrame.Raised)
+        self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground, False)
+        self.setStyleSheet(SETTINGS_STYLE_SHEET)
 
     def _build_ui(self):
         layout = QVBoxLayout(self)
-
+        title = QLabel("Physics Settings")
+        title.setObjectName("titleLabel")
+        layout.addWidget(title)
         # Spring length (L0)
         self.lb_l0 = QLabel("L₀ (spring length)")
         self.sl_l0 = QSlider(Qt.Horizontal)
@@ -134,22 +156,7 @@ class EdgeTypeSettingsWidget(QFrame):
         self.setFrameShadow(QFrame.Raised)
         self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, False)
-        self.setStyleSheet(
-            """
-            QFrame#EdgeTypeSettingsWidget {
-                background: rgba(30, 30, 35, 200);
-                border: 1px solid rgba(90, 90, 120, 140);
-                border-radius: 6px;
-            }
-            QLabel#titleLabel {
-                color: #ddd;
-                font-weight: bold;
-            }
-            QLabel {
-                color: #ddd;
-            }
-            """
-        )
+        self.setStyleSheet(SETTINGS_STYLE_SHEET)
 
         root = QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
@@ -236,7 +243,7 @@ class _EdgeLegendIcon(QWidget):
         p.drawLine(int(x1), int(y), int(x2), int(y))
 
 
-class EdgeSettingsSidebar(QWidget):
+class SettingsSidebar(QWidget):
     """Right-side overlay that hosts the EdgeTypeSettingsWidget and a
     collapsible arrow button. Intended to be parented to a QGraphicsView's
     viewport so it can overlay and match the viewport height.

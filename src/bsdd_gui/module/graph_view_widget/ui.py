@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (
 
 from bsdd_gui.module.graph_view_widget.view import GraphScene, GraphView
 from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES
-from bsdd_gui.module.graph_view_widget.edge_type_settings import EdgeSettingsSidebar
+from bsdd_gui.module.graph_view_widget.edge_type_settings import SettingsSidebar
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -50,21 +50,24 @@ class GraphWindow(QMainWindow):
         # Edge type visibility state and overlay settings panel
         self._edge_type_flags: Dict[str, bool] = {et: True for et in ALLOWED_EDGE_TYPES}
         try:
-            self._edge_sidebar = EdgeSettingsSidebar(self,
+            self.settings_sidebar = SettingsSidebar(
+                self,
                 allowed_edge_types=ALLOWED_EDGE_TYPES,
                 on_toggle=self._on_edge_type_toggled,
                 parent=self.view.viewport(),
             )
             # Reposition when the sidebar is expanded/collapsed
             try:
-                self._edge_sidebar.expandedChanged.connect(lambda _: self._position_edge_settings())
+                self.settings_sidebar.expandedChanged.connect(
+                    lambda _: self._position_edge_settings()
+                )
             except Exception:
                 pass
-            self._edge_sidebar.show()
+            self.settings_sidebar.show()
             self._position_edge_settings()
         except Exception:
             # Fail-safe: if overlay can't be created (e.g., headless), skip
-            self._edge_sidebar = None
+            self.settings_sidebar = None
     def _build_toolbar(self):
         tb = QToolBar("Controls")
         tb.setMovable(False)
@@ -87,7 +90,6 @@ class GraphWindow(QMainWindow):
         btn_clear.setText("Clear")
         btn_clear.clicked.connect(self._clear)
         tb.addWidget(btn_clear)
-
 
         tb.addSeparator()
 
@@ -181,14 +183,14 @@ class GraphWindow(QMainWindow):
         self._apply_filters()
 
     def _position_edge_settings(self) -> None:
-        if not hasattr(self, "_edge_sidebar") or self._edge_sidebar is None:
+        if not hasattr(self, "settings_sidebar") or self.settings_sidebar is None:
             return
         try:
             vp = self.view.viewport()
             if vp is None:
                 return
             margin = 6
-            self._edge_sidebar.position_and_resize(vp.width(), vp.height(), margin=margin)
+            self.settings_sidebar.position_and_resize(vp.width(), vp.height(), margin=margin)
         except Exception:
             pass
 
