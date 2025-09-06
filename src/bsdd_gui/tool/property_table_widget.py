@@ -62,7 +62,6 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
 
     @classmethod
     def add_property_to_dictionary(cls, bsdd_property, bsdd_dictionary: BsddDictionary):
-        # TODO: Model handling
         affected_models = [
             m
             for m in cls.get_models()
@@ -255,3 +254,29 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     @classmethod
     def request_new_property(cls):
         cls.signals.new_property_requested.emit()
+
+    @classmethod
+    def get_properties_from_mime_payload(
+        cls, payload: dict, bsdd_dictionary: BsddDictionary
+    ) -> bool:
+        raw_properties = payload.get("properties", [])
+        if not isinstance(raw_properties, list):
+            return False
+
+        # existing property codes in target dictionary
+        existing_properties = [p.Code for p in bsdd_dictionary.Properties]
+        property_code_dict = {
+            rp["Code"]: rp for rp in raw_properties if isinstance(rp, dict) and "Code" in rp
+        }
+
+        new_properties = []
+        for property_code, property_json in property_code_dict.items():
+
+            if property_code in existing_properties:
+                continue
+            try:
+                new_properties.append(BsddProperty.model_validate(property_json))
+            except Exception:
+                # if invalid, skip this one (or log)
+                continue
+        return new_properties

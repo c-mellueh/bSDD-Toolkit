@@ -88,6 +88,17 @@ def register_view(
     view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTableWidget]
 ):
     property_table.register_view(view)
+    # Common selection behavior
+    view.setSelectionBehavior(QTreeView.SelectRows)
+    view.setSelectionMode(QTreeView.ExtendedSelection)
+    view.setAlternatingRowColors(True)
+    # Enable drag/drop on the properties table for cross-instance copy
+    if isinstance(view, views.PropertyTable):
+        view.setDragEnabled(True)
+        view.setAcceptDrops(True)
+        view.setDropIndicatorShown(True)
+        view.setDefaultDropAction(Qt.CopyAction)
+        view.setDragDropMode(QTreeView.DragDrop)
 
 
 def add_columns_to_view(

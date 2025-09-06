@@ -55,7 +55,7 @@ def connect_widget(widget, graph_view: Type[tool.GraphViewWidget]):
 
 
 def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
-    
+
     widget = graph_view.get_widget()
     if widget is None:
         return

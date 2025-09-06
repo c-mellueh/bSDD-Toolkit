@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QTableView
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QDragEnterEvent
 from . import trigger
 from bsdd_gui.presets.ui_presets import TableItemView
 
@@ -17,6 +19,20 @@ class PropertyTable(TableItemView):
 
     def model(self) -> models.SortModel:
         return super().model()
+
+    def dragEnterEvent(self, e: QDragEnterEvent):
+        if e.source() is None:  # different process
+            e.setDropAction(Qt.CopyAction)
+            e.accept()
+        else:
+            super().dragEnterEvent(e)
+
+    def dragMoveEvent(self, e: QDragEnterEvent):
+        if e.source() is None:
+            e.setDropAction(Qt.CopyAction)
+            e.accept()
+        else:
+            super().dragMoveEvent(e)
 
 
 class ClassTable(TableItemView):

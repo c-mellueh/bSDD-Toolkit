@@ -272,18 +272,12 @@ def handle_mime_copy(
     class_code_dict = {
         rc["Code"]: rc for rc in raw_classes if isinstance(rc, dict) and "Code" in rc
     }
-    property_code_dict = {
-        rp["Code"]: rp for rp in raw_properties if isinstance(rp, dict) and "Code" in rp
-    }
 
     ordered_class_codes = sorted(
         class_code_dict.keys(), key=lambda c, ccd=class_code_dict: class_tree.depth_of(c, ccd)
     )  # parents first
 
     # 2) conflict-safe code mapping
-    existing_classes = set(cl_utils.get_all_class_codes(bsdd_dictionary))
-    existing_properties = set(prop_utils.get_property_code_dict(bsdd_dictionary))
-
     old2new = {}
 
     # 3) create & insert classes (parents first), adjusting codes/parents
@@ -298,19 +292,12 @@ def handle_mime_copy(
         if node is None:
             continue
         # insert with proper signals (parent must exist now)
-        class_tree.add_class(node, bsdd_dictionary)
+        class_tree.add_class_to_dictionary(node, bsdd_dictionary)
 
     # 4) Insert Properties
     #
     # that don't exist so far
-    for property_code, property_json in property_code_dict.items():
-
-        if property_code in existing_properties:
-            continue
-        try:
-            node = BsddProperty.model_validate(property_json)
-            property_table.add_property_to_dictionary(node, bsdd_dictionary)
-        except Exception:
-            # if invalid, skip this one (or log)
-            continue
+    new_properties = property_table.get_properties_from_mime_payload(payload, bsdd_dictionary)
+    for p in new_properties:
+        property_table.add_property_to_dictionary(p, bsdd_dictionary)
     return True

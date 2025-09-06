@@ -40,7 +40,7 @@ class GraphView(QGraphicsView):
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
         self.setAcceptDrops(True)
-        
+
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:
             factor = 1.25 if event.angleDelta().y() > 0 else 0.8
@@ -161,7 +161,11 @@ class GraphView(QGraphicsView):
             # try to find existing node with matching bsdd_code
             existing = None
             for n in getattr(scene, "nodes", []):
-                if isinstance(n, Node) and getattr(n, "bsdd_code", None) == code and n.node_type == "class":
+                if (
+                    isinstance(n, Node)
+                    and getattr(n, "bsdd_code", None) == code
+                    and n.node_type == "class"
+                ):
                     existing = n
                     break
             label = names_by_code.get(code, code)
@@ -179,6 +183,8 @@ class GraphView(QGraphicsView):
 
         event.acceptProposedAction()
         return
+
+
 class GraphScene(QGraphicsScene):
     def __init__(self):
         super().__init__()
