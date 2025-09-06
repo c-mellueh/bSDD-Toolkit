@@ -13,8 +13,8 @@ from PySide6.QtCore import (
 )
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QTreeView
 from bsdd_json.models import BsddClassProperty, BsddClass, BsddProperty, BsddDictionary
-from bsdd_gui.module.property_table_widget import ui, models, trigger, views
-
+from bsdd_gui.module.property_table_widget import ui, models, trigger, views, constants
+import json
 
 if TYPE_CHECKING:
     from bsdd_gui.module.property_table_widget.prop import PropertyTableWidgetProperties
@@ -280,3 +280,18 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
                 # if invalid, skip this one (or log)
                 continue
         return new_properties
+
+    @classmethod
+    def get_payload_from_data(cls, data):
+        payload = None
+        for fmt in (constants.JSON_MIME, "application/json", "text/plain"):
+            if data.hasFormat(fmt):
+                try:
+                    b = bytes(data.data(fmt))
+                    if fmt == "text/plain":
+                        b = b.strip()
+                    payload = json.loads(b.decode("utf-8"))
+                    return payload
+                except Exception:
+                    pass
+        return payload
