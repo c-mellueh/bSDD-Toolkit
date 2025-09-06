@@ -110,29 +110,6 @@ class GraphWindow(QMainWindow):
 
         tb.addSeparator()
 
-        # Edge toggles
-        tb.addWidget(QLabel("Edges:"))
-        self.tg_edge_class_rel = QToolButton()
-        self.tg_edge_class_rel.setText("Class↔Class")
-        self.tg_edge_class_rel.setCheckable(True)
-        self.tg_edge_class_rel.setChecked(True)
-        self.tg_edge_class_rel.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_edge_class_rel)
-
-        self.tg_edge_prop_rel = QToolButton()
-        self.tg_edge_prop_rel.setText("Prop↔Prop")
-        self.tg_edge_prop_rel.setCheckable(True)
-        self.tg_edge_prop_rel.setChecked(True)
-        self.tg_edge_prop_rel.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_edge_prop_rel)
-
-        self.tg_edge_cl_to_prop = QToolButton()
-        self.tg_edge_cl_to_prop.setText("Class→Prop")
-        self.tg_edge_cl_to_prop.setCheckable(True)
-        self.tg_edge_cl_to_prop.setChecked(True)
-        self.tg_edge_cl_to_prop.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_edge_cl_to_prop)
-
     # ---- Actions ----
     def _toggle_running(self):
         self.scene.set_running(not self.scene.running)
