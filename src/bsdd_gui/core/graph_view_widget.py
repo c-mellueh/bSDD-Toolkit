@@ -60,3 +60,4 @@ def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.
     if widget is None:
         return
     graph_view.populate_from_bsdd(widget, project.get())
+    widget.scene.clear_graph()

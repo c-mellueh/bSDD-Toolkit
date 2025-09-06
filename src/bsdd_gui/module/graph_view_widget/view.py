@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (
 from typing import TYPE_CHECKING
 from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
 from bsdd_gui.module.graph_view_widget.physics import Physics
+from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
 
 
 class GraphView(QGraphicsView):
@@ -38,7 +39,8 @@ class GraphView(QGraphicsView):
         self.setDragMode(QGraphicsView.RubberBandDrag)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
-
+        self.setAcceptDrops(True)
+        
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:
             factor = 1.25 if event.angleDelta().y() > 0 else 0.8
@@ -59,7 +61,124 @@ class GraphView(QGraphicsView):
             self.setDragMode(QGraphicsView.RubberBandDrag)
         super().mouseReleaseEvent(event)
 
+    # ---- Drag & Drop integration ----
+    def _mime_has_bsdd_class(self, md) -> bool:
+        try:
+            if md.hasFormat(CLASS_JSON_MIME):
+                return True
+            if md.hasFormat("application/json"):
+                return True
+            if md.hasFormat("text/plain"):
+                # expecting JSON array of codes as text
+                return True
+        except Exception:
+            pass
+        return False
 
+    def dragEnterEvent(self, event):
+        if self._mime_has_bsdd_class(event.mimeData()):
+            event.acceptProposedAction()
+        else:
+            super().dragEnterEvent(event)
+
+    def dragMoveEvent(self, event):
+        if self._mime_has_bsdd_class(event.mimeData()):
+            event.acceptProposedAction()
+        else:
+            super().dragMoveEvent(event)
+
+    def dropEvent(self, event):
+        md = event.mimeData()
+        if not self._mime_has_bsdd_class(md):
+            return super().dropEvent(event)
+
+        # Determine drop position in scene coordinates (Qt6: position() returns QPointF)
+        try:
+            pos_view = event.position()
+            # mapToScene expects int coordinates
+            scene_pos = self.mapToScene(int(pos_view.x()), int(pos_view.y()))
+        except Exception:
+            scene_pos = self.mapToScene(event.pos())
+
+        # Extract payload
+        payload = None
+        try:
+            if md.hasFormat(CLASS_JSON_MIME):
+                payload = bytes(md.data(CLASS_JSON_MIME)).decode("utf-8")
+            elif md.hasFormat("application/json"):
+                payload = bytes(md.data("application/json")).decode("utf-8")
+            elif md.hasFormat("text/plain"):
+                payload = bytes(md.data("text/plain")).decode("utf-8").strip()
+        except Exception:
+            payload = None
+
+        import json
+
+        codes_to_add: list[str] = []
+        names_by_code: dict[str, str] = {}
+
+        if payload:
+            try:
+                obj = json.loads(payload)
+                # Two shapes are supported:
+                # 1) { kind: 'BsddClassTransfer', roots: [...], classes: [{Code,Name,...}, ...] }
+                # 2) [ "IFC123", "IFC234" ]
+                if isinstance(obj, dict) and obj.get("kind") == "BsddClassTransfer":
+                    roots = obj.get("roots") or []
+                    classes = obj.get("classes") or []
+                    # build map for lookup
+                    for rc in classes:
+                        if isinstance(rc, dict) and "Code" in rc:
+                            code = rc.get("Code")
+                            name = rc.get("Name") or rc.get("Code")
+                            if code:
+                                names_by_code[code] = name
+                    # Use roots if present, else all class entries
+                    if roots:
+                        codes_to_add = [c for c in roots if isinstance(c, str)]
+                    else:
+                        codes_to_add = list(names_by_code.keys())
+                elif isinstance(obj, list):
+                    # list of codes
+                    codes_to_add = [c for c in obj if isinstance(c, str)]
+                else:
+                    codes_to_add = []
+            except Exception:
+                codes_to_add = []
+
+        if not codes_to_add:
+            return super().dropEvent(event)
+
+        # Add nodes for each code at/near drop position
+        scene: GraphScene = self.scene()  # type: ignore[assignment]
+        if not isinstance(scene, GraphScene):
+            scene = self.scene()
+
+        offset_step = QPointF(24.0, 18.0)
+        cur = QPointF(scene_pos)
+
+        for idx, code in enumerate(codes_to_add):
+            # try to find existing node with matching bsdd_code
+            existing = None
+            for n in getattr(scene, "nodes", []):
+                if isinstance(n, Node) and getattr(n, "bsdd_code", None) == code and n.node_type == "class":
+                    existing = n
+                    break
+            label = names_by_code.get(code, code)
+            if existing is not None:
+                existing.setPos(cur)
+            else:
+                n = scene.add_node(label, pos=cur, node_type="class", bsdd_code=code)
+            cur += offset_step
+
+        # Keep physics running and adjust scene rect
+        try:
+            scene.auto_scene_rect()
+        except Exception:
+            pass
+
+        event.acceptProposedAction()
+        return
 class GraphScene(QGraphicsScene):
     def __init__(self):
         super().__init__()
@@ -94,8 +213,14 @@ class GraphScene(QGraphicsScene):
         pos: Optional[QPointF] = None,
         color: Optional[QColor] = None,
         node_type: str = "generic",
+        bsdd_code: Optional[str] = None,
     ) -> Node:
         n = Node(label, color=color, node_type=node_type)
+        if bsdd_code is not None:
+            try:
+                setattr(n, "bsdd_code", bsdd_code)
+            except Exception:
+                pass
         p = (
             pos
             if pos is not None

@@ -45,7 +45,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         # 1) Classes
         for c in bsdd_dict.Classes:
-            n = widget.scene.add_node(c.Code or c.Name or "Class", node_type="class")
+            n = widget.scene.add_node(c.Code or c.Name or "Class", node_type="class", bsdd_code=c.Code)
             class_by_code[c.Code] = n
             try:
                 uri = cl_utils.build_bsdd_uri(c, bsdd_dict)
@@ -56,7 +56,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         # 2) Properties (dictionary-level)
         for p in bsdd_dict.Properties:
-            n = widget.scene.add_node(p.Code or p.Name or "Property", node_type="property")
+            n = widget.scene.add_node(p.Code or p.Name or "Property", node_type="property", bsdd_code=p.Code)
             prop_by_code[p.Code] = n
             # Map canonical bsDD URI and any owned URI
             try:
