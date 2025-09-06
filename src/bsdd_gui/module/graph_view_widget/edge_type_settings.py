@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, Iterable
+from typing import Callable, Dict, Iterable,TYPE_CHECKING
 
 from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtWidgets import (
@@ -12,12 +12,103 @@ from PySide6.QtWidgets import (
     QToolButton,
     QSizePolicy,
     QScrollArea,
+    QSpacerItem,
+    QPushButton,
+    QSlider,
 )
 from PySide6.QtGui import QPainter, QPen, QColor
 
 from bsdd_gui.module.graph_view_widget.constants import EDGE_STYLE_MAP, EDGE_STYLE_DEFAULT
 
 from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
+if TYPE_CHECKING:
+    from .ui import GraphWindow
+    from .view import GraphScene
+
+class GraphSettingsWidget(QWidget):
+    """Floating settings panel for Graph physics sliders."""
+
+    def __init__(self, physics, parent=None):
+        super().__init__(parent, f=Qt.Window)
+        self.setWindowTitle("Graph Settings")
+        self.physics = physics
+
+        self._build_ui()
+        self._sync_from_physics()
+
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+
+        # Spring length (L0)
+        self.lb_l0 = QLabel("L₀ (spring length)")
+        self.sl_l0 = QSlider(Qt.Horizontal)
+        self.sl_l0.setRange(50, 2000)
+        self.sl_l0.setSingleStep(10)
+        self.val_l0 = QLabel()
+        self._add_row(layout, self.lb_l0, self.sl_l0, self.val_l0)
+        self.sl_l0.valueChanged.connect(self._on_l0_changed)
+
+        # k_spring (scaled by 100)
+        self.lb_ks = QLabel("k_spring")
+        self.sl_ks = QSlider(Qt.Horizontal)
+        self.sl_ks.setRange(1, 100)  # 0.01 .. 10.00
+        self.sl_ks.setSingleStep(1)
+        self.val_ks = QLabel()
+        self._add_row(layout, self.lb_ks, self.sl_ks, self.val_ks)
+        self.sl_ks.valueChanged.connect(self._on_ks_changed)
+
+        # k_repulsion
+        self.lb_rep = QLabel("repulsion")
+        self.sl_rep = QSlider(Qt.Horizontal)
+        self.sl_rep.setRange(10, 10000)
+        self.sl_rep.setSingleStep(10)
+        self.val_rep = QLabel()
+        self._add_row(layout, self.lb_rep, self.sl_rep, self.val_rep)
+        self.sl_rep.valueChanged.connect(self._on_rep_changed)
+
+    def _add_row(
+        self, parent_layout: QVBoxLayout, label: QLabel, slider: QSlider, value_label: QLabel
+    ):
+        row = QHBoxLayout()
+        row.addWidget(label)
+        row.addWidget(slider, 1)
+        value_label.setMinimumWidth(60)
+        value_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        row.addWidget(value_label)
+        parent_layout.addLayout(row)
+
+    def _sync_from_physics(self):
+        # Avoid feedback loops by blocking signals while setting initial values
+        self.sl_l0.blockSignals(True)
+        self.sl_ks.blockSignals(True)
+        self.sl_rep.blockSignals(True)
+        try:
+            self.sl_l0.setValue(int(self.physics.spring_length))
+            self.sl_ks.setValue(int(self.physics.k_spring * 100))
+            self.sl_rep.setValue(int(self.physics.k_repulsion))
+        finally:
+            self.sl_l0.blockSignals(False)
+            self.sl_ks.blockSignals(False)
+            self.sl_rep.blockSignals(False)
+        self._update_value_labels()
+
+    def _update_value_labels(self):
+        self.val_l0.setText(f"{int(self.sl_l0.value())}")
+        self.val_ks.setText(f"{self.sl_ks.value() / 100.0:.2f}")
+        self.val_rep.setText(f"{int(self.sl_rep.value())}")
+
+    # Handlers
+    def _on_l0_changed(self, v: int):
+        self.physics.spring_length = float(v)
+        self._update_value_labels()
+
+    def _on_ks_changed(self, v: int):
+        self.physics.k_spring = float(v) / 1000.0
+        self._update_value_labels()
+
+    def _on_rep_changed(self, v: int):
+        self.physics.k_repulsion = float(v)
+        self._update_value_labels()
 
 
 class EdgeTypeSettingsWidget(QFrame):
@@ -156,12 +247,14 @@ class EdgeSettingsSidebar(QWidget):
 
     def __init__(
         self,
+        graph_window:GraphWindow,
         allowed_edge_types: Iterable[str],
         on_toggle: Callable[[str, bool], None],
         parent: QWidget | None = None,
         expanded_width: int = 240,
     ) -> None:
         super().__init__(parent)
+        self.graph_window = graph_window
         self._expanded_width = max(160, int(expanded_width))
         self._expanded = True
 
@@ -190,22 +283,45 @@ class EdgeSettingsSidebar(QWidget):
         self._btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         root.addWidget(self._btn)
 
-        # Scroll area hosting the settings panel
+        # Scroll area hosting a vertical stack of panels
         self._scroll = QScrollArea(self)
         self._scroll.setFrameShape(QFrame.NoFrame)
         self._scroll.setWidgetResizable(True)
-        self._content = EdgeTypeSettingsWidget(allowed_edge_types, on_toggle, parent=None)
-        self._scroll.setWidget(self._content)
+        self._scroll_content = QWidget(self._scroll)
+        self._scroll_layout = QVBoxLayout(self._scroll_content)
+        self._scroll_layout.setContentsMargins(0, 0, 0, 0)
+        self._scroll_layout.setSpacing(8)
+
+        # Primary edge-type panel (kept for API methods below)
+        self._edge_types_panel = EdgeTypeSettingsWidget(allowed_edge_types, on_toggle, parent=None)
+        scene:GraphScene = self.graph_window.view.scene()
+        self._view_settings = GraphSettingsWidget(scene.physics,None)
+        self._scroll_layout.addWidget(self._view_settings)
+        self._scroll_layout.addWidget(self._edge_types_panel)
+        self._scroll_layout.addStretch(1)
+
+        self._scroll.setWidget(self._scroll_content)
         root.addWidget(self._scroll, 1)
 
         self._apply_expanded_state()
 
     # Public API
     def get_flags(self) -> Dict[str, bool]:
-        return self._content.get_flags()
+        return self._edge_types_panel.get_flags()
 
     def set_flag(self, edge_type: str, value: bool) -> None:
-        self._content.set_flag(edge_type, value)
+        self._edge_types_panel.set_flag(edge_type, value)
+
+    def add_content_widget(self, widget: QWidget) -> None:
+        """Append an arbitrary widget below the edge-type panel inside the
+        scroll area. Useful for adding legends or extra controls.
+        """
+        # Insert before the final stretch, so it stays at the bottom
+        # but above the stretchable spacer
+        stretch_index = self._scroll_layout.count() - 1
+        if stretch_index < 0:
+            stretch_index = 0
+        self._scroll_layout.insertWidget(stretch_index, widget)
 
     def set_expanded(self, expanded: bool) -> None:
         if self._expanded == bool(expanded):

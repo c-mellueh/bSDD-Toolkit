@@ -27,7 +27,6 @@ from PySide6.QtWidgets import (
 from bsdd_gui.module.graph_view_widget.view import GraphScene, GraphView
 from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES
 from bsdd_gui.module.graph_view_widget.edge_type_settings import EdgeSettingsSidebar
-from bsdd_gui.module.graph_view_widget.settings_widget import GraphSettingsWidget
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -51,7 +50,7 @@ class GraphWindow(QMainWindow):
         # Edge type visibility state and overlay settings panel
         self._edge_type_flags: Dict[str, bool] = {et: True for et in ALLOWED_EDGE_TYPES}
         try:
-            self._edge_sidebar = EdgeSettingsSidebar(
+            self._edge_sidebar = EdgeSettingsSidebar(self,
                 allowed_edge_types=ALLOWED_EDGE_TYPES,
                 on_toggle=self._on_edge_type_toggled,
                 parent=self.view.viewport(),
@@ -89,11 +88,6 @@ class GraphWindow(QMainWindow):
         btn_clear.clicked.connect(self._clear)
         tb.addWidget(btn_clear)
 
-        # Settings button
-        btn_settings = QToolButton()
-        btn_settings.setText("Settings")
-        btn_settings.clicked.connect(self._open_settings)
-        tb.addWidget(btn_settings)
 
         tb.addSeparator()
 
@@ -152,15 +146,6 @@ class GraphWindow(QMainWindow):
     def _clear(self):
         self.scene.clear_graph()
         # print("[DEBUG] GraphWindow._clear: scene cleared")
-
-    def _open_settings(self):
-        w = self._settings_widget
-        if w is None or not w.isVisible():
-            self._settings_widget = GraphSettingsWidget(self.scene.physics, self)
-            w = self._settings_widget
-        w.show()
-        w.raise_()
-        w.activateWindow()
 
     def _apply_filters(self):
         node_flags = {
