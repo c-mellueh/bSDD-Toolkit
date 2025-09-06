@@ -2,6 +2,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 
+from PySide6.QtGui import QDropEvent
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QPointF
+
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, WidgetTool
 
@@ -12,8 +16,10 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
 
-from bsdd_gui.module.graph_view_widget import trigger, ui
+from bsdd_gui.module.graph_view_widget import trigger, ui, constants, view
 from bsdd_gui.module.graph_view_widget.graphics_items import Node
+from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
+from bsdd_gui.module.property_table_widget.constants import JSON_MIME as PROPERTY_JSON_MIME
 
 
 class GraphViewWidget(ActionTool, WidgetTool):
@@ -45,9 +51,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         # 1) Classes
         for c in bsdd_dict.Classes:
-            n = widget.scene.add_node(
-                c.Code or c.Name or "Class", node_type="class", bsdd_code=c.Code
-            )
+            n = widget.scene.add_node(c)
             class_by_code[c.Code] = n
             try:
                 uri = cl_utils.build_bsdd_uri(c, bsdd_dict)
@@ -58,9 +62,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         # 2) Properties (dictionary-level)
         for p in bsdd_dict.Properties:
-            n = widget.scene.add_node(
-                p.Code or p.Name or "Property", node_type="property", bsdd_code=p.Code
-            )
+            n = widget.scene.add_node(p)
             prop_by_code[p.Code] = n
             # Map canonical bsDD URI and any owned URI
             try:
@@ -142,3 +144,89 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if not cls.get_widgets():
             return None
         return cls.get_widgets()[-1]
+
+    ### Drag and Drop
+
+    @classmethod
+    def get_mime_type(cls, mime_data) -> constants.ALLOWED_DRAG_TYPES | None:
+        if mime_data.hasFormat(PROPERTY_JSON_MIME):
+            return constants.PROPERTY_DRAG
+        if mime_data.hasFormat(CLASS_JSON_MIME):
+            return constants.CLASS_DRAG
+        return None
+
+    @classmethod
+    def get_position_from_event(cls, event: QDropEvent, gv: view):
+        try:
+            pos_view = event.position()
+            # mapToScene expects int coordinates
+            scene_pos = gv.mapToScene(int(pos_view.x()), int(pos_view.y()))
+        except Exception:
+            scene_pos = gv.mapToScene(event.pos())
+        return scene_pos
+
+    @classmethod
+    def read_classes_to_add(cls, payload: dict, bsdd_dictionary: BsddDictionary):
+        classes_to_add = list()
+        if not "classes" in payload:
+            return []
+        for rc in payload["classes"]:
+            code = rc.get("Code", None)
+            if not code:
+                continue
+            bsdd_class = cl_utils.get_class_by_code(bsdd_dictionary, code)
+            if not bsdd_class:
+                continue
+            classes_to_add.append(bsdd_class)
+        return classes_to_add
+
+    @classmethod
+    def read_properties_to_add(cls, payload: dict, bsdd_dictionary: BsddDictionary):
+        properties_to_add = list()
+        if not "properties" in payload:
+            return []
+        for rp in payload["properties"]:
+            code = rp.get("Code")
+            if not code:
+                continue
+            bsdd_property = prop_utils.get_property_by_code(code, bsdd_dictionary)
+            if not bsdd_property:
+                continue
+            properties_to_add.append(bsdd_property)
+        return properties_to_add
+
+    @classmethod
+    def insert_classes_in_scene(
+        cls, scene: view.GraphScene, classes: list[BsddClass], position: QPointF
+    ):
+        offset_step = QPointF(24.0, 18.0)
+        cur = QPointF(position)
+        existing_class_codes = {
+            n.bsdd_data.Code
+            for n in scene.nodes
+            if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
+        }
+
+        for bsdd_class in classes:
+            if bsdd_class.Code in existing_class_codes:
+                continue
+            n = scene.add_node(bsdd_class, pos=cur)
+            cur += offset_step
+
+    @classmethod
+    def insert_properties_in_scene(
+        cls, scene: view.GraphScene, bsdd_properties: list[BsddProperty], position: QPointF
+    ):
+        offset_step = QPointF(24.0, 18.0)
+        cur = QPointF(position)
+        existing_property_codes = {
+            n.bsdd_data.Code
+            for n in scene.nodes
+            if hasattr(n, "bsdd_data") and n.node_type == constants.PROPERTY_NODE_TYPE
+        }
+
+        for bsdd_property in bsdd_properties:
+            if bsdd_property.Code in existing_property_codes:
+                continue
+            n = scene.add_node(bsdd_property, pos=cur)
+            cur += offset_step

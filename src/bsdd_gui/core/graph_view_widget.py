@@ -3,6 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
+from PySide6.QtGui import QDropEvent
+from bsdd_gui.module.graph_view_widget import constants
+
+if TYPE_CHECKING:
+    from bsdd_gui.module.graph_view_widget.view import GraphView
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -61,3 +66,43 @@ def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.
         return
     graph_view.populate_from_bsdd(widget, project.get())
     widget.scene.clear_graph()
+
+
+def handle_drop_event(
+    event: QDropEvent,
+    view: GraphView,
+    graph_view: Type[tool.GraphViewWidget],
+    class_tree: Type[tool.ClassTreeView],
+    property_table: Type[tool.PropertyTableWidget],
+    project: Type[tool.Project],
+):
+    mime_data = event.mimeData()
+    mime_type = graph_view.get_mime_type(mime_data)
+    if mime_type is None:
+        event.ignore()
+        return
+    scene_pos = graph_view.get_position_from_event(event, view)
+    bsdd_dictionary = project.get()
+
+    classes_to_add = list()
+    properties_to_add = list()
+    if mime_type == constants.CLASS_DRAG:
+        payload = class_tree.get_payload_from_data(mime_data)
+        classes_to_add += graph_view.read_classes_to_add(payload, bsdd_dictionary)
+
+    elif mime_type == constants.PROPERTY_DRAG:
+        payload = property_table.get_payload_from_data(mime_data)
+        properties_to_add += graph_view.read_properties_to_add(payload, bsdd_dictionary)
+
+    if not classes_to_add and not properties_to_add:
+        event.ignore()
+        return
+
+    scene = view.scene()
+    graph_view.insert_classes_in_scene(scene, classes_to_add, scene_pos)
+    graph_view.insert_properties_in_scene(scene, properties_to_add, scene_pos)
+    try:
+        scene.auto_scene_rect()
+    except Exception:
+        pass
+    event.acceptProposedAction()

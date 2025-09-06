@@ -2,7 +2,7 @@ from __future__ import annotations
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
-from bsdd_json import *
+from bsdd_json import BsddClass, BsddProperty, BsddDictionary
 import math
 import random
 from dataclasses import dataclass
@@ -33,10 +33,8 @@ from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MI
 from bsdd_gui.module.property_table_widget.constants import (
     JSON_MIME as PROPERTY_JSON_MIME,
 )
-
-PROPERTY_DRAG = "property_drag"
-CLASS_DRAG = "class_drag"
-ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
+from bsdd_gui.module.graph_view_widget.constants import *
+from . import trigger
 
 
 class GraphView(QGraphicsView):
@@ -103,94 +101,7 @@ class GraphView(QGraphicsView):
             super().dragMoveEvent(event)
 
     def dropEvent(self, event):
-        md = event.mimeData()
-        drag_type = self._get_drag_type(md)
-        if drag_type is None:
-            return super().dropEvent(event)
-
-        # Determine drop position in scene coordinates (Qt6: position() returns QPointF)
-        try:
-            pos_view = event.position()
-            # mapToScene expects int coordinates
-            scene_pos = self.mapToScene(int(pos_view.x()), int(pos_view.y()))
-        except Exception:
-            scene_pos = self.mapToScene(event.pos())
-
-        # Extract payload
-        classes_to_add: list[str] = []
-        properties_to_add: list[str] = []
-        class_names_by_code: dict[str, str] = {}
-        property_names_by_code: dict[str, str] = {}
-
-        payload = None
-        if drag_type == CLASS_DRAG:
-            payload = tool.ClassTreeView.get_payload_from_data(md)
-            if not "classes" in payload:
-                payload = None
-            for rc in payload["classes"]:
-                code = rc.get("Code")
-                name = rc.get("Name") or code
-                classes_to_add.append(code)
-                class_names_by_code[code] = name
-
-        elif drag_type == PROPERTY_DRAG:
-            payload = tool.PropertyTableWidget.get_payload_from_data(md)
-            if not "properties" in payload:
-                payload = None
-            for rp in payload["properties"]:
-                code = rp.get("Code")
-                name = rp.get("Name") or code
-                properties_to_add.append(code)
-                property_names_by_code[code] = name
-
-        if not payload:
-            event.ignore()
-            return
-
-        # Add nodes for each code at/near drop position
-        scene: GraphScene = self.scene()  # type: ignore[assignment]
-        if not isinstance(scene, GraphScene):
-            scene = self.scene()
-
-        offset_step = QPointF(24.0, 18.0)
-        cur = QPointF(scene_pos)
-
-        for class_code in classes_to_add:
-            # try to find existing node with matching bsdd_code
-            for n in scene.nodes:
-                if (
-                    getattr(n, "bsdd_code", None) == class_code
-                    and n.node_type == "class"
-                ):
-                    break
-            label = class_names_by_code.get(class_code, class_code)
-            n = scene.add_node(label, pos=cur, node_type="class", bsdd_code=class_code)
-            cur += offset_step
-
-        offset_step = QPointF(24.0, 18.0)
-        cur = QPointF(scene_pos)
-
-        for property_code in properties_to_add:
-            # try to find existing node with matching bsdd_code
-            for n in scene.nodes:
-                if (
-                    getattr(n, "bsdd_code", None) == property_code
-                    and n.node_type == "property"
-                ):
-                    break
-            label = property_names_by_code.get(property_code, property_code)
-            n = scene.add_node(
-                label, pos=cur, node_type="property", bsdd_code=property_code
-            )
-            cur += offset_step
-        # Keep physics running and adjust scene rect
-        try:
-            scene.auto_scene_rect()
-        except Exception:
-            pass
-
-        event.acceptProposedAction()
-        return
+        trigger.handle_drop_event(event, self)
 
 
 class GraphScene(QGraphicsScene):
@@ -211,11 +122,7 @@ class GraphScene(QGraphicsScene):
         self.physics.gravity_center = self.sceneRect().center()
         # Only simulate visible items
         vis_nodes = [n for n in self.nodes if n.isVisible()]
-        vis_edges = [
-            e
-            for e in self.edges
-            if e.isVisible() and e.a.isVisible() and e.b.isVisible()
-        ]
+        vis_edges = [e for e in self.edges if e.isVisible() and e.a.isVisible() and e.b.isVisible()]
         if vis_nodes:
             self.physics.step(vis_nodes, vis_edges, dt=1.0)
         # Update visible edges' geometry
@@ -227,18 +134,13 @@ class GraphScene(QGraphicsScene):
 
     def add_node(
         self,
-        label: str,
+        bsdd_data: BsddClass | BsddProperty,
         pos: Optional[QPointF] = None,
         color: Optional[QColor] = None,
-        node_type: str = "generic",
-        bsdd_code: Optional[str] = None,
     ) -> Node:
-        n = Node(label, color=color, node_type=node_type)
-        if bsdd_code is not None:
-            try:
-                setattr(n, "bsdd_code", bsdd_code)
-            except Exception:
-                pass
+
+        n = Node(bsdd_data, color=color)
+
         p = (
             pos
             if pos is not None
@@ -249,9 +151,7 @@ class GraphScene(QGraphicsScene):
         self.nodes.append(n)
         return n
 
-    def add_edge(
-        self, a: Node, b: Node, weight: float = 1.0, edge_type: str = "generic"
-    ) -> Edge:
+    def add_edge(self, a: Node, b: Node, weight: float = 1.0, edge_type: str = "generic") -> Edge:
         e = Edge(a, b, weight, edge_type=edge_type)
         self.addItem(e)
         self.edges.append(e)

@@ -28,3 +28,14 @@ def widget_created(widget):
 
 def create_widget(parent: QWidget | None = None):
     core.create_widget(parent, tool.GraphViewWidget, tool.MainWindowWidget)
+
+
+def handle_drop_event(event, view):
+    core.handle_drop_event(
+        event,
+        view,
+        tool.GraphViewWidget,
+        tool.ClassTreeView,
+        tool.PropertyTableWidget,
+        tool.Project,
+    )

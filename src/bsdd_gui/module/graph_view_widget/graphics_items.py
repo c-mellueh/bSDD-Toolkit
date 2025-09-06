@@ -69,23 +69,30 @@ class Node(QGraphicsObject):
 
     def __init__(
         self,
-        label: str,
+        bsdd_data: BsddClass | BsddProperty,
         radius: float = 12.0,
         color: QColor | None = None,
-        node_type: str = "generic",
     ):
         super().__init__()
-        self.label = label
+        self.bsdd_data = bsdd_data
+        self.label = bsdd_data.Name
         # radius retained for backward-compat, not used for drawing
         self.radius = radius
-        self.node_type = node_type
+        self.node_type = GENERIC_NODE_TYPE
+        if isinstance(bsdd_data, BsddProperty):
+            self.node_type = PROPERTY_NODE_TYPE
+        if isinstance(bsdd_data, BsddClass):
+            self.node_type = CLASS_NODE_TYPE
+
         # Resolve color and shape from registries unless explicitly provided
-        resolved_color = color or NODE_COLOR_MAP.get(node_type, NODE_COLOR_DEFAULT)
+        resolved_color = color or NODE_COLOR_MAP.get(self.node_type, NODE_COLOR_DEFAULT)
         self.color = resolved_color
         self.brush = QBrush(self.color)
         self.border = QPen(QColor(40, 60, 90), 1.2)
         self.border.setCosmetic(True)
-        self.node_shape = NODE_SHAPE_MAP.get(node_type, NODE_SHAPE_MAP.get("generic", "rect"))
+        self.node_shape = NODE_SHAPE_MAP.get(
+            self.node_type, NODE_SHAPE_MAP.get(GENERIC_NODE_TYPE, "rect")
+        )
 
         self.velocity = QPointF(0.0, 0.0)
         self.fixed = False
@@ -110,6 +117,10 @@ class Node(QGraphicsObject):
         )
         self.setAcceptHoverEvents(True)
 
+    @property
+    def bsdd_code(self):
+        return self.bsdd_data.Code
+
     def boundingRect(self) -> QRectF:
         # Include a small margin for the border
         margin = 2.0
@@ -122,11 +133,11 @@ class Node(QGraphicsObject):
 
     def shape(self) -> QPainterPath:
         path = QPainterPath()
-        if self.node_shape == "ellipse":
+        if self.node_shape == SHAPE_STYPE_ELLIPSE:
             path.addEllipse(QRectF(-self._w / 2, -self._h / 2, self._w, self._h))
-        elif self.node_shape == "roundrect":
+        elif self.node_shape == SHAPE_STYLE_ROUNDED_RECT:
             path.addRoundedRect(QRectF(-self._w / 2, -self._h / 2, self._w, self._h), 6, 6)
-        else:  # rect
+        elif self.node_shape == SHAPE_STYLE_RECT:  # rect
             path.addRect(QRectF(-self._w / 2, -self._h / 2, self._w, self._h))
         return path
 
