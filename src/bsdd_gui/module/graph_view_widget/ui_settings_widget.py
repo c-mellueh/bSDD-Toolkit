@@ -31,7 +31,11 @@ from .qt import ui_Buttons
 if TYPE_CHECKING:
     from .ui import GraphWindow
     from .view_ui import GraphScene
+
 SETTINGS_STYLE_SHEET = """
+            QScrollArea { background: transparent; }
+            QWidget#qt_scrollarea_viewport { background: transparent; }
+            QWidget#ScrollContent { background: transparent;}
             QFrame#SettingsWidget {
                 background: rgba(30, 30, 35, 200);
                 border: 1px solid rgba(90, 90, 120, 140);
@@ -55,8 +59,6 @@ class _SettingsWidget(QFrame):
         self.setFrameShadow(QFrame.Raised)
         self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, False)
-        self.setStyleSheet(SETTINGS_STYLE_SHEET)
-
 
 class ButtonWidget(_SettingsWidget, ui_Buttons.Ui_Form):
     """Floating settings panel for Graph physics sliders."""
@@ -429,22 +431,11 @@ class SettingsSidebar(QWidget):
             self._scroll.viewport().setAttribute(Qt.WA_TranslucentBackground, True)
         except Exception:
             pass
-        self._scroll.setStyleSheet(
-            """
-            QScrollArea { background: transparent; }
-            QWidget#qt_scrollarea_viewport { background: transparent; }
-            """
-        )
+        self._scroll.setStyleSheet(SETTINGS_STYLE_SHEET)
 
         self._scroll_content = QWidget(self._scroll)
         self._scroll_content.setObjectName("ScrollContent")
         self._scroll_content.setAttribute(Qt.WA_StyledBackground, True)
-        text = """
-        QWidget#ScrollContent {
-            background: transparent;
-        }
-        """
-        self._scroll_content.setStyleSheet(text)
         self._scroll_layout = QVBoxLayout(self._scroll_content)
         self._scroll_layout.setContentsMargins(0, 0, 0, 0)
         self._scroll_layout.setSpacing(8)
