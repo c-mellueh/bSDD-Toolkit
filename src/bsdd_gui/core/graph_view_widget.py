@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QDropEvent
-from bsdd_gui.module.graph_view_widget import constants
+from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.graph_view_widget.view import GraphView, GraphScene
-    from bsdd_gui.module.graph_view_widget import graphics_items
+    from bsdd_gui.module.graph_view_widget.view_ui import GraphView, GraphScene
+    from bsdd_gui.module.graph_view_widget import graphics_items, ui
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -56,7 +56,7 @@ def register_widget(widget, graph_view: Type[tool.GraphViewWidget]):
     graph_view.register_widget(widget)
 
 
-def connect_widget(widget, graph_view: Type[tool.GraphViewWidget]):
+def connect_widget(widget: ui.GraphWindow, graph_view: Type[tool.GraphViewWidget]):
     graph_view.connect_widget_signals(widget)
 
 
@@ -65,8 +65,8 @@ def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.
     widget = graph_view.get_widget()
     if widget is None:
         return
+    graph_view.clear_scene()
     graph_view.populate_from_bsdd(widget, project.get())
-    widget.scene.clear_graph()
 
 
 def handle_drop_event(

@@ -4,10 +4,12 @@ import logging
 
 from PySide6.QtGui import QDropEvent, QColor
 from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import QPointF
+from PySide6.QtCore import QPointF, QCoreApplication, QRectF, Qt
 
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, WidgetTool
+from bsdd_gui.presets.signal_presets import WidgetSignals
+
 import random
 
 if TYPE_CHECKING:
@@ -17,13 +19,26 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
 
-from bsdd_gui.module.graph_view_widget import trigger, ui, constants, view, graphics_items
+from bsdd_gui.module.graph_view_widget import (
+    trigger,
+    ui,
+    constants,
+    ui_settings_widget,
+    graphics_items,
+    view_ui,
+)
 from bsdd_gui.module.graph_view_widget.graphics_items import Node
 from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
 from bsdd_gui.module.property_table_widget.constants import JSON_MIME as PROPERTY_JSON_MIME
 
 
+class Signals(WidgetSignals):
+    pass
+
+
 class GraphViewWidget(ActionTool, WidgetTool):
+    signals = Signals()
+
     @classmethod
     def get_properties(cls) -> GraphViewWidgetProperties:
         return bsdd_gui.GraphViewWidgetProperties
@@ -40,10 +55,17 @@ class GraphViewWidget(ActionTool, WidgetTool):
         return GraphWindow
 
     @classmethod
+    def connect_widget_signals(cls, widget: ui.GraphWindow):
+        settings_sidebar = widget.settings_sidebar
+        bs = settings_sidebar._button_settings
+        bs.bt_import.clicked.connect(trigger.import_bsdd)
+        bs.bt_start_stop.clicked.connect(lambda _: cls.toggle_running())
+        bs.bt_clear.clicked.connect(lambda _: cls.clear_scene())
+        bs.bt_center.clicked.connect(lambda _: cls.center_scene())
+
+    @classmethod
     def populate_from_bsdd(cls, widget: ui.GraphWindow, bsdd_dict: BsddDictionary):
         # Build graph from bSDD model: Classes and Properties
-        widget.scene.clear_graph()
-
         # Node registries
         class_by_code: dict[str, Node] = {}
         class_by_uri: dict[str, Node] = {}
@@ -117,7 +139,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
             # for rel in c.ClassRelations:
             #     dst_node = class_by_uri.get(rel.RelatedClassUri)
             #     if dst_node is not None:
-            #         self.scene.add_edge(
+            #         scene.scene.add_edge(
             #             src_node, dst_node, weight=1.0, edge_type="class_rel"
             #         )
 
@@ -147,7 +169,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         widget._apply_filters()
 
     @classmethod
-    def get_widget(cls):
+    def get_widget(cls) -> ui.GraphWindow:
         if not cls.get_widgets():
             return None
         return cls.get_widgets()[-1]
@@ -163,7 +185,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         return None
 
     @classmethod
-    def get_position_from_event(cls, event: QDropEvent, gv: view):
+    def get_position_from_event(cls, event: QDropEvent, gv: view_ui):
         try:
             pos_view = event.position()
             # mapToScene expects int coordinates
@@ -215,7 +237,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     @classmethod
     def add_edge(
         cls,
-        scene: view.GraphScene,
+        scene: view_ui.GraphScene,
         edge: graphics_items.Edge,
     ) -> graphics_items.Edge:
 
@@ -226,7 +248,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     @classmethod
     def add_node(
         cls,
-        scene: view.GraphScene,
+        scene: view_ui.GraphScene,
         bsdd_data: BsddClass | BsddProperty,
         pos: Optional[QPointF] = None,
         color: Optional[QColor] = None,
@@ -246,7 +268,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def insert_classes_in_scene(
-        cls, scene: view.GraphScene, classes: list[BsddClass], position: QPointF
+        cls, scene: view_ui.GraphScene, classes: list[BsddClass], position: QPointF
     ):
         offset_step = QPointF(24.0, 18.0)
         cur = QPointF(position)
@@ -276,7 +298,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         )
 
     @classmethod
-    def get_code_dicts(cls, scene: view.GraphScene, bsdd_dictionary: BsddDictionary):
+    def get_code_dicts(cls, scene: view_ui.GraphScene, bsdd_dictionary: BsddDictionary):
         nodes = scene.nodes
         edges = scene.edges
 
@@ -297,7 +319,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
             for pn in property_codes.values()
         }
 
-        relations_dict: dict[str, dict[tuple[view.Node, view.Node], view.Edge]] = {
+        relations_dict: dict[str, dict[tuple[view_ui.Node, view_ui.Node], view_ui.Edge]] = {
             et: dict() for et in constants.ALLOWED_EDGE_TYPES
         }
         for edge in edges:
@@ -393,7 +415,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def insert_properties_in_scene(
-        cls, scene: view.GraphScene, bsdd_properties: list[BsddProperty], position: QPointF
+        cls, scene: view_ui.GraphScene, bsdd_properties: list[BsddProperty], position: QPointF
     ):
         offset_step = QPointF(24.0, 18.0)
         cur = QPointF(position)
@@ -408,3 +430,73 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 continue
             n = cls.add_node(scene, bsdd_property, pos=cur)
             cur += offset_step
+
+    @classmethod
+    def get_view(cls) -> view_ui.GraphView:
+        widget: ui.GraphWindow = cls.get_widget()
+        if not widget:
+            return None
+        return widget.view
+
+    @classmethod
+    def get_scene(cls) -> view_ui.GraphScene | None:
+        view: view_ui.GraphView = cls.get_view()
+        if not view:
+            return None
+        return view.scene()
+
+    @classmethod
+    def get_settings_widget(cls) -> ui_settings_widget.SettingsSidebar:
+        widget = cls.get_widget()
+        if not widget:
+            return None
+        return widget.settings_sidebar
+
+    @classmethod
+    def clear_scene(cls):
+        scene = cls.get_scene()
+        if scene is None:
+            return
+        for e in scene.edges:
+            scene.removeItem(e)
+        for n in scene.nodes:
+            scene.removeItem(n)
+        scene.nodes.clear()
+        scene.edges.clear()
+
+    @classmethod
+    def center_scene(cls):
+        scene = cls.get_scene()
+        view = cls.get_view()
+        if scene is None:
+            return
+            # Fit to visible nodes if any
+        vis = [n for n in scene.nodes if n.isVisible()]
+        items = vis if vis else scene.nodes
+        if not items:
+            scene.setSceneRect(QRectF(-200, -200, 400, 400))
+            return
+        xs = [n.pos().x() for n in items]
+        ys = [n.pos().y() for n in items]
+        minx, maxx = min(xs) - 120, max(xs) + 120
+        miny, maxy = min(ys) - 120, max(ys) + 120
+        scene.setSceneRect(QRectF(minx, miny, maxx - minx, maxy - miny))
+
+        view.fitInView(scene.sceneRect(), Qt.KeepAspectRatio)
+
+    @classmethod
+    def retranslate_buttons(cls):
+        scene = cls.get_scene()
+        if not scene:
+            return
+        button_widget = cls.get_settings_widget()._button_settings
+        button_widget.retranslateUi(button_widget)
+        pause_text = QCoreApplication.translate("GraphView", "Pause")
+        play_text = QCoreApplication.translate("GraphView", "Play")
+        button_widget.bt_start_stop.setText(pause_text if scene.running else play_text)
+
+    @classmethod
+    def toggle_running(cls):
+        scene = cls.get_scene()
+        scene.running = not scene.running
+        cls.retranslate_buttons()

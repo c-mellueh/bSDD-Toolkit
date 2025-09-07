@@ -25,7 +25,7 @@ from .qt import ui_Buttons
 
 if TYPE_CHECKING:
     from .ui import GraphWindow
-    from .view import GraphScene
+    from .view_ui import GraphScene
 SETTINGS_STYLE_SHEET = """
             QFrame#SettingsWidget {
                 background: rgba(30, 30, 35, 200);
@@ -42,7 +42,7 @@ SETTINGS_STYLE_SHEET = """
             """
 
 
-class SettingsWidget(QFrame):
+class _SettingsWidget(QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setObjectName("SettingsWidget")
@@ -53,7 +53,7 @@ class SettingsWidget(QFrame):
         self.setStyleSheet(SETTINGS_STYLE_SHEET)
 
 
-class ButtonWidget(SettingsWidget, ui_Buttons.Ui_Form):
+class ButtonWidget(_SettingsWidget, ui_Buttons.Ui_Form):
     """Floating settings panel for Graph physics sliders."""
 
     def __init__(self, parent=None):
@@ -61,7 +61,7 @@ class ButtonWidget(SettingsWidget, ui_Buttons.Ui_Form):
         self.setupUi(self)
 
 
-class PhysicsWidget(SettingsWidget):
+class PhysicsWidget(_SettingsWidget):
     """Floating settings panel for Graph physics sliders."""
 
     def __init__(self, physics, parent=None):
@@ -147,7 +147,7 @@ class PhysicsWidget(SettingsWidget):
         self._update_value_labels()
 
 
-class EdgeTypeSettingsWidget(SettingsWidget):
+class EdgeTypeSettingsWidget(_SettingsWidget):
     """
     Compact, floating panel with ToggleSwitches to control visibility
     of individual edge types.

@@ -18,7 +18,8 @@ def retranslate_ui():
 
 
 def on_new_project():
-    core.popuplate_widget(tool.GraphViewWidget, tool.Project)
+    pass
+    # core.popuplate_widget(tool.GraphViewWidget, tool.Project)
 
 
 def widget_created(widget):
@@ -39,3 +40,7 @@ def handle_drop_event(event, view):
         tool.PropertyTableWidget,
         tool.Project,
     )
+
+
+def import_bsdd(cls):
+    core.popuplate_widget(tool.GraphViewWidget, tool.Project)

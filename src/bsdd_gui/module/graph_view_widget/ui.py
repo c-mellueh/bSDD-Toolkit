@@ -22,10 +22,10 @@ from PySide6.QtWidgets import (
     QToolButton,
     QVBoxLayout,
 )
-
-from bsdd_gui.module.graph_view_widget.view import GraphScene, GraphView
+from . import trigger
+from bsdd_gui.module.graph_view_widget.view_ui import GraphScene, GraphView
 from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES
-from bsdd_gui.module.graph_view_widget.settings_widget import SettingsSidebar
+from bsdd_gui.module.graph_view_widget.ui_settings_widget import SettingsSidebar
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -41,7 +41,6 @@ class GraphWindow(QWidget):
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
         self._layout.addWidget(self.view)
-        self._build_toolbar()
         # self._populate_demo()
         self.scene.auto_scene_rect()
         self.resize(1000, 700)
@@ -69,32 +68,7 @@ class GraphWindow(QWidget):
         except Exception:
             # Fail-safe: if overlay can't be created (e.g., headless), skip
             self.settings_sidebar = None
-
-    def _build_toolbar(self):
-        return
-        tb = QToolBar("Controls")
-        tb.setMovable(False)
-        self.addToolBar(tb)
-
-        # Play/Pause
-        self.btn_play = QToolButton()
-        self.btn_play.setText("Pause")
-        self.btn_play.clicked.connect(self._toggle_running)
-        tb.addWidget(self.btn_play)
-
-        # Re-center
-        btn_center = QToolButton()
-        btn_center.setText("Center")
-        btn_center.clicked.connect(self._center_view)
-        tb.addWidget(btn_center)
-
-        # Clear
-        btn_clear = QToolButton()
-        btn_clear.setText("Clear")
-        btn_clear.clicked.connect(self._clear)
-        tb.addWidget(btn_clear)
-
-        tb.addSeparator()
+        trigger.widget_created(self)
 
     # ---- Actions ----
     def _toggle_running(self):
@@ -106,10 +80,6 @@ class GraphWindow(QWidget):
         self.scene.auto_scene_rect()
         self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
         # print("[DEBUG] GraphWindow._center_view: view centered on scene rect")
-
-    def _clear(self):
-        self.scene.clear_graph()
-        # print("[DEBUG] GraphWindow._clear: scene cleared")
 
     def _apply_filters(self):
         node_flags = {
