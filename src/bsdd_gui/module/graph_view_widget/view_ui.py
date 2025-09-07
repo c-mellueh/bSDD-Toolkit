@@ -371,6 +371,23 @@ class GraphView(QGraphicsView):
     def dropEvent(self, event):
         trigger.handle_drop_event(event, self)
 
+    def mouseDoubleClickEvent(self, event):
+        # On double-click, emit a tool-level signal when a Node is hit
+        try:
+            pos_view = self._event_qpoint(event)
+            item = self._item_at_pos(pos_view)
+            node = self._node_from_item(item)
+            if node is not None:
+                try:
+                    tool.GraphViewWidget.signals.node_double_clicked.emit(node)
+                except Exception:
+                    pass
+                event.accept()
+                return
+        except Exception:
+            pass
+        super().mouseDoubleClickEvent(event)
+
 
 class GraphScene(QGraphicsScene):
     def __init__(self):

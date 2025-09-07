@@ -273,6 +273,20 @@ class Node(QGraphicsObject):
         painter.setPen(QPen(QColor(20, 20, 30)))
         painter.drawText(rect, Qt.AlignCenter, self.label)
 
+    def mouseDoubleClickEvent(self, event):
+        # Emit tool signal when this node is double-clicked
+        try:
+            from bsdd_gui.tool.graph_view_widget import GraphViewWidget
+
+            GraphViewWidget.signals.node_double_clicked.emit(self)
+        except Exception:
+            pass
+        try:
+            event.accept()
+        except Exception:
+            pass
+        super().mouseDoubleClickEvent(event)
+
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         if change == QGraphicsItem.ItemPositionHasChanged:
             sc = self.scene()

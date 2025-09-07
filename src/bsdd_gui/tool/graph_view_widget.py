@@ -9,6 +9,7 @@ from PySide6.QtCore import QPointF, QCoreApplication, QRectF, Qt
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, WidgetTool
 from bsdd_gui.presets.signal_presets import WidgetSignals
+from PySide6.QtCore import Signal
 
 import random
 
@@ -33,7 +34,9 @@ from bsdd_gui.module.property_table_widget.constants import JSON_MIME as PROPERT
 
 
 class Signals(WidgetSignals):
-    pass
+    # Emitted when a graph node is double-clicked in the view.
+    # Payload: the Node graphics item (access bsdd_data via node.bsdd_data)
+    node_double_clicked = Signal(object)
 
 
 class GraphViewWidget(ActionTool, WidgetTool):
@@ -54,6 +57,10 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         return GraphWindow
 
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+    
     @classmethod
     def connect_widget_signals(cls, widget: ui.GraphWindow):
         settings_sidebar = widget.settings_sidebar
