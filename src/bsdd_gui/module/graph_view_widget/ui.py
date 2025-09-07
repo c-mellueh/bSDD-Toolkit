@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
 )
 from . import trigger
 from bsdd_gui.module.graph_view_widget.view_ui import GraphScene, GraphView
-from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES
+from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES, ALLOWED_NODE_TYPES
 from bsdd_gui.module.graph_view_widget.ui_settings_widget import SettingsSidebar
 from typing import TYPE_CHECKING
 
@@ -51,8 +51,9 @@ class GraphWindow(QWidget):
         # Track whether we auto-paused due to the window being hidden
         self._auto_paused = False
         self._settings_widget = None
-        # Edge type visibility state and overlay settings panel
+        # Visibility state and overlay settings panel
         self._edge_type_flags: Dict[str, bool] = {et: True for et in ALLOWED_EDGE_TYPES}
+        self._node_type_flags: Dict[str, bool] = {nt: True for nt in ALLOWED_NODE_TYPES}
         try:
             self.settings_sidebar = SettingsSidebar(
                 self,
@@ -103,34 +104,17 @@ class GraphWindow(QWidget):
         # print(f"[DEBUG] GraphWindow._toggle_running: now running={self.scene.running}")
 
     def _apply_filters(self):
-        node_flags = {
-            "class": (self.tg_nodes_class.isChecked() if hasattr(self, "tg_nodes_class") else True),
-            "property": (
-                self.tg_nodes_prop.isChecked() if hasattr(self, "tg_nodes_prop") else True
-            ),
-        }
-        edge_flags: Dict[str, bool] = {
-            "class_rel": (
-                self.tg_edge_class_rel.isChecked() if hasattr(self, "tg_edge_class_rel") else True
-            ),
-            "prop_rel": (
-                self.tg_edge_prop_rel.isChecked() if hasattr(self, "tg_edge_prop_rel") else True
-            ),
-            "class_to_prop": (
-                self.tg_edge_cl_to_prop.isChecked() if hasattr(self, "tg_edge_cl_to_prop") else True
-            ),
-            # default types (e.g., demo) remain visible by default
-        }
-        # Merge per-edge-type toggles from the overlay
-        try:
-            edge_flags.update(self._edge_type_flags)
-        except Exception:
-            pass
+        # Use node type flags from the sidebar; fall back to showing all when missing
+        node_flags: Dict[str, bool] = dict(self._node_type_flags)
         # Apply to scene
-        self.scene.apply_filters(node_flags, edge_flags)
+        self.scene.apply_filters(node_flags, self._edge_type_flags)
 
     def _on_edge_type_toggled(self, edge_type: str, checked: bool) -> None:
         self._edge_type_flags[edge_type] = checked
+        self._apply_filters()
+
+    def _on_node_type_toggled(self, node_type: str, checked: bool) -> None:
+        self._node_type_flags[node_type] = checked
         self._apply_filters()
 
     def _position_edge_settings(self) -> None:

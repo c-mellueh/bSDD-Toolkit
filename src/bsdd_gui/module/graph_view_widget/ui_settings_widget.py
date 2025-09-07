@@ -16,9 +16,14 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSlider,
 )
-from PySide6.QtGui import QPainter, QPen, QColor
+from PySide6.QtGui import QPainter, QPen, QColor, QBrush
 
-from bsdd_gui.module.graph_view_widget.constants import EDGE_STYLE_MAP, EDGE_STYLE_DEFAULT
+from bsdd_gui.module.graph_view_widget.constants import (
+    EDGE_STYLE_MAP,
+    EDGE_STYLE_DEFAULT,
+    NODE_COLOR_MAP,
+    NODE_SHAPE_MAP,
+)
 
 from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
 from .qt import ui_Buttons
@@ -268,6 +273,95 @@ class _EdgeLegendIcon(QWidget):
         p.setPen(pen)
         p.drawLine(int(x1), int(y), int(x2), int(y))
 
+
+class NodeTypeSettingsWidget(_SettingsWidget):
+    """Panel mirroring EdgeTypeSettingsWidget, but for node types."""
+
+    def __init__(
+        self,
+        allowed_node_types: Iterable[str],
+        on_toggle: Callable[[str, bool], None],
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self._on_toggle = on_toggle
+        self._switches: Dict[str, ToggleSwitch] = {}
+
+        root = QVBoxLayout(self)
+        root.setContentsMargins(8, 8, 8, 8)
+        root.setSpacing(6)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
+        title = QLabel("Node Types")
+        title.setObjectName("titleLabel")
+        root.addWidget(title)
+
+        for nt in allowed_node_types:
+            row = QHBoxLayout()
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(6)
+            icon = _NodeLegendIcon(str(nt))
+            lbl = QLabel(str(nt))
+            lbl.setToolTip(str(nt))
+            sw = ToggleSwitch(checked=True)
+            sw.toggled.connect(self._make_handler(nt))
+            self._switches[nt] = sw
+            row.addWidget(icon, 0)
+            row.addWidget(lbl, 1)
+            row.addWidget(sw, 0, alignment=Qt.AlignRight)
+            root.addLayout(row)
+
+    def _make_handler(self, node_type: str):
+        def _handler(checked: bool):
+            if callable(self._on_toggle):
+                self._on_toggle(node_type, checked)
+
+        return _handler
+
+    def get_flags(self) -> Dict[str, bool]:
+        return {nt: sw.isChecked() for nt, sw in self._switches.items()}
+
+    def set_flag(self, node_type: str, value: bool) -> None:
+        sw = self._switches.get(node_type)
+        if sw is not None:
+            sw.blockSignals(True)
+            try:
+                sw.setChecked(bool(value))
+            finally:
+                sw.blockSignals(False)
+
+
+class _NodeLegendIcon(QWidget):
+    """Small icon preview of node color/shape."""
+
+    def __init__(self, node_type: str, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self._node_type = node_type
+        self.setFixedWidth(28)
+        self.setFixedHeight(14)
+
+    def sizeHint(self):
+        return QSize(28, 14)
+
+    def paintEvent(self, _):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing, True)
+        rect = self.rect().adjusted(2, 2, -2, -2)
+        color = NODE_COLOR_MAP.get(self._node_type, QColor(130, 130, 150))
+        shape = NODE_SHAPE_MAP.get(self._node_type, "rect")
+        pen = QPen(color)
+        pen.setCosmetic(True)
+        p.setPen(pen)
+        brush = QBrush(Qt.BrushStyle.SolidPattern)
+        brush.setColor(color)
+        p.setBrush(brush)
+        if shape == "ellipse":
+            p.drawEllipse(rect)
+        elif shape == "roundrect":
+            p.drawRoundedRect(rect, 4, 4)
+        else:
+            p.drawRect(rect)
+
     def mouseDoubleClickEvent(self, event):
         try:
             self.edgeTypeActivated.emit(self._edge_type)
@@ -300,6 +394,8 @@ class SettingsSidebar(QWidget):
 
         self.setObjectName("SettingsSidebar")
         self.setAttribute(Qt.WA_StyledBackground, True)
+        # Ensure the overlay itself is fully transparent
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setStyleSheet(
             """
             QWidget#SettingsSidebar {
@@ -327,7 +423,28 @@ class SettingsSidebar(QWidget):
         self._scroll = QScrollArea(self)
         self._scroll.setFrameShape(QFrame.NoFrame)
         self._scroll.setWidgetResizable(True)
+        # Make scroll area and its viewport fully transparent
+        try:
+            self._scroll.setAttribute(Qt.WA_TranslucentBackground, True)
+            self._scroll.viewport().setAttribute(Qt.WA_TranslucentBackground, True)
+        except Exception:
+            pass
+        self._scroll.setStyleSheet(
+            """
+            QScrollArea { background: transparent; }
+            QWidget#qt_scrollarea_viewport { background: transparent; }
+            """
+        )
+
         self._scroll_content = QWidget(self._scroll)
+        self._scroll_content.setObjectName("ScrollContent")
+        self._scroll_content.setAttribute(Qt.WA_StyledBackground, True)
+        text = """
+        QWidget#ScrollContent {
+            background: transparent;
+        }
+        """
+        self._scroll_content.setStyleSheet(text)
         self._scroll_layout = QVBoxLayout(self._scroll_content)
         self._scroll_layout.setContentsMargins(0, 0, 0, 0)
         self._scroll_layout.setSpacing(8)
@@ -340,8 +457,21 @@ class SettingsSidebar(QWidget):
             pass
         scene: GraphScene = self.graph_window.view.scene()
         self._view_settings = PhysicsWidget(scene.physics, None)
+        # Node types panel
+        try:
+            from bsdd_gui.module.graph_view_widget import constants as _const
+
+            allowed_node_types = getattr(_const, "ALLOWED_NODE_TYPES", [])
+        except Exception:
+            allowed_node_types = []
+        self._node_types_panel = NodeTypeSettingsWidget(
+            allowed_node_types,
+            on_toggle=self._on_node_type_toggled,
+            parent=None,
+        )
         self._button_settings = ButtonWidget(None)
         self._scroll_layout.addWidget(self._view_settings)
+        self._scroll_layout.addWidget(self._node_types_panel)
         self._scroll_layout.addWidget(self._edge_types_panel)
         self._scroll_layout.addWidget(self._button_settings)
 
@@ -416,5 +546,13 @@ class SettingsSidebar(QWidget):
                     edge_type = None  # deselect
             if hasattr(gw, "set_active_edge_type") and callable(gw.set_active_edge_type):
                 gw.set_active_edge_type(edge_type)
+        except Exception:
+            pass
+
+    def _on_node_type_toggled(self, node_type: str, checked: bool) -> None:
+        try:
+            gw: GraphWindow = self.graph_window
+            if hasattr(gw, "_on_node_type_toggled"):
+                gw._on_node_type_toggled(node_type, checked)
         except Exception:
             pass

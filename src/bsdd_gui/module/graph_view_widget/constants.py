@@ -35,7 +35,7 @@ ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
 PROPERTY_NODE_TYPE = "property"
 CLASS_NODE_TYPE = "bsdd_class"
 GENERIC_NODE_TYPE = "generic"
-
+ALLOWED_NODE_TYPES = [PROPERTY_NODE_TYPE, CLASS_NODE_TYPE, GENERIC_NODE_TYPE]
 # Edge Type
 C_P_REL = "ClassProperty"
 MATERIAL_REL = "HasMaterial"
