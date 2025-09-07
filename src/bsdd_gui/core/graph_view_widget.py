@@ -93,6 +93,7 @@ def connect_signals(
 
     graph_view.signals.new_edge_created.connect(handle_edge_add)
 
+
 def connect_to_main_window(
     graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
 ):
