@@ -42,5 +42,5 @@ def handle_drop_event(event, view):
     )
 
 
-def import_bsdd(cls):
+def load_bsdd(cls):
     core.popuplate_widget(tool.GraphViewWidget, tool.Project)
