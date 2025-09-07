@@ -150,7 +150,7 @@ class ClassTreeView(ItemViewTool):
             stack.extend(cl_utils.get_children(n))
 
         for node in reversed(to_delete):
-            cls.delete_class(bsdd_class, bsdd_dictionary)
+            cls.delete_class(node, bsdd_dictionary)
 
     @classmethod
     def get_payload_from_data(cls, data):

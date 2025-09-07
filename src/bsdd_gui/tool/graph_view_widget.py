@@ -298,8 +298,10 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def insert_classes_in_scene(
-        cls, scene: view_ui.GraphScene, classes: list[BsddClass], position: QPointF
+        cls, scene: view_ui.GraphScene, classes: list[BsddClass], position: QPointF = None
     ):
+        if position is None:
+            position = QPointF(scene.sceneRect().width() / 2, scene.sceneRect().height() / 2)
         offset_step = QPointF(24.0, 18.0)
         cur = QPointF(position)
         new_nodes = list()
@@ -445,8 +447,10 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def insert_properties_in_scene(
-        cls, scene: view_ui.GraphScene, bsdd_properties: list[BsddProperty], position: QPointF
+        cls, scene: view_ui.GraphScene, bsdd_properties: list[BsddProperty], position: QPointF = None
     ):
+        if position is None:
+            position = QPointF(scene.sceneRect().width() / 2, scene.sceneRect().height() / 2)
         offset_step = QPointF(24.0, 18.0)
         cur = QPointF(position)
         existing_property_codes = {

@@ -137,7 +137,10 @@ class ClassTreeModel(ItemModel):
         else:
             # root class
             roots = cl_utils.get_root_classes(self.bsdd_dictionary)
-            row = roots.index(cls)
+            if cls in roots:
+                row = roots.index(cls)
+            else:
+                row = -1
             return self.index(row, 0, QModelIndex())
 
     def flags(self, index: QModelIndex):

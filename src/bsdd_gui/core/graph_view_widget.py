@@ -141,8 +141,11 @@ def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.
     widget = graph_view.get_widget()
     if widget is None:
         return
+    bsdd_dictionary = project.get()
     graph_view.clear_scene()
-    graph_view.populate_from_bsdd(widget, project.get())
+    graph_view.insert_classes_in_scene(graph_view.get_scene(), bsdd_dictionary.Classes)
+    graph_view.insert_properties_in_scene(graph_view.get_scene(), bsdd_dictionary.Properties)
+    recalculate_edges(graph_view, project)
 
 
 def handle_drop_event(
