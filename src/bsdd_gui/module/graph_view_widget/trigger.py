@@ -47,3 +47,6 @@ def load_bsdd():
 
 def node_double_clicked(node):
     core.node_double_clicked(node,tool.PropertyTableWidget,tool.ClassTreeView,tool.MainWindowWidget)
+    
+def create_relation(start_node,end_node,relation_type):
+    core.create_relation(start_node,end_node,relation_type,tool.GraphViewWidget,tool.Project)

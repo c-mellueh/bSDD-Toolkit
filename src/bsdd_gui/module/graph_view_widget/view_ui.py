@@ -232,6 +232,8 @@ class GraphView(QGraphicsView):
 
         # Decide edge type: use selected type if set, otherwise heuristic
         etype = self._create_edge_type
+        trigger.create_relation(start_node,end_node,etype)
+        return
         if not etype:
             etype = (
                 C_P_REL

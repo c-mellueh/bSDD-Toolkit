@@ -141,9 +141,34 @@ def node_double_clicked(
         class_tree.select_and_expand(bsdd_cass, main_window.get_class_view())
         main_window.get().raise_()
         main_window.get().activateWindow()
-        
+
     elif node.node_type == constants.PROPERTY_NODE_TYPE:
         bsdd_property:BsddProperty = node.bsdd_data
         property_table.request_widget()
         widget:PropertyWidget = property_table.get_widgets()[-1]
         property_table.select_property(bsdd_property,widget.tv_properties)
+
+
+def create_relation(
+    start_node: graphics_items.Node,
+    end_node: graphics_items.Node,
+    relation_type: constants.ALLOWED_EDGE_TYPES_TYPING,
+    graph_view: Type[tool.GraphViewWidget],
+    project: Type[tool.Project],
+):
+
+    if start_node.node_type == constants.CLASS_NODE_TYPE:
+        if end_node.node_type == constants.PROPERTY_NODE_TYPE:
+            if relation_type == constants.C_P_REL:
+                graph_view.create_class_property_relation(start_node, end_node, project.get())
+        elif end_node.node_type == constants.CLASS_NODE_TYPE:
+            graph_view.create_class_class_relation(
+                start_node, end_node, project.get(), relation_type
+            )
+    elif start_node.node_type == constants.PROPERTY_NODE_TYPE:
+        if end_node.node_type == constants.CLASS_NODE_TYPE:
+            graph_view.create_class_property_relation(start_node, end_node, project.get())
+        elif end_node.node_type == constants.PROPERTY_NODE_TYPE:
+            graph_view.create_property_property_relation(
+                start_node, end_node, project.get(), relation_type
+            )
