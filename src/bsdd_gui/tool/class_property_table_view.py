@@ -38,9 +38,47 @@ class ClassPropertyTableView(ItemViewTool):
         return trigger
 
     @classmethod
-    def delete_selection(view: ui.ClassPropertyTable):
-        # TODO
-        return None
+    def get_models_by_class(cls, bsdd_class: BsddClass) -> list[models.ClassPropertyTableModel]:
+        return [model for model in cls.get_models() if model.active_class == bsdd_class]
+
+    @classmethod
+    def add_class_property(cls, class_property: BsddClassProperty, bsdd_class: BsddClass):
+        if class_property in bsdd_class.ClassProperties:
+            return
+        affected_models = cls.get_models_by_class(bsdd_class)
+        for model in affected_models:
+            row = model.rowCount()
+            model.beginInsertRows(QModelIndex(), row, row)
+
+        bsdd_class.ClassProperties.append(class_property)
+        class_property._set_parent(bsdd_class)
+
+        for model in affected_models:
+            model.endInsertRows()
+
+        cls.signals.item_added.emit(class_property)
+
+    @classmethod
+    def remove_property(cls, bsdd_class: BsddClass, class_property: BsddClassProperty):
+        affected_models = cls.get_models_by_class(bsdd_class)
+        for model in affected_models:
+            row = model.get_row_for_data(class_property)
+            model.beginRemoveRows(QModelIndex(), row, row)
+
+        bsdd_class.ClassProperties.remove(class_property)
+
+        for model in affected_models:
+            model.endRemoveRows()
+
+        cls.signals.item_removed.emit(class_property)
+
+    @classmethod
+    def delete_selection(cls, view: ui.ClassPropertyTable):
+        class_properties = cls.get_selected(view)
+        bsdd_class = view.model().sourceModel().active_class
+
+        for prop in class_properties:
+            cls.remove_property(bsdd_class, prop)
 
     @classmethod
     def connect_internal_signals(cls):
@@ -79,10 +117,3 @@ class ClassPropertyTableView(ItemViewTool):
         if not index.isValid():
             return
         view.setCurrentIndex(index)
-
-    @classmethod
-    def remove_property(cls, bsdd_class: BsddClass, class_property: BsddClassProperty):
-        if class_property in bsdd_class.ClassProperties:
-            bsdd_class.ClassProperties.remove(class_property)
-        else:
-            logging.info(f"class_property '{class_property.Code}' not in class '{bsdd_class.Code}'")

@@ -10,9 +10,8 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_editor_widget import ui
 
 
-def connect_signals(class_editor: Type[tool.ClassEditorWidget], project: Type[tool.Project]):
+def connect_signals(class_editor: Type[tool.ClassEditorWidget]):
     class_editor.connect_signals()
-    class_editor.signals.new_class_created.connect(project.signals.class_added.emit)
 
 
 def retranslate_ui(class_editor: Type[tool.ClassEditorWidget]):
@@ -57,9 +56,7 @@ def register_fields(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorW
 
     class_editor.register_field_getter(widget, widget.cb_status, lambda c: c.Status)
     class_editor.register_field_setter(
-        widget,
-        widget.cb_status,
-        lambda e, v: setattr(e, "Status", v),
+        widget, widget.cb_status, lambda e, v: setattr(e, "Status", v)
     )
 
     class_editor.register_field_getter(
@@ -102,8 +99,7 @@ def connect_widget(
 
 
 def connect_to_main_window(
-    class_editor: Type[tool.ClassEditorWidget],
-    main_window: Type[tool.MainWindowWidget],
+    class_editor: Type[tool.ClassEditorWidget], main_window: Type[tool.MainWindowWidget]
 ):
     def emit_class_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)

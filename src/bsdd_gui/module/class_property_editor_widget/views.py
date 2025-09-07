@@ -1,12 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import (
-    QCoreApplication,
-    QSortFilterProxyModel,
-    QModelIndex,
-    Qt,
-    Signal,
-)
+from PySide6.QtCore import QCoreApplication, QSortFilterProxyModel, QModelIndex, Qt, Signal
 
 from PySide6.QtWidgets import QWidget, QWidget, QGridLayout, QApplication, QLineEdit, QStyle
 from PySide6.QtGui import QStyleHints, QStandardItem, QPalette, QIcon

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type, Literal
-from bsdd_json import BsddProperty, BsddClass
-from PySide6.QtWidgets import QWidget, QTreeView
-from PySide6.QtCore import QCoreApplication
+from bsdd_json import BsddProperty, BsddClass, BsddClassRelation, BsddPropertyRelation
+from PySide6.QtWidgets import QWidget, QTableView
+from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.relationship_editor_widget import ui
 
 if TYPE_CHECKING:
@@ -33,9 +33,40 @@ def connect_signals(
         lambda _: relationship_editor.update_all_completers(project.get())
     )
     class_editor.signals.dialog_accepted.connect(
-        relationship_editor.transform_virtual_relationships_to_real
+        relationship_editor.transform_virtual_relations_to_real
     )
     relationship_editor.connect_internal_signals()
+
+    def handle_item_remove(item):
+        if isinstance(item, BsddClassRelation):
+            project.signals.class_relation_removed.emit(item)
+        elif isinstance(item, BsddPropertyRelation):
+            project.signals.property_relation_removed.emit(item)
+
+    def handle_item_add(item):
+        if isinstance(item, BsddClassRelation):
+            project.signals.class_relation_added.emit(item)
+        elif isinstance(item, BsddPropertyRelation):
+            project.signals.property_relation_added.emit(item)
+
+    relationship_editor.signals.item_added.connect(handle_item_add)
+    relationship_editor.signals.item_removed.connect(handle_item_remove)
+
+    relationship_editor.signals.class_relation_added.connect(project.signals.class_relation_added)
+    relationship_editor.signals.class_relation_removed.connect(
+        project.signals.class_relation_removed
+    )
+    relationship_editor.signals.property_relation_added.connect(
+        project.signals.property_relation_added
+    )
+    relationship_editor.signals.property_relation_removed.connect(
+        project.signals.property_relation_removed
+    )
+
+    project.signals.class_relation_added.connect(
+        lambda r: relationship_editor.make_class_relation_bidrectional(r, project.get())
+    )
+    project.signals.class_relation_added.connect(print)
 
 
 def retranslate_ui(relationship_editor: Type[tool.RelationshipEditorWidget]):
@@ -57,12 +88,12 @@ def register_widget(
     relationship_editor.register_widget(widget)
 
 
-def register_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]):
+def register_view(view: QTableView, relationship_editor: Type[tool.RelationshipEditorWidget]):
     relationship_editor.register_view(view)
 
 
 def add_columns_to_view(
-    view: QTreeView,
+    view: QTableView,
     data: BsddClass | BsddProperty,
     mode: Literal["dialog"] | Literal["live"],
     relationship_editor: Type[tool.RelationshipEditorWidget],
@@ -78,16 +109,32 @@ def add_columns_to_view(
 
 
 def add_context_menu_to_view(
-    view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]
+    view: QTableView, relationship_editor: Type[tool.RelationshipEditorWidget]
 ):
-    pass  # TODO:
+    relationship_editor.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("AllowedValuesTable", "Delete"),
+        lambda: relationship_editor.signals.delete_selection_requested.emit(view),
+        True,
+        True,
+        True,
+    )
 
 
-def connect_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]):
-    pass
+def create_context_menu(
+    view: QTableView, pos: QPoint, relationship_editor: Type[tool.RelationshipEditorWidget]
+):
+    bsdd_allowed_values = relationship_editor.get_selected(view)
+    menu = relationship_editor.create_context_menu(view, bsdd_allowed_values)
+    menu_pos = view.viewport().mapToGlobal(pos)
+    menu.exec(menu_pos)
 
 
-def remove_view(view: QTreeView, relationship_editor: Type[tool.RelationshipEditorWidget]):
+def connect_view(view: QTableView, relationship_editor: Type[tool.RelationshipEditorWidget]):
+    relationship_editor.connect_view_signals(view)
+
+
+def remove_view(view: QTableView, relationship_editor: Type[tool.RelationshipEditorWidget]):
     relationship_editor.unregister_view(view)
 
 
@@ -144,7 +191,6 @@ def register_validators(
 
 
 def remove_widget(
-    widget: ui.RelationshipWidget,
-    relationship_editor: Type[tool.RelationshipEditorWidget],
+    widget: ui.RelationshipWidget, relationship_editor: Type[tool.RelationshipEditorWidget]
 ):
     relationship_editor.unregister_widget(widget)

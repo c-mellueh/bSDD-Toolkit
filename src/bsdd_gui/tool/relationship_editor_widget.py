@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Type
 import logging
 
-from PySide6.QtWidgets import QTreeView, QCompleter, QWidget
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QTreeView, QCompleter, QTableView
+from PySide6.QtCore import Qt, Signal
 import bsdd_gui
 from bsdd_json import (
     BsddProperty,
@@ -25,7 +25,11 @@ from bsdd_gui.module.relationship_editor_widget import ui, trigger, models
 
 
 class Signals(ViewSignals, FieldSignals):
-    pass
+    class_relation_added = Signal(BsddClassRelation)
+    class_relation_removed = Signal(BsddClassRelation)
+
+    property_relation_added = Signal(BsddPropertyRelation)
+    property_relation_removed = Signal(BsddPropertyRelation)
 
 
 class RelationshipEditorWidget(FieldTool, ItemViewTool):
@@ -91,9 +95,11 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         widget.cb_relation_type.currentTextChanged.connect(
             lambda _w=widget: cls.update_code_completer(widget, bsdd_dictionary)
         )
-        widget.tb_add.clicked.connect(lambda _, w=widget: cls.add_row_to_model(w, bsdd_dictionary))
+        widget.tb_add.clicked.connect(
+            lambda _, w=widget: cls.add_relation_to_model(w, bsdd_dictionary)
+        )
         widget.le_related_element.returnPressed.connect(
-            lambda w=widget: cls.add_row_to_model(w, bsdd_dictionary)
+            lambda w=widget: cls.add_relation_to_model(w, bsdd_dictionary)
         )
 
     @classmethod
@@ -132,11 +138,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         widget.le_owned_uri.setVisible(bsdd_dictionary.UseOwnUri)
 
     @classmethod
-    def update_code_completer(
-        cls,
-        widget: ui.RelationshipWidget,
-        bsdd_dictionary: BsddDictionary,
-    ):
+    def update_code_completer(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
         if isinstance(widget.bsdd_data, BsddClass):
             codes = [c.Code for c in bsdd_dictionary.Classes]
             if widget.cb_relation_type.currentText() == "HasMaterial":
@@ -171,7 +173,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             cls.update_code_completer(widget, bsdd_dictionary)
 
     @classmethod
-    def add_row_to_model(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
+    def add_relation_to_model(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
         def clear_inputs():
             widget.le_owned_uri.clear()
             widget.le_related_element.clear()
@@ -218,31 +220,94 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
                 )
             data_dict["RelatedPropertyName"] = related_property.Name
             relation = BsddPropertyRelation.model_validate(data_dict)
-
-        if model.mode == "dialog":
-            model.append_row(relation)
-        else:
-            model.append_row(relation)
+        model.append_relation(relation)
+        if model.mode == "live":
+            cls.signals.item_added.emit(relation)
         clear_inputs()
 
     @classmethod
-    def transform_virtual_relationships_to_real(cls, dialog: BaseDialog):
+    def delete_selection(cls, view: QTableView):
+        model: models.RelationshipModel = view.model().sourceModel()
+        for relation in cls.get_selected(view):
+            model.remove_relation(relation)
+            if model.mode == "live":
+                cls.signals.item_removed.emit(relation)
+
+    @classmethod
+    def transform_virtual_relations_to_real(cls, dialog: BaseDialog):
         widget = dialog._widget
         if isinstance(widget, class_editor_ui.ClassEditor):
             table_view = widget.relationship_editor.tv_relations
             model: models.RelationshipModel = table_view.model().sourceModel()
             model.beginResetModel()
-            for relationship in list(model.virtual_remove):
+            for relation in list(model.virtual_remove):
                 if isinstance(model.bsdd_data, BsddClass):
-                    model.bsdd_data.ClassRelations.remove(relationship)  # type: ignore[arg-type]
+                    model.bsdd_data.ClassRelations.remove(relation)  # type: ignore[arg-type]
                 else:
-                    model.bsdd_data.PropertyRelations.remove(relationship)  # type: ignore[arg-type]
-                model.virtual_remove.remove(relationship)
+                    model.bsdd_data.PropertyRelations.remove(relation)  # type: ignore[arg-type]
+                cls.signals.item_removed.emit(relation)
 
-            for relationship in list(model.virtual_append):
+                model.virtual_remove.remove(relation)
+
+            for relation in list(model.virtual_append):
                 if isinstance(model.bsdd_data, BsddClass):
-                    model.bsdd_data.ClassRelations.append(relationship)  # type: ignore[arg-type]
+                    model.bsdd_data.ClassRelations.append(relation)  # type: ignore[arg-type]
                 else:
-                    model.bsdd_data.PropertyRelations.append(relationship)  # type: ignore[arg-type]
-                model.virtual_append.remove(relationship)
+                    model.bsdd_data.PropertyRelations.append(relation)  # type: ignore[arg-type]
+                cls.signals.item_added.emit(relation)
+
+                model.virtual_append.remove(relation)
             model.endResetModel()
+
+    @classmethod
+    def get_widget(cls, bsdd_data: BsddClass | BsddProperty) -> ui.RelationshipWidget:
+        return super().get_widget(bsdd_data)
+
+    @classmethod
+    def read_relation(
+        cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
+    ):
+        start_data = relation._parent_ref()
+        relation_type = relation.RelationType
+
+        if isinstance(relation, BsddClassRelation):
+            related_uri = relation.RelatedClassUri
+            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
+            end_data = cl_utils.get_class_by_code(bsdd_dictionary, code)
+
+        elif isinstance(relation, BsddPropertyRelation):
+            related_uri = relation.RelatedPropertyUri
+            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
+            end_data = prop_utils.get_property_by_code(code)
+        return start_data, end_data, relation_type
+
+    @classmethod
+    def make_class_relation_bidrectional(
+        cls, relation: BsddClassRelation, bsdd_dictionary: BsddDictionary
+    ):
+        start_class, end_class, relation_type = cls.read_relation(relation, bsdd_dictionary)
+        start_uri = cl_utils.build_bsdd_uri(start_class, bsdd_dictionary)
+
+        inverse_relations = {"IsChildOf": "IsParentOf", "HasPart": "IsPartOf"}
+        for k, v in dict(inverse_relations).items():
+            inverse_relations[v] = k
+
+        if relation_type not in inverse_relations:
+            return
+        for cr in end_class.ClassRelations:
+            if (
+                cr.RelatedClassUri == start_uri
+                and cr.RelationType == inverse_relations[relation_type]
+            ):
+                return
+
+        for start_rel, end_rel in inverse_relations.items():
+            if relation_type == start_rel:
+                rel = BsddClassRelation(
+                    RelationType=end_rel,
+                    RelatedClassUri=start_uri,
+                    RelatedClassName=start_class.Name,
+                )
+                rel._set_parent(end_class)
+                end_class.ClassRelations.append(rel)
+                cls.signals.class_relation_added.emit(rel)

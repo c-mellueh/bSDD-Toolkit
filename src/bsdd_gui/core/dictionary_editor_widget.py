@@ -89,8 +89,7 @@ def connect_to_main_window(
 
 
 def register_fields(
-    widget: ui.DictionaryEditor,
-    dictionary_editor: Type[tool.DictionaryEditorWidget],
+    widget: ui.DictionaryEditor, dictionary_editor: Type[tool.DictionaryEditorWidget]
 ):
 
     dictionary_editor.register_basic_field(widget, widget.le_org_code, "OrganizationCode")

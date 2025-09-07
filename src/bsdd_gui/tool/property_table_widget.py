@@ -12,9 +12,10 @@ from PySide6.QtCore import (
     QItemSelectionModel,
 )
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QTreeView
-from bsdd_json.models import BsddClassProperty, BsddClass, BsddProperty
-from bsdd_gui.module.property_table_widget import ui, models, trigger, views
-
+from bsdd_json.models import BsddClassProperty, BsddClass, BsddProperty, BsddDictionary
+from bsdd_json.utils import property_utils as prop_utils
+from bsdd_gui.module.property_table_widget import ui, models, trigger, views, constants
+import json
 
 if TYPE_CHECKING:
     from bsdd_gui.module.property_table_widget.prop import PropertyTableWidgetProperties
@@ -23,13 +24,13 @@ from bsdd_gui.presets.tool_presets import (
     ItemViewTool,
     ItemViewTool,
     ViewSignals,
-    FieldSignals,
+    WidgetSignals,
     WidgetTool,
     ActionTool,
 )
 
 
-class Signals(ViewSignals, FieldSignals):
+class Signals(ViewSignals, WidgetSignals):
     property_info_requested = Signal(BsddProperty, ui.PropertyWidget)
     reset_all_property_tables_requested = Signal()
     new_property_requested = Signal()
@@ -61,8 +62,60 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         return ui.PropertyWidget
 
     @classmethod
+    def add_property_to_dictionary(cls, bsdd_property, bsdd_dictionary: BsddDictionary):
+        affected_models = [
+            m
+            for m in cls.get_models()
+            if m.bsdd_dictionary == bsdd_dictionary and isinstance(m, models.PropertyTableModel)
+        ]
+        for model in affected_models:
+            row = model.rowCount()
+            model.beginInsertRows(QModelIndex(), row, row)
+
+        bsdd_dictionary.Properties.append(bsdd_property)
+        for model in affected_models:
+            model.endInsertRows()
+        cls.signals.item_added.emit(bsdd_property)
+
+    @classmethod
     def delete_selection(cls, view: views.ClassTable | views.PropertyTable):
-        trigger.delete_selection(view)
+
+        selected_elements = cls.get_selected(view)
+        if not selected_elements:
+            return
+        bsdd_dictionary = view.model().sourceModel().bsdd_dictionary
+        affected_models = [m for m in cls.get_models() if m.bsdd_dictionary == bsdd_dictionary]
+
+        if isinstance(selected_elements[0], BsddProperty):
+            affected_models = [
+                m for m in affected_models if isinstance(m, models.PropertyTableModel)
+            ]
+            for bsdd_property in selected_elements:
+                for model in affected_models:
+                    row = model.get_row_for_data(bsdd_property)
+                    model.beginRemoveRows(QModelIndex(), row, row)
+                removed_properties = prop_utils.delete_property(bsdd_property)
+                for cp in removed_properties:
+                    cls.signals.item_removed.emit(cp)
+                cls.signals.item_removed.emit(bsdd_property)
+                for model in affected_models:
+                    model.endRemoveRows()
+
+        elif isinstance(selected_elements[0], BsddClass):
+            affected_models = [m for m in affected_models if isinstance(m, models.ClassTableModel)]
+            selected_elements: list[BsddClass]
+            active_prop = cls.get_active_property()
+            for bsdd_class in selected_elements:
+                for model in affected_models:
+                    row = model.get_row_for_data(bsdd_class)
+                    model.beginRemoveRows(QModelIndex(), row, row)
+                    model._data = None
+                for bsdd_class_property in list(bsdd_class.ClassProperties):
+                    if bsdd_class_property.PropertyCode == active_prop.Code:
+                        bsdd_class.ClassProperties.remove(bsdd_class_property)
+                        cls.signals.item_removed.emit(bsdd_class_property)
+                for model in affected_models:
+                    model.endRemoveRows()
 
     @classmethod
     def connect_internal_signals(cls):
@@ -105,6 +158,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         proxy_model = models.SortModel()
         proxy_model.setSourceModel(model)
         proxy_model.setDynamicSortFilter(True)
+        cls.get_properties().models.add(model)
         return proxy_model, model
 
     @classmethod
@@ -113,6 +167,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         proxy_model = models.SortModel()
         proxy_model.setSourceModel(model)
         proxy_model.setDynamicSortFilter(True)
+        cls.get_properties().models.add(model)
         return proxy_model, model
 
     @classmethod
@@ -137,9 +192,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
 
     @classmethod
     def select_property(
-        cls,
-        bsdd_property: BsddProperty,
-        view: QAbstractItemView | None = None,
+        cls, bsdd_property: BsddProperty, view: QAbstractItemView | None = None
     ) -> bool:
         """
         Select the given BsddProperty in the properties table and scroll it into view.
@@ -204,3 +257,44 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     @classmethod
     def request_new_property(cls):
         cls.signals.new_property_requested.emit()
+
+    @classmethod
+    def get_properties_from_mime_payload(
+        cls, payload: dict, bsdd_dictionary: BsddDictionary
+    ) -> bool:
+        raw_properties = payload.get("properties", [])
+        if not isinstance(raw_properties, list):
+            return False
+
+        # existing property codes in target dictionary
+        existing_properties = [p.Code for p in bsdd_dictionary.Properties]
+        property_code_dict = {
+            rp["Code"]: rp for rp in raw_properties if isinstance(rp, dict) and "Code" in rp
+        }
+
+        new_properties = []
+        for property_code, property_json in property_code_dict.items():
+
+            if property_code in existing_properties:
+                continue
+            try:
+                new_properties.append(BsddProperty.model_validate(property_json))
+            except Exception:
+                # if invalid, skip this one (or log)
+                continue
+        return new_properties
+
+    @classmethod
+    def get_payload_from_data(cls, data):
+        payload = None
+        for fmt in (constants.JSON_MIME, "application/json", "text/plain"):
+            if data.hasFormat(fmt):
+                try:
+                    b = bytes(data.data(fmt))
+                    if fmt == "text/plain":
+                        b = b.strip()
+                    payload = json.loads(b.decode("utf-8"))
+                    return payload
+                except Exception:
+                    pass
+        return payload

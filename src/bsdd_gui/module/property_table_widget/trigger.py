@@ -28,8 +28,8 @@ def on_new_project():
     pass
 
 
-def create_widget(parent_widget):
-    core.create_widget(parent_widget, tool.PropertyTableWidget, tool.Util, tool.MainWindowWidget)
+def create_widget():
+    core.create_widget(tool.PropertyTableWidget, tool.Util, tool.MainWindowWidget)
 
 
 def widget_created(widget: ui.PropertyWidget):
@@ -57,7 +57,3 @@ def search_requested(view: QTreeView):
 
 def context_menu_requested(view: views.PropertyTable | views.ClassTable, pos):
     core.create_context_menu(view, pos, tool.PropertyTableWidget)
-
-
-def delete_selection(view: QTreeView):
-    core.delete_selection(view, tool.PropertyTableWidget, tool.Project)

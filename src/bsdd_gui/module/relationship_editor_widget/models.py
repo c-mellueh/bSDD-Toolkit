@@ -24,12 +24,7 @@ from bsdd_gui.presets.models_presets import ItemModel
 
 class RelationshipModel(ItemModel):
 
-    def __init__(
-        self,
-        data: BsddClass | BsddProperty,
-        *args,
-        **kwargs,
-    ):
+    def __init__(self, data: BsddClass | BsddProperty, *args, **kwargs):
         super().__init__(tool.RelationshipEditorWidget, data, *args, **kwargs)
         self.bsdd_data: BsddClass | BsddProperty
         self.mode: Literal["dialog"] | Literal["live"] = None
@@ -74,7 +69,7 @@ class RelationshipModel(ItemModel):
         self._data = None
         return super().beginResetModel()
 
-    def append_row(self, relation: BsddClassRelation | BsddPropertyRelation):
+    def append_relation(self, relation: BsddClassRelation | BsddPropertyRelation):
         # Prevent duplicates for class relations (preserve previous ClassModel behavior)
         if isinstance(self.bsdd_data, BsddClass):
             if relation in self.bsdd_data.ClassRelations:
@@ -95,7 +90,42 @@ class RelationshipModel(ItemModel):
                     self.bsdd_data.ClassRelations.append(relation)  # type: ignore[arg-type]
                 else:
                     self.bsdd_data.PropertyRelations.append(relation)  # type: ignore[arg-type]
+
+        relation._set_parent(self.bsdd_data)
         self.endInsertRows()
+
+    def get_row_from_relationship(self, relation: BsddClassRelation | BsddPropertyRelation) -> int:
+        for row in range(self.rowCount(QModelIndex())):
+            if self.index(row, 0).internalPointer() == relation:
+                return row
+        return -1
+
+    def remove_relation(self, relation: BsddClassRelation | BsddPropertyRelation):
+        # Prevent duplicates for class relations (preserve previous ClassModel behavior)
+        if isinstance(self.bsdd_data, BsddClass):
+            if relation not in self.bsdd_data.ClassRelations:
+                return
+        if isinstance(self.bsdd_data, BsddProperty):
+            if relation not in self.bsdd_data.PropertyRelations:
+                return
+
+        if relation in self.virtual_remove:
+            return
+
+        row = self.get_row_from_relationship(relation)
+        self.beginRemoveRows(QModelIndex(), row, row)
+        if relation in self.virtual_append and self.mode == "dialog":
+            self.virtual_append.remove(relation)
+            return
+        else:
+            if self.mode == "dialog":
+                self.virtual_remove.append(relation)
+            else:
+                if isinstance(self.bsdd_data, BsddClass):
+                    self.bsdd_data.ClassRelations.remove(relation)  # type: ignore[arg-type]
+                else:
+                    self.bsdd_data.PropertyRelations.remove(relation)  # type: ignore[arg-type]
+        self.endRemoveRows()
 
 
 # typing

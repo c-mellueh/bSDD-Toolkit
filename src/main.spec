@@ -21,8 +21,7 @@ a = Analysis(
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
-    noarchive=False,
-)
+    noarchive=False)
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
@@ -41,8 +40,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon="bsdd_gui/resources/icons/icon.ico",
-)
+    icon="bsdd_gui/resources/icons/icon.ico")
 coll = COLLECT(
     exe,
     a.binaries,
@@ -51,5 +49,4 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name=f"BSDD-Toolkit",
-)
+    name=f"BSDD-Toolkit")

@@ -4,7 +4,7 @@ import logging
 from . import dictionary_utils as dict_utils
 import bsdd
 
-from bsdd_json.models import BsddDictionary, BsddClass
+from bsdd_json.models import BsddDictionary, BsddClass,BsddClassRelation
 
 
 class Cache:
@@ -143,7 +143,9 @@ def shared_parent(
         first = cls_list[0]
         dictionary = first.parent()
         if dictionary is None:
-            raise ValueError("shared_parent: dictionary not provided and parent is not set.")
+            raise ValueError(
+                "shared_parent: dictionary not provided and parent is not set."
+            )
 
     # Build top-down ancestor path for the first class and an index by Code -> depth
     path0 = _ancestors_topdown(cls_list[0], dictionary)
@@ -159,9 +161,13 @@ def shared_parent(
 
     # Choose highest (min depth) or lowest (max depth) among the shared set
     if mode == "highest":
-        code, _ = min(((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1])
+        code, _ = min(
+            ((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1]
+        )
     else:  # "lowest"
-        code, _ = max(((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1])
+        code, _ = max(
+            ((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1]
+        )
 
     return get_class_by_code(dictionary, code)
 
@@ -189,3 +195,16 @@ def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
         data["host"] = bsdd_dictionary.DictionaryUri
 
     return dict_utils.build_bsdd_url(data)
+
+
+def get_class_relation(
+    start_class: BsddClass, end_class: BsddClass, relation_type: str
+) -> BsddClassRelation |None:
+    end_uri = build_bsdd_uri(end_class, end_class._parent_ref())
+    for relation in start_class.ClassRelations:
+        if (
+            relation.RelatedClassUri == end_uri
+            and relation.RelationType == relation_type
+        ):
+            return relation
+    return None

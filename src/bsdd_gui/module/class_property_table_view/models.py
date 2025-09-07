@@ -49,7 +49,7 @@ class ClassPropertyTableModel(ItemModel):
         if parent.isValid():
             return QModelIndex()
 
-        if 0 > row >= len(self.rowCount()):
+        if 0 < row >= self.rowCount():
             return QModelIndex()
         bsdd_properties = tool.ClassPropertyTableView.filter_properties_by_pset(
             self.active_class, self.active_pset

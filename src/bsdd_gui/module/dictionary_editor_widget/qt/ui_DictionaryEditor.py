@@ -316,7 +316,9 @@ class Ui_DictionaryForm(object):
         # if QT_CONFIG(tooltip)
         self.cb_language_only.setToolTip(
             QCoreApplication.translate(
-                "DictionaryForm", "True if JSON contains only language-specific info.", None
+                "DictionaryForm",
+                "True if JSON contains only language-specific info.",
+                None,
             )
         )
         # endif // QT_CONFIG(tooltip)

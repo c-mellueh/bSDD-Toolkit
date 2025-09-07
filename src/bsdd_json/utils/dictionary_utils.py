@@ -133,7 +133,9 @@ def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
                 if isinstance(path_segments, str):
                     parts = [p for p in path_segments.strip("/").split("/") if p]
                 else:
-                    parts = [str(p).strip("/") for p in path_segments if str(p).strip("/")]
+                    parts = [
+                        str(p).strip("/") for p in path_segments if str(p).strip("/")
+                    ]
                 if not parts:
                     return ""
                 path = "/" + "/".join(q(p) for p in parts)

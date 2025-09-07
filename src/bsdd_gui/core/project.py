@@ -96,7 +96,9 @@ def new_file_clicked(
             missing_text = QCoreApplication.translate("Project", "is missing")
             missing_inputs = dictionary_editor.get_invalid_inputs(widget)
             popups.create_warning_popup(
-                f" {missing_text}\n".join(missing_inputs) + f" {missing_text}", None, text
+                f" {missing_text}\n".join(missing_inputs) + f" {missing_text}",
+                None,
+                text,
             )
 
     dialog = project.create_new_project_widget(main_window.get())

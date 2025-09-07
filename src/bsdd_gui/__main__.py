@@ -32,10 +32,7 @@ def main(initial_file: PathLike | None = None, log_level=None, open_last_project
 
     # Create UI
     app = QApplication(sys.argv)
-    bsdd_gui.core.main_window_widget.create_main_window(
-        app,
-        tool.MainWindowWidget,
-    )
+    bsdd_gui.core.main_window_widget.create_main_window(app, tool.MainWindowWidget)
     bsdd_gui.load_ui_triggers()
 
     bsdd_gui.core.project.create_project(tool.Project)
@@ -61,11 +58,7 @@ if __name__ == "__main__":
     parser.add_argument("open_path", help="Path to Project", default=None, type=str, nargs="?")
     parser.add_argument("-l", "--log-level", help="Logging level", default=None, type=int)
     parser.add_argument(
-        "-ol",
-        "--open_last_project",
-        help="Open last project",
-        default=False,
-        action="store_true",
+        "-ol", "--open_last_project", help="Open last project", default=False, action="store_true"
     )
     args = parser.parse_args()
     main(args.open_path, args.log_level, args.open_last_project)

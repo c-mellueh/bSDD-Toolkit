@@ -67,3 +67,10 @@ class ItemModel(QAbstractItemModel):
         if not index.isValid():
             return base
         return base | Qt.ItemIsSelectable | Qt.ItemIsEnabled
+
+    def get_row_for_data(self, data, parent=None):
+        parent = QModelIndex() if parent is None else parent
+        for row in range(self.rowCount(parent)):
+            if self.index(row, 0).internalPointer() == data:
+                return row
+        return -1

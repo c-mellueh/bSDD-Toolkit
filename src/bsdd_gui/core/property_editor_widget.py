@@ -23,7 +23,8 @@ def connect_signals(
         property_editor.request_new_property
     )
 
-    property_editor.signals.new_property_created.connect(project.signals.property_added.emit)
+    # dont do this because the property is not added to bsdd so far this happens in property_table_widget
+    # property_editor.signals.new_property_created.connect(project.signals.property_added.emit)
 
 
 def retranslate_ui(property_editor: Type[tool.PropertyEditorWidget]):
@@ -62,17 +63,13 @@ def create_dialog(
     dialog.setWindowTitle(text)
 
     if dialog.exec():
-        project.get().Properties.append(bsdd_property)
         property_editor.signals.new_property_created.emit(bsdd_property)
         property_editor.signals.dialog_accepted.emit(dialog)
     else:
         property_editor.signals.dialog_declined.emit(dialog)
 
 
-def register_widget(
-    widget: ui.PropertyEditor,
-    property_editor: Type[tool.PropertyEditorWidget],
-):
+def register_widget(widget: ui.PropertyEditor, property_editor: Type[tool.PropertyEditorWidget]):
     property_editor.register_widget(widget)
     widget.tv_allowed_values.model().sourceModel().bsdd_data = widget.bsdd_data
 

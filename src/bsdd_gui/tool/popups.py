@@ -2,13 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 from PySide6.QtCore import QCoreApplication, Qt
-from PySide6.QtWidgets import (
-    QFileDialog,
-    QInputDialog,
-    QLineEdit,
-    QListWidgetItem,
-    QMessageBox,
-)
+from PySide6.QtWidgets import QFileDialog, QInputDialog, QLineEdit, QListWidgetItem, QMessageBox
 import os
 import bsdd_gui
 from bsdd_gui.resources.icons import get_icon

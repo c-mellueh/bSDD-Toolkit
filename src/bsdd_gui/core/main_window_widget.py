@@ -8,10 +8,7 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
 
 
-def create_main_window(
-    application: QApplication,
-    main_window: Type[tool.MainWindowWidget],
-):
+def create_main_window(application: QApplication, main_window: Type[tool.MainWindowWidget]):
     """
     Creates the main window from the given application and hides the console.
     :param application:
