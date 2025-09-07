@@ -85,7 +85,7 @@ class GraphView(QGraphicsView):
                 return
         super().keyPressEvent(event)
 
-    def _delete_selected(self, sc: 'GraphScene') -> None:
+    def _delete_selected(self, sc: "GraphScene") -> None:
         # Collect selected items
         try:
             selected = list(sc.selectedItems())
@@ -145,7 +145,11 @@ class GraphView(QGraphicsView):
         try:
             if style == Qt.PenStyle.DotLine:
                 css_style = "dotted"
-            elif style in (Qt.PenStyle.DashLine, Qt.PenStyle.DashDotLine, Qt.PenStyle.DashDotDotLine):
+            elif style in (
+                Qt.PenStyle.DashLine,
+                Qt.PenStyle.DashDotLine,
+                Qt.PenStyle.DashDotDotLine,
+            ):
                 css_style = "dashed"
         except Exception:
             css_style = "solid"
@@ -153,9 +157,7 @@ class GraphView(QGraphicsView):
             r, g, b, a = color.red(), color.green(), color.blue(), color.alpha()
         else:
             r, g, b, a = 130, 130, 150, 255
-        css = (
-            f"QGraphicsView {{ border: {max(1, int(round(width)))}px {css_style} rgba({r}, {g}, {b}, 255); }}"
-        )
+        css = f"QGraphicsView {{ border: {max(1, int(round(width)))}px {css_style} rgba({r}, {g}, {b}, 255); }}"
         self.setStyleSheet(css)
 
     # --- helpers ---------------------------------------------------------
@@ -433,7 +435,6 @@ class GraphScene(QGraphicsScene):
         # Fit to visible nodes if any, with generous padding and minimum size
         half = SCENE_MIN_SIZE / 2.0
         self.setSceneRect(QRectF(-half, -half, SCENE_MIN_SIZE, SCENE_MIN_SIZE))
-    
 
     # Apply visibility filters for nodes and edges
     def apply_filters(self, node_flags: Dict[str, bool], edge_flags: Dict[str, bool]):

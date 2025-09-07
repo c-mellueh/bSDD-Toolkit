@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Callable, Dict, Iterable, TYPE_CHECKING
 
-from PySide6.QtCore import Qt, QSize, Signal,QMargins
+from PySide6.QtCore import Qt, QSize, Signal, QMargins
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -58,6 +58,7 @@ class _SettingsWidget(QFrame):
         self.setFrameShadow(QFrame.Raised)
         self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, False)
+
 
 class ButtonWidget(_SettingsWidget, ui_Buttons.Ui_Form):
     """Floating settings panel for Graph physics sliders."""
@@ -192,7 +193,9 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
             # Legend icon
             icon = _EdgeLegendIcon(str(et))
             try:
-                icon.edgeTypeActivated.connect(lambda etype=str(et): self.edgeTypeActivated.emit(etype))
+                icon.edgeTypeActivated.connect(
+                    lambda etype=str(et): self.edgeTypeActivated.emit(etype)
+                )
             except Exception:
                 pass
             lbl = QLabel(str(et))
@@ -412,8 +415,8 @@ class SettingsSidebar(QWidget):
         self._button_layout = QVBoxLayout()
         self._btn_layout_widget = QWidget()
         self._btn_layout_widget.setLayout(self._button_layout)
-        self._btn_layout_widget.setContentsMargins(QMargins(0.,0.,0.,0.))
-        self._button_layout.setContentsMargins(QMargins(0.,0.,0.,0.))
+        self._btn_layout_widget.setContentsMargins(QMargins(0.0, 0.0, 0.0, 0.0))
+        self._button_layout.setContentsMargins(QMargins(0.0, 0.0, 0.0, 0.0))
 
         # Collapse/Expand handle
         self._btn = QToolButton(self)

@@ -5,6 +5,7 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QDropEvent
 from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
+from bsdd_json import BsddClass, BsddProperty
 
 if TYPE_CHECKING:
     from bsdd_gui.module.graph_view_widget.view_ui import GraphView, GraphScene
@@ -127,3 +128,13 @@ def recalculate_relationships(
     for edge in new_edges:
         graph_view.add_edge(scene, edge)
         relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node)] = edge
+
+
+def node_double_clicked(
+    node: graphics_items.Node,
+    grah_view: Type[tool.GraphViewWidget],
+    class_tree: Type[tool.ClassTreeView],
+    main_window: Type[tool.MainWindowWidget],
+):
+    if node.node_type == constants.CLASS_NODE_TYPE:
+        bsdd_cass: BsddClass = node.bsdd_data

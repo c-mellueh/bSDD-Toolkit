@@ -60,7 +60,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-    
+
     @classmethod
     def connect_widget_signals(cls, widget: ui.GraphWindow):
         settings_sidebar = widget.settings_sidebar
@@ -70,6 +70,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         bs.bt_clear.clicked.connect(lambda _: cls.clear_scene())
         bs.bt_center.clicked.connect(lambda _: cls.center_scene())
         # TODO: Create export function
+
     @classmethod
     def populate_from_bsdd(cls, widget: ui.GraphWindow, bsdd_dict: BsddDictionary):
         # Build graph from bSDD model: Classes and Properties

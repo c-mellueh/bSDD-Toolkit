@@ -113,7 +113,9 @@ class Edge(QGraphicsPathItem):
         d = (v.x() ** 2 + v.y() ** 2) ** 0.5
         if d > 1e-6:
             ux, uy = v.x() / d, v.y() / d
-            p_end_line = QPointF(p_end_tip.x() - ux * self.arrow_length, p_end_tip.y() - uy * self.arrow_length)
+            p_end_line = QPointF(
+                p_end_tip.x() - ux * self.arrow_length, p_end_tip.y() - uy * self.arrow_length
+            )
         else:
             p_end_line = QPointF(p_end_tip)
         path = QPainterPath()
