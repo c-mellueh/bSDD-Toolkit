@@ -37,7 +37,7 @@ CLASS_NODE_TYPE = "bsdd_class"
 GENERIC_NODE_TYPE = "generic"
 
 # Edge Type
-CLASS_PROPERTY_REL = "ClassProperty"
+C_P_REL = "ClassProperty"
 MATERIAL_REL = "HasMaterial"
 REFERENCE_REL = "HasReference"
 IS_EQUAL_REL = "IsEqualTo"
@@ -50,7 +50,7 @@ PARENT_CLASS = "ParentClassCode"
 GENERIC_REL = "generic"
 
 ALLOWED_EDGE_TYPES = [
-    CLASS_PROPERTY_REL,
+    C_P_REL,
     MATERIAL_REL,
     REFERENCE_REL,
     IS_EQUAL_REL,
@@ -84,21 +84,17 @@ EDGE_STYLE_DEFAULT = {
 }
 
 EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
-    PARENT_CLASS: {"style": Qt.PenStyle.DotLine, "width": 1.5, "color": QColor(130, 130, 0)},
-    CLASS_PROPERTY_REL: {
-        "style": Qt.PenStyle.DashDotDotLine,
-        "width": 1.5,
-        "color": QColor(130, 130, 20),
-    },
-    MATERIAL_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 40)},
-    REFERENCE_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 60)},
-    IS_EQUAL_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 80)},
-    IS_SIMILAR_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 100)},
-    IS_PARENT_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 120)},
-    IS_CHILD_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 140)},
-    HAS_PART_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 160)},
-    IS_PART_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 180)},
-    GENERIC_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor(130, 130, 220)},
+    PARENT_CLASS: {"style": Qt.PenStyle.DotLine, "width": 1.5, "color": QColor("#06D6A0")},
+    C_P_REL: {"style": Qt.PenStyle.DashDotDotLine, "width": 1.5, "color": QColor("#F8FFE5")},
+    MATERIAL_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#1B9AAA")},
+    REFERENCE_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#EF476F")},
+    IS_EQUAL_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#FFC43D")},
+    IS_SIMILAR_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#7D1538")},
+    IS_PARENT_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#BC2C1A")},
+    IS_CHILD_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#DACC3E")},
+    HAS_PART_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#D3F3EE")},
+    IS_PART_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#7FB7BE")},
+    GENERIC_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#9D2129")},
 }
 
 # Node colors and shapes

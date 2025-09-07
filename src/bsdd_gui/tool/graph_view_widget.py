@@ -122,7 +122,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                     target_node = prop_by_code.get(cp.PropertyCode)
                 if target_node is not None:
                     edge = cls.create_edge(
-                        cnode, target_node, weight=1.0, edge_type=constants.CLASS_PROPERTY_REL
+                        cnode, target_node, weight=1.0, edge_type=constants.C_P_REL
                     )
                     cls.add_edge(scene, edge)
 
@@ -381,7 +381,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 if related_node is None:
                     continue
                 info = cls._info(start_node, related_node)
-                relation_type = constants.CLASS_PROPERTY_REL
+                relation_type = constants.C_P_REL
                 if info not in existing_relations_dict[relation_type]:
                     edge = cls.create_edge(start_node, related_node, edge_type=relation_type)
                     new_edges.append(edge)
@@ -484,7 +484,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         pad = 120.0
         w = max(1.0, (maxx - minx)) + 2 * pad
         h = max(1.0, (maxy - miny)) + 2 * pad
-        #scene.setSceneRect()
+        # scene.setSceneRect()
 
         view.fitInView(QRectF(minx - pad, miny - pad, w, h), Qt.KeepAspectRatio)
 

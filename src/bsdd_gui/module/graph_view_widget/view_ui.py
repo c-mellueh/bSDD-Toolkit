@@ -163,7 +163,7 @@ class GraphView(QGraphicsView):
         etype = self._create_edge_type
         if not etype:
             etype = (
-                CLASS_PROPERTY_REL
+                C_P_REL
                 if getattr(start_node, "node_type", None) == CLASS_NODE_TYPE
                 and getattr(end_node, "node_type", None) == PROPERTY_NODE_TYPE
                 else GENERIC_REL
