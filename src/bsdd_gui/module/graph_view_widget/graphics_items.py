@@ -61,6 +61,8 @@ class Edge(QGraphicsPathItem):
         self.update_path()
         self.edge_data = edge_data
 
+    def __str__(self):
+        return f"{self.edge_type}: {self.start_node.bsdd_data.Code} -> {self.end_node.bsdd_data.Code}"
     # --- geometry helpers -------------------------------------------------
     def _anchor_on_node(self, node: "Node", toward: QPointF) -> QPointF:
         """Return point on node boundary in direction of 'toward'.

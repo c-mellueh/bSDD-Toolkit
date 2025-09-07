@@ -220,7 +220,6 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
                 )
             data_dict["RelatedPropertyName"] = related_property.Name
             relation = BsddPropertyRelation.model_validate(data_dict)
-
         model.append_relation(relation)
         if model.mode == "live":
             cls.signals.item_added.emit(relation)

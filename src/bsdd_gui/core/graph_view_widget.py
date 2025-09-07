@@ -5,7 +5,14 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QDropEvent
 from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
-from bsdd_json import BsddClass, BsddProperty, BsddClassProperty
+from bsdd_json import (
+    BsddClass,
+    BsddProperty,
+    BsddClassProperty,
+    BsddClassRelation,
+    BsddPropertyRelation,
+)
+from bsdd_json.utils import property_utils as prop_utils
 import json
 import logging
 
@@ -23,6 +30,7 @@ def connect_signals(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     class_property_table: Type[tool.ClassPropertyTableView],
     property_set_table: Type[tool.PropertySetTableView],
+    project: Type[tool.Project],
 ):
     graph_view.connect_internal_signals()
 
@@ -42,6 +50,39 @@ def connect_signals(
 
     graph_view.signals.new_class_property_created.connect(handle_prop_update)
     graph_view.signals.class_property_removed.connect(handle_prop_update)
+
+    def handle_remove(bsdd_data):
+        if isinstance(bsdd_data, BsddClassProperty):
+            bsdd_data = prop_utils.get_internal_property(bsdd_data)
+        if not bsdd_data:
+            return
+        node = graph_view.get_node_from_bsdd_data(bsdd_data)
+        if not node:
+            return
+        graph_view.remove_node(node)
+
+    def handle_relation_remove(relation: BsddClassRelation | BsddPropertyRelation):
+        edge = graph_view.get_edge_from_relation(relation, project.get())
+        if edge is None:
+            return
+        graph_view.remove_edge(edge, only_visual=True, allow_parent_deletion=True)
+
+    def handle_relation_add(relation: BsddClassRelation | BsddPropertyRelation):
+        start_data, end_data, relation_type = graph_view.read_relation(relation, project.get())
+        start_node = graph_view.get_node_from_bsdd_data(start_data)
+        end_node = graph_view.get_node_from_bsdd_data(end_data)
+        if not (start_node and end_node):
+            return
+        edge = graph_view.create_edge(start_node, end_node, edge_type=relation_type)
+        graph_view.add_edge(graph_view.get_scene(), edge)
+
+    project.signals.class_removed.connect(handle_remove)
+    project.signals.property_removed.connect(handle_remove)
+    project.signals.class_property_removed.connect(handle_remove)
+    project.signals.class_relation_added.connect(handle_relation_add)
+    project.signals.class_relation_removed.connect(handle_relation_remove)
+    project.signals.property_relation_added.connect(handle_relation_add)
+    project.signals.property_relation_removed.connect(handle_relation_remove)
 
 
 def connect_to_main_window(
@@ -128,16 +169,13 @@ def handle_drop_event(
     scene = view.scene()
     new_class_nodes = graph_view.insert_classes_in_scene(scene, classes_to_add, scene_pos)
     new_property_nodes = graph_view.insert_properties_in_scene(scene, properties_to_add, scene_pos)
-    recalculate_relationships(view, graph_view, project)
+    recalculate_edges(graph_view, project)
     event.acceptProposedAction()
 
 
-def recalculate_relationships(
-    view: GraphView, graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]
-):
+def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
     bsdd_dictionary = project.get()
-
-    scene: GraphScene = view.scene()
+    scene: GraphScene = graph_view.get_scene()
     if not scene:
         return
     nodes = scene.nodes
@@ -154,6 +192,7 @@ def recalculate_relationships(
         graph_view.add_edge(scene, edge)
         relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node)] = edge
     graph_view.get_widget()._apply_filters()
+
 
 def node_double_clicked(
     node: graphics_items.Node,
@@ -206,12 +245,6 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget]):
     # Collect selected items
     nodes_to_remove, edges_to_remove = graph_view.get_selected_items()
 
-    # Also remove any edges attached to nodes slated for deletion
-    if nodes_to_remove:
-        for e in list(sc.edges):
-            if e.start_node in nodes_to_remove or e.end_node in nodes_to_remove:
-                if e not in edges_to_remove:
-                    graph_view.remove_edge(e, only_visual=True)
     # Deduplicate
     edges_to_remove = list(set(edges_to_remove))
 
@@ -220,7 +253,7 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget]):
         graph_view.remove_edge(e)
     # Remove nodes
     for n in nodes_to_remove:
-        graph_view.remove_node(n)
+        graph_view.remove_node(n, ignore_edges=edges_to_remove)
 
 
 def export_graph(
@@ -292,7 +325,7 @@ def import_graph(
         if node is not None:
             imported_nodes.append(node)
     # Recreate implied edges based on current dictionary relationships
-    recalculate_relationships(widget.view, graph_view, project)  # type: ignore[name-defined]
+    recalculate_edges(widget.view, graph_view, project)  # type: ignore[name-defined]
     try:
         widget.statusbar.showMessage(
             QCoreApplication.translate("GraphView", "Layout imported: ") + str(path),

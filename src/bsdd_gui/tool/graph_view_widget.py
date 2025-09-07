@@ -562,7 +562,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         try:
             from bsdd_gui.core import graph_view_widget as _core_gv
 
-            _core_gv.recalculate_relationships(widget.view, cls, _tool.Project)  # type: ignore[name-defined]
+            _core_gv.recalculate_edges(widget.view, cls, _tool.Project)  # type: ignore[name-defined]
         except Exception:
             pass
         # Ensure current visibility filters are applied
@@ -745,20 +745,22 @@ class GraphViewWidget(ActionTool, WidgetTool):
         return selected_nodes, selected_edges
 
     @classmethod
-    def remove_edge(cls, edge: graphics_items.Edge, only_visual=False):
+    def remove_edge(cls, edge: graphics_items.Edge, only_visual=False, allow_parent_deletion=False):
         """_summary_
 
         Args:
             edge (graphics_items.Edge): _description_
             only_visual (bool, optional): _description_. Delete edge only from scene but leave relationship intact
         """
+        if edge is None:
+            return
         scene = cls.get_scene()
         start_node, end_node = edge.start_node, edge.end_node
         relation_type = edge.edge_type
         if relation_type == constants.GENERIC_REL:
             return
 
-        if relation_type == constants.PARENT_CLASS:
+        if relation_type == constants.PARENT_CLASS and not allow_parent_deletion:
             return
 
         if not scene:
@@ -809,10 +811,18 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 cls.signals.class_property_removed.emit(class_property, end_data)
 
     @classmethod
-    def remove_node(cls, node: graphics_items.Node):
+    def remove_node(cls, node: graphics_items.Node, ignore_edges: list[graphics_items.Edge] = None):
+        ignore_edges = list() if ignore_edges is None else ignore_edges
+
         scene = cls.get_scene()
         if not scene:
             return
+        for e in list(scene.edges):
+            if e in ignore_edges:
+                continue
+            if e.start_node == node or e.end_node == node:
+                cls.remove_edge(e, only_visual=True, allow_parent_deletion=True)
+
         try:
             scene.removeItem(node)
         except Exception:
@@ -844,3 +854,60 @@ class GraphViewWidget(ActionTool, WidgetTool):
             return node
         except Exception:
             return
+
+    @classmethod
+    def get_node_from_bsdd_data(
+        cls, bsdd_data: BsddClass | BsddProperty
+    ) -> graphics_items.Node | None:
+        scene = cls.get_scene()
+        if not scene:
+            return None
+        for node in scene.nodes:
+            if node.bsdd_data == bsdd_data:
+                return node
+        return None
+
+    @classmethod
+    def redraw_edges(cls):
+        scene = cls.get_scene()
+        if not scene:
+            return
+        for edge in list(scene.edges):
+            cls.remove_edge(edge, only_visual=True)
+            trigger.recalculate_edges()
+
+    @classmethod
+    def read_relation(
+        cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
+    ):
+        start_data = relation._parent_ref()
+        relation_type = relation.RelationType
+
+        if isinstance(relation, BsddClassRelation):
+            related_uri = relation.RelatedClassUri
+            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
+            end_data = cl_utils.get_class_by_code(bsdd_dictionary, code)
+
+        elif isinstance(relation, BsddPropertyRelation):
+            related_uri = relation.RelatedPropertyUri
+            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
+            end_data = prop_utils.get_property_by_code(code)
+        return start_data, end_data, relation_type
+
+    @classmethod
+    def get_edge_from_relation(
+        cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
+    ):
+        scene = cls.get_scene()
+        if not scene:
+            return None
+        start_data, end_data, relation_type = cls.read_relation(relation, bsdd_dictionary)
+        for edge in scene.edges:
+            if edge.start_node.bsdd_data != start_data:
+                continue
+            if edge.end_node.bsdd_data != end_data:
+                continue
+            if relation_type == edge.edge_type:
+                return edge
+        if edge is None:
+            print(relation)

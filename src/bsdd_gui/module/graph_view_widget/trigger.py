@@ -12,6 +12,7 @@ def connect():
         tool.RelationshipEditorWidget,
         tool.ClassPropertyTableView,
         tool.PropertySetTableView,
+        tool.Project,
     )
     core.connect_to_main_window(tool.GraphViewWidget, tool.MainWindowWidget)
     w = core.create_widget(tool.MainWindowWidget.get(), tool.GraphViewWidget, tool.MainWindowWidget)
@@ -58,9 +59,13 @@ def create_relation(start_node,end_node,relation_type):
 
 def delete_selection():
     core.delete_selection(tool.GraphViewWidget)
-    
+
 def export_requested():
     core.export_graph(tool.GraphViewWidget,tool.Popups,tool.Appdata)
 
 def import_requested():
     core.import_graph(tool.GraphViewWidget,tool.Project,tool.Popups,tool.Appdata)
+
+
+def recalculate_edges():
+    core.recalculate_edges(tool.GraphViewWidget, tool.Project)
