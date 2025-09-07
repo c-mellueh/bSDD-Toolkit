@@ -251,10 +251,10 @@ class GraphViewWidget(ActionTool, WidgetTool):
         cls,
         start_node: Node,
         end_node: Node,
+        edge_type,
         weight: float = 1.0,
-        edge_type="generic",
     ):
-        return graphics_items.Edge(start_node, end_node, weight, edge_type=edge_type)
+        return graphics_items.Edge(start_node, end_node, edge_type, weight)
 
     @classmethod
     def add_edge(

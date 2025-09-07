@@ -33,10 +33,11 @@ CLASS_DRAG = "class_drag"
 ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
 
 # Node Types
-PROPERTY_NODE_TYPE = "property"
-CLASS_NODE_TYPE = "bsdd_class"
+PROPERTY_NODE_TYPE = "Property"
+CLASS_NODE_TYPE = "Class"
 GENERIC_NODE_TYPE = "generic"
-ALLOWED_NODE_TYPES = [PROPERTY_NODE_TYPE, CLASS_NODE_TYPE, GENERIC_NODE_TYPE]
+
+ALLOWED_NODE_TYPES = [PROPERTY_NODE_TYPE, CLASS_NODE_TYPE]
 # Edge Type
 C_P_REL = "ClassProperty"
 MATERIAL_REL = "HasMaterial"
@@ -61,7 +62,6 @@ ALLOWED_EDGE_TYPES = [
     HAS_PART_REL,
     IS_PART_REL,
     PARENT_CLASS,
-    GENERIC_REL,
 ]
 CLASS_RELATIONS = [
     MATERIAL_REL,
@@ -87,7 +87,6 @@ ALLOWED_EDGE_TYPES_TYPING = Literal[
     "HasPart",
     "IsPartOf",
     "ParentClassCode",
-    "generic",
 ]
 
 # Edge pen styles
@@ -124,7 +123,7 @@ SHAPE_STYLE_ROUNDED_RECT = "roundrect"
 NODE_SHAPE_MAP: dict[str, str] = {
     CLASS_NODE_TYPE: SHAPE_STYLE_RECT,
     PROPERTY_NODE_TYPE: SHAPE_STYLE_ROUNDED_RECT,
-    GENERIC_NODE_TYPE: SHAPE_STYLE_RECT,
+    "generic": SHAPE_STYLE_RECT,
 }
 
 # Scene sizing

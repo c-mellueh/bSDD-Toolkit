@@ -38,8 +38,8 @@ class Edge(QGraphicsPathItem):
         self,
         start_node: "Node",
         end_node: "Node",
+        edge_type: str,
         weight: float = 1.0,
-        edge_type: str = "generic",
         edge_data=None,
     ):
         super().__init__()
@@ -186,7 +186,8 @@ class Node(QGraphicsObject):
         self.label = bsdd_data.Name
         # radius retained for backward-compat, not used for drawing
         self.radius = radius
-        self.node_type = GENERIC_NODE_TYPE
+        self.node_type = "generic"
+        
         if isinstance(bsdd_data, BsddProperty):
             self.node_type = PROPERTY_NODE_TYPE
         if isinstance(bsdd_data, BsddClass):
@@ -199,7 +200,7 @@ class Node(QGraphicsObject):
         self.border = QPen(QColor(40, 60, 90), 1.2)
         self.border.setCosmetic(True)
         self.node_shape = NODE_SHAPE_MAP.get(
-            self.node_type, NODE_SHAPE_MAP.get(GENERIC_NODE_TYPE, "rect")
+            self.node_type, NODE_SHAPE_MAP.get("generic", "rect")
         )
 
         self.velocity = QPointF(0.0, 0.0)

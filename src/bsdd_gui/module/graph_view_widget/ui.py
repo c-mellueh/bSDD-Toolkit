@@ -32,11 +32,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
 
+from bsdd_gui.resources.icons import get_icon
 
 class GraphWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Force‑Directed Graph — PySide6 (Barnes–Hut)")
+        self.setWindowTitle(self.tr("Force-Directed Relationship Graph"))
+        self.setWindowIcon(get_icon())
         self.scene = GraphScene()
         self.view = GraphView(self.scene)
         self._layout = QVBoxLayout()
