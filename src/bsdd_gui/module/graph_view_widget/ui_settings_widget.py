@@ -374,7 +374,6 @@ class _NodeLegendIcon(QWidget):
             p.drawRect(rect)
 
 
-
 class SettingsSidebar(QWidget):
     """Right-side overlay that hosts the EdgeTypeSettingsWidget and a
     collapsible arrow button. Intended to be parented to a QGraphicsView's

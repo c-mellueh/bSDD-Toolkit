@@ -48,6 +48,8 @@ class Signals(WidgetSignals):
     class_property_removed = Signal(BsddClassProperty, BsddClass)
     new_relation_created = Signal(graphics_items.Edge)
     relation_removed = Signal(graphics_items.Edge)
+
+
 class GraphViewWidget(ActionTool, WidgetTool):
     signals = Signals()
 
@@ -70,6 +72,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     def connect_internal_signals(cls):
         super().connect_internal_signals()
         cls.signals.node_double_clicked.connect(trigger.node_double_clicked)
+
     @classmethod
     def connect_widget_signals(cls, widget: ui.GraphWindow):
         settings_sidebar = widget.settings_sidebar

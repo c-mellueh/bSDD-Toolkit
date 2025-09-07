@@ -51,20 +51,27 @@ def handle_drop_event(event, view):
 def load_bsdd():
     core.popuplate_widget(tool.GraphViewWidget, tool.Project)
 
-def node_double_clicked(node):
-    core.node_double_clicked(node,tool.PropertyTableWidget,tool.ClassTreeView,tool.MainWindowWidget)
 
-def create_relation(start_node,end_node,relation_type):
-    core.create_relation(start_node,end_node,relation_type,tool.GraphViewWidget,tool.Project)
+def node_double_clicked(node):
+    core.node_double_clicked(
+        node, tool.PropertyTableWidget, tool.ClassTreeView, tool.MainWindowWidget
+    )
+
+
+def create_relation(start_node, end_node, relation_type):
+    core.create_relation(start_node, end_node, relation_type, tool.GraphViewWidget, tool.Project)
+
 
 def delete_selection():
     core.delete_selection(tool.GraphViewWidget)
 
+
 def export_requested():
-    core.export_graph(tool.GraphViewWidget,tool.Popups,tool.Appdata)
+    core.export_graph(tool.GraphViewWidget, tool.Popups, tool.Appdata)
+
 
 def import_requested():
-    core.import_graph(tool.GraphViewWidget,tool.Project,tool.Popups,tool.Appdata)
+    core.import_graph(tool.GraphViewWidget, tool.Project, tool.Popups, tool.Appdata)
 
 
 def recalculate_edges():

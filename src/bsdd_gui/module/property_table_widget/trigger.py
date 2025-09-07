@@ -29,7 +29,7 @@ def on_new_project():
 
 
 def create_widget():
-    core.create_widget( tool.PropertyTableWidget, tool.Util, tool.MainWindowWidget)
+    core.create_widget(tool.PropertyTableWidget, tool.Util, tool.MainWindowWidget)
 
 
 def widget_created(widget: ui.PropertyWidget):

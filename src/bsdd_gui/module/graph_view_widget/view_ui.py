@@ -192,7 +192,7 @@ class GraphView(QGraphicsView):
 
         # Decide edge type: use selected type if set, otherwise heuristic
         etype = self._create_edge_type
-        trigger.create_relation(start_node,end_node,etype)
+        trigger.create_relation(start_node, end_node, etype)
 
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:

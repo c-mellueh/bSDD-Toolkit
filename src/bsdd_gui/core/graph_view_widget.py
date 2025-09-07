@@ -207,10 +207,10 @@ def node_double_clicked(
         main_window.get().activateWindow()
 
     elif node.node_type == constants.PROPERTY_NODE_TYPE:
-        bsdd_property:BsddProperty = node.bsdd_data
+        bsdd_property: BsddProperty = node.bsdd_data
         property_table.request_widget()
-        widget:PropertyWidget = property_table.get_widgets()[-1]
-        property_table.select_property(bsdd_property,widget.tv_properties)
+        widget: PropertyWidget = property_table.get_widgets()[-1]
+        property_table.select_property(bsdd_property, widget.tv_properties)
 
 
 def create_relation(

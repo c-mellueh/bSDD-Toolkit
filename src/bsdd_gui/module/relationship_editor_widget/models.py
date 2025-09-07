@@ -90,7 +90,7 @@ class RelationshipModel(ItemModel):
                     self.bsdd_data.ClassRelations.append(relation)  # type: ignore[arg-type]
                 else:
                     self.bsdd_data.PropertyRelations.append(relation)  # type: ignore[arg-type]
-        
+
         relation._set_parent(self.bsdd_data)
         self.endInsertRows()
 
