@@ -156,6 +156,9 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
     the scene and can be anchored in the bottom-right corner by the owner.
     """
 
+    # Emitted when a legend icon is double-clicked to choose creation type
+    edgeTypeActivated = Signal(str)
+
     def __init__(
         self,
         allowed_edge_types: Iterable[str],
@@ -182,6 +185,10 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
             row.setSpacing(6)
             # Legend icon
             icon = _EdgeLegendIcon(str(et))
+            try:
+                icon.edgeTypeActivated.connect(lambda etype=str(et): self.edgeTypeActivated.emit(etype))
+            except Exception:
+                pass
             lbl = QLabel(str(et))
             lbl.setToolTip(str(et))
             sw = ToggleSwitch(checked=True)
@@ -222,6 +229,16 @@ class _EdgeLegendIcon(QWidget):
         self._edge_type = edge_type
         self.setFixedWidth(28)
         self.setFixedHeight(14)
+        # Signal for activation (double-click selection)
+        try:
+            from PySide6.QtCore import Signal as _Signal  # type: ignore
+        except Exception:
+            _Signal = None
+        # Dynamically attach a signal attribute if possible
+        # But better: declare on class; see above in EdgeTypeSettingsWidget connection
+
+    # Custom signal declared on class via Qt meta-object (added above)
+    edgeTypeActivated = Signal(str)
 
     def sizeHint(self):
         return QSize(28, 14)
@@ -250,6 +267,13 @@ class _EdgeLegendIcon(QWidget):
         pen = self._pen_for_edge()
         p.setPen(pen)
         p.drawLine(int(x1), int(y), int(x2), int(y))
+
+    def mouseDoubleClickEvent(self, event):
+        try:
+            self.edgeTypeActivated.emit(self._edge_type)
+        except Exception:
+            pass
+        super().mouseDoubleClickEvent(event)
 
 
 class SettingsSidebar(QWidget):
@@ -310,6 +334,10 @@ class SettingsSidebar(QWidget):
 
         # Primary edge-type panel (kept for API methods below)
         self._edge_types_panel = EdgeTypeSettingsWidget(allowed_edge_types, on_toggle, parent=None)
+        try:
+            self._edge_types_panel.edgeTypeActivated.connect(self._on_edge_type_chosen)
+        except Exception:
+            pass
         scene: GraphScene = self.graph_window.view.scene()
         self._view_settings = PhysicsWidget(scene.physics, None)
         self._button_settings = ButtonWidget(None)
@@ -377,3 +405,16 @@ class SettingsSidebar(QWidget):
 
     def _on_toggle_clicked(self):
         self.set_expanded(self._btn.isChecked())
+
+    def _on_edge_type_chosen(self, edge_type: str) -> None:
+        try:
+            # Toggle selection if same type chosen again
+            gw: GraphWindow = self.graph_window
+            if hasattr(gw, "get_active_edge_type") and callable(gw.get_active_edge_type):
+                cur = gw.get_active_edge_type()
+                if cur == edge_type:
+                    edge_type = None  # deselect
+            if hasattr(gw, "set_active_edge_type") and callable(gw.set_active_edge_type):
+                gw.set_active_edge_type(edge_type)
+        except Exception:
+            pass

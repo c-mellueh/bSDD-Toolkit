@@ -53,6 +53,38 @@ class GraphView(QGraphicsView):
         self._edge_drag_active: bool = False
         self._edge_drag_start: Node | None = None
         self._edge_preview_item: QGraphicsPathItem | None = None
+        # Selected edge type for creation (None = auto/heuristic)
+        self._create_edge_type: str | None = None
+
+    # --- public API ------------------------------------------------------
+    def set_create_edge_type(self, edge_type: str | None) -> None:
+        """Select edge type for interactive creation and update border style."""
+        self._create_edge_type = edge_type
+        # Apply a border to the view to reflect style
+        if not edge_type:
+            self.setStyleSheet("")
+            return
+        cfg = EDGE_STYLE_MAP.get(edge_type, EDGE_STYLE_DEFAULT)
+        color = cfg.get("color", EDGE_STYLE_DEFAULT["color"])  # type: ignore[index]
+        width = float(cfg.get("width", EDGE_STYLE_DEFAULT["width"]))
+        style = cfg.get("style", EDGE_STYLE_DEFAULT["style"])  # type: ignore[index]
+        # Map Qt pen style to CSS border style
+        css_style = "solid"
+        try:
+            if style == Qt.PenStyle.DotLine:
+                css_style = "dotted"
+            elif style in (Qt.PenStyle.DashLine, Qt.PenStyle.DashDotLine, Qt.PenStyle.DashDotDotLine):
+                css_style = "dashed"
+        except Exception:
+            css_style = "solid"
+        if isinstance(color, QColor):
+            r, g, b, a = color.red(), color.green(), color.blue(), color.alpha()
+        else:
+            r, g, b, a = 130, 130, 150, 255
+        css = (
+            f"QGraphicsView {{ border: {max(1, int(round(width)))}px {css_style} rgba({r}, {g}, {b}, 255); }}"
+        )
+        self.setStyleSheet(css)
 
     # --- helpers ---------------------------------------------------------
     def _event_qpoint(self, event) -> QPoint:
@@ -124,13 +156,15 @@ class GraphView(QGraphicsView):
         if end_node is start_node:
             return
 
-        # Decide edge type (simple heuristic) and add the edge
-        etype = (
-            CLASS_PROPERTY_REL
-            if getattr(start_node, "node_type", None) == CLASS_NODE_TYPE
-            and getattr(end_node, "node_type", None) == PROPERTY_NODE_TYPE
-            else GENERIC_REL
-        )
+        # Decide edge type: use selected type if set, otherwise heuristic
+        etype = self._create_edge_type
+        if not etype:
+            etype = (
+                CLASS_PROPERTY_REL
+                if getattr(start_node, "node_type", None) == CLASS_NODE_TYPE
+                and getattr(end_node, "node_type", None) == PROPERTY_NODE_TYPE
+                else GENERIC_REL
+            )
 
         scene: GraphScene = self.scene()
         try:

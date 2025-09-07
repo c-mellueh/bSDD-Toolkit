@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QToolBar,
     QToolButton,
     QVBoxLayout,
+    QStatusBar,
 )
 from . import trigger
 from bsdd_gui.module.graph_view_widget.view_ui import GraphScene, GraphView
@@ -41,6 +42,9 @@ class GraphWindow(QWidget):
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
         self._layout.addWidget(self.view)
+        # Status bar for interactive prompts
+        self.statusbar = QStatusBar(self)
+        self._layout.addWidget(self.statusbar)
         # self._populate_demo()
         self.scene.auto_scene_rect()
         self.resize(1000, 700)
@@ -69,6 +73,28 @@ class GraphWindow(QWidget):
             # Fail-safe: if overlay can't be created (e.g., headless), skip
             self.settings_sidebar = None
         trigger.widget_created(self)
+
+    # ---- Active edge type selection (from sidebar) ----
+    def set_active_edge_type(self, edge_type: str | None):
+        # Route to view for border style and creation mode
+        try:
+            self.view.set_create_edge_type(edge_type)
+        except Exception:
+            pass
+        # Update status text
+        try:
+            if edge_type:
+                self.statusbar.showMessage(f"Create {edge_type} Relationship")
+            else:
+                self.statusbar.clearMessage()
+        except Exception:
+            pass
+
+    def get_active_edge_type(self) -> str | None:
+        try:
+            return getattr(self.view, "_create_edge_type", None)
+        except Exception:
+            return None
 
     # ---- Actions ----
     def _toggle_running(self):
