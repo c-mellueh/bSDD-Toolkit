@@ -5,7 +5,7 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QDropEvent
 from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
-from bsdd_json import BsddClass, BsddProperty
+from bsdd_json import BsddClass, BsddProperty, BsddClassProperty
 
 if TYPE_CHECKING:
     from bsdd_gui.module.graph_view_widget.view_ui import GraphView, GraphScene
@@ -15,8 +15,28 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
-def connect_signals(graph_view: Type[tool.GraphViewWidget]):
+
+def connect_signals(
+    graph_view: Type[tool.GraphViewWidget],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
+    class_property_table: Type[tool.ClassPropertyTableView],
+    property_set_table: Type[tool.PropertySetTableView],
+):
     graph_view.connect_internal_signals()
+
+    def handle_new_rel(edge: graphics_items.Edge):
+        start_data = edge.start_node.bsdd_data
+        widget = relationship_editor.get_widget(start_data)
+        if not widget:
+            return
+        relationship_editor.reset_view(widget.tv_relations)
+
+    def handle_new_prop(bsdd_class_property: BsddClassProperty):
+        class_property_table.reset_views()
+        property_set_table.reset_views()
+
+    graph_view.signals.new_relation_created.connect(handle_new_rel)
+    graph_view.signals.new_class_property_created.connect(handle_new_prop)
 
 
 def connect_to_main_window(

@@ -259,3 +259,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
                 model.virtual_append.remove(relation)
             model.endResetModel()
+
+    @classmethod
+    def get_widget(cls, bsdd_data: BsddClass | BsddProperty) -> ui.RelationshipWidget:
+        return super().get_widget(bsdd_data)

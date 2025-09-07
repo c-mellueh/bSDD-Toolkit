@@ -549,6 +549,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
             bsdd_property, bsdd_class
         )
         bsdd_class.ClassProperties.append(new_property)
+        cls.signals.new_class_property_created.emit(new_property)
         new_edge = cls.create_edge(start_node, end_node, edge_type=constants.C_P_REL)
         cls.add_edge(cls.get_scene(), new_edge)
 
@@ -566,14 +567,14 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if relation not in constants.CLASS_RELATIONS:
             return
 
-        end_class_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
+        end_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
         existing_relations = [
-            r.RelationType for r in start_class.ClassRelations if r.RelatedClassUri == end_class_uri
+            r.RelationType for r in start_class.ClassRelations if r.RelatedClassUri == end_uri
         ]
         if relation in existing_relations:
             return
         new_relation = BsddClassRelation(
-            RelationType=relation, RelatedClassUri=end_class_uri, RelatedClassName=end_class.Name
+            RelationType=relation, RelatedClassUri=end_uri, RelatedClassName=end_class.Name
         )
         start_class.ClassRelations.append(new_relation)
         new_edge = cls.create_edge(start_node, end_node, edge_type=relation)
@@ -594,16 +595,16 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if relation not in constants.PROPERTY_RELATIONS:
             return
 
-        end_class_uri = prop_utils.build_bsdd_uri(end_property, bsdd_dictionary)
+        end_uri = prop_utils.build_bsdd_uri(end_property, bsdd_dictionary)
         existing_relations = [
             r.RelationType
             for r in start_property.PropertyRelations
-            if r.RelatedPropertyUri == end_class_uri
+            if r.RelatedPropertyUri == end_uri
         ]
         if relation in existing_relations:
             return
         new_relation = BsddPropertyRelation(
-            RelationType=relation, RelatedClassUri=end_class_uri, RelatedClassName=end_property.Name
+            RelationType=relation, RelatedPropertyUri=end_uri, RelatedPropertyName=end_property.Name
         )
         start_property.PropertyRelations.append(new_relation)
         new_edge = cls.create_edge(start_node, end_node, edge_type=relation)

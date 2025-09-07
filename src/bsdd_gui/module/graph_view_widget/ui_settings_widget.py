@@ -277,6 +277,13 @@ class _EdgeLegendIcon(QWidget):
         p.setPen(pen)
         p.drawLine(int(x1), int(y), int(x2), int(y))
 
+    def mouseDoubleClickEvent(self, event):
+        try:
+            self.edgeTypeActivated.emit(self._edge_type)
+        except Exception:
+            pass
+        super().mouseDoubleClickEvent(event)
+
 
 class NodeTypeSettingsWidget(_SettingsWidget):
     """Panel mirroring EdgeTypeSettingsWidget, but for node types."""
@@ -366,12 +373,6 @@ class _NodeLegendIcon(QWidget):
         else:
             p.drawRect(rect)
 
-    def mouseDoubleClickEvent(self, event):
-        try:
-            self.edgeTypeActivated.emit(self._edge_type)
-        except Exception:
-            pass
-        super().mouseDoubleClickEvent(event)
 
 
 class SettingsSidebar(QWidget):

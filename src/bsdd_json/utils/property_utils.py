@@ -193,8 +193,7 @@ def create_class_property_from_internal_property(
 ) -> BsddClassProperty:
     existing_codes = [p.Code for p in bsdd_class.ClassProperties]
     code = build_unique_code(bsdd_property.Code, existing_codes)
-    new_property = BsddClassProperty(Code=code)
-    new_property.PropertyCode = bsdd_property.Code
+    new_property = BsddClassProperty(Code=code, PropertyCode=bsdd_property.Code)
     pset = get_most_used_property_set(bsdd_property, bsdd_property._parent_ref())
     if pset:
         new_property.PropertySet = pset
