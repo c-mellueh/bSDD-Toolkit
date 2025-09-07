@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Callable, Dict, Iterable, TYPE_CHECKING
 
-from PySide6.QtCore import Qt, QSize, Signal
+from PySide6.QtCore import Qt, QSize, Signal,QMargins
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -13,7 +13,6 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QScrollArea,
     QSpacerItem,
-    QPushButton,
     QSlider,
 )
 from PySide6.QtGui import QPainter, QPen, QColor, QBrush
@@ -410,6 +409,12 @@ class SettingsSidebar(QWidget):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
+        self._button_layout = QVBoxLayout()
+        self._btn_layout_widget = QWidget()
+        self._btn_layout_widget.setLayout(self._button_layout)
+        self._btn_layout_widget.setContentsMargins(QMargins(0.,0.,0.,0.))
+        self._button_layout.setContentsMargins(QMargins(0.,0.,0.,0.))
+
         # Collapse/Expand handle
         self._btn = QToolButton(self)
         self._btn.setArrowType(Qt.ArrowType.LeftArrow)
@@ -418,9 +423,15 @@ class SettingsSidebar(QWidget):
         self._btn.clicked.connect(self._on_toggle_clicked)
         self._btn.setToolTip("Show/Hide edge types")
         self._btn.setFixedWidth(18)
-        self._btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        root.addWidget(self._btn)
+        self._btn.setFixedHeight(18)
 
+        self._btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self._button_layout.addWidget(self._btn)
+        self.spacer_item = QSpacerItem(
+            20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
+        )
+        self._button_layout.addItem(self.spacer_item)
+        root.addWidget(self._btn_layout_widget)
         # Scroll area hosting a vertical stack of panels
         self._scroll = QScrollArea(self)
         self._scroll.setFrameShape(QFrame.NoFrame)
