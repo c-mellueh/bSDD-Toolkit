@@ -98,7 +98,7 @@ def connect_to_main_window(
     graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
 ):
     # Action uses the WidgetTool request to allow trigger routing
-    action = main_window.add_action("menuData", "Graph View", lambda: graph_view.request_widget())
+    action = main_window.add_action(None, "Graph View", lambda: graph_view.request_widget())
     graph_view.set_action(main_window.get(), "open_window", action)
 
 

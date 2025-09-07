@@ -50,9 +50,9 @@ def retranslate_ui(
 ):
     """Retranslates the UI elements of dictionary Editor. and the Actions."""
     action = property_table.get_action(main_window.get(), "open_window")
-    text = QCoreApplication.translate("PropertyTable", "Properties Data")
+    text = QCoreApplication.translate("PropertyTable", "Properties")
     action.setText(text)
-    title = util.get_window_title(QCoreApplication.translate("PropertyTable", "Properties Data"))
+    title = util.get_window_title(QCoreApplication.translate("PropertyTable", "bSDD Properties"))
     for widget in property_table.get_widgets():
         widget.setWindowTitle(title)
 
@@ -177,8 +177,7 @@ def remove_view(
 def connect_to_main_menu(
     property_table: Type[tool.PropertyTableWidget], main_window: Type[tool.MainWindowWidget]
 ) -> None:
-    action = main_window.add_action(
-        "menuData", "bSDD Properties", lambda: property_table.request_widget()
+    action = main_window.add_action(None, "Properties", lambda: property_table.request_widget()
     )
     property_table.set_action(main_window.get(), "open_window", action)
 
