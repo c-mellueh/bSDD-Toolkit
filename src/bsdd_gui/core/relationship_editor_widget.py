@@ -63,7 +63,11 @@ def connect_signals(
         project.signals.property_relation_removed
     )
 
-
+    project.signals.class_relation_added.connect(
+        lambda r: relationship_editor.make_class_relation_bidrectional(r, project.get())
+    )
+    project.signals.class_relation_added.connect(print)
+    
 def retranslate_ui(relationship_editor: Type[tool.RelationshipEditorWidget]):
     for widget in relationship_editor.get_widgets():
         widget.retranslateUi(widget)

@@ -262,3 +262,52 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
     @classmethod
     def get_widget(cls, bsdd_data: BsddClass | BsddProperty) -> ui.RelationshipWidget:
         return super().get_widget(bsdd_data)
+
+    @classmethod
+    def read_relation(
+        cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
+    ):
+        start_data = relation._parent_ref()
+        relation_type = relation.RelationType
+
+        if isinstance(relation, BsddClassRelation):
+            related_uri = relation.RelatedClassUri
+            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
+            end_data = cl_utils.get_class_by_code(bsdd_dictionary, code)
+
+        elif isinstance(relation, BsddPropertyRelation):
+            related_uri = relation.RelatedPropertyUri
+            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
+            end_data = prop_utils.get_property_by_code(code)
+        return start_data, end_data, relation_type
+
+    @classmethod
+    def make_class_relation_bidrectional(
+        cls, relation: BsddClassRelation, bsdd_dictionary: BsddDictionary
+    ):
+        start_class, end_class, relation_type = cls.read_relation(relation, bsdd_dictionary)
+        start_uri = cl_utils.build_bsdd_uri(start_class, bsdd_dictionary)
+
+        inverse_relations = {"IsChildOf": "IsParentOf", "HasPart": "IsPartOf"}
+        for k, v in dict(inverse_relations).items():
+            inverse_relations[v] = k
+
+        if relation_type not in inverse_relations:
+            return
+        for cr in end_class.ClassRelations:
+            if (
+                cr.RelatedClassUri == start_uri
+                and cr.RelationType == inverse_relations[relation_type]
+            ):
+                return
+
+        for start_rel, end_rel in inverse_relations.items():
+            if relation_type == start_rel:
+                rel = BsddClassRelation(
+                    RelationType=end_rel,
+                    RelatedClassUri=start_uri,
+                    RelatedClassName=start_class.Name,
+                )
+                rel._set_parent(end_class)
+                end_class.ClassRelations.append(rel)
+                cls.signals.class_relation_added.emit(rel)

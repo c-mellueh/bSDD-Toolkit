@@ -45,8 +45,8 @@ def connect_signals(
         class_property_table.reset_views()
         property_set_table.reset_views()
 
-    graph_view.signals.new_relation_created.connect(handle_rel_update)
-    graph_view.signals.relation_removed.connect(handle_rel_update)
+    graph_view.signals.new_edge_created.connect(handle_rel_update)
+    graph_view.signals.edge_removed.connect(handle_rel_update)
 
     graph_view.signals.new_class_property_created.connect(handle_prop_update)
     graph_view.signals.class_property_removed.connect(handle_prop_update)
@@ -84,6 +84,14 @@ def connect_signals(
     project.signals.property_relation_added.connect(handle_relation_add)
     project.signals.property_relation_removed.connect(handle_relation_remove)
 
+    def handle_edge_add(edge: graphics_items.Edge):
+        relation = graph_view.get_relation_from_edge(edge, project.get())
+        if isinstance(relation, BsddClassRelation):
+            project.signals.class_relation_added.emit(relation)
+        if isinstance(relation, BsddClassRelation):
+            project.signals.property_relation_added.emit(relation)
+
+    graph_view.signals.new_edge_created.connect(handle_edge_add)
 
 def connect_to_main_window(
     graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]

@@ -46,8 +46,8 @@ class Signals(WidgetSignals):
     node_double_clicked = Signal(object)
     new_class_property_created = Signal(BsddClassProperty)
     class_property_removed = Signal(BsddClassProperty, BsddClass)
-    new_relation_created = Signal(graphics_items.Edge)
-    relation_removed = Signal(graphics_items.Edge)
+    new_edge_created = Signal(graphics_items.Edge)
+    edge_removed = Signal(graphics_items.Edge)
 
 
 class GraphViewWidget(ActionTool, WidgetTool):
@@ -263,6 +263,14 @@ class GraphViewWidget(ActionTool, WidgetTool):
         edge: graphics_items.Edge,
     ) -> graphics_items.Edge:
 
+        for existing_edge in scene.edges:
+            if existing_edge.start_node.bsdd_data != edge.start_node.bsdd_data:
+                continue
+            if existing_edge.end_node.bsdd_data != edge.end_node.bsdd_data:
+                continue
+            if existing_edge.edge_type == edge.edge_type:
+                logging.info(f"Edge allread exists {edge}")
+                return None
         scene.addItem(edge)
         scene.edges.append(edge)
         return edge
@@ -691,10 +699,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
         new_relation = BsddClassRelation(
             RelationType=relation, RelatedClassUri=end_uri, RelatedClassName=end_class.Name
         )
+        new_relation._set_parent(start_class)
         start_class.ClassRelations.append(new_relation)
         new_edge = cls.create_edge(start_node, end_node, edge_type=relation)
         cls.add_edge(cls.get_scene(), new_edge)
-        cls.signals.new_relation_created.emit(new_edge)
+        cls.signals.new_edge_created.emit(new_edge)
 
     @classmethod
     def create_property_property_relation(
@@ -721,10 +730,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
         new_relation = BsddPropertyRelation(
             RelationType=relation, RelatedPropertyUri=end_uri, RelatedPropertyName=end_property.Name
         )
+        new_relation._set_parent(start_property)
         start_property.PropertyRelations.append(new_relation)
         new_edge = cls.create_edge(start_node, end_node, edge_type=relation)
         cls.add_edge(cls.get_scene(), new_edge)
-        cls.signals.new_relation_created.emit(new_edge)
+        cls.signals.new_edge_created.emit(new_edge)
 
     @classmethod
     def get_selected_items(cls) -> tuple[list[graphics_items.Node], list[graphics_items.Edge]]:
@@ -786,7 +796,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 if not class_relation:
                     return
                 start_data.ClassRelations.remove(class_relation)
-                cls.signals.relation_removed.emit(edge)
+                cls.signals.edge_removed.emit(edge)
             elif isinstance(end_data, BsddProperty):
                 class_property = {cp.PropertyCode: cp for cp in start_data.ClassProperties}.get(
                     end_data.Code
@@ -803,7 +813,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 if not property_relation:
                     return
                 start_data.PropertyRelations.remove(property_relation)
-                cls.signals.relation_removed.emit(edge)
+                cls.signals.edge_removed.emit(edge)
             elif isinstance(end_data, BsddClass):
                 class_property = {cp.PropertyCode: cp for cp in end_data.ClassProperties}.get(
                     start_data.Code
@@ -912,5 +922,21 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 continue
             if relation_type == edge.edge_type:
                 return edge
-        if edge is None:
-            print(relation)
+
+    @classmethod
+    def get_relation_from_edge(cls, edge: graphics_items.Edge, bsdd_dictionary: BsddDictionary):
+        start_data, end_data = edge.start_node.bsdd_data, edge.end_node.bsdd_data
+        if isinstance(start_data, BsddClass):
+            if not isinstance(end_data, BsddClass):
+                return
+            end_uri = cl_utils.build_bsdd_uri(end_data, bsdd_dictionary)
+            for rel in start_data.ClassRelations:
+                if rel.RelatedClassUri == end_uri:
+                    return rel
+        elif isinstance(start_data, BsddProperty):
+            if not isinstance(end_data, BsddProperty):
+                return
+            end_uri = prop_utils.build_bsdd_uri(end_data, bsdd_dictionary)
+            for rel in start_data.PropertyRelations:
+                if rel.RelatedPropertyUri == end_uri:
+                    return rel
