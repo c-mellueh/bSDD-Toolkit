@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from bsdd_json import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass
+from bsdd_json import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass,BsddPropertyRelation
 import bsdd
 from bsdd import Client
 from . import dictionary_utils as dict_utils
@@ -202,3 +202,15 @@ def create_class_property_from_internal_property(
     new_property.IsRequired = True
     new_property.AllowedValues = bsdd_property.AllowedValues
     return new_property
+
+def get_property_relation(
+    start_property: BsddProperty, end_property: BsddProperty, relation_type: str
+) -> BsddPropertyRelation |None:
+    end_uri = build_bsdd_uri(end_property, end_property._parent_ref())
+    for relation in start_property.PropertyRelations:
+        if (
+            relation.RelatedPropertyUri == end_uri
+            and relation.RelationType == relation_type
+        ):
+            return relation
+    return None

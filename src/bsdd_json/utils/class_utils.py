@@ -4,7 +4,7 @@ import logging
 from . import dictionary_utils as dict_utils
 import bsdd
 
-from bsdd_json.models import BsddDictionary, BsddClass
+from bsdd_json.models import BsddDictionary, BsddClass,BsddClassRelation
 
 
 class Cache:
@@ -195,3 +195,16 @@ def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
         data["host"] = bsdd_dictionary.DictionaryUri
 
     return dict_utils.build_bsdd_url(data)
+
+
+def get_class_relation(
+    start_class: BsddClass, end_class: BsddClass, relation_type: str
+) -> BsddClassRelation |None:
+    end_uri = build_bsdd_uri(end_class, end_class._parent_ref())
+    for relation in start_class.ClassRelations:
+        if (
+            relation.RelatedClassUri == end_uri
+            and relation.RelationType == relation_type
+        ):
+            return relation
+    return None

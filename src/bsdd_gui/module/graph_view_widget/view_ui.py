@@ -86,47 +86,7 @@ class GraphView(QGraphicsView):
         super().keyPressEvent(event)
 
     def _delete_selected(self, sc: "GraphScene") -> None:
-        # Collect selected items
-        try:
-            selected = list(sc.selectedItems())
-        except Exception:
-            selected = []
-        if not selected:
-            return
-        nodes_to_remove: list[Node] = []
-        edges_to_remove: list[Edge] = []
-        for it in selected:
-            if isinstance(it, Node):
-                nodes_to_remove.append(it)
-            elif isinstance(it, Edge):
-                edges_to_remove.append(it)
-        # Also remove any edges attached to nodes slated for deletion
-        if nodes_to_remove:
-            for e in list(sc.edges):
-                if e.start_node in nodes_to_remove or e.end_node in nodes_to_remove:
-                    edges_to_remove.append(e)
-        # Deduplicate
-        edges_to_remove = list(dict.fromkeys(edges_to_remove))
-        # Remove edges first
-        for e in edges_to_remove:
-            try:
-                sc.removeItem(e)
-            except Exception:
-                pass
-            try:
-                sc.edges.remove(e)
-            except ValueError:
-                pass
-        # Remove nodes
-        for n in nodes_to_remove:
-            try:
-                sc.removeItem(n)
-            except Exception:
-                pass
-            try:
-                sc.nodes.remove(n)
-            except ValueError:
-                pass
+        trigger.delete_selection()
 
     # --- public API ------------------------------------------------------
     def set_create_edge_type(self, edge_type: str | None) -> None:
@@ -233,35 +193,6 @@ class GraphView(QGraphicsView):
         # Decide edge type: use selected type if set, otherwise heuristic
         etype = self._create_edge_type
         trigger.create_relation(start_node,end_node,etype)
-        return
-        if not etype:
-            etype = (
-                C_P_REL
-                if getattr(start_node, "node_type", None) == CLASS_NODE_TYPE
-                and getattr(end_node, "node_type", None) == PROPERTY_NODE_TYPE
-                else GENERIC_REL
-            )
-
-        scene: GraphScene = self.scene()
-        try:
-            edge = tool.GraphViewWidget.create_edge(start_node, end_node, edge_type=etype)
-            tool.GraphViewWidget.add_edge(scene, edge)
-        except Exception:
-            # Fallback: add directly if tool helper not available
-            e = Edge(start_node, end_node, edge_type=etype)
-            scene.addItem(e)
-            try:
-                scene.edges.append(e)
-            except Exception:
-                pass
-
-        # Re-apply current visibility filters if widget is available
-        try:
-            w = tool.GraphViewWidget.get_widget()
-            if w:
-                w._apply_filters()
-        except Exception:
-            pass
 
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:

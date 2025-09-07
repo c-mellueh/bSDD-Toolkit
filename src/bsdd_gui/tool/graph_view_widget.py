@@ -45,7 +45,9 @@ class Signals(WidgetSignals):
     # Payload: the Node graphics item (access bsdd_data via node.bsdd_data)
     node_double_clicked = Signal(object)
     new_class_property_created = Signal(BsddClassProperty)
+    class_property_removed = Signal(BsddClassProperty, BsddClass)
     new_relation_created = Signal(graphics_items.Edge)
+    relation_removed = Signal(graphics_items.Edge)
 class GraphViewWidget(ActionTool, WidgetTool):
     signals = Signals()
 
@@ -548,6 +550,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         new_property = prop_utils.create_class_property_from_internal_property(
             bsdd_property, bsdd_class
         )
+        new_property._set_parent(bsdd_class)
         bsdd_class.ClassProperties.append(new_property)
         cls.signals.new_class_property_created.emit(new_property)
         new_edge = cls.create_edge(start_node, end_node, edge_type=constants.C_P_REL)
@@ -610,3 +613,102 @@ class GraphViewWidget(ActionTool, WidgetTool):
         new_edge = cls.create_edge(start_node, end_node, edge_type=relation)
         cls.add_edge(cls.get_scene(), new_edge)
         cls.signals.new_relation_created.emit(new_edge)
+
+    @classmethod
+    def get_selected_items(cls) -> tuple[list[graphics_items.Node], list[graphics_items.Edge]]:
+
+        selected_nodes: list[graphics_items.Node] = []
+        selected_edges: list[graphics_items.Edge] = []
+        scene = cls.get_scene()
+        if not scene:
+            return [], []
+        try:
+            selected = list(scene.selectedItems())
+        except Exception:
+            selected = []
+        if not selected:
+            return [], []
+        for it in selected:
+            if isinstance(it, graphics_items.Node):
+                selected_nodes.append(it)
+            elif isinstance(it, graphics_items.Edge):
+                selected_edges.append(it)
+        return selected_nodes, selected_edges
+
+    @classmethod
+    def remove_edge(cls, edge: graphics_items.Edge, only_visual=False):
+        """_summary_
+
+        Args:
+            edge (graphics_items.Edge): _description_
+            only_visual (bool, optional): _description_. Delete edge only from scene but leave relationship intact
+        """
+        scene = cls.get_scene()
+        start_node, end_node = edge.start_node, edge.end_node
+        relation_type = edge.edge_type
+        if relation_type == constants.GENERIC_REL:
+            return
+
+        if relation_type == constants.PARENT_CLASS:
+            return
+
+        if not scene:
+            return
+        try:
+            scene.removeItem(edge)
+        except Exception:
+            pass
+        try:
+            scene.edges.remove(edge)
+        except ValueError:
+            pass
+        if only_visual:
+            return
+        start_data, end_data = start_node.bsdd_data, end_node.bsdd_data
+
+        if isinstance(start_data, BsddClass):
+            if isinstance(end_data, BsddClass):
+                class_relation = cl_utils.get_class_relation(start_data, end_data, relation_type)
+                if not class_relation:
+                    return
+                start_data.ClassRelations.remove(class_relation)
+                cls.signals.relation_removed.emit(edge)
+            elif isinstance(end_data, BsddProperty):
+                class_property = {cp.PropertyCode: cp for cp in start_data.ClassProperties}.get(
+                    end_data.Code
+                )
+                if class_property is None:
+                    return
+                start_data.ClassProperties.remove(class_property)
+                cls.signals.class_property_removed.emit(class_property, start_data)
+        elif isinstance(start_data, BsddProperty):
+            if isinstance(end_data, BsddProperty):
+                property_relation = prop_utils.get_property_relation(
+                    start_data, end_data, relation_type
+                )
+                if not property_relation:
+                    return
+                start_data.PropertyRelations.remove(property_relation)
+                cls.signals.relation_removed.emit(edge)
+            elif isinstance(end_data, BsddClass):
+                class_property = {cp.PropertyCode: cp for cp in end_data.ClassProperties}.get(
+                    start_data.Code
+                )
+                if class_property is None:
+                    return
+                end_data.ClassProperties.remove(class_property)
+                cls.signals.class_property_removed.emit(class_property, end_data)
+
+    @classmethod
+    def remove_node(cls, node: graphics_items.Node):
+        scene = cls.get_scene()
+        if not scene:
+            return
+        try:
+            scene.removeItem(node)
+        except Exception:
+            pass
+        try:
+            scene.nodes.remove(node)
+        except ValueError:
+            pass

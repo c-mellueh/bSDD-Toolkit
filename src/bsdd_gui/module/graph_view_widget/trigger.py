@@ -55,3 +55,6 @@ def node_double_clicked(node):
 
 def create_relation(start_node,end_node,relation_type):
     core.create_relation(start_node,end_node,relation_type,tool.GraphViewWidget,tool.Project)
+
+def delete_selection():
+    core.delete_selection(tool.GraphViewWidget)

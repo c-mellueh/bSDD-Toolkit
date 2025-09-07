@@ -24,19 +24,22 @@ def connect_signals(
 ):
     graph_view.connect_internal_signals()
 
-    def handle_new_rel(edge: graphics_items.Edge):
+    def handle_rel_update(edge: graphics_items.Edge):
         start_data = edge.start_node.bsdd_data
         widget = relationship_editor.get_widget(start_data)
         if not widget:
             return
         relationship_editor.reset_view(widget.tv_relations)
 
-    def handle_new_prop(bsdd_class_property: BsddClassProperty):
+    def handle_prop_update(*args, **kwargs):
         class_property_table.reset_views()
         property_set_table.reset_views()
 
-    graph_view.signals.new_relation_created.connect(handle_new_rel)
-    graph_view.signals.new_class_property_created.connect(handle_new_prop)
+    graph_view.signals.new_relation_created.connect(handle_rel_update)
+    graph_view.signals.relation_removed.connect(handle_rel_update)
+
+    graph_view.signals.new_class_property_created.connect(handle_prop_update)
+    graph_view.signals.class_property_removed.connect(handle_prop_update)
 
 
 def connect_to_main_window(
@@ -192,3 +195,27 @@ def create_relation(
             graph_view.create_property_property_relation(
                 start_node, end_node, project.get(), relation_type
             )
+    widget = graph_view.get_widget()
+    widget._apply_filters()
+
+
+def delete_selection(graph_view: Type[tool.GraphViewWidget]):
+    sc = graph_view.get_scene()
+    # Collect selected items
+    nodes_to_remove, edges_to_remove = graph_view.get_selected_items()
+
+    # Also remove any edges attached to nodes slated for deletion
+    if nodes_to_remove:
+        for e in list(sc.edges):
+            if e.start_node in nodes_to_remove or e.end_node in nodes_to_remove:
+                if e not in edges_to_remove:
+                    graph_view.remove_edge(e, only_visual=True)
+    # Deduplicate
+    edges_to_remove = list(set(edges_to_remove))
+
+    # Remove edges first
+    for e in edges_to_remove:
+        graph_view.remove_edge(e)
+    # Remove nodes
+    for n in nodes_to_remove:
+        graph_view.remove_node(n)
