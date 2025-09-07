@@ -116,3 +116,10 @@ NODE_SHAPE_MAP: dict[str, str] = {
     PROPERTY_NODE_TYPE: SHAPE_STYLE_ROUNDED_RECT,
     GENERIC_NODE_TYPE: SHAPE_STYLE_RECT,
 }
+
+# Scene sizing
+# Extra padding added around the bounding box of current nodes when
+# computing the scene rect, to allow panning into empty space.
+SCENE_PADDING = 800  # pixels
+# Minimum scene size to guarantee ample panning room even for tiny graphs.
+SCENE_MIN_SIZE = 100_000  # width and height in pixels

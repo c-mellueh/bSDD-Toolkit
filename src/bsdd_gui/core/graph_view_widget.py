@@ -103,10 +103,6 @@ def handle_drop_event(
     new_class_nodes = graph_view.insert_classes_in_scene(scene, classes_to_add, scene_pos)
     new_property_nodes = graph_view.insert_properties_in_scene(scene, properties_to_add, scene_pos)
     recalculate_relationships(view, graph_view, project)
-    try:
-        scene.auto_scene_rect()
-    except Exception:
-        pass
     event.acceptProposedAction()
 
 

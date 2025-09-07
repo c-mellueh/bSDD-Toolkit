@@ -343,18 +343,11 @@ class GraphScene(QGraphicsScene):
         self.nodes.clear()
         self.edges.clear()
 
-    def auto_scene_rect(self):
-        # Fit to visible nodes if any
-        vis = [n for n in self.nodes if n.isVisible()]
-        items = vis if vis else self.nodes
-        if not items:
-            self.setSceneRect(QRectF(-200, -200, 400, 400))
-            return
-        xs = [n.pos().x() for n in items]
-        ys = [n.pos().y() for n in items]
-        minx, maxx = min(xs) - 120, max(xs) + 120
-        miny, maxy = min(ys) - 120, max(ys) + 120
-        self.setSceneRect(QRectF(minx, miny, maxx - minx, maxy - miny))
+    def create_scene_rect(self):
+        # Fit to visible nodes if any, with generous padding and minimum size
+        half = SCENE_MIN_SIZE / 2.0
+        self.setSceneRect(QRectF(-half, -half, SCENE_MIN_SIZE, SCENE_MIN_SIZE))
+    
 
     # Apply visibility filters for nodes and edges
     def apply_filters(self, node_flags: Dict[str, bool], edge_flags: Dict[str, bool]):
@@ -365,5 +358,3 @@ class GraphScene(QGraphicsScene):
             show_edge = edge_flags.get(e.edge_type, True)
             show_edge = show_edge and e.start_node.isVisible() and e.end_node.isVisible()
             e.setVisible(show_edge)
-        # Update scene rect after visibility changes
-        self.auto_scene_rect()

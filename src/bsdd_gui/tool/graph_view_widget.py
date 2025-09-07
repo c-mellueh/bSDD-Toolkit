@@ -470,19 +470,23 @@ class GraphViewWidget(ActionTool, WidgetTool):
         view = cls.get_view()
         if scene is None:
             return
-            # Fit to visible nodes if any
+        # Fit to visible nodes if any, with a small buffer
         vis = [n for n in scene.nodes if n.isVisible()]
         items = vis if vis else scene.nodes
         if not items:
-            scene.setSceneRect(QRectF(-200, -200, 400, 400))
+            # Fallback to a reasonable default area
+            scene.setSceneRect(QRectF(-500, -500, 1000, 1000))
             return
         xs = [n.pos().x() for n in items]
         ys = [n.pos().y() for n in items]
-        minx, maxx = min(xs) - 120, max(xs) + 120
-        miny, maxy = min(ys) - 120, max(ys) + 120
-        scene.setSceneRect(QRectF(minx, miny, maxx - minx, maxy - miny))
+        minx, maxx = min(xs), max(xs)
+        miny, maxy = min(ys), max(ys)
+        pad = 120.0
+        w = max(1.0, (maxx - minx)) + 2 * pad
+        h = max(1.0, (maxy - miny)) + 2 * pad
+        #scene.setSceneRect()
 
-        view.fitInView(scene.sceneRect(), Qt.KeepAspectRatio)
+        view.fitInView(QRectF(minx - pad, miny - pad, w, h), Qt.KeepAspectRatio)
 
     @classmethod
     def retranslate_buttons(cls):

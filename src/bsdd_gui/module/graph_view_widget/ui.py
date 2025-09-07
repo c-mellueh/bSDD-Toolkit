@@ -46,7 +46,7 @@ class GraphWindow(QWidget):
         self.statusbar = QStatusBar(self)
         self._layout.addWidget(self.statusbar)
         # self._populate_demo()
-        self.scene.auto_scene_rect()
+        self.scene.create_scene_rect()
         self.resize(1000, 700)
         # Track whether we auto-paused due to the window being hidden
         self._auto_paused = False
@@ -102,11 +102,6 @@ class GraphWindow(QWidget):
         self.btn_play.setText("Pause" if self.scene.running else "Play")
         # print(f"[DEBUG] GraphWindow._toggle_running: now running={self.scene.running}")
 
-    def _center_view(self):
-        self.scene.auto_scene_rect()
-        self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
-        # print("[DEBUG] GraphWindow._center_view: view centered on scene rect")
-
     def _apply_filters(self):
         node_flags = {
             "class": (self.tg_nodes_class.isChecked() if hasattr(self, "tg_nodes_class") else True),
@@ -133,8 +128,6 @@ class GraphWindow(QWidget):
             pass
         # Apply to scene
         self.scene.apply_filters(node_flags, edge_flags)
-
-        self.scene.auto_scene_rect()
 
     def _on_edge_type_toggled(self, edge_type: str, checked: bool) -> None:
         self._edge_type_flags[edge_type] = checked
