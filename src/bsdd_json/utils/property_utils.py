@@ -214,3 +214,14 @@ def get_property_relation(
         ):
             return relation
     return None
+
+def delete_property(bsdd_property:BsddProperty,bsdd_dictionary:BsddDictionary = None):
+    bsdd_dictionary = bsdd_property._parent_ref() if not bsdd_dictionary else bsdd_dictionary
+    removed_class_properties = list()
+    for bsdd_class in get_classes_with_bsdd_property(bsdd_property.Code,bsdd_dictionary):
+        for bsdd_class_property in list(bsdd_class.ClassProperties):
+            if bsdd_class_property.PropertyCode == bsdd_property.Code:
+                bsdd_class.ClassProperties.remove(bsdd_class_property)
+                removed_class_properties.append(bsdd_class_property)
+    bsdd_dictionary.Properties.remove(bsdd_property)
+    return removed_class_properties

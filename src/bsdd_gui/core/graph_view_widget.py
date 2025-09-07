@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication,QPointF
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QDropEvent
 from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
@@ -137,14 +137,17 @@ def connect_widget(widget: ui.GraphWindow, graph_view: Type[tool.GraphViewWidget
 
 
 def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
-
     widget = graph_view.get_widget()
     if widget is None:
         return
     bsdd_dictionary = project.get()
     graph_view.clear_scene()
-    graph_view.insert_classes_in_scene(graph_view.get_scene(), bsdd_dictionary.Classes)
-    graph_view.insert_properties_in_scene(graph_view.get_scene(), bsdd_dictionary.Properties)
+    position = QPointF(0.,0.)
+    graph_view.insert_classes_in_scene(graph_view.get_scene(), bsdd_dictionary.Classes,position)
+    widget._apply_filters()
+    graph_view.center_scene()
+    position+=QPointF(40.,40.)
+    graph_view.insert_properties_in_scene(graph_view.get_scene(), bsdd_dictionary.Properties,position)
     recalculate_edges(graph_view, project)
 
 

@@ -13,6 +13,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QTreeView
 from bsdd_json.models import BsddClassProperty, BsddClass, BsddProperty, BsddDictionary
+from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.property_table_widget import ui, models, trigger, views, constants
 import json
 
@@ -93,7 +94,9 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
                 for model in affected_models:
                     row = model.get_row_for_data(bsdd_property)
                     model.beginRemoveRows(QModelIndex(), row, row)
-                bsdd_dictionary.Properties.remove(bsdd_property)
+                removed_properties = prop_utils.delete_property(bsdd_property)
+                for cp in removed_properties:
+                    cls.signals.item_removed.emit(cp)
                 cls.signals.item_removed.emit(bsdd_property)
                 for model in affected_models:
                     model.endRemoveRows()

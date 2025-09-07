@@ -117,6 +117,7 @@ class Physics:
             "com_x",
             "com_y",
             "body",
+            "bodies",
             "nw",
             "ne",
             "sw",
@@ -131,6 +132,7 @@ class Physics:
             self.com_x = 0.0
             self.com_y = 0.0
             self.body: Optional[Node] = None
+            self.bodies: Optional[List[Node]] = None  # for degenerate leaves
             self.nw = self.ne = self.sw = self.se = None
 
         def is_leaf(self) -> bool:
@@ -165,6 +167,11 @@ class Physics:
             self._add_mass(x, y, m)
 
             if self.is_leaf():
+                # If we already collapsed into a degenerate leaf, just add here
+                if self.bodies is not None:
+                    if node not in self.bodies:
+                        self.bodies.append(node)
+                    return
                 if self.body is None:
                     # empty leaf: store body here
                     self.body = node
@@ -172,12 +179,26 @@ class Physics:
                 if self.body is node:
                     # same body being re-inserted; nothing to do
                     return
-                # Subdivide and reinsert the existing body
+
+                # Check for degeneracy: points too close or cell too small
                 old = self.body
+                oldx, oldy = old.pos().x(), old.pos().y()
+                dx = abs(oldx - x)
+                dy = abs(oldy - y)
+                POS_EPS = 1e-9
+                MIN_HALF = 1e-6
+                too_close = (dx <= POS_EPS and dy <= POS_EPS) or (self.half <= MIN_HALF)
+                if too_close:
+                    # Collapse to a list of bodies within this leaf to avoid infinite subdivision
+                    self.bodies = [old, node] if old is not node else [old]
+                    self.body = None
+                    return
+
+                # Subdivide and reinsert the existing body
                 self.body = None
-                quadrant_old = self._child_for(old.pos().x(), old.pos().y())
+                quadrant_old = self._child_for(oldx, oldy)
                 self._ensure_child(quadrant_old)
-                getattr(self, quadrant_old).insert(old, old.pos().x(), old.pos().y(), 1.0)
+                getattr(self, quadrant_old).insert(old, oldx, oldy, 1.0)
 
             # Insert new body into a child
             quadrant = self._child_for(x, y)
@@ -196,8 +217,24 @@ class Physics:
             if self.mass == 0.0:
                 return 0.0, 0.0
             # If this region is just the target itself, ignore
-            if self.is_leaf() and self.body is target:
-                return 0.0, 0.0
+            if self.is_leaf():
+                if self.bodies is not None:
+                    # Compute exact pairwise repulsion within a degenerate leaf
+                    fx = fy = 0.0
+                    for b in self.bodies:
+                        if b is target:
+                            continue
+                        bx, by = b.pos().x(), b.pos().y()
+                        dx = tx - bx
+                        dy = ty - by
+                        d2 = dx * dx + dy * dy + eps
+                        d = math.sqrt(d2)
+                        f_mag = k_repulsion / d2
+                        fx += f_mag * (dx / d)
+                        fy += f_mag * (dy / d)
+                    return fx, fy
+                if self.body is target:
+                    return 0.0, 0.0
 
             dx = tx - self.com_x
             dy = ty - self.com_y

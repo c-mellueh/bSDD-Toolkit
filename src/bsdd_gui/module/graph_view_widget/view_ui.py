@@ -331,7 +331,7 @@ class GraphScene(QGraphicsScene):
         self.edges: List[Edge] = []
         self.physics = Physics()
         self.timer = QTimer()
-        self.timer.setInterval(40)
+        self.timer.setInterval(30)
         self.timer.timeout.connect(self._tick)
         self.running = True
         self.timer.start()
