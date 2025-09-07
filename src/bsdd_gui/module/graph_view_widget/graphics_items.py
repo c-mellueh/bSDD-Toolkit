@@ -7,8 +7,8 @@ from bsdd_gui.module.graph_view_widget.constants import *
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, Dict
 
-from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
-from PySide6.QtGui import QBrush, QColor, QFontMetrics, QPainter, QPainterPath, QPen
+from PySide6.QtCore import QPointF, QRectF, Qt, QTimer, QLineF
+from PySide6.QtGui import QBrush, QColor, QFontMetrics, QPainter, QPainterPath, QPen, QPolygonF
 from PySide6.QtWidgets import (
     QApplication,
     QGraphicsItem,
@@ -49,14 +49,74 @@ class Edge(QGraphicsPathItem):
         self.edge_type = edge_type
         self.setZValue(-1)
         self.update_pen()
+        # Arrow visuals
+        self.arrow_length = 12.0
+        self.arrow_width = 8.0
+        self._arrow_polygon: QPolygonF | None = None
         self.update_path()
         self.edge_data = edge_data
 
+    # --- geometry helpers -------------------------------------------------
+    def _anchor_on_node(self, node: "Node", toward: QPointF) -> QPointF:
+        """Return point on node boundary in direction of 'toward'.
+        Approximates node shape as its rectangle for rect/roundedrect, and
+        as ellipse for ellipse shape.
+        """
+        c = node.pos()
+        v = QPointF(toward.x() - c.x(), toward.y() - c.y())
+        length = (v.x() ** 2 + v.y() ** 2) ** 0.5
+        if length < 1e-6:
+            return QPointF(c)
+        ux, uy = v.x() / length, v.y() / length
+        hx, hy = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
+        # Ellipse intersection distance from center along direction u
+        if getattr(node, "node_shape", None) == SHAPE_STYPE_ELLIPSE:
+            import math
+
+            denom = (ux / max(hx, 1e-6)) ** 2 + (uy / max(hy, 1e-6)) ** 2
+            t = 1.0 / math.sqrt(max(denom, 1e-9))
+        else:
+            # Rect/roundedrect: distance to edge along u
+            tx = hx / abs(ux) if abs(ux) > 1e-6 else float("inf")
+            ty = hy / abs(uy) if abs(uy) > 1e-6 else float("inf")
+            t = min(tx, ty)
+        return QPointF(c.x() + ux * t, c.y() + uy * t)
+
+    def _compute_arrow(self, p1: QPointF, p2: QPointF) -> QPolygonF:
+        """Create an arrowhead polygon at p2, pointing from p1 -> p2."""
+        dx = p2.x() - p1.x()
+        dy = p2.y() - p1.y()
+        d = (dx * dx + dy * dy) ** 0.5
+        if d < 1e-6:
+            return QPolygonF()
+        ux, uy = dx / d, dy / d
+        # Orthogonal vector
+        nx, ny = -uy, ux
+        tail_x = p2.x() - ux * self.arrow_length
+        tail_y = p2.y() - uy * self.arrow_length
+        half_w = self.arrow_width / 2.0
+        left = QPointF(tail_x + nx * half_w, tail_y + ny * half_w)
+        right = QPointF(tail_x - nx * half_w, tail_y - ny * half_w)
+        return QPolygonF([p2, left, right])
+
     def update_path(self):
+        # Compute anchors on node boundaries
+        p_start = self._anchor_on_node(self.start_node, self.end_node.pos())
+        p_end_tip = self._anchor_on_node(self.end_node, self.start_node.pos())
+        # Shrink line to leave room for arrow head so it doesn't overshoot
+        v = QPointF(p_end_tip.x() - p_start.x(), p_end_tip.y() - p_start.y())
+        d = (v.x() ** 2 + v.y() ** 2) ** 0.5
+        if d > 1e-6:
+            ux, uy = v.x() / d, v.y() / d
+            p_end_line = QPointF(p_end_tip.x() - ux * self.arrow_length, p_end_tip.y() - uy * self.arrow_length)
+        else:
+            p_end_line = QPointF(p_end_tip)
         path = QPainterPath()
-        path.moveTo(self.start_node.pos())
-        path.lineTo(self.end_node.pos())
+        path.moveTo(p_start)
+        path.lineTo(p_end_line)
         self.setPath(path)
+        # Update arrow polygon
+        self._arrow_polygon = self._compute_arrow(p_start, p_end_tip)
 
     def update_pen(self):
         # Style edges using registry; falls back to default
@@ -71,6 +131,34 @@ class Edge(QGraphicsPathItem):
         except Exception:
             pen.setStyle(Qt.SolidLine)
         self.setPen(pen)
+        # No fill for arrow head
+        self._arrow_brush = QBrush(Qt.NoBrush)
+
+    def paint(self, painter: QPainter, option, widget=None):
+        painter.setRenderHint(QPainter.Antialiasing, True)
+        # Draw the shaft (path)
+        super().paint(painter, option, widget)
+        # Draw arrow head on top
+        if self._arrow_polygon is not None and not self._arrow_polygon.isEmpty():
+            # Always render arrowhead with a solid outline, regardless of edge style
+            solid_pen = QPen(self.pen())
+            try:
+                solid_pen.setStyle(Qt.SolidLine)
+            except Exception:
+                pass
+            painter.setPen(solid_pen)
+            painter.setBrush(QBrush(Qt.NoBrush))
+            painter.drawPolygon(self._arrow_polygon)
+
+    def boundingRect(self) -> QRectF:
+        rect = super().boundingRect()
+        try:
+            if self._arrow_polygon is not None and not self._arrow_polygon.isEmpty():
+                rect = rect.united(self._arrow_polygon.boundingRect())
+        except Exception:
+            pass
+        # Add small margin for cosmetic pen width
+        return rect.adjusted(-2, -2, 2, 2)
 
 
 class Node(QGraphicsObject):
