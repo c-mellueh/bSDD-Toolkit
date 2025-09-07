@@ -48,6 +48,11 @@ class Edge(QGraphicsPathItem):
         self.weight = weight
         self.edge_type = edge_type
         self.setZValue(-1)
+        # Allow selecting edges so users can delete relationships explicitly
+        try:
+            self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        except Exception:
+            pass
         self.update_pen()
         # Arrow visuals
         self.arrow_length = 12.0

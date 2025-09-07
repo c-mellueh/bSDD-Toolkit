@@ -48,6 +48,11 @@ class GraphView(QGraphicsView):
         self.setAcceptDrops(True)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        # Enable receiving key events
+        try:
+            self.setFocusPolicy(Qt.StrongFocus)
+        except Exception:
+            pass
 
         # Edge-drawing interaction state
         self._edge_drag_active: bool = False
@@ -58,6 +63,70 @@ class GraphView(QGraphicsView):
         # Middle-button panning state
         self._panning_mmb: bool = False
         self._pan_last_pos: QPoint | None = None
+
+    # --- keyboard shortcuts ---------------------------------------------
+    def keyPressEvent(self, event):
+        key = event.key()
+        # Toggle physics with Spacebar
+        if key == Qt.Key_Space:
+            try:
+                tool.GraphViewWidget.toggle_running()
+            except Exception:
+                sc: GraphScene = self.scene()
+                sc.set_running(not sc.running)
+            event.accept()
+            return
+        # Delete selected nodes/relationships with Delete key
+        if key in (Qt.Key_Delete,):
+            sc: GraphScene = self.scene()
+            if sc is not None:
+                self._delete_selected(sc)
+                event.accept()
+                return
+        super().keyPressEvent(event)
+
+    def _delete_selected(self, sc: 'GraphScene') -> None:
+        # Collect selected items
+        try:
+            selected = list(sc.selectedItems())
+        except Exception:
+            selected = []
+        if not selected:
+            return
+        nodes_to_remove: list[Node] = []
+        edges_to_remove: list[Edge] = []
+        for it in selected:
+            if isinstance(it, Node):
+                nodes_to_remove.append(it)
+            elif isinstance(it, Edge):
+                edges_to_remove.append(it)
+        # Also remove any edges attached to nodes slated for deletion
+        if nodes_to_remove:
+            for e in list(sc.edges):
+                if e.start_node in nodes_to_remove or e.end_node in nodes_to_remove:
+                    edges_to_remove.append(e)
+        # Deduplicate
+        edges_to_remove = list(dict.fromkeys(edges_to_remove))
+        # Remove edges first
+        for e in edges_to_remove:
+            try:
+                sc.removeItem(e)
+            except Exception:
+                pass
+            try:
+                sc.edges.remove(e)
+            except ValueError:
+                pass
+        # Remove nodes
+        for n in nodes_to_remove:
+            try:
+                sc.removeItem(n)
+            except Exception:
+                pass
+            try:
+                sc.nodes.remove(n)
+            except ValueError:
+                pass
 
     # --- public API ------------------------------------------------------
     def set_create_edge_type(self, edge_type: str | None) -> None:
