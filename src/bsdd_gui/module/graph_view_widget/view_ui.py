@@ -55,6 +55,9 @@ class GraphView(QGraphicsView):
         self._edge_preview_item: QGraphicsPathItem | None = None
         # Selected edge type for creation (None = auto/heuristic)
         self._create_edge_type: str | None = None
+        # Middle-button panning state
+        self._panning_mmb: bool = False
+        self._pan_last_pos: QPoint | None = None
 
     # --- public API ------------------------------------------------------
     def set_create_edge_type(self, edge_type: str | None) -> None:
@@ -197,9 +200,15 @@ class GraphView(QGraphicsView):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
-            self.setDragMode(QGraphicsView.ScrollHandDrag)
-            fake = type("Fake", (), {"button": lambda self: Qt.LeftButton})
-            event = type(event)(event)
+            # Start manual panning with middle mouse
+            self._panning_mmb = True
+            self._pan_last_pos = self._event_qpoint(event)
+            try:
+                self.setCursor(Qt.ClosedHandCursor)
+            except Exception:
+                pass
+            event.accept()
+            return
         elif event.button() == Qt.LeftButton and (event.modifiers() & Qt.ShiftModifier):
             # Begin edge drawing if pressed on a Node
             pos_view = self._event_qpoint(event)
@@ -213,8 +222,15 @@ class GraphView(QGraphicsView):
         super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if self.dragMode() == QGraphicsView.ScrollHandDrag:
-            self.setDragMode(QGraphicsView.RubberBandDrag)
+        if self._panning_mmb and event.button() == Qt.MiddleButton:
+            self._panning_mmb = False
+            self._pan_last_pos = None
+            try:
+                self.setCursor(Qt.ArrowCursor)
+            except Exception:
+                pass
+            event.accept()
+            return
         elif self._edge_drag_active and event.button() == Qt.LeftButton:
             pos_view = self._event_qpoint(event)
             item = self._item_at_pos(pos_view)
@@ -225,6 +241,23 @@ class GraphView(QGraphicsView):
         super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
+        if self._panning_mmb:
+            # Drag the view by adjusting scrollbars
+            cur = self._event_qpoint(event)
+            if self._pan_last_pos is not None and cur is not None:
+                delta = cur - self._pan_last_pos
+                try:
+                    self.horizontalScrollBar().setValue(
+                        self.horizontalScrollBar().value() - int(delta.x())
+                    )
+                    self.verticalScrollBar().setValue(
+                        self.verticalScrollBar().value() - int(delta.y())
+                    )
+                except Exception:
+                    pass
+            self._pan_last_pos = cur
+            event.accept()
+            return
         if self._edge_drag_active:
             pos_view = self._event_qpoint(event)
             scene_pos = self.mapToScene(pos_view)
