@@ -7,12 +7,11 @@ import math
 import random
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, Dict
-
 from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
 from PySide6.QtGui import QBrush, QColor, QFontMetrics, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QApplication,
-    QGraphicsItem,
+    QWidget,
     QGraphicsObject,
     QGraphicsPathItem,
     QGraphicsScene,
@@ -21,7 +20,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QToolBar,
     QToolButton,
-    QFileDialog,
+    QVBoxLayout,
 )
 
 from bsdd_gui.module.graph_view_widget.view import GraphScene, GraphView
@@ -33,13 +32,15 @@ if TYPE_CHECKING:
     from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
 
 
-class GraphWindow(QMainWindow):
+class GraphWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Force‑Directed Graph — PySide6 (Barnes–Hut)")
         self.scene = GraphScene()
         self.view = GraphView(self.scene)
-        self.setCentralWidget(self.view)
+        self._layout = QVBoxLayout()
+        self.setLayout(self._layout)
+        self._layout.addWidget(self.view)
         self._build_toolbar()
         # self._populate_demo()
         self.scene.auto_scene_rect()
@@ -68,7 +69,9 @@ class GraphWindow(QMainWindow):
         except Exception:
             # Fail-safe: if overlay can't be created (e.g., headless), skip
             self.settings_sidebar = None
+
     def _build_toolbar(self):
+        return
         tb = QToolBar("Controls")
         tb.setMovable(False)
         self.addToolBar(tb)
@@ -90,47 +93,6 @@ class GraphWindow(QMainWindow):
         btn_clear.setText("Clear")
         btn_clear.clicked.connect(self._clear)
         tb.addWidget(btn_clear)
-
-        tb.addSeparator()
-
-        # Edge toggles (legacy/demo groupings)
-        tb.addWidget(QLabel("Edges:"))
-        self.tg_edge_class_rel = QToolButton()
-        self.tg_edge_class_rel.setText("Class↔Class")
-        self.tg_edge_class_rel.setCheckable(True)
-        self.tg_edge_class_rel.setChecked(True)
-        self.tg_edge_class_rel.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_edge_class_rel)
-
-        self.tg_edge_prop_rel = QToolButton()
-        self.tg_edge_prop_rel.setText("Prop↔Prop")
-        self.tg_edge_prop_rel.setCheckable(True)
-        self.tg_edge_prop_rel.setChecked(True)
-        self.tg_edge_prop_rel.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_edge_prop_rel)
-
-        self.tg_edge_cl_to_prop = QToolButton()
-        self.tg_edge_cl_to_prop.setText("Class→Prop")
-        self.tg_edge_cl_to_prop.setCheckable(True)
-        self.tg_edge_cl_to_prop.setChecked(True)
-        self.tg_edge_cl_to_prop.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_edge_cl_to_prop)
-
-        # Node toggles
-        tb.addWidget(QLabel("Nodes:"))
-        self.tg_nodes_class = QToolButton()
-        self.tg_nodes_class.setText("Classes")
-        self.tg_nodes_class.setCheckable(True)
-        self.tg_nodes_class.setChecked(True)
-        self.tg_nodes_class.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_nodes_class)
-
-        self.tg_nodes_prop = QToolButton()
-        self.tg_nodes_prop.setText("Properties")
-        self.tg_nodes_prop.setCheckable(True)
-        self.tg_nodes_prop.setChecked(True)
-        self.tg_nodes_prop.clicked.connect(self._apply_filters)
-        tb.addWidget(self.tg_nodes_prop)
 
         tb.addSeparator()
 

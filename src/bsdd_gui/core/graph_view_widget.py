@@ -43,7 +43,7 @@ def create_widget(
     if w is None:
         if parent is None:
             parent = main_window.get()
-        w = graph_view.create_widget(parent)
+        w = graph_view.create_widget()
         graph_view.register_widget(w)
         # Show as independent window
     w.show()

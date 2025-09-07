@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, Iterable,TYPE_CHECKING
+from typing import Callable, Dict, Iterable, TYPE_CHECKING
 
 from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtWidgets import (
@@ -21,11 +21,12 @@ from PySide6.QtGui import QPainter, QPen, QColor
 from bsdd_gui.module.graph_view_widget.constants import EDGE_STYLE_MAP, EDGE_STYLE_DEFAULT
 
 from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
+
 if TYPE_CHECKING:
     from .ui import GraphWindow
     from .view import GraphScene
 SETTINGS_STYLE_SHEET = """
-            QFrame#EdgeTypeSettingsWidget {
+            QFrame#SettingsWidget {
                 background: rgba(30, 30, 35, 200);
                 border: 1px solid rgba(90, 90, 120, 140);
                 border-radius: 6px;
@@ -40,21 +41,25 @@ SETTINGS_STYLE_SHEET = """
             """
 
 
-class GraphSettingsWidget(QFrame):
-    """Floating settings panel for Graph physics sliders."""
-
-    def __init__(self, physics, parent=None):
-        super().__init__(parent, f=Qt.Window)
-        self.setWindowTitle("Graph Settings")
-        self.physics = physics
-
-        self._build_ui()
-        self._sync_from_physics()
+class SettingsWidget(QFrame):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setObjectName("SettingsWidget")
         self.setFrameShape(QFrame.StyledPanel)
         self.setFrameShadow(QFrame.Raised)
         self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, False)
         self.setStyleSheet(SETTINGS_STYLE_SHEET)
+
+
+class GraphSettingsWidget(SettingsWidget):
+    """Floating settings panel for Graph physics sliders."""
+
+    def __init__(self, physics, parent=None):
+        super().__init__(parent, f=Qt.Window)
+        self.physics = physics
+        self._build_ui()
+        self._sync_from_physics()
 
     def _build_ui(self):
         layout = QVBoxLayout(self)
@@ -133,7 +138,7 @@ class GraphSettingsWidget(QFrame):
         self._update_value_labels()
 
 
-class EdgeTypeSettingsWidget(QFrame):
+class EdgeTypeSettingsWidget(SettingsWidget):
     """
     Compact, floating panel with ToggleSwitches to control visibility
     of individual edge types.
@@ -149,14 +154,8 @@ class EdgeTypeSettingsWidget(QFrame):
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
-        self.setObjectName("EdgeTypeSettingsWidget")
         self._on_toggle = on_toggle
         self._switches: Dict[str, ToggleSwitch] = {}
-        self.setFrameShape(QFrame.StyledPanel)
-        self.setFrameShadow(QFrame.Raised)
-        self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground, False)
-        self.setStyleSheet(SETTINGS_STYLE_SHEET)
 
         root = QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
@@ -188,6 +187,7 @@ class EdgeTypeSettingsWidget(QFrame):
         def _handler(checked: bool):
             if callable(self._on_toggle):
                 self._on_toggle(edge_type, checked)
+
         return _handler
 
     def get_flags(self) -> Dict[str, bool]:
@@ -211,7 +211,7 @@ class _EdgeLegendIcon(QWidget):
     def __init__(self, edge_type: str, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._edge_type = edge_type
-        self.setFixedWidth(30)
+        self.setFixedWidth(28)
         self.setFixedHeight(14)
 
     def sizeHint(self):
@@ -254,7 +254,7 @@ class SettingsSidebar(QWidget):
 
     def __init__(
         self,
-        graph_window:GraphWindow,
+        graph_window: GraphWindow,
         allowed_edge_types: Iterable[str],
         on_toggle: Callable[[str, bool], None],
         parent: QWidget | None = None,
@@ -281,7 +281,7 @@ class SettingsSidebar(QWidget):
 
         # Collapse/Expand handle
         self._btn = QToolButton(self)
-        self._btn.setArrowType(Qt.RightArrow)
+        self._btn.setArrowType(Qt.ArrowType.LeftArrow)
         self._btn.setCheckable(True)
         self._btn.setChecked(True)
         self._btn.clicked.connect(self._on_toggle_clicked)
@@ -301,8 +301,8 @@ class SettingsSidebar(QWidget):
 
         # Primary edge-type panel (kept for API methods below)
         self._edge_types_panel = EdgeTypeSettingsWidget(allowed_edge_types, on_toggle, parent=None)
-        scene:GraphScene = self.graph_window.view.scene()
-        self._view_settings = GraphSettingsWidget(scene.physics,None)
+        scene: GraphScene = self.graph_window.view.scene()
+        self._view_settings = GraphSettingsWidget(scene.physics, None)
         self._scroll_layout.addWidget(self._view_settings)
         self._scroll_layout.addWidget(self._edge_types_panel)
         self._scroll_layout.addStretch(1)
@@ -345,7 +345,9 @@ class SettingsSidebar(QWidget):
     def toggle(self) -> None:
         self.set_expanded(not self._expanded)
 
-    def position_and_resize(self, viewport_width: int, viewport_height: int, margin: int = 0) -> None:
+    def position_and_resize(
+        self, viewport_width: int, viewport_height: int, margin: int = 0
+    ) -> None:
         """Anchor to top-right of the given viewport size and stretch to full height."""
         width = self._btn.width() + (self._expanded_width if self._expanded else 0)
         x = max(0, viewport_width - width - margin)
@@ -356,7 +358,9 @@ class SettingsSidebar(QWidget):
     # Internal
     def _apply_expanded_state(self) -> None:
         self._scroll.setVisible(self._expanded)
-        self._btn.setArrowType(Qt.RightArrow if not self._expanded else Qt.LeftArrow)
+        self._btn.setArrowType(
+            Qt.ArrowType.LeftArrow if not self._expanded else Qt.ArrowType.RightArrow
+        )
         self.updateGeometry()
 
     def _on_toggle_clicked(self):
