@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-
+    from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
 def connect_signals(graph_view: Type[tool.GraphViewWidget]):
     graph_view.connect_internal_signals()
@@ -132,9 +132,18 @@ def recalculate_relationships(
 
 def node_double_clicked(
     node: graphics_items.Node,
-    grah_view: Type[tool.GraphViewWidget],
+    property_table: Type[tool.PropertyTableWidget],
     class_tree: Type[tool.ClassTreeView],
     main_window: Type[tool.MainWindowWidget],
 ):
     if node.node_type == constants.CLASS_NODE_TYPE:
         bsdd_cass: BsddClass = node.bsdd_data
+        class_tree.select_and_expand(bsdd_cass, main_window.get_class_view())
+        main_window.get().raise_()
+        main_window.get().activateWindow()
+        
+    elif node.node_type == constants.PROPERTY_NODE_TYPE:
+        bsdd_property:BsddProperty = node.bsdd_data
+        property_table.request_widget()
+        widget:PropertyWidget = property_table.get_widgets()[-1]
+        property_table.select_property(bsdd_property,widget.tv_properties)

@@ -58,7 +58,6 @@ def retranslate_ui(
 
 
 def create_widget(
-    parent: QWidget,
     property_table: Type[tool.PropertyTableWidget],
     util: Type[tool.Util],
     main_window: Type[tool.MainWindowWidget],
@@ -68,8 +67,8 @@ def create_widget(
     else:
         widget = property_table.create_widget(None)
 
-    widget.setParent(parent)
     widget.show()
+    widget.raise_()
     widget.activateWindow()
     retranslate_ui(property_table, main_window, util)
 
@@ -179,9 +178,7 @@ def connect_to_main_menu(
     property_table: Type[tool.PropertyTableWidget], main_window: Type[tool.MainWindowWidget]
 ) -> None:
     action = main_window.add_action(
-        "menuData",
-        "bSDD Properties",
-        lambda: property_table.request_widget(None, main_window.get()),
+        "menuData", "bSDD Properties", lambda: property_table.request_widget()
     )
     property_table.set_action(main_window.get(), "open_window", action)
 

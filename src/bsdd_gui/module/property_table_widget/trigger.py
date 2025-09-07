@@ -28,8 +28,8 @@ def on_new_project():
     pass
 
 
-def create_widget(parent_widget):
-    core.create_widget(parent_widget, tool.PropertyTableWidget, tool.Util, tool.MainWindowWidget)
+def create_widget():
+    core.create_widget( tool.PropertyTableWidget, tool.Util, tool.MainWindowWidget)
 
 
 def widget_created(widget: ui.PropertyWidget):

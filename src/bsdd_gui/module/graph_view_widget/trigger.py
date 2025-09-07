@@ -42,5 +42,8 @@ def handle_drop_event(event, view):
     )
 
 
-def load_bsdd(cls):
+def load_bsdd():
     core.popuplate_widget(tool.GraphViewWidget, tool.Project)
+
+def node_double_clicked(node):
+    core.node_double_clicked(node,tool.PropertyTableWidget,tool.ClassTreeView,tool.MainWindowWidget)

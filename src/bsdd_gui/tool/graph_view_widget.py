@@ -60,12 +60,12 @@ class GraphViewWidget(ActionTool, WidgetTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-
+        cls.signals.node_double_clicked.connect(trigger.node_double_clicked)
     @classmethod
     def connect_widget_signals(cls, widget: ui.GraphWindow):
         settings_sidebar = widget.settings_sidebar
         bs = settings_sidebar._button_settings
-        bs.bt_load.clicked.connect(trigger.load_bsdd)
+        bs.bt_load.clicked.connect(lambda _: trigger.load_bsdd())
         bs.bt_start_stop.clicked.connect(lambda _: cls.toggle_running())
         bs.bt_clear.clicked.connect(lambda _: cls.clear_scene())
         bs.bt_center.clicked.connect(lambda _: cls.center_scene())
