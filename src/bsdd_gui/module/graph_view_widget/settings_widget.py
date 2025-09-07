@@ -21,6 +21,7 @@ from PySide6.QtGui import QPainter, QPen, QColor
 from bsdd_gui.module.graph_view_widget.constants import EDGE_STYLE_MAP, EDGE_STYLE_DEFAULT
 
 from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
+from .qt import ui_Buttons
 
 if TYPE_CHECKING:
     from .ui import GraphWindow
@@ -52,7 +53,15 @@ class SettingsWidget(QFrame):
         self.setStyleSheet(SETTINGS_STYLE_SHEET)
 
 
-class GraphSettingsWidget(SettingsWidget):
+class ButtonWidget(SettingsWidget, ui_Buttons.Ui_Form):
+    """Floating settings panel for Graph physics sliders."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent, f=Qt.Window)
+        self.setupUi(self)
+
+
+class PhysicsWidget(SettingsWidget):
     """Floating settings panel for Graph physics sliders."""
 
     def __init__(self, physics, parent=None):
@@ -265,11 +274,11 @@ class SettingsSidebar(QWidget):
         self._expanded_width = max(160, int(expanded_width))
         self._expanded = True
 
-        self.setObjectName("EdgeSettingsSidebar")
+        self.setObjectName("SettingsSidebar")
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(
             """
-            QWidget#EdgeSettingsSidebar {
+            QWidget#SettingsSidebar {
                 background: transparent;
             }
             """
@@ -302,9 +311,12 @@ class SettingsSidebar(QWidget):
         # Primary edge-type panel (kept for API methods below)
         self._edge_types_panel = EdgeTypeSettingsWidget(allowed_edge_types, on_toggle, parent=None)
         scene: GraphScene = self.graph_window.view.scene()
-        self._view_settings = GraphSettingsWidget(scene.physics, None)
+        self._view_settings = PhysicsWidget(scene.physics, None)
+        self._button_settings = ButtonWidget(None)
         self._scroll_layout.addWidget(self._view_settings)
         self._scroll_layout.addWidget(self._edge_types_panel)
+        self._scroll_layout.addWidget(self._button_settings)
+
         self._scroll_layout.addStretch(1)
 
         self._scroll.setWidget(self._scroll_content)

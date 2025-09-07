@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
 
 from bsdd_gui.module.graph_view_widget.view import GraphScene, GraphView
 from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES
-from bsdd_gui.module.graph_view_widget.edge_type_settings import SettingsSidebar
+from bsdd_gui.module.graph_view_widget.settings_widget import SettingsSidebar
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
