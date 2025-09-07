@@ -6,6 +6,8 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QDropEvent
 from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
 from bsdd_json import BsddClass, BsddProperty, BsddClassProperty
+import json
+import logging
 
 if TYPE_CHECKING:
     from bsdd_gui.module.graph_view_widget.view_ui import GraphView, GraphScene
@@ -151,7 +153,7 @@ def recalculate_relationships(
     for edge in new_edges:
         graph_view.add_edge(scene, edge)
         relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node)] = edge
-
+    graph_view.get_widget()._apply_filters()
 
 def node_double_clicked(
     node: graphics_items.Node,
@@ -219,3 +221,82 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget]):
     # Remove nodes
     for n in nodes_to_remove:
         graph_view.remove_node(n)
+
+
+def export_graph(
+    graph_view: Type[tool.GraphViewWidget], popups: Type[tool.Popups], appdata: Type[tool.Appdata]
+):
+    widget = graph_view.get_widget()
+    if widget is None:
+        return
+    last_path = appdata.get_path(constants.PATH_NAME) or "graph_layout.json"
+    text = QCoreApplication.translate("Graph View", "Export Graph View")
+    path = popups.get_save_path(constants.FILETYPE, graph_view.get_widget(), last_path, text)
+    if not path:
+        return
+    appdata.set_path(constants.PATH_NAME, path)
+    payload = graph_view._collect_layout()
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        try:
+            widget.statusbar.showMessage(
+                QCoreApplication.translate("GraphView", "Layout exported: ") + str(path),
+                3000,
+            )
+        except Exception:
+            pass
+    except Exception as e:
+        logging.exception("Failed to export layout: %s", e)
+
+
+def import_graph(
+    graph_view: Type[tool.GraphViewWidget],
+    project: Type[tool.Project],
+    popups: Type[tool.Popups],
+    appdata: Type[tool.Appdata],
+):
+
+    widget = graph_view.get_widget()
+    if widget is None:
+        return
+    last_path = appdata.get_path(constants.PATH_NAME) or "graph_layout.json"
+    title = QCoreApplication.translate("Graph View", "Export Graph View")
+
+    path = popups.get_open_path(constants.FILETYPE, graph_view.get_widget(), last_path, title)
+    if not path:
+        return
+    appdata.set_path(constants.PATH_NAME, path)
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        logging.exception("Failed to load layout: %s", e)
+        return
+
+    # Resolve bsDD dictionary from current project lazily to avoid import cycles
+    bsdd_dict = project.get()
+    if not isinstance(data, dict) or "nodes" not in data:
+        return
+
+    # Clear current scene
+    graph_view.clear_scene()
+    scene = graph_view.get_scene()
+    if scene is None:
+        return
+
+    imported_nodes: list[graphics_items.Node] = []
+    for item in data.get("nodes", []) or []:
+        node = graph_view.import_node_from_json(item, project.get())
+        if node is not None:
+            imported_nodes.append(node)
+    # Recreate implied edges based on current dictionary relationships
+    recalculate_relationships(widget.view, graph_view, project)  # type: ignore[name-defined]
+    try:
+        widget.statusbar.showMessage(
+            QCoreApplication.translate("GraphView", "Layout imported: ") + str(path),
+            3000,
+        )
+    except Exception:
+        pass

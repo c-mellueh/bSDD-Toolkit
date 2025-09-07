@@ -8,7 +8,8 @@ Styling registries for easy expansion of visuals.
 - NODE_COLOR_MAP: per node_type fill color
 - NODE_SHAPE_MAP: per node_type shape keyword (rect, roundedrect, ellipse)
 """
-
+FILETYPE = "JSON Files (*.json);;all (*.*)"
+PATH_NAME = "graph_view"
 
 from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
 from PySide6.QtGui import QBrush, QColor, QFontMetrics, QPainter, QPainterPath, QPen

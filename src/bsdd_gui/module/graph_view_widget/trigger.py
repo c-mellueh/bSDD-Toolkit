@@ -58,3 +58,9 @@ def create_relation(start_node,end_node,relation_type):
 
 def delete_selection():
     core.delete_selection(tool.GraphViewWidget)
+    
+def export_requested():
+    core.export_graph(tool.GraphViewWidget,tool.Popups,tool.Appdata)
+
+def import_requested():
+    core.import_graph(tool.GraphViewWidget,tool.Project,tool.Popups,tool.Appdata)

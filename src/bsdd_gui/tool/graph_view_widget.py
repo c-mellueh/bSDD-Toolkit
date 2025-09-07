@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional
 import logging
 
 from PySide6.QtGui import QDropEvent, QColor
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QFileDialog
 from PySide6.QtCore import QPointF, QCoreApplication, QRectF, Qt
 
 import bsdd_gui
@@ -78,7 +78,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
         bs.bt_start_stop.clicked.connect(lambda _: cls.toggle_running())
         bs.bt_clear.clicked.connect(lambda _: cls.clear_scene())
         bs.bt_center.clicked.connect(lambda _: cls.center_scene())
-        # TODO: Create export function
+        # Import/Export current graph layout (nodes + positions)
+        bs.bt_export.clicked.connect(lambda _: trigger.export_requested())
+        bs.bt_import.clicked.connect(lambda _: trigger.import_requested())
 
     @classmethod
     def populate_from_bsdd(cls, widget: ui.GraphWindow, bsdd_dict: BsddDictionary):
@@ -469,6 +471,113 @@ class GraphViewWidget(ActionTool, WidgetTool):
             return None
         return widget.settings_sidebar
 
+    # --- Import/Export ----------------------------------------------------
+    @classmethod
+    def _collect_layout(cls) -> dict:
+        scene = cls.get_scene()
+        if scene is None:
+            return {"version": 1, "nodes": []}
+        nodes_payload = []
+        for n in scene.nodes:
+            try:
+                code = getattr(n.bsdd_data, "Code", None)
+                if code is None:
+                    continue
+                p = n.pos()
+                nodes_payload.append(
+                    {
+                        "type": getattr(n, "node_type", None),
+                        "code": code,
+                        "pos": [float(p.x()), float(p.y())],
+                    }
+                )
+            except Exception:
+                continue
+        return {"version": 1, "nodes": nodes_payload}
+
+    @classmethod
+    def import_layout_dialog(cls):
+        import json
+        from bsdd_json.utils import class_utils as _clu
+        from bsdd_json.utils import property_utils as _ppu
+
+        widget = cls.get_widget()
+        if widget is None:
+            return
+        path, _ = QFileDialog.getOpenFileName(
+            widget,
+            QCoreApplication.translate("GraphView", "Import Graph Layout"),
+            "",
+            "JSON Files (*.json)",
+        )
+        if not path:
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception as e:
+            logging.exception("Failed to load layout: %s", e)
+            return
+
+        # Resolve bsDD dictionary from current project lazily to avoid import cycles
+        try:
+            from bsdd_gui import tool as _tool
+
+            bsdd_dict = _tool.Project.get()
+        except Exception:
+            bsdd_dict = None
+
+        if not isinstance(data, dict) or "nodes" not in data:
+            return
+
+        # Clear current scene
+        cls.clear_scene()
+        scene = cls.get_scene()
+        if scene is None:
+            return
+
+        imported_nodes: list[Node] = []
+        for item in data.get("nodes", []) or []:
+            try:
+                ntype = item.get("type")
+                code = item.get("code")
+                pos = item.get("pos") or [0.0, 0.0]
+                if not code or not ntype:
+                    continue
+                x, y = float(pos[0]), float(pos[1])
+                bsdd_obj = None
+                if bsdd_dict is not None:
+                    if ntype == constants.CLASS_NODE_TYPE:
+                        bsdd_obj = _clu.get_class_by_code(bsdd_dict, code)
+                    elif ntype == constants.PROPERTY_NODE_TYPE:
+                        bsdd_obj = _ppu.get_property_by_code(code, bsdd_dict)
+                if bsdd_obj is None:
+                    continue
+                node = cls.add_node(scene, bsdd_obj, pos=QPointF(x, y))
+                imported_nodes.append(node)
+            except Exception:
+                continue
+
+        # Recreate implied edges based on current dictionary relationships
+        try:
+            from bsdd_gui.core import graph_view_widget as _core_gv
+
+            _core_gv.recalculate_relationships(widget.view, cls, _tool.Project)  # type: ignore[name-defined]
+        except Exception:
+            pass
+        # Ensure current visibility filters are applied
+        try:
+            widget._apply_filters()
+        except Exception:
+            pass
+        try:
+            widget.statusbar.showMessage(
+                QCoreApplication.translate("GraphView", "Layout imported: ") + str(path),
+                3000,
+            )
+        except Exception:
+            pass
+
     @classmethod
     def clear_scene(cls):
         scene = cls.get_scene()
@@ -712,3 +821,26 @@ class GraphViewWidget(ActionTool, WidgetTool):
             scene.nodes.remove(node)
         except ValueError:
             pass
+
+    @classmethod
+    def import_node_from_json(cls, item: dict, bsdd_dictionary: BsddDictionary):
+        scene = cls.get_scene()
+        try:
+            ntype = item.get("type")
+            code = item.get("code")
+            pos = item.get("pos") or [0.0, 0.0]
+            if not code or not ntype:
+                return
+            x, y = float(pos[0]), float(pos[1])
+            bsdd_obj = None
+            if bsdd_dictionary is not None:
+                if ntype == constants.CLASS_NODE_TYPE:
+                    bsdd_obj = cl_utils.get_class_by_code(bsdd_dictionary, code)
+                elif ntype == constants.PROPERTY_NODE_TYPE:
+                    bsdd_obj = prop_utils.get_property_by_code(code, bsdd_dictionary)
+            if bsdd_obj is None:
+                return
+            node = cls.add_node(scene, bsdd_obj, pos=QPointF(x, y))
+            return node
+        except Exception:
+            return
