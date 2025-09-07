@@ -447,7 +447,10 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def insert_properties_in_scene(
-        cls, scene: view_ui.GraphScene, bsdd_properties: list[BsddProperty], position: QPointF = None
+        cls,
+        scene: view_ui.GraphScene,
+        bsdd_properties: list[BsddProperty],
+        position: QPointF = None,
     ):
         if position is None:
             position = QPointF(scene.sceneRect().width() / 2, scene.sceneRect().height() / 2)

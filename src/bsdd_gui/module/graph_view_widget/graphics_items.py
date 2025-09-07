@@ -187,7 +187,7 @@ class Node(QGraphicsObject):
         # radius retained for backward-compat, not used for drawing
         self.radius = radius
         self.node_type = "generic"
-        
+
         if isinstance(bsdd_data, BsddProperty):
             self.node_type = PROPERTY_NODE_TYPE
         if isinstance(bsdd_data, BsddClass):
@@ -199,9 +199,7 @@ class Node(QGraphicsObject):
         self.brush = QBrush(self.color)
         self.border = QPen(QColor(40, 60, 90), 1.2)
         self.border.setCosmetic(True)
-        self.node_shape = NODE_SHAPE_MAP.get(
-            self.node_type, NODE_SHAPE_MAP.get("generic", "rect")
-        )
+        self.node_shape = NODE_SHAPE_MAP.get(self.node_type, NODE_SHAPE_MAP.get("generic", "rect"))
 
         self.velocity = QPointF(0.0, 0.0)
         self.fixed = False

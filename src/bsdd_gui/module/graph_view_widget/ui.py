@@ -34,6 +34,7 @@ if TYPE_CHECKING:
 
 from bsdd_gui.resources.icons import get_icon
 
+
 class GraphWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
