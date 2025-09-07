@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Callable, Dict, Iterable, TYPE_CHECKING
 
-from PySide6.QtCore import Qt, QSize, Signal, QMargins
+from PySide6.QtCore import Qt, QSize, Signal, QMargins, QCoreApplication
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSpacerItem,
     QSlider,
+    QGridLayout,
 )
 from PySide6.QtGui import QPainter, QPen, QColor, QBrush
 
@@ -22,6 +23,8 @@ from bsdd_gui.module.graph_view_widget.constants import (
     EDGE_STYLE_DEFAULT,
     NODE_COLOR_MAP,
     NODE_SHAPE_MAP,
+    EDGE_TYPE_LABEL_MAP,
+    NODE_TYPE_LABEL_MAP,
 )
 
 from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
@@ -79,20 +82,20 @@ class PhysicsWidget(_SettingsWidget):
 
     def _build_ui(self):
         layout = QVBoxLayout(self)
-        title = QLabel("Physics Settings")
+        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Physics Settings"))
         title.setObjectName("titleLabel")
         layout.addWidget(title)
         # Spring length (L0)
-        self.lb_l0 = QLabel("L₀ (spring length)")
+        self.lb_l0 = QLabel(QCoreApplication.translate("GraphViewSettings", "L₀ (spring length)"))
         self.sl_l0 = QSlider(Qt.Horizontal)
-        self.sl_l0.setRange(50, 2000)
-        self.sl_l0.setSingleStep(10)
+        self.sl_l0.setRange(100, 750)
+        self.sl_l0.setSingleStep(5)
         self.val_l0 = QLabel()
         self._add_row(layout, self.lb_l0, self.sl_l0, self.val_l0)
         self.sl_l0.valueChanged.connect(self._on_l0_changed)
 
         # k_spring (scaled by 100)
-        self.lb_ks = QLabel("k_spring")
+        self.lb_ks = QLabel(QCoreApplication.translate("GraphViewSettings", "k_spring"))
         self.sl_ks = QSlider(Qt.Horizontal)
         self.sl_ks.setRange(1, 100)  # 0.01 .. 10.00
         self.sl_ks.setSingleStep(1)
@@ -101,9 +104,9 @@ class PhysicsWidget(_SettingsWidget):
         self.sl_ks.valueChanged.connect(self._on_ks_changed)
 
         # k_repulsion
-        self.lb_rep = QLabel("repulsion")
+        self.lb_rep = QLabel(QCoreApplication.translate("GraphViewSettings", "repulsion"))
         self.sl_rep = QSlider(Qt.Horizontal)
-        self.sl_rep.setRange(10, 10000)
+        self.sl_rep.setRange(10, 2_500)
         self.sl_rep.setSingleStep(10)
         self.val_rep = QLabel()
         self._add_row(layout, self.lb_rep, self.sl_rep, self.val_rep)
@@ -112,13 +115,13 @@ class PhysicsWidget(_SettingsWidget):
     def _add_row(
         self, parent_layout: QVBoxLayout, label: QLabel, slider: QSlider, value_label: QLabel
     ):
-        row = QHBoxLayout()
-        row.addWidget(label)
-        row.addWidget(slider, 1)
+        layout = QGridLayout()
+        layout.addWidget(label, 0, 0, 1, 2)
+        layout.addWidget(slider, 1, 0, 1, 1)
         value_label.setMinimumWidth(60)
         value_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        row.addWidget(value_label)
-        parent_layout.addLayout(row)
+        layout.addWidget(value_label, 1, 1, 1, 1)
+        parent_layout.addLayout(layout)
 
     def _sync_from_physics(self):
         # Avoid feedback loops by blocking signals while setting initial values
@@ -182,7 +185,7 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
         # Ensure it can stretch vertically when hosted in a sidebar
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
-        title = QLabel("Edge Types")
+        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Edge Types"))
         title.setObjectName("titleLabel")
         root.addWidget(title)
 
@@ -198,8 +201,11 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
                 )
             except Exception:
                 pass
-            lbl = QLabel(str(et))
-            lbl.setToolTip(str(et))
+            # Map internal key to human-friendly label and translate it
+            _raw_label = EDGE_TYPE_LABEL_MAP.get(str(et), str(et))
+            _tr_label = QCoreApplication.translate("GraphViewSettings", _raw_label)
+            lbl = QLabel(_tr_label)
+            lbl.setToolTip(_tr_label)
             sw = ToggleSwitch(checked=True)
             sw.toggled.connect(self._make_handler(et))
             self._switches[et] = sw
@@ -303,7 +309,7 @@ class NodeTypeSettingsWidget(_SettingsWidget):
         root.setSpacing(6)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
-        title = QLabel("Node Types")
+        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Node Types"))
         title.setObjectName("titleLabel")
         root.addWidget(title)
 
@@ -312,8 +318,10 @@ class NodeTypeSettingsWidget(_SettingsWidget):
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(6)
             icon = _NodeLegendIcon(str(nt))
-            lbl = QLabel(str(nt))
-            lbl.setToolTip(str(nt))
+            _raw_label = NODE_TYPE_LABEL_MAP.get(str(nt), str(nt))
+            _tr_label = QCoreApplication.translate("GraphViewSettings", _raw_label)
+            lbl = QLabel(_tr_label)
+            lbl.setToolTip(_tr_label)
             sw = ToggleSwitch(checked=True)
             sw.toggled.connect(self._make_handler(nt))
             self._switches[nt] = sw
@@ -424,7 +432,9 @@ class SettingsSidebar(QWidget):
         self._btn.setCheckable(True)
         self._btn.setChecked(True)
         self._btn.clicked.connect(self._on_toggle_clicked)
-        self._btn.setToolTip("Show/Hide edge types")
+        self._btn.setToolTip(
+            QCoreApplication.translate("GraphViewSettings", "Show/Hide edge types")
+        )
         self._btn.setFixedWidth(18)
         self._btn.setFixedHeight(18)
 

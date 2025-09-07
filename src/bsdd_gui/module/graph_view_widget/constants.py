@@ -110,6 +110,29 @@ EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
     GENERIC_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#9D2129")},
 }
 
+# Display label mappings (to be translated in UI)
+# These provide human-friendly names for types; UI should wrap with
+# QCoreApplication.translate("GraphViewSettings", ...)
+EDGE_TYPE_LABEL_MAP: dict[str, str] = {
+    PARENT_CLASS: "Parent Class Code",
+    C_P_REL: "Class Property",
+    MATERIAL_REL: "Has Material",
+    REFERENCE_REL: "Has Reference",
+    IS_EQUAL_REL: "Is Equal To",
+    IS_SIMILAR_REL: "Is Similar To",
+    IS_PARENT_REL: "Is Parent Of",
+    IS_CHILD_REL: "Is Child Of",
+    HAS_PART_REL: "Has Part",
+    IS_PART_REL: "Is Part Of",
+    GENERIC_REL: "Generic",
+}
+
+NODE_TYPE_LABEL_MAP: dict[str, str] = {
+    CLASS_NODE_TYPE: "Class",
+    PROPERTY_NODE_TYPE: "Property",
+    GENERIC_NODE_TYPE: "Generic",
+}
+
 # Node colors and shapes
 NODE_COLOR_DEFAULT = QColor(80, 140, 255)
 NODE_COLOR_MAP: dict[str, QColor] = {
