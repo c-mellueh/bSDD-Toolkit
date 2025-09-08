@@ -81,7 +81,7 @@ Add the PNGs to `docs/images/` with the names below. They will render automatica
 | <img src="docs/images/edit-properties.png" alt="Editing Properties" width="400"> | <img src="docs/images/edit-classes.png" alt="Editing Classes" width="400"> |
 
 ### Graph View
-![Graph View](docs/images/graph_view.mp4)
+![Graph View](docs/images/graph_view.png)
 
 ## Use the Data Model (Python)
 
