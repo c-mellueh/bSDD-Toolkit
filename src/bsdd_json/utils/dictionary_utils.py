@@ -99,6 +99,8 @@ def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
 
     # Helper to quote path segments fast
     def q(seg: str) -> str:
+        return seg
+        #Disable quoting for bsDD URIs
         return quote(str(seg), safe="")
 
     # 1) Build canonical bsDD shape if sufficient fields are present
