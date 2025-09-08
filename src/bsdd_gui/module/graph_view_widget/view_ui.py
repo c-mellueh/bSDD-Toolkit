@@ -166,9 +166,32 @@ class GraphView(QGraphicsView):
             return
         if self._edge_drag_start is None:
             return
+        start = self._edge_drag_start.pos()
         p = QPainterPath()
-        p.moveTo(self._edge_drag_start.pos())
-        p.lineTo(scene_pos)
+        p.moveTo(start)
+        # Match the scene's routing mode for the preview path
+        orth = False
+        try:
+            sc: GraphScene = self.scene()
+            orth = bool(getattr(sc, "orthogonal_edges", False))
+        except Exception:
+            orth = False
+        if not orth:
+            p.lineTo(scene_pos)
+        else:
+            # Create a short stub that leaves the node perpendicular (axis-aligned)
+            dx = scene_pos.x() - start.x()
+            dy = scene_pos.y() - start.y()
+            stub_len = 14.0
+            if abs(dx) >= abs(dy):
+                s1 = QPointF(start.x() + (stub_len if dx >= 0 else -stub_len), start.y())
+                m = QPointF(s1.x(), scene_pos.y())
+            else:
+                s1 = QPointF(start.x(), start.y() + (stub_len if dy >= 0 else -stub_len))
+                m = QPointF(scene_pos.x(), s1.y())
+            p.lineTo(s1)
+            p.lineTo(m)
+            p.lineTo(scene_pos)
         self._edge_preview_item.setPath(p)
 
     def _finish_edge_drag(self, end_node: Node | None) -> None:
@@ -335,6 +358,8 @@ class GraphScene(QGraphicsScene):
         self.timer.timeout.connect(self._tick)
         self.running = True
         self.timer.start()
+        # Edge routing mode: False=straight, True=orthogonal (right-angles)
+        self.orthogonal_edges: bool = False
 
     def _tick(self):
         if not self.running or not self.nodes:
@@ -355,6 +380,16 @@ class GraphScene(QGraphicsScene):
 
     def set_running(self, run: bool):
         self.running = run
+
+    def set_orthogonal_edges(self, enabled: bool) -> None:
+        """Enable/disable right-angle routing for edges and refresh paths."""
+        self.orthogonal_edges = bool(enabled)
+        # Update all edges to reflect the new routing mode
+        for e in list(self.edges):
+            try:
+                e.update_path()
+            except Exception:
+                pass
 
     def clear_graph(self):
         for e in self.edges:

@@ -113,22 +113,84 @@ class Edge(QGraphicsPathItem):
         # Compute anchors on node boundaries
         p_start = self._anchor_on_node(self.start_node, self.end_node.pos())
         p_end_tip = self._anchor_on_node(self.end_node, self.start_node.pos())
-        # Shrink line to leave room for arrow head so it doesn't overshoot
-        v = QPointF(p_end_tip.x() - p_start.x(), p_end_tip.y() - p_start.y())
-        d = (v.x() ** 2 + v.y() ** 2) ** 0.5
-        if d > 1e-6:
-            ux, uy = v.x() / d, v.y() / d
-            p_end_line = QPointF(
-                p_end_tip.x() - ux * self.arrow_length, p_end_tip.y() - uy * self.arrow_length
-            )
-        else:
-            p_end_line = QPointF(p_end_tip)
+
+        # Determine routing mode from scene
+        sc = self.scene()
+        orth = False
+        try:
+            orth = bool(getattr(sc, "orthogonal_edges", False))
+        except Exception:
+            orth = False
+
         path = QPainterPath()
         path.moveTo(p_start)
-        path.lineTo(p_end_line)
+        if not orth:
+            # Straight line with arrow margin
+            v = QPointF(p_end_tip.x() - p_start.x(), p_end_tip.y() - p_start.y())
+            d = (v.x() ** 2 + v.y() ** 2) ** 0.5
+            if d > 1e-6:
+                ux, uy = v.x() / d, v.y() / d
+                p_end_line = QPointF(
+                    p_end_tip.x() - ux * self.arrow_length,
+                    p_end_tip.y() - uy * self.arrow_length,
+                )
+                last_base = QPointF(p_start)
+            else:
+                p_end_line = QPointF(p_end_tip)
+                last_base = QPointF(p_start)
+            path.lineTo(p_end_line)
+        else:
+            # Orthogonal routing with stubs perpendicular to node sides
+            c1 = self.start_node.pos()
+            c2 = self.end_node.pos()
+            # Determine which side we hit on start: left/right vs top/bottom
+            dx1 = p_start.x() - c1.x()
+            dy1 = p_start.y() - c1.y()
+            start_horizontal_side = abs(dy1)
+            # Unit outward normal at start (axis-aligned)
+            if start_horizontal_side:
+                n1x = 1.0 if dx1 >= 0.0 else -1.0
+                n1y = 0.0
+                start_axis = 'x'
+            else:
+                n1x = 0.0
+                n1y = 1.0 if dy1 >= 0.0 else -1.0
+                start_axis = 'y'
+            stub_len = max(12.0, self.arrow_length)
+            s1 = QPointF(p_start.x() + n1x * stub_len, p_start.y() + n1y * stub_len)
+
+            # Determine end side and approach direction (toward node)
+            dx2 = p_end_tip.x() - c2.x()
+            dy2 = p_end_tip.y() - c2.y()
+            end_horizontal_side = abs(dx2) >= abs(dy2)
+            if end_horizontal_side:
+                n2x = 1.0 if dx2 >= 0.0 else -1.0  # outward
+                n2y = 0.0
+                end_axis = 'x'
+            else:
+                n2x = 0.0
+                n2y = 1.0 if dy2 >= 0.0 else -1.0  # outward
+                end_axis = 'y'
+            # Approach direction is toward the node (opposite of outward)
+            ax = -n2x
+            ay = -n2y
+            p_end_line = QPointF(p_end_tip.x() - ax * self.arrow_length, p_end_tip.y() - ay * self.arrow_length)
+
+            # Connect s1 -> p_end_line with one bend so last segment matches end_axis
+            if end_axis == 'x':
+                m = QPointF(s1.x(), p_end_line.y())
+            else:  # end_axis == 'y'
+                m = QPointF(p_end_line.x(), s1.y())
+
+            # Build path: start anchor -> start stub -> middle -> end base
+            path.lineTo(s1)
+            path.lineTo(m)
+            path.lineTo(p_end_line)
+            last_base = QPointF(m)
+
         self.setPath(path)
-        # Update arrow polygon
-        self._arrow_polygon = self._compute_arrow(p_start, p_end_tip)
+        # Arrow head aligned with the last segment direction
+        self._arrow_polygon = self._compute_arrow(last_base, p_end_tip)
 
     def update_pen(self):
         # Style edges using registry; falls back to default
