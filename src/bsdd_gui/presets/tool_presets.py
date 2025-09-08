@@ -435,6 +435,7 @@ class FieldTool(WidgetTool):
             value = field.isChecked()
         elif isinstance(field, TagInput):
             value = field.tags()
+            value = value if value else None
         elif isinstance(field, DateTimeWithNow):
             value = field.get_time()
         elif isinstance(field, QAbstractButton):
