@@ -44,7 +44,7 @@ class AllowedValuesTableView(ItemViewTool):
 
     @classmethod
     def delete_selection(cls, view: ui.AllowedValuesTable):
-        bsdd_property = view.bsdd_data
+        bsdd_property = cls.get_property_from_view(view)
         for allowed_value in cls.get_selected(view):
             if allowed_value in bsdd_property.AllowedValues:
                 bsdd_property.AllowedValues.remove(allowed_value)
@@ -110,16 +110,15 @@ class AllowedValuesTableView(ItemViewTool):
         allowed_value.OwnedUri = value if value else None
 
     @classmethod
-    def append_new_value(cls, widget: ui.AllowedValuesTable):
-        model = widget.model().sourceModel()
-        bsdd_property = model.bsdd_data
+    def append_new_value(cls, view: ui.AllowedValuesTable):
+        bsdd_property = cls.get_property_from_view(view)
         new_name = QCoreApplication.translate("AllowedValuesTable", "New Value")
         new_name = tool.Util.get_unique_name(
             new_name, [v.Code for v in bsdd_property.AllowedValues]
         )
         av = BsddAllowedValue(Code=new_name, Value=new_name)
         bsdd_property.AllowedValues.append(av)
-        cls.reset_view(widget)
+        cls.reset_view(view)
 
     @classmethod
     def get_view_from_property_editor(cls, widget: ClassPropertyEditor):
@@ -135,3 +134,9 @@ class AllowedValuesTableView(ItemViewTool):
         table_view = cls.get_view_from_property_editor(widget)
         if table_view:
             cls.unregister_view(table_view)
+
+    @classmethod
+    def get_property_from_view(
+        cls, view: ui.AllowedValuesTable
+    ) -> BsddClassProperty | BsddProperty:
+        return view.model().sourceModel().bsdd_data

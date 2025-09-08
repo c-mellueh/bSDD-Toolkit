@@ -31,7 +31,7 @@ def create_dialog(blueprint: dict, parent: QWidget):
 
 
 def widget_created(widget: ui.PropertyEditor):
-    core.register_widget(widget, tool.PropertyEditorWidget)
+    core.register_widget(widget, tool.PropertyEditorWidget,tool.AllowedValuesTableView)
     core.register_fields(
         widget,
         tool.PropertyEditorWidget,

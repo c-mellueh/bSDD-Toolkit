@@ -36,8 +36,9 @@ def connect_signals(
         if isinstance(item, BsddProperty):
             project.signals.property_added.emit(item)
         elif isinstance(item, BsddClassProperty):
-            project.signals.class_property_added.emit(item)
+            project.signals.class_property_added.emit(item)       
 
+    property_editor.signals.new_property_created.connect(lambda p:property_table.add_property_to_dictionary(p,project.get()))
     property_table.signals.item_added.connect(handle_item_add)
     property_table.signals.item_removed.connect(handle_item_remove)
     property_table.connect_internal_signals()
