@@ -405,7 +405,7 @@ class _NodeLegendIcon(QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing, True)
         rect = self.rect().adjusted(2, 2, -2, -2)
-        color = NODE_COLOR_MAP.get(self._node_type, QColor(130, 130, 150))
+        color = NODE_COLOR_MAP.get(self._node_type, QColor("#FF0000"))
         shape = NODE_SHAPE_MAP.get(self._node_type, "rect")
         pen = QPen(color)
         pen.setCosmetic(True)
