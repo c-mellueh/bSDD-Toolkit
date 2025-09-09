@@ -4,7 +4,7 @@ import logging
 from . import dictionary_utils as dict_utils
 import bsdd
 
-from bsdd_json.models import BsddDictionary, BsddClass,BsddClassRelation
+from bsdd_json.models import BsddDictionary, BsddClass, BsddClassRelation
 
 
 class Cache:
@@ -199,7 +199,7 @@ def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
 
 def get_class_relation(
     start_class: BsddClass, end_class: BsddClass, relation_type: str
-) -> BsddClassRelation |None:
+) -> BsddClassRelation | None:
     end_uri = build_bsdd_uri(end_class, end_class._parent_ref())
     for relation in start_class.ClassRelations:
         if (
@@ -208,3 +208,11 @@ def get_class_relation(
         ):
             return relation
     return None
+
+
+def set_code(bsdd_class: BsddClass, code: str) -> None:
+    if code == bsdd_class.Code:
+        return
+    bsdd_class._apply_code_side_effects(code)
+    # assign without recursion (no property involved)
+    object.__setattr__(bsdd_class, "Code", code)

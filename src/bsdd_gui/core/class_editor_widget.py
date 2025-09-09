@@ -47,7 +47,7 @@ def register_fields(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorW
     class_editor.register_basic_field(widget, widget.te_definition, "Definition")
 
     class_editor.register_field_getter(widget, widget.le_code, lambda c: c.Code)
-    class_editor.register_field_setter(widget, widget.le_code, lambda e, v: e.set_code(v))
+    class_editor.register_field_setter(widget, widget.le_code, lambda e, v: cl_utils.set_code(e,v))
 
     class_editor.register_field_getter(widget, widget.cb_class_type, lambda c: c.ClassType)
     class_editor.register_field_setter(

@@ -39,26 +39,6 @@ class BsddDictionary(CaseInsensitiveModel):
     Classes: List[BsddClass] = Field(default_factory=list)
     Properties: List[BsddProperty] = Field(default_factory=list)
 
-    @property
-    def base(self) -> str:
-        return (
-            self.DictionaryUri
-            if self.UseOwnUri
-            else "https://identifier.buildingsmart.org"
-        )
-
-    @property
-    def uri(self) -> str:
-        return "/".join(
-            [
-                self.base(),
-                "uri",
-                self.OrganizationCode,
-                str(self.DictionaryCode),
-                str(self.DictionaryVersion),
-            ]
-        )
-
     @classmethod
     def load(cls, path) -> BsddDictionary:
         """Load from a JSON file and validate via the normalizer above."""
@@ -71,6 +51,7 @@ class BsddDictionary(CaseInsensitiveModel):
         with open(path, "w") as file:
             json.dump(self.model_dump(mode="json", exclude_none=True), file)
 
+    # add Parent to children after loading
     def model_post_init(self, context):
         for c in self.Classes:
             c._set_parent(self)
@@ -141,28 +122,6 @@ class BsddClass(CaseInsensitiveModel):
         for child in cl_utils.get_children(self):
             child.ParentClassCode = code
 
-    # # validate the field value itself (runs on parse and assignment validation)
-    # @field_validator("Code", mode="before")
-    # @classmethod
-    # def _normalize_code(cls, v: str):
-    #     if v is None:
-    #         return v
-    #     return v.strip()
-
-    @model_validator(mode="after")
-    def _after_init(self):
-        # run once after parsing so JSON -> model path also triggers side-effects
-        self._apply_code_side_effects(self.Code)
-        return self
-
-    # optional: a method to change Code at runtime with the same guarantees
-    def set_code(self, code: str) -> None:
-        if code == self.Code:
-            return
-        self._apply_code_side_effects(code)
-        # assign without recursion (no property involved)
-        object.__setattr__(self, "Code", code)
-
 
 class BsddAllowedValue(CaseInsensitiveModel):
     Code: str
@@ -218,6 +177,9 @@ class BsddClassProperty(CaseInsensitiveModel):
 
     @model_validator(mode="after")
     def _validate_property_code_or_uri(self):
+        """
+        only one of PropertyCode or PropertyUri must be set (XOR)
+        """
         # normalize whitespace
         code = (
             self.PropertyCode.strip()
