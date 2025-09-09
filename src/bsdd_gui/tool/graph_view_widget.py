@@ -86,6 +86,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
         bs.bt_import.clicked.connect(lambda _: trigger.import_requested())
 
     @classmethod
+    def create_widget(cls, *args, **kwargs):
+        widget:ui.GraphWindow = super().create_widget(*args, **kwargs)
+        return widget
+        
+    @classmethod
     def populate_from_bsdd(cls, widget: ui.GraphWindow, bsdd_dict: BsddDictionary):
         # Build graph from bSDD model: Classes and Properties
         # Node registries

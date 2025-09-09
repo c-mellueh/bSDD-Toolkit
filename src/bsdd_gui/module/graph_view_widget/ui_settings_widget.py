@@ -247,6 +247,8 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
             lbl.setToolTip(_tr_label)
             sw = ToggleSwitch(checked=True)
             sw.toggled.connect(self._make_handler(et))
+
+            sw.setChecked(EDGE_STYLE_MAP.get(str(et), dict()).get("enabled", True))
             self._switches[et] = sw
             row.addWidget(icon, 0)
             row.addWidget(lbl, 1)

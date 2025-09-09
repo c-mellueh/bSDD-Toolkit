@@ -96,18 +96,73 @@ EDGE_STYLE_DEFAULT = {
     "color": QColor(130, 130, 150),
 }
 
-EDGE_STYLE_MAP: dict[str, dict[str, object]] = { 
-    PARENT_CLASS: {"style": Qt.PenStyle.DotLine, "width": 1.5, "color": QColor("#06D6A0")},
-    C_P_REL: {"style": Qt.PenStyle.DashDotDotLine, "width": 1.5, "color": QColor("#F8FFE5")},
-    MATERIAL_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#1B9AAA")},
-    REFERENCE_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#EF476F")},
-    IS_EQUAL_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#FFC43D")},
-    IS_SIMILAR_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#7D1538")},
-    IS_PARENT_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#80DACC3E")},
-    IS_CHILD_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#DACC3E")},
-    HAS_PART_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#807FB7BE")},
-    IS_PART_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#7FB7BE")},
-    GENERIC_REL: {"style": Qt.PenStyle.SolidLine, "width": 1.5, "color": QColor("#9D2129")},
+EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
+    PARENT_CLASS: {
+        "style": Qt.PenStyle.DotLine,
+        "width": 1.5,
+        "color": QColor("#06D6A0"),
+        "enabled": True,
+    },
+    C_P_REL: {
+        "style": Qt.PenStyle.DashDotDotLine,
+        "width": 1.5,
+        "color": QColor("#F8FFE5"),
+        "enabled": True,
+    },
+    MATERIAL_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#1B9AAA"),
+        "enabled": True,
+    },
+    REFERENCE_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#EF476F"),
+        "enabled": True,
+    },
+    IS_EQUAL_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#FFC43D"),
+        "enabled": True,
+    },
+    IS_SIMILAR_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#7D1538"),
+        "enabled": True,
+    },
+    IS_PARENT_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#80DACC3E"),
+        "enabled": False,
+    },
+    IS_CHILD_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#DACC3E"),
+        "enabled": True,
+    },
+    HAS_PART_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#807FB7BE"),
+        "enabled": False,
+    },
+    IS_PART_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#7FB7BE"),
+        "enabled": True,
+    },
+    GENERIC_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#9D2129"),
+        "enabled": True,
+    },
 }
 
 # Display label mappings (to be translated in UI)
