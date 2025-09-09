@@ -64,6 +64,42 @@ class GraphView(QGraphicsView):
         self._panning_mmb: bool = False
         self._pan_last_pos: QPoint | None = None
 
+        # Help overlay: centered, non-interactive notification
+        self._help_overlay: QLabel | None = None
+        try:
+            txt = self.tr(
+                "Drag & drop classes or properties in the view to edit their relations.\n"
+                "Hold Shift and drag between nodes to create relations.\n"
+                "Double-click an edge legend in the settings tab to change relation style.\n"
+                "Editing Parent-Class-Code relations isn't supported so far."
+            )
+            self._help_overlay = QLabel(txt, self.viewport())
+            self._help_overlay.setWordWrap(True)
+            self._help_overlay.setAlignment(Qt.AlignCenter)
+            self._help_overlay.setTextInteractionFlags(Qt.NoTextInteraction)
+            self._help_overlay.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            self._help_overlay.setStyleSheet(
+                """
+                QLabel {
+                    color: #e8e8f0;
+                    background: rgba(25, 25, 35, 180);
+                    border: 1px solid rgba(80, 90, 120, 160);
+                    border-radius: 8px;
+                    padding: 10px 14px;
+                }
+                """
+            )
+            self._reposition_help_overlay()
+            self._update_help_overlay_visibility()
+        except Exception:
+            self._help_overlay = None
+
+        # React to scene modifications to show/hide the help overlay
+        try:
+            self.scene().changed.connect(self._on_scene_changed)
+        except Exception:
+            pass
+
     # --- keyboard shortcuts ---------------------------------------------
     def keyPressEvent(self, event):
         key = event.key()
@@ -225,6 +261,14 @@ class GraphView(QGraphicsView):
         else:
             super().wheelEvent(event)
 
+    def resizeEvent(self, event):
+        # Keep overlays anchored in viewport coordinates
+        try:
+            self._reposition_help_overlay()
+        except Exception:
+            pass
+        super().resizeEvent(event)
+
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
             # Start manual panning with middle mouse
@@ -345,6 +389,45 @@ class GraphView(QGraphicsView):
         except Exception:
             pass
         super().mouseDoubleClickEvent(event)
+
+    # ---- Help overlay helpers -------------------------------------------
+    def _reposition_help_overlay(self) -> None:
+        if not self._help_overlay:
+            return
+        vp = self.viewport()
+        if vp is None:
+            return
+        margin = 16
+        max_w = int(min(720, vp.width() - 2 * margin))
+        if max_w < 120:
+            max_w = max(120, vp.width() - 2 * margin)
+        try:
+            self._help_overlay.setMaximumWidth(max_w)
+            self._help_overlay.adjustSize()
+        except Exception:
+            pass
+        w = min(self._help_overlay.width(), max_w)
+        h = self._help_overlay.height()
+        x = int((vp.width() - w) / 2)
+        y = int((vp.height() - h) / 2)
+        self._help_overlay.setGeometry(x, y, w, h)
+        try:
+            self._help_overlay.raise_()
+        except Exception:
+            pass
+
+    def _update_help_overlay_visibility(self) -> None:
+        if not self._help_overlay:
+            return
+        try:
+            sc: GraphScene = self.scene()
+            has_nodes = bool(getattr(sc, "nodes", []) or [])
+        except Exception:
+            has_nodes = True
+        self._help_overlay.setVisible(not has_nodes)
+
+    def _on_scene_changed(self, *_):
+        self._update_help_overlay_visibility()
 
 
 class GraphScene(QGraphicsScene):
