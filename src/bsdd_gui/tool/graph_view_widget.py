@@ -1006,8 +1006,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
         sc = cls.get_scene()
         children_dict = dict()  # list all children
         parent_dict = {node: None for node in sc.nodes}
+        edge_type = cls.get_widget().get_active_edge_type()
+        if edge_type not in constants.ALLOWED_EDGE_TYPES:
+            return False
         for edge in sc.edges:
-            if edge.edge_type != constants.PARENT_CLASS:
+            if edge.edge_type != edge_type:
                 continue
             start_node = edge.start_node
             end_node = edge.end_node
@@ -1017,7 +1020,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
             children_dict[end_node].append(start_node)
         cls.get_properties().children_dict = children_dict
         cls.get_properties().parent_dict = parent_dict
-
+        return True
     @classmethod
     def firstwalk(cls, v: view_ui.Node, depth):
         while depth >= len(cls.get_properties().height_list):
@@ -1027,11 +1030,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
         )
 
         if len(cls.children(v)) == 0:  # no children exist
-            if cls.get_lmost_sibling(
-                v
-            ):  # if sibling exist move next to sibling with constants.X_MARGIN
-                lbrother = cls.lbrother(v)
-                cls.set_x(v, cls.x(lbrother) + cls.width(lbrother) + constants.X_MARGIN)
+            # If a left brother exists, place next to it; otherwise start at 0
+            lbrother = cls.lbrother(v)
+            if lbrother:
+                sibling_sep = (cls.width(lbrother) + cls.width(v)) / 2.0 + constants.X_MARGIN
+                cls.set_x(v, cls.x(lbrother) + sibling_sep)
             else:
                 cls.set_x(v, 0.0)
 
@@ -1046,9 +1049,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
             w = cls.lbrother(v)
             if w:
-                cls.set_x(v, cls.x(w) + cls.width(w) + constants.X_MARGIN)
-
-                v.mod = cls.x(v) - midpoint
+                # Align current subtree next to its left brother with symmetric spacing
+                sibling_sep = (cls.width(w) + cls.width(v)) / 2.0 + constants.X_MARGIN
+                new_x = cls.x(w) + sibling_sep
+                cls.set_x(v, new_x)
+                v.mod = new_x - midpoint
             else:
                 cls.set_x(v, midpoint)
         return v
@@ -1080,7 +1085,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
             vol = cls.left(vol)
             vor = cls.right(vor)
             vor.ancestor = v
-            shift = cls.x(vil) + sil - (cls.x(vir) + sir) + cls.width(vil) + constants.X_MARGIN * 2
+            # Use both nodes' half-widths to avoid overlap and enforce a symmetric margin
+            sep = (cls.width(vil) + cls.width(vir)) / 2.0 + constants.X_MARGIN * 2
+            shift = (cls.x(vil) + sil) - (cls.x(vir) + sir) + sep
             if shift > 0:
                 cls.move_subtree(cls.ancestor(vil, v, default_ancestor), v, shift)
                 sir = sir + shift
@@ -1100,7 +1107,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def move_subtree(cls, wl: view_ui.Node, wr: view_ui.Node, shift: float):
-        subtrees = wr.number - wl.number
+        subtrees = (wr.number or 0) - (wl.number or 0)
+        if subtrees <= 0:
+            subtrees = 1
         wr.change -= shift / subtrees
         wr.shift += shift
         wl.change += shift / subtrees
@@ -1114,7 +1123,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
         v: view_ui.Node,
         default_ancestor: view_ui.Node,
     ):
-        if vil.ancestor in cls.children(v):
+        pv = cls.parent(v)
+        siblings = cls.children(pv) if pv else []
+        if vil.ancestor in siblings:
             return vil.ancestor
         else:
             return default_ancestor
@@ -1135,7 +1146,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def children(cls, v: view_ui.Node) -> list[view_ui.Node]:
-        return sorted(cls.get_properties().children_dict.get(v, []), key=lambda n: n.x())
+        # Preserve original insertion order from children_dict; sorting by x corrupts numbering
+        return cls.get_properties().children_dict.get(v, [])
 
     @classmethod
     def parent(cls, v: view_ui.Node) -> view_ui.Node:
@@ -1143,11 +1155,17 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def left(cls, v: view_ui.Node):
-        return v.thread or len(cls.children(v)) and cls.children(v)[0]
+        if v.thread:
+            return v.thread
+        ch = cls.children(v)
+        return ch[0] if ch else None
 
     @classmethod
     def right(cls, v: view_ui.Node):
-        return v.thread or len(cls.children(v)) and cls.children(v)[-1]
+        if v.thread:
+            return v.thread
+        ch = cls.children(v)
+        return ch[-1] if ch else None
 
     @classmethod
     def lbrother(cls, v: view_ui.Node):
@@ -1163,9 +1181,16 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def get_lmost_sibling(cls, v: view_ui.Node) -> view_ui.Node:
-        if not v._lmost_sibling and cls.parent(v) and v != cls.children(cls.parent(v))[0]:
-            v._lmost_sibling = cls.children(cls.parent(v))[0]
-        return v._lmost_sibling
+        p = cls.parent(v)
+        if not p:
+            return v
+        ch = cls.children(p)
+        if not ch:
+            return v
+        first = ch[0]
+        if v._lmost_sibling is None:
+            v._lmost_sibling = first
+        return v if v == first else v._lmost_sibling
 
     @classmethod
     def x(cls, v: view_ui.Node):

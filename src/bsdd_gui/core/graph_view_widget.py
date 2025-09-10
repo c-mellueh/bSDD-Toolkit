@@ -353,8 +353,10 @@ def import_graph(
 
 
 def buchheim(graph_view: Type[tool.GraphViewWidget]):
+    allowed = graph_view.reset_children_dict()
+    if not allowed:
+        return
     graph_view.pause()
-    graph_view.reset_children_dict()
     roots = graph_view.find_roots()
     root = roots[0]
     all_nodes = graph_view.get_scene().nodes
