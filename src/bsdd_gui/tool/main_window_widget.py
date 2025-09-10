@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import ctypes
 import sys
 
-from PySide6.QtWidgets import QApplication, QMenu, QMenuBar, QStatusBar
+from PySide6.QtWidgets import QApplication, QMenu, QMenuBar, QStatusBar, QLabel
 import bsdd_gui
 from bsdd_gui.module.main_window_widget import ui
 from bsdd_json.models import BsddClass, BsddClassProperty
@@ -51,6 +51,9 @@ class MainWindowWidget(ActionTool):
             window = ui.MainWindow(application)
             cls.get_properties().ui = window
             cls.get_properties().application = application
+            cls.get_properties().status_text_label = QLabel()
+            cls.get_statusbar().addPermanentWidget(cls.get_properties().status_text_label)
+            cls.get_statusbar().setSizeGripEnabled(False)
         return cls.get_properties().ui
 
     @classmethod
@@ -173,7 +176,8 @@ class MainWindowWidget(ActionTool):
 
     @classmethod
     def set_status_bar_text(cls, text: str):
-        cls.get_statusbar().showMessage(text)
+        print(text)
+        cls.get_properties().status_text_label.setText(text)
 
     @classmethod
     def toggle_console(cls):

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from typing import TypedDict
 
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QApplication, QMenu
+from PySide6.QtWidgets import QApplication, QMenu, QLabel
 import bsdd_json
 from bsdd_gui.presets.prop_presets import ActionsProperties
 
@@ -21,6 +21,6 @@ class MainWindowWidgetProperties(ActionsProperties):
     active_class: BsddClass = None
     active_pset: str = None
     active_property: BsddClassProperty = None
-
+    status_text_label: QLabel = None
     # Most Modules have an Actions dict. In this dict The Actions of the MainMenubar are stored. and can be called by get/set action w/ their name
     # This is Mostly used for translating the Actions on Language change

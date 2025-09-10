@@ -4,14 +4,14 @@ import logging
 
 import bsdd_gui
 from bsdd_gui.module.shell_widget import ui, trigger
-from bsdd_gui.presets.tool_presets import WidgetTool
+from bsdd_gui.presets.tool_presets import WidgetTool, ActionTool
 from bsdd_gui.presets.signal_presets import WidgetSignals
 
 if TYPE_CHECKING:
     from bsdd_gui.module.shell_widget.prop import ShellWidgetProperties
 
 
-class ShellWidget(WidgetTool):
+class ShellWidget(WidgetTool, ActionTool):
     signals = WidgetSignals()
 
     @classmethod

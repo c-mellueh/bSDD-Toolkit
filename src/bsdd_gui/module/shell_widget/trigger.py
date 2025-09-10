@@ -8,7 +8,7 @@ def connect():
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.ShellWidget)
+    core.retranslate_ui(tool.ShellWidget, tool.MainWindowWidget)
     pass
 
 
