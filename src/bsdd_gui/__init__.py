@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__version__ = "0.2.2"  # needs to be on top of bsdd_gui import statements else ImportError
+__version__ = "0.2.3"  # needs to be on top of bsdd_gui import statements else ImportError
 
 import logging
 from typing import TYPE_CHECKING
