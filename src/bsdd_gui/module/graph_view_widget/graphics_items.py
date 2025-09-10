@@ -215,18 +215,44 @@ class Edge(QGraphicsPathItem):
 
     def paint(self, painter: QPainter, option, widget=None):
         painter.setRenderHint(QPainter.Antialiasing, True)
-        # Draw the shaft (path)
-        super().paint(painter, option, widget)
-        # Draw arrow head on top
+        painter.setBrush(QBrush(Qt.NoBrush))
+        path = self.path()
+
+        # Custom selection visualization: soft glow under the edge instead of Qt's default rectangle
+        if self.isSelected():
+            base_pen = self.pen()
+            glow_color = QColor(base_pen.color())
+            try:
+                glow_color.setAlpha(110)
+            except Exception:
+                pass
+            glow_width = max(float(base_pen.widthF()) * 5.0, 10.0)
+            glow_pen = QPen(glow_color, glow_width)
+            glow_pen.setCosmetic(True)
+            try:
+                glow_pen.setStyle(Qt.SolidLine)
+                glow_pen.setCapStyle(Qt.RoundCap)
+                glow_pen.setJoinStyle(Qt.RoundJoin)
+            except Exception:
+                pass
+            painter.setPen(glow_pen)
+            painter.drawPath(path)
+            # Glow around arrow outline too
+            if self._arrow_polygon is not None and not self._arrow_polygon.isEmpty():
+                painter.drawPolygon(self._arrow_polygon)
+
+        # Draw the edge with its configured style
+        painter.setPen(self.pen())
+        painter.drawPath(path)
+
+        # Draw arrow head on top (solid outline)
         if self._arrow_polygon is not None and not self._arrow_polygon.isEmpty():
-            # Always render arrowhead with a solid outline, regardless of edge style
             solid_pen = QPen(self.pen())
             try:
                 solid_pen.setStyle(Qt.SolidLine)
             except Exception:
                 pass
             painter.setPen(solid_pen)
-            painter.setBrush(QBrush(Qt.NoBrush))
             painter.drawPolygon(self._arrow_polygon)
 
     def boundingRect(self) -> QRectF:
@@ -236,8 +262,8 @@ class Edge(QGraphicsPathItem):
                 rect = rect.united(self._arrow_polygon.boundingRect())
         except Exception:
             pass
-        # Add small margin for cosmetic pen width
-        return rect.adjusted(-2, -2, 2, 2)
+        # Add generous margin to accommodate selection glow
+        return rect.adjusted(-12, -12, 12, 12)
 
 
 class Node(QGraphicsObject):
