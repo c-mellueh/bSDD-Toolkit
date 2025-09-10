@@ -157,6 +157,45 @@ class PhysicsWidget(_SettingsWidget):
         self._update_value_labels()
 
 
+class EdgeRoutingWidget(_SettingsWidget):
+    """Simple panel to toggle between straight and right-angle edges."""
+
+    def __init__(self, scene: "GraphScene", parent: QWidget | None = None) -> None:
+        super().__init__(parent, f=Qt.Window)
+        self._scene = scene
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        lay = QVBoxLayout(self)
+        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Edge Routing"))
+        title.setObjectName("titleLabel")
+        lay.addWidget(title)
+
+        row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(6)
+        lbl = QLabel(QCoreApplication.translate("GraphViewSettings", "Right-angle edges"))
+        self.sw_ortho = ToggleSwitch(checked=False)
+        self.sw_ortho.toggled.connect(self._on_toggled)
+        row.addWidget(lbl, 1)
+        row.addWidget(self.sw_ortho, 0, alignment=Qt.AlignRight)
+        lay.addLayout(row)
+
+    def _on_toggled(self, checked: bool) -> None:
+        try:
+            self._scene.set_orthogonal_edges(bool(checked))
+        except Exception:
+            # Fallback in case method not available (older scene)
+            try:
+                setattr(self._scene, "orthogonal_edges", bool(checked))
+                for e in getattr(self._scene, "edges", []) or []:
+                    try:
+                        e.update_path()
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+
 class EdgeTypeSettingsWidget(_SettingsWidget):
     """
     Compact, floating panel with ToggleSwitches to control visibility
@@ -208,6 +247,8 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
             lbl.setToolTip(_tr_label)
             sw = ToggleSwitch(checked=True)
             sw.toggled.connect(self._make_handler(et))
+
+            sw.setChecked(EDGE_STYLE_MAP.get(str(et), dict()).get("enabled", True))
             self._switches[et] = sw
             row.addWidget(icon, 0)
             row.addWidget(lbl, 1)
@@ -366,7 +407,7 @@ class _NodeLegendIcon(QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing, True)
         rect = self.rect().adjusted(2, 2, -2, -2)
-        color = NODE_COLOR_MAP.get(self._node_type, QColor(130, 130, 150))
+        color = NODE_COLOR_MAP.get(self._node_type, QColor("#FF0000"))
         shape = NODE_SHAPE_MAP.get(self._node_type, "rect")
         pen = QPen(color)
         pen.setCosmetic(True)
@@ -472,6 +513,8 @@ class SettingsSidebar(QWidget):
             pass
         scene: GraphScene = self.graph_window.view.scene()
         self._view_settings = PhysicsWidget(scene.physics, None)
+        # Edge routing panel (straight vs right-angle)
+        self._routing_settings = EdgeRoutingWidget(scene, None)
         # Node types panel
         try:
             from bsdd_gui.module.graph_view_widget import constants as _const
@@ -486,6 +529,7 @@ class SettingsSidebar(QWidget):
         )
         self._button_settings = ButtonWidget(None)
         self._scroll_layout.addWidget(self._view_settings)
+        self._scroll_layout.addWidget(self._routing_settings)
         self._scroll_layout.addWidget(self._node_types_panel)
         self._scroll_layout.addWidget(self._edge_types_panel)
         self._scroll_layout.addWidget(self._button_settings)

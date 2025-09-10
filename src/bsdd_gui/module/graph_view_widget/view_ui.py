@@ -64,6 +64,42 @@ class GraphView(QGraphicsView):
         self._panning_mmb: bool = False
         self._pan_last_pos: QPoint | None = None
 
+        # Help overlay: centered, non-interactive notification
+        self._help_overlay: QLabel | None = None
+        try:
+            txt = self.tr(
+                "Drag & drop classes or properties in the view to edit their relations.\n"
+                "Hold Shift and drag between nodes to create relations.\n"
+                "Double-click an edge legend in the settings tab to change relation style.\n"
+                "Editing Parent-Class-Code relations isn't supported so far."
+            )
+            self._help_overlay = QLabel(txt, self.viewport())
+            self._help_overlay.setWordWrap(True)
+            self._help_overlay.setAlignment(Qt.AlignCenter)
+            self._help_overlay.setTextInteractionFlags(Qt.NoTextInteraction)
+            self._help_overlay.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            self._help_overlay.setStyleSheet(
+                """
+                QLabel {
+                    color: #e8e8f0;
+                    background: rgba(25, 25, 35, 180);
+                    border: 1px solid rgba(80, 90, 120, 160);
+                    border-radius: 8px;
+                    padding: 10px 14px;
+                }
+                """
+            )
+            self._reposition_help_overlay()
+            self._update_help_overlay_visibility()
+        except Exception:
+            self._help_overlay = None
+
+        # React to scene modifications to show/hide the help overlay
+        try:
+            self.scene().changed.connect(self._on_scene_changed)
+        except Exception:
+            pass
+
     # --- keyboard shortcuts ---------------------------------------------
     def keyPressEvent(self, event):
         key = event.key()
@@ -166,9 +202,32 @@ class GraphView(QGraphicsView):
             return
         if self._edge_drag_start is None:
             return
+        start = self._edge_drag_start.pos()
         p = QPainterPath()
-        p.moveTo(self._edge_drag_start.pos())
-        p.lineTo(scene_pos)
+        p.moveTo(start)
+        # Match the scene's routing mode for the preview path
+        orth = False
+        try:
+            sc: GraphScene = self.scene()
+            orth = bool(getattr(sc, "orthogonal_edges", False))
+        except Exception:
+            orth = False
+        if not orth:
+            p.lineTo(scene_pos)
+        else:
+            # Create a short stub that leaves the node perpendicular (axis-aligned)
+            dx = scene_pos.x() - start.x()
+            dy = scene_pos.y() - start.y()
+            stub_len = 14.0
+            if abs(dx) >= abs(dy):
+                s1 = QPointF(start.x() + (stub_len if dx >= 0 else -stub_len), start.y())
+                m = QPointF(s1.x(), scene_pos.y())
+            else:
+                s1 = QPointF(start.x(), start.y() + (stub_len if dy >= 0 else -stub_len))
+                m = QPointF(scene_pos.x(), s1.y())
+            p.lineTo(s1)
+            p.lineTo(m)
+            p.lineTo(scene_pos)
         self._edge_preview_item.setPath(p)
 
     def _finish_edge_drag(self, end_node: Node | None) -> None:
@@ -201,6 +260,14 @@ class GraphView(QGraphicsView):
             event.accept()
         else:
             super().wheelEvent(event)
+
+    def resizeEvent(self, event):
+        # Keep overlays anchored in viewport coordinates
+        try:
+            self._reposition_help_overlay()
+        except Exception:
+            pass
+        super().resizeEvent(event)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
@@ -323,6 +390,45 @@ class GraphView(QGraphicsView):
             pass
         super().mouseDoubleClickEvent(event)
 
+    # ---- Help overlay helpers -------------------------------------------
+    def _reposition_help_overlay(self) -> None:
+        if not self._help_overlay:
+            return
+        vp = self.viewport()
+        if vp is None:
+            return
+        margin = 16
+        max_w = int(min(720, vp.width() - 2 * margin))
+        if max_w < 120:
+            max_w = max(120, vp.width() - 2 * margin)
+        try:
+            self._help_overlay.setMaximumWidth(max_w)
+            self._help_overlay.adjustSize()
+        except Exception:
+            pass
+        w = min(self._help_overlay.width(), max_w)
+        h = self._help_overlay.height()
+        x = int((vp.width() - w) / 2)
+        y = int((vp.height() - h) / 2)
+        self._help_overlay.setGeometry(x, y, w, h)
+        try:
+            self._help_overlay.raise_()
+        except Exception:
+            pass
+
+    def _update_help_overlay_visibility(self) -> None:
+        if not self._help_overlay:
+            return
+        try:
+            sc: GraphScene = self.scene()
+            has_nodes = bool(getattr(sc, "nodes", []) or [])
+        except Exception:
+            has_nodes = True
+        self._help_overlay.setVisible(not has_nodes)
+
+    def _on_scene_changed(self, *_):
+        self._update_help_overlay_visibility()
+
 
 class GraphScene(QGraphicsScene):
     def __init__(self):
@@ -335,6 +441,8 @@ class GraphScene(QGraphicsScene):
         self.timer.timeout.connect(self._tick)
         self.running = True
         self.timer.start()
+        # Edge routing mode: False=straight, True=orthogonal (right-angles)
+        self.orthogonal_edges: bool = False
 
     def _tick(self):
         if not self.running or not self.nodes:
@@ -355,6 +463,16 @@ class GraphScene(QGraphicsScene):
 
     def set_running(self, run: bool):
         self.running = run
+
+    def set_orthogonal_edges(self, enabled: bool) -> None:
+        """Enable/disable right-angle routing for edges and refresh paths."""
+        self.orthogonal_edges = bool(enabled)
+        # Update all edges to reflect the new routing mode
+        for e in list(self.edges):
+            try:
+                e.update_path()
+            except Exception:
+                pass
 
     def clear_graph(self):
         for e in self.edges:
