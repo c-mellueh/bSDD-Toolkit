@@ -51,6 +51,7 @@ class Signals(WidgetSignals):
     class_relation_removed = Signal(BsddClassRelation)
     property_relation_removed = Signal(BsddPropertyRelation)
 
+
 class GraphViewWidget(ActionTool, WidgetTool):
     signals = Signals()
 
