@@ -283,31 +283,48 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
     @classmethod
     def make_class_relation_bidrectional(
-        cls, relation: BsddClassRelation, bsdd_dictionary: BsddDictionary
+        cls,
+        relation: BsddClassRelation,
+        bsdd_dictionary: BsddDictionary,
+        mode: Literal["add"] | Literal["remove"] = "add",
     ):
         start_class, end_class, relation_type = cls.read_relation(relation, bsdd_dictionary)
         start_uri = cl_utils.build_bsdd_uri(start_class, bsdd_dictionary)
 
-        inverse_relations = {"IsChildOf": "IsParentOf", "HasPart": "IsPartOf"}
+        inverse_relations = {
+            "IsChildOf": "IsParentOf",
+            "HasPart": "IsPartOf",
+            "IsEqualTo": "IsEqualTo",
+        }
         for k, v in dict(inverse_relations).items():
             inverse_relations[v] = k
 
         if relation_type not in inverse_relations:
             return
+
+        relation_found = False
         for cr in end_class.ClassRelations:
             if (
                 cr.RelatedClassUri == start_uri
                 and cr.RelationType == inverse_relations[relation_type]
             ):
-                return
-
-        for start_rel, end_rel in inverse_relations.items():
-            if relation_type == start_rel:
-                rel = BsddClassRelation(
-                    RelationType=end_rel,
-                    RelatedClassUri=start_uri,
-                    RelatedClassName=start_class.Name,
-                )
-                rel._set_parent(end_class)
-                end_class.ClassRelations.append(rel)
-                cls.signals.class_relation_added.emit(rel)
+                relation_found = True
+        if relation_found and mode == "add":
+            return
+        if not relation_found and mode == "remove":
+            return
+        end_type = inverse_relations.get(relation_type)
+        if mode == "add":
+            rel = BsddClassRelation(
+                RelationType=end_type,
+                RelatedClassUri=start_uri,
+                RelatedClassName=start_class.Name,
+            )
+            rel._set_parent(end_class)
+            end_class.ClassRelations.append(rel)
+            cls.signals.class_relation_added.emit(rel)
+        elif mode == "remove":
+            for cr in list(end_class.ClassRelations):
+                if cr.RelatedClassUri == start_uri and cr.RelationType == end_type:
+                    end_class.ClassRelations.remove(cr)
+                    cls.signals.class_relation_removed.emit(cr)

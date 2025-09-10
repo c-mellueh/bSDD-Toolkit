@@ -48,7 +48,8 @@ class Signals(WidgetSignals):
     class_property_removed = Signal(BsddClassProperty, BsddClass)
     new_edge_created = Signal(graphics_items.Edge)
     edge_removed = Signal(graphics_items.Edge)
-
+    class_relation_removed = Signal(BsddClassRelation)
+    property_relation_removed = Signal(BsddPropertyRelation)
 
 class GraphViewWidget(ActionTool, WidgetTool):
     signals = Signals()
@@ -810,7 +811,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
         except Exception:
             pass
         try:
-            scene.edges.remove(edge)
+            if edge in scene.edges:
+                scene.edges.remove(edge)
         except ValueError:
             pass
         if only_visual:
@@ -824,6 +826,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                     return
                 start_data.ClassRelations.remove(class_relation)
                 cls.signals.edge_removed.emit(edge)
+                cls.signals.class_relation_removed.emit(class_relation)
             elif isinstance(end_data, BsddProperty):
                 class_property = {cp.PropertyCode: cp for cp in start_data.ClassProperties}.get(
                     end_data.Code
@@ -840,6 +843,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 if not property_relation:
                     return
                 start_data.PropertyRelations.remove(property_relation)
+                cls.signals.property_relation_removed.emit(property_relation)
+
                 cls.signals.edge_removed.emit(edge)
             elif isinstance(end_data, BsddClass):
                 class_property = {cp.PropertyCode: cp for cp in end_data.ClassProperties}.get(

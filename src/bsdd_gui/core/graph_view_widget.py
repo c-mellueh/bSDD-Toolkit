@@ -41,6 +41,7 @@ def connect_signals(
             return
         relationship_editor.reset_view(widget.tv_relations)
 
+
     def handle_prop_update(*args, **kwargs):
         class_property_table.reset_views()
         property_set_table.reset_views()
@@ -50,6 +51,9 @@ def connect_signals(
 
     graph_view.signals.new_class_property_created.connect(handle_prop_update)
     graph_view.signals.class_property_removed.connect(handle_prop_update)
+    graph_view.signals.class_relation_removed.connect(project.signals.class_relation_removed.emit)
+    graph_view.signals.property_relation_removed.connect(project.signals.property_relation_removed.emit)
+
 
     def handle_remove(bsdd_data):
         if isinstance(bsdd_data, BsddClassProperty):
