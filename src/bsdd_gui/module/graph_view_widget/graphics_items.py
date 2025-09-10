@@ -67,7 +67,7 @@ class Edge(QGraphicsPathItem):
         )
 
     # --- geometry helpers -------------------------------------------------
-    def _anchor_on_node(self, node: "Node", toward: QPointF) -> QPointF:
+    def _anchor_on_node(self, node: "Node", toward: QPointF, orto=False) -> QPointF:
         """Return point on node boundary in direction of 'toward'.
         Approximates node shape as its rectangle for rect/roundedrect, and
         as ellipse for ellipse shape.
@@ -77,20 +77,47 @@ class Edge(QGraphicsPathItem):
         length = (v.x() ** 2 + v.y() ** 2) ** 0.5
         if length < 1e-6:
             return QPointF(c)
-        ux, uy = v.x() / length, v.y() / length
-        hx, hy = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
+        normalized_x, normalized_y = v.x() / length, v.y() / length
+
+        halfe_width, half_height = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
         # Ellipse intersection distance from center along direction u
         if getattr(node, "node_shape", None) == SHAPE_STYPE_ELLIPSE:
             import math
 
-            denom = (ux / max(hx, 1e-6)) ** 2 + (uy / max(hy, 1e-6)) ** 2
+            denom = (normalized_x / max(halfe_width, 1e-6)) ** 2 + (
+                normalized_y / max(half_height, 1e-6)
+            ) ** 2
             t = 1.0 / math.sqrt(max(denom, 1e-9))
         else:
             # Rect/roundedrect: distance to edge along u
-            tx = hx / abs(ux) if abs(ux) > 1e-6 else float("inf")
-            ty = hy / abs(uy) if abs(uy) > 1e-6 else float("inf")
+            tx = halfe_width / abs(normalized_x) if abs(normalized_x) > 1e-6 else float("inf")
+            ty = half_height / abs(normalized_y) if abs(normalized_y) > 1e-6 else float("inf")
             t = min(tx, ty)
-        return QPointF(c.x() + ux * t, c.y() + uy * t)
+        if not orto:
+            return QPointF(c.x() + normalized_x * t, c.y() + normalized_y * t)
+
+        if abs(v.y()) < half_height:
+            dw = normalized_x / abs(normalized_x) * halfe_width
+            return QPointF(c.x() + dw, c.y())
+        else:
+            dh = normalized_y / abs(normalized_y) * half_height
+            return QPointF(c.x(), c.y() + dh)
+
+    def _ortho_mode_is_hor(self, node, toward):
+        c = node.pos()
+        v = QPointF(toward.x() - c.x(), toward.y() - c.y())
+        return abs(v.y()) < self.arrow_length*3
+
+    def _ortho_start(self, node, toward, hor_mode):
+        c = node.pos()
+        v = QPointF(toward.x() - c.x(), toward.y() - c.y())
+        halfe_width, half_height = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
+        if hor_mode:
+            dw = v.x() / abs(v.x()) * halfe_width
+            return QPointF(c.x() + dw, c.y())
+        else:
+            dh = v.y() / abs(v.y()) * half_height
+            return QPointF(c.x(), c.y() + dh)
 
     def _compute_arrow(self, p1: QPointF, p2: QPointF) -> QPolygonF:
         """Create an arrowhead polygon at p2, pointing from p1 -> p2."""
@@ -110,10 +137,6 @@ class Edge(QGraphicsPathItem):
         return QPolygonF([p2, left, right])
 
     def update_path(self):
-        # Compute anchors on node boundaries
-        p_start = self._anchor_on_node(self.start_node, self.end_node.pos())
-        p_end_tip = self._anchor_on_node(self.end_node, self.start_node.pos())
-
         # Determine routing mode from scene
         sc = self.scene()
         orth = False
@@ -122,9 +145,13 @@ class Edge(QGraphicsPathItem):
         except Exception:
             orth = False
 
+        # Compute anchors on node boundaries
+
         path = QPainterPath()
-        path.moveTo(p_start)
         if not orth:
+            p_start = self._anchor_on_node(self.start_node, self.end_node.pos(), orth)
+            p_end_tip = self._anchor_on_node(self.end_node, self.start_node.pos(), orth)
+            path.moveTo(p_start)
             # Straight line with arrow margin
             v = QPointF(p_end_tip.x() - p_start.x(), p_end_tip.y() - p_start.y())
             d = (v.x() ** 2 + v.y() ** 2) ** 0.5
@@ -139,54 +166,32 @@ class Edge(QGraphicsPathItem):
                 p_end_line = QPointF(p_end_tip)
                 last_base = QPointF(p_start)
             path.lineTo(p_end_line)
+
         else:
-            # Orthogonal routing with stubs perpendicular to node sides
-            c1 = self.start_node.pos()
-            c2 = self.end_node.pos()
-            # Determine which side we hit on start: left/right vs top/bottom
-            dx1 = p_start.x() - c1.x()
-            dy1 = p_start.y() - c1.y()
-            start_horizontal_side = abs(dy1)
-            # Unit outward normal at start (axis-aligned)
-            if start_horizontal_side:
-                n1x = 1.0 if dx1 >= 0.0 else -1.0
-                n1y = 0.0
-                start_axis = 'x'
+
+            horizontal_mode = self._ortho_mode_is_hor(self.start_node, self.end_node.pos())
+            p_start = self._ortho_start(self.start_node, self.end_node.pos(), horizontal_mode)
+            p_end_tip = self._ortho_start(self.end_node, self.start_node.pos(), horizontal_mode)
+            delta_x = p_end_tip.x() - p_start.x()
+            delta_y = p_end_tip.y() - p_start.y()
+            x_dir = delta_x / abs(delta_x) if abs(delta_x) > 1e-6 else 0.0
+            y_dir = delta_y / abs(delta_y) if abs(delta_y) > 1e-6 else 0.0
+            if horizontal_mode:
+                x_height = p_end_tip.x() - self.arrow_length * x_dir*3
+                p1 = QPointF(x_height, p_start.y())
+                p2 = QPointF(x_height, p_end_tip.y())
+                p3 = QPointF(p_end_tip.x()-x_dir*self.arrow_length,p_end_tip.y())
+
             else:
-                n1x = 0.0
-                n1y = 1.0 if dy1 >= 0.0 else -1.0
-                start_axis = 'y'
-            stub_len = max(12.0, self.arrow_length)
-            s1 = QPointF(p_start.x() + n1x * stub_len, p_start.y() + n1y * stub_len)
-
-            # Determine end side and approach direction (toward node)
-            dx2 = p_end_tip.x() - c2.x()
-            dy2 = p_end_tip.y() - c2.y()
-            end_horizontal_side = abs(dx2) >= abs(dy2)
-            if end_horizontal_side:
-                n2x = 1.0 if dx2 >= 0.0 else -1.0  # outward
-                n2y = 0.0
-                end_axis = 'x'
-            else:
-                n2x = 0.0
-                n2y = 1.0 if dy2 >= 0.0 else -1.0  # outward
-                end_axis = 'y'
-            # Approach direction is toward the node (opposite of outward)
-            ax = -n2x
-            ay = -n2y
-            p_end_line = QPointF(p_end_tip.x() - ax * self.arrow_length, p_end_tip.y() - ay * self.arrow_length)
-
-            # Connect s1 -> p_end_line with one bend so last segment matches end_axis
-            if end_axis == 'x':
-                m = QPointF(s1.x(), p_end_line.y())
-            else:  # end_axis == 'y'
-                m = QPointF(p_end_line.x(), s1.y())
-
-            # Build path: start anchor -> start stub -> middle -> end base
-            path.lineTo(s1)
-            path.lineTo(m)
-            path.lineTo(p_end_line)
-            last_base = QPointF(m)
+                y_height = p_end_tip.y() - self.arrow_length * y_dir*3
+                p1 = QPointF(p_start.x(), y_height)
+                p2 = QPointF(p_end_tip.x(), y_height)
+                p3 = QPointF(p_end_tip.x(),p_end_tip.y()-y_dir*self.arrow_length)
+            path.moveTo(p_start)
+            path.lineTo(p1)
+            path.lineTo(p2)
+            path.lineTo(p3)
+            last_base = QPointF(p3)
 
         self.setPath(path)
         # Arrow head aligned with the last segment direction

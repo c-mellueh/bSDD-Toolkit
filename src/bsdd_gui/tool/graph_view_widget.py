@@ -585,7 +585,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         try:
             from bsdd_gui.core import graph_view_widget as _core_gv
 
-            _core_gv.recalculate_edges(widget.view, cls, _tool.Project)  # type: ignore[name-defined]
+            _core_gv.recalculate_edges(cls, _tool.Project)  # type: ignore[name-defined]
         except Exception:
             pass
         # Ensure current visibility filters are applied

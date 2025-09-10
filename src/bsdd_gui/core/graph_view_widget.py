@@ -342,7 +342,7 @@ def import_graph(
         if node is not None:
             imported_nodes.append(node)
     # Recreate implied edges based on current dictionary relationships
-    recalculate_edges(widget.view, graph_view, project)  # type: ignore[name-defined]
+    recalculate_edges( graph_view, project)  # type: ignore[name-defined]
     try:
         widget.statusbar.showMessage(
             QCoreApplication.translate("GraphView", "Layout imported: ") + str(path),
