@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QCoreApplication, QPointF
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QDropEvent
 from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
 from bsdd_json import (
@@ -355,6 +355,17 @@ def import_graph(
 def buchheim(graph_view: Type[tool.GraphViewWidget]):
     allowed = graph_view.reset_children_dict()
     if not allowed:
+        # Inform the user that an edge type must be selected
+        try:
+            w = graph_view.get_widget()
+            title = QCoreApplication.translate("GraphView", "Create Tree")
+            msg = QCoreApplication.translate(
+                "GraphView",
+                "Select an edge type in the sidebar (Edge Types) by double-clicking the legend to activate it, then run Create Tree.",
+            )
+            QMessageBox.information(w, title, msg)
+        except Exception:
+            pass
         return
     graph_view.pause()
     roots = graph_view.find_roots()

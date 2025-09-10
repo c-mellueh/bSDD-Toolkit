@@ -1021,6 +1021,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         cls.get_properties().children_dict = children_dict
         cls.get_properties().parent_dict = parent_dict
         return True
+        return True
 
     @classmethod
     def firstwalk(cls, v: view_ui.Node, depth):
