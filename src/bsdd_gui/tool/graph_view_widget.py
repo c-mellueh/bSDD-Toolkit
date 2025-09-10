@@ -82,8 +82,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
         bs.bt_clear.clicked.connect(lambda _: cls.clear_scene())
         bs.bt_center.clicked.connect(lambda _: cls.center_scene())
         # Import/Export current graph layout (nodes + positions)
-        bs.bt_export.clicked.connect(lambda _: trigger.buchheim())
+        bs.bt_export.clicked.connect(lambda _: trigger.export_requested())
         bs.bt_import.clicked.connect(lambda _: trigger.import_requested())
+        bs.bt_tree.clicked.connect(lambda _: trigger.buchheim())
 
     @classmethod
     def create_widget(cls, *args, **kwargs):
@@ -655,6 +656,20 @@ class GraphViewWidget(ActionTool, WidgetTool):
         cls.retranslate_buttons()
 
     @classmethod
+    def pause(cls):
+        scene = cls.get_scene()
+        if not scene:
+            return
+        scene.running = False
+
+    @classmethod
+    def play(cls):
+        scene = cls.get_scene()
+        if not scene:
+            return
+        scene.running = True
+
+    @classmethod
     def create_class_property_relation(
         cls,
         start_node: graphics_items.Node,
@@ -836,14 +851,16 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 cls.signals.class_property_removed.emit(class_property, end_data)
 
     @classmethod
-    def remove_node(cls, node: graphics_items.Node, ignore_edges: list[graphics_items.Edge] = None):
-        ignore_edges = list() if ignore_edges is None else ignore_edges
+    def remove_node(
+        cls, node: graphics_items.Node, ignored_edges: list[graphics_items.Edge] = None
+    ):
+        ignored_edges = list() if ignored_edges is None else ignored_edges
 
         scene = cls.get_scene()
         if not scene:
             return
         for e in list(scene.edges):
-            if e in ignore_edges:
+            if e in ignored_edges:
                 continue
             if e.start_node == node or e.end_node == node:
                 cls.remove_edge(e, only_visual=True, allow_parent_deletion=True)
@@ -994,8 +1011,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 continue
             start_node = edge.start_node
             end_node = edge.end_node
-            if start_node not in parent_dict:
-                parent_dict[start_node] = end_node
+            parent_dict[start_node] = end_node
             if end_node not in children_dict:
                 children_dict[end_node] = list()
             children_dict[end_node].append(start_node)
@@ -1173,8 +1189,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def width(cls, v: view_ui.Node):
-        return v._w
+        return getattr(v, "_w", 24.0) 
 
     @classmethod
     def height(cls, v: view_ui.Node):
-        return v._h
+        return getattr(v, "_h", 24.0)

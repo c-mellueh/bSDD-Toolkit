@@ -14,6 +14,41 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="1">
+    <widget class="QPushButton" name="bt_import">
+     <property name="text">
+      <string>Import</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="bt_load">
+     <property name="text">
+      <string>Load</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="bt_center">
+     <property name="text">
+      <string>Center</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="titleLabel">
+     <property name="text">
+      <string>Actions</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="bt_export">
+     <property name="text">
+      <string>Export</string>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="0">
     <widget class="QPushButton" name="bt_start_stop">
      <property name="text">
@@ -28,38 +63,10 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QPushButton" name="bt_center">
+   <item row="4" column="0">
+    <widget class="QPushButton" name="bt_tree">
      <property name="text">
-      <string>Center</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="bt_load">
-     <property name="text">
-      <string>Load</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="titleLabel">
-     <property name="text">
-      <string>Actions</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="bt_import">
-     <property name="text">
-      <string>Import</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="bt_export">
-     <property name="text">
-      <string>Export</string>
+      <string>Create Tree</string>
      </property>
     </widget>
    </item>

@@ -270,7 +270,7 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget]):
         graph_view.remove_edge(e)
     # Remove nodes
     for n in nodes_to_remove:
-        graph_view.remove_node(n, ignore_edges=edges_to_remove)
+        graph_view.remove_node(n, ignored_edges=edges_to_remove)
 
 
 def export_graph(
@@ -353,6 +353,7 @@ def import_graph(
 
 
 def buchheim(graph_view: Type[tool.GraphViewWidget]):
+    graph_view.pause()
     graph_view.reset_children_dict()
     roots = graph_view.find_roots()
     root = roots[0]
@@ -374,4 +375,5 @@ def buchheim(graph_view: Type[tool.GraphViewWidget]):
     graph_view.intialize(helper_node)
     graph_view.buchheim(helper_node)
     graph_view.rearrange(helper_node, QPointF(min_x, min_y))
-    graph_view.remove_node(helper_node, ignore_edges=True)
+    graph_view.remove_node(helper_node)
+    graph_view.center_scene()

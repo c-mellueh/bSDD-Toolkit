@@ -79,25 +79,25 @@ class Edge(QGraphicsPathItem):
             return QPointF(c)
         normalized_x, normalized_y = v.x() / length, v.y() / length
 
-        halfe_width, half_height = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
+        half_width, half_height = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
         # Ellipse intersection distance from center along direction u
         if getattr(node, "node_shape", None) == SHAPE_STYPE_ELLIPSE:
             import math
 
-            denom = (normalized_x / max(halfe_width, 1e-6)) ** 2 + (
+            denom = (normalized_x / max(half_width, 1e-6)) ** 2 + (
                 normalized_y / max(half_height, 1e-6)
             ) ** 2
             t = 1.0 / math.sqrt(max(denom, 1e-9))
         else:
             # Rect/roundedrect: distance to edge along u
-            tx = halfe_width / abs(normalized_x) if abs(normalized_x) > 1e-6 else float("inf")
+            tx = half_width / abs(normalized_x) if abs(normalized_x) > 1e-6 else float("inf")
             ty = half_height / abs(normalized_y) if abs(normalized_y) > 1e-6 else float("inf")
             t = min(tx, ty)
         if not orto:
             return QPointF(c.x() + normalized_x * t, c.y() + normalized_y * t)
 
         if abs(v.y()) < half_height:
-            dw = normalized_x / abs(normalized_x) * halfe_width
+            dw = normalized_x / abs(normalized_x) * half_width
             return QPointF(c.x() + dw, c.y())
         else:
             dh = normalized_y / abs(normalized_y) * half_height
@@ -113,10 +113,10 @@ class Edge(QGraphicsPathItem):
         v = QPointF(toward.x() - c.x(), toward.y() - c.y())
         halfe_width, half_height = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
         if hor_mode:
-            dw = v.x() / abs(v.x()) * halfe_width
+            dw = v.x() / abs(v.x()) * halfe_width if abs(v.x()) > 1e-6 else 0.0
             return QPointF(c.x() + dw, c.y())
         else:
-            dh = v.y() / abs(v.y()) * half_height
+            dh = v.y() / abs(v.y()) * half_height if abs(v.y()) > 1e-6 else 0.0
             return QPointF(c.x(), c.y() + dh)
 
     def _compute_arrow(self, p1: QPointF, p2: QPointF) -> QPolygonF:
