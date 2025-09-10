@@ -196,6 +196,7 @@ class EdgeRoutingWidget(_SettingsWidget):
             except Exception:
                 pass
 
+
 class EdgeTypeSettingsWidget(_SettingsWidget):
     """
     Compact, floating panel with ToggleSwitches to control visibility

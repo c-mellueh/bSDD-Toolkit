@@ -77,5 +77,6 @@ def import_requested():
 def recalculate_edges():
     core.recalculate_edges(tool.GraphViewWidget, tool.Project)
 
+
 def buchheim():
     core.buchheim(tool.GraphViewWidget)

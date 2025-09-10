@@ -36,9 +36,11 @@ def connect_signals(
         if isinstance(item, BsddProperty):
             project.signals.property_added.emit(item)
         elif isinstance(item, BsddClassProperty):
-            project.signals.class_property_added.emit(item)       
+            project.signals.class_property_added.emit(item)
 
-    property_editor.signals.new_property_created.connect(lambda p:property_table.add_property_to_dictionary(p,project.get()))
+    property_editor.signals.new_property_created.connect(
+        lambda p: property_table.add_property_to_dictionary(p, project.get())
+    )
     property_table.signals.item_added.connect(handle_item_add)
     property_table.signals.item_removed.connect(handle_item_remove)
     property_table.connect_internal_signals()
@@ -178,8 +180,7 @@ def remove_view(
 def connect_to_main_menu(
     property_table: Type[tool.PropertyTableWidget], main_window: Type[tool.MainWindowWidget]
 ) -> None:
-    action = main_window.add_action(None, "Properties", lambda: property_table.request_widget()
-    )
+    action = main_window.add_action(None, "Properties", lambda: property_table.request_widget())
     property_table.set_action(main_window.get(), "open_window", action)
 
 

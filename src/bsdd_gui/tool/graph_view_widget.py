@@ -1021,6 +1021,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         cls.get_properties().children_dict = children_dict
         cls.get_properties().parent_dict = parent_dict
         return True
+
     @classmethod
     def firstwalk(cls, v: view_ui.Node, depth):
         while depth >= len(cls.get_properties().height_list):
@@ -1214,7 +1215,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def width(cls, v: view_ui.Node):
-        return getattr(v, "_w", 24.0) 
+        return getattr(v, "_w", 24.0)
 
     @classmethod
     def height(cls, v: view_ui.Node):

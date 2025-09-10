@@ -106,7 +106,7 @@ class Edge(QGraphicsPathItem):
     def _ortho_mode_is_hor(self, node, toward):
         c = node.pos()
         v = QPointF(toward.x() - c.x(), toward.y() - c.y())
-        return abs(v.y()) < self.arrow_length*3
+        return abs(v.y()) < self.arrow_length * 3
 
     def _ortho_start(self, node, toward, hor_mode):
         c = node.pos()
@@ -177,16 +177,16 @@ class Edge(QGraphicsPathItem):
             x_dir = delta_x / abs(delta_x) if abs(delta_x) > 1e-6 else 0.0
             y_dir = delta_y / abs(delta_y) if abs(delta_y) > 1e-6 else 0.0
             if horizontal_mode:
-                x_height = p_end_tip.x() - self.arrow_length * x_dir*3
+                x_height = p_end_tip.x() - self.arrow_length * x_dir * 3
                 p1 = QPointF(x_height, p_start.y())
                 p2 = QPointF(x_height, p_end_tip.y())
-                p3 = QPointF(p_end_tip.x()-x_dir*self.arrow_length,p_end_tip.y())
+                p3 = QPointF(p_end_tip.x() - x_dir * self.arrow_length, p_end_tip.y())
 
             else:
-                y_height = p_end_tip.y() - self.arrow_length * y_dir*3
+                y_height = p_end_tip.y() - self.arrow_length * y_dir * 3
                 p1 = QPointF(p_start.x(), y_height)
                 p2 = QPointF(p_end_tip.x(), y_height)
-                p3 = QPointF(p_end_tip.x(),p_end_tip.y()-y_dir*self.arrow_length)
+                p3 = QPointF(p_end_tip.x(), p_end_tip.y() - y_dir * self.arrow_length)
             path.moveTo(p_start)
             path.lineTo(p1)
             path.lineTo(p2)
@@ -293,10 +293,10 @@ class Node(QGraphicsObject):
         self.setAcceptHoverEvents(True)
 
     def __str__(self):
-        if hasattr(self.bsdd_data,"Code"):
+        if hasattr(self.bsdd_data, "Code"):
             return f"Node: {self.bsdd_data.Code} ({self.node_type})"
         return f"Node: {self.bsdd_data} ({self.node_type})"
-    
+
     def __repr__(self):
         return self.__str__()
 
