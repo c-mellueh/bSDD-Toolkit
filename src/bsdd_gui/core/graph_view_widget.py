@@ -342,7 +342,7 @@ def import_graph(
         if node is not None:
             imported_nodes.append(node)
     # Recreate implied edges based on current dictionary relationships
-    recalculate_edges( graph_view, project)  # type: ignore[name-defined]
+    recalculate_edges(graph_view, project)  # type: ignore[name-defined]
     try:
         widget.statusbar.showMessage(
             QCoreApplication.translate("GraphView", "Layout imported: ") + str(path),
@@ -350,3 +350,28 @@ def import_graph(
         )
     except Exception:
         pass
+
+
+def buchheim(graph_view: Type[tool.GraphViewWidget]):
+    graph_view.reset_children_dict()
+    roots = graph_view.find_roots()
+    root = roots[0]
+    all_nodes = graph_view.get_scene().nodes
+    graph_view.intialize(root)
+    root_x_pos = [n.pos().x() for n in roots]
+    root_y_pos = [n.pos().y() for n in roots]
+    root_mid_x = (min(root_x_pos) + max(root_x_pos)) / 2
+    root_mid_y = (min(root_y_pos) + max(root_y_pos)) / 2
+    min_x = max(min(n.pos().x() for n in all_nodes), 500.0)
+    min_y = max(min(n.pos().y() for n in all_nodes), 500.0)
+    center_pos = QPointF(root_mid_x, root_mid_y)
+    helper_node = graph_view.add_node(graph_view.get_scene(), None, center_pos)
+
+    graph_view.get_properties().children_dict[helper_node] = roots
+    for r in roots:
+        graph_view.get_properties().parent_dict[r] = helper_node
+
+    graph_view.intialize(helper_node)
+    graph_view.buchheim(helper_node)
+    graph_view.rearrange(helper_node, QPointF(min_x, min_y))
+    graph_view.remove_node(helper_node, ignore_edges=True)

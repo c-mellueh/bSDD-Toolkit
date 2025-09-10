@@ -210,3 +210,7 @@ NODE_SHAPE_MAP: dict[str, str] = {
 SCENE_PADDING = 800  # pixels
 # Minimum scene size to guarantee ample panning room even for tiny graphs.
 SCENE_MIN_SIZE = 100_000  # width and height in pixels
+
+
+X_MARGIN = 20
+Y_MARGIN = 65

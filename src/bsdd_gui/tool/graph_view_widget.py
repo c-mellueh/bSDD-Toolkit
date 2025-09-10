@@ -82,14 +82,14 @@ class GraphViewWidget(ActionTool, WidgetTool):
         bs.bt_clear.clicked.connect(lambda _: cls.clear_scene())
         bs.bt_center.clicked.connect(lambda _: cls.center_scene())
         # Import/Export current graph layout (nodes + positions)
-        bs.bt_export.clicked.connect(lambda _: trigger.export_requested())
+        bs.bt_export.clicked.connect(lambda _: trigger.buchheim())
         bs.bt_import.clicked.connect(lambda _: trigger.import_requested())
 
     @classmethod
     def create_widget(cls, *args, **kwargs):
-        widget:ui.GraphWindow = super().create_widget(*args, **kwargs)
+        widget: ui.GraphWindow = super().create_widget(*args, **kwargs)
         return widget
-        
+
     @classmethod
     def populate_from_bsdd(cls, widget: ui.GraphWindow, bsdd_dict: BsddDictionary):
         # Build graph from bSDD model: Classes and Properties
@@ -952,3 +952,229 @@ class GraphViewWidget(ActionTool, WidgetTool):
             for rel in start_data.PropertyRelations:
                 if rel.RelatedPropertyUri == end_uri:
                     return rel
+
+    ### BUchheim
+
+    @classmethod
+    def find_roots(cls) -> list[graphics_items.Node]:
+        sc = cls.get_scene()
+        roots = list()
+        for node in sc.nodes:
+            if cls.parent(node) is None:
+                roots.append(node)
+        return roots
+
+    @classmethod
+    def intialize(cls, v: graphics_items.Node, depth=0, number: int = 1):
+        v.thread = None
+        v._lmost_sibling = None
+        v.mod = 0
+        v.change = 0
+        v.shift = 0
+        v.ancestor = v
+        v.number = None
+        cls.get_properties().position_dict[v] = [-1.0, depth]
+        v.number = number
+        for index, w in enumerate(cls.children(v)):
+            cls.intialize(w, depth + 1, index + 1)
+
+    @classmethod
+    def buchheim(cls, v: view_ui.Node):
+        tree = cls.firstwalk(v, 0)
+        cls.second_walk(tree)
+        return tree
+
+    @classmethod
+    def reset_children_dict(cls):
+        sc = cls.get_scene()
+        children_dict = dict()  # list all children
+        parent_dict = {node: None for node in sc.nodes}
+        for edge in sc.edges:
+            if edge.edge_type != constants.PARENT_CLASS:
+                continue
+            start_node = edge.start_node
+            end_node = edge.end_node
+            if start_node not in parent_dict:
+                parent_dict[start_node] = end_node
+            if end_node not in children_dict:
+                children_dict[end_node] = list()
+            children_dict[end_node].append(start_node)
+        cls.get_properties().children_dict = children_dict
+        cls.get_properties().parent_dict = parent_dict
+
+    @classmethod
+    def firstwalk(cls, v: view_ui.Node, depth):
+        while depth >= len(cls.get_properties().height_list):
+            cls.get_properties().height_list.append(0.0)
+        cls.get_properties().height_list[depth] = max(
+            cls.get_properties().height_list[depth], cls.height(v)
+        )
+
+        if len(cls.children(v)) == 0:  # no children exist
+            if cls.get_lmost_sibling(
+                v
+            ):  # if sibling exist move next to sibling with constants.X_MARGIN
+                lbrother = cls.lbrother(v)
+                cls.set_x(v, cls.x(lbrother) + cls.width(lbrother) + constants.X_MARGIN)
+            else:
+                cls.set_x(v, 0.0)
+
+        else:
+            default_ancestor = cls.children(v)[0]  # elektrotechnik
+            for w in cls.children(v):
+                cls.firstwalk(w, depth + 1)
+                default_ancestor = cls.apportion(w, default_ancestor)
+            c1 = cls.x(cls.children(v)[0])
+            c2 = cls.x(cls.children(v)[-1])
+            midpoint = (c1 + c2) / 2
+
+            w = cls.lbrother(v)
+            if w:
+                cls.set_x(v, cls.x(w) + cls.width(w) + constants.X_MARGIN)
+
+                v.mod = cls.x(v) - midpoint
+            else:
+                cls.set_x(v, midpoint)
+        return v
+
+    @classmethod
+    def second_walk(cls, v: view_ui.Node, m=0, depth=0):
+        cls.set_x(v, cls.x(v) + m)
+        height_list = cls.get_properties().height_list
+        cls.set_y(v, sum(height_list[:depth]) + constants.Y_MARGIN * depth)
+        for w in cls.children(v):
+            cls.second_walk(w, m + v.mod, depth + 1)
+
+    @classmethod
+    def apportion(cls, v: view_ui.Node, default_ancestor: view_ui.Node):
+        w = cls.lbrother(v)
+        if w is None:
+            return default_ancestor
+        # in buchheim notation:
+        # i == inner; o == outer; r == right; l == left; r = +; l = -
+        vir = vor = v
+        vil = w
+        vol = cls.get_lmost_sibling(v)
+        sir = sor = v.mod
+        sil = vil.mod
+        sol = vol.mod
+        while cls.right(vil) and cls.left(vir):
+            vil = cls.right(vil)
+            vir = cls.left(vir)
+            vol = cls.left(vol)
+            vor = cls.right(vor)
+            vor.ancestor = v
+            shift = cls.x(vil) + sil - (cls.x(vir) + sir) + cls.width(vil) + constants.X_MARGIN * 2
+            if shift > 0:
+                cls.move_subtree(cls.ancestor(vil, v, default_ancestor), v, shift)
+                sir = sir + shift
+                sor = sor + shift
+            sil += vil.mod
+            sir += vir.mod
+            sol += vol.mod
+            sor += vor.mod
+        if cls.right(vil) and not cls.right(vor):
+            vor.thread = cls.right(vil)
+            vor.mod += sil - sor
+        if cls.left(vir) and not cls.left(vol):
+            vol.thread = cls.left(vir)
+            vol.mod += sir - sol
+            default_ancestor = v
+        return default_ancestor
+
+    @classmethod
+    def move_subtree(cls, wl: view_ui.Node, wr: view_ui.Node, shift: float):
+        subtrees = wr.number - wl.number
+        wr.change -= shift / subtrees
+        wr.shift += shift
+        wl.change += shift / subtrees
+        cls.set_x(wr, cls.x(wr) + shift)
+        wr.mod += shift
+
+    @classmethod
+    def ancestor(
+        cls,
+        vil: view_ui.Node,
+        v: view_ui.Node,
+        default_ancestor: view_ui.Node,
+    ):
+        if vil.ancestor in cls.children(v):
+            return vil.ancestor
+        else:
+            return default_ancestor
+
+    @classmethod
+    def rearrange(cls, root_node: view_ui.Node, base_pos: QPointF):
+        def ra(v: view_ui.Node):
+            x, y = cls.pos(v)
+            x = base_pos.x() + x
+            y = base_pos.y() + y
+            v.setPos(QPointF(x, y))
+            for child in cls.children(v):
+                ra(child)
+
+        ra(root_node)
+
+    # NodeProxy getter functions
+
+    @classmethod
+    def children(cls, v: view_ui.Node) -> list[view_ui.Node]:
+        return sorted(cls.get_properties().children_dict.get(v, []), key=lambda n: n.x())
+
+    @classmethod
+    def parent(cls, v: view_ui.Node) -> view_ui.Node:
+        return cls.get_properties().parent_dict.get(v)
+
+    @classmethod
+    def left(cls, v: view_ui.Node):
+        return v.thread or len(cls.children(v)) and cls.children(v)[0]
+
+    @classmethod
+    def right(cls, v: view_ui.Node):
+        return v.thread or len(cls.children(v)) and cls.children(v)[-1]
+
+    @classmethod
+    def lbrother(cls, v: view_ui.Node):
+        n = None
+        parent = cls.parent(v)
+        if parent:
+            for node in cls.children(parent):
+                if node == v:
+                    return n
+                else:
+                    n = node
+        return n
+
+    @classmethod
+    def get_lmost_sibling(cls, v: view_ui.Node) -> view_ui.Node:
+        if not v._lmost_sibling and cls.parent(v) and v != cls.children(cls.parent(v))[0]:
+            v._lmost_sibling = cls.children(cls.parent(v))[0]
+        return v._lmost_sibling
+
+    @classmethod
+    def x(cls, v: view_ui.Node):
+        return cls.get_properties().position_dict[v][0]
+
+    @classmethod
+    def y(cls, v: view_ui.Node):
+        return cls.get_properties().position_dict[v][1]
+
+    @classmethod
+    def set_x(cls, v: view_ui.Node, x: float):
+        cls.get_properties().position_dict[v][0] = x
+
+    @classmethod
+    def set_y(cls, v: view_ui.Node, y: float):
+        cls.get_properties().position_dict[v][1] = y
+
+    @classmethod
+    def pos(cls, v: view_ui.Node):
+        return cls.get_properties().position_dict[v]
+
+    @classmethod
+    def width(cls, v: view_ui.Node):
+        return v._w
+
+    @classmethod
+    def height(cls, v: view_ui.Node):
+        return v._h

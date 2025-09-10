@@ -250,16 +250,17 @@ class Node(QGraphicsObject):
     ):
         super().__init__()
         self.bsdd_data = bsdd_data
-        self.label = bsdd_data.Name
+        self.label = bsdd_data.Name if bsdd_data else str(bsdd_data)
         # radius retained for backward-compat, not used for drawing
         self.radius = radius
         self.node_type = "generic"
 
         if isinstance(bsdd_data, BsddProperty):
             self.node_type = PROPERTY_NODE_TYPE
-        if isinstance(bsdd_data, BsddClass):
+        elif isinstance(bsdd_data, BsddClass):
             self.node_type = CLASS_NODE_TYPE
-
+        else:
+            self.node_type = "generic"
         # Resolve color and shape from registries unless explicitly provided
         resolved_color = color or NODE_COLOR_MAP.get(self.node_type, NODE_COLOR_DEFAULT)
         self.color = resolved_color
@@ -290,6 +291,14 @@ class Node(QGraphicsObject):
             | QGraphicsItem.ItemIsSelectable
         )
         self.setAcceptHoverEvents(True)
+
+    def __str__(self):
+        if hasattr(self.bsdd_data,"Code"):
+            return f"Node: {self.bsdd_data.Code} ({self.node_type})"
+        return f"Node: {self.bsdd_data} ({self.node_type})"
+    
+    def __repr__(self):
+        return self.__str__()
 
     @property
     def bsdd_code(self):
