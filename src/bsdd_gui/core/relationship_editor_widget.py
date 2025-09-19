@@ -74,7 +74,7 @@ def connect_signals(
             r, project.get(), mode="remove"
         )
     )
-
+    #TODO: add the same for property relation
     project.signals.class_relation_added.connect(print)
 
 
