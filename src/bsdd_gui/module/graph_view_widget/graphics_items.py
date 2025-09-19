@@ -6,7 +6,7 @@ from bsdd_json import *
 from bsdd_gui.module.graph_view_widget.constants import *
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, Dict
-
+from . import constants
 from PySide6.QtCore import QPointF, QRectF, Qt, QTimer, QLineF
 from PySide6.QtGui import QBrush, QColor, QFontMetrics, QPainter, QPainterPath, QPen, QPolygonF
 from PySide6.QtWidgets import (
@@ -49,10 +49,8 @@ class Edge(QGraphicsPathItem):
         self.edge_type = edge_type
         self.setZValue(-1)
         # Allow selecting edges so users can delete relationships explicitly
-        try:
+        if self.edge_type != constants.PARENT_CLASS:
             self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        except Exception:
-            pass
         self.update_pen()
         # Arrow visuals
         self.arrow_length = 12.0
@@ -311,11 +309,13 @@ class Node(QGraphicsObject):
             # Fallback if no application font is available yet
             self._w = self._h = 2 * self.radius
 
-        self.setFlags(
+        flags = (
             QGraphicsItem.ItemIsMovable
             | QGraphicsItem.ItemSendsGeometryChanges
             | QGraphicsItem.ItemIsSelectable
         )
+
+        self.setFlags(flags)
         self.setAcceptHoverEvents(True)
 
     def __str__(self):

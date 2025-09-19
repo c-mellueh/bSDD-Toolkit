@@ -866,7 +866,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if not scene:
             return
         for e in list(scene.edges):
-            if e in ignored_edges:
+            if e.edge_type != constants.PARENT_CLASS and e in ignored_edges:
                 continue
             if e.start_node == node or e.end_node == node:
                 cls.remove_edge(e, only_visual=True, allow_parent_deletion=True)
@@ -939,7 +939,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         elif isinstance(relation, BsddPropertyRelation):
             related_uri = relation.RelatedPropertyUri
             code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
-            end_data = prop_utils.get_property_by_code(code)
+            end_data = prop_utils.get_property_by_code(code,bsdd_dictionary)
         return start_data, end_data, relation_type
 
     @classmethod

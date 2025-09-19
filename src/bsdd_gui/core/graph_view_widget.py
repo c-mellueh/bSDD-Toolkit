@@ -272,6 +272,7 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget]):
     # Remove edges first
     for e in edges_to_remove:
         graph_view.remove_edge(e)
+        
     # Remove nodes
     for n in nodes_to_remove:
         graph_view.remove_node(n, ignored_edges=edges_to_remove)
