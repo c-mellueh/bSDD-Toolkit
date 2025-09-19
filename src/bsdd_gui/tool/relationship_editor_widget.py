@@ -282,7 +282,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         return start_data, end_data, relation_type
 
     @classmethod
-    def make_class_relation_bidrectional(
+    def make_class_relation_bidirectional(
         cls,
         relation: BsddClassRelation,
         bsdd_dictionary: BsddDictionary,

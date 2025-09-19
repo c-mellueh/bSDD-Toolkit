@@ -64,11 +64,13 @@ def connect_signals(
     )
 
     project.signals.class_relation_added.connect(
-        lambda r: relationship_editor.make_class_relation_bidrectional(r, project.get(), mode="add")
+        lambda r: relationship_editor.make_class_relation_bidirectional(
+            r, project.get(), mode="add"
+        )
     )
 
     project.signals.class_relation_removed.connect(
-        lambda r: relationship_editor.make_class_relation_bidrectional(
+        lambda r: relationship_editor.make_class_relation_bidirectional(
             r, project.get(), mode="remove"
         )
     )
