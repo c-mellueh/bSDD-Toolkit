@@ -1,8 +1,8 @@
 from __future__ import annotations
-from PySide6.QtCore import Property, QEasingCurve, QPropertyAnimation, QRectF, QSize, Qt,QMargins
+from PySide6.QtCore import Property, QEasingCurve, QPropertyAnimation, QRectF, QSize, Qt, QMargins
 from PySide6.QtGui import QColor, QPainter, QPen, QPalette
 from PySide6.QtWidgets import QApplication, QAbstractButton, QWidget, QHBoxLayout, QLayout
-from typing import Literal
+from typing import Literal,overload
 
 class ToggleSwitch(QAbstractButton):
     """
@@ -205,29 +205,48 @@ if __name__ == "__main__":
 
 
 class ItemWithToggleSwitch(QWidget):
-    def __init__(self, item, *args, toggle_pos:Literal["Left","Right"] = "Left",toggle_is_on = True,**kwargs):
+    def __init__(
+        self,
+        item,
+        *args,
+        toggle_pos: Literal["Left", "Right"] = "Left",
+        toggle_is_on=True,
+        special_return_item=None,
+        **kwargs,
+    ):
+        """Wrap ``item`` with a toggle switch so the user can enable or disable the
+        embedded widget. ``toggle_pos`` chooses the side for the switch,
+        ``toggle_is_on`` sets the initial state, and ``special_return_item`` lets
+        callers override what the ``item`` property returns when a different
+        object should be exposed."""
         super().__init__(*args, **kwargs)
         layout = QHBoxLayout(self)
         self.setLayout(layout)
         self.layout().setContentsMargins(QMargins(0, 0, 0, 0))
         self.active_toggle = ToggleSwitch(self, False)
-        self.item = item
-        self.layout().addWidget(self.item)
+        self._item = item
+        self.layout().addWidget(self._item)
 
-            
         if toggle_pos == "Left":
-            self.layout().insertWidget(0,self.active_toggle)
+            self.layout().insertWidget(0, self.active_toggle)
         else:
             self.layout().addWidget(self.active_toggle)
 
         self.active_toggle.toggled.connect(self.enable_widget)
         self.active_toggle.setChecked(toggle_is_on)
-    
+        self.special_return_item = special_return_item
+    @property
+    def item(self):
+        if self.special_return_item is not None:
+            return self.special_return_item
+        return self._item
+
     def enable_widget(self, state: bool):
-        self.item.setEnabled(state)
-    
+        self._item.setEnabled(state)
+
     def is_active(self):
         return self.active_toggle.isChecked()
 
     def set_active(self, state: bool):
         self.active_toggle.setChecked(state)
+

@@ -15,7 +15,12 @@ class DateTimeWithNow(ItemWithToggleSwitch):
         self.dt_layout.addWidget(self.dt_edit)
         self.dt_layout.addWidget(self.now_btn)
         super().__init__(
-            self.layout_container, *args, toggle_pos="Right", toggle_is_on=is_enabled, **kwargs
+            self.layout_container,
+            *args,
+            toggle_pos="Right",
+            toggle_is_on=is_enabled,
+            special_return_item=self.dt_edit,
+            **kwargs,
         )
         self.now_btn.setMaximumWidth(50)
         self.now_btn.clicked.connect(self.set_now)
@@ -30,15 +35,3 @@ class DateTimeWithNow(ItemWithToggleSwitch):
     def set_now(self):
         self.set_active(True)
         self.dt_edit.setDateTime(QDateTime.currentDateTime())
-
-    def get_time(self):
-        if self.is_active():
-            return self.dt_edit.dateTime().toPython()
-        return None
-
-    def set_time(self, value: datetime | None):
-        if value is None:
-            self.set_active(False)
-        else:
-            self.set_active(True)
-            self.dt_edit.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))

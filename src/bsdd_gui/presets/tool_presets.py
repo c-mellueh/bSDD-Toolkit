@@ -39,10 +39,12 @@ from PySide6.QtWidgets import (
     QAbstractButton,
     QTreeView,
     QLayout,
+    QDateTimeEdit,
 )
 from PySide6.QtCore import (
     QObject,
     Signal,
+    QDateTime,
     Qt,
     QSortFilterProxyModel,
     QModelIndex,
@@ -56,6 +58,7 @@ from bsdd_gui.presets.ui_presets import (
     TreeItemView,
     BaseDialog,
     ItemViewType,
+    ItemWithToggleSwitch,
 )
 from bsdd_json import *
 import logging
@@ -337,23 +340,32 @@ class FieldTool(WidgetTool):
 
     @classmethod
     def register_field_listener(cls, widget: FieldWidget, field: QWidget):
-        f = field
+        """
+        Listen to changes in the field and emit a signal with the widget and field as arguments.
+        """
         w = widget
-        if isinstance(f, QLineEdit):
-            f.textChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
-        elif isinstance(f, QComboBox):
-            f.currentTextChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
-        elif isinstance(f, QTextEdit):
-            f.textChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
-        elif isinstance(f, QCheckBox):
-            f.checkStateChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
-        elif isinstance(f, TagInput):
-            f.tagsChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
-        elif isinstance(f, DateTimeWithNow):
-            f.dt_edit.dateTimeChanged.connect(lambda: cls.signals.field_changed.emit(w, f))
-            f.active_toggle.toggled.connect(lambda: cls.signals.field_changed.emit(w, f))
-        elif isinstance(f, QAbstractButton):
-            f.toggled.connect(lambda: cls.signals.field_changed.emit(w, f))
+        r_field = field #return field -> to wich the model is synced
+        c_field = field # connect field -> to wich the signal is connected
+
+        if isinstance(c_field, ItemWithToggleSwitch):
+            c_field.active_toggle.toggled.connect(
+                lambda: cls.signals.field_changed.emit(w, r_field)
+            )
+            c_field = c_field.item
+        if isinstance(c_field, QLineEdit):
+            c_field.textChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QComboBox):
+            c_field.currentTextChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QTextEdit):
+            c_field.textChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QCheckBox):
+            c_field.checkStateChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, TagInput):
+            c_field.tagsChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QDateTimeEdit):
+            c_field.dateTimeChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QAbstractButton):
+            c_field.toggled.connect(lambda: cls.signals.field_changed.emit(w, r_field))
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
@@ -392,39 +404,46 @@ class FieldTool(WidgetTool):
             (validator_function, result_function)
         )
         rf, vf, f, w = result_function, validator_function, field, widget
+
+        func = lambda: rf(f, vf(cls.get_value_from_field(f), w))
+
+        if isinstance(f, ItemWithToggleSwitch):
+            f.active_toggle.toggled.connect(func)
+            f = f.item
+
         if isinstance(f, QLineEdit):
-            func = lambda text: rf(f, vf(text, w))
             f.textChanged.connect(func)
-            func(f.text())
         elif isinstance(f, QComboBox):
-            func = lambda text: rf(f, vf(text, w))
             f.currentTextChanged.connect(func)
-            func(f.currentText())
         elif isinstance(f, QTextEdit):
-            func = lambda: rf(f, vf(f.toPlainText(), w))
             f.textChanged.connect(func)
-            func()
         elif isinstance(f, QCheckBox):
-            func = lambda state: rf(f, vf(state, w))
             f.checkStateChanged.connect(func)
-            func(f.isChecked())
         elif isinstance(f, TagInput):
-            func = lambda: rf(f, vf(f.tags(), w))
             f.tagsChanged.connect(func)
-            func()
-        elif isinstance(f, DateTimeWithNow):
-            func = lambda: rf(f, vf(f.get_time(), w))
-            f.dt_edit.dateTimeChanged.connect(func)
-            func()
+        elif isinstance(f, QDateTimeEdit):
+            f.dateTimeChanged.connect(func)
         elif isinstance(f, QAbstractButton):
-            func = lambda state: rf(f, vf(state, w))
             f.toggled.connect(func)
-            func(f.isChecked())
         else:
             logging.info("ClassType not Found")
+            return
+        func()  # initial validation
 
     @classmethod
     def get_value_from_field(cls, field: QWidget):
+        """
+        Docstring für get_value_from_field
+
+        :param cls: Beschreibung
+        :param field: Beschreibung
+        :type field: QWidget
+        """
+        if isinstance(field, ItemWithToggleSwitch):
+            if not field.is_active():
+                return None
+            field = field.item
+        
         if isinstance(field, QLineEdit):
             value = field.text()
         elif isinstance(field, QComboBox):
@@ -436,8 +455,8 @@ class FieldTool(WidgetTool):
         elif isinstance(field, TagInput):
             value = field.tags()
             value = value if value else None
-        elif isinstance(field, DateTimeWithNow):
-            value = field.get_time()
+        elif isinstance(field, QDateTimeEdit):
+            value = field.dateTime().toPython()
         elif isinstance(field, QAbstractButton):
             value = field.isChecked()
         else:
@@ -446,11 +465,19 @@ class FieldTool(WidgetTool):
 
     @classmethod
     def sync_from_model(cls, widget: FieldWidget, data, explicit_field=None):
-
+        """
+        get values from the model and set them to the fields
+        """
         for field, getter_func in cls.get_properties().field_getter[widget].items():
             if explicit_field is not None and explicit_field != field:
                 continue
             value = getter_func(data)
+            if isinstance(field, ItemWithToggleSwitch):
+                if value is None:
+                    field.set_active(False)
+                    return
+                else:
+                    field = field.item
             if isinstance(field, QLineEdit):
                 field.setText(value)
             elif isinstance(field, QLabel):
@@ -463,8 +490,8 @@ class FieldTool(WidgetTool):
                 field.setChecked(value or False)
             elif isinstance(field, TagInput):
                 field.setTags(value or [])
-            elif isinstance(field, DateTimeWithNow):
-                field.set_time(value)
+            elif isinstance(field, QDateTimeEdit):
+                field.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))
             elif isinstance(field, QAbstractButton):
                 field.setChecked(value)
 
