@@ -45,6 +45,7 @@ def handle_drop_event(event, view):
         tool.ClassTreeView,
         tool.PropertyTableWidget,
         tool.Project,
+        tool.IfcHelper,
     )
 
 

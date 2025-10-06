@@ -13,6 +13,7 @@ from bsdd_gui.module.project.constants import OPEN_PATH
 import bsdd_gui.core.project
 import bsdd_gui.core.main_window_widget
 from bsdd_gui.module.language.trigger import set_language
+from bsdd_gui.module.ifc_helper.data import IfcHelperData
 
 
 def main(initial_file: PathLike | None = None, log_level=None, open_last_project=False):
@@ -24,6 +25,7 @@ def main(initial_file: PathLike | None = None, log_level=None, open_last_project
     :return:
     """
     print("START")
+    IfcHelperData.get_classes()
 
     if log_level is not None:
         tool.Logging.set_log_level(log_level)

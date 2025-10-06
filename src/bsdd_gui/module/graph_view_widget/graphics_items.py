@@ -271,9 +271,11 @@ class Node(QGraphicsObject):
         bsdd_data: BsddClass | BsddProperty,
         radius: float = 12.0,
         color: QColor | None = None,
+        is_external = False
     ):
         super().__init__()
         self.bsdd_data = bsdd_data
+        self.is_external = is_external
         self.label = bsdd_data.Name if bsdd_data else str(bsdd_data)
         # radius retained for backward-compat, not used for drawing
         self.radius = radius
@@ -287,7 +289,12 @@ class Node(QGraphicsObject):
             self.node_type = "generic"
         # Resolve color and shape from registries unless explicitly provided
         resolved_color = color or NODE_COLOR_MAP.get(self.node_type, NODE_COLOR_DEFAULT)
-        self.color = resolved_color
+        self.color = QColor(resolved_color)
+        
+        if self.is_external:
+            print(bsdd_data.Name ,is_external)
+            self.color.setAlpha(100)
+
         self.brush = QBrush(self.color)
         self.border = QPen(QColor(40, 60, 90), 1.2)
         self.border.setCosmetic(True)

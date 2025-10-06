@@ -50,6 +50,7 @@ HAS_PART_REL = "HasPart"
 IS_PART_REL = "IsPartOf"
 PARENT_CLASS = "ParentClassCode"
 GENERIC_REL = "generic"
+IFC_REFERENCE_REL = "IfcReference"
 
 ALLOWED_EDGE_TYPES = [
     C_P_REL,
@@ -62,6 +63,7 @@ ALLOWED_EDGE_TYPES = [
     HAS_PART_REL,
     IS_PART_REL,
     PARENT_CLASS,
+    IFC_REFERENCE_REL,
 ]
 CLASS_RELATIONS = [
     MATERIAL_REL,
@@ -72,6 +74,7 @@ CLASS_RELATIONS = [
     IS_CHILD_REL,
     HAS_PART_REL,
     IS_PART_REL,
+    IFC_REFERENCE_REL,
 ]
 
 PROPERTY_RELATIONS = [REFERENCE_REL, IS_EQUAL_REL, IS_SIMILAR_REL]
@@ -87,6 +90,7 @@ ALLOWED_EDGE_TYPES_TYPING = Literal[
     "HasPart",
     "IsPartOf",
     "ParentClassCode",
+    "IfcReference"
 ]
 
 # Edge pen styles
@@ -161,6 +165,12 @@ EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#9D2129"),
+        "enabled": True,
+    },
+    IFC_REFERENCE_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#213E9D78"),
         "enabled": True,
     },
 }

@@ -45,6 +45,7 @@ class Cache:
         cls.data = dict()
 
 
+
 def get_root_classes(bsdd_dictionary: BsddDictionary):
     if bsdd_dictionary is None:
         return []

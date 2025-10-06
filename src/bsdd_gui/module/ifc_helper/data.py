@@ -14,7 +14,7 @@ class IfcHelperData:
 
     @classmethod
     def load(cls):
-        cls.load_ifc_classes()
+        cls.get_classes()
 
     @classmethod
     def flush_data(cls):

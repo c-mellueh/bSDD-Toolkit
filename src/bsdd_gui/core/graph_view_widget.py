@@ -13,6 +13,8 @@ from bsdd_json import (
     BsddPropertyRelation,
 )
 from bsdd_json.utils import property_utils as prop_utils
+from bsdd_json.utils import class_utils as class_utils
+
 import json
 import logging
 
@@ -164,6 +166,7 @@ def handle_drop_event(
     class_tree: Type[tool.ClassTreeView],
     property_table: Type[tool.PropertyTableWidget],
     project: Type[tool.Project],
+    ifc_helper: Type[tool.IfcHelper],
 ):
     mime_data = event.mimeData()
     mime_type = graph_view.get_mime_type(mime_data)
@@ -173,7 +176,7 @@ def handle_drop_event(
     scene_pos = graph_view.get_position_from_event(event, view)
     bsdd_dictionary = project.get()
 
-    classes_to_add = list()
+    classes_to_add: list[BsddClass] = list()
     properties_to_add = list()
     if mime_type == constants.CLASS_DRAG:
         payload = class_tree.get_payload_from_data(mime_data)
@@ -209,6 +212,7 @@ def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool
     new_edges += graph_view.find_property_relations(
         nodes, property_codes, full_property_uris, relations_dict
     )
+    new_edges += graph_view.find_ifc_relations(nodes, full_class_uris, relations_dict)
     for edge in new_edges:
         graph_view.add_edge(scene, edge)
         relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node)] = edge
@@ -272,7 +276,7 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget]):
     # Remove edges first
     for e in edges_to_remove:
         graph_view.remove_edge(e)
-        
+
     # Remove nodes
     for n in nodes_to_remove:
         graph_view.remove_node(n, ignored_edges=edges_to_remove)
