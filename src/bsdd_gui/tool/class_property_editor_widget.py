@@ -20,6 +20,7 @@ from bsdd_gui.module.class_property_editor_widget.constants import (
     BUTTON_MODE_VIEW,
 )
 
+import webbrowser
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_property_editor_widget.prop import (
@@ -228,7 +229,7 @@ class ClassPropertyEditorWidget(DialogTool):
     def handle_pr_button_press(cls, widget: ui.ClassPropertyEditor):
         line_edit = widget.le_property_reference
         if line_edit.button_mode == BUTTON_MODE_VIEW:
-            pass  # TODO Open Website
+            webbrowser.open(line_edit.text())
         elif line_edit.button_mode == BUTTON_MODE_EDIT:
             bsdd_property = prop_utils.get_internal_property(widget.bsdd_data)
             cls.signals.edit_bsdd_property_requested.emit(bsdd_property, widget)
