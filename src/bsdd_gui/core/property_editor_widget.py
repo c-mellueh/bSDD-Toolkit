@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING, Type
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QCoreApplication
 from bsdd_json.utils import property_utils as prop_utils
-
+from typing import get_args
+from bsdd_json.type_hints import COUNTRY_CODE
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_editor_widget import ui
@@ -85,6 +86,9 @@ def register_fields(
     allowed_values_table: Type[tool.AllowedValuesTableView],
     relationship_editor: Type[tool.RelationshipEditorWidget],
 ):
+    items = [""]+list(get_args(COUNTRY_CODE))
+    widget.cb_country_origin.addItems(items)
+    
     property_editor.register_basic_field(widget, widget.le_code, "Code")
     property_editor.register_basic_field(widget, widget.le_name, "Name")
     property_editor.register_basic_field(widget, widget.le_measurement, "MethodOfMeasurement")
@@ -131,6 +135,7 @@ def register_fields(
     if widget.bsdd_data.Description:
         widget.cb_description.setChecked(True)
     property_editor.update_description_visiblility(widget)
+
 
 
 def register_validators(
