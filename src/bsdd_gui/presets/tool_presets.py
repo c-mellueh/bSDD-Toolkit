@@ -595,7 +595,7 @@ class DialogTool(FieldTool):
 
 class ItemViewTool(BaseTool):
 
-    signals = ViewSignals()  # TODO: rename to signals
+    signals = ViewSignals()
     # TODO: make info_requested a signal for all handlers
 
     @classmethod

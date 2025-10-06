@@ -110,6 +110,7 @@ def add_columns_to_view(
     if isinstance(view, views.PropertyTable):
         proxy_model, model = property_table.create_property_model()
         model = proxy_model.sourceModel()
+        property_table.add_column_to_table(model, "Name", lambda p: p.Name)
         property_table.add_column_to_table(model, "Code", lambda p: p.Code)
         property_table.add_column_to_table(model, "Datatype", lambda p: p.DataType)
         view.setModel(proxy_model)

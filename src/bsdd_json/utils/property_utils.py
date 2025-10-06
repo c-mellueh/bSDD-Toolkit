@@ -44,9 +44,12 @@ def get_data_type(class_property: BsddClassProperty):
 
     if not is_external_ref(class_property):
         prop = get_internal_property(class_property)
-        if not prop:
-            return None
-        return prop.DataType
+    else:
+        prop = get_external_property(class_property)
+    if not prop:
+        return None
+    return prop.DataType
+    
 
 
 def is_external_ref(class_property: BsddClassProperty) -> bool:
@@ -225,3 +228,13 @@ def delete_property(bsdd_property:BsddProperty,bsdd_dictionary:BsddDictionary = 
                 removed_class_properties.append(bsdd_class_property)
     bsdd_dictionary.Properties.remove(bsdd_property)
     return removed_class_properties
+
+def get_name(class_property:BsddClassProperty):
+    if not is_external_ref(class_property):
+        prop = get_internal_property(class_property)
+    else:
+        prop = get_external_property(class_property)
+    if not prop:
+        return None
+    return prop.Name
+    

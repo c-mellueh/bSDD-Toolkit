@@ -37,7 +37,8 @@ def add_columns_to_view(
 ):
 
     sort_model, model = property_table.create_model(None)
-    property_table.add_column_to_table(model, "Name", lambda a: a.Code)
+    property_table.add_column_to_table(model, "Name", prop_utils.get_name)
+    property_table.add_column_to_table(model, "Code", lambda a: a.Code)
     property_table.add_column_to_table(model, "Datatype", prop_utils.get_datatype)
     property_table.add_column_to_table(model, "Unit", prop_utils.get_units)
     property_table.add_column_to_table(model, "Values", property_table.get_allowed_values)
