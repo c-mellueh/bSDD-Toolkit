@@ -13,8 +13,9 @@ from PySide6.QtCore import (
     Qt,
     QEvent,
     QTimer,
+    QMargins,
 )
-from PySide6.QtGui import QFontMetrics, QKeyEvent
+from PySide6.QtGui import QFontMetrics, QKeyEvent, QFont
 from PySide6.QtWidgets import (
     QApplication,
     QWidget,
@@ -51,7 +52,7 @@ STYLE_SHEET2 = """
         border: 1px solid palette(mid);
         border-radius: 10px;
         background: palette(base);
-        padding: 2px 6px;
+        padding: 0px 0px;
     }
     """
 
@@ -170,14 +171,28 @@ class Chip(QFrame):
         self._close.setObjectName("ChipClose")
         self._close.setAutoRaise(True)
         self._close.setCursor(Qt.CursorShape.PointingHandCursor)
-        self._close.setText("×")
+        self._close.setText("x")
         self._close.clicked.connect(lambda: self.removed.emit(self._text))
 
         lay = QHBoxLayout(self)
-        lay.setContentsMargins(8, 2, 4, 2)
-        lay.setSpacing(4)
+        lay.setContentsMargins(6, 1, 2, 1)
+        lay.setSpacing(3)
         lay.addWidget(self._label)
         lay.addWidget(self._close)
+
+        chip_font = self.font()
+        if chip_font.pointSizeF() > 0:
+            chip_font.setPointSizeF(max(1.0, chip_font.pointSizeF() * 0.9))
+        elif chip_font.pixelSize() > 0:
+            chip_font.setPixelSize(max(1, int(chip_font.pixelSize() * 0.9)))
+        self.setFont(chip_font)
+        self._label.setFont(chip_font)
+        self._close.setFont(chip_font)
+
+        metrics = QFontMetrics(chip_font)
+        close_size = max(16, metrics.height() + 4)
+        self._close.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self._close.setFixedSize(close_size, close_size)
 
         # Simple styling (override with your QSS if you want)
         self.setStyleSheet(STYLE_SHEET)
@@ -218,7 +233,7 @@ class TagInput(QWidget):
         self._tags: list[str] = []
         self._allowed: set[str] | None = set(allowed) if allowed else None
 
-        self._flow = FlowLayout(self, margin=6, hspacing=6, vspacing=6)
+        self._flow = FlowLayout(self, margin=2, hspacing=6, vspacing=4)
 
         self._edit = QLineEdit()
         self._edit.setObjectName("LineEdit")
@@ -233,9 +248,11 @@ class TagInput(QWidget):
         self._edit.setTextMargins(left, top, right, bottom)
         fm = QFontMetrics(self._edit.font())
         target_h = (
-            max(24, fm.height() + top + bottom) + 4
+            max(24, fm.height() + top + bottom)
         )  # I don't know why but i need th +4 else the line edit is not high enough #TODO
         self._edit.setFixedHeight(target_h)
+        flow_margins = self._flow.contentsMargins()
+        self.setMinimumHeight(target_h + flow_margins.top() + flow_margins.bottom())
 
         if allowed:
             self._completer = QCompleter(sorted(allowed), self)
@@ -362,9 +379,10 @@ class TagInput(QWidget):
         super().keyPressEvent(e)
 
     def sizeHint(self) -> QSize:
-        fm = QFontMetrics(self.font())
-        h = max(32, fm.height() + 14)
-        return QSize(300, h)
+        margins = self._flow.contentsMargins()
+        edit_hint = self._edit.sizeHint()
+        h = edit_hint.height() + margins.top() + margins.bottom()
+        return QSize(max(300, edit_hint.width()), h)
 
     # Ensure frame + style draw nicely
     def paintEvent(self, event):
