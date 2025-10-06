@@ -305,7 +305,7 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(8, QFormLayout.ItemRole.LabelRole, self.lb_creator_iso)
 
-        self.cb_creator_iso = QComboBox(self.tab_advanced)
+        self.cb_creator_iso = ComboBoxWithToggleSwitch(self.tab_advanced)
         self.cb_creator_iso.setObjectName(u"cb_creator_iso")
 
         self.formLayout.setWidget(8, QFormLayout.ItemRole.FieldRole, self.cb_creator_iso)
@@ -320,7 +320,7 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(9, QFormLayout.ItemRole.LabelRole, self.lb_document_ref)
 
-        self.cb_document_ref = QComboBox(self.tab_advanced)
+        self.cb_document_ref = ComboBoxWithToggleSwitch(self.tab_advanced)
         self.cb_document_ref.setObjectName(u"cb_document_ref")
 
         self.formLayout.setWidget(9, QFormLayout.ItemRole.FieldRole, self.cb_document_ref)

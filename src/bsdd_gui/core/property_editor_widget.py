@@ -5,11 +5,12 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QCoreApplication
 from bsdd_json.utils import property_utils as prop_utils
 from typing import get_args
-from bsdd_json.type_hints import COUNTRY_CODE
+from bsdd_json.type_hints import COUNTRY_CODE, LANGUAGE_ISO_CODE, DOCUMENT_TYPE
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_editor_widget import ui
+    from bsdd_gui.presets.ui_presets import ComboBoxWithToggleSwitch
 
 
 def connect_signals(
@@ -88,8 +89,25 @@ def register_fields(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     util: Type[tool.Util],
 ):
+    # Fill ComboBoxes
+    def setup_combo_box(cb_widget: ComboBoxWithToggleSwitch, values: list[str]):
 
+        cb_widget.item.addItems(values)
+        cb_widget.item.setEditable(True)
+        property_editor.add_validator(
+            widget,
+            cb_widget,
+            lambda v, w,: v in values or not cb_widget.is_active(),
+            lambda w, v: util.set_invalid(w, not v),
+        )
 
+    language_iso = list(get_args(LANGUAGE_ISO_CODE))
+    country_codes = list(get_args(COUNTRY_CODE))
+    document_type = list(get_args(DOCUMENT_TYPE))
+
+    setup_combo_box(widget.cb_country_origin, country_codes)
+    setup_combo_box(widget.cb_creator_iso, language_iso)
+    setup_combo_box(widget.cb_document_ref, document_type)
 
     property_editor.register_basic_field(widget, widget.le_code, "Code")
     property_editor.register_basic_field(widget, widget.le_name, "Name")
@@ -118,7 +136,7 @@ def register_fields(
     property_editor.register_basic_field(widget, widget.cb_status, "Status")
     property_editor.register_basic_field(widget, widget.cb_country_origin, "CountryOfOrigin")
     property_editor.register_basic_field(widget, widget.cb_creator_iso, "CreatorLanguageIsoCode")
-    property_editor.register_basic_field(widget, widget.cb_creator_iso, "DocumentReference")
+    property_editor.register_basic_field(widget, widget.cb_document_ref, "DocumentReference")
 
     property_editor.register_basic_field(widget, widget.de_activation_time, "ActivationDateUtc")
     property_editor.register_basic_field(widget, widget.de_revision_time, "RevisionDateUtc")
@@ -134,23 +152,9 @@ def register_fields(
         lambda w=widget: allowed_values_table.append_new_value(widget.tv_allowed_values)
     )
 
-    #Fill ComboBoxes
-    cc_combo_box = widget.cb_country_origin
-    country_codes = list(get_args(COUNTRY_CODE))
-    cc_combo_box.item.addItems(country_codes)
-    cc_combo_box.item.setEditable(True)
-    widget.cb_country_origin.item.setEditable(True)
-    property_editor.add_validator(
-        widget,
-        cc_combo_box,
-        lambda v, w,: v in country_codes or not cc_combo_box.is_active(),
-        lambda w, v: util.set_invalid(w, not v),
-    )
-
     if widget.bsdd_data.Description:
         widget.cb_description.setChecked(True)
     property_editor.update_description_visiblility(widget)
-
 
 
 def register_validators(
