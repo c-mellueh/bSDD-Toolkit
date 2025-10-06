@@ -14,6 +14,7 @@ from bsdd_json import (
 )
 from bsdd_gui.module.project import ui
 from PySide6.QtCore import QObject, Signal
+from pydantic import ValidationError
 
 if TYPE_CHECKING:
     from bsdd_gui.module.project.prop import ProjectProperties
@@ -61,9 +62,9 @@ class Project(ActionTool):
         bsdd_gui.on_new_project()
 
     @classmethod
-    def load_project(cls, path: os.PathLike):
+    def load_project(cls, path: os.PathLike,sloppy = False):
         prop = cls.get_properties()
-        prop.project_dictionary = BsddDictionary.load(path)
+        prop.project_dictionary = BsddDictionary.load(path,sloppy=sloppy)
         return prop.project_dictionary
 
     @classmethod

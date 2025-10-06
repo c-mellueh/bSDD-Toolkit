@@ -1,12 +1,12 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QCoreApplication, Qt
+from PySide6.QtCore import QCoreApplication
 from typing import Type, TYPE_CHECKING
 from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH
 import logging
 import bsdd_gui
 import os
 import json
+from pydantic import ValidationError
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -28,10 +28,7 @@ def create_project(project: Type[tool.Project]):
     project.register_project(bsdd_dictionary)
 
 
-def open_project(path, project: Type[tool.Project]):
-    proj = project.load_project(path)
-    bsdd_gui.on_new_project()
-    return proj
+
 
 
 def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool.MainWindowWidget]):
@@ -130,11 +127,27 @@ def open_file_clicked(
     logging.info("Load Project")
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
-    project_tool.load_project(path)
-    bsdd_gui.on_new_project()
+    proj = open_project(path, project_tool,popups)
+    if proj is None:
+        return
+
     for plugin in plugins.get_available_plugins():
         plugins.on_new_project(plugin)
 
+
+
+def open_project(path, project: Type[tool.Project],popups: Type[tool.Popups]):
+    proj = None
+    try:
+        proj = project.load_project(path, sloppy=False)
+    except ValidationError as error:
+        if popups.request_sloppy_load(error):
+            proj = project.load_project(path, sloppy=True)
+        else:
+            logging.info("User declined sloppy loading")
+    if proj is not None:
+        bsdd_gui.on_new_project()
+    return proj
 
 def save_clicked(
     proejct: Type[tool.Project],
@@ -175,3 +188,6 @@ def save_project(path: str, project: Type[tool.Project], appdata: Type[tool.Appd
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
     logging.info(f"Save Done!")
+
+
+

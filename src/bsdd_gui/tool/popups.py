@@ -2,12 +2,23 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 from PySide6.QtCore import QCoreApplication, Qt
-from PySide6.QtWidgets import QFileDialog, QInputDialog, QLineEdit, QListWidgetItem, QMessageBox
+from PySide6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QDialogButtonBox,
+    QFileDialog,
+    QInputDialog,
+    QLabel,
+    QListWidgetItem,
+    QMessageBox,
+    QPlainTextEdit,
+    QVBoxLayout,
+)
 import os
 import bsdd_gui
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui.module.popups import ui
-
+from pydantic import ValidationError
 if TYPE_CHECKING:
     from bsdd_gui.module.popups.prop import PopupsProperties
 
@@ -119,3 +130,56 @@ class Popups:
             True if dialog.check_box_recursion.checkState() == Qt.CheckState.Checked else False
         )
         return bool(result), check_box_state
+
+    @classmethod
+    def request_sloppy_load(cls, error: ValidationError):
+        window = QApplication.activeWindow()
+        dialog = QDialog(window)
+        dialog.setModal(True)
+        dialog.setWindowTitle(
+            QCoreApplication.translate("Project", "Project Load Warning")
+        )
+        dialog.setWindowIcon(get_icon())
+        dialog.setSizeGripEnabled(True)
+
+        layout = QVBoxLayout(dialog)
+
+        message_label = QLabel(
+            QCoreApplication.translate("Project", "The project failed validation.")
+        )
+        message_label.setWordWrap(True)
+        layout.addWidget(message_label)
+
+        question_label = QLabel(
+            QCoreApplication.translate(
+                "Project", "Do you want to try loading it in sloppy mode?"
+            )
+        )
+        question_label.setWordWrap(True)
+        layout.addWidget(question_label)
+
+        detail = QPlainTextEdit(dialog)
+        detail.setReadOnly(True)
+        detail.setPlainText(str(error))
+        detail.setMinimumHeight(120)
+        layout.addWidget(detail)
+
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Yes | QDialogButtonBox.StandardButton.No,
+            parent=dialog,
+        )
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        layout.addWidget(button_box)
+
+        no_button = button_box.button(QDialogButtonBox.StandardButton.No)
+        if no_button:
+            no_button.setDefault(True)
+            no_button.setFocus()
+
+        dialog.resize(420, 320)
+        return dialog.exec() == QDialog.DialogCode.Accepted
+
+
+
+

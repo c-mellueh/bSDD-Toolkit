@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel,ValidationError
 from .type_hints import *
 from typing import List, Optional, Literal
 from datetime import datetime
@@ -40,12 +40,17 @@ class BsddDictionary(CaseInsensitiveModel):
     Properties: List[BsddProperty] = Field(default_factory=list)
 
     @classmethod
-    def load(cls, path) -> BsddDictionary:
-        """Load from a JSON file and validate via the normalizer above."""
-        with open(path, "r", encoding="utf-8") as f:
+    def load(cls, path: str, *, sloppy: bool = False) -> "BsddDictionary":
+        with open(path, encoding="utf-8") as f:
             raw = json.load(f)
-        # The model_validator(before) handles list/dict/nested shapes
-        return cls.model_validate(raw)
+        if not sloppy:
+            return cls.model_validate(raw)
+
+        try:
+            return cls.model_validate(raw)
+        except ValidationError as exc:
+            data = {k: v for k, v in raw.items() if k in cls.model_fields}
+            return cls.model_construct(**data)
 
     def save(self, path):
         with open(path, "w") as file:
