@@ -477,6 +477,7 @@ class FieldTool(WidgetTool):
                     field.set_active(False)
                     return
                 else:
+                    field.set_active(True)
                     field = field.item
             if isinstance(field, QLineEdit):
                 field.setText(value)

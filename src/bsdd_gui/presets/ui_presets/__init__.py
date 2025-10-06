@@ -1,4 +1,4 @@
-from .toggle_switch import ToggleSwitch,ItemWithToggleSwitch
+from .toggle_switch import ToggleSwitch,ItemWithToggleSwitch,ComboBoxWithToggleSwitch,LineEditWithToggleSwitch
 from .label_tags_input import TagInput
 from .line_edit_with_button import LineEditWithButton
 from .datetime_now import DateTimeWithNow

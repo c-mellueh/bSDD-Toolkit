@@ -1,8 +1,16 @@
 from __future__ import annotations
 from PySide6.QtCore import Property, QEasingCurve, QPropertyAnimation, QRectF, QSize, Qt, QMargins
 from PySide6.QtGui import QColor, QPainter, QPen, QPalette
-from PySide6.QtWidgets import QApplication, QAbstractButton, QWidget, QHBoxLayout, QLayout
-from typing import Literal,overload
+from PySide6.QtWidgets import (
+    QApplication,
+    QAbstractButton,
+    QWidget,
+    QHBoxLayout,
+    QComboBox,
+    QLineEdit,
+)
+from typing import Literal, overload
+
 
 class ToggleSwitch(QAbstractButton):
     """
@@ -235,6 +243,8 @@ class ItemWithToggleSwitch(QWidget):
         self.active_toggle.toggled.connect(self.enable_widget)
         self.active_toggle.setChecked(toggle_is_on)
         self.special_return_item = special_return_item
+        self.enable_widget(toggle_is_on)
+
     @property
     def item(self):
         if self.special_return_item is not None:
@@ -250,3 +260,34 @@ class ItemWithToggleSwitch(QWidget):
     def set_active(self, state: bool):
         self.active_toggle.setChecked(state)
 
+
+class LineEditWithToggleSwitch(ItemWithToggleSwitch):
+    def __init__(self, *args, is_enabled=False, **kwargs):
+
+        line_edit = QLineEdit()
+        super().__init__(
+            line_edit,
+            *args,
+            toggle_pos="Left",
+            toggle_is_on=is_enabled,
+            **kwargs,
+        )
+    @property
+    def item(self) -> QLineEdit:
+        return super().item
+
+
+class ComboBoxWithToggleSwitch(ItemWithToggleSwitch):
+    def __init__(self, *args, is_enabled=False, **kwargs):
+
+        combo = QComboBox()
+        super().__init__(
+            combo,
+            *args,
+            toggle_pos="Right",
+            toggle_is_on=is_enabled,
+            **kwargs,
+        )
+    @property
+    def item(self) -> QComboBox:
+        return super().item
