@@ -6,6 +6,7 @@ from typing import List, Optional, Literal
 from datetime import datetime
 from pydantic import BaseModel, Field, PrivateAttr, model_validator, ConfigDict
 import json
+import copy
 import weakref
 import logging
 
@@ -13,6 +14,29 @@ import logging
 def _lower_first(s: str) -> str:
     return s[:1].lower() + s[1:] if s else s
 
+
+def _prune_error_path(data, loc):
+    if not loc:
+        return
+    target = data
+    for index, key in enumerate(loc):
+        is_last = index == len(loc) - 1
+        if isinstance(key, int):
+            if not isinstance(target, list) or key >= len(target):
+                return
+            if is_last:
+                target.pop(key)
+                return
+            target = target[key]
+        else:
+            if not isinstance(target, dict) or key not in target:
+                return
+            if is_last:
+                target.pop(key, None)
+                return
+            target = target.get(key)
+            if target is None:
+                return
 
 class CaseInsensitiveModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True, alias_generator=_lower_first)
@@ -49,8 +73,24 @@ class BsddDictionary(CaseInsensitiveModel):
         try:
             return cls.model_validate(raw)
         except ValidationError as exc:
-            data = {k: v for k, v in raw.items() if k in cls.model_fields}
-            return cls.model_construct(**data)
+            cleaned = copy.deepcopy(raw)
+            errors = exc.errors()
+            seen = set()
+            while True:
+                progress = False
+                for error in errors:
+                    loc = tuple(error.get("loc", ()))
+                    if not loc or loc in seen:
+                        continue
+                    seen.add(loc)
+                    _prune_error_path(cleaned, loc)
+                    progress = True
+                try:
+                    return cls.model_validate(cleaned)
+                except ValidationError as new_exc:
+                    errors = new_exc.errors()
+                    if not progress:
+                        raise new_exc
 
     def save(self, path):
         with open(path, "w") as file:
@@ -284,3 +324,4 @@ class BsddPropertyRelation(CaseInsensitiveModel):
 
     def parent(self) -> Optional[BsddProperty]:
         return self._parent_ref() if self._parent_ref is not None else None
+
