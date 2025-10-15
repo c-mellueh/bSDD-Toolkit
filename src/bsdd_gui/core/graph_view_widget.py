@@ -14,6 +14,7 @@ from bsdd_json import (
 )
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils as class_utils
+from bsdd_gui.module.ifc_helper.data import IfcHelperData
 
 import json
 import logging
@@ -377,9 +378,16 @@ def import_graph(
     if scene is None:
         return
 
-    imported_nodes: list[graphics_items.Node] = []
+    imported_nodes = list()
+    existing_nodes = {
+        n
+        for n in scene.nodes
+        if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
+    }
+    external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
+    ifc_classes = {c.get("code"): c for c in IfcHelperData.get_classes()}
     for item in data.get("nodes", []) or []:
-        node = graph_view.import_node_from_json(item, project.get())
+        node = graph_view.import_node_from_json(item, project.get(), ifc_classes, external_nodes)
         if node is not None:
             imported_nodes.append(node)
     # Recreate implied edges based on current dictionary relationships

@@ -612,96 +612,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
         return {"version": 1, "nodes": nodes_payload}
 
     @classmethod
-    def import_layout_dialog(cls):
-
-        widget = cls.get_widget()
-        if widget is None:
-            return
-        path, _ = QFileDialog.getOpenFileName(
-            widget,
-            QCoreApplication.translate("GraphView", "Import Graph Layout"),
-            "",
-            "JSON Files (*.json)",
-        )
-        if not path:
-            return
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except Exception as e:
-            logging.exception("Failed to load layout: %s", e)
-            return
-
-        # Resolve bsDD dictionary from current project lazily to avoid import cycles
-        try:
-            from bsdd_gui import tool as _tool
-
-            bsdd_dict = _tool.Project.get()
-        except Exception:
-            bsdd_dict = None
-
-        if not isinstance(data, dict) or "nodes" not in data:
-            return
-
-        # Clear current scene
-        cls.clear_scene()
-        scene = cls.get_scene()
-        if scene is None:
-            return
-
-        existing_nodes = {
-            n
-            for n in scene.nodes
-            if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
-        }
-        external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
-        ifc_classes = {c.get("code"): c for c in IfcHelperData.get_classes()}
-        imported_nodes: list[Node] = []
-        for item in data.get("nodes", []) or []:
-            try:
-                ntype = item.get("type")
-                code = item.get("code")
-                pos = item.get("pos") or [0.0, 0.0]
-                if not code or not ntype:
-                    continue
-                x, y = float(pos[0]), float(pos[1])
-                bsdd_obj = None
-                if bsdd_dict is not None:
-                    if ntype == constants.CLASS_NODE_TYPE:
-                        bsdd_obj = cl_utils.get_class_by_code(bsdd_dict, code)
-                    elif ntype == constants.PROPERTY_NODE_TYPE:
-                        bsdd_obj = prop_utils.get_property_by_code(code, bsdd_dict)
-                    elif ntype == constants.IFC_NODE_TYPE:
-                        node = cls.add_ifc_node(code, QPointF(x, y), ifc_classes, external_nodes)
-                        imported_nodes.append(node)
-                if bsdd_obj is None:
-                    continue
-                node = cls.add_node(scene, bsdd_obj, pos=QPointF(x, y))
-                imported_nodes.append(node)
-            except Exception:
-                continue
-
-        # Recreate implied edges based on current dictionary relationships
-        try:
-            from bsdd_gui.core import graph_view_widget as _core_gv
-
-            _core_gv.recalculate_edges(cls, _tool.Project)  # type: ignore[name-defined]
-        except Exception:
-            pass
-        # Ensure current visibility filters are applied
-        try:
-            widget._apply_filters()
-        except Exception:
-            pass
-        try:
-            widget.statusbar.showMessage(
-                QCoreApplication.translate("GraphView", "Layout imported: ") + str(path),
-                3000,
-            )
-        except Exception:
-            pass
-
-    @classmethod
     def clear_scene(cls):
         scene = cls.get_scene()
         if scene is None:
@@ -991,7 +901,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
             pass
 
     @classmethod
-    def import_node_from_json(cls, item: dict, bsdd_dictionary: BsddDictionary):
+    def import_node_from_json(
+        cls, item: dict, bsdd_dictionary: BsddDictionary, ifc_classes, external_nodes
+    ):
         scene = cls.get_scene()
         try:
             ntype = item.get("type")
@@ -1006,6 +918,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
                     bsdd_obj = cl_utils.get_class_by_code(bsdd_dictionary, code)
                 elif ntype == constants.PROPERTY_NODE_TYPE:
                     bsdd_obj = prop_utils.get_property_by_code(code, bsdd_dictionary)
+                elif ntype == constants.IFC_NODE_TYPE:
+                    node = cls.add_ifc_node(code, QPointF(x, y), ifc_classes, external_nodes)
+                    return node
             if bsdd_obj is None:
                 return
             node = cls.add_node(scene, bsdd_obj, pos=QPointF(x, y))
