@@ -786,12 +786,15 @@ class GraphViewWidget(ActionTool, WidgetTool):
         start_class: BsddClass = start_node.bsdd_data
         end_class: BsddClass = end_node.bsdd_data
 
-        # TODO: if a IFCRef gets deleted from the UI it needs to get deleted from the graph
         if relation not in constants.CLASS_RELATIONS:
             return
         if relation == constants.IFC_REFERENCE_REL:
-            if end_class.Code not in start_class.RelatedIfcEntityNamesList:
+            if not end_node.is_external:
+                return
+            rienl = start_class.RelatedIfcEntityNamesList or []
+            if end_class.Code not in rienl:
                 start_class.RelatedIfcEntityNamesList.append(end_class.Code)
+
         else:
             end_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
             existing_relations = [
