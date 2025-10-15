@@ -331,20 +331,42 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 new_nodes.append(new_node)
             ifc_entities = bsdd_class.RelatedIfcEntityNamesList
             for e in ifc_entities:
-                ifc_class_dict = ifc_classes.get(e)
-                uri = ifc_class_dict.get("uri")
-                if uri in external_nodes:
-                    continue
-                ifc_class = BsddClass(
-                    Code=e,
-                    Name=ifc_class_dict.get("referenceCode"),
-                    ClassType=ifc_class_dict.get("classType"),
-                    OwnedUri=uri,
-                )
-                external_nodes[uri] = ifc_class
-                new_node = cls.add_node(scene, ifc_class, pos=cur, is_external=True)
+                new_node = cls.add_ifc_node(e, cur, ifc_classes, external_nodes)
+                if new_node:
+                    temp_bsdd_class = new_node.bsdd_data
+                    external_nodes[temp_bsdd_class.OwnedUri] = temp_bsdd_class
             cur += offset_step
         return new_nodes
+
+    @classmethod
+    def add_ifc_node(
+        cls, ifc_code: str, position: QPointF, ifc_classes: dict = None, external_nodes=None
+    ):
+        scene = cls.get_scene()
+        if not ifc_classes:
+            ifc_classes = {c.get("code"): c for c in IfcHelperData.get_classes()}
+        if not external_nodes:
+            existing_nodes = {
+                n
+                for n in scene.nodes
+                if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
+            }
+            external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
+
+        ifc_class_dict = ifc_classes.get(ifc_code)
+        if not ifc_class_dict:
+            return
+        uri = ifc_class_dict.get("uri")
+        if uri in external_nodes:
+            return
+        ifc_class = BsddClass(
+            Code=ifc_code,
+            Name=ifc_class_dict.get("referenceCode"),
+            ClassType=ifc_class_dict.get("classType"),
+            OwnedUri=uri,
+        )
+        new_node = cls.add_node(scene, ifc_class, pos=position, is_external=True)
+        return new_node
 
     @classmethod
     def _info(cls, start_node: graphics_items.Node, end_node: graphics_items.Node):
@@ -764,8 +786,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         start_class: BsddClass = start_node.bsdd_data
         end_class: BsddClass = end_node.bsdd_data
 
-
-        #TODO: if a IFCRef gets deleted from the UI it needs to get deleted from the graph
+        # TODO: if a IFCRef gets deleted from the UI it needs to get deleted from the graph
         if relation not in constants.CLASS_RELATIONS:
             return
         if relation == constants.IFC_REFERENCE_REL:
@@ -879,7 +900,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
                     start_data.RelatedIfcEntityNamesList.remove(end_data.Code)
                     cls.signals.ifc_reference_removed.emit(start_data, end_data.Code)
                 else:
-                    class_relation = cl_utils.get_class_relation(start_data, end_data, relation_type)
+                    class_relation = cl_utils.get_class_relation(
+                        start_data, end_data, relation_type
+                    )
                     if not class_relation:
                         return
                     start_data.ClassRelations.remove(class_relation)
@@ -973,6 +996,15 @@ class GraphViewWidget(ActionTool, WidgetTool):
         return None
 
     @classmethod
+    def get_node_from_ifc_code(cls, ifc_code: str):
+        scene = cls.get_scene()
+        if not scene:
+            return None
+        for node in scene.nodes:
+            if node.is_external and node.bsdd_data.Code == ifc_code:
+                return node
+
+    @classmethod
     def redraw_edges(cls):
         scene = cls.get_scene()
         if not scene:
@@ -1000,6 +1032,41 @@ class GraphViewWidget(ActionTool, WidgetTool):
         return start_data, end_data, relation_type
 
     @classmethod
+    def get_connected_edges(cls, node: graphics_items.Node) -> set[graphics_items.Edge]:
+        scene = cls.get_scene()
+        if not scene:
+            return []
+        connected_edges = set()
+        for edge in scene.edges:
+            if edge.start_node == node or edge.end_node == node:
+                connected_edges.add(edge)
+        return connected_edges
+
+    @classmethod
+    def get_edge_from_nodes(
+        cls,
+        start_node: graphics_items.Node,
+        end_node: graphics_items.Node | str,
+        edge_type: str,
+    ) -> graphics_items.Edge | None:
+        scene = cls.get_scene()
+        if not scene:
+            return None
+        for edge in scene.edges:
+            if edge.start_node.bsdd_data != start_node.bsdd_data:
+                continue
+            if edge_type == constants.IFC_REFERENCE_REL and isinstance(end_node, str):
+                if not edge.end_node.is_external:
+                    continue
+                if edge.end_node.bsdd_data.Code == end_node:
+                    continue
+            elif edge.end_node.bsdd_data != end_node.bsdd_data:
+                continue
+            if edge.edge_type == edge_type:
+                return edge
+        return None
+
+    @classmethod
     def get_edge_from_relation(
         cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
     ):
@@ -1007,13 +1074,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if not scene:
             return None
         start_data, end_data, relation_type = cls.read_relation(relation, bsdd_dictionary)
-        for edge in scene.edges:
-            if edge.start_node.bsdd_data != start_data:
-                continue
-            if edge.end_node.bsdd_data != end_data:
-                continue
-            if relation_type == edge.edge_type:
-                return edge
+        return cls.get_edge_from_nodes(start_data, end_data, relation_type)
 
     @classmethod
     def get_relation_from_edge(cls, edge: graphics_items.Edge, bsdd_dictionary: BsddDictionary):

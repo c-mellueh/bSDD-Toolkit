@@ -84,12 +84,28 @@ def connect_signals(
         edge = graph_view.create_edge(start_node, end_node, edge_type=relation_type)
         graph_view.add_edge(graph_view.get_scene(), edge)
 
-    def handle_ifc_relation_add(bsdd_class:BsddClass,ifc_code: str):
-        print(f"IFC Relation added: {bsdd_class.Code} -> {ifc_code}")
+    def handle_ifc_relation_add(bsdd_class: BsddClass, ifc_code: str):
+        start_node = graph_view.get_node_from_bsdd_data(bsdd_class)
+        end_node = graph_view.get_node_from_ifc_code(ifc_code)
+        if not start_node:
+            return
+        if not end_node:
+            end_node = graph_view.add_ifc_node(ifc_code, start_node.pos() + QPointF(10.0, 10.0))
+        if not (start_node and end_node):
+            return
+        edge = graph_view.create_edge(start_node, end_node, edge_type=constants.IFC_REFERENCE_REL)
+        graph_view.add_edge(graph_view.get_scene(), edge)
 
-    def handle_ifc_relation_remove(bsdd_class:BsddClass,ifc_code: str):
-        pass
-
+    def handle_ifc_relation_remove(bsdd_class: BsddClass, ifc_code: str):
+        start_node = graph_view.get_node_from_bsdd_data(bsdd_class)
+        end_node = graph_view.get_node_from_ifc_code(ifc_code)
+        relation = graph_view.get_edge_from_nodes(start_node,end_node,constants.IFC_REFERENCE_REL)
+        if relation is None:
+            return
+        graph_view.remove_edge(relation, only_visual=True, allow_parent_deletion=True)
+        if not graph_view.get_connected_edges(end_node):
+            graph_view.remove_node(end_node)
+            
     project.signals.class_removed.connect(handle_remove)
     project.signals.property_removed.connect(handle_remove)
     project.signals.class_property_removed.connect(handle_remove)
