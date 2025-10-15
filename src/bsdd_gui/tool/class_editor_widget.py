@@ -21,6 +21,8 @@ class Signals(DialogSignals):
     new_class_created = Signal(
         BsddClass
     )  # the class is not added to the Dictionary So far, this gets handled by ClassTree
+    related_ifc_removed = Signal(BsddClass, str)  # class, ifc code
+    related_ifc_added = Signal(BsddClass, str)  # class, ifc code
 
 
 class ClassEditorWidget(DialogTool):
@@ -90,3 +92,18 @@ class ClassEditorWidget(DialogTool):
     @classmethod
     def copy_class(cls, bsdd_class: BsddClass):
         return BsddClass(**bsdd_class.model_dump())
+
+    @classmethod
+    def sync_to_model(
+        cls, widget: ui.EditDialog, element: BsddClass, explicit_field: QWidget = None
+    ):
+        related_ifc = set(element.RelatedIfcEntityNamesList or [])
+        super().sync_to_model(widget, element, explicit_field)
+        update_related_ifc = set(element.RelatedIfcEntityNamesList or [])
+        added_ifc = update_related_ifc - related_ifc
+        removed_ifc = related_ifc - update_related_ifc
+
+        for ifc_code in added_ifc:
+            cls.signals.related_ifc_added.emit(element, ifc_code)
+        for ifc_code in removed_ifc:
+            cls.signals.related_ifc_removed.emit(element, ifc_code)

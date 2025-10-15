@@ -344,8 +344,8 @@ class FieldTool(WidgetTool):
         Listen to changes in the field and emit a signal with the widget and field as arguments.
         """
         w = widget
-        r_field = field #return field -> to wich the model is synced
-        c_field = field # connect field -> to wich the signal is connected
+        r_field = field  # return field -> to wich the model is synced
+        c_field = field  # connect field -> to wich the signal is connected
 
         if isinstance(c_field, ItemWithToggleSwitch):
             c_field.active_toggle.toggled.connect(
@@ -443,7 +443,7 @@ class FieldTool(WidgetTool):
             if not field.is_active():
                 return None
             field = field.item
-        
+
         if isinstance(field, QLineEdit):
             value = field.text()
         elif isinstance(field, QComboBox):

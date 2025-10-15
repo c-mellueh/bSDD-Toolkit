@@ -45,6 +45,7 @@ class Cache:
         cls.data = dict()
 
 
+
 def get_root_classes(bsdd_dictionary: BsddDictionary):
     if bsdd_dictionary is None:
         return []
@@ -200,7 +201,7 @@ def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
 def get_class_relation(
     start_class: BsddClass, end_class: BsddClass, relation_type: str
 ) -> BsddClassRelation | None:
-    end_uri = build_bsdd_uri(end_class, end_class._parent_ref())
+    end_uri = end_class.OwnedUri if not end_class.parent() else build_bsdd_uri(end_class, end_class._parent_ref())
     for relation in start_class.ClassRelations:
         if (
             relation.RelatedClassUri == end_uri

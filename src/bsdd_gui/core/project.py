@@ -28,9 +28,6 @@ def create_project(project: Type[tool.Project]):
     project.register_project(bsdd_dictionary)
 
 
-
-
-
 def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool.MainWindowWidget]):
     from bsdd_gui.module.project import trigger
 
@@ -127,7 +124,7 @@ def open_file_clicked(
     logging.info("Load Project")
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
-    proj = open_project(path, project_tool,popups)
+    proj = open_project(path, project_tool, popups)
     if proj is None:
         return
 
@@ -135,8 +132,7 @@ def open_file_clicked(
         plugins.on_new_project(plugin)
 
 
-
-def open_project(path, project: Type[tool.Project],popups: Type[tool.Popups]):
+def open_project(path, project: Type[tool.Project], popups: Type[tool.Popups]):
     proj = None
     try:
         proj = project.load_project(path, sloppy=False)
@@ -148,6 +144,7 @@ def open_project(path, project: Type[tool.Project],popups: Type[tool.Popups]):
     if proj is not None:
         bsdd_gui.on_new_project()
     return proj
+
 
 def save_clicked(
     proejct: Type[tool.Project],
@@ -188,6 +185,3 @@ def save_project(path: str, project: Type[tool.Project], appdata: Type[tool.Appd
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
     logging.info(f"Save Done!")
-
-
-

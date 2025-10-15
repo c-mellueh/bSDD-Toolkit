@@ -19,6 +19,7 @@ import bsdd_gui
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui.module.popups import ui
 from pydantic import ValidationError
+
 if TYPE_CHECKING:
     from bsdd_gui.module.popups.prop import PopupsProperties
 
@@ -136,9 +137,7 @@ class Popups:
         window = QApplication.activeWindow()
         dialog = QDialog(window)
         dialog.setModal(True)
-        dialog.setWindowTitle(
-            QCoreApplication.translate("Project", "Project Load Warning")
-        )
+        dialog.setWindowTitle(QCoreApplication.translate("Project", "Project Load Warning"))
         dialog.setWindowIcon(get_icon())
         dialog.setSizeGripEnabled(True)
 
@@ -151,9 +150,7 @@ class Popups:
         layout.addWidget(message_label)
 
         question_label = QLabel(
-            QCoreApplication.translate(
-                "Project", "Do you want to try loading it in sloppy mode?"
-            )
+            QCoreApplication.translate("Project", "Do you want to try loading it in sloppy mode?")
         )
         question_label.setWordWrap(True)
         layout.addWidget(question_label)
@@ -179,7 +176,3 @@ class Popups:
 
         dialog.resize(420, 320)
         return dialog.exec() == QDialog.DialogCode.Accepted
-
-
-
-

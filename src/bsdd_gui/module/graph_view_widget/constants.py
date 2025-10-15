@@ -35,9 +35,11 @@ ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
 # Node Types
 PROPERTY_NODE_TYPE = "Property"
 CLASS_NODE_TYPE = "Class"
+IFC_NODE_TYPE = "IfcReference"
+
 GENERIC_NODE_TYPE = "generic"
 
-ALLOWED_NODE_TYPES = [PROPERTY_NODE_TYPE, CLASS_NODE_TYPE]
+ALLOWED_NODE_TYPES = [PROPERTY_NODE_TYPE, CLASS_NODE_TYPE, IFC_NODE_TYPE]
 # Edge Type
 C_P_REL = "ClassProperty"
 MATERIAL_REL = "HasMaterial"
@@ -50,6 +52,7 @@ HAS_PART_REL = "HasPart"
 IS_PART_REL = "IsPartOf"
 PARENT_CLASS = "ParentClassCode"
 GENERIC_REL = "generic"
+IFC_REFERENCE_REL = "IfcReference"
 
 ALLOWED_EDGE_TYPES = [
     C_P_REL,
@@ -62,6 +65,7 @@ ALLOWED_EDGE_TYPES = [
     HAS_PART_REL,
     IS_PART_REL,
     PARENT_CLASS,
+    IFC_REFERENCE_REL,
 ]
 CLASS_RELATIONS = [
     MATERIAL_REL,
@@ -72,6 +76,7 @@ CLASS_RELATIONS = [
     IS_CHILD_REL,
     HAS_PART_REL,
     IS_PART_REL,
+    IFC_REFERENCE_REL,
 ]
 
 PROPERTY_RELATIONS = [REFERENCE_REL, IS_EQUAL_REL, IS_SIMILAR_REL]
@@ -87,6 +92,7 @@ ALLOWED_EDGE_TYPES_TYPING = Literal[
     "HasPart",
     "IsPartOf",
     "ParentClassCode",
+    "IfcReference",
 ]
 
 # Edge pen styles
@@ -163,6 +169,12 @@ EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
         "color": QColor("#9D2129"),
         "enabled": True,
     },
+    IFC_REFERENCE_REL: {
+        "style": Qt.PenStyle.SolidLine,
+        "width": 1.5,
+        "color": QColor("#213E9D78"),
+        "enabled": True,
+    },
 }
 
 # Display label mappings (to be translated in UI)
@@ -185,6 +197,7 @@ EDGE_TYPE_LABEL_MAP: dict[str, str] = {
 NODE_TYPE_LABEL_MAP: dict[str, str] = {
     CLASS_NODE_TYPE: "Class",
     PROPERTY_NODE_TYPE: "Property",
+    IFC_NODE_TYPE: "IfcReference",
     GENERIC_NODE_TYPE: "Generic",
 }
 
@@ -192,6 +205,7 @@ NODE_TYPE_LABEL_MAP: dict[str, str] = {
 NODE_COLOR_DEFAULT = QColor(80, 140, 255)
 NODE_COLOR_MAP: dict[str, QColor] = {
     CLASS_NODE_TYPE: QColor(220, 60, 60),  # red
+    IFC_NODE_TYPE: QColor(220, 60, 60, 100),  # red
     PROPERTY_NODE_TYPE: QColor(60, 120, 220),  # blue
     GENERIC_NODE_TYPE: NODE_COLOR_DEFAULT,
 }
@@ -200,6 +214,7 @@ SHAPE_STYLE_RECT = "rect"
 SHAPE_STYLE_ROUNDED_RECT = "roundrect"
 NODE_SHAPE_MAP: dict[str, str] = {
     CLASS_NODE_TYPE: SHAPE_STYLE_RECT,
+    IFC_NODE_TYPE: SHAPE_STYLE_RECT,
     PROPERTY_NODE_TYPE: SHAPE_STYLE_ROUNDED_RECT,
     "generic": SHAPE_STYLE_RECT,
 }

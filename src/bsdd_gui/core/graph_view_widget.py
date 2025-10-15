@@ -13,6 +13,9 @@ from bsdd_json import (
     BsddPropertyRelation,
 )
 from bsdd_json.utils import property_utils as prop_utils
+from bsdd_json.utils import class_utils as class_utils
+from bsdd_gui.module.ifc_helper.data import IfcHelperData
+
 import json
 import logging
 
@@ -54,6 +57,8 @@ def connect_signals(
     graph_view.signals.property_relation_removed.connect(
         project.signals.property_relation_removed.emit
     )
+    graph_view.signals.ifc_reference_added.connect(project.signals.ifc_relation_addded.emit)
+    graph_view.signals.ifc_reference_removed.connect(project.signals.ifc_relation_removed.emit)
 
     def handle_remove(bsdd_data):
         if isinstance(bsdd_data, BsddClassProperty):
@@ -80,6 +85,28 @@ def connect_signals(
         edge = graph_view.create_edge(start_node, end_node, edge_type=relation_type)
         graph_view.add_edge(graph_view.get_scene(), edge)
 
+    def handle_ifc_relation_add(bsdd_class: BsddClass, ifc_code: str):
+        start_node = graph_view.get_node_from_bsdd_data(bsdd_class)
+        end_node = graph_view.get_node_from_ifc_code(ifc_code)
+        if not start_node:
+            return
+        if not end_node:
+            end_node = graph_view.add_ifc_node(ifc_code, start_node.pos() + QPointF(10.0, 10.0))
+        if not (start_node and end_node):
+            return
+        edge = graph_view.create_edge(start_node, end_node, edge_type=constants.IFC_REFERENCE_REL)
+        graph_view.add_edge(graph_view.get_scene(), edge)
+
+    def handle_ifc_relation_remove(bsdd_class: BsddClass, ifc_code: str):
+        start_node = graph_view.get_node_from_bsdd_data(bsdd_class)
+        end_node = graph_view.get_node_from_ifc_code(ifc_code)
+        relation = graph_view.get_edge_from_nodes(start_node, end_node, constants.IFC_REFERENCE_REL)
+        if relation is None:
+            return
+        graph_view.remove_edge(relation, only_visual=True, allow_parent_deletion=True)
+        if not graph_view.get_connected_edges(end_node):
+            graph_view.remove_node(end_node)
+
     project.signals.class_removed.connect(handle_remove)
     project.signals.property_removed.connect(handle_remove)
     project.signals.class_property_removed.connect(handle_remove)
@@ -87,6 +114,8 @@ def connect_signals(
     project.signals.class_relation_removed.connect(handle_relation_remove)
     project.signals.property_relation_added.connect(handle_relation_add)
     project.signals.property_relation_removed.connect(handle_relation_remove)
+    project.signals.ifc_relation_addded.connect(handle_ifc_relation_add)
+    project.signals.ifc_relation_removed.connect(handle_ifc_relation_remove)
 
     def handle_edge_add(edge: graphics_items.Edge):
         relation = graph_view.get_relation_from_edge(edge, project.get())
@@ -164,6 +193,7 @@ def handle_drop_event(
     class_tree: Type[tool.ClassTreeView],
     property_table: Type[tool.PropertyTableWidget],
     project: Type[tool.Project],
+    ifc_helper: Type[tool.IfcHelper],
 ):
     mime_data = event.mimeData()
     mime_type = graph_view.get_mime_type(mime_data)
@@ -173,7 +203,7 @@ def handle_drop_event(
     scene_pos = graph_view.get_position_from_event(event, view)
     bsdd_dictionary = project.get()
 
-    classes_to_add = list()
+    classes_to_add: list[BsddClass] = list()
     properties_to_add = list()
     if mime_type == constants.CLASS_DRAG:
         payload = class_tree.get_payload_from_data(mime_data)
@@ -201,14 +231,21 @@ def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool
         return
     nodes = scene.nodes
     edges = scene.edges
-    class_codes, full_class_uris, property_codes, full_property_uris, relations_dict = (
-        graph_view.get_code_dicts(scene, bsdd_dictionary)
-    )
+    (
+        class_codes,
+        full_class_uris,
+        ifc_codes,
+        full_ifc_uris,
+        property_codes,
+        full_property_uris,
+        relations_dict,
+    ) = graph_view.get_code_dicts(scene, bsdd_dictionary)
     new_edges = graph_view.find_class_relations(nodes, class_codes, full_class_uris, relations_dict)
     new_edges += graph_view.find_class_property_relations(nodes, property_codes, relations_dict)
     new_edges += graph_view.find_property_relations(
         nodes, property_codes, full_property_uris, relations_dict
     )
+    new_edges += graph_view.find_ifc_relations(nodes, full_ifc_uris, relations_dict)
     for edge in new_edges:
         graph_view.add_edge(scene, edge)
         relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node)] = edge
@@ -272,7 +309,7 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget]):
     # Remove edges first
     for e in edges_to_remove:
         graph_view.remove_edge(e)
-        
+
     # Remove nodes
     for n in nodes_to_remove:
         graph_view.remove_node(n, ignored_edges=edges_to_remove)
@@ -341,9 +378,16 @@ def import_graph(
     if scene is None:
         return
 
-    imported_nodes: list[graphics_items.Node] = []
+    imported_nodes = list()
+    existing_nodes = {
+        n
+        for n in scene.nodes
+        if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
+    }
+    external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
+    ifc_classes = {c.get("code"): c for c in IfcHelperData.get_classes()}
     for item in data.get("nodes", []) or []:
-        node = graph_view.import_node_from_json(item, project.get())
+        node = graph_view.import_node_from_json(item, project.get(), ifc_classes, external_nodes)
         if node is not None:
             imported_nodes.append(node)
     # Recreate implied edges based on current dictionary relationships
