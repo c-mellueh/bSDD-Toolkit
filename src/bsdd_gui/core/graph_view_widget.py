@@ -99,13 +99,13 @@ def connect_signals(
     def handle_ifc_relation_remove(bsdd_class: BsddClass, ifc_code: str):
         start_node = graph_view.get_node_from_bsdd_data(bsdd_class)
         end_node = graph_view.get_node_from_ifc_code(ifc_code)
-        relation = graph_view.get_edge_from_nodes(start_node,end_node,constants.IFC_REFERENCE_REL)
+        relation = graph_view.get_edge_from_nodes(start_node, end_node, constants.IFC_REFERENCE_REL)
         if relation is None:
             return
         graph_view.remove_edge(relation, only_visual=True, allow_parent_deletion=True)
         if not graph_view.get_connected_edges(end_node):
             graph_view.remove_node(end_node)
-            
+
     project.signals.class_removed.connect(handle_remove)
     project.signals.property_removed.connect(handle_remove)
     project.signals.class_property_removed.connect(handle_remove)
@@ -230,15 +230,21 @@ def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool
         return
     nodes = scene.nodes
     edges = scene.edges
-    class_codes, full_class_uris, property_codes, full_property_uris, relations_dict = (
-        graph_view.get_code_dicts(scene, bsdd_dictionary)
-    )
+    (
+        class_codes,
+        full_class_uris,
+        ifc_codes,
+        full_ifc_uris,
+        property_codes,
+        full_property_uris,
+        relations_dict,
+    ) = graph_view.get_code_dicts(scene, bsdd_dictionary)
     new_edges = graph_view.find_class_relations(nodes, class_codes, full_class_uris, relations_dict)
     new_edges += graph_view.find_class_property_relations(nodes, property_codes, relations_dict)
     new_edges += graph_view.find_property_relations(
         nodes, property_codes, full_property_uris, relations_dict
     )
-    new_edges += graph_view.find_ifc_relations(nodes, full_class_uris, relations_dict)
+    new_edges += graph_view.find_ifc_relations(nodes, full_ifc_uris, relations_dict)
     for edge in new_edges:
         graph_view.add_edge(scene, edge)
         relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node)] = edge

@@ -5,6 +5,7 @@ import logging
 from PySide6.QtGui import QDropEvent, QColor
 from PySide6.QtWidgets import QWidget, QFileDialog
 from PySide6.QtCore import QPointF, QCoreApplication, QRectF, Qt
+import json
 
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, WidgetTool
@@ -385,7 +386,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
         class_codes = {
             cn.bsdd_data.Code: cn for cn in nodes if cn.node_type == constants.CLASS_NODE_TYPE
         }
-
+        ifc_codes = {
+            cn.bsdd_data.Code: cn for cn in nodes if cn.node_type == constants.IFC_NODE_TYPE
+        }
         full_class_uris = {
             (
                 cl_utils.build_bsdd_uri(cn.bsdd_data, bsdd_dictionary)
@@ -393,6 +396,15 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 else cn.bsdd_data.OwnedUri
             ): cn
             for cn in class_codes.values()
+        }
+
+        full_ifc_uris = {
+            (
+                cl_utils.build_bsdd_uri(ifcn.bsdd_data, bsdd_dictionary)
+                if not ifcn.is_external
+                else ifcn.bsdd_data.OwnedUri
+            ): ifcn
+            for ifcn in ifc_codes.values()
         }
 
         property_codes = {
@@ -411,7 +423,15 @@ class GraphViewWidget(ActionTool, WidgetTool):
             if info in relations_dict[edge.edge_type]:
                 logging.info(f"Relationship duplicate found")
             relations_dict[edge.edge_type][info] = edge
-        return class_codes, full_class_uris, property_codes, full_property_uris, relations_dict
+        return (
+            class_codes,
+            full_class_uris,
+            ifc_codes,
+            full_ifc_uris,
+            property_codes,
+            full_property_uris,
+            relations_dict,
+        )
 
     @classmethod
     def find_class_relations(
@@ -449,7 +469,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     def find_ifc_relations(
         cls,
         nodes: list[graphics_items.Node],
-        full_class_uris: dict[str, graphics_items.Node],
+        full_ifc_uris: dict[str, graphics_items.Node],
         existing_relations_dict: dict[str, dict[tuple[str, str, str, str], graphics_items.Edge]],
     ):
         ifc_dict = {c["code"]: c for c in IfcHelperData.get_classes()}
@@ -461,7 +481,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
             start_class = start_node.bsdd_data
             for ifc_name in start_class.RelatedIfcEntityNamesList:
                 ifc_uri = ifc_dict.get(ifc_name).get("uri")
-                related_node = full_class_uris.get(ifc_uri)
+                related_node = full_ifc_uris.get(ifc_uri)
                 if not related_node:
                     continue
                 info = cls._info(start_node, related_node)
@@ -593,9 +613,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def import_layout_dialog(cls):
-        import json
-        from bsdd_json.utils import class_utils as _clu
-        from bsdd_json.utils import property_utils as _ppu
 
         widget = cls.get_widget()
         if widget is None:
@@ -632,6 +649,13 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if scene is None:
             return
 
+        existing_nodes = {
+            n
+            for n in scene.nodes
+            if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
+        }
+        external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
+        ifc_classes = {c.get("code"): c for c in IfcHelperData.get_classes()}
         imported_nodes: list[Node] = []
         for item in data.get("nodes", []) or []:
             try:
@@ -644,9 +668,12 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 bsdd_obj = None
                 if bsdd_dict is not None:
                     if ntype == constants.CLASS_NODE_TYPE:
-                        bsdd_obj = _clu.get_class_by_code(bsdd_dict, code)
+                        bsdd_obj = cl_utils.get_class_by_code(bsdd_dict, code)
                     elif ntype == constants.PROPERTY_NODE_TYPE:
-                        bsdd_obj = _ppu.get_property_by_code(code, bsdd_dict)
+                        bsdd_obj = prop_utils.get_property_by_code(code, bsdd_dict)
+                    elif ntype == constants.IFC_NODE_TYPE:
+                        node = cls.add_ifc_node(code, QPointF(x, y), ifc_classes, external_nodes)
+                        imported_nodes.append(node)
                 if bsdd_obj is None:
                     continue
                 node = cls.add_node(scene, bsdd_obj, pos=QPointF(x, y))

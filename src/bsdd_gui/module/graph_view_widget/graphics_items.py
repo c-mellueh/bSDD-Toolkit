@@ -284,17 +284,16 @@ class Node(QGraphicsObject):
         if isinstance(bsdd_data, BsddProperty):
             self.node_type = PROPERTY_NODE_TYPE
         elif isinstance(bsdd_data, BsddClass):
-            self.node_type = CLASS_NODE_TYPE
+            if is_external:
+                self.node_type = IFC_NODE_TYPE
+            else:
+                self.node_type = CLASS_NODE_TYPE
+
         else:
             self.node_type = "generic"
         # Resolve color and shape from registries unless explicitly provided
         resolved_color = color or NODE_COLOR_MAP.get(self.node_type, NODE_COLOR_DEFAULT)
         self.color = QColor(resolved_color)
-        
-        if self.is_external:
-            print(bsdd_data.Name ,is_external)
-            self.color.setAlpha(100)
-
         self.brush = QBrush(self.color)
         self.border = QPen(QColor(40, 60, 90), 1.2)
         self.border.setCosmetic(True)
