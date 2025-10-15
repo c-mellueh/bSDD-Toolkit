@@ -32,8 +32,8 @@ class Signals(QObject):
     class_relation_removed = Signal(BsddClassRelation)
     property_relation_added = Signal(BsddPropertyRelation)
     property_relation_removed = Signal(BsddPropertyRelation)
-    ifc_relation_addded = Signal(str)  # IfcRelationName
-    ifc_relation_removed = Signal(str)  # IfcRelationName
+    ifc_relation_addded = Signal(BsddClass, str)  # IfcRelationName
+    ifc_relation_removed = Signal(BsddClass, str)  # IfcRelationName
 
 
 class Project(ActionTool):
@@ -64,9 +64,9 @@ class Project(ActionTool):
         bsdd_gui.on_new_project()
 
     @classmethod
-    def load_project(cls, path: os.PathLike,sloppy = False):
+    def load_project(cls, path: os.PathLike, sloppy=False):
         prop = cls.get_properties()
-        prop.project_dictionary = BsddDictionary.load(path,sloppy=sloppy)
+        prop.project_dictionary = BsddDictionary.load(path, sloppy=sloppy)
         return prop.project_dictionary
 
     @classmethod

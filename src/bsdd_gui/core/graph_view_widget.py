@@ -85,7 +85,7 @@ def connect_signals(
         graph_view.add_edge(graph_view.get_scene(), edge)
 
     def handle_ifc_relation_add(bsdd_class:BsddClass,ifc_code: str):
-        pass
+        print(f"IFC Relation added: {bsdd_class.Code} -> {ifc_code}")
 
     def handle_ifc_relation_remove(bsdd_class:BsddClass,ifc_code: str):
         pass
