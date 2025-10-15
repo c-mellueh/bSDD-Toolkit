@@ -51,6 +51,8 @@ class Signals(WidgetSignals):
     edge_removed = Signal(graphics_items.Edge)
     class_relation_removed = Signal(BsddClassRelation)
     property_relation_removed = Signal(BsddPropertyRelation)
+    ifc_reference_removed = Signal(BsddClass, str)  # BsddClass, IfcRelationName
+    ifc_reference_added = Signal(BsddClass, str)  # BsddClass, IfcRelationName
 
 
 class GraphViewWidget(ActionTool, WidgetTool):
@@ -875,6 +877,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
             if isinstance(end_data, BsddClass):
                 if relation_type == constants.IFC_REFERENCE_REL:
                     start_data.RelatedIfcEntityNamesList.remove(end_data.Code)
+                    cls.signals.ifc_reference_removed.emit(start_data, end_data.Code)
                 else:
                     class_relation = cl_utils.get_class_relation(start_data, end_data, relation_type)
                     if not class_relation:

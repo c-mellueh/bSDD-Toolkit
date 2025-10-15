@@ -32,6 +32,8 @@ class Signals(QObject):
     class_relation_removed = Signal(BsddClassRelation)
     property_relation_added = Signal(BsddPropertyRelation)
     property_relation_removed = Signal(BsddPropertyRelation)
+    ifc_relation_addded = Signal(str)  # IfcRelationName
+    ifc_relation_removed = Signal(str)  # IfcRelationName
 
 
 class Project(ActionTool):

@@ -56,6 +56,8 @@ def connect_signals(
     graph_view.signals.property_relation_removed.connect(
         project.signals.property_relation_removed.emit
     )
+    graph_view.signals.ifc_reference_added.connect(project.signals.ifc_relation_addded.emit)
+    graph_view.signals.ifc_reference_removed.connect(project.signals.ifc_relation_removed.emit)
 
     def handle_remove(bsdd_data):
         if isinstance(bsdd_data, BsddClassProperty):
@@ -82,6 +84,12 @@ def connect_signals(
         edge = graph_view.create_edge(start_node, end_node, edge_type=relation_type)
         graph_view.add_edge(graph_view.get_scene(), edge)
 
+    def handle_ifc_relation_add(bsdd_class:BsddClass,ifc_code: str):
+        pass
+
+    def handle_ifc_relation_remove(bsdd_class:BsddClass,ifc_code: str):
+        pass
+
     project.signals.class_removed.connect(handle_remove)
     project.signals.property_removed.connect(handle_remove)
     project.signals.class_property_removed.connect(handle_remove)
@@ -89,6 +97,8 @@ def connect_signals(
     project.signals.class_relation_removed.connect(handle_relation_remove)
     project.signals.property_relation_added.connect(handle_relation_add)
     project.signals.property_relation_removed.connect(handle_relation_remove)
+    project.signals.ifc_relation_addded.connect(handle_ifc_relation_add)
+    project.signals.ifc_relation_removed.connect(handle_ifc_relation_remove)
 
     def handle_edge_add(edge: graphics_items.Edge):
         relation = graph_view.get_relation_from_edge(edge, project.get())
