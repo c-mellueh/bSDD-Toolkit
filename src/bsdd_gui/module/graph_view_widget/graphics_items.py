@@ -271,7 +271,7 @@ class Node(QGraphicsObject):
         bsdd_data: BsddClass | BsddProperty,
         radius: float = 12.0,
         color: QColor | None = None,
-        is_external = False
+        is_external=False,
     ):
         super().__init__()
         self.bsdd_data = bsdd_data

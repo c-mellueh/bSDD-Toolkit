@@ -40,14 +40,12 @@ def main(initial_file: PathLike | None = None, log_level=None, open_last_project
     bsdd_gui.core.project.create_project(tool.Project)
 
     if initial_file is not None:
-        bsdd_gui.core.project.open_project(initial_file, tool.Project,tool.Popups)
+        bsdd_gui.core.project.open_project(initial_file, tool.Project, tool.Popups)
 
     elif open_last_project:
         pass
         bsdd_gui.core.project.open_project(
-            tool.Appdata.get_path(OPEN_PATH),
-            tool.Project,
-            tool.Popups
+            tool.Appdata.get_path(OPEN_PATH), tool.Project, tool.Popups
         )
 
     set_language(None)

@@ -75,6 +75,7 @@ def connect_signals(
         )
     )
 
+
 def retranslate_ui(relationship_editor: Type[tool.RelationshipEditorWidget]):
     for widget in relationship_editor.get_widgets():
         widget.retranslateUi(widget)

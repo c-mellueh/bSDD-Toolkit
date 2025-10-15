@@ -272,6 +272,7 @@ class LineEditWithToggleSwitch(ItemWithToggleSwitch):
             toggle_is_on=is_enabled,
             **kwargs,
         )
+
     @property
     def item(self) -> QLineEdit:
         return super().item
@@ -288,6 +289,7 @@ class ComboBoxWithToggleSwitch(ItemWithToggleSwitch):
             toggle_is_on=is_enabled,
             **kwargs,
         )
+
     @property
     def item(self) -> QComboBox:
         return super().item

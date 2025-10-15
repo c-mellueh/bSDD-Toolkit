@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_editor_widget import ui
 
 
-def connect_signals(class_editor: Type[tool.ClassEditorWidget],project:Type[tool.Project]):
+def connect_signals(class_editor: Type[tool.ClassEditorWidget], project: Type[tool.Project]):
     class_editor.connect_signals()
     class_editor.signals.related_ifc_added.connect(project.signals.ifc_relation_addded.emit)
     class_editor.signals.related_ifc_removed.connect(project.signals.ifc_relation_removed.emit)

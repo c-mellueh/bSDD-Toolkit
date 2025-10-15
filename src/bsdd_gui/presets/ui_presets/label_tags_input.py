@@ -247,8 +247,8 @@ class TagInput(QWidget):
         left, top, right, bottom = 8, 2, 4, 2
         self._edit.setTextMargins(left, top, right, bottom)
         fm = QFontMetrics(self._edit.font())
-        target_h = (
-            max(24, fm.height() + top + bottom)
+        target_h = max(
+            24, fm.height() + top + bottom
         )  # I don't know why but i need th +4 else the line edit is not high enough #TODO
         self._edit.setFixedHeight(target_h)
         flow_margins = self._flow.contentsMargins()

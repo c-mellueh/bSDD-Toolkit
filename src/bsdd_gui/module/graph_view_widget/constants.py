@@ -199,13 +199,13 @@ NODE_TYPE_LABEL_MAP: dict[str, str] = {
     PROPERTY_NODE_TYPE: "Property",
     IFC_NODE_TYPE: "IfcReference",
     GENERIC_NODE_TYPE: "Generic",
-}     
+}
 
 # Node colors and shapes
 NODE_COLOR_DEFAULT = QColor(80, 140, 255)
 NODE_COLOR_MAP: dict[str, QColor] = {
     CLASS_NODE_TYPE: QColor(220, 60, 60),  # red
-    IFC_NODE_TYPE: QColor(220, 60, 60,100),  # red
+    IFC_NODE_TYPE: QColor(220, 60, 60, 100),  # red
     PROPERTY_NODE_TYPE: QColor(60, 120, 220),  # blue
     GENERIC_NODE_TYPE: NODE_COLOR_DEFAULT,
 }
