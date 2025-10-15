@@ -762,20 +762,25 @@ class GraphViewWidget(ActionTool, WidgetTool):
         start_class: BsddClass = start_node.bsdd_data
         end_class: BsddClass = end_node.bsdd_data
 
+
+        #TODO: if a IFCRef gets deleted from the UI it needs to get deleted from the graph
         if relation not in constants.CLASS_RELATIONS:
             return
-
-        end_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
-        existing_relations = [
-            r.RelationType for r in start_class.ClassRelations if r.RelatedClassUri == end_uri
-        ]
-        if relation in existing_relations:
-            return
-        new_relation = BsddClassRelation(
-            RelationType=relation, RelatedClassUri=end_uri, RelatedClassName=end_class.Name
-        )
-        new_relation._set_parent(start_class)
-        start_class.ClassRelations.append(new_relation)
+        if relation == constants.IFC_REFERENCE_REL:
+            if end_class.Code not in start_class.RelatedIfcEntityNamesList:
+                start_class.RelatedIfcEntityNamesList.append(end_class.Code)
+        else:
+            end_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
+            existing_relations = [
+                r.RelationType for r in start_class.ClassRelations if r.RelatedClassUri == end_uri
+            ]
+            if relation in existing_relations:
+                return
+            new_relation = BsddClassRelation(
+                RelationType=relation, RelatedClassUri=end_uri, RelatedClassName=end_class.Name
+            )
+            new_relation._set_parent(start_class)
+            start_class.ClassRelations.append(new_relation)
         new_edge = cls.create_edge(start_node, end_node, edge_type=relation)
         cls.add_edge(cls.get_scene(), new_edge)
         cls.signals.new_edge_created.emit(new_edge)
@@ -868,12 +873,15 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         if isinstance(start_data, BsddClass):
             if isinstance(end_data, BsddClass):
-                class_relation = cl_utils.get_class_relation(start_data, end_data, relation_type)
-                if not class_relation:
-                    return
-                start_data.ClassRelations.remove(class_relation)
-                cls.signals.edge_removed.emit(edge)
-                cls.signals.class_relation_removed.emit(class_relation)
+                if relation_type == constants.IFC_REFERENCE_REL:
+                    start_data.RelatedIfcEntityNamesList.remove(end_data.Code)
+                else:
+                    class_relation = cl_utils.get_class_relation(start_data, end_data, relation_type)
+                    if not class_relation:
+                        return
+                    start_data.ClassRelations.remove(class_relation)
+                    cls.signals.edge_removed.emit(edge)
+                    cls.signals.class_relation_removed.emit(class_relation)
             elif isinstance(end_data, BsddProperty):
                 class_property = {cp.PropertyCode: cp for cp in start_data.ClassProperties}.get(
                     end_data.Code
