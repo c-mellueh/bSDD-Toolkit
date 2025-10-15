@@ -32,7 +32,7 @@ class ItemModel(QAbstractItemModel):
         if not index.isValid():
             return None
 
-        if role != Qt.ItemDataRole.DisplayRole:
+        if role not in [Qt.ItemDataRole.DisplayRole,Qt.ItemDataRole.EditRole]:
             return None
         getter_func = self.tool.value_getter_functions(self)[index.column()]
         return getter_func(index.internalPointer())
