@@ -254,7 +254,9 @@ def get_values(class_property: BsddClassProperty):
     return []
 
 
-def get_property_by_class_property(class_prop: BsddClassProperty):
+def get_property_by_class_property(
+    class_prop: BsddClassProperty,
+) -> BsddProperty | None:
     if not is_external_ref(class_prop):
         return get_internal_property(class_prop)
     else:
