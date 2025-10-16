@@ -162,7 +162,7 @@ def build_bsdd_uri(bsdd_property: BsddProperty, bsdd_dictionary: BsddDictionary)
     data = {
         "namespace": [bsdd_dictionary.OrganizationCode, bsdd_dictionary.DictionaryCode],
         "version": bsdd_dictionary.DictionaryVersion,
-        "resource_type": "property",
+        "resource_type": "prop",
         "resource_id": bsdd_property.Code,
     }
     if bsdd_dictionary.UseOwnUri:

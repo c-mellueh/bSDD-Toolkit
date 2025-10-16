@@ -170,11 +170,11 @@
       <ids:requirements>
         <ids:property cardinality="required" dataType="IFCLABEL">
           <ids:propertySet>
-            <ids:simpleValue>Allgemein</ids:simpleValue>
+            <ids:simpleValue>XXX</ids:simpleValue>
           </ids:propertySet>
           <ids:baseName>
             <xs:restriction base="xs:string">
-              <xs:enumeration value="Klassifikation" />
+              <xs:enumeration value="X" />
             </xs:restriction>
           </ids:baseName>
           <ids:value>
