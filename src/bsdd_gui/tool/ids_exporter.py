@@ -66,7 +66,6 @@ class IdsExporter(ActionTool):
             spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
             ids.specifications.append(spec)
         ids.to_xml(out_path)
-        print("EXPORT DONE!")
 
     @classmethod
     def build_property_requirements(cls, class_prop: BsddClassProperty, bsdd_dict: BsddDictionary):
