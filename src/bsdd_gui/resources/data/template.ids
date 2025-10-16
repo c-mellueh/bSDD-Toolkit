@@ -1,0 +1,189 @@
+<ids:ids xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://standards.buildingsmart.org/IDS http://standards.buildingsmart.org/IDS/1.0/ids.xsd" xmlns:ids="http://standards.buildingsmart.org/IDS">
+  <!--IDS created by Datacomp IDS Maker-->
+  <ids:info>
+    <ids:title>Curslack S13</ids:title>
+    <ids:copyright>Hamburg Wasser</ids:copyright>
+    <ids:version>1.0.0</ids:version>
+    <ids:description>Prüfung auf Basis-Modellierung</ids:description>
+    <ids:author>christoph.mellueh@hamburgwasser.de</ids:author>
+    <ids:date>2025-10-16</ids:date>
+    <ids:purpose>Bestandsmodellierung</ids:purpose>
+    <ids:milestone>Leistungsphase 1</ids:milestone>
+  </ids:info>
+  <ids:specifications>
+    <ids:specification ifcVersion="IFC4X3_ADD2" name="Check for Classification Property">
+      <ids:applicability minOccurs="0" maxOccurs="unbounded">
+        <ids:entity>
+          <ids:name>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="IFCACTUATOR" />
+              <xs:enumeration value="IFCAIRTERMINAL" />
+              <xs:enumeration value="IFCAIRTERMINALBOX" />
+              <xs:enumeration value="IFCAIRTOAIRHEATRECOVERY" />
+              <xs:enumeration value="IFCALARM" />
+              <xs:enumeration value="IFCAUDIOVISUALAPPLIANCE" />
+              <xs:enumeration value="IFCBEAM" />
+              <xs:enumeration value="IFCBEARING" />
+              <xs:enumeration value="IFCBOILER" />
+              <xs:enumeration value="IFCBOREHOLE" />
+              <xs:enumeration value="IFCBUILDINGELEMENTPART" />
+              <xs:enumeration value="IFCBUILDINGELEMENTPROXY" />
+              <xs:enumeration value="IFCBUILTELEMENT" />
+              <xs:enumeration value="IFCBURNER" />
+              <xs:enumeration value="IFCCABLECARRIERFITTING" />
+              <xs:enumeration value="IFCCABLECARRIERSEGMENT" />
+              <xs:enumeration value="IFCCABLEFITTING" />
+              <xs:enumeration value="IFCCABLESEGMENT" />
+              <xs:enumeration value="IFCCAISSONFOUNDATION" />
+              <xs:enumeration value="IFCCHILLER" />
+              <xs:enumeration value="IFCCHIMNEY" />
+              <xs:enumeration value="IFCCOIL" />
+              <xs:enumeration value="IFCCOLUMN" />
+              <xs:enumeration value="IFCCOMMUNICATIONSAPPLIANCE" />
+              <xs:enumeration value="IFCCOMPRESSOR" />
+              <xs:enumeration value="IFCCONDENSER" />
+              <xs:enumeration value="IFCCONTROLLER" />
+              <xs:enumeration value="IFCCONVEYORSEGMENT" />
+              <xs:enumeration value="IFCCOOLEDBEAM" />
+              <xs:enumeration value="IFCCOOLINGTOWER" />
+              <xs:enumeration value="IFCCOURSE" />
+              <xs:enumeration value="IFCCOVERING" />
+              <xs:enumeration value="IFCCURTAINWALL" />
+              <xs:enumeration value="IFCDAMPER" />
+              <xs:enumeration value="IFCDEEPFOUNDATION" />
+              <xs:enumeration value="IFCDISCRETEACCESSORY" />
+              <xs:enumeration value="IFCDISTRIBUTIONBOARD" />
+              <xs:enumeration value="IFCDISTRIBUTIONCHAMBERELEMENT" />
+              <xs:enumeration value="IFCDISTRIBUTIONCONTROLELEMENT" />
+              <xs:enumeration value="IFCDISTRIBUTIONELEMENT" />
+              <xs:enumeration value="IFCDISTRIBUTIONFLOWELEMENT" />
+              <xs:enumeration value="IFCDOOR" />
+              <xs:enumeration value="IFCDUCTFITTING" />
+              <xs:enumeration value="IFCDUCTSEGMENT" />
+              <xs:enumeration value="IFCDUCTSILENCER" />
+              <xs:enumeration value="IFCEARTHWORKSCUT" />
+              <xs:enumeration value="IFCEARTHWORKSELEMENT" />
+              <xs:enumeration value="IFCEARTHWORKSFILL" />
+              <xs:enumeration value="IFCELECTRICAPPLIANCE" />
+              <xs:enumeration value="IFCELECTRICFLOWSTORAGEDEVICE" />
+              <xs:enumeration value="IFCELECTRICFLOWTREATMENTDEVICE" />
+              <xs:enumeration value="IFCELECTRICGENERATOR" />
+              <xs:enumeration value="IFCELECTRICMOTOR" />
+              <xs:enumeration value="IFCELECTRICTIMECONTROL" />
+              <xs:enumeration value="IFCELEMENTASSEMBLY" />
+              <xs:enumeration value="IFCENERGYCONVERSIONDEVICE" />
+              <xs:enumeration value="IFCENGINE" />
+              <xs:enumeration value="IFCEVAPORATIVECOOLER" />
+              <xs:enumeration value="IFCEVAPORATOR" />
+              <xs:enumeration value="IFCFAN" />
+              <xs:enumeration value="IFCFASTENER" />
+              <xs:enumeration value="IFCFILTER" />
+              <xs:enumeration value="IFCFIRESUPPRESSIONTERMINAL" />
+              <xs:enumeration value="IFCFLOWCONTROLLER" />
+              <xs:enumeration value="IFCFLOWFITTING" />
+              <xs:enumeration value="IFCFLOWINSTRUMENT" />
+              <xs:enumeration value="IFCFLOWMETER" />
+              <xs:enumeration value="IFCFLOWMOVINGDEVICE" />
+              <xs:enumeration value="IFCFLOWSEGMENT" />
+              <xs:enumeration value="IFCFLOWSTORAGEDEVICE" />
+              <xs:enumeration value="IFCFLOWTERMINAL" />
+              <xs:enumeration value="IFCFLOWTREATMENTDEVICE" />
+              <xs:enumeration value="IFCFOOTING" />
+              <xs:enumeration value="IFCFURNISHINGELEMENT" />
+              <xs:enumeration value="IFCFURNITURE" />
+              <xs:enumeration value="IFCGEOGRAPHICELEMENT" />
+              <xs:enumeration value="IFCGEOMODEL" />
+              <xs:enumeration value="IFCGEOSLICE" />
+              <xs:enumeration value="IFCGEOTECHNICALSTRATUM" />
+              <xs:enumeration value="IFCHEATEXCHANGER" />
+              <xs:enumeration value="IFCHUMIDIFIER" />
+              <xs:enumeration value="IFCIMPACTPROTECTIONDEVICE" />
+              <xs:enumeration value="IFCINTERCEPTOR" />
+              <xs:enumeration value="IFCJUNCTIONBOX" />
+              <xs:enumeration value="IFCKERB" />
+              <xs:enumeration value="IFCLAMP" />
+              <xs:enumeration value="IFCLIGHTFIXTURE" />
+              <xs:enumeration value="IFCLIQUIDTERMINAL" />
+              <xs:enumeration value="IFCMECHANICALFASTENER" />
+              <xs:enumeration value="IFCMEDICALDEVICE" />
+              <xs:enumeration value="IFCMEMBER" />
+              <xs:enumeration value="IFCMOBILETELECOMMUNICATIONSAPPLIANCE" />
+              <xs:enumeration value="IFCMOORINGDEVICE" />
+              <xs:enumeration value="IFCMOTORCONNECTION" />
+              <xs:enumeration value="IFCNAVIGATIONELEMENT" />
+              <xs:enumeration value="IFCOPENINGELEMENT" />
+              <xs:enumeration value="IFCOUTLET" />
+              <xs:enumeration value="IFCPAVEMENT" />
+              <xs:enumeration value="IFCPILE" />
+              <xs:enumeration value="IFCPIPEFITTING" />
+              <xs:enumeration value="IFCPIPESEGMENT" />
+              <xs:enumeration value="IFCPLATE" />
+              <xs:enumeration value="IFCPROJECTIONELEMENT" />
+              <xs:enumeration value="IFCPROTECTIVEDEVICE" />
+              <xs:enumeration value="IFCPROTECTIVEDEVICETRIPPINGUNIT" />
+              <xs:enumeration value="IFCPUMP" />
+              <xs:enumeration value="IFCRAIL" />
+              <xs:enumeration value="IFCRAILING" />
+              <xs:enumeration value="IFCRAMP" />
+              <xs:enumeration value="IFCRAMPFLIGHT" />
+              <xs:enumeration value="IFCREINFORCEDSOIL" />
+              <xs:enumeration value="IFCREINFORCINGBAR" />
+              <xs:enumeration value="IFCREINFORCINGMESH" />
+              <xs:enumeration value="IFCROOF" />
+              <xs:enumeration value="IFCSANITARYTERMINAL" />
+              <xs:enumeration value="IFCSENSOR" />
+              <xs:enumeration value="IFCSHADINGDEVICE" />
+              <xs:enumeration value="IFCSIGN" />
+              <xs:enumeration value="IFCSIGNAL" />
+              <xs:enumeration value="IFCSLAB" />
+              <xs:enumeration value="IFCSOLARDEVICE" />
+              <xs:enumeration value="IFCSPACEHEATER" />
+              <xs:enumeration value="IFCSTACKTERMINAL" />
+              <xs:enumeration value="IFCSTAIR" />
+              <xs:enumeration value="IFCSTAIRFLIGHT" />
+              <xs:enumeration value="IFCSURFACEFEATURE" />
+              <xs:enumeration value="IFCSWITCHINGDEVICE" />
+              <xs:enumeration value="IFCSYSTEMFURNITUREELEMENT" />
+              <xs:enumeration value="IFCTANK" />
+              <xs:enumeration value="IFCTENDON" />
+              <xs:enumeration value="IFCTENDONANCHOR" />
+              <xs:enumeration value="IFCTENDONCONDUIT" />
+              <xs:enumeration value="IFCTRACKELEMENT" />
+              <xs:enumeration value="IFCTRANSFORMER" />
+              <xs:enumeration value="IFCTRANSPORTELEMENT" />
+              <xs:enumeration value="IFCTUBEBUNDLE" />
+              <xs:enumeration value="IFCUNITARYCONTROLELEMENT" />
+              <xs:enumeration value="IFCUNITARYEQUIPMENT" />
+              <xs:enumeration value="IFCVALVE" />
+              <xs:enumeration value="IFCVEHICLE" />
+              <xs:enumeration value="IFCVIBRATIONDAMPER" />
+              <xs:enumeration value="IFCVIBRATIONISOLATOR" />
+              <xs:enumeration value="IFCVIRTUALELEMENT" />
+              <xs:enumeration value="IFCVOIDINGFEATURE" />
+              <xs:enumeration value="IFCWALL" />
+              <xs:enumeration value="IFCWASTETERMINAL" />
+              <xs:enumeration value="IFCWINDOW" />
+            </xs:restriction>
+          </ids:name>
+        </ids:entity>
+      </ids:applicability>
+      <ids:requirements>
+        <ids:property cardinality="required" dataType="IFCLABEL">
+          <ids:propertySet>
+            <ids:simpleValue>Allgemein</ids:simpleValue>
+          </ids:propertySet>
+          <ids:baseName>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Klassifikation" />
+            </xs:restriction>
+          </ids:baseName>
+          <ids:value>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="xxx" />
+            </xs:restriction>
+          </ids:value>
+        </ids:property>
+      </ids:requirements>
+    </ids:specification>
+  </ids:specifications>
+</ids:ids>

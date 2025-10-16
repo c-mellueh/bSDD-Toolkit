@@ -13,7 +13,7 @@ def connect_to_main_window(
 
 
 def retranslate_ui(
-    graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
+    ids_exporter: Type[tool.IdsExporter], main_window: Type[tool.MainWindowWidget]
 ):
-    action = graph_view.get_action(main_window.get(), "open_window")
+    action = ids_exporter.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("GraphView", "Graph View"))

@@ -237,4 +237,16 @@ def get_name(class_property:BsddClassProperty):
     if not prop:
         return None
     return prop.Name
-    
+
+def get_values(class_property:BsddClassProperty):
+    if not is_external_ref(class_property):
+        prop = get_internal_property(class_property)
+    else:
+        prop = get_external_property(class_property)
+    if not prop:
+        return None
+    if class_property.AllowedValues:
+        return class_property.AllowedValues
+    if prop.AllowedValues:
+        return prop.AllowedValues
+    return []
