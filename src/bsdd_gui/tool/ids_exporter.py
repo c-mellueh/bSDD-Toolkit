@@ -61,8 +61,8 @@ class IdsExporter(ActionTool):
                 pset, prop, bsdd_class.Code, data_type, cardinality="optional"
             )
             spec.applicability.append(applicability_facet)
-            #for class_prop in bsdd_class.ClassProperties:
-            #    spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
+            for class_prop in bsdd_class.ClassProperties:
+                spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
             spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
             ids.specifications.append(spec)
         ids.to_xml(out_path)
