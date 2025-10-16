@@ -129,7 +129,7 @@ class ActionTool(BaseTool):
         cls.get_properties().actions[widget][name] = action
 
     @classmethod
-    def get_action(cls, widget, name):
+    def get_action(cls, widget, name) -> QAction:
         return cls.get_properties().actions[widget][name]
 
 

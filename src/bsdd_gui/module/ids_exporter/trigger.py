@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING
 
 
 def connect():
-    pass
+    core.connect_to_main_window(tool.IdsExporter,tool.MainWindowWidget,tool.Project)
 
 def retranslate_ui():
-    pass
+    core.retranslate_ui(tool.GraphViewWidget, tool.MainWindowWidget)
 
 def on_new_project():
     pass
