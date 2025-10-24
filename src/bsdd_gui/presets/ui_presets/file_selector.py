@@ -11,14 +11,15 @@ FILETYPE = "bSDD Project (*.json);;all (*.*)"
 class FileSelector(QWidget):
     def __init__(
         self,
-        section: str = "DEFAULT",
-        option: str = "DEFAULT",
+        parent = None,
+        section: str = "test",
+        option: str = "test",
         mode: MODES = "open",
         file_format=FILETYPE,
         *args,
         **kwargs,
     ):
-        super().__init__(*args, **kwargs)
+        super().__init__(parent,*args, **kwargs)
         layout = QHBoxLayout(self)
         self.setLayout(layout)
         self.layout().setContentsMargins(QMargins(0, 0, 0, 0))
@@ -33,8 +34,9 @@ class FileSelector(QWidget):
         self.mode = mode
         self.file_format = file_format
         self.tool_button.clicked.connect(self.on_button_click)
-        from bsdd_gui.tool import Appdata,Popups
 
+    def load_path(self):
+        from bsdd_gui.tool import Appdata
         path = Appdata.get_string_setting(self.section,self.option,None)
         if path:
             self.line_edit.setText(path)
@@ -50,7 +52,6 @@ class FileSelector(QWidget):
 
         path = Appdata.get_string_setting(self.section,self.option,None)
         path = Popups.get_save_path(self.file_format,self,path)
-        print(path)
         if path is not None:
             Appdata.set_setting(self.section,self.option,path)
             self.set_path(path)

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>669</width>
+    <height>615</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QTreeView" name="tv_properties"/>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="FileSelector" name="fw_output" native="true"/>
+   </item>
+   <item row="0" column="0">
+    <widget class="QTreeView" name="tv_classes"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FileSelector</class>
+   <extends>QWidget</extends>
+   <header>bsdd_gui.presets.ui_presets</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

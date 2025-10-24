@@ -286,6 +286,7 @@ class FieldTool(WidgetTool):
         widget.show()
         widget.activateWindow()
         widget.showNormal()
+        return widget
 
     @classmethod
     def register_widget(cls, widget: FieldWidget):
@@ -468,6 +469,8 @@ class FieldTool(WidgetTool):
         """
         get values from the model and set them to the fields
         """
+        if not widget in cls.get_properties().field_getter:
+            return
         for field, getter_func in cls.get_properties().field_getter[widget].items():
             if explicit_field is not None and explicit_field != field:
                 continue
@@ -590,6 +593,10 @@ class DialogTool(FieldTool):
         return BaseDialog
 
     @classmethod
+    def request_dialog(cls, data: object, parent: QWidget):
+        cls.signals.dialog_requested.emit(data, parent)
+
+    @classmethod
     def create_dialog(cls, data: object, parent: QWidget) -> BaseDialog:
         widget = cls.create_widget(data, None)
         dialog = cls._get_dialog_class()(widget, parent)
@@ -604,6 +611,7 @@ class DialogTool(FieldTool):
         super().connect_internal_signals()
         cls.signals.dialog_accepted.connect(lambda dialog: dialog._widget.closed.emit())
         cls.signals.dialog_declined.connect(lambda dialog: dialog._widget.closed.emit())
+        cls.signals.dialog_requested.connect(lambda d, p: cls._get_trigger().create_dialog(d, p))
 
     @classmethod
     def connect_widget_signals(cls, widget: FieldWidget):

@@ -8,18 +8,20 @@ from ifctester.facet import Entity as EntityFacet
 
 from ifctester.facet import Restriction
 from ifctester.ids import Specification
-
-from bsdd_gui.presets.tool_presets import ActionTool
+from bsdd_gui.presets.signal_presets import DialogSignals
+from bsdd_gui.presets.tool_presets import ActionTool, DialogTool
 from bsdd_json.utils import property_utils as prop_utils
-
+from bsdd_gui.module.ids_exporter import ui
 if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter.prop import IdsExporterProperties
 from bsdd_gui.module.ids_exporter import trigger
 import ifctester
 import os
 
-
-class IdsExporter(ActionTool):
+class Signals(DialogSignals):
+    pass
+class IdsExporter(ActionTool, DialogTool):
+    signals = Signals()
     @classmethod
     def get_properties(cls) -> IdsExporterProperties:
         return bsdd_gui.IdsExporterProperties
@@ -27,6 +29,12 @@ class IdsExporter(ActionTool):
     @classmethod
     def _get_trigger(cls):
         return trigger
+    @classmethod
+    def _get_dialog_class(cls):
+        return ui.IdsDialog
+    @classmethod
+    def _get_widget_class(cls):
+        return ui.IdsWidget
 
     @classmethod
     def get_template(cls):
@@ -84,6 +92,7 @@ class IdsExporter(ActionTool):
         if values:
             req.value = Restriction({"enumeration": sorted([v.Value for v in values])})
         return [req]
+
     @classmethod
     def build_ifc_requirements(cls, bsdd_class: BsddClass, bsdd_dict: BsddDictionary):
         from bsdd_gui.tool.ifc_helper import IfcHelper
@@ -104,7 +113,6 @@ class IdsExporter(ActionTool):
             pt_res = Restriction({"enumeration": sorted(predefined_types)})
             req.predefinedType = pt_res
         return [req]
-
 
     @classmethod
     def deprecated_build_ifc_requirements(cls, bsdd_class: BsddClass, bsdd_dict: BsddDictionary):
