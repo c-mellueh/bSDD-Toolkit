@@ -9,3 +9,4 @@ from .line_edit_with_button import LineEditWithButton
 from .datetime_now import DateTimeWithNow
 from .base_widgets import FieldWidget, BaseDialog, BaseWidget
 from .item_views import TreeItemView, TableItemView, ItemViewType
+from .file_selector import FileSelector

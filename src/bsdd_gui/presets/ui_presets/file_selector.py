@@ -3,7 +3,6 @@ from PySide6.QtCore import QMargins
 from typing import Literal
 import sys
 from PySide6.QtWidgets import QApplication
-from bsdd_gui.tool import Appdata,Popups
 
 MODES = Literal["open", "save"]
 FILETYPE = "bSDD Project (*.json);;all (*.*)"
@@ -34,6 +33,7 @@ class FileSelector(QWidget):
         self.mode = mode
         self.file_format = file_format
         self.tool_button.clicked.connect(self.on_button_click)
+        from bsdd_gui.tool import Appdata,Popups
 
         path = Appdata.get_string_setting(self.section,self.option,None)
         if path:
@@ -46,6 +46,7 @@ class FileSelector(QWidget):
         return self.line_edit.text()
 
     def on_button_click(self):
+        from bsdd_gui.tool import Appdata,Popups
 
         path = Appdata.get_string_setting(self.section,self.option,None)
         path = Popups.get_save_path(self.file_format,self,path)
