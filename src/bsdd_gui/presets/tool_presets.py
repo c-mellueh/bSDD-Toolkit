@@ -628,6 +628,24 @@ class DialogTool(FieldTool):
         else:
             pass
 
+    @classmethod
+    def get_dialog(cls):
+        return cls.get_properties().dialog
+
+    @classmethod
+    def get_data(cls):
+        widget = cls.get_widget()
+        if not widget:
+            return None
+        return widget.bsdd_data
+
+    @classmethod
+    def get_widget(cls):
+        dialog = cls.get_dialog()
+        if not dialog:
+            return None
+        return dialog._widget
+
 
 class ItemViewTool(BaseTool):
 

@@ -21,4 +21,4 @@ from .property_table_widget import PropertyTableWidget
 from .search_widget import SearchWidget
 from .relationship_editor_widget import RelationshipEditorWidget
 from .graph_view_widget import GraphViewWidget
-from .ids_exporter import IdsExporter
+from .ids_exporter import IdsExporter,IdsClassView

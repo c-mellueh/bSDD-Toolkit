@@ -5,6 +5,10 @@ from typing import TypedDict, Callable, TypeAlias
 from bsdd_gui.presets.ui_presets import ItemViewType, FieldWidget
 from .models_presets import ItemModel
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .ui_presets.base_widgets import BaseDialog
 
 
 class ContextMenuDict(TypedDict, total=False):
@@ -55,7 +59,7 @@ class FieldProperties(WidgetProperties):
 class DialogProperties(FieldProperties):
     def __init__(self):
         super().__init__()
-        self.dialog = None
+        self.dialog: BaseDialog | None = None
 
 
 class ViewProperties:

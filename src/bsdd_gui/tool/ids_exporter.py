@@ -9,19 +9,24 @@ from ifctester.facet import Entity as EntityFacet
 from ifctester.facet import Restriction
 from ifctester.ids import Specification
 from bsdd_gui.presets.signal_presets import DialogSignals
-from bsdd_gui.presets.tool_presets import ActionTool, DialogTool
+from bsdd_gui.presets.tool_presets import ActionTool, DialogTool, ItemViewTool
 from bsdd_json.utils import property_utils as prop_utils
-from bsdd_gui.module.ids_exporter import ui
+from bsdd_gui.module.ids_exporter import ui, models
+
 if TYPE_CHECKING:
-    from bsdd_gui.module.ids_exporter.prop import IdsExporterProperties
+    from bsdd_gui.module.ids_exporter.prop import IdsExporterProperties, IdsClassViewProperties
 from bsdd_gui.module.ids_exporter import trigger
 import ifctester
 import os
 
+
 class Signals(DialogSignals):
     pass
+
+
 class IdsExporter(ActionTool, DialogTool):
     signals = Signals()
+
     @classmethod
     def get_properties(cls) -> IdsExporterProperties:
         return bsdd_gui.IdsExporterProperties
@@ -29,9 +34,11 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def _get_trigger(cls):
         return trigger
+
     @classmethod
     def _get_dialog_class(cls):
         return ui.IdsDialog
+
     @classmethod
     def _get_widget_class(cls):
         return ui.IdsWidget
@@ -150,3 +157,26 @@ class IdsExporter(ActionTool, DialogTool):
             req.cardinality = "optional"
             requirements.append(req)
         return requirements
+
+    @classmethod
+    def get_widget(cls) -> ui.IdsWidget:
+        return super().get_widget()
+
+
+class IdsClassView(ItemViewTool):
+
+    @classmethod
+    def get_properties(cls) -> IdsClassViewProperties:
+        return bsdd_gui.IdsClassViewProperties  #
+
+    @classmethod
+    def _get_model_class(cls):
+        return models.ClassTreeModel
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def _get_proxy_model_class(cls):
+        return models.SortModel

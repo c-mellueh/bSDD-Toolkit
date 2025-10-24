@@ -21,7 +21,7 @@
     <widget class="FileSelector" name="fw_output" native="true"/>
    </item>
    <item row="0" column="0">
-    <widget class="QTreeView" name="tv_classes"/>
+    <widget class="ClassView" name="tv_classes"/>
    </item>
   </layout>
  </widget>
@@ -31,6 +31,11 @@
    <extends>QWidget</extends>
    <header>bsdd_gui.presets.ui_presets</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ClassView</class>
+   <extends>QTreeView</extends>
+   <header>bsdd_gui.module.ids_exporter.model_views</header>
   </customwidget>
  </customwidgets>
  <resources/>

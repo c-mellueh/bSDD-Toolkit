@@ -18,6 +18,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHeaderView, QSizePolicy,
     QTreeView, QWidget)
 
+from bsdd_gui.module.ids_exporter.model_views import ClassView
 from bsdd_gui.presets.ui_presets import FileSelector
 
 class Ui_Form(object):
@@ -37,7 +38,7 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.fw_output, 1, 0, 1, 2)
 
-        self.tv_classes = QTreeView(Form)
+        self.tv_classes = ClassView(Form)
         self.tv_classes.setObjectName(u"tv_classes")
 
         self.gridLayout.addWidget(self.tv_classes, 0, 0, 1, 1)
