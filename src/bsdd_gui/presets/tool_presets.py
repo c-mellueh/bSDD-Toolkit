@@ -640,7 +640,7 @@ class DialogTool(FieldTool):
         return widget.bsdd_data
 
     @classmethod
-    def get_widget(cls):
+    def get_widget(cls,data=None):
         dialog = cls.get_dialog()
         if not dialog:
             return None

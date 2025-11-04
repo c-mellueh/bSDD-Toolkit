@@ -73,7 +73,7 @@ class ClassPropertyEditorWidget(DialogTool):
         #
         cls.signals.paste_clipboard.connect(trigger.paste_clipboard)
         cls.signals.property_reference_changed.connect(
-            lambda cp: cls.request_property_specific_redraw(cls.get_widget(cp))
+            lambda cp: cls.request_property_specific_redraw(cls.get_widget())
         )
         cls.signals.create_new_class_property_requested.connect(trigger.create_dialog)
         # Autoupdate Values
