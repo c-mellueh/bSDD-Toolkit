@@ -11,7 +11,9 @@ if TYPE_CHECKING:
 
 def connect():
     core.connect_signals(tool.PropertySetTableView)
-    core.connect_to_main_window(tool.PropertySetTableView, tool.MainWindowWidget)
+    core.connect_to_main_window(
+        tool.PropertySetTableView, tool.MainWindowWidget, tool.Util, tool.ClassPropertyTableView
+    )
     core.define_context_menu(tool.MainWindowWidget, tool.PropertySetTableView)
 
 
