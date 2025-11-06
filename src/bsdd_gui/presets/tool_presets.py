@@ -640,10 +640,18 @@ class DialogTool(FieldTool):
         return widget.bsdd_data
 
     @classmethod
-    def get_widget(cls,data=None):
+    def get_widget(cls, data=None):
+        """
+        if a dialog is open, return its widget
+        otherwise return the widget for the given data object
+        some modules can be run as widget or as dialog this handles those edgecases
+        if the module is only run as a dialog no data object is needed
+        """
+        if data is not None:
+            return super().get_widget(data)
         dialog = cls.get_dialog()
         if not dialog:
-            return None
+            return super().get_widget(data)
         return dialog._widget
 
 
