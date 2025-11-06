@@ -1,12 +1,13 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication,QModelIndex
+from PySide6.QtCore import QCoreApplication, QModelIndex
 from typing import TYPE_CHECKING, Type
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.ids_exporter import ui, model_views,models
+    from bsdd_gui.module.ids_exporter import ui, model_views, models
     from bsdd_json import BsddClass
     from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
+
 
 def connect_to_main_window(
     ids_exporter: Type[tool.IdsExporter],
@@ -28,7 +29,7 @@ def retranslate_ui(ids_exporter: Type[tool.IdsExporter], main_window: Type[tool.
 def connect_signals(widget_tool: Type[tool.IdsExporter], class_tree_tool: Type[tool.IdsClassView]):
     widget_tool.connect_internal_signals()
     class_tree_tool.connect_internal_signals()
-    
+
 
 def create_widget(data, parent, widget_tool: Type[tool.IdsExporter]):
     widget: ui.IdsWidget = widget_tool.show_widget(data, parent)
@@ -39,7 +40,7 @@ def create_dialog(data: object, parent, dialog_tool: Type[tool.IdsExporter]):
     text = QCoreApplication.translate("Preset", "Example Title")
     dialog.setWindowTitle(text)
     widget = dialog_tool.get_widget()
-    model:models.ClassTreeModel = widget.tv_classes.model().sourceModel()
+    model: models.ClassTreeModel = widget.tv_classes.model().sourceModel()
     model.beginResetModel()
     model.bsdd_data = data
     model.endResetModel()
@@ -63,32 +64,57 @@ def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[
     pass
 
 
-def connect_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter],ids_class:Type[tool.IdsClassView]):
+def connect_widget(
+    widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter], ids_class: Type[tool.IdsClassView]
+):
     widget_tool.connect_widget_signals(widget)
     class_view = widget.tv_classes
-    ids_class.connect_settings_signals(widget,class_view)
+    ids_class.connect_settings_signals(widget, class_view)
 
 
-def register_view(view: model_views.ClassView, ids_class_view: Type[tool.IdsClassView]):
+def register_class_view(view: model_views.ClassView, ids_class_view: Type[tool.IdsClassView]):
     ids_class_view.register_view(view)
 
 
-def add_columns_to_view(
+def register_property_view(
+    view: model_views.ClassView, ids_property_view: Type[tool.IdsPropertyView]
+):
+    ids_property_view.register_view(view)
+
+
+def add_columns_to_class_view(
     view: model_views.ClassView,
     ids_class: Type[tool.IdsClassView],
     ids_exporter: Type[tool.IdsExporter],
 ):
-    def set_checkstate(model:CTM,index:QModelIndex,value:bool):
+    def set_checkstate(model: CTM, index: QModelIndex, value: bool):
         bsdd_class = index.internalPointer()
-        ids_class.set_checkstate(bsdd_class,value)
+        ids_class.set_checkstate(bsdd_class, value)
 
     data = ids_exporter.get_data()
     proxy_model, model = ids_class.create_model(data)
     ids_class.add_column_to_table(model, "Name", lambda a: a.Name)
     ids_class.add_column_to_table(model, "Code", lambda a: a.Code)
-    ids_class.add_column_to_table(model, "Export", ids_class.get_checkstate,set_checkstate)
+    ids_class.add_column_to_table(model, "Export", ids_class.get_checkstate, set_checkstate)
     view.setModel(proxy_model)
 
 
-def connect_view(view: model_views.ClassView, ids_class: Type[tool.IdsClassView]):
+def add_columns_to_property_view(
+    view: model_views.PropertyView,
+    ids_property: Type[tool.IdsPropertyView],
+    ids_exporter: Type[tool.IdsExporter],
+):
+    data = ids_exporter.get_data()
+    proxy_model, model = ids_property.create_model(data)
+    ids_property.add_column_to_table(model, "Name", lambda a: a.Name)
+    ids_property.add_column_to_table(model, "Code", lambda a: a.Code)
+    view.setModel(proxy_model)
+
+
+def connect_class_view(view: model_views.ClassView, ids_class: Type[tool.IdsClassView]):
     ids_class.connect_view_signals(view)
+
+def connect_property_view(
+    view: model_views.PropertyView, ids_property: Type[tool.IdsPropertyView]
+):
+    ids_property.connect_view_signals(view)

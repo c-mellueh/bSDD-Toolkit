@@ -10,3 +10,4 @@ class ClassView(QTreeView):
 class PropertyView(QTreeView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        trigger.property_view_created(self)

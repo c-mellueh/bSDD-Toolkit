@@ -9,3 +9,8 @@ class IdsClassViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()
         self.checkstate_dict = {}
+
+class IdsPropertyViewProperties(ViewProperties):
+    def __init__(self):
+        super().__init__()
+        self.checkstate_dict = {}

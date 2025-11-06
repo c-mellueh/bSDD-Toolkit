@@ -17,16 +17,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHeaderView,
     QLabel, QSizePolicy, QSpacerItem, QSplitter,
-    QTreeView, QWidget)
+    QWidget)
 
-from bsdd_gui.module.ids_exporter.model_views import ClassView
+from bsdd_gui.module.ids_exporter.model_views import (ClassView, PropertyView)
 from bsdd_gui.presets.ui_presets import (FileSelector, ToggleSwitch)
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(796, 710)
+        Form.resize(1075, 710)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
         self.splitter = QSplitter(Form)
@@ -40,21 +40,21 @@ class Ui_Form(object):
         self.tv_classes = ClassView(self.splitter)
         self.tv_classes.setObjectName(u"tv_classes")
         self.splitter.addWidget(self.tv_classes)
-        self.tv_properties = QTreeView(self.splitter)
+        self.tv_properties = PropertyView(self.splitter)
         self.tv_properties.setObjectName(u"tv_properties")
         self.splitter.addWidget(self.tv_properties)
-        self.frame = QFrame(self.splitter)
-        self.frame.setObjectName(u"frame")
-        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Shadow.Raised)
-        self.gridLayout_2 = QGridLayout(self.frame)
+        self.fr_settings = QFrame(self.splitter)
+        self.fr_settings.setObjectName(u"fr_settings")
+        self.fr_settings.setFrameShape(QFrame.Shape.StyledPanel)
+        self.fr_settings.setFrameShadow(QFrame.Shadow.Raised)
+        self.gridLayout_2 = QGridLayout(self.fr_settings)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.cb_inherit = ToggleSwitch(self.frame)
+        self.cb_inherit = ToggleSwitch(self.fr_settings)
         self.cb_inherit.setObjectName(u"cb_inherit")
 
         self.gridLayout_2.addWidget(self.cb_inherit, 0, 1, 1, 1)
 
-        self.label = QLabel(self.frame)
+        self.label = QLabel(self.fr_settings)
         self.label.setObjectName(u"label")
 
         self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
@@ -63,7 +63,7 @@ class Ui_Form(object):
 
         self.gridLayout_2.addItem(self.verticalSpacer, 1, 0, 1, 1)
 
-        self.splitter.addWidget(self.frame)
+        self.splitter.addWidget(self.fr_settings)
 
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
 

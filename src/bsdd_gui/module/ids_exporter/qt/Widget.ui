@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>796</width>
+    <width>1075</width>
     <height>710</height>
    </rect>
   </property>
@@ -26,8 +26,8 @@
       <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <widget class="ClassView" name="tv_classes"/>
-     <widget class="QTreeView" name="tv_properties"/>
-     <widget class="QFrame" name="frame">
+     <widget class="PropertyView" name="tv_properties"/>
+     <widget class="QFrame" name="fr_settings">
       <property name="frameShape">
        <enum>QFrame::Shape::StyledPanel</enum>
       </property>
@@ -83,6 +83,11 @@
    <class>ToggleSwitch</class>
    <extends>QAbstractButton</extends>
    <header>bsdd_gui.presets.ui_presets</header>
+  </customwidget>
+  <customwidget>
+   <class>PropertyView</class>
+   <extends>QTreeView</extends>
+   <header>bsdd_gui.module.ids_exporter.model_views</header>
   </customwidget>
  </customwidgets>
  <resources/>

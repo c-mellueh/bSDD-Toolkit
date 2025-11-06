@@ -1,4 +1,5 @@
 from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
+from bsdd_gui.presets.models_presets import ItemModel
 from bsdd_gui.module.class_tree_view.models import SortModel as SM
 from bsdd_gui import tool
 from PySide6.QtCore import QModelIndex,Qt
@@ -84,5 +85,9 @@ class ClassTreeModel(CTM):
             self._emit_row_changed(index)
             self._refresh_boolean_descendants(index)
             return True
+
+class PropertyTreeModel(ItemModel):
+    pass
+
 class SortModel(SM):
     pass

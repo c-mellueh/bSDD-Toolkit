@@ -195,3 +195,21 @@ class IdsClassView(ItemViewTool):
     @classmethod
     def set_checkstate(cls, bsdd_class: BsddClass, state: bool):
         cls.get_properties().checkstate_dict[bsdd_class.Code] = state
+
+class IdsPropertyView(ItemViewTool):
+
+    @classmethod
+    def get_properties(cls) -> IdsClassViewProperties:
+        return bsdd_gui.IdsClassViewProperties  #
+
+    @classmethod
+    def _get_model_class(cls):
+        return models.PropertyTreeModel
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def _get_proxy_model_class(cls):
+        return models.SortModel
