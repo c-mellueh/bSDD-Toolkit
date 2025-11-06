@@ -646,6 +646,7 @@ class DialogTool(FieldTool):
         otherwise return the widget for the given data object
         some modules can be run as widget or as dialog this handles those edgecases
         if the module is only run as a dialog no data object is needed
+
         """
         if data is not None:
             return super().get_widget(data)

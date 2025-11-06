@@ -8,6 +8,10 @@ class ClassTreeModel(CTM):
         super().__init__(data, tool.IdsClassView, *args, **kwargs)
         self.is_check_inerheritance_enabled = False
 
+    def set_checkstate_inheritance(self, value: bool) -> None:
+        self.is_check_inerheritance_enabled = value
+        self._refresh_boolean_descendants(QModelIndex())
+
     def _are_boolean_parents_enabled(self, index: QModelIndex) -> bool:
         """Return True when all boolean ancestors of *index* are enabled/checked."""
         column = index.column()

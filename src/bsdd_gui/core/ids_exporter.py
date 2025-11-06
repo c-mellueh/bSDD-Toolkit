@@ -28,7 +28,7 @@ def retranslate_ui(ids_exporter: Type[tool.IdsExporter], main_window: Type[tool.
 def connect_signals(widget_tool: Type[tool.IdsExporter], class_tree_tool: Type[tool.IdsClassView]):
     widget_tool.connect_internal_signals()
     class_tree_tool.connect_internal_signals()
-
+    
 
 def create_widget(data, parent, widget_tool: Type[tool.IdsExporter]):
     widget: ui.IdsWidget = widget_tool.show_widget(data, parent)
@@ -63,8 +63,10 @@ def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[
     pass
 
 
-def connect_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
+def connect_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter],ids_class:Type[tool.IdsClassView]):
     widget_tool.connect_widget_signals(widget)
+    class_view = widget.tv_classes
+    ids_class.connect_settings_signals(widget,class_view)
 
 
 def register_view(view: model_views.ClassView, ids_class_view: Type[tool.IdsClassView]):

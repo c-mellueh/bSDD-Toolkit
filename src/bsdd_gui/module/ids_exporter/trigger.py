@@ -31,7 +31,7 @@ def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
     core.register_fields(widget, tool.IdsExporter)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
-    core.connect_widget(widget, tool.IdsExporter)
+    core.connect_widget(widget, tool.IdsExporter,tool.IdsClassView)
 
 
 def class_view_created(view: model_views.ClassView):

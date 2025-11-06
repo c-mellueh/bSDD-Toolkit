@@ -11,7 +11,7 @@ from ifctester.ids import Specification
 from bsdd_gui.presets.signal_presets import DialogSignals
 from bsdd_gui.presets.tool_presets import ActionTool, DialogTool, ItemViewTool
 from bsdd_json.utils import property_utils as prop_utils
-from bsdd_gui.module.ids_exporter import ui, models
+from bsdd_gui.module.ids_exporter import ui, models, model_views
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter.prop import IdsExporterProperties, IdsClassViewProperties
@@ -182,9 +182,16 @@ class IdsClassView(ItemViewTool):
         return models.SortModel
 
     @classmethod
-    def get_checkstate(cls,bsdd_class:BsddClass):
+    def connect_settings_signals(cls, widget: ui.IdsWidget, view: model_views.ClassView):
+        class_model = view.model().sourceModel()
+        widget.cb_inherit.toggled.connect(
+            lambda checked: class_model.set_checkstate_inheritance(checked)         )
+        return super().connect_view_signals(view)
+
+    @classmethod
+    def get_checkstate(cls, bsdd_class: BsddClass):
         return cls.get_properties().checkstate_dict.get(bsdd_class.Code, True)
 
     @classmethod
-    def set_checkstate(cls,bsdd_class:BsddClass, state:bool):
+    def set_checkstate(cls, bsdd_class: BsddClass, state: bool):
         cls.get_properties().checkstate_dict[bsdd_class.Code] = state
