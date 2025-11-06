@@ -1,11 +1,12 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication,QModelIndex
 from typing import TYPE_CHECKING, Type
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.ids_exporter import ui, model_views,models
-
+    from bsdd_json import BsddClass
+    from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
 
 def connect_to_main_window(
     ids_exporter: Type[tool.IdsExporter],
@@ -75,11 +76,15 @@ def add_columns_to_view(
     ids_class: Type[tool.IdsClassView],
     ids_exporter: Type[tool.IdsExporter],
 ):
+    def set_checkstate(model:CTM,index:QModelIndex,value:bool):
+        bsdd_class = index.internalPointer()
+        ids_class.set_checkstate(bsdd_class,value)
+
     data = ids_exporter.get_data()
     proxy_model, model = ids_class.create_model(data)
     ids_class.add_column_to_table(model, "Name", lambda a: a.Name)
     ids_class.add_column_to_table(model, "Code", lambda a: a.Code)
-    ids_class.add_column_to_table(model, "Status", lambda a: a.Status)
+    ids_class.add_column_to_table(model, "Export", ids_class.get_checkstate,set_checkstate)
     view.setModel(proxy_model)
 
 

@@ -66,8 +66,8 @@ class ClassTreeModel(ItemModel):
             return self.createIndex(row, column, children[row])
         return QModelIndex()
 
-    def setData(self, index, value, /, role=...):
-        return False
+#    def setData(self, index, value, /, role=...):
+#        return False
 
     def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():

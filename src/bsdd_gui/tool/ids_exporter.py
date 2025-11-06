@@ -180,3 +180,11 @@ class IdsClassView(ItemViewTool):
     @classmethod
     def _get_proxy_model_class(cls):
         return models.SortModel
+
+    @classmethod
+    def get_checkstate(cls,bsdd_class:BsddClass):
+        return cls.get_properties().checkstate_dict.get(bsdd_class.Code, True)
+
+    @classmethod
+    def set_checkstate(cls,bsdd_class:BsddClass, state:bool):
+        cls.get_properties().checkstate_dict[bsdd_class.Code] = state

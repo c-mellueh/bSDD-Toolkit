@@ -8,3 +8,4 @@ class IdsExporterProperties(ActionsProperties,DialogProperties):
 class IdsClassViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()
+        self.checkstate_dict = {}

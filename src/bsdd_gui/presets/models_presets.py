@@ -32,21 +32,43 @@ class ItemModel(QAbstractItemModel):
         if not index.isValid():
             return None
 
-        if role not in [Qt.ItemDataRole.DisplayRole,Qt.ItemDataRole.EditRole]:
-            return None
         getter_func = self.tool.value_getter_functions(self)[index.column()]
-        return getter_func(index.internalPointer())
+        value = getter_func(index.internalPointer())
+
+        if isinstance(value, bool):
+            if role == Qt.ItemDataRole.CheckStateRole:
+                return Qt.CheckState.Checked if value else Qt.CheckState.Unchecked
+            if role == Qt.ItemDataRole.EditRole:
+                return value
+            if role == Qt.ItemDataRole.DisplayRole:
+                return None
+            return None
+
+        if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
+            return value
+
+        return None
 
     def setData(self, index, value, /, role=...):
         if not index.isValid():
             return False
+
+        setter_func = self.tool.value_setter_functions(self)[index.column()]
+        if setter_func is None:
+            return False
+
+        if role == Qt.ItemDataRole.CheckStateRole:
+            # CheckStateRole passes an enum/int; convert to bool for the setter.
+            new_value = value == Qt.CheckState.Checked
+            setter_func(self, index, new_value)
+            self.dataChanged.emit(index, index, [Qt.DisplayRole, Qt.EditRole, Qt.CheckStateRole])
+            return True
+
         if role == Qt.ItemDataRole.EditRole:
-            setter_func = self.tool.value_setter_functions(self)[index.column()]
-            if setter_func is None:
-                return False
             setter_func(self, index, value)
             self.dataChanged.emit(index, index, [Qt.DisplayRole, Qt.EditRole])
             return True
+
         return False
 
     def headerData(self, section, orientation, /, role=...):
@@ -66,7 +88,16 @@ class ItemModel(QAbstractItemModel):
         base = super().flags(index)
         if not index.isValid():
             return base
-        return base | Qt.ItemIsSelectable | Qt.ItemIsEnabled
+
+        base |= Qt.ItemIsSelectable | Qt.ItemIsEnabled
+
+        getter_func = self.tool.value_getter_functions(self)[index.column()]
+        value = getter_func(index.internalPointer())
+        if isinstance(value, bool):
+            base |= Qt.ItemIsUserCheckable
+            base &= ~Qt.ItemIsEditable
+
+        return base
 
     def get_row_for_data(self, data, parent=None):
         parent = QModelIndex() if parent is None else parent
