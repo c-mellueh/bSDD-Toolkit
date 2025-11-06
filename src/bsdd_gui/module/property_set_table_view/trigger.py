@@ -14,7 +14,9 @@ def connect():
     core.connect_to_main_window(
         tool.PropertySetTableView, tool.MainWindowWidget, tool.Util, tool.ClassPropertyTableView
     )
-    core.define_context_menu(tool.MainWindowWidget, tool.PropertySetTableView)
+    core.define_context_menu(
+        tool.MainWindowWidget, tool.PropertySetTableView, tool.Util, tool.ClassPropertyTableView
+    )
 
 
 def retranslate_ui():
@@ -31,7 +33,6 @@ def view_created(view: ui.PsetTableView):
     core.add_columns_to_view(
         view, tool.PropertySetTableView, tool.Project, tool.MainWindowWidget, tool.Util
     )
-    core.add_context_menu_to_view(view, tool.PropertySetTableView)
     core.connect_view(view, tool.PropertySetTableView, tool.Project, tool.MainWindowWidget)
 
 

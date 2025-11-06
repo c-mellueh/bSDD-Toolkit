@@ -181,13 +181,6 @@ def paste_property_sets_from_clipboard(
         property_set_table.select_row(view, row_index)
 
 
-def add_context_menu_to_view(
-    view: ui.PsetTableView, property_set_table: Type[tool.PropertySetTableView]
-):
-    # TODO
-    pass
-
-
 def connect_view(
     view: ui.PsetTableView,
     property_set_table: Type[tool.PropertySetTableView],
@@ -260,11 +253,32 @@ def create_new_property_set(
 
 
 def define_context_menu(
-    main_window: Type[tool.MainWindowWidget], property_set_table: Type[tool.PropertySetTableView]
+    main_window: Type[tool.MainWindowWidget],
+    property_set_table: Type[tool.PropertySetTableView],
+    util: Type[tool.Util],
+    property_table: Type[tool.ClassPropertyTableView],
 ):
 
     view = main_window.get_pset_view()
     property_set_table.clear_context_menu_list(view)
+    property_set_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("PropertySet", "Copy"),
+        lambda: copy_property_sets_to_clipboard(view, property_set_table, main_window),
+        True,
+        True,
+        True,
+    )
+    property_set_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("PropertySet", "Paste"),
+        lambda: paste_property_sets_from_clipboard(
+            view, property_set_table, property_table, main_window, util
+        ),
+        False,
+        True,
+        True,
+    )
     property_set_table.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("PropertySet", "Delete"),
