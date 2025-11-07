@@ -87,7 +87,16 @@ class ClassTreeModel(CTM):
             return True
 
 class PropertyTreeModel(ItemModel):
-    pass
+    def __init__(self, data, *args, **kwargs):
+        """
+        self.bsdd_data is the active bsdd_class
+        """
+        super().__init__(data, tool.IdsPropertyView, *args, **kwargs)
+    
+    def hasChildren(self, /, parent = ...):
+        if parent.isValid():
+            return False
+        return super().hasChildren(parent)
 
 class SortModel(SM):
     pass
