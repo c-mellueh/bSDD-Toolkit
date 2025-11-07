@@ -40,7 +40,7 @@ def register_widget(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorW
 
     ct_combobox_items = ["Class", "Material", "GroupOfProperties", "AlternativeUse"]
     widget.cb_class_type.addItems(ct_combobox_items)
-    st_combobox_items = ["Preview", "Active", "Inactive"]
+    st_combobox_items = ["Active", "Inactive"]
     widget.cb_status.addItems(st_combobox_items)
 
 

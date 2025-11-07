@@ -330,7 +330,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
             if not bsdd_class.Code in internal_nodes:
                 new_node = cls.add_node(scene, bsdd_class, pos=cur, is_external=False)
                 new_nodes.append(new_node)
-            ifc_entities = bsdd_class.RelatedIfcEntityNamesList
+            ifc_entities = bsdd_class.RelatedIfcEntityNamesList or []
             for e in ifc_entities:
                 new_node = cls.add_ifc_node(e, cur, ifc_classes, external_nodes)
                 if new_node:
@@ -479,7 +479,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
             if start_node.node_type != constants.CLASS_NODE_TYPE or start_node.is_external:
                 continue
             start_class = start_node.bsdd_data
-            for ifc_name in start_class.RelatedIfcEntityNamesList:
+            for ifc_name in start_class.RelatedIfcEntityNamesList or []:
                 ifc_uri = ifc_dict.get(ifc_name).get("uri")
                 related_node = full_ifc_uris.get(ifc_uri)
                 if not related_node:
