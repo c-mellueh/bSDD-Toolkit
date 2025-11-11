@@ -161,9 +161,9 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
                 cls.update_owned_uri_visibility(widget, bsdd_dictionary)
         if field_name in ["DictionaryVersion", "OrganizationCode", "DictionaryCode"]:
             for cl in bsdd_dictionary.Classes:
-                cl_utils.update_relations_to_new_uri(cl, bsdd_dictionary)
+                cl_utils.update_internal_relations_to_new_version(cl, bsdd_dictionary)
             for prop in bsdd_dictionary.Properties:
-                prop_utils.update_relations_to_new_uri(prop, bsdd_dictionary)
+                prop_utils.update_internal_relations_to_new_version(prop, bsdd_dictionary)
 
     @classmethod
     def update_all_completers(cls, bsdd_dictionary: BsddDictionary):

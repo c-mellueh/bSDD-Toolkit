@@ -265,7 +265,7 @@ CLASS_TYPE = Literal[
 ]
 
 STATUS = Literal["Preview", "Active", "Inactive"]
-CLASS_STATUS = Literal["Active", "Inactive"]
+CLASS_STATUS = Literal["Active", "Inactive","Preview"]
 PROPERTY_STATUS = Literal["Active", "Inactive"]
 
 # Pydantic-validated DateTime adhering to bSDD import rules

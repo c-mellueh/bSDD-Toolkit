@@ -45,7 +45,6 @@ class Cache:
         cls.data = dict()
 
 
-
 def get_root_classes(bsdd_dictionary: BsddDictionary):
     if bsdd_dictionary is None:
         return []
@@ -173,12 +172,20 @@ def shared_parent(
     return get_class_by_code(dictionary, code)
 
 
-def update_relations_to_new_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
+def update_internal_relations_to_new_version(
+    bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary
+):
+    """
+    If the Version of the given dictionary has changed, update all internal
+    class relations of the given class to point to the new version URIs.
+    """
     namespace = f"{bsdd_dictionary.OrganizationCode}/{bsdd_dictionary.DictionaryCode}"
     version = bsdd_dictionary.DictionaryVersion
     for relationship in bsdd_class.ClassRelations:
         old_uri = dict_utils.parse_bsdd_url(relationship.RelatedClassUri)
-        new_uri = dict(old_uri)
+        if old_uri["namespace"] != namespace: #skip external relations
+            continue
+        new_uri = dict(old_uri) #copy
         new_uri["namespace"] = namespace
         new_uri["version"] = version
         if old_uri != new_uri:
@@ -201,7 +208,11 @@ def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
 def get_class_relation(
     start_class: BsddClass, end_class: BsddClass, relation_type: str
 ) -> BsddClassRelation | None:
-    end_uri = end_class.OwnedUri if not end_class.parent() else build_bsdd_uri(end_class, end_class._parent_ref())
+    end_uri = (
+        end_class.OwnedUri
+        if not end_class.parent()
+        else build_bsdd_uri(end_class, end_class._parent_ref())
+    )
     for relation in start_class.ClassRelations:
         if (
             relation.RelatedClassUri == end_uri

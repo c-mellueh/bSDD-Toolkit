@@ -1,11 +1,18 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from bsdd_json import BsddClassProperty, BsddProperty, BsddDictionary, BsddClass,BsddPropertyRelation
+from bsdd_json import (
+    BsddClassProperty,
+    BsddProperty,
+    BsddDictionary,
+    BsddClass,
+    BsddPropertyRelation,
+)
 import bsdd
 from bsdd import Client
 from . import dictionary_utils as dict_utils
 from . import build_unique_code
+
 
 class Cache:
     data = {}
@@ -49,7 +56,6 @@ def get_data_type(class_property: BsddClassProperty):
     if not prop:
         return None
     return prop.DataType
-    
 
 
 def is_external_ref(class_property: BsddClassProperty) -> bool:
@@ -145,15 +151,20 @@ def get_property_by_code(
     return prop
 
 
-def update_relations_to_new_uri(
+def update_internal_relations_to_new_version(
     bsdd_proeprty: BsddProperty, bsdd_dictionary: BsddDictionary
 ):
+    """
+    If the Version of the given dictionary has changed, update all internal
+    Property relations of the given property to point to the new version URIs.
+    """
     namespace = f"{bsdd_dictionary.OrganizationCode}/{bsdd_dictionary.DictionaryCode}"
     version = bsdd_dictionary.DictionaryVersion
-
     for relationship in bsdd_proeprty.PropertyRelations:
         old_uri = dict_utils.parse_bsdd_url(relationship.RelatedPropertyUri)
-        new_uri = dict(old_uri)
+        if old_uri["namespace"] != namespace: #skip external relations
+            continue
+        new_uri = dict(old_uri) #copy
         new_uri["namespace"] = namespace
         new_uri["version"] = version
         if old_uri != new_uri:
@@ -206,9 +217,10 @@ def create_class_property_from_internal_property(
     new_property.AllowedValues = bsdd_property.AllowedValues
     return new_property
 
+
 def get_property_relation(
     start_property: BsddProperty, end_property: BsddProperty, relation_type: str
-) -> BsddPropertyRelation |None:
+) -> BsddPropertyRelation | None:
     end_uri = build_bsdd_uri(end_property, end_property._parent_ref())
     for relation in start_property.PropertyRelations:
         if (
@@ -218,10 +230,17 @@ def get_property_relation(
             return relation
     return None
 
-def delete_property(bsdd_property:BsddProperty,bsdd_dictionary:BsddDictionary = None):
-    bsdd_dictionary = bsdd_property._parent_ref() if not bsdd_dictionary else bsdd_dictionary
+
+def delete_property(
+    bsdd_property: BsddProperty, bsdd_dictionary: BsddDictionary = None
+):
+    bsdd_dictionary = (
+        bsdd_property._parent_ref() if not bsdd_dictionary else bsdd_dictionary
+    )
     removed_class_properties = list()
-    for bsdd_class in get_classes_with_bsdd_property(bsdd_property.Code,bsdd_dictionary):
+    for bsdd_class in get_classes_with_bsdd_property(
+        bsdd_property.Code, bsdd_dictionary
+    ):
         for bsdd_class_property in list(bsdd_class.ClassProperties):
             if bsdd_class_property.PropertyCode == bsdd_property.Code:
                 bsdd_class.ClassProperties.remove(bsdd_class_property)
@@ -229,7 +248,8 @@ def delete_property(bsdd_property:BsddProperty,bsdd_dictionary:BsddDictionary = 
     bsdd_dictionary.Properties.remove(bsdd_property)
     return removed_class_properties
 
-def get_name(class_property:BsddClassProperty):
+
+def get_name(class_property: BsddClassProperty):
     if not is_external_ref(class_property):
         prop = get_internal_property(class_property)
     else:
@@ -237,4 +257,3 @@ def get_name(class_property:BsddClassProperty):
     if not prop:
         return None
     return prop.Name
-    
