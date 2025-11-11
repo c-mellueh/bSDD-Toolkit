@@ -115,6 +115,15 @@ def connect_class_view(view: model_views.ClassView, ids_class: Type[tool.IdsClas
     ids_class.connect_view_signals(view)
 
 def connect_property_view(
-    view: model_views.PropertyView, ids_property: Type[tool.IdsPropertyView]
+    view: model_views.PropertyView, ids_property: Type[tool.IdsPropertyView],ids_class:Type[tool.IdsClassView]
 ):
     ids_property.connect_view_signals(view)
+    
+    def update_property_view(class_view,data:BsddClass):
+        proxy_model:models.SortModel = view.model()
+        model = proxy_model.sourceModel()
+        model.beginResetModel()
+        model.bsdd_data = data
+        model.endResetModel()
+    
+    ids_class.signals.selection_changed.connect(update_property_view)

@@ -213,3 +213,4 @@ class IdsPropertyView(ItemViewTool):
     @classmethod
     def _get_proxy_model_class(cls):
         return models.SortModel
+    

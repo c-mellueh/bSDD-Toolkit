@@ -49,7 +49,7 @@ def property_view_created(view: model_views.PropertyView):
     core.register_property_view(view, tool.IdsClassView)
     core.add_columns_to_property_view(view, tool.IdsClassView, tool.IdsExporter)
     # core.add_context_menu_to_view(view, tool.IdsClassView, tool.ClassEditorWidget)
-    core.connect_property_view(view, tool.IdsClassView)
+    core.connect_property_view(view, tool.IdsClassView,tool.IdsClassView)
 
 
 def context_menu_requested(view: model_views.ClassView, pos: QPoint):

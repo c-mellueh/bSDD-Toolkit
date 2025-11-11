@@ -261,3 +261,7 @@ def get_property_by_class_property(
         return get_internal_property(class_prop)
     else:
         return get_external_property(class_prop)
+
+
+def get_class_properties_by_pset_name(bsdd_class: BsddClass, pset_name: str):
+    return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]

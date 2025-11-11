@@ -2,7 +2,10 @@ from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
 from bsdd_gui.presets.models_presets import ItemModel
 from bsdd_gui.module.class_tree_view.models import SortModel as SM
 from bsdd_gui import tool
-from PySide6.QtCore import QModelIndex,Qt
+from PySide6.QtCore import QModelIndex, Qt
+from bsdd_json import BsddClass, BsddClassProperty
+from bsdd_json.utils import property_utils as prop_utils
+
 
 class ClassTreeModel(CTM):
     def __init__(self, data, *args, **kwargs):
@@ -27,7 +30,6 @@ class ClassTreeModel(CTM):
                 return False
             parent = parent.parent()
         return True
-
 
     def _refresh_boolean_descendants(self, index: QModelIndex) -> None:
         """Emit dataChanged for boolean descendants so views refresh their flags."""
@@ -62,7 +64,7 @@ class ClassTreeModel(CTM):
         last = index.siblingAtColumn(column_count - 1)
         self.dataChanged.emit(first, last, [])
 
-    def flags(self,index:QModelIndex):
+    def flags(self, index: QModelIndex):
         base = super().flags(index)
         getter_func = self.tool.value_getter_functions(self)[index.column()]
         value = getter_func(index.internalPointer())
@@ -76,7 +78,6 @@ class ClassTreeModel(CTM):
                 base &= ~Qt.ItemFlag.ItemIsUserCheckable
         return base
 
-
     def setData(self, index, value, /, role=...):
         val = super().setData(index, value, role)
         if not val:
@@ -86,17 +87,63 @@ class ClassTreeModel(CTM):
             self._refresh_boolean_descendants(index)
             return True
 
+
 class PropertyTreeModel(ItemModel):
     def __init__(self, data, *args, **kwargs):
         """
         self.bsdd_data is the active bsdd_class
         """
         super().__init__(data, tool.IdsPropertyView, *args, **kwargs)
-    
-    def hasChildren(self, /, parent = ...):
-        if parent.isValid():
+        self.bsdd_data: BsddClass = None
+
+    def hasChildren(self, parent=QModelIndex()):
+        print("HASCHILDren")
+        if parent.isValid() and parent.column() != 0:
             return False
         return super().hasChildren(parent)
+
+    def rowCount(self, /, parent=...):
+        print("ROwCOunt")
+        from bsdd_gui import tool
+        if not self.bsdd_data:
+            return 0
+        if not parent.isValid():
+            return len(tool.PropertySetTableView.get_pset_names_with_temporary(self.bsdd_data))
+        else:
+            pset_name = parent.internalPointer()
+            c_properties = prop_utils.get_class_properties_by_pset_name(self.bsdd_data, pset_name)
+            return len(c_properties)
+
+    def index(self, row: int, column: int, parent=QModelIndex()):
+        print("index")
+        if not parent.isValid():
+            psets = tool.PropertySetTableView.get_pset_names_with_temporary(self.bsdd_data)
+            if 0 > row >= len(psets):
+                return QModelIndex()
+            return self.createIndex(row, column, psets[row])
+        else:
+            pset_name = parent.internalPointer()
+            c_properties = prop_utils.get_class_properties_by_pset_name(self.bsdd_data, pset_name)
+            if 0 > row >= len(c_properties):
+                return QModelIndex()
+            return self.createIndex(row, column, c_properties[row])
+
+    def parent(self, index: QModelIndex):
+        print("PARENT")
+        if not index.isValid():
+            return QModelIndex()
+        val = index.internalPointer()
+        if isinstance(val, str):
+            return QModelIndex()
+        else:
+            val: BsddClassProperty
+            pset_name = val.PropertySet
+            psets = tool.PropertySetTableView.get_pset_names_with_temporary(self.bsdd_data)
+            if pset_name in psets:
+                row = psets.index(pset_name)
+                return self.createIndex(row, 0, pset_name)
+            return QModelIndex()
+        
 
 class SortModel(SM):
     pass
