@@ -1,11 +1,12 @@
 from __future__ import annotations
 from PySide6.QtCore import QCoreApplication, QModelIndex
 from typing import TYPE_CHECKING, Type
+from bsdd_json.utils import property_utils as prop_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.ids_exporter import ui, model_views, models
-    from bsdd_json import BsddClass
+    from bsdd_json import BsddClass, BsddClassProperty
     from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
 
 
@@ -26,9 +27,14 @@ def retranslate_ui(ids_exporter: Type[tool.IdsExporter], main_window: Type[tool.
     action.setText(QCoreApplication.translate("GraphView", "Graph View"))
 
 
-def connect_signals(widget_tool: Type[tool.IdsExporter], class_tree_tool: Type[tool.IdsClassView]):
+def connect_signals(
+    widget_tool: Type[tool.IdsExporter],
+    ids_class: Type[tool.IdsClassView],
+    ids_property: Type[tool.IdsPropertyView],
+):
     widget_tool.connect_internal_signals()
-    class_tree_tool.connect_internal_signals()
+    ids_class.connect_internal_signals()
+    ids_property.connect_internal_signals()
 
 
 def create_widget(data, parent, widget_tool: Type[tool.IdsExporter]):
@@ -77,7 +83,7 @@ def register_class_view(view: model_views.ClassView, ids_class_view: Type[tool.I
 
 
 def register_property_view(
-    view: model_views.ClassView, ids_property_view: Type[tool.IdsPropertyView]
+    view: model_views.PropertyView, ids_property_view: Type[tool.IdsPropertyView]
 ):
     ids_property_view.register_view(view)
 
@@ -106,7 +112,7 @@ def add_columns_to_property_view(
 ):
     data = ids_exporter.get_data()
     proxy_model, model = ids_property.create_model(data)
-    ids_property.add_column_to_table(model, "Name", lambda a: a.Name)
+    ids_property.add_column_to_table(model, "Name", prop_utils.get_name)
     ids_property.add_column_to_table(model, "Code", lambda a: a.Code)
     view.setModel(proxy_model)
 
@@ -114,16 +120,19 @@ def add_columns_to_property_view(
 def connect_class_view(view: model_views.ClassView, ids_class: Type[tool.IdsClassView]):
     ids_class.connect_view_signals(view)
 
+
 def connect_property_view(
-    view: model_views.PropertyView, ids_property: Type[tool.IdsPropertyView],ids_class:Type[tool.IdsClassView]
+    view: model_views.PropertyView,
+    ids_property: Type[tool.IdsPropertyView],
+    ids_class: Type[tool.IdsClassView],
 ):
-    ids_property.connect_view_signals(view)
-    
-    def update_property_view(class_view,data:BsddClass):
-        proxy_model:models.SortModel = view.model()
+
+    def update_property_view(class_view, data: BsddClass):
+        proxy_model: models.SortModel = view.model()
         model = proxy_model.sourceModel()
         model.beginResetModel()
         model.bsdd_data = data
         model.endResetModel()
-    
+
     ids_class.signals.selection_changed.connect(update_property_view)
+    ids_property.connect_view_signals(view)

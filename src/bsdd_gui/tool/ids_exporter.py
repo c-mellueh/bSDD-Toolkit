@@ -8,7 +8,7 @@ from ifctester.facet import Entity as EntityFacet
 
 from ifctester.facet import Restriction
 from ifctester.ids import Specification
-from bsdd_gui.presets.signal_presets import DialogSignals
+from bsdd_gui.presets.signal_presets import DialogSignals, ViewSignals
 from bsdd_gui.presets.tool_presets import ActionTool, DialogTool, ItemViewTool
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import ui, models, model_views
@@ -20,12 +20,12 @@ import ifctester
 import os
 
 
-class Signals(DialogSignals):
+class IdsSignals(DialogSignals):
     pass
 
 
 class IdsExporter(ActionTool, DialogTool):
-    signals = Signals()
+    signals = IdsSignals()
 
     @classmethod
     def get_properties(cls) -> IdsExporterProperties:
@@ -163,7 +163,12 @@ class IdsExporter(ActionTool, DialogTool):
         return super().get_widget()
 
 
+class ClassSignals(ViewSignals):
+    pass
+
+
 class IdsClassView(ItemViewTool):
+    signals = ClassSignals()
 
     @classmethod
     def get_properties(cls) -> IdsClassViewProperties:
@@ -185,7 +190,8 @@ class IdsClassView(ItemViewTool):
     def connect_settings_signals(cls, widget: ui.IdsWidget, view: model_views.ClassView):
         class_model = view.model().sourceModel()
         widget.cb_inherit.toggled.connect(
-            lambda checked: class_model.set_checkstate_inheritance(checked)         )
+            lambda checked: class_model.set_checkstate_inheritance(checked)
+        )
         return super().connect_view_signals(view)
 
     @classmethod
@@ -196,7 +202,13 @@ class IdsClassView(ItemViewTool):
     def set_checkstate(cls, bsdd_class: BsddClass, state: bool):
         cls.get_properties().checkstate_dict[bsdd_class.Code] = state
 
+
+class PropertySignals(ViewSignals):
+    pass
+
+
 class IdsPropertyView(ItemViewTool):
+    signals = PropertySignals()
 
     @classmethod
     def get_properties(cls) -> IdsClassViewProperties:
@@ -213,4 +225,3 @@ class IdsPropertyView(ItemViewTool):
     @classmethod
     def _get_proxy_model_class(cls):
         return models.SortModel
-    

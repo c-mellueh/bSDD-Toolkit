@@ -93,17 +93,15 @@ class PropertyTreeModel(ItemModel):
         """
         self.bsdd_data is the active bsdd_class
         """
-        super().__init__(data, tool.IdsPropertyView, *args, **kwargs)
+        super().__init__(tool.IdsPropertyView,data,  *args, **kwargs)
         self.bsdd_data: BsddClass = None
 
     def hasChildren(self, parent=QModelIndex()):
-        print("HASCHILDren")
         if parent.isValid() and parent.column() != 0:
             return False
         return super().hasChildren(parent)
 
     def rowCount(self, /, parent=...):
-        print("ROwCOunt")
         from bsdd_gui import tool
         if not self.bsdd_data:
             return 0
@@ -115,21 +113,19 @@ class PropertyTreeModel(ItemModel):
             return len(c_properties)
 
     def index(self, row: int, column: int, parent=QModelIndex()):
-        print("index")
         if not parent.isValid():
             psets = tool.PropertySetTableView.get_pset_names_with_temporary(self.bsdd_data)
-            if 0 > row >= len(psets):
+            if row < 0 or row >= len(psets):
                 return QModelIndex()
             return self.createIndex(row, column, psets[row])
         else:
             pset_name = parent.internalPointer()
             c_properties = prop_utils.get_class_properties_by_pset_name(self.bsdd_data, pset_name)
-            if 0 > row >= len(c_properties):
+            if row < 0 or row >= len(c_properties):
                 return QModelIndex()
             return self.createIndex(row, column, c_properties[row])
 
     def parent(self, index: QModelIndex):
-        print("PARENT")
         if not index.isValid():
             return QModelIndex()
         val = index.internalPointer()
@@ -143,7 +139,24 @@ class PropertyTreeModel(ItemModel):
                 row = psets.index(pset_name)
                 return self.createIndex(row, 0, pset_name)
             return QModelIndex()
-        
+    
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        if not index.isValid():
+            return None
+        val = index.internalPointer()
+        if isinstance(val, str):
+            if role == Qt.ItemDataRole.DisplayRole and index.column() == 0:
+                return val
+            return None
+        else:
+            return super().data(index, role)
+
+    def headerData(self, section, orientation, /, role=...):
+        if role != Qt.ItemDataRole.DisplayRole:
+            return None
+        if orientation == Qt.Orientation.Vertical:
+            return None
+        return self.tool.get_column_names(self)[section]
 
 class SortModel(SM):
     pass
