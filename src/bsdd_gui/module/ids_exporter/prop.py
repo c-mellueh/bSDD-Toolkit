@@ -5,7 +5,7 @@ from bsdd_gui.presets.prop_presets import ActionsProperties, DialogProperties, V
 class IdsExporterProperties(ActionsProperties, DialogProperties):
     def __init__(self):
         super().__init__()
-
+        self.property_count = dict()
 
 class IdsClassViewProperties(ViewProperties):
     def __init__(self):

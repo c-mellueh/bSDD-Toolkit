@@ -184,14 +184,27 @@ class IdsExporter(ActionTool, DialogTool):
         widget.cb_pset.setVisible(state)
 
     @classmethod
-    def fill_pset_combobox(cls, widget: ui.IdsWidget):
-        pset_names = dict()
-        for bsdd_class in widget.bsdd_data.Classes:
+    def count_properties(cls, bsdd_dictionary: BsddDictionary):
+        count_dict = dict()
+        for bsdd_class in bsdd_dictionary.Classes:
+            existing_psets = list()
             for class_prop in bsdd_class.ClassProperties:
                 pset_name = class_prop.PropertySet
-                if pset_name not in pset_names:
-                    pset_names[pset_name] = 0
-                pset_names[pset_name] += 1
+                prop_name = prop_utils.get_name(class_prop)
+                if pset_name not in count_dict:
+                    count_dict[pset_name] = {"properties": {}, "count": 0}
+                if pset_name not in existing_psets:
+                    count_dict[pset_name]["count"] += 1
+                    existing_psets.append(pset_name)
+                if prop_name not in count_dict[pset_name]["properties"]:
+                    count_dict[pset_name]["properties"][prop_name] = 0
+                count_dict[pset_name]["properties"][prop_name] += 1
+        cls.get_properties().property_count = count_dict
+
+    @classmethod
+    def fill_pset_combobox(cls, widget: ui.IdsWidget):
+        count_dict = cls.get_properties().property_count
+        pset_names = {pset: data["count"] for pset, data in count_dict.items()}
         widget.cb_pset.clear()
         if not pset_names:
             return
@@ -201,14 +214,9 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def fill_prop_combobox(cls, widget: ui.IdsWidget):
         pset_name = widget.cb_pset.currentText()
-        prop_names = dict()
-        for bsdd_class in widget.bsdd_data.Classes:
-            for class_prop in bsdd_class.ClassProperties:
-                if class_prop.PropertySet == pset_name:
-                    prop_name = prop_utils.get_name(class_prop)
-                    if prop_name not in prop_names:
-                        prop_names[prop_name] = 0
-                    prop_names[prop_name] += 1
+        count_dict = cls.get_properties().property_count
+        count_dict = count_dict.get(pset_name, {})
+        prop_names = count_dict.get("properties", {})
         widget.cb_prop.clear()
         if not prop_names:
             return

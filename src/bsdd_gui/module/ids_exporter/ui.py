@@ -13,13 +13,14 @@ from .qt.ui_Widget import Ui_Form
 class IdsDialog(BaseDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._widget:IdsWidget
         self.button_box.addButton("Create", QDialogButtonBox.ActionRole)
 
 
 class IdsWidget(FieldWidget, Ui_Form):
     def __init__(self, data: BsddDictionary, *args, **kwargs):
-        super().__init__(data,*args, **kwargs)
-        
+        super().__init__(data, *args, **kwargs)
+        self.bsdd_data: BsddDictionary
         self.setupUi(self)
         self.fw_output.section = "paths"
         self.fw_output.option = "ids"
