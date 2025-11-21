@@ -110,10 +110,20 @@ def add_columns_to_property_view(
     ids_property: Type[tool.IdsPropertyView],
     ids_exporter: Type[tool.IdsExporter],
 ):
+
     data = ids_exporter.get_data()
     proxy_model, model = ids_property.create_model(data)
-    ids_property.add_column_to_table(model, "Name", prop_utils.get_name)
-    ids_property.add_column_to_table(model, "Code", lambda a: a.Code)
+
+    def set_checkstate(model: CTM, index: QModelIndex, value: bool):
+        bsdd_class = index.internalPointer()
+        ids_property.set_checkstate(model, bsdd_class, value)
+
+    ids_property.add_column_to_table(model, "Name", ids_property._get_name)
+    ids_property.add_column_to_table(model, "Code", ids_property._get_code)
+    ids_property.add_column_to_table(
+        model, "Export", lambda cp: ids_property.get_checkstate(model, cp), set_checkstate
+    )
+
     view.setModel(proxy_model)
 
 

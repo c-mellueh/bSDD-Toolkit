@@ -14,7 +14,11 @@ from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import ui, models, model_views
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.ids_exporter.prop import IdsExporterProperties, IdsClassViewProperties
+    from bsdd_gui.module.ids_exporter.prop import (
+        IdsExporterProperties,
+        IdsClassViewProperties,
+        IdsPropertyViewProperties,
+    )
 from bsdd_gui.module.ids_exporter import trigger
 import ifctester
 import os
@@ -211,8 +215,8 @@ class IdsPropertyView(ItemViewTool):
     signals = PropertySignals()
 
     @classmethod
-    def get_properties(cls) -> IdsClassViewProperties:
-        return bsdd_gui.IdsClassViewProperties  #
+    def get_properties(cls) -> IdsPropertyViewProperties:
+        return bsdd_gui.IdsPropertyViewProperties
 
     @classmethod
     def _get_model_class(cls):
@@ -225,3 +229,46 @@ class IdsPropertyView(ItemViewTool):
     @classmethod
     def _get_proxy_model_class(cls):
         return models.SortModel
+
+    @classmethod
+    def _get_name(cls, bsdd_property: BsddClassProperty | str):
+        if isinstance(bsdd_property, str):
+            return bsdd_property
+        return prop_utils.get_name(bsdd_property)
+
+    @classmethod
+    def _get_code(cls, bsdd_property: BsddClassProperty | str):
+        if isinstance(bsdd_property, str):
+            return ""
+        return bsdd_property.Code
+
+    @classmethod
+    def get_checkstate(
+        cls, model: models.PropertyTreeModel, bsdd_class_property: BsddClassProperty | str
+    ):
+        bsdd_class_code = model.bsdd_data.Code
+        cs_dict = cls.get_properties().checkstate_dict.get(bsdd_class_code, None)
+        if not cs_dict:
+            return True
+        if isinstance(bsdd_class_property, str):  # propertySet
+            return cs_dict["psets"].get(bsdd_class_property, True)
+        else:
+            return cs_dict["class_prop"].get(bsdd_class_property.Code, True)
+
+    @classmethod
+    def set_checkstate(
+        cls,
+        model: models.PropertyTreeModel,
+        bsdd_class_property: BsddClassProperty | str,
+        state: bool,
+    ):
+        if not model.bsdd_data:
+            return
+        bsdd_class_code = model.bsdd_data.Code
+        cls.get_properties().checkstate_dict[bsdd_class_code] = {"class_prop": {}, "psets": {}}
+        checkstate_dict = cls.get_properties().checkstate_dict[bsdd_class_code]
+
+        if isinstance(bsdd_class_property, str):  # propertySet
+            checkstate_dict["psets"][bsdd_class_property] = state
+        else:
+            checkstate_dict["class_prop"][bsdd_class_property.Code] = state
