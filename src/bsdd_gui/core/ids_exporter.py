@@ -2,6 +2,8 @@ from __future__ import annotations
 from PySide6.QtCore import QCoreApplication, QModelIndex
 from typing import TYPE_CHECKING, Type
 from bsdd_json.utils import property_utils as prop_utils
+from bsdd_gui.module.ids_exporter import constants
+import json
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -24,7 +26,7 @@ def connect_to_main_window(
 
 def retranslate_ui(ids_exporter: Type[tool.IdsExporter], main_window: Type[tool.MainWindowWidget]):
     action = ids_exporter.get_action(main_window.get(), "open_window")
-    action.setText(QCoreApplication.translate("GraphView", "Graph View"))
+    action.setText(QCoreApplication.translate("IDSExport", "Graph View"))
 
 
 def connect_signals(
@@ -43,7 +45,7 @@ def create_widget(data: BsddDictionary, parent, widget_tool: Type[tool.IdsExport
 
 def create_dialog(data: BsddDictionary, parent, dialog_tool: Type[tool.IdsExporter]):
     dialog = dialog_tool.create_dialog(data, parent)
-    text = QCoreApplication.translate("Preset", "Example Title")
+    text = QCoreApplication.translate("IdsExport", "IDS Exporter")
     dialog.setWindowTitle(text)
     widget = dialog_tool.get_widget()
     model: models.ClassTreeModel = widget.tv_classes.model().sourceModel()
@@ -140,9 +142,10 @@ def connect_property_view(
 ):
 
     def update_property_view(
-        class_view: model_views.ClassView, data: BsddClass,
+        class_view: model_views.ClassView,
+        data: BsddClass,
     ):
-        dialog:ui.IdsDialog = class_view.window()
+        dialog: ui.IdsDialog = class_view.window()
         property_view = dialog._widget.tv_properties
         proxy_model: models.SortModel = property_view.model()
         model = proxy_model.sourceModel()
@@ -152,3 +155,50 @@ def connect_property_view(
 
     ids_class.signals.selection_changed.connect(update_property_view)
     ids_property.connect_view_signals(view)
+
+
+def export_settings(
+    widget: ui.IdsWidget,
+    widget_tool: Type[tool.IdsExporter],
+    class_view: Type[tool.IdsClassView],
+    property_view: Type[tool.IdsPropertyView],
+    appdata: Type[tool.Appdata],
+    popups: Type[tool.Popups],
+):
+    class_dict = class_view.get_check_dict()
+    property_dict = property_view.get_check_dict()
+    settings_dict = widget_tool.get_settings(widget)
+    full_dict = {"class": class_dict, "property": property_dict, "settings": settings_dict}
+    text = QCoreApplication.translate("IDSExport", "Export IDS settings")
+    old_path = appdata.get_path(constants.IDS_APPDATA)
+    new_path = popups.get_save_path(constants.FILETYPE, widget.window(), old_path, text)
+    if not new_path:
+        return
+    appdata.set_path(constants.IDS_APPDATA, new_path)
+    with open(new_path, "w") as file:
+        json.dump(full_dict, file)
+
+
+def import_settings(
+    widget: ui.IdsWidget,
+    widget_tool: Type[tool.IdsExporter],
+    class_view: Type[tool.IdsClassView],
+    property_view: Type[tool.IdsPropertyView],
+    appdata: Type[tool.Appdata],
+    popups: Type[tool.Popups],
+):
+    old_path = appdata.get_path(constants.IDS_APPDATA)
+    text = QCoreApplication.translate("IDSExport", "Import IDS settings")
+    new_path = popups.get_open_path(constants.FILETYPE, widget.window(), old_path, text)
+    if not new_path:
+        return
+    appdata.set_path(constants.IDS_APPDATA, new_path)
+    with open(new_path, "r") as file:
+        full_dict = json.load(file)
+    class_dict = full_dict.get("class", {})
+    property_dict = full_dict.get("property", {})
+    settings_dict = full_dict.get("settings", {})
+    class_view.set_check_dict(class_dict, widget.tv_classes)
+    property_view.set_check_dict(property_dict, widget.tv_properties)
+    widget_tool.set_settings(widget,settings_dict)
+    pass

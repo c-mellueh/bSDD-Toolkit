@@ -56,7 +56,8 @@ class IdsExporter(ActionTool, DialogTool):
         )
         widget.cb_pset.currentTextChanged.connect(lambda _: cls.fill_prop_combobox(widget))
         widget.cb_pset.currentIndexChanged.connect(lambda _: cls.fill_prop_combobox(widget))
-
+        widget.tb_import.clicked.connect(lambda: trigger.import_settings(widget))
+        widget.tb_export.clicked.connect(lambda: trigger.export_settings(widget))
         return widget
 
     @classmethod
@@ -222,6 +223,40 @@ class IdsExporter(ActionTool, DialogTool):
             return
         widget.cb_prop.addItems(sorted(prop_names, key=prop_names.get, reverse=True))
 
+    @classmethod
+    def get_settings(cls, widget: ui.IdsWidget):
+        settings_dict = {
+            "inherit": widget.cb_inherit.isChecked(),
+            "classification": widget.cb_classification.isChecked(),
+            "pset": widget.cb_pset.currentText(),
+            "property": widget.cb_prop.currentText(),
+        }
+        return settings_dict
+
+    @classmethod
+    def set_settings(cls, widget: ui.IdsWidget, settings_dict: dict):
+        inherit = settings_dict.get("inherit")
+        classification = settings_dict.get("classification")
+        pset = settings_dict.get("pset")
+        prop = settings_dict.get("property")
+
+        if inherit is not None:
+            widget.cb_inherit.setChecked(inherit)
+        if classification is not None:
+            widget.cb_classification.setChecked(classification)
+        if pset is not None:
+            widget.cb_pset.setCurrentText(pset)
+        if prop is not None:
+            widget.cb_prop.setCurrentText(prop)
+
+    @classmethod
+    def export_settings(cls, widget):
+        pass
+
+    @classmethod
+    def import_settings(cls, widget):
+        pass
+
 
 class ClassSignals(ViewSignals):
     pass
@@ -262,6 +297,17 @@ class IdsClassView(ItemViewTool):
     @classmethod
     def set_checkstate(cls, bsdd_class: BsddClass, state: bool):
         cls.get_properties().checkstate_dict[bsdd_class.Code] = state
+
+    @classmethod
+    def get_check_dict(cls):
+        return cls.get_properties().checkstate_dict
+
+    @classmethod
+    def set_check_dict(cls, check_dict, treev_view: model_views.ClassView):
+        model: models.ClassTreeModel = treev_view.model().sourceModel()
+        model.beginResetModel()
+        cls.get_properties().checkstate_dict = check_dict
+        model.endResetModel()
 
 
 class PropertySignals(ViewSignals):
@@ -329,3 +375,14 @@ class IdsPropertyView(ItemViewTool):
             checkstate_dict["psets"][bsdd_class_property] = state
         else:
             checkstate_dict["class_prop"][bsdd_class_property.Code] = state
+
+    @classmethod
+    def get_check_dict(cls):
+        return cls.get_properties().checkstate_dict
+
+    @classmethod
+    def set_check_dict(cls, check_dict, tree_view: model_views.PropertyView):
+        model: models.ClassTreeModel = tree_view.model().sourceModel()
+        model.beginResetModel()
+        cls.get_properties().checkstate_dict = check_dict
+        model.endResetModel()

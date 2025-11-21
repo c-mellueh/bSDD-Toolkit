@@ -12,7 +12,7 @@ import bsdd
 from bsdd import Client
 from . import dictionary_utils as dict_utils
 from . import build_unique_code
-
+import logging
 
 class Cache:
     data = {}
@@ -24,8 +24,10 @@ class Cache:
         from bsdd_json.utils import property_utils as prop_utils
 
         def _make_request():
+
             if not dict_utils.is_uri(property_uri):
                 return dict()
+            logging.debug(f"Load {property_uri}")
             c = Client() if client is None else client
             result = c.get_property(property_uri)
 
@@ -85,6 +87,9 @@ def get_internal_property(
 def get_external_property(
     class_property: BsddClassProperty, client=None
 ) -> BsddProperty | None:
+    from bsdd_gui import tool
+    if tool.Project.get_offline_mode():
+        return None
     return Cache.get_external_property(class_property.PropertyUri, client)
 
 

@@ -32,6 +32,7 @@ def main(initial_file: PathLike | None = None, log_level=None, open_last_project
         tool.Logging.set_log_level(log_level)
 
     bsdd_gui.register()
+    tool.Project.set_offline_mode(offline_mode)
 
     # Create UI
     app = QApplication(sys.argv)

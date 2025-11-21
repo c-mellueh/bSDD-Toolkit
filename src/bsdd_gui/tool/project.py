@@ -93,3 +93,11 @@ class Project(ActionTool):
     @classmethod
     def get_plugin_save_functions(cls):
         return cls.get_properties().plugin_save_functions
+
+    @classmethod
+    def set_offline_mode(cls,mode:bool):
+        cls.get_properties().offline_mode = mode
+    
+    @classmethod
+    def get_offline_mode(cls)->bool:
+        return cls.get_properties().offline_mode

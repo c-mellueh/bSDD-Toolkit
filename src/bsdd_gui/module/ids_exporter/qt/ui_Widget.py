@@ -65,6 +65,7 @@ class Ui_Form(object):
 
         self.cb_classification = ToggleSwitch(self.fr_settings)
         self.cb_classification.setObjectName(u"cb_classification")
+        self.cb_classification.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
         self.gridLayout_2.addWidget(self.cb_classification, 1, 1, 1, 1)
 
@@ -75,29 +76,36 @@ class Ui_Form(object):
 
         self.cb_inherit = ToggleSwitch(self.fr_settings)
         self.cb_inherit.setObjectName(u"cb_inherit")
+        self.cb_inherit.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
         self.gridLayout_2.addWidget(self.cb_inherit, 0, 1, 1, 1)
 
         self.cb_pset = QComboBox(self.fr_settings)
         self.cb_pset.setObjectName(u"cb_pset")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.cb_pset.sizePolicy().hasHeightForWidth())
+        self.cb_pset.setSizePolicy(sizePolicy1)
+        self.cb_pset.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 
         self.gridLayout_2.addWidget(self.cb_pset, 2, 0, 1, 1)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer = QSpacerItem(1, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
-        self.tb_download = QToolButton(self.fr_settings)
-        self.tb_download.setObjectName(u"tb_download")
+        self.tb_export = QToolButton(self.fr_settings)
+        self.tb_export.setObjectName(u"tb_export")
 
-        self.horizontalLayout.addWidget(self.tb_download)
+        self.horizontalLayout.addWidget(self.tb_export)
 
-        self.tb_upload = QToolButton(self.fr_settings)
-        self.tb_upload.setObjectName(u"tb_upload")
+        self.tb_import = QToolButton(self.fr_settings)
+        self.tb_import.setObjectName(u"tb_import")
 
-        self.horizontalLayout.addWidget(self.tb_upload)
+        self.horizontalLayout.addWidget(self.tb_import)
 
 
         self.gridLayout_2.addLayout(self.horizontalLayout, 4, 0, 1, 2)
@@ -120,12 +128,15 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
 #if QT_CONFIG(tooltip)
-        self.label_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the BSDD classification. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
+        self.label_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.label_classification.setText(QCoreApplication.translate("Form", u"Check for Classification", None))
         self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
+#if QT_CONFIG(tooltip)
+        self.cb_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.cb_classification.setText(QCoreApplication.translate("Form", u"CheckBox", None))
-        self.tb_download.setText(QCoreApplication.translate("Form", u"D", None))
-        self.tb_upload.setText(QCoreApplication.translate("Form", u"U", None))
+        self.tb_export.setText(QCoreApplication.translate("Form", u"D", None))
+        self.tb_import.setText(QCoreApplication.translate("Form", u"U", None))
     # retranslateUi
 

@@ -38,6 +38,18 @@ def widget_created(widget: IdsWidget):
     core.connect_widget(widget, tool.IdsExporter, tool.IdsClassView)
 
 
+def import_settings(widget: IdsWidget):
+    core.import_settings(
+        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Appdata, tool.Popups
+    )
+
+
+def export_settings(widget: IdsWidget):
+    core.export_settings(
+        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Appdata, tool.Popups
+    )
+
+
 def class_view_created(view: model_views.ClassView):
     core.register_class_view(view, tool.IdsClassView)
     core.add_columns_to_class_view(view, tool.IdsClassView, tool.IdsExporter)

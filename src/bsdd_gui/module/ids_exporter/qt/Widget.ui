@@ -38,7 +38,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_classification">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the BSDD classification. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Check for Classification</string>
@@ -67,6 +67,12 @@
        </item>
        <item row="1" column="1">
         <widget class="ToggleSwitch" name="cb_classification">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LayoutDirection::RightToLeft</enum>
+         </property>
          <property name="text">
           <string>CheckBox</string>
          </property>
@@ -76,10 +82,24 @@
         <widget class="QComboBox" name="cb_prop"/>
        </item>
        <item row="0" column="1">
-        <widget class="ToggleSwitch" name="cb_inherit"/>
+        <widget class="ToggleSwitch" name="cb_inherit">
+         <property name="layoutDirection">
+          <enum>Qt::LayoutDirection::RightToLeft</enum>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QComboBox" name="cb_pset"/>
+        <widget class="QComboBox" name="cb_pset">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::SizeAdjustPolicy::AdjustToMinimumContentsLengthWithIcon</enum>
+         </property>
+        </widget>
        </item>
        <item row="4" column="0" colspan="2">
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -90,21 +110,21 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
+             <width>1</width>
              <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <widget class="QToolButton" name="tb_download">
+          <widget class="QToolButton" name="tb_export">
            <property name="text">
             <string>D</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="tb_upload">
+          <widget class="QToolButton" name="tb_import">
            <property name="text">
             <string>U</string>
            </property>
