@@ -16,7 +16,12 @@ from bsdd_gui.module.language.trigger import set_language
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
 
 
-def main(initial_file: PathLike | None = None, log_level=None, open_last_project=False,offline_mode = False):
+def main(
+    initial_file: PathLike | None = None,
+    log_level=None,
+    open_last_project=False,
+    offline_mode=False,
+):
     """
     Opens the Application and starts the GUI
     :param initial_file: SOMJson file that will be opened on startup
@@ -67,4 +72,4 @@ if __name__ == "__main__":
         "-ofm", "--offline_mode", help="Offline Mode", default=False, action="store_true"
     )
     args = parser.parse_args()
-    main(args.open_path, args.log_level, args.open_last_project,args.offline_mode)
+    main(args.open_path, args.log_level, args.open_last_project, args.offline_mode)

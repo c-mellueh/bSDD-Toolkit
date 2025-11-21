@@ -21,7 +21,8 @@ class FieldSignals(WidgetSignals):
 class DialogSignals(FieldSignals):
     dialog_accepted = Signal(BaseDialog)
     dialog_declined = Signal(BaseDialog)
-    dialog_requested = Signal(Any,QWidget) #Data, Parent
+    dialog_requested = Signal(Any, QWidget)  # Data, Parent
+
 
 class ViewSignals(QObject):
     model_refresh_requested = Signal()

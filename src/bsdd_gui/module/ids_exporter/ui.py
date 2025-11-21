@@ -13,7 +13,7 @@ from .qt.ui_Widget import Ui_Form
 class IdsDialog(BaseDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._widget:IdsWidget
+        self._widget: IdsWidget
         self.button_box.addButton("Create", QDialogButtonBox.ActionRole)
 
 

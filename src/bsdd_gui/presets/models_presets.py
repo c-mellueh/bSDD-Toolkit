@@ -93,12 +93,6 @@ class ItemModel(QAbstractItemModel):
         base |= Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
         return base
 
-
-
-
-
-
-
     def get_row_for_data(self, data, parent=None):
         parent = QModelIndex() if parent is None else parent
         for row in range(self.rowCount(parent)):

@@ -7,6 +7,7 @@ class IdsExporterProperties(ActionsProperties, DialogProperties):
         super().__init__()
         self.property_count = dict()
 
+
 class IdsClassViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()

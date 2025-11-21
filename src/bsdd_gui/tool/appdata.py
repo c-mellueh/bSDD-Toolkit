@@ -112,7 +112,7 @@ class Appdata:
             value = config_parser.get(section, option)
             if value is not None:
                 return value
-        #cls.set_setting(section, option, default)
+        # cls.set_setting(section, option, default)
         return default
 
     @classmethod

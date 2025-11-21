@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QTreeView
 from . import trigger
 
+
 class ClassView(QTreeView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

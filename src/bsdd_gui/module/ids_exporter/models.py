@@ -218,5 +218,7 @@ class PropertyTreeModel(ItemModel):
                 if child_checkbox_index.isValid():
                     self._emit_row_changed(child_checkbox_index)
                 stack.append(child_row_index)
+
+
 class SortModel(SM):
     pass

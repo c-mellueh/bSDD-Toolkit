@@ -200,5 +200,5 @@ def import_settings(
     settings_dict = full_dict.get("settings", {})
     class_view.set_check_dict(class_dict, widget.tv_classes)
     property_view.set_check_dict(property_dict, widget.tv_properties)
-    widget_tool.set_settings(widget,settings_dict)
+    widget_tool.set_settings(widget, settings_dict)
     pass

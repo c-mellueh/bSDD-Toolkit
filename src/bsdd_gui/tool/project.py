@@ -95,9 +95,9 @@ class Project(ActionTool):
         return cls.get_properties().plugin_save_functions
 
     @classmethod
-    def set_offline_mode(cls,mode:bool):
+    def set_offline_mode(cls, mode: bool):
         cls.get_properties().offline_mode = mode
-    
+
     @classmethod
-    def get_offline_mode(cls)->bool:
+    def get_offline_mode(cls) -> bool:
         return cls.get_properties().offline_mode

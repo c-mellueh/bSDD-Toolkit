@@ -15,7 +15,7 @@ class IfcHelper:
         return bsdd_gui.IfcHelperProperties
 
     @classmethod
-    def split_ifc_term(cls,term: str):
+    def split_ifc_term(cls, term: str):
         """
         Splits an IFC name like 'IfcElectricMotorSYNCHRONOUS' into:
         ('IfcElectricMotor', 'SYNCHRONOUS')
