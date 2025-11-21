@@ -195,8 +195,8 @@ def import_settings(
     appdata.set_path(constants.IDS_APPDATA, new_path)
     with open(new_path, "r") as file:
         full_dict = json.load(file)
-    class_dict = full_dict.get("class", {})
-    property_dict = full_dict.get("property", {})
+    class_dict = full_dict.get("class_settings", {})
+    property_dict = full_dict.get("property_settings", {})
     settings_dict = full_dict.get("settings", {})
     class_view.set_check_dict(class_dict, widget.tv_classes)
     property_view.set_check_dict(property_dict, widget.tv_properties)
@@ -207,7 +207,7 @@ def export_ids(widget:ui.IdsWidget,widget_tool:Type[tool.IdsExporter],class_view
     class_dict = class_view.get_check_dict()
     property_dict = property_view.get_check_dict()
     settings_dict = widget_tool.get_settings(widget)
-    full_dict = {"class": class_dict, "property": property_dict, "settings": settings_dict}
+    full_dict = {"class_settings": class_dict, "property_settings": property_dict, "settings": settings_dict}
     out_path = widget.fw_output.get_path()
     ids = widget_tool.build_ids(widget.bsdd_data,full_dict)
     ids.to_xml(out_path)

@@ -14,8 +14,9 @@ class IdsDialog(BaseDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._widget: IdsWidget
-        self.button_box.addButton("Create", QDialogButtonBox.ActionRole)
-
+        self.button_box.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
 
 class IdsWidget(FieldWidget, Ui_Form):
     def __init__(self, data: BsddDictionary, *args, **kwargs):

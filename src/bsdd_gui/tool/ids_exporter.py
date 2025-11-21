@@ -33,6 +33,7 @@ class PsetDict(TypedDict):
 class SettingsDict(TypedDict):
     class_settings: dict[str, bool]
     property_settings: dict[str, dict[str, PsetDict]]
+    settings:dict
 
 
 class IdsSignals(DialogSignals):
@@ -57,7 +58,10 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def _get_widget_class(cls):
         return ui.IdsWidget
-
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.dialog_accepted.connect(lambda d:trigger.export_ids(d._widget))
     @classmethod
     def connect_widget_signals(cls, widget: ui.IdsWidget):
         super().connect_widget_signals(widget)
@@ -78,9 +82,16 @@ class IdsExporter(ActionTool, DialogTool):
 
     @classmethod
     def build_ids(cls, bsdd_dict: BsddDictionary, settings_dict: dict):
-        settings_dict
-        pset = "Allgemein"
-        prop = "Klassifikation"
+        settings_dict:SettingsDict
+        class_settings = settings_dict.get("class_settings",dict())
+        property_settings = settings_dict.get("property_settings",dict())
+        main_settings = settings_dict.get("settings",dict())
+
+        pset = main_settings.get("main_pset","")
+        prop = main_settings.get("main_property","")
+        classification = main_settings.get("classification",False)
+        inherit = main_settings.get("inherit",False)
+
         data_type = "IfcLabel"  # IfcLabel or IfcText
         ifc_versions = [
             "IFC4X3_ADD2",
@@ -93,6 +104,9 @@ class IdsExporter(ActionTool, DialogTool):
         base_restriction = base_requirement.value
         base_restriction.options = {"enumeration": [c.Code for c in bsdd_dict.Classes]}
         for bsdd_class in sorted(bsdd_dict.Classes, key=lambda x: x.Code):
+            if not class_settings.get(bsdd_class.Code,True):
+                continue
+            
             spec = Specification(
                 f"Check for {bsdd_class.Code}",
                 ifcVersion=ifc_versions,
@@ -238,8 +252,8 @@ class IdsExporter(ActionTool, DialogTool):
         settings_dict = {
             "inherit": widget.cb_inherit.isChecked(),
             "classification": widget.cb_classification.isChecked(),
-            "pset": widget.cb_pset.currentText(),
-            "property": widget.cb_prop.currentText(),
+            "main_pset": widget.cb_pset.currentText(),
+            "main_property": widget.cb_prop.currentText(),
         }
         return settings_dict
 
@@ -247,8 +261,8 @@ class IdsExporter(ActionTool, DialogTool):
     def set_settings(cls, widget: ui.IdsWidget, settings_dict: dict):
         inherit = settings_dict.get("inherit")
         classification = settings_dict.get("classification")
-        pset = settings_dict.get("pset")
-        prop = settings_dict.get("property")
+        pset = settings_dict.get("main_pset")
+        prop = settings_dict.get("main_property")
 
         if inherit is not None:
             widget.cb_inherit.setChecked(inherit)
