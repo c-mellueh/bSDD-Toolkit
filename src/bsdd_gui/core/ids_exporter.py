@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Type
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import constants
 import json
-
+import os
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.ids_exporter import ui, model_views, models
@@ -168,7 +168,7 @@ def export_settings(
     class_dict = class_view.get_check_dict()
     property_dict = property_view.get_check_dict()
     settings_dict = widget_tool.get_settings(widget)
-    full_dict = {"class": class_dict, "property": property_dict, "settings": settings_dict}
+    full_dict = {"class_settings": class_dict, "property_settings": property_dict, "settings": settings_dict}
     text = QCoreApplication.translate("IDSExport", "Export IDS settings")
     old_path = appdata.get_path(constants.IDS_APPDATA)
     new_path = popups.get_save_path(constants.FILETYPE, widget.window(), old_path, text)
@@ -202,3 +202,12 @@ def import_settings(
     property_view.set_check_dict(property_dict, widget.tv_properties)
     widget_tool.set_settings(widget, settings_dict)
     pass
+
+def export_ids(widget:ui.IdsWidget,widget_tool:Type[tool.IdsExporter],class_view:Type[tool.IdsClassView],property_view:Type[tool.IdsPropertyView]):
+    class_dict = class_view.get_check_dict()
+    property_dict = property_view.get_check_dict()
+    settings_dict = widget_tool.get_settings(widget)
+    full_dict = {"class": class_dict, "property": property_dict, "settings": settings_dict}
+    out_path = widget.fw_output.get_path()
+    ids = widget_tool.build_ids(widget.bsdd_data,full_dict)
+    ids.to_xml(out_path)

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 import logging
 from bsdd_json import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
 import bsdd_gui
@@ -23,6 +23,16 @@ if TYPE_CHECKING:
 from bsdd_gui.module.ids_exporter import trigger
 import ifctester
 import os
+
+
+class PsetDict(TypedDict):
+    check: bool
+    proeprties: dict[str, bool]
+
+
+class SettingsDict(TypedDict):
+    class_settings: dict[str, bool]
+    property_settings: dict[str, dict[str, PsetDict]]
 
 
 class IdsSignals(DialogSignals):
@@ -67,8 +77,8 @@ class IdsExporter(ActionTool, DialogTool):
         return ifctester.ids.open(os.path.join(DATA_PATH, "template.ids"))
 
     @classmethod
-    def build_ids(cls, bsdd_dict: BsddDictionary):
-        out_path = "test.ids"
+    def build_ids(cls, bsdd_dict: BsddDictionary, settings_dict: dict):
+        settings_dict
         pset = "Allgemein"
         prop = "Klassifikation"
         data_type = "IfcLabel"  # IfcLabel or IfcText
@@ -97,7 +107,7 @@ class IdsExporter(ActionTool, DialogTool):
                 spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
             spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
             ids.specifications.append(spec)
-        ids.to_xml(out_path)
+        return ids
 
     @classmethod
     def build_property_requirements(cls, class_prop: BsddClassProperty, bsdd_dict: BsddDictionary):
@@ -349,14 +359,24 @@ class IdsPropertyView(ItemViewTool):
     def get_checkstate(
         cls, model: models.PropertyTreeModel, bsdd_class_property: BsddClassProperty | str
     ):
+        pset_name = (
+            bsdd_class_property
+            if isinstance(bsdd_class_property, str)
+            else bsdd_class_property.PropertySet
+        )
+        property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
         bsdd_class_code = model.bsdd_data.Code
-        cs_dict = cls.get_properties().checkstate_dict.get(bsdd_class_code, None)
-        if not cs_dict:
+        checkstate_dict: PsetDict = cls.get_properties().checkstate_dict
+        class_dict = checkstate_dict.get(bsdd_class_code, None)
+        if not class_dict:
             return True
-        if isinstance(bsdd_class_property, str):  # propertySet
-            return cs_dict["psets"].get(bsdd_class_property, True)
+        pset_dict = class_dict.get(pset_name)
+        if not pset_dict:
+            return True
+        if property_code is None:  # propertySet
+            return pset_dict.get("checked", True)
         else:
-            return cs_dict["class_prop"].get(bsdd_class_property.Code, True)
+            return pset_dict["properties"].get(property_code, True)
 
     @classmethod
     def set_checkstate(
@@ -367,14 +387,24 @@ class IdsPropertyView(ItemViewTool):
     ):
         if not model.bsdd_data:
             return
-        bsdd_class_code = model.bsdd_data.Code
-        cls.get_properties().checkstate_dict[bsdd_class_code] = {"class_prop": {}, "psets": {}}
-        checkstate_dict = cls.get_properties().checkstate_dict[bsdd_class_code]
 
-        if isinstance(bsdd_class_property, str):  # propertySet
-            checkstate_dict["psets"][bsdd_class_property] = state
+        pset_name = (
+            bsdd_class_property
+            if isinstance(bsdd_class_property, str)
+            else bsdd_class_property.PropertySet
+        )
+        property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
+        bsdd_class_code = model.bsdd_data.Code
+
+        if bsdd_class_code not in cls.get_properties().checkstate_dict:
+            cls.get_properties().checkstate_dict[bsdd_class_code] = dict()
+        checkstate_dict = cls.get_properties().checkstate_dict[bsdd_class_code]
+        if not pset_name in checkstate_dict:
+            checkstate_dict[pset_name] = {"checked": True, "properties": dict()}
+        if not property_code:
+            checkstate_dict[pset_name]["checked"] = state
         else:
-            checkstate_dict["class_prop"][bsdd_class_property.Code] = state
+            checkstate_dict[pset_name]["properties"][property_code] = state
 
     @classmethod
     def get_check_dict(cls):
