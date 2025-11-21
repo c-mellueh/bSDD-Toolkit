@@ -12,6 +12,7 @@ from bsdd_gui.presets.signal_presets import DialogSignals, ViewSignals
 from bsdd_gui.presets.tool_presets import ActionTool, DialogTool, ItemViewTool
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import ui, models, model_views
+from operator import itemgetter
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter.prop import (
@@ -46,6 +47,17 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def _get_widget_class(cls):
         return ui.IdsWidget
+
+    @classmethod
+    def connect_widget_signals(cls, widget: ui.IdsWidget):
+        super().connect_widget_signals(widget)
+        widget.cb_classification.toggled.connect(
+            lambda state: cls.set_prop_combobox_visible(widget, not state)
+        )
+        widget.cb_pset.currentTextChanged.connect(lambda _: cls.fill_prop_combobox(widget))
+        widget.cb_pset.currentIndexChanged.connect(lambda _: cls.fill_prop_combobox(widget))
+
+        return widget
 
     @classmethod
     def get_template(cls):
@@ -166,6 +178,42 @@ class IdsExporter(ActionTool, DialogTool):
     def get_widget(cls) -> ui.IdsWidget:
         return super().get_widget()
 
+    @classmethod
+    def set_prop_combobox_visible(cls, widget: ui.IdsWidget, state: bool):
+        widget.cb_prop.setVisible(state)
+        widget.cb_pset.setVisible(state)
+
+    @classmethod
+    def fill_pset_combobox(cls, widget: ui.IdsWidget):
+        pset_names = dict()
+        for bsdd_class in widget.bsdd_data.Classes:
+            for class_prop in bsdd_class.ClassProperties:
+                pset_name = class_prop.PropertySet
+                if pset_name not in pset_names:
+                    pset_names[pset_name] = 0
+                pset_names[pset_name] += 1
+        widget.cb_pset.clear()
+        if not pset_names:
+            return
+        # sort all psets by occurence count
+        widget.cb_pset.addItems(sorted(pset_names, key=pset_names.get, reverse=True))
+
+    @classmethod
+    def fill_prop_combobox(cls, widget: ui.IdsWidget):
+        pset_name = widget.cb_pset.currentText()
+        prop_names = dict()
+        for bsdd_class in widget.bsdd_data.Classes:
+            for class_prop in bsdd_class.ClassProperties:
+                if class_prop.PropertySet == pset_name:
+                    prop_name = prop_utils.get_name(class_prop)
+                    if prop_name not in prop_names:
+                        prop_names[prop_name] = 0
+                    prop_names[prop_name] += 1
+        widget.cb_prop.clear()
+        if not prop_names:
+            return
+        widget.cb_prop.addItems(sorted(prop_names, key=prop_names.get, reverse=True))
+
 
 class ClassSignals(ViewSignals):
     pass
@@ -196,6 +244,7 @@ class IdsClassView(ItemViewTool):
         widget.cb_inherit.toggled.connect(
             lambda checked: class_model.set_checkstate_inheritance(checked)
         )
+
         return super().connect_view_signals(view)
 
     @classmethod

@@ -6,7 +6,7 @@ from bsdd_json.utils import property_utils as prop_utils
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.ids_exporter import ui, model_views, models
-    from bsdd_json import BsddClass, BsddClassProperty
+    from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
     from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
 
 
@@ -37,11 +37,11 @@ def connect_signals(
     ids_property.connect_internal_signals()
 
 
-def create_widget(data, parent, widget_tool: Type[tool.IdsExporter]):
+def create_widget(data: BsddDictionary, parent, widget_tool: Type[tool.IdsExporter]):
     widget: ui.IdsWidget = widget_tool.show_widget(data, parent)
 
 
-def create_dialog(data: object, parent, dialog_tool: Type[tool.IdsExporter]):
+def create_dialog(data: BsddDictionary, parent, dialog_tool: Type[tool.IdsExporter]):
     dialog = dialog_tool.create_dialog(data, parent)
     text = QCoreApplication.translate("Preset", "Example Title")
     dialog.setWindowTitle(text)
@@ -76,6 +76,7 @@ def connect_widget(
     widget_tool.connect_widget_signals(widget)
     class_view = widget.tv_classes
     ids_class.connect_settings_signals(widget, class_view)
+    widget_tool.fill_pset_combobox(widget)
 
 
 def register_class_view(view: model_views.ClassView, ids_class_view: Type[tool.IdsClassView]):

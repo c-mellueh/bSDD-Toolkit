@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHeaderView,
-    QLabel, QSizePolicy, QSpacerItem, QSplitter,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
+    QHeaderView, QLabel, QSizePolicy, QSpacerItem,
+    QSplitter, QWidget)
 
 from bsdd_gui.module.ids_exporter.model_views import (ClassView, PropertyView)
 from bsdd_gui.presets.ui_presets import (FileSelector, ToggleSwitch)
@@ -49,10 +49,10 @@ class Ui_Form(object):
         self.fr_settings.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_2 = QGridLayout(self.fr_settings)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.cb_inherit = ToggleSwitch(self.fr_settings)
-        self.cb_inherit.setObjectName(u"cb_inherit")
+        self.label_classification = QLabel(self.fr_settings)
+        self.label_classification.setObjectName(u"label_classification")
 
-        self.gridLayout_2.addWidget(self.cb_inherit, 0, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_classification, 1, 0, 1, 1)
 
         self.label = QLabel(self.fr_settings)
         self.label.setObjectName(u"label")
@@ -61,7 +61,27 @@ class Ui_Form(object):
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.gridLayout_2.addItem(self.verticalSpacer, 1, 0, 1, 1)
+        self.gridLayout_2.addItem(self.verticalSpacer, 3, 0, 1, 1)
+
+        self.cb_classification = ToggleSwitch(self.fr_settings)
+        self.cb_classification.setObjectName(u"cb_classification")
+
+        self.gridLayout_2.addWidget(self.cb_classification, 1, 1, 1, 1)
+
+        self.cb_inherit = ToggleSwitch(self.fr_settings)
+        self.cb_inherit.setObjectName(u"cb_inherit")
+
+        self.gridLayout_2.addWidget(self.cb_inherit, 0, 1, 1, 1)
+
+        self.cb_pset = QComboBox(self.fr_settings)
+        self.cb_pset.setObjectName(u"cb_pset")
+
+        self.gridLayout_2.addWidget(self.cb_pset, 2, 0, 1, 1)
+
+        self.cb_prop = QComboBox(self.fr_settings)
+        self.cb_prop.setObjectName(u"cb_prop")
+
+        self.gridLayout_2.addWidget(self.cb_prop, 2, 1, 1, 1)
 
         self.splitter.addWidget(self.fr_settings)
 
@@ -80,6 +100,11 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
+#if QT_CONFIG(tooltip)
+        self.label_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the BSDD classification. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_classification.setText(QCoreApplication.translate("Form", u"Check for Classification", None))
         self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
+        self.cb_classification.setText(QCoreApplication.translate("Form", u"CheckBox", None))
     # retranslateUi
 
