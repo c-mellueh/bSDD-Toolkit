@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
-    QHeaderView, QLabel, QSizePolicy, QSpacerItem,
-    QSplitter, QWidget)
+    QHBoxLayout, QHeaderView, QLabel, QSizePolicy,
+    QSpacerItem, QSplitter, QToolButton, QWidget)
 
 from bsdd_gui.module.ids_exporter.model_views import (ClassView, PropertyView)
 from bsdd_gui.presets.ui_presets import (FileSelector, ToggleSwitch)
@@ -68,6 +68,11 @@ class Ui_Form(object):
 
         self.gridLayout_2.addWidget(self.cb_classification, 1, 1, 1, 1)
 
+        self.cb_prop = QComboBox(self.fr_settings)
+        self.cb_prop.setObjectName(u"cb_prop")
+
+        self.gridLayout_2.addWidget(self.cb_prop, 2, 1, 1, 1)
+
         self.cb_inherit = ToggleSwitch(self.fr_settings)
         self.cb_inherit.setObjectName(u"cb_inherit")
 
@@ -78,10 +83,24 @@ class Ui_Form(object):
 
         self.gridLayout_2.addWidget(self.cb_pset, 2, 0, 1, 1)
 
-        self.cb_prop = QComboBox(self.fr_settings)
-        self.cb_prop.setObjectName(u"cb_prop")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.gridLayout_2.addWidget(self.cb_prop, 2, 1, 1, 1)
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.tb_download = QToolButton(self.fr_settings)
+        self.tb_download.setObjectName(u"tb_download")
+
+        self.horizontalLayout.addWidget(self.tb_download)
+
+        self.tb_upload = QToolButton(self.fr_settings)
+        self.tb_upload.setObjectName(u"tb_upload")
+
+        self.horizontalLayout.addWidget(self.tb_upload)
+
+
+        self.gridLayout_2.addLayout(self.horizontalLayout, 4, 0, 1, 2)
 
         self.splitter.addWidget(self.fr_settings)
 
@@ -106,5 +125,7 @@ class Ui_Form(object):
         self.label_classification.setText(QCoreApplication.translate("Form", u"Check for Classification", None))
         self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
         self.cb_classification.setText(QCoreApplication.translate("Form", u"CheckBox", None))
+        self.tb_download.setText(QCoreApplication.translate("Form", u"D", None))
+        self.tb_upload.setText(QCoreApplication.translate("Form", u"U", None))
     # retranslateUi
 

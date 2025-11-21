@@ -73,6 +73,7 @@ def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[
 def connect_widget(
     widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter], ids_class: Type[tool.IdsClassView]
 ):
+    widget_tool.count_properties(widget.bsdd_data)
     widget_tool.connect_widget_signals(widget)
     class_view = widget.tv_classes
     ids_class.connect_settings_signals(widget, class_view)
@@ -138,8 +139,12 @@ def connect_property_view(
     ids_class: Type[tool.IdsClassView],
 ):
 
-    def update_property_view(class_view, data: BsddClass):
-        proxy_model: models.SortModel = view.model()
+    def update_property_view(
+        class_view: model_views.ClassView, data: BsddClass,
+    ):
+        dialog:ui.IdsDialog = class_view.window()
+        property_view = dialog._widget.tv_properties
+        proxy_model: models.SortModel = property_view.model()
         model = proxy_model.sourceModel()
         model.beginResetModel()
         model.bsdd_data = data
