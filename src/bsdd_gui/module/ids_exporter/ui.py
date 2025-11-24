@@ -17,7 +17,11 @@ class IdsDialog(BaseDialog):
         self.button_box.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
-
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            event.accept()   # Konsumieren, nichts tun
+            return
+        super().keyPressEvent(event)
 class IdsWidget(FieldWidget, Ui_Form):
     def __init__(self, data: BsddDictionary, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
