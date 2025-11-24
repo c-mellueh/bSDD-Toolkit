@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter import ui, model_views, models
     from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
     from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
+    from bsdd_gui.tool.ids_exporter import BasicSettingsDict, MetadataDict, PsetDict, SettingsDict
 
 
 def connect_to_main_window(
@@ -71,12 +72,14 @@ def create_dialog(data: BsddDictionary, parent, dialog_tool: Type[tool.IdsExport
 
 def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget_tool.register_widget(widget)
-    if not widget.fw_template.get_path():
-        widget.fw_template.set_path(widget_tool.get_template())
     widget.dt_date.hide_toggle_switch()
     widget.dt_date.set_now()
     widget.dt_date.dt_edit.setDisplayFormat("yyyy-MM-dd")
-
+    widget.fw_output.file_format = constants.IDS_FILETYPE
+    widget.fw_output.section = "paths"
+    widget.fw_output.option = "ids"
+    widget.fw_output.title = "get IDS-Export Path"
+    widget.fw_output.load_path()
 
 def register_fields(
     widget: ui.IdsWidget,
@@ -104,65 +107,65 @@ def register_fields(
             return bool(value)
         return bool(value.strip())
 
-    #Check for Classification
+    # Check for Classification
     widget_tool.register_field_getter(widget, widget.cb_clsf, lambda _: _getter("classif", "bool"))
     widget_tool.register_field_setter(widget, widget.cb_clsf, lambda _, v: _setter("classif", v))
     widget_tool.register_field_listener(widget, widget.cb_clsf)
 
-    #Inherit to Subclasses
+    # Inherit to Subclasses
     widget_tool.register_field_getter(widget, widget.cb_inh, lambda _: _getter("inherit", "bool"))
     widget_tool.register_field_setter(widget, widget.cb_inh, lambda _, v: _setter("inherit", v))
     widget_tool.register_field_listener(widget, widget.cb_inh)
 
-    #Title
+    # Title
     widget_tool.register_field_getter(widget, widget.le_title, lambda _: _getter("title"))
     widget_tool.register_field_setter(widget, widget.le_title, lambda _, v: _setter("title", v))
     widget_tool.register_field_listener(widget, widget.le_title)
     widget_tool.add_validator(widget, widget.le_title, _is_not_empty, util.set_valid)
 
-    #Description
+    # Description
     widget_tool.register_field_getter(widget, widget.le_desc, lambda _: _getter("desc"))
     widget_tool.register_field_setter(widget, widget.le_desc, lambda _, v: _setter("desc", v))
     widget_tool.register_field_listener(widget, widget.le_desc)
     widget_tool.add_validator(widget, widget.le_desc, _is_not_empty, util.set_valid)
 
-    #Author
+    # Author
     widget_tool.register_field_getter(widget, widget.le_author, lambda _: _getter("author"))
     widget_tool.register_field_setter(widget, widget.le_author, lambda _, v: _setter("author", v))
     widget_tool.register_field_listener(widget, widget.le_author)
     widget_tool.add_validator(widget, widget.le_author, _is_not_empty, util.set_valid)
 
-    #Milestone
+    # Milestone
     widget_tool.register_field_getter(widget, widget.le_miles, lambda _: _getter("milestone"))
     widget_tool.register_field_setter(widget, widget.le_miles, lambda _, v: _setter("milestone", v))
     widget_tool.register_field_listener(widget, widget.le_miles)
     widget_tool.add_validator(widget, widget.le_miles, _is_not_empty, util.set_valid)
 
-    #Purpose
+    # Purpose
     widget_tool.register_field_getter(widget, widget.le_purpose, lambda _: _getter("purpose"))
     widget_tool.register_field_setter(widget, widget.le_purpose, lambda _, v: _setter("purpose", v))
     widget_tool.register_field_listener(widget, widget.le_purpose)
     widget_tool.add_validator(widget, widget.le_purpose, _is_not_empty, util.set_valid)
 
-    #Version
+    # Version
     widget_tool.register_field_getter(widget, widget.le_version, lambda _: _getter("version"))
     widget_tool.register_field_setter(widget, widget.le_version, lambda _, v: _setter("version", v))
     widget_tool.register_field_listener(widget, widget.le_version)
     widget_tool.add_validator(widget, widget.le_version, _is_not_empty, util.set_valid)
 
-    #Copyright
+    # Copyright
     widget_tool.register_field_getter(widget, widget.le_copyr, lambda _: _getter("copyright"))
     widget_tool.register_field_setter(widget, widget.le_copyr, lambda _, v: _setter("copyright", v))
     widget_tool.register_field_listener(widget, widget.le_copyr)
     widget_tool.add_validator(widget, widget.le_copyr, _is_not_empty, util.set_valid)
 
-    #Ifc-Version
+    # Ifc-Version
     widget_tool.register_field_getter(widget, widget.ti_ifc_vers, lambda _: _getter("ifc", "list"))
     widget_tool.register_field_setter(widget, widget.ti_ifc_vers, lambda _, v: _setter("ifc", v))
     widget_tool.register_field_listener(widget, widget.ti_ifc_vers)
     widget_tool.add_validator(widget, widget.ti_ifc_vers, _is_not_empty, util.set_valid)
 
-    #Date
+    # Date
     widget_tool.register_field_getter(widget, widget.dt_date, lambda _: _getter("date"))
     widget_tool.register_field_setter(widget, widget.dt_date, lambda _, v: _setter("date", v))
     widget_tool.register_field_listener(widget, widget.dt_date)
@@ -279,20 +282,27 @@ def export_settings(
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
-    class_dict = class_view.get_check_dict()
-    property_dict = property_view.get_check_dict()
-    settings_dict = widget_tool.get_settings(widget)
-    full_dict = {
+    # Create Dict
+    class_dict: dict[str, bool] = class_view.get_check_dict()
+    property_dict: PsetDict = property_view.get_check_dict()
+    settings_dict: BasicSettingsDict = widget_tool.get_settings(widget)
+    ids_metadata: MetadataDict = widget_tool.get_ids_metadata(widget)
+    full_dict: SettingsDict = {
         "class_settings": class_dict,
         "property_settings": property_dict,
         "settings": settings_dict,
+        "ids_metadata": ids_metadata,
     }
+
+    # Set Path
     text = QCoreApplication.translate("IDSExport", "Export IDS settings")
     old_path = appdata.get_path(constants.IDS_APPDATA)
-    new_path = popups.get_save_path(constants.FILETYPE, widget.window(), old_path, text)
+    new_path = popups.get_save_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
     if not new_path:
         return
     appdata.set_path(constants.IDS_APPDATA, new_path)
+
+    # Write Json
     with open(new_path, "w") as file:
         json.dump(full_dict, file)
 
@@ -305,20 +315,27 @@ def import_settings(
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
+    # Handle Path
     old_path = appdata.get_path(constants.IDS_APPDATA)
     text = QCoreApplication.translate("IDSExport", "Import IDS settings")
-    new_path = popups.get_open_path(constants.FILETYPE, widget.window(), old_path, text)
+    new_path = popups.get_open_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
     if not new_path:
         return
     appdata.set_path(constants.IDS_APPDATA, new_path)
+
+    # Read Settings
     with open(new_path, "r") as file:
-        full_dict = json.load(file)
+        full_dict: SettingsDict = json.load(file)
     class_dict = full_dict.get("class_settings", {})
     property_dict = full_dict.get("property_settings", {})
     settings_dict = full_dict.get("settings", {})
+    ids_metadata = full_dict.get("ids_metadata", {})
+
+    # Fill Fields and Checkstates
     class_view.set_check_dict(class_dict, widget.tv_classes)
     property_view.set_check_dict(property_dict, widget.tv_properties)
     widget_tool.set_settings(widget, settings_dict)
+    widget_tool.set_ids_metadata(widget, ids_metadata)
     pass
 
 
@@ -331,13 +348,12 @@ def export_ids(
     class_settings = class_view.get_check_dict()
     property_settings = property_view.get_check_dict()
     main_settings = widget_tool.get_settings(widget)
-    out_path = widget.fw_output.get_path()
-    template_path = widget.fw_template.get_path()
-    data_type = "IfcLabel"  # IfcLabel or IfcText
-    ifc_versions = [
-        "IFC4X3_ADD2",
-    ]
+    metadata_settings = widget_tool.get_ids_metadata(widget)
 
+    out_path = widget.fw_output.get_path()
+    template_path = widget_tool.get_template()
+    data_type = "IfcLabel"  # IfcLabel or IfcText
+    ifc_version = metadata_settings.get("ifc_versions", ["IFC4X3_ADD2"])
     bsdd_dict = widget.bsdd_data
     ids = ifctester.ids.open(template_path)
     base_spec = ids.specifications[0]
@@ -346,6 +362,15 @@ def export_ids(
     base_requirement.baseName = main_settings.get("main_property", "")
     base_restriction = base_requirement.value
     base_restriction.options = {"enumeration": [c.Code for c in bsdd_dict.Classes]}
+    base_spec.ifcVersion = ifc_version
+
+    ids.info["title"] = metadata_settings.get("title", ids.info.get("title"))
+    ids.info["description"] = metadata_settings.get("description", ids.info.get("description"))
+    ids.info["author"] = metadata_settings.get("author", ids.info.get("author"))
+    ids.info["milestone"] = metadata_settings.get("milestone", ids.info.get("milestone"))
+    ids.info["purpose"] = metadata_settings.get("purpose", ids.info.get("purpose"))
+    ids.info["version"] = metadata_settings.get("version", ids.info.get("version"))
+    ids.info["copyright"] = metadata_settings.get("copyright", ids.info.get("copyright"))
 
     # If Inherit is Checked it will build the class settings dict exclude subclasses of unchecked classes
     if main_settings["inherit"]:
@@ -359,7 +384,7 @@ def export_ids(
 
         spec = Specification(
             f"Check for {bsdd_class.Code}",
-            ifcVersion=ifc_versions,
+            ifcVersion=ifc_version,
             identifier=bsdd_class.Code,
             description="Auto-generated from bSDD",
         )

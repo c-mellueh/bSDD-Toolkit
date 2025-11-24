@@ -16,6 +16,7 @@ class FileSelector(QWidget):
         option: str = "test",
         mode: MODES = "open",
         file_format=FILETYPE,
+        title = None,
         *args,
         **kwargs,
     ):
@@ -34,7 +35,7 @@ class FileSelector(QWidget):
         self.mode = mode
         self.file_format = file_format
         self.tool_button.clicked.connect(self.on_button_click)
-
+        self.title = title
     def load_path(self):
         from bsdd_gui.tool import Appdata
 
@@ -52,7 +53,7 @@ class FileSelector(QWidget):
         from bsdd_gui.tool import Appdata, Popups
 
         path = Appdata.get_string_setting(self.section, self.option, None)
-        path = Popups.get_save_path(self.file_format, self, path)
+        path = Popups.get_save_path(self.file_format, self, path,title = self.title)
         if path is not None:
             Appdata.set_setting(self.section, self.option, path)
             self.set_path(path)

@@ -15,6 +15,8 @@ from bsdd_json.utils import class_utils
 from bsdd_gui.module.ids_exporter import ui, models, model_views
 from operator import itemgetter
 from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QDate
+import datetime
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter.prop import (
@@ -37,13 +39,26 @@ class SettingsDict(TypedDict):
     class_settings: dict[str, bool]
     property_settings: dict[str, dict[str, PsetDict]]
     settings: dict
+    ids_metadata: MetadataDict
 
 
-class MainSettingsDIct(TypedDict):
+class BasicSettingsDict(TypedDict):
     inherit: bool
     classification: bool
     main_pset: str
     main_property: str
+
+
+class MetadataDict(TypedDict):
+    title: str
+    description: str
+    author: str
+    milestone: str
+    purpose: str
+    version: str
+    copyright: str
+    date: datetime.date
+    ifc_versions: list[str]
 
 
 class IdsSignals(DialogSignals):
@@ -89,8 +104,14 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def get_template(cls):
         from bsdd_gui.resources.data import DATA_PATH
+        from bsdd_gui import tool
 
-        return os.path.join(DATA_PATH, "template.ids")
+        var = "ids_template"
+        path = tool.Appdata.get_path(var)
+        if not path:
+            path = os.path.join(DATA_PATH, "template.ids")
+        tool.Appdata.set_path(var, path)
+        return path
 
     @classmethod
     def build_inherited_checkstate_dict(
@@ -287,7 +308,7 @@ class IdsExporter(ActionTool, DialogTool):
         return settings_dict
 
     @classmethod
-    def get_ids_metadata(cls, widget: ui.IdsWidget):
+    def get_ids_metadata(cls, widget: ui.IdsWidget) -> MetadataDict:
         metadata_dict = {
             "title": widget.le_title.text(),
             "description": widget.le_desc.text(),
@@ -296,10 +317,28 @@ class IdsExporter(ActionTool, DialogTool):
             "purpose": widget.le_purpose.text(),
             "version": widget.le_version.text(),
             "copyright": widget.le_copyr.text(),
-            "date": widget.dt_date.dt_edit.date().toPython(),
+            "date": widget.dt_date.dt_edit.date().toPython().strftime(r"%Y-%m-%d"),
             "ifc_versions": widget.ti_ifc_vers.tags(),
         }
         return metadata_dict
+
+    @classmethod
+    def set_ids_metadata(cls, widget: ui.IdsWidget, metadata: MetadataDict):
+        widget.le_title.setText(metadata.get("title", ""))
+        widget.le_desc.setText(metadata.get("description", ""))
+        widget.le_author.setText(metadata.get("author", ""))
+        widget.le_miles.setText(metadata.get("milestone", ""))
+        widget.le_purpose.setText(metadata.get("purpose", ""))
+        widget.le_version.setText(metadata.get("version", ""))
+        widget.le_copyr.setText(metadata.get("copyright", ""))
+
+        dt = metadata.get("date")
+        if dt is not None:
+            dt = datetime.datetime.strptime(dt, r"%Y-%m-%d")
+            widget.dt_date.dt_edit.setDate(QDate(dt.year, dt.month, dt, dt.day))
+
+        ifc_versions = metadata.get("ifc_versions", ["IFC4X3_ADD2"])
+        widget.ti_ifc_vers.setTags(ifc_versions)
 
     @classmethod
     def set_settings(cls, widget: ui.IdsWidget, settings_dict: dict):

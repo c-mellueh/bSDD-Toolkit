@@ -27,9 +27,5 @@ class IdsWidget(FieldWidget, Ui_Form):
         super().__init__(data, *args, **kwargs)
         self.bsdd_data: BsddDictionary
         self.setupUi(self)
-        self.fw_output.section = "paths"
-        self.fw_output.option = "ids"
-        self.fw_output.load_path()
-        self.fw_template.section = "paths"
-        self.fw_template.option = "ids_template"
+
         trigger.widget_created(self)
