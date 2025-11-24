@@ -14,6 +14,7 @@ from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils
 from bsdd_gui.module.ids_exporter import ui, models, model_views
 from operator import itemgetter
+from PySide6.QtWidgets import QWidget
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter.prop import (
@@ -24,6 +25,7 @@ if TYPE_CHECKING:
 from bsdd_gui.module.ids_exporter import trigger
 import ifctester
 import os
+from bsdd_gui.presets.ui_presets import run_iterable_with_progress
 
 
 class PsetDict(TypedDict):
@@ -36,11 +38,13 @@ class SettingsDict(TypedDict):
     property_settings: dict[str, dict[str, PsetDict]]
     settings: dict
 
+
 class MainSettingsDIct(TypedDict):
     inherit: bool
     classification: bool
     main_pset: str
     main_property: str
+
 
 class IdsSignals(DialogSignals):
     pass
@@ -210,22 +214,46 @@ class IdsExporter(ActionTool, DialogTool):
         widget.cb_pset.setVisible(state)
 
     @classmethod
-    def count_properties(cls, bsdd_dictionary: BsddDictionary):
-        count_dict = dict()
-        for bsdd_class in bsdd_dictionary.Classes:
-            existing_psets = list()
+    def count_properties_with_progress(cls, parent: QWidget, classes: list["BsddClass"]):
+        """
+        [Unverified] Wraps the outer loop in a worker thread with QProgressDialog.
+        """
+
+        # initialize once in the GUI thread
+        count_dict: dict[str, dict] = {}
+        cls.get_properties().property_count = count_dict
+
+        def process_bsdd_class(bsdd_class: BsddClass, idx: int):
+            # runs in worker thread – no UI calls here
+            existing_psets: list[str] = []
             for class_prop in bsdd_class.ClassProperties:
                 pset_name = class_prop.PropertySet
                 prop_name = prop_utils.get_name(class_prop)
+
                 if pset_name not in count_dict:
                     count_dict[pset_name] = {"properties": {}, "count": 0}
+
                 if pset_name not in existing_psets:
                     count_dict[pset_name]["count"] += 1
                     existing_psets.append(pset_name)
+
                 if prop_name not in count_dict[pset_name]["properties"]:
                     count_dict[pset_name]["properties"][prop_name] = 0
+
                 count_dict[pset_name]["properties"][prop_name] += 1
-        cls.get_properties().property_count = count_dict
+
+        worker, thread, dialog = run_iterable_with_progress(
+            parent=parent,
+            iterable=classes,
+            total=len(classes),
+            title="Counting properties…",
+            text="Processing bSDD classes…",
+            cancel_text="Cancel",
+            process_func=process_bsdd_class,
+        )
+
+        # keep references on the class or the caller side if needed
+        return worker, thread, dialog
 
     @classmethod
     def fill_pset_combobox(cls, widget: ui.IdsWidget):

@@ -10,6 +10,7 @@ from ifctester.facet import Property as PropertyFacet
 from ifctester.facet import Entity as EntityFacet
 from ifctester.facet import Restriction
 from ifctester.ids import Specification
+from bsdd_gui.presets.ui_presets import run_iterable_with_progress
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -59,7 +60,7 @@ def create_dialog(data: BsddDictionary, parent, dialog_tool: Type[tool.IdsExport
     model.bsdd_data = data
     model.endResetModel()
     geom = dialog.geometry()
-    dialog.setGeometry(geom.x(),geom.y(),1075,710)
+    dialog.setGeometry(geom.x(), geom.y(), 1075, 710)
     if dialog.exec():
         dialog_tool.sync_to_model(dialog._widget, data)
         dialog_tool.signals.dialog_accepted.emit(dialog)
@@ -83,9 +84,18 @@ def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[
 
 
 def connect_widget(
-    widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter], ids_class: Type[tool.IdsClassView]
+    widget: ui.IdsWidget,
+    widget_tool: Type[tool.IdsExporter],
+    ids_class: Type[tool.IdsClassView],
+    main_window: Type[tool.MainWindowWidget],
 ):
-    widget_tool.count_properties(widget.bsdd_data, widget, lambda: widget_tool.fill_pset_combobox(widget))
+    worker, thread, dialog = widget_tool.count_properties_with_progress(
+        main_window.get(), widget.bsdd_data.Classes
+    )
+    widget._count_worker = worker
+    widget._count_thread = thread
+    widget._count_dialog = dialog
+    worker.finished.connect(lambda: widget_tool.fill_pset_combobox(widget))
     widget_tool.connect_widget_signals(widget)
     class_view = widget.tv_classes
     ids_class.connect_settings_signals(widget, class_view)

@@ -35,7 +35,7 @@ def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
     core.register_fields(widget, tool.IdsExporter)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
-    core.connect_widget(widget, tool.IdsExporter, tool.IdsClassView)
+    core.connect_widget(widget, tool.IdsExporter, tool.IdsClassView,tool.MainWindowWidget)
 
 
 def import_settings(widget: IdsWidget):
