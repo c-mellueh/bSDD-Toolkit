@@ -70,4 +70,4 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
     # core.create_context_menu(view, pos, tool.ItemViewTool)
 
 def export_ids(widget:IdsWidget):
-    core.export_ids(widget,tool.IdsExporter,tool.IdsClassView,tool.IdsPropertyView)
+    core.export_ids(widget,tool.IdsExporter,tool.IdsClassView,tool.IdsPropertyView,tool.MainWindowWidget,tool.Popups)

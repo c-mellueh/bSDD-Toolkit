@@ -354,6 +354,8 @@ def export_ids(
     widget_tool: Type[tool.IdsExporter],
     class_view: Type[tool.IdsClassView],
     property_view: Type[tool.IdsPropertyView],
+    main_window: Type[tool.MainWindowWidget],
+    popups: Type[tool.Popups],
 ):
     class_settings = class_view.get_check_dict()
     property_settings = property_view.get_check_dict()
@@ -387,24 +389,31 @@ def export_ids(
             bsdd_dict.Classes, class_settings
         )
 
-    for bsdd_class in sorted(bsdd_dict.Classes, key=lambda x: x.Code):
-        if not class_settings.get(bsdd_class.Code, True):
-            continue
+    input = sorted(bsdd_dict.Classes, key=lambda x: x.Code)
+    worker, thread, dialog = widget_tool.create_specification_with_progress(
+        ids,
+        input,
+        base_settings,
+        class_settings,
+        property_settings,
+        bsdd_dict,
+        ifc_version,
+        main_window.get(),
+    )
+    widget._specification_worker = worker
+    widget._specification_thread = thread
+    widget._specification_dialog = dialog
 
-        spec = Specification(
-            f"Check for {bsdd_class.Code}",
-            ifcVersion=ifc_version,
-            identifier=bsdd_class.Code,
-            description="Auto-generated from bSDD",
+    def _export():
+        ids.to_xml(out_path)
+        popups.create_info_popup(
+            f"{len(ids.specifications)} Specifications created.",
+            "IDS Export Done!",
+            "IDS Export Done!",
+            parent=main_window.get(),
         )
-        if base_settings.get("classification", False):
-            applicability_facet = widget_tool.build_classification_facet(bsdd_class, bsdd_dict)
-        else:
-            applicability_facet = widget_tool.build_main_property_facet(bsdd_class, base_settings)
-        spec.applicability.append(applicability_facet)
-        for class_prop in bsdd_class.ClassProperties:
-            if widget_tool.is_class_prop_active(class_prop, property_settings):
-                spec.requirements += widget_tool.build_property_requirements(class_prop, bsdd_dict)
-        spec.requirements += widget_tool.build_ifc_requirements(bsdd_class, bsdd_dict)
-        ids.specifications.append(spec)
-    ids.to_xml(out_path)
+
+    thread.finished.connect(lambda: setattr(widget, "_specification_worker", None))
+    thread.finished.connect(lambda: setattr(widget, "_specification_thread", None))
+    thread.finished.connect(lambda: setattr(widget, "_specification_dialog", None))
+    thread.finished.connect(_export)

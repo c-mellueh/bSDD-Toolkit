@@ -372,7 +372,7 @@ class IdsExporter(ActionTool, DialogTool):
     def build_classification_facet(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
 
         return ClassificationFacet(
-            class_utils.build_bsdd_uri(bsdd_class,bsdd_dictionary),
+            class_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary),
             "bSDD",
             cardinality="optional",
         )
@@ -386,6 +386,60 @@ class IdsExporter(ActionTool, DialogTool):
             base_settings.get("datatype"),
             cardinality="optional",
         )
+
+    @classmethod
+    def create_specification_with_progress(
+        cls,
+        ids,
+        classes: list["BsddClass"],
+        base_settings: BasicSettingsDict,
+        class_settings: dict[str, bool],
+        property_settings: PsetDict,
+        bsdd_dict: BsddDictionary,
+        ifc_version: list[str],
+        parent: QWidget,
+    ):
+        """
+        [Unverified] Wraps the outer loop in a worker thread with progress embedded in the UI.
+        """
+
+        # initialize once in the GUI thread
+        count_dict: dict[str, dict] = {}
+        cls.get_properties().property_count = count_dict
+
+        def process_bsdd_class(bsdd_class: BsddClass, idx: int):
+            if not class_settings.get(bsdd_class.Code, True):
+                return
+
+            spec = Specification(
+                f"Check for {bsdd_class.Code}",
+                ifcVersion=ifc_version,
+                identifier=bsdd_class.Code,
+                description="Auto-generated from bSDD",
+            )
+            if base_settings.get("classification", False):
+                applicability_facet = cls.build_classification_facet(bsdd_class, bsdd_dict)
+            else:
+                applicability_facet = cls.build_main_property_facet(bsdd_class, base_settings)
+            spec.applicability.append(applicability_facet)
+            for class_prop in bsdd_class.ClassProperties:
+                if cls.is_class_prop_active(class_prop, property_settings.get(bsdd_class.Code,dict())):
+                    spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
+            spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
+            ids.specifications.append(spec)
+
+        worker, thread, dialog = run_iterable_with_progress(
+            parent=parent,
+            iterable=classes,
+            total=len(classes),
+            title="Create Specifications…",
+            text="Create Specifications…",
+            cancel_text="Cancel",
+            process_func=process_bsdd_class,
+        )
+
+        # keep references on the class or the caller side if needed
+        return worker, thread, dialog
 
 
 class ClassSignals(ViewSignals):
