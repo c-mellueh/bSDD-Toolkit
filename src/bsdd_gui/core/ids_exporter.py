@@ -11,7 +11,9 @@ from ifctester.facet import Entity as EntityFacet
 from ifctester.facet import Classification as ClassificationFacet
 from ifctester.facet import Restriction
 from ifctester.ids import Specification
-from bsdd_gui.presets.ui_presets import run_iterable_with_progress
+from bsdd_gui.resources import icons
+import qtawesome as qta
+
 import datetime
 
 if TYPE_CHECKING:
@@ -76,10 +78,16 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget.dt_date.hide_toggle_switch()
     widget.dt_date.set_now()
     widget.dt_date.dt_edit.setDisplayFormat("yyyy-MM-dd")
+
     widget.fw_output.file_format = constants.IDS_FILETYPE
     widget.fw_output.section = "paths"
     widget.fw_output.option = "ids"
     widget.fw_output.title = "get IDS-Export Path"
+
+    widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
+    widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
+    widget.pb_import.setText("")
+    widget.pb_export.setText("")
     widget.fw_output.load_path()
 
 

@@ -182,7 +182,7 @@
             <x>0</x>
             <y>0</y>
             <width>376</width>
-            <height>668</height>
+            <height>660</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -371,16 +371,28 @@
            </spacer>
           </item>
           <item>
-           <widget class="QToolButton" name="tb_export">
+           <widget class="QPushButton" name="pb_import">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
             <property name="text">
-             <string>D</string>
+             <string>Import</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="tb_import">
+           <widget class="QPushButton" name="pb_export">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
-             <string>U</string>
+             <string>Export</string>
             </property>
            </widget>
           </item>

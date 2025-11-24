@@ -17,8 +17,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
-    QScrollArea, QSizePolicy, QSpacerItem, QSplitter,
-    QToolButton, QVBoxLayout, QWidget)
+    QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
+    QSplitter, QVBoxLayout, QWidget)
 
 from bsdd_gui.module.ids_exporter.model_views import (ClassView, PropertyView, TagInput_IfcVersion)
 from bsdd_gui.presets.ui_presets import (DateTimeWithNow, FileSelector, ToggleSwitch)
@@ -137,7 +137,7 @@ class Ui_Form(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 376, 668))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 376, 660))
         self.verticalLayout_2 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -268,15 +268,21 @@ class Ui_Form(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
-        self.tb_export = QToolButton(self.fr_download)
-        self.tb_export.setObjectName(u"tb_export")
+        self.pb_import = QPushButton(self.fr_download)
+        self.pb_import.setObjectName(u"pb_import")
+        self.pb_import.setMinimumSize(QSize(0, 30))
 
-        self.horizontalLayout.addWidget(self.tb_export)
+        self.horizontalLayout.addWidget(self.pb_import)
 
-        self.tb_import = QToolButton(self.fr_download)
-        self.tb_import.setObjectName(u"tb_import")
+        self.pb_export = QPushButton(self.fr_download)
+        self.pb_export.setObjectName(u"pb_export")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.pb_export.sizePolicy().hasHeightForWidth())
+        self.pb_export.setSizePolicy(sizePolicy2)
 
-        self.horizontalLayout.addWidget(self.tb_import)
+        self.horizontalLayout.addWidget(self.pb_export)
 
 
         self.verticalLayout.addWidget(self.fr_download)
@@ -323,7 +329,7 @@ class Ui_Form(object):
         self.label_5.setText(QCoreApplication.translate("Form", u"Description", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"IFC-Versions", None))
         self.label_14.setText(QCoreApplication.translate("Form", u"**IDS Metadata**", None))
-        self.tb_export.setText(QCoreApplication.translate("Form", u"D", None))
-        self.tb_import.setText(QCoreApplication.translate("Form", u"U", None))
+        self.pb_import.setText(QCoreApplication.translate("Form", u"Import", None))
+        self.pb_export.setText(QCoreApplication.translate("Form", u"Export", None))
     # retranslateUi
 

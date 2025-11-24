@@ -100,8 +100,8 @@ class IdsExporter(ActionTool, DialogTool):
         widget.cb_clsf.toggled.connect(lambda state: widget.widget_prop.setVisible(not state))
         widget.cb_pset.currentTextChanged.connect(lambda _: cls.fill_prop_combobox(widget))
         widget.cb_pset.currentIndexChanged.connect(lambda _: cls.fill_prop_combobox(widget))
-        widget.tb_import.clicked.connect(lambda: trigger.import_settings(widget))
-        widget.tb_export.clicked.connect(lambda: trigger.export_settings(widget))
+        widget.pb_import.clicked.connect(lambda: trigger.import_settings(widget))
+        widget.pb_export.clicked.connect(lambda: trigger.export_settings(widget))
         return widget
 
     @classmethod
@@ -339,7 +339,7 @@ class IdsExporter(ActionTool, DialogTool):
         dt = metadata.get("date")
         if dt is not None:
             dt = datetime.datetime.strptime(dt, r"%Y-%m-%d")
-            widget.dt_date.dt_edit.setDate(QDate(dt.year, dt.month, dt, dt.day))
+            widget.dt_date.dt_edit.setDate(QDate(dt.year, dt.month, dt.day))
 
         ifc_versions = metadata.get("ifc_versions", ["IFC4X3_ADD2"])
         widget.ti_ifc_vers.setTags(ifc_versions)
