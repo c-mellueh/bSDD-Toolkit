@@ -58,6 +58,8 @@ def create_dialog(data: BsddDictionary, parent, dialog_tool: Type[tool.IdsExport
     model.beginResetModel()
     model.bsdd_data = data
     model.endResetModel()
+    geom = dialog.geometry()
+    dialog.setGeometry(geom.x(),geom.y(),1075,710)
     if dialog.exec():
         dialog_tool.sync_to_model(dialog._widget, data)
         dialog_tool.signals.dialog_accepted.emit(dialog)
@@ -83,11 +85,10 @@ def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[
 def connect_widget(
     widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter], ids_class: Type[tool.IdsClassView]
 ):
-    widget_tool.count_properties(widget.bsdd_data)
+    widget_tool.count_properties(widget.bsdd_data, widget, lambda: widget_tool.fill_pset_combobox(widget))
     widget_tool.connect_widget_signals(widget)
     class_view = widget.tv_classes
     ids_class.connect_settings_signals(widget, class_view)
-    widget_tool.fill_pset_combobox(widget)
 
 
 def register_class_view(view: model_views.ClassView, ids_class_view: Type[tool.IdsClassView]):
