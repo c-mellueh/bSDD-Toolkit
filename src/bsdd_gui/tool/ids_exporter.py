@@ -11,6 +11,7 @@ from ifctester.ids import Specification
 from bsdd_gui.presets.signal_presets import DialogSignals, ViewSignals
 from bsdd_gui.presets.tool_presets import ActionTool, DialogTool, ItemViewTool
 from bsdd_json.utils import property_utils as prop_utils
+from bsdd_json.utils import class_utils
 from bsdd_gui.module.ids_exporter import ui, models, model_views
 from operator import itemgetter
 
@@ -26,15 +27,20 @@ import os
 
 
 class PsetDict(TypedDict):
-    check: bool
+    checked: bool
     proeprties: dict[str, bool]
 
 
 class SettingsDict(TypedDict):
     class_settings: dict[str, bool]
     property_settings: dict[str, dict[str, PsetDict]]
-    settings:dict
+    settings: dict
 
+class MainSettingsDIct(TypedDict):
+    inherit: bool
+    classification: bool
+    main_pset: str
+    main_property: str
 
 class IdsSignals(DialogSignals):
     pass
@@ -58,10 +64,12 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def _get_widget_class(cls):
         return ui.IdsWidget
+
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.dialog_accepted.connect(lambda d:trigger.export_ids(d._widget))
+        cls.signals.dialog_accepted.connect(lambda d: trigger.export_ids(d._widget))
+
     @classmethod
     def connect_widget_signals(cls, widget: ui.IdsWidget):
         super().connect_widget_signals(widget)
@@ -78,50 +86,43 @@ class IdsExporter(ActionTool, DialogTool):
     def get_template(cls):
         from bsdd_gui.resources.data import DATA_PATH
 
-        return ifctester.ids.open(os.path.join(DATA_PATH, "template.ids"))
+        return os.path.join(DATA_PATH, "template.ids")
 
     @classmethod
-    def build_ids(cls, bsdd_dict: BsddDictionary, settings_dict: dict):
-        settings_dict:SettingsDict
-        class_settings = settings_dict.get("class_settings",dict())
-        property_settings = settings_dict.get("property_settings",dict())
-        main_settings = settings_dict.get("settings",dict())
+    def build_inherited_checkstate_dict(
+        cls, bsdd_classes: list[BsddClass], old_checkstate_dict: dict[str, bool]
+    ):
+        def _iter_classes(child_classes: list[BsddClass], parent_checkstate: bool):
+            for child in child_classes:
+                checkstate = old_checkstate_dict.get(child.Code, True) and parent_checkstate
+                new_checkstate_dict[child.Code] = checkstate
+                _iter_classes(class_utils.get_children(child), checkstate)
 
-        pset = main_settings.get("main_pset","")
-        prop = main_settings.get("main_property","")
-        classification = main_settings.get("classification",False)
-        inherit = main_settings.get("inherit",False)
+        new_checkstate_dict: dict[str, bool] = dict()
+        root_classes = [c for c in bsdd_classes if not c.ParentClassCode]
+        _iter_classes(root_classes, True)
+        return new_checkstate_dict
 
-        data_type = "IfcLabel"  # IfcLabel or IfcText
-        ifc_versions = [
-            "IFC4X3_ADD2",
-        ]
-        ids = cls.get_template()
-        base_spec = ids.specifications[0]
-        base_requirement: PropertyFacet = base_spec.requirements[0]
-        base_requirement.propertySet = pset
-        base_requirement.baseName = prop
-        base_restriction = base_requirement.value
-        base_restriction.options = {"enumeration": [c.Code for c in bsdd_dict.Classes]}
-        for bsdd_class in sorted(bsdd_dict.Classes, key=lambda x: x.Code):
-            if not class_settings.get(bsdd_class.Code,True):
-                continue
-            
-            spec = Specification(
-                f"Check for {bsdd_class.Code}",
-                ifcVersion=ifc_versions,
-                identifier=bsdd_class.Code,
-                description="Auto-generated from bSDD",
-            )
-            applicability_facet = PropertyFacet(
-                pset, prop, bsdd_class.Code, data_type, cardinality="optional"
-            )
-            spec.applicability.append(applicability_facet)
-            for class_prop in bsdd_class.ClassProperties:
-                spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
-            spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
-            ids.specifications.append(spec)
-        return ids
+    @classmethod
+    def is_class_active(
+        cls, bsdd_class: BsddClass, class_settings: dict[str, bool], inherit_checkstates: bool
+    ):
+        checkstate = class_settings.get(bsdd_class.Code, True)
+        if not inherit_checkstates or not checkstate:
+            return checkstate
+        parent = bsdd_class.ParentClassCode
+        if not parent:
+            return checkstate
+
+    @classmethod
+    def is_class_prop_active(cls, class_prop: BsddClassProperty, property_settings: PsetDict):
+        pset_dict = property_settings.get(class_prop.PropertySet, dict())
+        pset_checkstate = pset_dict.get("checked")
+        if pset_checkstate is None:
+            return True
+        elif pset_checkstate is False:
+            return False
+        return pset_dict.get("properties", dict()).get(class_prop.Code, True)
 
     @classmethod
     def build_property_requirements(cls, class_prop: BsddClassProperty, bsdd_dict: BsddDictionary):

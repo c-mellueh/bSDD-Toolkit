@@ -5,6 +5,12 @@ from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import constants
 import json
 import os
+import ifctester
+from ifctester.facet import Property as PropertyFacet
+from ifctester.facet import Entity as EntityFacet
+from ifctester.facet import Restriction
+from ifctester.ids import Specification
+
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.ids_exporter import ui, model_views, models
@@ -61,6 +67,8 @@ def create_dialog(data: BsddDictionary, parent, dialog_tool: Type[tool.IdsExport
 
 def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget_tool.register_widget(widget)
+    if not widget.fw_template.get_path():
+        widget.fw_template.set_path(widget_tool.get_template())
 
 
 def register_fields(widget: ui.IdsWidget, widget_Tool: Type[tool.IdsExporter]):
@@ -168,7 +176,11 @@ def export_settings(
     class_dict = class_view.get_check_dict()
     property_dict = property_view.get_check_dict()
     settings_dict = widget_tool.get_settings(widget)
-    full_dict = {"class_settings": class_dict, "property_settings": property_dict, "settings": settings_dict}
+    full_dict = {
+        "class_settings": class_dict,
+        "property_settings": property_dict,
+        "settings": settings_dict,
+    }
     text = QCoreApplication.translate("IDSExport", "Export IDS settings")
     old_path = appdata.get_path(constants.IDS_APPDATA)
     new_path = popups.get_save_path(constants.FILETYPE, widget.window(), old_path, text)
@@ -203,11 +215,59 @@ def import_settings(
     widget_tool.set_settings(widget, settings_dict)
     pass
 
-def export_ids(widget:ui.IdsWidget,widget_tool:Type[tool.IdsExporter],class_view:Type[tool.IdsClassView],property_view:Type[tool.IdsPropertyView]):
-    class_dict = class_view.get_check_dict()
-    property_dict = property_view.get_check_dict()
-    settings_dict = widget_tool.get_settings(widget)
-    full_dict = {"class_settings": class_dict, "property_settings": property_dict, "settings": settings_dict}
+
+def export_ids(
+    widget: ui.IdsWidget,
+    widget_tool: Type[tool.IdsExporter],
+    class_view: Type[tool.IdsClassView],
+    property_view: Type[tool.IdsPropertyView],
+):
+    class_settings = class_view.get_check_dict()
+    property_settings = property_view.get_check_dict()
+    main_settings = widget_tool.get_settings(widget)
     out_path = widget.fw_output.get_path()
-    ids = widget_tool.build_ids(widget.bsdd_data,full_dict)
+    template_path = widget.fw_template.get_path()
+    data_type = "IfcLabel"  # IfcLabel or IfcText
+    ifc_versions = [
+        "IFC4X3_ADD2",
+    ]
+
+    bsdd_dict = widget.bsdd_data
+    ids = ifctester.ids.open(template_path)
+    base_spec = ids.specifications[0]
+    base_requirement: PropertyFacet = base_spec.requirements[0]
+    base_requirement.propertySet = main_settings.get("main_pset", "")
+    base_requirement.baseName = main_settings.get("main_property", "")
+    base_restriction = base_requirement.value
+    base_restriction.options = {"enumeration": [c.Code for c in bsdd_dict.Classes]}
+
+    # If Inherit is Checked it will build the class settings dict exclude subclasses of unchecked classes
+    if main_settings["inherit"]:
+        class_settings = widget_tool.build_inherited_checkstate_dict(
+            bsdd_dict.Classes, class_settings
+        )
+
+    for bsdd_class in sorted(bsdd_dict.Classes, key=lambda x: x.Code):
+        if not class_settings.get(bsdd_class.Code, True):
+            continue
+
+        spec = Specification(
+            f"Check for {bsdd_class.Code}",
+            ifcVersion=ifc_versions,
+            identifier=bsdd_class.Code,
+            description="Auto-generated from bSDD",
+        )
+        applicability_facet = PropertyFacet(
+            base_requirement.propertySet,
+            base_requirement.baseName,
+            bsdd_class.Code,
+            data_type,
+            cardinality="optional",
+        )
+        spec.applicability.append(applicability_facet)
+        for class_prop in bsdd_class.ClassProperties:
+            if widget_tool.is_class_prop_active(class_prop, property_settings):
+                spec.requirements += widget_tool.build_property_requirements(class_prop, bsdd_dict)
+        spec.requirements += widget_tool.build_ifc_requirements(bsdd_class, bsdd_dict)
+        ids.specifications.append(spec)
     ids.to_xml(out_path)

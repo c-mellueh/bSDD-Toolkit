@@ -29,6 +29,16 @@ class Ui_Form(object):
         Form.resize(1075, 710)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.fw_template = FileSelector(Form)
+        self.fw_template.setObjectName(u"fw_template")
+
+        self.gridLayout.addWidget(self.fw_template, 2, 0, 1, 1)
+
+        self.fw_output = FileSelector(Form)
+        self.fw_output.setObjectName(u"fw_output")
+
+        self.gridLayout.addWidget(self.fw_output, 4, 0, 1, 1)
+
         self.splitter = QSplitter(Form)
         self.splitter.setObjectName(u"splitter")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
@@ -65,7 +75,7 @@ class Ui_Form(object):
 
         self.cb_classification = ToggleSwitch(self.fr_settings)
         self.cb_classification.setObjectName(u"cb_classification")
-        self.cb_classification.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        self.cb_classification.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
         self.gridLayout_2.addWidget(self.cb_classification, 1, 1, 1, 1)
 
@@ -76,7 +86,7 @@ class Ui_Form(object):
 
         self.cb_inherit = ToggleSwitch(self.fr_settings)
         self.cb_inherit.setObjectName(u"cb_inherit")
-        self.cb_inherit.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        self.cb_inherit.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
         self.gridLayout_2.addWidget(self.cb_inherit, 0, 1, 1, 1)
 
@@ -114,10 +124,15 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
 
-        self.fw_output = FileSelector(Form)
-        self.fw_output.setObjectName(u"fw_output")
+        self.label_2 = QLabel(Form)
+        self.label_2.setObjectName(u"label_2")
 
-        self.gridLayout.addWidget(self.fw_output, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_2, 1, 0, 1, 1)
+
+        self.label_3 = QLabel(Form)
+        self.label_3.setObjectName(u"label_3")
+
+        self.gridLayout.addWidget(self.label_3, 3, 0, 1, 1)
 
 
         self.retranslateUi(Form)
@@ -138,5 +153,7 @@ class Ui_Form(object):
         self.cb_classification.setText(QCoreApplication.translate("Form", u"CheckBox", None))
         self.tb_export.setText(QCoreApplication.translate("Form", u"D", None))
         self.tb_import.setText(QCoreApplication.translate("Form", u"U", None))
+        self.label_2.setText(QCoreApplication.translate("Form", u"Template:", None))
+        self.label_3.setText(QCoreApplication.translate("Form", u"Export:", None))
     # retranslateUi
 

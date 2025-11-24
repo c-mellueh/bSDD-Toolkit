@@ -26,4 +26,6 @@ class IdsWidget(FieldWidget, Ui_Form):
         self.fw_output.section = "paths"
         self.fw_output.option = "ids"
         self.fw_output.load_path()
+        self.fw_template.section = "paths"
+        self.fw_template.option = "ids_template"
         trigger.widget_created(self)
