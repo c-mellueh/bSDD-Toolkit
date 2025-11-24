@@ -12,6 +12,7 @@ import bsdd
 from bsdd import Client
 from . import dictionary_utils as dict_utils
 from . import build_unique_code
+import logging
 
 
 class Cache:
@@ -24,8 +25,10 @@ class Cache:
         from bsdd_json.utils import property_utils as prop_utils
 
         def _make_request():
+
             if not dict_utils.is_uri(property_uri):
                 return dict()
+            logging.debug(f"Load {property_uri}")
             c = Client() if client is None else client
             result = c.get_property(property_uri)
 
@@ -49,10 +52,8 @@ class Cache:
 
 def get_data_type(class_property: BsddClassProperty):
 
-    if not is_external_ref(class_property):
-        prop = get_internal_property(class_property)
-    else:
-        prop = get_external_property(class_property)
+    prop = get_property_by_class_property(class_property)
+
     if not prop:
         return None
     return prop.DataType
@@ -87,6 +88,9 @@ def get_internal_property(
 def get_external_property(
     class_property: BsddClassProperty, client=None
 ) -> BsddProperty | None:
+    from bsdd_gui import tool
+    if tool.Project.get_offline_mode():
+        return None
     return Cache.get_external_property(class_property.PropertyUri, client)
 
 
@@ -95,25 +99,19 @@ def get_property_code_dict(bsdd_dictionary: BsddDictionary) -> dict[str, BsddPro
 
 
 def get_datatype(class_property: BsddClassProperty):
-    if is_external_ref(class_property):
-        bsdd_property = get_external_property(class_property)
-    else:
-        bsdd_property = get_internal_property(class_property)
+    prop = get_property_by_class_property(class_property)
 
-    if bsdd_property is None:
+    if prop is None:
         return ""
-    return bsdd_property.DataType or "String"
+    return prop.DataType or "String"
 
 
 def get_units(class_property: BsddClassProperty):
-    if is_external_ref(class_property):
-        bsdd_property = get_external_property(class_property)
-    else:
-        bsdd_property = get_internal_property(class_property)
+    prop = get_property_by_class_property(class_property)
 
-    if bsdd_property is None:
+    if prop is None:
         return []
-    return bsdd_property.Units or []
+    return prop.Units or []
 
 
 def get_classes_with_bsdd_property(property_code: str, bsdd_dictionary: BsddDictionary):
@@ -175,7 +173,7 @@ def build_bsdd_uri(bsdd_property: BsddProperty, bsdd_dictionary: BsddDictionary)
     data = {
         "namespace": [bsdd_dictionary.OrganizationCode, bsdd_dictionary.DictionaryCode],
         "version": bsdd_dictionary.DictionaryVersion,
-        "resource_type": "property",
+        "resource_type": "prop",
         "resource_id": bsdd_property.Code,
     }
     if bsdd_dictionary.UseOwnUri:
@@ -250,10 +248,31 @@ def delete_property(
 
 
 def get_name(class_property: BsddClassProperty):
-    if not is_external_ref(class_property):
-        prop = get_internal_property(class_property)
-    else:
-        prop = get_external_property(class_property)
+    prop = get_property_by_class_property(class_property)
     if not prop:
         return None
     return prop.Name
+
+
+def get_values(class_property: BsddClassProperty):
+    prop = get_property_by_class_property(class_property)
+    if not prop:
+        return None
+    if class_property.AllowedValues:
+        return class_property.AllowedValues
+    if prop.AllowedValues:
+        return prop.AllowedValues
+    return []
+
+
+def get_property_by_class_property(
+    class_prop: BsddClassProperty,
+) -> BsddProperty | None:
+    if not is_external_ref(class_prop):
+        return get_internal_property(class_prop)
+    else:
+        return get_external_property(class_prop)
+
+
+def get_class_properties_by_pset_name(bsdd_class: BsddClass, pset_name: str):
+    return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]

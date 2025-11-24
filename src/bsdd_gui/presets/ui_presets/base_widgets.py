@@ -17,9 +17,9 @@ class BaseDialog(QDialog):
         self.button_box = QDialogButtonBox(Qt.Horizontal)
         # Layout
         self._layout = QVBoxLayout(self)
-        self._layout.addWidget(self.button_box)
         self._widget: FieldWidget = widget
-        self._widget.setParent(self)
+        self._layout.addWidget(self._widget)
+        self._layout.addWidget(self.button_box)
         self.setWindowIcon(get_icon())
 
 

@@ -401,7 +401,25 @@ class Util:
 
     @classmethod
     def set_invalid(cls, widget: QWidget, invalid: bool) -> None:
+        """
+        invalidates style of widget (see install_validation_styles in main_window_widget.py)
+        """
         widget.setProperty("invalid", invalid)
+        cls._repolish_widget(widget)
+
+        # Composite inputs like TagInput host the actual editor in `_edit`.
+        # Propagate the flag so the QLineEdit gets the same invalid styling.
+        embedded = getattr(widget, "_edit", None)
+        if isinstance(embedded, QWidget):
+            embedded.setProperty("invalid", invalid)
+            cls._repolish_widget(embedded)
+
+    @classmethod
+    def _repolish_widget(cls, widget: QWidget):
         widget.style().unpolish(widget)
         widget.style().polish(widget)
         widget.update()
+    
+    @classmethod
+    def set_valid(cls, widget: QWidget, valid: bool):
+        cls.set_invalid(widget, not valid)

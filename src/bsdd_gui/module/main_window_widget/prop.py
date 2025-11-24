@@ -5,7 +5,6 @@ from typing import TypedDict
 
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QMenu, QLabel
-import bsdd_json
 from bsdd_gui.presets.prop_presets import ActionsProperties
 
 if TYPE_CHECKING:

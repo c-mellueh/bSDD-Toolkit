@@ -65,6 +65,8 @@ class Project(ActionTool):
 
     @classmethod
     def load_project(cls, path: os.PathLike, sloppy=False):
+        if not path:
+            return
         prop = cls.get_properties()
         prop.project_dictionary = BsddDictionary.load(path, sloppy=sloppy)
         return prop.project_dictionary
@@ -93,3 +95,11 @@ class Project(ActionTool):
     @classmethod
     def get_plugin_save_functions(cls):
         return cls.get_properties().plugin_save_functions
+
+    @classmethod
+    def set_offline_mode(cls, mode: bool):
+        cls.get_properties().offline_mode = mode
+
+    @classmethod
+    def get_offline_mode(cls) -> bool:
+        return cls.get_properties().offline_mode

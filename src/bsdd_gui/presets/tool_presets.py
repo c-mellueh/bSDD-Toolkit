@@ -64,6 +64,7 @@ from bsdd_json import *
 import logging
 from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals
 from .models_presets import ItemModel
+import datetime
 
 BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassProperty
 
@@ -129,7 +130,7 @@ class ActionTool(BaseTool):
         cls.get_properties().actions[widget][name] = action
 
     @classmethod
-    def get_action(cls, widget, name):
+    def get_action(cls, widget, name) -> QAction:
         return cls.get_properties().actions[widget][name]
 
 
@@ -286,6 +287,7 @@ class FieldTool(WidgetTool):
         widget.show()
         widget.activateWindow()
         widget.showNormal()
+        return widget
 
     @classmethod
     def register_widget(cls, widget: FieldWidget):
@@ -468,6 +470,8 @@ class FieldTool(WidgetTool):
         """
         get values from the model and set them to the fields
         """
+        if not widget in cls.get_properties().field_getter:
+            return
         for field, getter_func in cls.get_properties().field_getter[widget].items():
             if explicit_field is not None and explicit_field != field:
                 continue
@@ -492,6 +496,13 @@ class FieldTool(WidgetTool):
             elif isinstance(field, TagInput):
                 field.setTags(value or [])
             elif isinstance(field, QDateTimeEdit):
+                if not value:
+                    return
+                if isinstance(value, str):
+                    try:
+                        value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+                    except ValueError:
+                        value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
                 field.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))
             elif isinstance(field, QAbstractButton):
                 field.setChecked(value)
@@ -590,6 +601,10 @@ class DialogTool(FieldTool):
         return BaseDialog
 
     @classmethod
+    def request_dialog(cls, data: object, parent: QWidget):
+        cls.signals.dialog_requested.emit(data, parent)
+
+    @classmethod
     def create_dialog(cls, data: object, parent: QWidget) -> BaseDialog:
         widget = cls.create_widget(data, None)
         dialog = cls._get_dialog_class()(widget, parent)
@@ -604,6 +619,7 @@ class DialogTool(FieldTool):
         super().connect_internal_signals()
         cls.signals.dialog_accepted.connect(lambda dialog: dialog._widget.closed.emit())
         cls.signals.dialog_declined.connect(lambda dialog: dialog._widget.closed.emit())
+        cls.signals.dialog_requested.connect(lambda d, p: cls._get_trigger().create_dialog(d, p))
 
     @classmethod
     def connect_widget_signals(cls, widget: FieldWidget):
@@ -619,6 +635,33 @@ class DialogTool(FieldTool):
             dialog.accept()
         else:
             pass
+
+    @classmethod
+    def get_dialog(cls):
+        return cls.get_properties().dialog
+
+    @classmethod
+    def get_data(cls):
+        widget = cls.get_widget()
+        if not widget:
+            return None
+        return widget.bsdd_data
+
+    @classmethod
+    def get_widget(cls, data=None):
+        """
+        if a dialog is open, return its widget
+        otherwise return the widget for the given data object
+        some modules can be run as widget or as dialog this handles those edgecases
+        if the module is only run as a dialog no data object is needed
+
+        """
+        if data is not None:
+            return super().get_widget(data)
+        dialog = cls.get_dialog()
+        if not dialog:
+            return super().get_widget(data)
+        return dialog._widget
 
 
 class ItemViewTool(BaseTool):

@@ -134,6 +134,8 @@ def open_file_clicked(
 
 def open_project(path, project: Type[tool.Project], popups: Type[tool.Popups]):
     proj = None
+    if not path:
+        return
     try:
         proj = project.load_project(path, sloppy=False)
     except ValidationError as error:

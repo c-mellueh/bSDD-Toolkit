@@ -69,10 +69,10 @@ def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[t
     version = f'{QCoreApplication.translate("MainWindow", "Version")}: {bsdd_dictionary.DictionaryVersion}'
     status = " | ".join(
         [
-            bsdd_dictionary.OrganizationCode,
-            bsdd_dictionary.DictionaryCode,
-            bsdd_dictionary.DictionaryName,
-            version,
+            bsdd_dictionary.OrganizationCode or "",
+            bsdd_dictionary.DictionaryCode or "",
+            bsdd_dictionary.DictionaryName or "",
+            version or "",
         ]
     )
     main_window.set_status_bar_text(status)

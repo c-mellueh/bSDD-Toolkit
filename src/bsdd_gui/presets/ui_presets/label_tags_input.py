@@ -54,6 +54,9 @@ STYLE_SHEET2 = """
         background: palette(base);
         padding: 0px 0px;
     }
+    QLineEdit[invalid="true"] {
+        border: 1px solid red;
+    }
     """
 
 
@@ -127,14 +130,27 @@ class FlowLayout(QLayout):
         for item in self._items:
             hint = item.sizeHint()
             iw, ih = hint.width(), hint.height()
+            if item.hasHeightForWidth():
+                ih = item.heightForWidth(iw)
+
+            # If the item is wider than the available row width, clamp it so it
+            # doesn't get visually clipped (e.g., the line edit in a wrapped row).
+            max_row_width = effective.width()
+            iw = min(iw, max_row_width)
+
+            remaining = effective.right() - x + 1
 
             if x + iw > effective.right() + 1 and line_h > 0:
                 x = effective.x()
                 y += line_h + self._vspace
                 line_h = 0
 
+            # Recompute remaining width after potential wrap
+            remaining = effective.right() - x + 1
+            iw = min(iw, remaining)
+
             if not test_only:
-                item.setGeometry(QRect(QPoint(x, y), hint))
+                item.setGeometry(QRect(QPoint(x, y), QSize(iw, ih)))
 
             x += iw + self._hspace
             line_h = max(line_h, ih)
@@ -253,6 +269,9 @@ class TagInput(QWidget):
         self._edit.setFixedHeight(target_h)
         flow_margins = self._flow.contentsMargins()
         self.setMinimumHeight(target_h + flow_margins.top() + flow_margins.bottom())
+        policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        policy.setHeightForWidth(True)
+        self.setSizePolicy(policy)
 
         if allowed:
             self._completer = QCompleter(sorted(allowed), self)
@@ -378,11 +397,14 @@ class TagInput(QWidget):
             return
         super().keyPressEvent(e)
 
+    def hasHeightForWidth(self) -> bool:
+        return True
+
+    def heightForWidth(self, width: int) -> int:
+        return self._flow.heightForWidth(width)
+
     def sizeHint(self) -> QSize:
-        margins = self._flow.contentsMargins()
-        edit_hint = self._edit.sizeHint()
-        h = edit_hint.height() + margins.top() + margins.bottom()
-        return QSize(max(300, edit_hint.width()), h)
+        return self._flow.minimumSize()
 
     # Ensure frame + style draw nicely
     def paintEvent(self, event):

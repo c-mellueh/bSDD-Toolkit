@@ -73,7 +73,7 @@ class ClassPropertyEditorWidget(DialogTool):
         #
         cls.signals.paste_clipboard.connect(trigger.paste_clipboard)
         cls.signals.property_reference_changed.connect(
-            lambda cp: cls.request_property_specific_redraw(cls.get_widget(cp))
+            lambda cp: cls.request_property_specific_redraw(cls.get_widget())
         )
         cls.signals.create_new_class_property_requested.connect(trigger.create_dialog)
         # Autoupdate Values
@@ -257,16 +257,13 @@ class ClassPropertyEditorWidget(DialogTool):
     @classmethod
     def update_description_placeholder(cls, widget: ui.ClassPropertyEditor):
         bsdd_class_property = widget.bsdd_data
-        if prop_utils.is_external_ref(bsdd_class_property):
-            class_property = prop_utils.get_external_property(bsdd_class_property)
-        else:
-            class_property = prop_utils.get_internal_property(bsdd_class_property)
-        if not class_property:
+        bsdd_property = prop_utils.get_property_by_class_property(bsdd_class_property)
+        if not bsdd_property:
             text = ""
-        elif class_property.Description:
-            text = class_property.Description
-        elif class_property.Definition:
-            text = class_property.Definition
+        elif bsdd_property.Description:
+            text = bsdd_property.Description
+        elif bsdd_property.Definition:
+            text = bsdd_property.Definition
         else:
             text = ""
         widget.te_description.setPlaceholderText(text)
@@ -274,10 +271,7 @@ class ClassPropertyEditorWidget(DialogTool):
     @classmethod
     def update_value_view(cls, widget: ui.ClassPropertyEditor):
         bsdd_class_property = widget.bsdd_data
-        if prop_utils.is_external_ref(bsdd_class_property):
-            bsdd_property = prop_utils.get_external_property(bsdd_class_property)
-        else:
-            bsdd_property = prop_utils.get_internal_property(bsdd_class_property)
+        bsdd_property = prop_utils.get_property_by_class_property(bsdd_class_property)
         if not bsdd_property:
             return
         value_kind = bsdd_property.PropertyValueKind

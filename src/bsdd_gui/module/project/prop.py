@@ -12,3 +12,4 @@ class ProjectProperties(ActionsProperties):
         self.project_dictionary: BsddDictionary = None
         self.dialog = None
         self.plugin_save_functions = list()
+        self.offline_mode = False

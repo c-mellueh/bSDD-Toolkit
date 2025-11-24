@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bsdd_gui"
-version = "0.2.4"
+version = "0.2.5"
 description = "bSDD GUI"
 requires-python = ">=3.10"
 authors = [{ name = "Christoph Mellüh" }]
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-qt", "mypy", "ruff", "black", "pyinstaller"]
+dev = ["pytest", "pytest-qt", "mypy", "ruff", "black", "pyinstaller","qtawesome"]
 
 [project.scripts]
 bsdd-gui = "bsdd_gui.__main__:main"
@@ -37,6 +37,6 @@ line-length = 100
 line-length = 100
 
 [tool.mypy]
-python_version = "3.10"
+python_version >= "3.10"
 strict = true
 

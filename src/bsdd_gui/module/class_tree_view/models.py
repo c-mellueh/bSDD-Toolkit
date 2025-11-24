@@ -24,8 +24,10 @@ from .constants import JSON_MIME, CODES_MIME
 
 class ClassTreeModel(ItemModel):
 
-    def __init__(self, bsdd_dictionary: BsddDictionary, *args, **kwargs):
-        super().__init__(tool.ClassTreeView, bsdd_dictionary, *args, **kwargs)
+    def __init__(self, bsdd_dictionary: BsddDictionary, tl=None, *args, **kwargs):
+        if tl is None:
+            tl = tool.ClassTreeView
+        super().__init__(tl, bsdd_dictionary, *args, **kwargs)
         self.bsdd_data: BsddDictionary
 
     @property
@@ -64,8 +66,8 @@ class ClassTreeModel(ItemModel):
             return self.createIndex(row, column, children[row])
         return QModelIndex()
 
-    def setData(self, index, value, /, role=...):
-        return False
+    #    def setData(self, index, value, /, role=...):
+    #        return False
 
     def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():

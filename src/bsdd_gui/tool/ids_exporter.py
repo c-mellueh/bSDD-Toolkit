@@ -1,0 +1,592 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING, TypedDict, Literal
+import logging
+from bsdd_json import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
+import bsdd_gui
+from ifctester.facet import Property as PropertyFacet
+from ifctester.facet import Entity as EntityFacet
+
+from ifctester.facet import Restriction
+from ifctester.ids import Specification
+from bsdd_gui.presets.signal_presets import DialogSignals, ViewSignals
+from bsdd_gui.presets.tool_presets import ActionTool, DialogTool, ItemViewTool
+from bsdd_json.utils import property_utils as prop_utils
+from bsdd_json.utils import class_utils
+from bsdd_gui.module.ids_exporter import ui, models, model_views
+from operator import itemgetter
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QDate
+import datetime
+from ifctester.facet import Classification as ClassificationFacet
+from ifctester.facet import Property as PropertyFacet
+
+if TYPE_CHECKING:
+    from bsdd_gui.module.ids_exporter.prop import (
+        IdsExporterProperties,
+        IdsClassViewProperties,
+        IdsPropertyViewProperties,
+    )
+from bsdd_gui.module.ids_exporter import trigger
+import ifctester
+import os
+from bsdd_gui.presets.ui_presets import run_iterable_with_progress
+
+
+class PsetDict(TypedDict):
+    checked: bool
+    proeprties: dict[str, bool]
+
+
+class SettingsDict(TypedDict):
+    class_settings: dict[str, bool]
+    property_settings: dict[str, dict[str, PsetDict]]
+    settings: dict
+    ids_metadata: MetadataDict
+
+
+class BasicSettingsDict(TypedDict):
+    inherit: bool
+    classification: bool
+    main_pset: str
+    main_property: str
+    datatype: Literal["IfcLabel", "IfcText"]
+
+
+class MetadataDict(TypedDict):
+    title: str
+    description: str
+    author: str
+    milestone: str
+    purpose: str
+    version: str
+    copyright: str
+    date: datetime.date
+    ifc_versions: list[str]
+
+
+class IdsSignals(DialogSignals):
+    pass
+
+
+class IdsExporter(ActionTool, DialogTool):
+    signals = IdsSignals()
+
+    @classmethod
+    def get_properties(cls) -> IdsExporterProperties:
+        return bsdd_gui.IdsExporterProperties
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def _get_dialog_class(cls):
+        return ui.IdsDialog
+
+    @classmethod
+    def _get_widget_class(cls):
+        return ui.IdsWidget
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.dialog_accepted.connect(lambda d: trigger.export_ids(d._widget))
+        # live sync of fields
+        cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
+
+    @classmethod
+    def connect_widget_signals(cls, widget: ui.IdsWidget):
+        super().connect_widget_signals(widget)
+        widget.cb_clsf.toggled.connect(lambda state: widget.widget_prop.setVisible(not state))
+        widget.cb_pset.currentTextChanged.connect(lambda _: cls.fill_prop_combobox(widget))
+        widget.cb_pset.currentIndexChanged.connect(lambda _: cls.fill_prop_combobox(widget))
+        widget.pb_import.clicked.connect(lambda: trigger.import_settings(widget))
+        widget.pb_export.clicked.connect(lambda: trigger.export_settings(widget))
+        return widget
+
+    @classmethod
+    def get_template(cls):
+        from bsdd_gui.resources.data import DATA_PATH
+        from bsdd_gui import tool
+
+        var = "ids_template"
+        path = tool.Appdata.get_path(var)
+        if not path:
+            path = os.path.join(DATA_PATH, "template.ids")
+        tool.Appdata.set_path(var, path)
+        return path
+
+    @classmethod
+    def build_inherited_checkstate_dict(
+        cls, bsdd_classes: list[BsddClass], old_checkstate_dict: dict[str, bool]
+    ):
+        def _iter_classes(child_classes: list[BsddClass], parent_checkstate: bool):
+            for child in child_classes:
+                checkstate = old_checkstate_dict.get(child.Code, True) and parent_checkstate
+                new_checkstate_dict[child.Code] = checkstate
+                _iter_classes(class_utils.get_children(child), checkstate)
+
+        new_checkstate_dict: dict[str, bool] = dict()
+        root_classes = [c for c in bsdd_classes if not c.ParentClassCode]
+        _iter_classes(root_classes, True)
+        return new_checkstate_dict
+
+    @classmethod
+    def is_class_active(
+        cls, bsdd_class: BsddClass, class_settings: dict[str, bool], inherit_checkstates: bool
+    ):
+        checkstate = class_settings.get(bsdd_class.Code, True)
+        if not inherit_checkstates or not checkstate:
+            return checkstate
+        parent = bsdd_class.ParentClassCode
+        if not parent:
+            return checkstate
+
+    @classmethod
+    def is_class_prop_active(cls, class_prop: BsddClassProperty, property_settings: PsetDict):
+        pset_dict = property_settings.get(class_prop.PropertySet, dict())
+        pset_checkstate = pset_dict.get("checked")
+        if pset_checkstate is None:
+            return True
+        elif pset_checkstate is False:
+            return False
+        return pset_dict.get("properties", dict()).get(class_prop.Code, True)
+
+    @classmethod
+    def build_property_requirements(cls, class_prop: BsddClassProperty, bsdd_dict: BsddDictionary):
+        data_type = "IfcLabel"  # IfcLabel or IfcText
+
+        bsdd_prop = prop_utils.get_property_by_class_property(class_prop)
+        if bsdd_prop:
+            uri = prop_utils.build_bsdd_uri(bsdd_prop, bsdd_dict)
+        else:
+            uri = None
+        req = PropertyFacet(class_prop.PropertySet, prop_utils.get_name(class_prop))
+        req.uri = uri
+        req.cardinality = "optional"
+        req.dataType = data_type
+        values = prop_utils.get_values(class_prop)
+        if values:
+            req.value = Restriction({"enumeration": sorted([v.Value for v in values])})
+        return [req]
+
+    @classmethod
+    def build_ifc_requirements(cls, bsdd_class: BsddClass, bsdd_dict: BsddDictionary):
+        from bsdd_gui.tool.ifc_helper import IfcHelper
+
+        classes = set()
+        predefined_types = set()
+        for ifc_reference in bsdd_class.RelatedIfcEntityNamesList:
+            entity, predefined = IfcHelper.split_ifc_term(ifc_reference)
+            classes.add(entity.upper())
+            if predefined:
+                predefined_types.add(predefined.upper())
+            else:
+                predefined_types.add("NOTDEFINED")
+        req = EntityFacet()
+        class_res = Restriction({"enumeration": sorted(classes)})
+        req.name = class_res
+        if predefined_types and predefined_types != {"NOTDEFINED"}:
+            pt_res = Restriction({"enumeration": sorted(predefined_types)})
+            req.predefinedType = pt_res
+        return [req]
+
+    @classmethod
+    def deprecated_build_ifc_requirements(cls, bsdd_class: BsddClass, bsdd_dict: BsddDictionary):
+        """
+        this doesn't work because the documentation and the xsd say different things:
+        XSD:
+            Contrary to other requirements facet extensions, cardinality is not available in the entityType facet when used for requirements.
+            Its cardinality state is always considered to be "required".
+        Docu allowes for optinal e.G.
+            If applicable object is an IFCWINDOW entity, it must also have the SKYLIGHT predefined type.
+        """
+        from bsdd_gui.tool.ifc_helper import IfcHelper
+
+        data_dict = dict()
+        for ifc_reference in bsdd_class.RelatedIfcEntityNamesList:
+            entity, predefined = IfcHelper.split_ifc_term(ifc_reference)
+            if entity not in data_dict:
+                data_dict[entity] = set()
+            if predefined:
+                data_dict[entity].add(predefined)
+
+        req = EntityFacet()
+        d = {"enumeration": sorted(data_dict.keys())}
+        req.name = Restriction(d)
+        req.cardinality = "required"
+        requirements = [req]
+        if all(len(pt) == 0 for en, pt in data_dict.items()):
+            return requirements
+
+        for entity_name, predefined_types in data_dict.items():
+            if not predefined_types:
+                continue
+            req = EntityFacet(entity_name)
+            req.predefinedType = Restriction({"enumeration": list(predefined_types)})
+            req.cardinality = "optional"
+            requirements.append(req)
+        return requirements
+
+    @classmethod
+    def get_widget(cls) -> ui.IdsWidget:
+        return super().get_widget()
+
+    @classmethod
+    def count_properties_with_progress(
+        cls, parent: QWidget, classes: list["BsddClass"], inline_parent: QWidget | None = None
+    ):
+        """
+        [Unverified] Wraps the outer loop in a worker thread with progress embedded in the UI.
+        """
+
+        # initialize once in the GUI thread
+        count_dict: dict[str, dict] = {}
+        cls.get_properties().property_count = count_dict
+
+        def process_bsdd_class(bsdd_class: BsddClass, idx: int):
+            # runs in worker thread – no UI calls here
+            existing_psets: list[str] = []
+            for class_prop in bsdd_class.ClassProperties:
+                pset_name = class_prop.PropertySet
+                prop_name = prop_utils.get_name(class_prop)
+
+                if pset_name not in count_dict:
+                    count_dict[pset_name] = {"properties": {}, "count": 0}
+
+                if pset_name not in existing_psets:
+                    count_dict[pset_name]["count"] += 1
+                    existing_psets.append(pset_name)
+
+                if prop_name not in count_dict[pset_name]["properties"]:
+                    count_dict[pset_name]["properties"][prop_name] = 0
+
+                count_dict[pset_name]["properties"][prop_name] += 1
+
+        worker, thread, dialog = run_iterable_with_progress(
+            parent=parent,
+            iterable=classes,
+            total=len(classes),
+            title="Counting properties…",
+            text="",
+            cancel_text="Cancel",
+            process_func=process_bsdd_class,
+            inline_parent=inline_parent,
+        )
+
+        # keep references on the class or the caller side if needed
+        return worker, thread, dialog
+
+    @classmethod
+    def fill_pset_combobox(cls, widget: ui.IdsWidget):
+        count_dict = cls.get_properties().property_count
+        pset_names = {pset: data["count"] for pset, data in count_dict.items()}
+        widget.cb_pset.clear()
+        if not pset_names:
+            return
+        # sort all psets by occurence count
+        widget.cb_pset.addItems(sorted(pset_names, key=pset_names.get, reverse=True))
+        widget.cb_pset.show()
+        widget.cb_prop.show()
+
+    @classmethod
+    def fill_prop_combobox(cls, widget: ui.IdsWidget):
+        pset_name = widget.cb_pset.currentText()
+        count_dict = cls.get_properties().property_count
+        count_dict = count_dict.get(pset_name, {})
+        prop_names = count_dict.get("properties", {})
+        widget.cb_prop.clear()
+        if not prop_names:
+            return
+        widget.cb_prop.addItems(sorted(prop_names, key=prop_names.get, reverse=True))
+
+    @classmethod
+    def get_settings(cls, widget: ui.IdsWidget) -> BasicSettingsDict:
+        settings_dict = {
+            "inherit": widget.cb_inh.isChecked(),
+            "classification": widget.cb_clsf.isChecked(),
+            "main_pset": widget.cb_pset.currentText(),
+            "main_property": widget.cb_prop.currentText(),
+            "datatype": widget.cb_datatype.currentText(),
+        }
+        return settings_dict
+
+    @classmethod
+    def get_ids_metadata(cls, widget: ui.IdsWidget) -> MetadataDict:
+        metadata_dict = {
+            "title": widget.le_title.text(),
+            "description": widget.le_desc.text(),
+            "author": widget.le_author.text(),
+            "milestone": widget.le_miles.text(),
+            "purpose": widget.le_purpose.text(),
+            "version": widget.le_version.text(),
+            "copyright": widget.le_copyr.text(),
+            "date": widget.dt_date.dt_edit.date().toPython().strftime(r"%Y-%m-%d"),
+            "ifc_versions": widget.ti_ifc_vers.tags(),
+        }
+        return metadata_dict
+
+    @classmethod
+    def set_ids_metadata(cls, widget: ui.IdsWidget, metadata: MetadataDict):
+        widget.le_title.setText(metadata.get("title", ""))
+        widget.le_desc.setText(metadata.get("description", ""))
+        widget.le_author.setText(metadata.get("author", ""))
+        widget.le_miles.setText(metadata.get("milestone", ""))
+        widget.le_purpose.setText(metadata.get("purpose", ""))
+        widget.le_version.setText(metadata.get("version", ""))
+        widget.le_copyr.setText(metadata.get("copyright", ""))
+
+        dt = metadata.get("date")
+        if dt is not None:
+            dt = datetime.datetime.strptime(dt, r"%Y-%m-%d")
+            widget.dt_date.dt_edit.setDate(QDate(dt.year, dt.month, dt.day))
+
+        ifc_versions = metadata.get("ifc_versions", ["IFC4X3_ADD2"])
+        widget.ti_ifc_vers.setTags(ifc_versions)
+
+    @classmethod
+    def set_settings(cls, widget: ui.IdsWidget, settings_dict: dict):
+        inherit = settings_dict.get("inherit")
+        classification = settings_dict.get("classification")
+        pset = settings_dict.get("main_pset")
+        prop = settings_dict.get("main_property")
+
+        if inherit is not None:
+            widget.cb_inh.setChecked(inherit)
+        if classification is not None:
+            widget.cb_clsf.setChecked(classification)
+        if pset is not None:
+            widget.cb_pset.setCurrentText(pset)
+        if prop is not None:
+            widget.cb_prop.setCurrentText(prop)
+
+    @classmethod
+    def export_settings(cls, widget):
+        pass
+
+    @classmethod
+    def import_settings(cls, widget):
+        pass
+
+    @classmethod
+    def build_classification_facet(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
+
+        return ClassificationFacet(
+            class_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary),
+            "bSDD",
+            cardinality="optional",
+        )
+
+    @classmethod
+    def build_main_property_facet(cls, bsdd_class: BsddClass, base_settings: BasicSettingsDict):
+        return PropertyFacet(
+            base_settings.get("main_pset"),
+            base_settings.get("main_property"),
+            bsdd_class.Code,
+            base_settings.get("datatype"),
+            cardinality="optional",
+        )
+
+    @classmethod
+    def create_specification_with_progress(
+        cls,
+        ids,
+        classes: list["BsddClass"],
+        base_settings: BasicSettingsDict,
+        class_settings: dict[str, bool],
+        property_settings: PsetDict,
+        bsdd_dict: BsddDictionary,
+        ifc_version: list[str],
+        parent: QWidget,
+    ):
+        """
+        [Unverified] Wraps the outer loop in a worker thread with progress embedded in the UI.
+        """
+
+        # initialize once in the GUI thread
+        count_dict: dict[str, dict] = {}
+        cls.get_properties().property_count = count_dict
+
+        def process_bsdd_class(bsdd_class: BsddClass, idx: int):
+            if not class_settings.get(bsdd_class.Code, True):
+                return
+
+            spec = Specification(
+                f"Check for {bsdd_class.Code}",
+                ifcVersion=ifc_version,
+                identifier=bsdd_class.Code,
+                description="Auto-generated from bSDD",
+            )
+            if base_settings.get("classification", False):
+                applicability_facet = cls.build_classification_facet(bsdd_class, bsdd_dict)
+            else:
+                applicability_facet = cls.build_main_property_facet(bsdd_class, base_settings)
+            spec.applicability.append(applicability_facet)
+            for class_prop in bsdd_class.ClassProperties:
+                if cls.is_class_prop_active(class_prop, property_settings.get(bsdd_class.Code,dict())):
+                    spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
+            spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
+            ids.specifications.append(spec)
+
+        worker, thread, dialog = run_iterable_with_progress(
+            parent=parent,
+            iterable=classes,
+            total=len(classes),
+            title="Create Specifications…",
+            text="Create Specifications…",
+            cancel_text="Cancel",
+            process_func=process_bsdd_class,
+        )
+
+        # keep references on the class or the caller side if needed
+        return worker, thread, dialog
+
+
+class ClassSignals(ViewSignals):
+    pass
+
+
+class IdsClassView(ItemViewTool):
+    signals = ClassSignals()
+
+    @classmethod
+    def get_properties(cls) -> IdsClassViewProperties:
+        return bsdd_gui.IdsClassViewProperties  #
+
+    @classmethod
+    def _get_model_class(cls):
+        return models.ClassTreeModel
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def _get_proxy_model_class(cls):
+        return models.SortModel
+
+    @classmethod
+    def connect_settings_signals(cls, widget: ui.IdsWidget, view: model_views.ClassView):
+        class_model = view.model().sourceModel()
+        widget.cb_inh.toggled.connect(
+            lambda checked: class_model.set_checkstate_inheritance(checked)
+        )
+
+        return super().connect_view_signals(view)
+
+    @classmethod
+    def get_checkstate(cls, bsdd_class: BsddClass):
+        return cls.get_properties().checkstate_dict.get(bsdd_class.Code, True)
+
+    @classmethod
+    def set_checkstate(cls, bsdd_class: BsddClass, state: bool):
+        cls.get_properties().checkstate_dict[bsdd_class.Code] = state
+
+    @classmethod
+    def get_check_dict(cls):
+        return cls.get_properties().checkstate_dict
+
+    @classmethod
+    def set_check_dict(cls, check_dict, treev_view: model_views.ClassView):
+        model: models.ClassTreeModel = treev_view.model().sourceModel()
+        model.beginResetModel()
+        cls.get_properties().checkstate_dict = check_dict
+        model.endResetModel()
+
+
+class PropertySignals(ViewSignals):
+    pass
+
+
+class IdsPropertyView(ItemViewTool):
+    signals = PropertySignals()
+
+    @classmethod
+    def get_properties(cls) -> IdsPropertyViewProperties:
+        return bsdd_gui.IdsPropertyViewProperties
+
+    @classmethod
+    def _get_model_class(cls):
+        return models.PropertyTreeModel
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def _get_proxy_model_class(cls):
+        return models.SortModel
+
+    @classmethod
+    def _get_name(cls, bsdd_property: BsddClassProperty | str):
+        if isinstance(bsdd_property, str):
+            return bsdd_property
+        return prop_utils.get_name(bsdd_property)
+
+    @classmethod
+    def _get_code(cls, bsdd_property: BsddClassProperty | str):
+        if isinstance(bsdd_property, str):
+            return ""
+        return bsdd_property.Code
+
+    @classmethod
+    def get_checkstate(
+        cls, model: models.PropertyTreeModel, bsdd_class_property: BsddClassProperty | str
+    ):
+        pset_name = (
+            bsdd_class_property
+            if isinstance(bsdd_class_property, str)
+            else bsdd_class_property.PropertySet
+        )
+        property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
+        bsdd_class_code = model.bsdd_data.Code
+        checkstate_dict: PsetDict = cls.get_properties().checkstate_dict
+        class_dict = checkstate_dict.get(bsdd_class_code, None)
+        if not class_dict:
+            return True
+        pset_dict = class_dict.get(pset_name)
+        if not pset_dict:
+            return True
+        if property_code is None:  # propertySet
+            return pset_dict.get("checked", True)
+        else:
+            return pset_dict["properties"].get(property_code, True)
+
+    @classmethod
+    def set_checkstate(
+        cls,
+        model: models.PropertyTreeModel,
+        bsdd_class_property: BsddClassProperty | str,
+        state: bool,
+    ):
+        if not model.bsdd_data:
+            return
+
+        pset_name = (
+            bsdd_class_property
+            if isinstance(bsdd_class_property, str)
+            else bsdd_class_property.PropertySet
+        )
+        property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
+        bsdd_class_code = model.bsdd_data.Code
+
+        if bsdd_class_code not in cls.get_properties().checkstate_dict:
+            cls.get_properties().checkstate_dict[bsdd_class_code] = dict()
+        checkstate_dict = cls.get_properties().checkstate_dict[bsdd_class_code]
+        if not pset_name in checkstate_dict:
+            checkstate_dict[pset_name] = {"checked": True, "properties": dict()}
+        if not property_code:
+            checkstate_dict[pset_name]["checked"] = state
+        else:
+            checkstate_dict[pset_name]["properties"][property_code] = state
+
+    @classmethod
+    def get_check_dict(cls):
+        return cls.get_properties().checkstate_dict
+
+    @classmethod
+    def set_check_dict(cls, check_dict, tree_view: model_views.PropertyView):
+        model: models.ClassTreeModel = tree_view.model().sourceModel()
+        model.beginResetModel()
+        cls.get_properties().checkstate_dict = check_dict
+        model.endResetModel()

@@ -1,4 +1,68 @@
 from urllib.parse import urlparse, quote
+import re
+import unicodedata
+
+def slugify(text: str, *, delimiter: str = "-", lowercase: bool = True, max_length: int | None = None) -> str:
+    """
+    Convert a string into a URL-friendly slug.
+
+    - Transliterate German umlauts/ß: ä→ae, ö→oe, ü→ue, Ä→Ae, Ö→Oe, Ü→Ue, ß→ss
+    - Strip accents/diacritics (é → e, å → a, etc.)
+    - Replace any run of non-alphanumeric characters with `delimiter`
+    - Collapse repeated delimiters and trim from ends
+    - Optionally lowercase and/or truncate to `max_length`
+
+    Parameters
+    ----------
+    text : str
+        Input string (any language).
+    delimiter : str, default "-"
+        Character to use as word separator.
+    lowercase : bool, default True
+        Whether to lowercase the output.
+    max_length : int | None, default None
+        If set, truncate the slug to this length (without cutting in the middle
+        of a delimiter run when possible).
+
+    Returns
+    -------
+    str
+        URL-safe slug (ASCII only).
+    """
+    if not isinstance(text, str):
+        text = str(text)
+
+    # 1) German-specific replacements first (before accent stripping)
+    german_map = {
+        "ä": "ae", "ö": "oe", "ü": "ue",
+        "Ä": "Ae", "Ö": "Oe", "Ü": "Ue",
+        "ß": "ss",
+    }
+    text = "".join(german_map.get(ch, ch) for ch in text)
+
+    # 2) Strip accents/diacritics -> ASCII
+    # Normalize to NFKD and drop combining marks
+    normalized = unicodedata.normalize("NFKD", text)
+    ascii_text = "".join(c for c in normalized if not unicodedata.combining(c))
+    # Keep only ASCII
+    ascii_text = ascii_text.encode("ascii", "ignore").decode("ascii")
+
+    # 3) Replace non-alphanumeric with delimiter
+    # Allow a-z, A-Z, 0-9. Everything else -> delimiter
+    slug = re.sub(r"[^A-Za-z0-9]+", delimiter, ascii_text)
+
+    # 4) Collapse repeats and trim delimiters from ends
+    slug = re.sub(fr"{re.escape(delimiter)}+", delimiter, slug).strip(delimiter)
+
+    # 5) Casing
+    if lowercase:
+        slug = slug.lower()
+
+    # 6) Optional length limit (avoid trailing delimiter after cut)
+    if max_length is not None and max_length > 0 and len(slug) > max_length:
+        slug = slug[:max_length].rstrip(delimiter)
+
+    return slug
 
 
 def get_dictionary_path_from_uri(uri: str) -> str:
