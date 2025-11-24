@@ -78,7 +78,7 @@ class IdsExporter(ActionTool, DialogTool):
     def connect_widget_signals(cls, widget: ui.IdsWidget):
         super().connect_widget_signals(widget)
         widget.cb_classification.toggled.connect(
-            lambda state: cls.set_prop_combobox_visible(widget, not state)
+            lambda state: widget.widget_prop.setVisible(not state)
         )
         widget.cb_pset.currentTextChanged.connect(lambda _: cls.fill_prop_combobox(widget))
         widget.cb_pset.currentIndexChanged.connect(lambda _: cls.fill_prop_combobox(widget))
@@ -209,11 +209,6 @@ class IdsExporter(ActionTool, DialogTool):
         return super().get_widget()
 
     @classmethod
-    def set_prop_combobox_visible(cls, widget: ui.IdsWidget, state: bool):
-        widget.cb_prop.setVisible(state)
-        widget.cb_pset.setVisible(state)
-
-    @classmethod
     def count_properties_with_progress(
         cls, parent: QWidget, classes: list["BsddClass"], inline_parent: QWidget | None = None
     ):
@@ -249,7 +244,7 @@ class IdsExporter(ActionTool, DialogTool):
             iterable=classes,
             total=len(classes),
             title="Counting properties…",
-            text="Processing bSDD classes…",
+            text="",
             cancel_text="Cancel",
             process_func=process_bsdd_class,
             inline_parent=inline_parent,
@@ -269,6 +264,7 @@ class IdsExporter(ActionTool, DialogTool):
         widget.cb_pset.addItems(sorted(pset_names, key=pset_names.get, reverse=True))
         widget.cb_pset.show()
         widget.cb_prop.show()
+
     @classmethod
     def fill_prop_combobox(cls, widget: ui.IdsWidget):
         pset_name = widget.cb_pset.currentText()
