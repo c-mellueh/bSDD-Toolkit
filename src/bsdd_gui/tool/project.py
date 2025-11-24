@@ -65,6 +65,8 @@ class Project(ActionTool):
 
     @classmethod
     def load_project(cls, path: os.PathLike, sloppy=False):
+        if not path:
+            return
         prop = cls.get_properties()
         prop.project_dictionary = BsddDictionary.load(path, sloppy=sloppy)
         return prop.project_dictionary

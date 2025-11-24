@@ -76,6 +76,11 @@ class Ui_Form(object):
         self.gridLayout_3 = QGridLayout(self.widget_prop)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.cb_prop = QComboBox(self.widget_prop)
+        self.cb_prop.setObjectName(u"cb_prop")
+
+        self.gridLayout_3.addWidget(self.cb_prop, 0, 1, 1, 1)
+
         self.cb_pset = QComboBox(self.widget_prop)
         self.cb_pset.setObjectName(u"cb_pset")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
@@ -87,10 +92,17 @@ class Ui_Form(object):
 
         self.gridLayout_3.addWidget(self.cb_pset, 0, 0, 1, 1)
 
-        self.cb_prop = QComboBox(self.widget_prop)
-        self.cb_prop.setObjectName(u"cb_prop")
+        self.cb_datatype = QComboBox(self.widget_prop)
+        self.cb_datatype.addItem("")
+        self.cb_datatype.addItem("")
+        self.cb_datatype.setObjectName(u"cb_datatype")
 
-        self.gridLayout_3.addWidget(self.cb_prop, 0, 1, 1, 1)
+        self.gridLayout_3.addWidget(self.cb_datatype, 1, 1, 1, 1)
+
+        self.label_2 = QLabel(self.widget_prop)
+        self.label_2.setObjectName(u"label_2")
+
+        self.gridLayout_3.addWidget(self.label_2, 1, 0, 1, 1)
 
 
         self.gridLayout_2.addWidget(self.widget_prop, 3, 0, 1, 2)
@@ -125,7 +137,7 @@ class Ui_Form(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 376, 698))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 376, 668))
         self.verticalLayout_2 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -295,6 +307,10 @@ class Ui_Form(object):
         self.cb_clsf.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.cb_clsf.setText(QCoreApplication.translate("Form", u"CheckBox", None))
+        self.cb_datatype.setItemText(0, QCoreApplication.translate("Form", u"IfcLabel", None))
+        self.cb_datatype.setItemText(1, QCoreApplication.translate("Form", u"IfcText", None))
+
+        self.label_2.setText(QCoreApplication.translate("Form", u"Datatype:", None))
         self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
         self.label_13.setText(QCoreApplication.translate("Form", u"**Settings**", None))
         self.label_10.setText(QCoreApplication.translate("Form", u"Version", None))

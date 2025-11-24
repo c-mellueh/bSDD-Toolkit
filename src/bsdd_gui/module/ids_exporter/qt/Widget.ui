@@ -89,6 +89,9 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="cb_prop"/>
+             </item>
              <item row="0" column="0">
               <widget class="QComboBox" name="cb_pset">
                <property name="sizePolicy">
@@ -102,8 +105,26 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="cb_prop"/>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="cb_datatype">
+               <item>
+                <property name="text">
+                 <string>IfcLabel</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IfcText</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Datatype:</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -161,7 +182,7 @@
             <x>0</x>
             <y>0</y>
             <width>376</width>
-            <height>698</height>
+            <height>668</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

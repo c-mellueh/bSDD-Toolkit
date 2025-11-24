@@ -65,6 +65,8 @@ class BsddDictionary(CaseInsensitiveModel):
 
     @classmethod
     def load(cls, path: str, *, sloppy: bool = False) -> "BsddDictionary":
+        if not path:
+            return
         with open(path, encoding="utf-8") as f:
             raw = json.load(f)
         if not sloppy:

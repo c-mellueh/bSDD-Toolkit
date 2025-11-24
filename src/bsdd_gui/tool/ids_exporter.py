@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, TypedDict, Literal
 import logging
 from bsdd_json import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
 import bsdd_gui
@@ -17,6 +17,8 @@ from operator import itemgetter
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QDate
 import datetime
+from ifctester.facet import Classification as ClassificationFacet
+from ifctester.facet import Property as PropertyFacet
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter.prop import (
@@ -47,6 +49,7 @@ class BasicSettingsDict(TypedDict):
     classification: bool
     main_pset: str
     main_property: str
+    datatype: Literal["IfcLabel", "IfcText"]
 
 
 class MetadataDict(TypedDict):
@@ -298,12 +301,13 @@ class IdsExporter(ActionTool, DialogTool):
         widget.cb_prop.addItems(sorted(prop_names, key=prop_names.get, reverse=True))
 
     @classmethod
-    def get_settings(cls, widget: ui.IdsWidget):
+    def get_settings(cls, widget: ui.IdsWidget) -> BasicSettingsDict:
         settings_dict = {
             "inherit": widget.cb_inh.isChecked(),
             "classification": widget.cb_clsf.isChecked(),
             "main_pset": widget.cb_pset.currentText(),
             "main_property": widget.cb_prop.currentText(),
+            "datatype": widget.cb_datatype.currentText(),
         }
         return settings_dict
 
@@ -363,6 +367,25 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def import_settings(cls, widget):
         pass
+
+    @classmethod
+    def build_classification_facet(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
+
+        return ClassificationFacet(
+            class_utils.build_bsdd_uri(bsdd_class,bsdd_dictionary),
+            "bSDD",
+            cardinality="optional",
+        )
+
+    @classmethod
+    def build_main_property_facet(cls, bsdd_class: BsddClass, base_settings: BasicSettingsDict):
+        return PropertyFacet(
+            base_settings.get("main_pset"),
+            base_settings.get("main_property"),
+            bsdd_class.Code,
+            base_settings.get("datatype"),
+            cardinality="optional",
+        )
 
 
 class ClassSignals(ViewSignals):

@@ -8,6 +8,7 @@ import os
 import ifctester
 from ifctester.facet import Property as PropertyFacet
 from ifctester.facet import Entity as EntityFacet
+from ifctester.facet import Classification as ClassificationFacet
 from ifctester.facet import Restriction
 from ifctester.ids import Specification
 from bsdd_gui.presets.ui_presets import run_iterable_with_progress
@@ -80,6 +81,7 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget.fw_output.option = "ids"
     widget.fw_output.title = "get IDS-Export Path"
     widget.fw_output.load_path()
+
 
 def register_fields(
     widget: ui.IdsWidget,
@@ -170,6 +172,14 @@ def register_fields(
     widget_tool.register_field_setter(widget, widget.dt_date, lambda _, v: _setter("date", v))
     widget_tool.register_field_listener(widget, widget.dt_date)
     widget_tool.add_validator(widget, widget.dt_date, _is_not_empty, util.set_valid)
+
+    # Datatype
+    widget_tool.register_field_getter(widget, widget.cb_datatype, lambda _: _getter("datatype"))
+    widget_tool.register_field_setter(
+        widget, widget.cb_datatype, lambda _, v: _setter("datatype", v)
+    )
+    widget_tool.register_field_listener(widget, widget.cb_datatype)
+    widget_tool.add_validator(widget, widget.cb_datatype, _is_not_empty, util.set_valid)
 
 
 def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
@@ -347,19 +357,18 @@ def export_ids(
 ):
     class_settings = class_view.get_check_dict()
     property_settings = property_view.get_check_dict()
-    main_settings = widget_tool.get_settings(widget)
+    base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 
     out_path = widget.fw_output.get_path()
     template_path = widget_tool.get_template()
-    data_type = "IfcLabel"  # IfcLabel or IfcText
     ifc_version = metadata_settings.get("ifc_versions", ["IFC4X3_ADD2"])
     bsdd_dict = widget.bsdd_data
     ids = ifctester.ids.open(template_path)
     base_spec = ids.specifications[0]
     base_requirement: PropertyFacet = base_spec.requirements[0]
-    base_requirement.propertySet = main_settings.get("main_pset", "")
-    base_requirement.baseName = main_settings.get("main_property", "")
+    base_requirement.propertySet = base_settings.get("main_pset", "")
+    base_requirement.baseName = base_settings.get("main_property", "")
     base_restriction = base_requirement.value
     base_restriction.options = {"enumeration": [c.Code for c in bsdd_dict.Classes]}
     base_spec.ifcVersion = ifc_version
@@ -373,7 +382,7 @@ def export_ids(
     ids.info["copyright"] = metadata_settings.get("copyright", ids.info.get("copyright"))
 
     # If Inherit is Checked it will build the class settings dict exclude subclasses of unchecked classes
-    if main_settings["inherit"]:
+    if base_settings["inherit"]:
         class_settings = widget_tool.build_inherited_checkstate_dict(
             bsdd_dict.Classes, class_settings
         )
@@ -388,13 +397,10 @@ def export_ids(
             identifier=bsdd_class.Code,
             description="Auto-generated from bSDD",
         )
-        applicability_facet = PropertyFacet(
-            base_requirement.propertySet,
-            base_requirement.baseName,
-            bsdd_class.Code,
-            data_type,
-            cardinality="optional",
-        )
+        if base_settings.get("classification", False):
+            applicability_facet = widget_tool.build_classification_facet(bsdd_class, bsdd_dict)
+        else:
+            applicability_facet = widget_tool.build_main_property_facet(bsdd_class, base_settings)
         spec.applicability.append(applicability_facet)
         for class_prop in bsdd_class.ClassProperties:
             if widget_tool.is_class_prop_active(class_prop, property_settings):
