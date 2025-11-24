@@ -289,6 +289,21 @@ class IdsExporter(ActionTool, DialogTool):
         return settings_dict
 
     @classmethod
+    def get_ids_metadata(cls,widget:ui.IdsWidget):
+        metadata_dict = {
+            "title": widget.le_title.text(),
+            "description": widget.le_description.text(),
+            "author": widget.le_author.text(),
+            "milestone": widget.le_milestone.text(),
+            "purpose": widget.le_purpose.text(),
+            "version": widget.le_version.text(),
+            "copyright": widget.le_copyright.text(),
+            "date": widget.dt_date.dt_edit.date().toPython(),
+            "ifc_versions": widget.ti_ifc_versions.tags(),
+        }
+        return metadata_dict
+
+    @classmethod
     def set_settings(cls, widget: ui.IdsWidget, settings_dict: dict):
         inherit = settings_dict.get("inherit")
         classification = settings_dict.get("classification")

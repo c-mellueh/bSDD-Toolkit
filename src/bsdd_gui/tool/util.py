@@ -405,3 +405,7 @@ class Util:
         widget.style().unpolish(widget)
         widget.style().polish(widget)
         widget.update()
+    
+    @classmethod
+    def set_valid(cls, widget: QWidget,valid:bool):
+        cls.set_invalid(widget,not valid)

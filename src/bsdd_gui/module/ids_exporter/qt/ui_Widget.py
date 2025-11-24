@@ -27,7 +27,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(1083, 722)
+        Form.resize(1600, 900)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
         self.label_2 = QLabel(Form)
@@ -68,6 +68,7 @@ class Ui_Form(object):
         self.widget.setObjectName(u"widget")
         self.verticalLayout = QVBoxLayout(self.widget)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(-1, 0, -1, 0)
         self.main_settings = QFrame(self.widget)
         self.main_settings.setObjectName(u"main_settings")
         self.main_settings.setFrameShape(QFrame.Shape.StyledPanel)
@@ -77,13 +78,13 @@ class Ui_Form(object):
         self.label_classification = QLabel(self.main_settings)
         self.label_classification.setObjectName(u"label_classification")
 
-        self.gridLayout_2.addWidget(self.label_classification, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.label_classification, 2, 0, 1, 1)
 
         self.cb_classification = ToggleSwitch(self.main_settings)
         self.cb_classification.setObjectName(u"cb_classification")
         self.cb_classification.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
-        self.gridLayout_2.addWidget(self.cb_classification, 1, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.cb_classification, 2, 1, 1, 1)
 
         self.widget_prop = QWidget(self.main_settings)
         self.widget_prop.setObjectName(u"widget_prop")
@@ -107,18 +108,25 @@ class Ui_Form(object):
         self.gridLayout_3.addWidget(self.cb_prop, 0, 1, 1, 1)
 
 
-        self.gridLayout_2.addWidget(self.widget_prop, 2, 0, 1, 2)
+        self.gridLayout_2.addWidget(self.widget_prop, 3, 0, 1, 2)
 
         self.cb_inherit = ToggleSwitch(self.main_settings)
         self.cb_inherit.setObjectName(u"cb_inherit")
         self.cb_inherit.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
-        self.gridLayout_2.addWidget(self.cb_inherit, 0, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.cb_inherit, 1, 1, 1, 1)
 
         self.label = QLabel(self.main_settings)
         self.label.setObjectName(u"label")
 
-        self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
+
+        self.label_13 = QLabel(self.main_settings)
+        self.label_13.setObjectName(u"label_13")
+        self.label_13.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.label_13.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.label_13, 0, 0, 1, 2)
 
 
         self.verticalLayout.addWidget(self.main_settings)
@@ -132,7 +140,7 @@ class Ui_Form(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 278, 486))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 278, 505))
         self.verticalLayout_2 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -147,96 +155,103 @@ class Ui_Form(object):
         self.le_description = QLineEdit(self.ids_settings)
         self.le_description.setObjectName(u"le_description")
 
-        self.gridLayout_4.addWidget(self.le_description, 4, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_description, 5, 0, 1, 1)
 
         self.label_10 = QLabel(self.ids_settings)
         self.label_10.setObjectName(u"label_10")
 
-        self.gridLayout_4.addWidget(self.label_10, 13, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_10, 14, 0, 1, 1)
 
         self.label_8 = QLabel(self.ids_settings)
         self.label_8.setObjectName(u"label_8")
 
-        self.gridLayout_4.addWidget(self.label_8, 9, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_8, 10, 0, 1, 1)
 
         self.dt_date = DateTimeWithNow(self.ids_settings)
         self.dt_date.setObjectName(u"dt_date")
 
-        self.gridLayout_4.addWidget(self.dt_date, 10, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.dt_date, 11, 0, 1, 1)
 
         self.label_6 = QLabel(self.ids_settings)
         self.label_6.setObjectName(u"label_6")
 
-        self.gridLayout_4.addWidget(self.label_6, 5, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_6, 6, 0, 1, 1)
 
         self.verticalSpacer = QSpacerItem(40, 1, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.gridLayout_4.addItem(self.verticalSpacer, 19, 0, 1, 1)
+        self.gridLayout_4.addItem(self.verticalSpacer, 20, 0, 1, 1)
 
         self.label_7 = QLabel(self.ids_settings)
         self.label_7.setObjectName(u"label_7")
 
-        self.gridLayout_4.addWidget(self.label_7, 7, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_7, 8, 0, 1, 1)
 
         self.label_11 = QLabel(self.ids_settings)
         self.label_11.setObjectName(u"label_11")
 
-        self.gridLayout_4.addWidget(self.label_11, 15, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_11, 16, 0, 1, 1)
 
         self.label_4 = QLabel(self.ids_settings)
         self.label_4.setObjectName(u"label_4")
 
-        self.gridLayout_4.addWidget(self.label_4, 1, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_4, 2, 0, 1, 1)
 
         self.le_author = QLineEdit(self.ids_settings)
         self.le_author.setObjectName(u"le_author")
 
-        self.gridLayout_4.addWidget(self.le_author, 6, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_author, 7, 0, 1, 1)
 
         self.label_9 = QLabel(self.ids_settings)
         self.label_9.setObjectName(u"label_9")
 
-        self.gridLayout_4.addWidget(self.label_9, 11, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_9, 12, 0, 1, 1)
 
         self.ti_ifc_versions = TagInput_IfcVersion(self.ids_settings)
         self.ti_ifc_versions.setObjectName(u"ti_ifc_versions")
 
-        self.gridLayout_4.addWidget(self.ti_ifc_versions, 18, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.ti_ifc_versions, 19, 0, 1, 1)
 
         self.le_copyright = QLineEdit(self.ids_settings)
         self.le_copyright.setObjectName(u"le_copyright")
 
-        self.gridLayout_4.addWidget(self.le_copyright, 16, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_copyright, 17, 0, 1, 1)
 
         self.le_milestone = QLineEdit(self.ids_settings)
         self.le_milestone.setObjectName(u"le_milestone")
 
-        self.gridLayout_4.addWidget(self.le_milestone, 8, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_milestone, 9, 0, 1, 1)
 
         self.le_title = QLineEdit(self.ids_settings)
         self.le_title.setObjectName(u"le_title")
 
-        self.gridLayout_4.addWidget(self.le_title, 2, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_title, 3, 0, 1, 1)
 
         self.label_5 = QLabel(self.ids_settings)
         self.label_5.setObjectName(u"label_5")
 
-        self.gridLayout_4.addWidget(self.label_5, 3, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_5, 4, 0, 1, 1)
 
         self.le_purpose = QLineEdit(self.ids_settings)
         self.le_purpose.setObjectName(u"le_purpose")
 
-        self.gridLayout_4.addWidget(self.le_purpose, 12, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_purpose, 13, 0, 1, 1)
 
         self.le_version = QLineEdit(self.ids_settings)
         self.le_version.setObjectName(u"le_version")
 
-        self.gridLayout_4.addWidget(self.le_version, 14, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_version, 15, 0, 1, 1)
 
         self.label_12 = QLabel(self.ids_settings)
         self.label_12.setObjectName(u"label_12")
 
-        self.gridLayout_4.addWidget(self.label_12, 17, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_12, 18, 0, 1, 1)
+
+        self.label_14 = QLabel(self.ids_settings)
+        self.label_14.setObjectName(u"label_14")
+        self.label_14.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.label_14.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.gridLayout_4.addWidget(self.label_14, 1, 0, 1, 1)
 
 
         self.verticalLayout_2.addWidget(self.ids_settings)
@@ -292,6 +307,7 @@ class Ui_Form(object):
 #endif // QT_CONFIG(tooltip)
         self.cb_classification.setText(QCoreApplication.translate("Form", u"CheckBox", None))
         self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
+        self.label_13.setText(QCoreApplication.translate("Form", u"**Settings**", None))
         self.label_10.setText(QCoreApplication.translate("Form", u"Version", None))
         self.label_8.setText(QCoreApplication.translate("Form", u"Date", None))
         self.label_6.setText(QCoreApplication.translate("Form", u"Author", None))
@@ -301,6 +317,7 @@ class Ui_Form(object):
         self.label_9.setText(QCoreApplication.translate("Form", u"Purpose", None))
         self.label_5.setText(QCoreApplication.translate("Form", u"Description", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"IFC-Versions", None))
+        self.label_14.setText(QCoreApplication.translate("Form", u"**IDS Metadata**", None))
         self.tb_export.setText(QCoreApplication.translate("Form", u"D", None))
         self.tb_import.setText(QCoreApplication.translate("Form", u"U", None))
     # retranslateUi

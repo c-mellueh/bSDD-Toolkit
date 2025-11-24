@@ -499,7 +499,10 @@ class FieldTool(WidgetTool):
                 if not value:
                     return
                 if isinstance(value, str):
-                    value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+                    try:
+                        value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+                    except ValueError:
+                        value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
                 field.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))
             elif isinstance(field, QAbstractButton):
                 field.setChecked(value)

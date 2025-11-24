@@ -11,6 +11,7 @@ from ifctester.facet import Entity as EntityFacet
 from ifctester.facet import Restriction
 from ifctester.ids import Specification
 from bsdd_gui.presets.ui_presets import run_iterable_with_progress
+import datetime
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -60,7 +61,7 @@ def create_dialog(data: BsddDictionary, parent, dialog_tool: Type[tool.IdsExport
     model.bsdd_data = data
     model.endResetModel()
     geom = dialog.geometry()
-    dialog.setGeometry(geom.x(), geom.y(), 1075, 710)
+    dialog.setGeometry(geom.x(), geom.y(), 1600, 900)
     if dialog.exec():
         dialog_tool.sync_to_model(dialog._widget, data)
         dialog_tool.signals.dialog_accepted.emit(dialog)
@@ -74,10 +75,14 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
         widget.fw_template.set_path(widget_tool.get_template())
     widget.dt_date.hide_toggle_switch()
     widget.dt_date.set_now()
+    widget.dt_date.dt_edit.setDisplayFormat("yyyy-MM-dd")
 
 
 def register_fields(
-    widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter], appdata: Type[tool.Appdata]
+    widget: ui.IdsWidget,
+    widget_tool: Type[tool.IdsExporter],
+    appdata: Type[tool.Appdata],
+    util: Type[tool.Util],
 ):
     def _getter(name, data_type: Literal["string", "list"] = "string"):
         if data_type == "string":
@@ -88,9 +93,17 @@ def register_fields(
     def _setter(name, value):
         appdata.set_setting("ids", name, value)
 
+    def _is_not_empty(value, widget):
+        if value is None:
+            return False
+        if isinstance(value,datetime.datetime):
+            return True
+        return bool(value.strip())
+
     widget_tool.register_field_getter(widget, widget.le_title, lambda _: _getter("title"))
     widget_tool.register_field_setter(widget, widget.le_title, lambda _, v: _setter("title", v))
     widget_tool.register_field_listener(widget, widget.le_title)
+    widget_tool.add_validator(widget, widget.le_title, _is_not_empty, util.set_valid)
 
     widget_tool.register_field_getter(
         widget, widget.le_description, lambda _: _getter("description")
@@ -99,30 +112,36 @@ def register_fields(
         widget, widget.le_description, lambda _, v: _setter("description", v)
     )
     widget_tool.register_field_listener(widget, widget.le_description)
+    widget_tool.add_validator(widget, widget.le_description, _is_not_empty, util.set_valid)
 
     widget_tool.register_field_getter(widget, widget.le_author, lambda _: _getter("author"))
     widget_tool.register_field_setter(widget, widget.le_author, lambda _, v: _setter("author", v))
     widget_tool.register_field_listener(widget, widget.le_author)
+    widget_tool.add_validator(widget, widget.le_author, _is_not_empty, util.set_valid)
 
     widget_tool.register_field_getter(widget, widget.le_milestone, lambda _: _getter("milestone"))
     widget_tool.register_field_setter(
         widget, widget.le_milestone, lambda _, v: _setter("milestone", v)
     )
     widget_tool.register_field_listener(widget, widget.le_milestone)
+    widget_tool.add_validator(widget, widget.le_milestone, _is_not_empty, util.set_valid)
 
     widget_tool.register_field_getter(widget, widget.le_purpose, lambda _: _getter("purpose"))
     widget_tool.register_field_setter(widget, widget.le_purpose, lambda _, v: _setter("purpose", v))
     widget_tool.register_field_listener(widget, widget.le_purpose)
+    widget_tool.add_validator(widget, widget.le_purpose, _is_not_empty, util.set_valid)
 
     widget_tool.register_field_getter(widget, widget.le_version, lambda _: _getter("version"))
     widget_tool.register_field_setter(widget, widget.le_version, lambda _, v: _setter("version", v))
     widget_tool.register_field_listener(widget, widget.le_version)
+    widget_tool.add_validator(widget, widget.le_version, _is_not_empty, util.set_valid)
 
     widget_tool.register_field_getter(widget, widget.le_copyright, lambda _: _getter("copyright"))
     widget_tool.register_field_setter(
         widget, widget.le_copyright, lambda _, v: _setter("copyright", v)
     )
     widget_tool.register_field_listener(widget, widget.le_copyright)
+    widget_tool.add_validator(widget, widget.le_copyright, _is_not_empty, util.set_valid)
 
     widget_tool.register_field_getter(
         widget, widget.ti_ifc_versions, lambda _: _getter("ifc_versions")
@@ -131,10 +150,12 @@ def register_fields(
         widget, widget.ti_ifc_versions, lambda _, v: _setter("ifc_versions", v)
     )
     widget_tool.register_field_listener(widget, widget.ti_ifc_versions)
+    widget_tool.add_validator(widget, widget.ti_ifc_versions, _is_not_empty, util.set_valid)
 
     widget_tool.register_field_getter(widget, widget.dt_date, lambda _: _getter("date"))
     widget_tool.register_field_setter(widget, widget.dt_date, lambda _, v: _setter("date", v))
     widget_tool.register_field_listener(widget, widget.dt_date)
+    widget_tool.add_validator(widget, widget.dt_date, _is_not_empty, util.set_valid)
 
 
 def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
