@@ -17,7 +17,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QHBoxLayout, QHeaderView, QLabel, QSizePolicy,
-    QSpacerItem, QSplitter, QToolButton, QWidget)
+    QSpacerItem, QSplitter, QToolButton, QVBoxLayout,
+    QWidget)
 
 from bsdd_gui.module.ids_exporter.model_views import (ClassView, PropertyView)
 from bsdd_gui.presets.ui_presets import (FileSelector, ToggleSwitch)
@@ -29,15 +30,20 @@ class Ui_Form(object):
         Form.resize(1075, 710)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.fw_template = FileSelector(Form)
-        self.fw_template.setObjectName(u"fw_template")
+        self.label_3 = QLabel(Form)
+        self.label_3.setObjectName(u"label_3")
 
-        self.gridLayout.addWidget(self.fw_template, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_3, 5, 0, 1, 1)
 
         self.fw_output = FileSelector(Form)
         self.fw_output.setObjectName(u"fw_output")
 
-        self.gridLayout.addWidget(self.fw_output, 4, 0, 1, 1)
+        self.gridLayout.addWidget(self.fw_output, 6, 0, 1, 1)
+
+        self.fw_template = FileSelector(Form)
+        self.fw_template.setObjectName(u"fw_template")
+
+        self.gridLayout.addWidget(self.fw_template, 4, 0, 1, 1)
 
         self.splitter = QSplitter(Form)
         self.splitter.setObjectName(u"splitter")
@@ -53,36 +59,20 @@ class Ui_Form(object):
         self.tv_properties = PropertyView(self.splitter)
         self.tv_properties.setObjectName(u"tv_properties")
         self.splitter.addWidget(self.tv_properties)
-        self.fr_settings = QFrame(self.splitter)
+        self.widget = QWidget(self.splitter)
+        self.widget.setObjectName(u"widget")
+        self.verticalLayout = QVBoxLayout(self.widget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.fr_settings = QFrame(self.widget)
         self.fr_settings.setObjectName(u"fr_settings")
         self.fr_settings.setFrameShape(QFrame.Shape.StyledPanel)
         self.fr_settings.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_2 = QGridLayout(self.fr_settings)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.label_classification = QLabel(self.fr_settings)
-        self.label_classification.setObjectName(u"label_classification")
-
-        self.gridLayout_2.addWidget(self.label_classification, 1, 0, 1, 1)
-
-        self.label = QLabel(self.fr_settings)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
-
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.gridLayout_2.addItem(self.verticalSpacer, 3, 0, 1, 1)
-
-        self.cb_classification = ToggleSwitch(self.fr_settings)
-        self.cb_classification.setObjectName(u"cb_classification")
-        self.cb_classification.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-
-        self.gridLayout_2.addWidget(self.cb_classification, 1, 1, 1, 1)
-
-        self.cb_prop = QComboBox(self.fr_settings)
-        self.cb_prop.setObjectName(u"cb_prop")
-
-        self.gridLayout_2.addWidget(self.cb_prop, 2, 1, 1, 1)
 
         self.cb_inherit = ToggleSwitch(self.fr_settings)
         self.cb_inherit.setObjectName(u"cb_inherit")
@@ -90,16 +80,48 @@ class Ui_Form(object):
 
         self.gridLayout_2.addWidget(self.cb_inherit, 0, 1, 1, 1)
 
-        self.cb_pset = QComboBox(self.fr_settings)
+        self.label = QLabel(self.fr_settings)
+        self.label.setObjectName(u"label")
+
+        self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
+
+        self.label_classification = QLabel(self.fr_settings)
+        self.label_classification.setObjectName(u"label_classification")
+
+        self.gridLayout_2.addWidget(self.label_classification, 1, 0, 1, 1)
+
+        self.cb_classification = ToggleSwitch(self.fr_settings)
+        self.cb_classification.setObjectName(u"cb_classification")
+        self.cb_classification.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+
+        self.gridLayout_2.addWidget(self.cb_classification, 1, 1, 1, 1)
+
+        self.widget_prop = QWidget(self.fr_settings)
+        self.widget_prop.setObjectName(u"widget_prop")
+        self.gridLayout_3 = QGridLayout(self.widget_prop)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.cb_pset = QComboBox(self.widget_prop)
         self.cb_pset.setObjectName(u"cb_pset")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.cb_pset.sizePolicy().hasHeightForWidth())
         self.cb_pset.setSizePolicy(sizePolicy1)
         self.cb_pset.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 
-        self.gridLayout_2.addWidget(self.cb_pset, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.cb_pset, 0, 0, 1, 1)
+
+        self.cb_prop = QComboBox(self.widget_prop)
+        self.cb_prop.setObjectName(u"cb_prop")
+
+        self.gridLayout_3.addWidget(self.cb_prop, 0, 1, 1, 1)
+
+
+        self.gridLayout_2.addWidget(self.widget_prop, 2, 0, 1, 2)
+
+
+        self.verticalLayout.addWidget(self.fr_settings)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -107,32 +129,27 @@ class Ui_Form(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
-        self.tb_export = QToolButton(self.fr_settings)
+        self.tb_export = QToolButton(self.widget)
         self.tb_export.setObjectName(u"tb_export")
 
         self.horizontalLayout.addWidget(self.tb_export)
 
-        self.tb_import = QToolButton(self.fr_settings)
+        self.tb_import = QToolButton(self.widget)
         self.tb_import.setObjectName(u"tb_import")
 
         self.horizontalLayout.addWidget(self.tb_import)
 
 
-        self.gridLayout_2.addLayout(self.horizontalLayout, 4, 0, 1, 2)
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.splitter.addWidget(self.fr_settings)
+        self.splitter.addWidget(self.widget)
 
-        self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.splitter, 2, 0, 1, 1)
 
         self.label_2 = QLabel(Form)
         self.label_2.setObjectName(u"label_2")
 
-        self.gridLayout.addWidget(self.label_2, 1, 0, 1, 1)
-
-        self.label_3 = QLabel(Form)
-        self.label_3.setObjectName(u"label_3")
-
-        self.gridLayout.addWidget(self.label_3, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_2, 3, 0, 1, 1)
 
 
         self.retranslateUi(Form)
@@ -142,11 +159,12 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
+        self.label_3.setText(QCoreApplication.translate("Form", u"Export:", None))
+        self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
 #if QT_CONFIG(tooltip)
         self.label_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.label_classification.setText(QCoreApplication.translate("Form", u"Check for Classification", None))
-        self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
 #if QT_CONFIG(tooltip)
         self.cb_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -154,6 +172,5 @@ class Ui_Form(object):
         self.tb_export.setText(QCoreApplication.translate("Form", u"D", None))
         self.tb_import.setText(QCoreApplication.translate("Form", u"U", None))
         self.label_2.setText(QCoreApplication.translate("Form", u"Template:", None))
-        self.label_3.setText(QCoreApplication.translate("Form", u"Export:", None))
     # retranslateUi
 

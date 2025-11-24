@@ -89,12 +89,17 @@ def connect_widget(
     ids_class: Type[tool.IdsClassView],
     main_window: Type[tool.MainWindowWidget],
 ):
+    widget.cb_prop.hide()
+    widget.cb_pset.hide()
     worker, thread, dialog = widget_tool.count_properties_with_progress(
-        main_window.get(), widget.bsdd_data.Classes
+        widget, widget.bsdd_data.Classes, inline_parent=widget.widget_prop
     )
     widget._count_worker = worker
     widget._count_thread = thread
     widget._count_dialog = dialog
+    thread.finished.connect(lambda: setattr(widget, "_count_worker", None))
+    thread.finished.connect(lambda: setattr(widget, "_count_thread", None))
+    thread.finished.connect(lambda: setattr(widget, "_count_dialog", None))
     worker.finished.connect(lambda: widget_tool.fill_pset_combobox(widget))
     widget_tool.connect_widget_signals(widget)
     class_view = widget.tv_classes

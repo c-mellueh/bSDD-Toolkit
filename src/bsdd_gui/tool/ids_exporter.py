@@ -214,9 +214,11 @@ class IdsExporter(ActionTool, DialogTool):
         widget.cb_pset.setVisible(state)
 
     @classmethod
-    def count_properties_with_progress(cls, parent: QWidget, classes: list["BsddClass"]):
+    def count_properties_with_progress(
+        cls, parent: QWidget, classes: list["BsddClass"], inline_parent: QWidget | None = None
+    ):
         """
-        [Unverified] Wraps the outer loop in a worker thread with QProgressDialog.
+        [Unverified] Wraps the outer loop in a worker thread with progress embedded in the UI.
         """
 
         # initialize once in the GUI thread
@@ -250,6 +252,7 @@ class IdsExporter(ActionTool, DialogTool):
             text="Processing bSDD classes…",
             cancel_text="Cancel",
             process_func=process_bsdd_class,
+            inline_parent=inline_parent,
         )
 
         # keep references on the class or the caller side if needed
@@ -264,7 +267,8 @@ class IdsExporter(ActionTool, DialogTool):
             return
         # sort all psets by occurence count
         widget.cb_pset.addItems(sorted(pset_names, key=pset_names.get, reverse=True))
-
+        widget.cb_pset.show()
+        widget.cb_prop.show()
     @classmethod
     def fill_prop_combobox(cls, widget: ui.IdsWidget):
         pset_name = widget.cb_pset.currentText()
