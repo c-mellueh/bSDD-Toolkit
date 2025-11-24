@@ -84,11 +84,13 @@ def register_fields(
     appdata: Type[tool.Appdata],
     util: Type[tool.Util],
 ):
-    def _getter(name, data_type: Literal["string", "list"] = "string"):
+    def _getter(name, data_type: Literal["string", "list", "bool"] = "string"):
         if data_type == "string":
             return appdata.get_string_setting("ids", name)
-        if data_type == "list":
+        elif data_type == "list":
             return appdata.get_list_setting("ids", name)
+        elif data_type == "bool":
+            return appdata.get_bool_setting("ids", name)
 
     def _setter(name, value):
         appdata.set_setting("ids", name, value)
@@ -96,62 +98,71 @@ def register_fields(
     def _is_not_empty(value, widget):
         if value is None:
             return False
-        if isinstance(value,datetime.datetime):
+        if isinstance(value, datetime.datetime):
             return True
+        if isinstance(value, list):
+            return bool(value)
         return bool(value.strip())
 
+    #Check for Classification
+    widget_tool.register_field_getter(widget, widget.cb_clsf, lambda _: _getter("classif", "bool"))
+    widget_tool.register_field_setter(widget, widget.cb_clsf, lambda _, v: _setter("classif", v))
+    widget_tool.register_field_listener(widget, widget.cb_clsf)
+
+    #Inherit to Subclasses
+    widget_tool.register_field_getter(widget, widget.cb_inh, lambda _: _getter("inherit", "bool"))
+    widget_tool.register_field_setter(widget, widget.cb_inh, lambda _, v: _setter("inherit", v))
+    widget_tool.register_field_listener(widget, widget.cb_inh)
+
+    #Title
     widget_tool.register_field_getter(widget, widget.le_title, lambda _: _getter("title"))
     widget_tool.register_field_setter(widget, widget.le_title, lambda _, v: _setter("title", v))
     widget_tool.register_field_listener(widget, widget.le_title)
     widget_tool.add_validator(widget, widget.le_title, _is_not_empty, util.set_valid)
 
-    widget_tool.register_field_getter(
-        widget, widget.le_description, lambda _: _getter("description")
-    )
-    widget_tool.register_field_setter(
-        widget, widget.le_description, lambda _, v: _setter("description", v)
-    )
-    widget_tool.register_field_listener(widget, widget.le_description)
-    widget_tool.add_validator(widget, widget.le_description, _is_not_empty, util.set_valid)
+    #Description
+    widget_tool.register_field_getter(widget, widget.le_desc, lambda _: _getter("desc"))
+    widget_tool.register_field_setter(widget, widget.le_desc, lambda _, v: _setter("desc", v))
+    widget_tool.register_field_listener(widget, widget.le_desc)
+    widget_tool.add_validator(widget, widget.le_desc, _is_not_empty, util.set_valid)
 
+    #Author
     widget_tool.register_field_getter(widget, widget.le_author, lambda _: _getter("author"))
     widget_tool.register_field_setter(widget, widget.le_author, lambda _, v: _setter("author", v))
     widget_tool.register_field_listener(widget, widget.le_author)
     widget_tool.add_validator(widget, widget.le_author, _is_not_empty, util.set_valid)
 
-    widget_tool.register_field_getter(widget, widget.le_milestone, lambda _: _getter("milestone"))
-    widget_tool.register_field_setter(
-        widget, widget.le_milestone, lambda _, v: _setter("milestone", v)
-    )
-    widget_tool.register_field_listener(widget, widget.le_milestone)
-    widget_tool.add_validator(widget, widget.le_milestone, _is_not_empty, util.set_valid)
+    #Milestone
+    widget_tool.register_field_getter(widget, widget.le_miles, lambda _: _getter("milestone"))
+    widget_tool.register_field_setter(widget, widget.le_miles, lambda _, v: _setter("milestone", v))
+    widget_tool.register_field_listener(widget, widget.le_miles)
+    widget_tool.add_validator(widget, widget.le_miles, _is_not_empty, util.set_valid)
 
+    #Purpose
     widget_tool.register_field_getter(widget, widget.le_purpose, lambda _: _getter("purpose"))
     widget_tool.register_field_setter(widget, widget.le_purpose, lambda _, v: _setter("purpose", v))
     widget_tool.register_field_listener(widget, widget.le_purpose)
     widget_tool.add_validator(widget, widget.le_purpose, _is_not_empty, util.set_valid)
 
+    #Version
     widget_tool.register_field_getter(widget, widget.le_version, lambda _: _getter("version"))
     widget_tool.register_field_setter(widget, widget.le_version, lambda _, v: _setter("version", v))
     widget_tool.register_field_listener(widget, widget.le_version)
     widget_tool.add_validator(widget, widget.le_version, _is_not_empty, util.set_valid)
 
-    widget_tool.register_field_getter(widget, widget.le_copyright, lambda _: _getter("copyright"))
-    widget_tool.register_field_setter(
-        widget, widget.le_copyright, lambda _, v: _setter("copyright", v)
-    )
-    widget_tool.register_field_listener(widget, widget.le_copyright)
-    widget_tool.add_validator(widget, widget.le_copyright, _is_not_empty, util.set_valid)
+    #Copyright
+    widget_tool.register_field_getter(widget, widget.le_copyr, lambda _: _getter("copyright"))
+    widget_tool.register_field_setter(widget, widget.le_copyr, lambda _, v: _setter("copyright", v))
+    widget_tool.register_field_listener(widget, widget.le_copyr)
+    widget_tool.add_validator(widget, widget.le_copyr, _is_not_empty, util.set_valid)
 
-    widget_tool.register_field_getter(
-        widget, widget.ti_ifc_versions, lambda _: _getter("ifc_versions")
-    )
-    widget_tool.register_field_setter(
-        widget, widget.ti_ifc_versions, lambda _, v: _setter("ifc_versions", v)
-    )
-    widget_tool.register_field_listener(widget, widget.ti_ifc_versions)
-    widget_tool.add_validator(widget, widget.ti_ifc_versions, _is_not_empty, util.set_valid)
+    #Ifc-Version
+    widget_tool.register_field_getter(widget, widget.ti_ifc_vers, lambda _: _getter("ifc", "list"))
+    widget_tool.register_field_setter(widget, widget.ti_ifc_vers, lambda _, v: _setter("ifc", v))
+    widget_tool.register_field_listener(widget, widget.ti_ifc_vers)
+    widget_tool.add_validator(widget, widget.ti_ifc_vers, _is_not_empty, util.set_valid)
 
+    #Date
     widget_tool.register_field_getter(widget, widget.dt_date, lambda _: _getter("date"))
     widget_tool.register_field_setter(widget, widget.dt_date, lambda _, v: _setter("date", v))
     widget_tool.register_field_listener(widget, widget.dt_date)

@@ -73,15 +73,13 @@ class IdsExporter(ActionTool, DialogTool):
     def connect_internal_signals(cls):
         super().connect_internal_signals()
         cls.signals.dialog_accepted.connect(lambda d: trigger.export_ids(d._widget))
-        #live sync of fields
+        # live sync of fields
         cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.IdsWidget):
         super().connect_widget_signals(widget)
-        widget.cb_classification.toggled.connect(
-            lambda state: widget.widget_prop.setVisible(not state)
-        )
+        widget.cb_clsf.toggled.connect(lambda state: widget.widget_prop.setVisible(not state))
         widget.cb_pset.currentTextChanged.connect(lambda _: cls.fill_prop_combobox(widget))
         widget.cb_pset.currentIndexChanged.connect(lambda _: cls.fill_prop_combobox(widget))
         widget.tb_import.clicked.connect(lambda: trigger.import_settings(widget))
@@ -281,25 +279,25 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def get_settings(cls, widget: ui.IdsWidget):
         settings_dict = {
-            "inherit": widget.cb_inherit.isChecked(),
-            "classification": widget.cb_classification.isChecked(),
+            "inherit": widget.cb_inh.isChecked(),
+            "classification": widget.cb_clsf.isChecked(),
             "main_pset": widget.cb_pset.currentText(),
             "main_property": widget.cb_prop.currentText(),
         }
         return settings_dict
 
     @classmethod
-    def get_ids_metadata(cls,widget:ui.IdsWidget):
+    def get_ids_metadata(cls, widget: ui.IdsWidget):
         metadata_dict = {
             "title": widget.le_title.text(),
-            "description": widget.le_description.text(),
+            "description": widget.le_desc.text(),
             "author": widget.le_author.text(),
-            "milestone": widget.le_milestone.text(),
+            "milestone": widget.le_miles.text(),
             "purpose": widget.le_purpose.text(),
             "version": widget.le_version.text(),
-            "copyright": widget.le_copyright.text(),
+            "copyright": widget.le_copyr.text(),
             "date": widget.dt_date.dt_edit.date().toPython(),
-            "ifc_versions": widget.ti_ifc_versions.tags(),
+            "ifc_versions": widget.ti_ifc_vers.tags(),
         }
         return metadata_dict
 
@@ -311,9 +309,9 @@ class IdsExporter(ActionTool, DialogTool):
         prop = settings_dict.get("main_property")
 
         if inherit is not None:
-            widget.cb_inherit.setChecked(inherit)
+            widget.cb_inh.setChecked(inherit)
         if classification is not None:
-            widget.cb_classification.setChecked(classification)
+            widget.cb_clsf.setChecked(classification)
         if pset is not None:
             widget.cb_pset.setCurrentText(pset)
         if prop is not None:
@@ -354,7 +352,7 @@ class IdsClassView(ItemViewTool):
     @classmethod
     def connect_settings_signals(cls, widget: ui.IdsWidget, view: model_views.ClassView):
         class_model = view.model().sourceModel()
-        widget.cb_inherit.toggled.connect(
+        widget.cb_inh.toggled.connect(
             lambda checked: class_model.set_checkstate_inheritance(checked)
         )
 

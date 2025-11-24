@@ -80,11 +80,11 @@ class Ui_Form(object):
 
         self.gridLayout_2.addWidget(self.label_classification, 2, 0, 1, 1)
 
-        self.cb_classification = ToggleSwitch(self.main_settings)
-        self.cb_classification.setObjectName(u"cb_classification")
-        self.cb_classification.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.cb_clsf = ToggleSwitch(self.main_settings)
+        self.cb_clsf.setObjectName(u"cb_clsf")
+        self.cb_clsf.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
-        self.gridLayout_2.addWidget(self.cb_classification, 2, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.cb_clsf, 2, 1, 1, 1)
 
         self.widget_prop = QWidget(self.main_settings)
         self.widget_prop.setObjectName(u"widget_prop")
@@ -110,11 +110,11 @@ class Ui_Form(object):
 
         self.gridLayout_2.addWidget(self.widget_prop, 3, 0, 1, 2)
 
-        self.cb_inherit = ToggleSwitch(self.main_settings)
-        self.cb_inherit.setObjectName(u"cb_inherit")
-        self.cb_inherit.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.cb_inh = ToggleSwitch(self.main_settings)
+        self.cb_inh.setObjectName(u"cb_inh")
+        self.cb_inh.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
-        self.gridLayout_2.addWidget(self.cb_inherit, 1, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.cb_inh, 1, 1, 1, 1)
 
         self.label = QLabel(self.main_settings)
         self.label.setObjectName(u"label")
@@ -140,7 +140,7 @@ class Ui_Form(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 278, 505))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 376, 660))
         self.verticalLayout_2 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -152,10 +152,10 @@ class Ui_Form(object):
         self.ids_settings.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_4 = QGridLayout(self.ids_settings)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.le_description = QLineEdit(self.ids_settings)
-        self.le_description.setObjectName(u"le_description")
+        self.le_desc = QLineEdit(self.ids_settings)
+        self.le_desc.setObjectName(u"le_desc")
 
-        self.gridLayout_4.addWidget(self.le_description, 5, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_desc, 5, 0, 1, 1)
 
         self.label_10 = QLabel(self.ids_settings)
         self.label_10.setObjectName(u"label_10")
@@ -206,20 +206,20 @@ class Ui_Form(object):
 
         self.gridLayout_4.addWidget(self.label_9, 12, 0, 1, 1)
 
-        self.ti_ifc_versions = TagInput_IfcVersion(self.ids_settings)
-        self.ti_ifc_versions.setObjectName(u"ti_ifc_versions")
+        self.ti_ifc_vers = TagInput_IfcVersion(self.ids_settings)
+        self.ti_ifc_vers.setObjectName(u"ti_ifc_vers")
 
-        self.gridLayout_4.addWidget(self.ti_ifc_versions, 19, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.ti_ifc_vers, 19, 0, 1, 1)
 
-        self.le_copyright = QLineEdit(self.ids_settings)
-        self.le_copyright.setObjectName(u"le_copyright")
+        self.le_copyr = QLineEdit(self.ids_settings)
+        self.le_copyr.setObjectName(u"le_copyr")
 
-        self.gridLayout_4.addWidget(self.le_copyright, 17, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_copyr, 17, 0, 1, 1)
 
-        self.le_milestone = QLineEdit(self.ids_settings)
-        self.le_milestone.setObjectName(u"le_milestone")
+        self.le_miles = QLineEdit(self.ids_settings)
+        self.le_miles.setObjectName(u"le_miles")
 
-        self.gridLayout_4.addWidget(self.le_milestone, 9, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_miles, 9, 0, 1, 1)
 
         self.le_title = QLineEdit(self.ids_settings)
         self.le_title.setObjectName(u"le_title")
@@ -303,9 +303,9 @@ class Ui_Form(object):
 #endif // QT_CONFIG(tooltip)
         self.label_classification.setText(QCoreApplication.translate("Form", u"Check for Classification", None))
 #if QT_CONFIG(tooltip)
-        self.cb_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
+        self.cb_clsf.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.cb_classification.setText(QCoreApplication.translate("Form", u"CheckBox", None))
+        self.cb_clsf.setText(QCoreApplication.translate("Form", u"CheckBox", None))
         self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
         self.label_13.setText(QCoreApplication.translate("Form", u"**Settings**", None))
         self.label_10.setText(QCoreApplication.translate("Form", u"Version", None))

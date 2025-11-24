@@ -54,6 +54,9 @@ STYLE_SHEET2 = """
         background: palette(base);
         padding: 0px 0px;
     }
+    QLineEdit[invalid="true"] {
+        border: 1px solid red;
+    }
     """
 
 

@@ -75,7 +75,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="ToggleSwitch" name="cb_classification">
+           <widget class="ToggleSwitch" name="cb_clsf">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
@@ -122,7 +122,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="ToggleSwitch" name="cb_inherit">
+           <widget class="ToggleSwitch" name="cb_inh">
             <property name="layoutDirection">
              <enum>Qt::LayoutDirection::LeftToRight</enum>
             </property>
@@ -173,8 +173,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>278</width>
-            <height>505</height>
+            <width>376</width>
+            <height>660</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -206,7 +206,7 @@
              </property>
              <layout class="QGridLayout" name="gridLayout_4">
               <item row="5" column="0">
-               <widget class="QLineEdit" name="le_description"/>
+               <widget class="QLineEdit" name="le_desc"/>
               </item>
               <item row="14" column="0">
                <widget class="QLabel" name="label_10">
@@ -277,13 +277,13 @@
                </widget>
               </item>
               <item row="19" column="0">
-               <widget class="TagInput_IfcVersion" name="ti_ifc_versions" native="true"/>
+               <widget class="TagInput_IfcVersion" name="ti_ifc_vers" native="true"/>
               </item>
               <item row="17" column="0">
-               <widget class="QLineEdit" name="le_copyright"/>
+               <widget class="QLineEdit" name="le_copyr"/>
               </item>
               <item row="9" column="0">
-               <widget class="QLineEdit" name="le_milestone"/>
+               <widget class="QLineEdit" name="le_miles"/>
               </item>
               <item row="3" column="0">
                <widget class="QLineEdit" name="le_title"/>
