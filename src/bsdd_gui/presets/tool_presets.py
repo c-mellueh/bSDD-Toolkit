@@ -64,6 +64,7 @@ from bsdd_json import *
 import logging
 from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals
 from .models_presets import ItemModel
+import datetime
 
 BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassProperty
 
@@ -495,6 +496,10 @@ class FieldTool(WidgetTool):
             elif isinstance(field, TagInput):
                 field.setTags(value or [])
             elif isinstance(field, QDateTimeEdit):
+                if not value:
+                    return
+                if isinstance(value, str):
+                    value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
                 field.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))
             elif isinstance(field, QAbstractButton):
                 field.setChecked(value)

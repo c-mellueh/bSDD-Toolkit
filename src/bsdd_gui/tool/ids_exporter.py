@@ -73,6 +73,8 @@ class IdsExporter(ActionTool, DialogTool):
     def connect_internal_signals(cls):
         super().connect_internal_signals()
         cls.signals.dialog_accepted.connect(lambda d: trigger.export_ids(d._widget))
+        #live sync of fields
+        cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.IdsWidget):

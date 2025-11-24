@@ -223,10 +223,10 @@ class Ui_Form(object):
 
         self.gridLayout_4.addWidget(self.label_5, 3, 0, 1, 1)
 
-        self.Le_purpose = QLineEdit(self.ids_settings)
-        self.Le_purpose.setObjectName(u"Le_purpose")
+        self.le_purpose = QLineEdit(self.ids_settings)
+        self.le_purpose.setObjectName(u"le_purpose")
 
-        self.gridLayout_4.addWidget(self.Le_purpose, 12, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.le_purpose, 12, 0, 1, 1)
 
         self.le_version = QLineEdit(self.ids_settings)
         self.le_version.setObjectName(u"le_version")

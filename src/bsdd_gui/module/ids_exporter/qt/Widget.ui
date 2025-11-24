@@ -277,7 +277,7 @@
                </widget>
               </item>
               <item row="12" column="0">
-               <widget class="QLineEdit" name="Le_purpose"/>
+               <widget class="QLineEdit" name="le_purpose"/>
               </item>
               <item row="14" column="0">
                <widget class="QLineEdit" name="le_version"/>

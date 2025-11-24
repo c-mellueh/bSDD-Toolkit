@@ -1,6 +1,6 @@
 from __future__ import annotations
 from PySide6.QtCore import QCoreApplication, QModelIndex
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Type, Literal
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import constants
 import json
@@ -75,9 +75,66 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget.dt_date.hide_toggle_switch()
     widget.dt_date.set_now()
 
-def register_fields(widget: ui.IdsWidget, widget_Tool: Type[tool.IdsExporter]):
-    pass
-    # widget_Tool.register_basic_field(widget, widget.le_name, "Name")
+
+def register_fields(
+    widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter], appdata: Type[tool.Appdata]
+):
+    def _getter(name, data_type: Literal["string", "list"] = "string"):
+        if data_type == "string":
+            return appdata.get_string_setting("ids", name)
+        if data_type == "list":
+            return appdata.get_list_setting("ids", name)
+
+    def _setter(name, value):
+        appdata.set_setting("ids", name, value)
+
+    widget_tool.register_field_getter(widget, widget.le_title, lambda _: _getter("title"))
+    widget_tool.register_field_setter(widget, widget.le_title, lambda _, v: _setter("title", v))
+    widget_tool.register_field_listener(widget, widget.le_title)
+
+    widget_tool.register_field_getter(
+        widget, widget.le_description, lambda _: _getter("description")
+    )
+    widget_tool.register_field_setter(
+        widget, widget.le_description, lambda _, v: _setter("description", v)
+    )
+    widget_tool.register_field_listener(widget, widget.le_description)
+
+    widget_tool.register_field_getter(widget, widget.le_author, lambda _: _getter("author"))
+    widget_tool.register_field_setter(widget, widget.le_author, lambda _, v: _setter("author", v))
+    widget_tool.register_field_listener(widget, widget.le_author)
+
+    widget_tool.register_field_getter(widget, widget.le_milestone, lambda _: _getter("milestone"))
+    widget_tool.register_field_setter(
+        widget, widget.le_milestone, lambda _, v: _setter("milestone", v)
+    )
+    widget_tool.register_field_listener(widget, widget.le_milestone)
+
+    widget_tool.register_field_getter(widget, widget.le_purpose, lambda _: _getter("purpose"))
+    widget_tool.register_field_setter(widget, widget.le_purpose, lambda _, v: _setter("purpose", v))
+    widget_tool.register_field_listener(widget, widget.le_purpose)
+
+    widget_tool.register_field_getter(widget, widget.le_version, lambda _: _getter("version"))
+    widget_tool.register_field_setter(widget, widget.le_version, lambda _, v: _setter("version", v))
+    widget_tool.register_field_listener(widget, widget.le_version)
+
+    widget_tool.register_field_getter(widget, widget.le_copyright, lambda _: _getter("copyright"))
+    widget_tool.register_field_setter(
+        widget, widget.le_copyright, lambda _, v: _setter("copyright", v)
+    )
+    widget_tool.register_field_listener(widget, widget.le_copyright)
+
+    widget_tool.register_field_getter(
+        widget, widget.ti_ifc_versions, lambda _: _getter("ifc_versions")
+    )
+    widget_tool.register_field_setter(
+        widget, widget.ti_ifc_versions, lambda _, v: _setter("ifc_versions", v)
+    )
+    widget_tool.register_field_listener(widget, widget.ti_ifc_versions)
+
+    widget_tool.register_field_getter(widget, widget.dt_date, lambda _: _getter("date"))
+    widget_tool.register_field_setter(widget, widget.dt_date, lambda _, v: _setter("date", v))
+    widget_tool.register_field_listener(widget, widget.dt_date)
 
 
 def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
