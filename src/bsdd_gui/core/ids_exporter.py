@@ -72,7 +72,8 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget_tool.register_widget(widget)
     if not widget.fw_template.get_path():
         widget.fw_template.set_path(widget_tool.get_template())
-
+    widget.dt_date.hide_toggle_switch()
+    widget.dt_date.set_now()
 
 def register_fields(widget: ui.IdsWidget, widget_Tool: Type[tool.IdsExporter]):
     pass

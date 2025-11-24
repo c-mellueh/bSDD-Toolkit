@@ -35,3 +35,6 @@ class DateTimeWithNow(ItemWithToggleSwitch):
     def set_now(self):
         self.set_active(True)
         self.dt_edit.setDateTime(QDateTime.currentDateTime())
+
+    def hide_toggle_switch(self):
+        self.active_toggle.setVisible(False)
