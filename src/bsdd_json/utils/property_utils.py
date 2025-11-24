@@ -14,6 +14,7 @@ from . import dictionary_utils as dict_utils
 from . import build_unique_code
 import logging
 
+
 class Cache:
     data = {}
 
@@ -148,15 +149,20 @@ def get_property_by_code(
     return prop
 
 
-def update_relations_to_new_uri(
+def update_internal_relations_to_new_version(
     bsdd_proeprty: BsddProperty, bsdd_dictionary: BsddDictionary
 ):
+    """
+    If the Version of the given dictionary has changed, update all internal
+    Property relations of the given property to point to the new version URIs.
+    """
     namespace = f"{bsdd_dictionary.OrganizationCode}/{bsdd_dictionary.DictionaryCode}"
     version = bsdd_dictionary.DictionaryVersion
-
     for relationship in bsdd_proeprty.PropertyRelations:
         old_uri = dict_utils.parse_bsdd_url(relationship.RelatedPropertyUri)
-        new_uri = dict(old_uri)
+        if old_uri["namespace"] != namespace: #skip external relations
+            continue
+        new_uri = dict(old_uri) #copy
         new_uri["namespace"] = namespace
         new_uri["version"] = version
         if old_uri != new_uri:
