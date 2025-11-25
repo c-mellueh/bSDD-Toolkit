@@ -1,6 +1,6 @@
 from typing import Iterable, Optional, Callable, Any
 
-from PySide6.QtCore import QObject, Signal, QThread, Slot,QCoreApplication
+from PySide6.QtCore import QObject, Signal, QThread, Slot, QCoreApplication
 from PySide6.QtWidgets import (
     QWidget,
     QProgressDialog,
@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QHBoxLayout,
     QGridLayout,
-    QSizePolicy
+    QSizePolicy,
 )
 from PySide6.QtCore import Qt
 
@@ -94,13 +94,13 @@ class InlineProgressWidget(QWidget):
         self._layout.addWidget(self._label)
         self._layout.addWidget(self._progress_bar, 1)
         self._layout.addWidget(self._cancel_button)
-            
+
         self._cancel_button.clicked.connect(self.canceled.emit)
         sp = self.sizePolicy()
         sp.setHorizontalPolicy(QSizePolicy.Policy.Minimum)
         self.setSizePolicy(sp)
         self._cancel_button.hide()
-        
+
     def setValue(self, value: int):
         self._progress_bar.setValue(value)
 
@@ -110,6 +110,7 @@ class InlineProgressWidget(QWidget):
     def close(self):
         # hide instead of destroying immediately; caller may deleteLater()
         self.hide()
+
 
 def run_iterable_with_progress(
     parent: QWidget,

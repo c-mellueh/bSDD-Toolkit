@@ -74,6 +74,8 @@ class WaitingWidget(QWidget):
         sp.setHorizontalPolicy(QSizePolicy.Policy.Minimum)
         sp.setVerticalPolicy(QSizePolicy.Policy.Minimum)
         self.setSizePolicy(sp)
+        if not text:
+            self._text_label.hide()
 
     def set_title(self, title: str):
         self._title_label.setText(title)
@@ -116,6 +118,7 @@ def start_waiting_widget(parent: QWidget, title: str = "Title", text: str = "Tex
     worker.finished.connect(waiting_widget.close)
 
     thread.finished.connect(worker.deleteLater)
+    thread.finished.connect(waiting_widget.close)
     thread.finished.connect(waiting_widget.deleteLater)
     thread.finished.connect(thread.deleteLater)
 

@@ -389,26 +389,16 @@ class IdsExporter(ActionTool, DialogTool):
         )
 
     @classmethod
-    def create_specification_with_progress(
+    def create_build_thread(
         cls,
-        ids,
-        classes: list["BsddClass"],
-        base_settings: BasicSettingsDict,
-        class_settings: dict[str, bool],
-        property_settings: PsetDict,
-        bsdd_dict: BsddDictionary,
-        ifc_version: list[str],
+        payload,
         parent: QWidget,
     ):
         """
         [Unverified] Wraps the outer loop in a worker thread with progress embedded in the UI.
         """
 
-        # initialize once in the GUI thread
-        count_dict: dict[str, dict] = {}
-        cls.get_properties().property_count = count_dict
-
-        def process_bsdd_class(bsdd_class: BsddClass, idx: int):
+        def _process_bsdd_class(bsdd_class: BsddClass, idx: int):
             if not class_settings.get(bsdd_class.Code, True):
                 return
 
@@ -430,17 +420,35 @@ class IdsExporter(ActionTool, DialogTool):
                     spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
             spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
             ids.specifications.append(spec)
+            import time
+
+            time.sleep(0.1)
+
+        # initialize once in the GUI thread
+        ids = payload["ids"]
+        sorted_classes = payload["sorted_classes"]
+        base_settings = payload["base_settings"]
+        class_settings = payload["class_settings"]
+        property_settings = payload["property_settings"]
+        bsdd_dict = payload["bsdd_dict"]
+        ifc_version = payload["ifc_version"]
+
+        count_dict: dict[str, dict] = {}
+        cls.get_properties().property_count = count_dict
 
         worker, thread, dialog = run_iterable_with_progress(
             parent=parent,
-            iterable=classes,
-            total=len(classes),
+            iterable=sorted_classes,
+            total=len(sorted_classes),
             title="Create Specifications…",
-            text="Create Specifications…",
+            text="",
             cancel_text="Cancel",
-            process_func=process_bsdd_class,
+            process_func=_process_bsdd_class,
+            inline_parent=parent,
         )
-
+        cls.get_properties().specification_worker = worker
+        cls.get_properties().specification_thread = thread
+        cls.get_properties().specification_widget = dialog
         # keep references on the class or the caller side if needed
         return worker, thread, dialog
 
@@ -456,7 +464,7 @@ class IdsExporter(ActionTool, DialogTool):
         ids.info["copyright"] = metadata.get("copyright", ids.info.get("copyright"))
 
     @classmethod
-    def create_export_setup(
+    def create_export_setup_thread(
         cls,
         widget: ui.IdsWidget,
         class_settings: dict[str, bool],
@@ -472,7 +480,6 @@ class IdsExporter(ActionTool, DialogTool):
                 super().__init__()
 
             def run(self):
-                print("RUN SETUP")
                 try:
                     out_path = widget.fw_output.get_path()
                     template_path = cls.get_template()
@@ -488,9 +495,7 @@ class IdsExporter(ActionTool, DialogTool):
                     base_spec.ifcVersion = ifc_version
                     cls.fill_ids_by_metadata(ids, metadata_settings)
                     if base_settings["inherit"]:
-                        cs = cls.build_inherited_checkstate_dict(
-                            bsdd_dict.Classes, class_settings
-                        )
+                        cs = cls.build_inherited_checkstate_dict(bsdd_dict.Classes, class_settings)
                     else:
                         cs = class_settings
 
@@ -505,7 +510,6 @@ class IdsExporter(ActionTool, DialogTool):
                         "ifc_version": ifc_version,
                         "out_path": out_path,
                     }
-                    print("FINISH SETUP")
                     self.finished.emit(payload)
                 except Exception as exc:  # pragma: no cover - pass through
                     self.error.emit(exc)
@@ -528,7 +532,7 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def create_waiting_widget(cls):
         waiting_worker, waiting_thread, waiting_widget = start_waiting_widget(
-            None, "Export IDS", "Export IDS"
+            None, "Export IDS", ""
         )
         cls.get_properties().waiting_worker = waiting_worker
         cls.get_properties().waiting_thread = waiting_thread
@@ -536,29 +540,34 @@ class IdsExporter(ActionTool, DialogTool):
         return waiting_worker, waiting_thread, waiting_widget
 
     @classmethod
-    def create_ids_creator(cls, payload):
-        ids = payload["ids"]
-        sorted_classes = payload["sorted_classes"]
-        base_settings = payload["base_settings"]
-        class_settings = payload["class_settings"]
-        property_settings = payload["property_settings"]
-        bsdd_dict = payload["bsdd_dict"]
-        ifc_version = payload["ifc_version"]
+    def create_write_thread(cls, ids, out_path):
+        class _SetupWorker(QObject):
+            finished = Signal()
+            error = Signal(object)
 
-        worker, thread, dialog = cls.create_specification_with_progress(
-            ids,
-            sorted_classes,
-            base_settings,
-            class_settings,
-            property_settings,
-            bsdd_dict,
-            ifc_version,
-            None,
-        )
-        cls.get_properties().specification_worker = worker
-        cls.get_properties().specification_thread = thread
-        cls.get_properties().specification_widget = dialog
-        return worker,thread,dialog
+            def __init__(self):
+                super().__init__()
+
+            def run(self):
+                try:
+                    ids.to_xml(out_path)
+                    self.finished.emit()
+                except Exception as exc:  # pragma: no cover - pass through
+                    self.error.emit(exc)
+
+        write_worker = _SetupWorker()
+        cls.get_properties().write_worker = write_worker
+        write_thread = QThread()
+        cls.get_properties().write_thread = write_thread
+        write_worker.moveToThread(write_thread)
+        write_worker.finished.connect(write_thread.quit)
+        write_worker.finished.connect(write_worker.deleteLater)
+        write_worker.error.connect(write_thread.quit)
+        write_worker.error.connect(write_worker.deleteLater)
+        write_thread.finished.connect(write_thread.deleteLater)
+        write_thread.started.connect(write_worker.run, Qt.ConnectionType.QueuedConnection)
+        return write_worker, write_thread
+
 
 class ClassSignals(ViewSignals):
     pass

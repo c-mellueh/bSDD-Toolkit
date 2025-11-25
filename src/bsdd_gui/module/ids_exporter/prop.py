@@ -14,7 +14,8 @@ class IdsExporterProperties(ActionsProperties, DialogProperties):
         self.specification_worker = None
         self.specification_thread = None
         self.specification_widget = None
-
+        self.write_worker = None
+        self.write_thread = None
 
 class IdsClassViewProperties(ViewProperties):
     def __init__(self):

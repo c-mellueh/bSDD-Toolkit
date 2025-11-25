@@ -373,42 +373,43 @@ def export_ids(
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 
-    print("START WAITING")
     waiting_worker, waiting_thread, waiting_widget = widget_tool.create_waiting_widget()
+    waiting_widget.set_title("Load Data")
 
-
-    print("START SETUP")
-    setup_worker,setup_thread = widget_tool.create_export_setup(
+    setup_worker, setup_thread = widget_tool.create_export_setup_thread(
         widget, class_settings, property_settings, base_settings, metadata_settings
     )
 
     def _start_specification(payload: dict):
-        print("START SPECIFICATION")
-        create_worker,creator_thread,creator_dialog = widget_tool.create_ids_creator(payload)
-        creator_thread.finished.connect(lambda:_export(payload["ids"],payload["out_path"]))
+        waiting_widget.set_title("Build IDS")
+
+        create_worker, creator_thread, creator_dialog = widget_tool.create_build_thread(
+            payload, waiting_widget
+        )
+        creator_thread.finished.connect(lambda: _export(payload["ids"], payload["out_path"]))
         creator_thread.start()
 
     def _setup_failed(_exc: Exception):
-        print("SETUP FAILED")
         stop_waiting_widget(waiting_worker)
 
     def _dispatch_specification(payload: dict):
-        print("DISPATCH")
         # queue execution on the main thread (mw affinity)
         QTimer.singleShot(0, mw, lambda: _start_specification(payload))
 
-    def _export(ids,out_path):
-        print("EXPORT")
-        ids.to_xml(out_path)
-        popups.create_info_popup(
-            f"{len(ids.specifications)} Specifications created.",
-            "IDS Export Done!",
-            "IDS Export Done!",
-            parent=main_window.get(),
+    def _export(ids, out_path):
+        write_worker, write_thread = widget_tool.create_write_thread(ids, out_path)
+        waiting_widget.set_title("Write IDS")
+        write_thread.finished.connect(
+            lambda: popups.create_info_popup(
+                f"{len(ids.specifications)} Specifications created.",
+                "IDS Export Done!",
+                "IDS Export Done!",
+                parent=main_window.get(),
+            )
         )
-        print("EXPORT DONE")
-        stop_waiting_widget(waiting_worker)
-        print("STOPED WAITING")
+        write_thread.finished.connect(lambda: stop_waiting_widget(waiting_worker))
+        write_thread.start()
+
     setup_worker.finished.connect(_dispatch_specification)
     setup_worker.error.connect(_setup_failed)
     setup_thread.start()
