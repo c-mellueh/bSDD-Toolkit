@@ -96,7 +96,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           mkdir -p artifacts
-          cd src/dist
+          cd dist
           zip -r ../../artifacts/bSDD-Toolkit-linux-x86_64-v${{ needs.check_version.outputs.version }}.zip bSDD-Toolkit
 
       - name: Package artifact (Windows)
@@ -104,7 +104,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          Compress-Archive -Path src\dist\bSDD-Toolkit\* -DestinationPath artifacts\bSDD-Toolkit-windows-x86_64-v${{ needs.check_version.outputs.version }}.zip -Force
+          Compress-Archive -Path dist\bSDD-Toolkit\* -DestinationPath artifacts\bSDD-Toolkit-windows-x86_64-v${{ needs.check_version.outputs.version }}.zip -Force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
