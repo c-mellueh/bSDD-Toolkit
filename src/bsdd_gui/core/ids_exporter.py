@@ -1,5 +1,5 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication, QModelIndex
+from PySide6.QtCore import QCoreApplication, QModelIndex, QThread, QObject, Signal, Slot, Qt, QTimer
 from typing import TYPE_CHECKING, Type, Literal
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import constants
@@ -13,6 +13,7 @@ from ifctester.facet import Restriction
 from ifctester.ids import Specification
 from bsdd_gui.resources import icons
 import qtawesome as qta
+from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
 
 import datetime
 
@@ -365,54 +366,39 @@ def export_ids(
     main_window: Type[tool.MainWindowWidget],
     popups: Type[tool.Popups],
 ):
+
+    mw = main_window.get()
     class_settings = class_view.get_check_dict()
     property_settings = property_view.get_check_dict()
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 
-    out_path = widget.fw_output.get_path()
-    template_path = widget_tool.get_template()
-    ifc_version = metadata_settings.get("ifc_versions", ["IFC4X3_ADD2"])
-    bsdd_dict = widget.bsdd_data
-    ids = ifctester.ids.open(template_path)
-    base_spec = ids.specifications[0]
-    base_requirement: PropertyFacet = base_spec.requirements[0]
-    base_requirement.propertySet = base_settings.get("main_pset", "")
-    base_requirement.baseName = base_settings.get("main_property", "")
-    base_restriction = base_requirement.value
-    base_restriction.options = {"enumeration": [c.Code for c in bsdd_dict.Classes]}
-    base_spec.ifcVersion = ifc_version
+    print("START WAITING")
+    waiting_worker, waiting_thread, waiting_widget = widget_tool.create_waiting_widget()
 
-    ids.info["title"] = metadata_settings.get("title", ids.info.get("title"))
-    ids.info["description"] = metadata_settings.get("description", ids.info.get("description"))
-    ids.info["author"] = metadata_settings.get("author", ids.info.get("author"))
-    ids.info["milestone"] = metadata_settings.get("milestone", ids.info.get("milestone"))
-    ids.info["purpose"] = metadata_settings.get("purpose", ids.info.get("purpose"))
-    ids.info["version"] = metadata_settings.get("version", ids.info.get("version"))
-    ids.info["copyright"] = metadata_settings.get("copyright", ids.info.get("copyright"))
 
-    # If Inherit is Checked it will build the class settings dict exclude subclasses of unchecked classes
-    if base_settings["inherit"]:
-        class_settings = widget_tool.build_inherited_checkstate_dict(
-            bsdd_dict.Classes, class_settings
-        )
-
-    input = sorted(bsdd_dict.Classes, key=lambda x: x.Code)
-    worker, thread, dialog = widget_tool.create_specification_with_progress(
-        ids,
-        input,
-        base_settings,
-        class_settings,
-        property_settings,
-        bsdd_dict,
-        ifc_version,
-        main_window.get(),
+    print("START SETUP")
+    setup_worker,setup_thread = widget_tool.create_export_setup(
+        widget, class_settings, property_settings, base_settings, metadata_settings
     )
-    widget._specification_worker = worker
-    widget._specification_thread = thread
-    widget._specification_dialog = dialog
 
-    def _export():
+    def _start_specification(payload: dict):
+        print("START SPECIFICATION")
+        create_worker,creator_thread,creator_dialog = widget_tool.create_ids_creator(payload)
+        creator_thread.finished.connect(lambda:_export(payload["ids"],payload["out_path"]))
+        creator_thread.start()
+
+    def _setup_failed(_exc: Exception):
+        print("SETUP FAILED")
+        stop_waiting_widget(waiting_worker)
+
+    def _dispatch_specification(payload: dict):
+        print("DISPATCH")
+        # queue execution on the main thread (mw affinity)
+        QTimer.singleShot(0, mw, lambda: _start_specification(payload))
+
+    def _export(ids,out_path):
+        print("EXPORT")
         ids.to_xml(out_path)
         popups.create_info_popup(
             f"{len(ids.specifications)} Specifications created.",
@@ -420,9 +406,9 @@ def export_ids(
             "IDS Export Done!",
             parent=main_window.get(),
         )
-
-    thread.finished.connect(_export)
-    thread.finished.connect(lambda: setattr(widget, "_specification_worker", None))
-    thread.finished.connect(lambda: setattr(widget, "_specification_dialog", None))
-    thread.finished.connect(lambda: setattr(widget, "_specification_thread", None))
-
+        print("EXPORT DONE")
+        stop_waiting_widget(waiting_worker)
+        print("STOPED WAITING")
+    setup_worker.finished.connect(_dispatch_specification)
+    setup_worker.error.connect(_setup_failed)
+    setup_thread.start()

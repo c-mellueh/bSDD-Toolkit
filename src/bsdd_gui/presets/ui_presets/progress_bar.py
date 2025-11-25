@@ -1,6 +1,6 @@
 from typing import Iterable, Optional, Callable, Any
 
-from PySide6.QtCore import QObject, Signal, QThread, Slot
+from PySide6.QtCore import QObject, Signal, QThread, Slot,QCoreApplication
 from PySide6.QtWidgets import (
     QWidget,
     QProgressDialog,
@@ -155,7 +155,7 @@ def run_iterable_with_progress(
         dialog.setAutoReset(True)
         dialog.setMinimumDuration(0)  # show immediately
         dialog.show()
-
+        QCoreApplication.processEvents()
     if total == 0:
         dialog.setRange(0, 0)  # busy indicator
 
