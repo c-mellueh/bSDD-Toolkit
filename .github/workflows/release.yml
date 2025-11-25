@@ -90,7 +90,6 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          cd src
           pyinstaller main.spec -y
 
       - name: Package artifact (Linux)
