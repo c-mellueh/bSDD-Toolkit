@@ -18,6 +18,9 @@ dependencies = [
   "pyqtconsole",
   "thefuzz",
   "bsdd_json>=0.1.1",
+  "ifctester",
+  "qtawesome",
+  "ifcopenshell",
 ]
 
 [project.optional-dependencies]
