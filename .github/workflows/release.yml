@@ -97,7 +97,7 @@ jobs:
         run: |
           mkdir -p artifacts
           cd dist
-          zip -r ../../artifacts/bSDD-Toolkit-linux-x86_64-v${{ needs.check_version.outputs.version }}.zip bSDD-Toolkit
+          zip -r ../artifacts/bSDD-Toolkit-linux-x86_64-v${{ needs.check_version.outputs.version }}.zip bSDD-Toolkit
 
       - name: Package artifact (Windows)
         if: runner.os == 'Windows'
