@@ -176,7 +176,6 @@ class MainWindowWidget(ActionTool):
 
     @classmethod
     def set_status_bar_text(cls, text: str):
-        print(text)
         cls.get_properties().status_text_label.setText(text)
 
     @classmethod

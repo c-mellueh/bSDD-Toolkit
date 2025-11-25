@@ -184,8 +184,8 @@ pyinstaller main.spec -y
 
 Artifacts:
 
-- Windows: `src/dist/BSDD-Toolkit/BSDD-Toolkit.exe`
-- macOS/Linux: `src/dist/BSDD-Toolkit/` binary in the same folder
+- Windows: `src/dist/bSDD-Toolkit/bSDD-Toolkit.exe`
+- macOS/Linux: `src/dist/bSDD-Toolkit/` binary in the same folder
 
 Notes:
 
