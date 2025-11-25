@@ -1,11 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
+from pathlib import Path
 from PyInstaller.utils.hooks import collect_submodules
+import ifctester
 
 block_cipher = None
 added_files = [
     ("src/bsdd_gui/resources", "bsdd_gui/resources"),
     ("src/bsdd_gui/plugins", "bsdd_gui/plugins"),
-    (r'.venv/Lib/site-packages/ifctester/ids.xsd', 'ifctester'),
+    # Resolve ids.xsd from the installed package to work across OS/venv layouts
+    (str(Path(ifctester.__file__).resolve().parent / "ids.xsd"), "ifctester"),
 ]
 
 hi = collect_submodules("bsdd_json")
