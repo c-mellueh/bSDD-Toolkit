@@ -420,9 +420,6 @@ class IdsExporter(ActionTool, DialogTool):
                     spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
             spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
             ids.specifications.append(spec)
-            import time
-
-            time.sleep(0.1)
 
         # initialize once in the GUI thread
         ids = payload["ids"]
@@ -553,6 +550,7 @@ class IdsExporter(ActionTool, DialogTool):
                     ids.to_xml(out_path)
                     self.finished.emit()
                 except Exception as exc:  # pragma: no cover - pass through
+                    logging.error(exc)
                     self.error.emit(exc)
 
         write_worker = _SetupWorker()

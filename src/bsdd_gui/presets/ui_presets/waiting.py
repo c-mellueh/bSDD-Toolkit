@@ -5,7 +5,7 @@ from typing import Optional
 from PySide6.QtCore import QObject, QThread, QTimer, Signal, Slot, Qt
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QWidget
-
+from bsdd_gui.resources.icons import get_icon
 
 class _Spinner(QWidget):
     """
@@ -74,6 +74,8 @@ class WaitingWidget(QWidget):
         sp.setHorizontalPolicy(QSizePolicy.Policy.Minimum)
         sp.setVerticalPolicy(QSizePolicy.Policy.Minimum)
         self.setSizePolicy(sp)
+        self.setWindowIcon(get_icon())
+        self.setWindowTitle(title)
         if not text:
             self._text_label.hide()
 
