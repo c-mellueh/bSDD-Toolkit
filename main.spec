@@ -1,16 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_submodules
 
 block_cipher = None
 added_files = [
-    ("bsdd_json", "bsdd_json"),
-    ("bsdd_gui/resources", "bsdd_gui/resources"),
-    ("bsdd_gui/plugins", "bsdd_gui/plugins"),
+    ("src/bsdd_json", "bsdd_json"),
+    ("src/bsdd_gui/resources", "bsdd_gui/resources"),
+    ("src/bsdd_gui/plugins", "bsdd_gui/plugins"),
+    (r'.venv/Lib/site-packages/ifctester/ids.xsd', 'ifctester/ids.xsd'),
 ]
 
-hi = []
+hi = collect_submodules("bsdd_json")
 a = Analysis(
-    ["bsdd_gui/__main__.py"],
-    pathex=[],
+    ["src/bsdd_gui/__main__.py"],
+    pathex=["src"],
     binaries=[],
     datas=added_files,
     hiddenimports=hi,
@@ -40,7 +42,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon="bsdd_gui/resources/icons/icon.ico")
+    icon="src/bsdd_gui/resources/icons/icon.ico")
 coll = COLLECT(
     exe,
     a.binaries,
