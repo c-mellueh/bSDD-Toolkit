@@ -421,7 +421,8 @@ def export_ids(
             parent=main_window.get(),
         )
 
-    thread.finished.connect(lambda: setattr(widget, "_specification_worker", None))
-    thread.finished.connect(lambda: setattr(widget, "_specification_thread", None))
-    thread.finished.connect(lambda: setattr(widget, "_specification_dialog", None))
     thread.finished.connect(_export)
+    thread.finished.connect(lambda: setattr(widget, "_specification_worker", None))
+    thread.finished.connect(lambda: setattr(widget, "_specification_dialog", None))
+    thread.finished.connect(lambda: setattr(widget, "_specification_thread", None))
+

@@ -3,10 +3,9 @@ from PyInstaller.utils.hooks import collect_submodules
 
 block_cipher = None
 added_files = [
-    ("src/bsdd_json", "bsdd_json"),
     ("src/bsdd_gui/resources", "bsdd_gui/resources"),
     ("src/bsdd_gui/plugins", "bsdd_gui/plugins"),
-    (r'.venv/Lib/site-packages/ifctester/ids.xsd', 'ifctester/ids.xsd'),
+    (r'.venv/Lib/site-packages/ifctester/ids.xsd', 'ifctester'),
 ]
 
 hi = collect_submodules("bsdd_json")
