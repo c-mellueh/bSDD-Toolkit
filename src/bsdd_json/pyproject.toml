@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "bsdd_json"
 version = "0.1.1"
 description = "bSDD JSON data models and utilities"
-requires-python = ">=3.10"
+requires-python = "=3.11"
 authors = [{ name = "Christoph Mellüh" }]
 license = { text = "MIT" }
 dependencies = [
