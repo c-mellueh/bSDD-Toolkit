@@ -30,7 +30,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="BSDD-Toolkit",
+    name="bSDD-Toolkit",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -50,4 +50,4 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name=f"BSDD-Toolkit")
+    name=f"bSDD-Toolkit")
