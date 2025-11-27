@@ -192,7 +192,7 @@ def register_validators(
             "IsPartOf",
         ]
     else:
-        elements = ["HasReference", "IsEqualTo", " IsSimilarTo"]
+        elements = ["HasReference", "IsEqualTo", "IsSimilarTo"]
     widget.cb_relation_type.clear()
     widget.cb_relation_type.addItems(elements)
 
