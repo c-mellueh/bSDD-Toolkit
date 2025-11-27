@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from types import ModuleType
 import logging
 from PySide6.QtCore import Qt, QModelIndex, QCoreApplication, Signal
+from PySide6.QtWidgets import QWidget
 import bsdd_gui
 
 if TYPE_CHECKING:
@@ -16,7 +17,7 @@ from bsdd_gui import tool
 
 
 class Signals(ViewSignals):
-    pass
+    items_pasted = Signal(QWidget)#View
 
 
 class AllowedValuesTableView(ItemViewTool):
@@ -29,7 +30,7 @@ class AllowedValuesTableView(ItemViewTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-
+        cls.signals.items_pasted.connect(trigger.items_pasted)
     @classmethod
     def _get_model_class(cls) -> models.AllowedValuesModel:
         return models.AllowedValuesModel
@@ -111,6 +112,10 @@ class AllowedValuesTableView(ItemViewTool):
 
     @classmethod
     def append_new_value(cls, view: ui.AllowedValuesTable):
+        """
+        appends new Value and returns Index of Value
+        :type view: ui.AllowedValuesTable
+        """
         bsdd_property = cls.get_property_from_view(view)
         new_name = QCoreApplication.translate("AllowedValuesTable", "New Value")
         new_name = tool.Util.get_unique_name(
@@ -119,6 +124,7 @@ class AllowedValuesTableView(ItemViewTool):
         av = BsddAllowedValue(Code=new_name, Value=new_name)
         bsdd_property.AllowedValues.append(av)
         cls.reset_view(view)
+        return len(bsdd_property.AllowedValues)-1
 
     @classmethod
     def get_view_from_property_editor(cls, widget: ClassPropertyEditor):

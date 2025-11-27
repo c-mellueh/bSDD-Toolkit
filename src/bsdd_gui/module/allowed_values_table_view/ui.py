@@ -21,3 +21,4 @@ class AllowedValuesTable(TableItemView):
 
     def model(self) -> models.SortModel:
         return super().model()
+    

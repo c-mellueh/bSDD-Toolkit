@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Type
 from bsdd_json import BsddClassProperty, BsddProperty
 from bsdd_gui.module.allowed_values_table_view import ui
 from PySide6.QtCore import QCoreApplication, QPoint
+from bsdd_json.utils import dictionary_utils as dict_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -73,9 +74,14 @@ def add_context_menu_to_view(
 
 
 def connect_view(
-    view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTableView]
+    view: ui.AllowedValuesTable,
+    allowed_values_table: Type[tool.AllowedValuesTableView],
+    util: Type[tool.Util],
 ):
     allowed_values_table.connect_view_signals(view)
+    util.add_shortcut(
+        "Ctrl+V", view, lambda v=view: allowed_values_table.signals.items_pasted.emit(v)
+    )
 
 
 def create_context_menu(
@@ -93,3 +99,47 @@ def remove_view(
     view: ui.AllowedValuesTable, allowed_values_table: Type[tool.AllowedValuesTableView]
 ):
     allowed_values_table.remove_model(view.model().sourceModel())
+
+
+def item_paste_event(
+    view: ui.AllowedValuesTable,
+    allowed_values_table: Type[tool.AllowedValuesTableView],
+    util: Type[tool.Util],
+):
+    content = util.get_clipboard_content()
+    model = view.model().sourceModel()
+    bsdd_data = model.bsdd_data
+    existing_codes = {v.Code.lower() for v in bsdd_data.AllowedValues}
+    code_index = allowed_values_table.get_column_names(model).index("Code")
+
+    for line in content:
+        if not isinstance(line, list):
+            code = dict_utils.slugify(line)
+            if code.lower() in existing_codes:
+                continue
+            else:
+                existing_codes.add(code)
+            row_count = allowed_values_table.append_new_value(view)
+            bsdd_data.AllowedValues[row_count].Code = code
+            bsdd_data.AllowedValues[row_count].Value = line
+            continue
+        
+        if code_index >= len(line):
+            if len(line) == 1:
+                line.append(dict_utils.slugify(line[0]))
+            else:
+                continue
+        pasted_code = line[code_index]
+        if str(pasted_code).lower() in existing_codes:
+            continue
+        else:
+            existing_codes.add(str(pasted_code))
+
+        row_count = allowed_values_table.append_new_value(view)
+        for col_index, value in enumerate(line):
+            if not isinstance(value, (str, int, float)):
+                continue
+            if col_index >= allowed_values_table.get_column_count(model):
+                continue
+            index = model.index(row_count, col_index)
+            allowed_values_table.value_setter_functions(model)[col_index](model, index, str(value))

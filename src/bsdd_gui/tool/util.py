@@ -423,3 +423,24 @@ class Util:
     @classmethod
     def set_valid(cls, widget: QWidget, valid: bool):
         cls.set_invalid(widget, not valid)
+
+    @classmethod
+    def get_clipboard_content(cls,splitter:str = None):
+        def _data_to_text(d):
+            raw = bytes(d)
+            return raw.decode("utf-8").rstrip("\x00")
+
+        def csv_to_list(data):
+            csv_text = _data_to_text(data)
+            return [line.split(";") for line in csv_text.splitlines()]
+
+        content = QApplication.clipboard()
+        md = content.mimeData()
+        if md.hasFormat("csv"):
+            return csv_to_list(md.data("csv"))
+        
+        plain_text = content.text()
+        if splitter is None:
+            return [plain_text]
+        return plain_text.split(splitter)
+         
