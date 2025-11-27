@@ -159,7 +159,9 @@ def create_dialog(
     else:
         class_property_editor.signals.dialog_declined.emit(dialog)
 
+
 #### Settings
+
 
 def fill_settings(func, settings: Type[tool.SettingsWidget]):
     settings.add_page_to_toolbox(views.SplitterSettings, "pageSplitter", func)

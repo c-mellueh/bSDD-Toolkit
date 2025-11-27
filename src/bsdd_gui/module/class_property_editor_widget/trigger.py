@@ -11,7 +11,7 @@ from . import ui, views
 
 def connect():
     func = lambda: core.splitter_settings_accepted(tool.ClassPropertyEditorWidget, tool.Appdata)
-    core.fill_settings(func,tool.SettingsWidget)
+    core.fill_settings(func, tool.SettingsWidget)
     core.connect_signals(
         tool.ClassPropertyEditorWidget,
         tool.ClassPropertyTableView,

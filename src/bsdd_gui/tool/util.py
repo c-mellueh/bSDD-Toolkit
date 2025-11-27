@@ -419,13 +419,13 @@ class Util:
         widget.style().unpolish(widget)
         widget.style().polish(widget)
         widget.update()
-    
+
     @classmethod
     def set_valid(cls, widget: QWidget, valid: bool):
         cls.set_invalid(widget, not valid)
 
     @classmethod
-    def get_clipboard_content(cls,seperator:str = None):
+    def get_clipboard_content(cls, seperator: str = None):
         def _data_to_text(d):
             raw = bytes(d)
             return raw.decode("utf-8").rstrip("\x00")
@@ -438,9 +438,8 @@ class Util:
         md = content.mimeData()
         if md.hasFormat("csv"):
             return csv_to_list(md.data("csv"))
-        
+
         plain_text = content.text()
         if seperator is None:
             return [plain_text]
         return plain_text.split(seperator)
-         

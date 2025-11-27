@@ -5,7 +5,12 @@ from bsdd_json import BsddClassProperty, BsddProperty
 from bsdd_gui.module.allowed_values_table_view import ui
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_json.utils import dictionary_utils as dict_utils
-from bsdd_gui.module.class_property_editor_widget.constants import SEPERATOR,SEPERATOR_SECTION,SEPERATOR_STATUS
+from bsdd_gui.module.class_property_editor_widget.constants import (
+    SEPERATOR,
+    SEPERATOR_SECTION,
+    SEPERATOR_STATUS,
+)
+
 if TYPE_CHECKING:
     from bsdd_gui import tool
 
@@ -105,10 +110,10 @@ def item_paste_event(
     view: ui.AllowedValuesTable,
     allowed_values_table: Type[tool.AllowedValuesTableView],
     util: Type[tool.Util],
-    appdata:Type[tool.Appdata],
+    appdata: Type[tool.Appdata],
 ):
-    seperator_text = appdata.get_string_setting(SEPERATOR_SECTION,SEPERATOR)
-    seperator_status = appdata.get_bool_setting(SEPERATOR_SECTION,SEPERATOR_STATUS)
+    seperator_text = appdata.get_string_setting(SEPERATOR_SECTION, SEPERATOR)
+    seperator_status = appdata.get_bool_setting(SEPERATOR_SECTION, SEPERATOR_STATUS)
 
     content = util.get_clipboard_content(seperator_text if seperator_status else None)
     model = view.model().sourceModel()
@@ -127,7 +132,7 @@ def item_paste_event(
             bsdd_data.AllowedValues[row_count].Code = code
             bsdd_data.AllowedValues[row_count].Value = line
             continue
-        
+
         if code_index >= len(line):
             if len(line) == 1:
                 line.append(dict_utils.slugify(line[0]))

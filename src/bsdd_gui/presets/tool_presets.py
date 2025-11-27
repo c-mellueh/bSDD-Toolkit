@@ -850,8 +850,6 @@ class ItemViewTool(BaseTool):
 
         return menu
 
-    
-
     @classmethod
     def add_column_to_table(
         cls, model: ItemModel, name: str, get_function: Callable, set_function=None

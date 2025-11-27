@@ -17,7 +17,7 @@ from bsdd_gui import tool
 
 
 class Signals(ViewSignals):
-    items_pasted = Signal(QWidget)#View
+    items_pasted = Signal(QWidget)  # View
 
 
 class AllowedValuesTableView(ItemViewTool):
@@ -31,6 +31,7 @@ class AllowedValuesTableView(ItemViewTool):
     def connect_internal_signals(cls):
         super().connect_internal_signals()
         cls.signals.items_pasted.connect(trigger.items_pasted)
+
     @classmethod
     def _get_model_class(cls) -> models.AllowedValuesModel:
         return models.AllowedValuesModel
@@ -124,7 +125,7 @@ class AllowedValuesTableView(ItemViewTool):
         av = BsddAllowedValue(Code=new_name, Value=new_name)
         bsdd_property.AllowedValues.append(av)
         cls.reset_view(view)
-        return len(bsdd_property.AllowedValues)-1
+        return len(bsdd_property.AllowedValues) - 1
 
     @classmethod
     def get_view_from_property_editor(cls, widget: ClassPropertyEditor):

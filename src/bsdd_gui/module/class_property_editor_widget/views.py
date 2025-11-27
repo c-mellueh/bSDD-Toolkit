@@ -22,7 +22,7 @@ class ValueTagInput(TagInput):
         super().__init__(parent, placeholder, allowed, minimum_le_width)
 
 
-class SplitterSettings(QWidget,Ui_SplitterSettings):
+class SplitterSettings(QWidget, Ui_SplitterSettings):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)

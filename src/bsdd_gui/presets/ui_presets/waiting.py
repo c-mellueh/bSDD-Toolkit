@@ -7,6 +7,7 @@ from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QWidget
 from bsdd_gui.resources.icons import get_icon
 
+
 class _Spinner(QWidget):
     """
     Simple animated arc that continuously spins to indicate background work.

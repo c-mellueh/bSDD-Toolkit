@@ -48,7 +48,7 @@ class Popups:
             return False
 
     @classmethod
-    def create_info_popup(cls, text, window_title: str = None, text_title: str = None,parent = None):
+    def create_info_popup(cls, text, window_title: str = None, text_title: str = None, parent=None):
         if window_title is None:
             window_title = QCoreApplication.translate("Popups", "Info")
         if text_title is None:
@@ -61,7 +61,6 @@ class Popups:
         msg_box.setIcon(QMessageBox.Icon.Information)
         msg_box.setWindowIcon(icon)
         msg_box.exec()
-
 
     @classmethod
     def create_warning_popup(cls, text, window_title: str = None, text_title: str = None):
