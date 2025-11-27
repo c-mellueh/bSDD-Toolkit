@@ -70,8 +70,6 @@ open_path           Optional path to a bSDD JSON file
 
 ## Screenshots
 
-Add the PNGs to `docs/images/` with the names below. They will render automatically in GitHub once added.
-
 ### Main Window
 ![Main UI](docs/images/main-ui.png)
 
