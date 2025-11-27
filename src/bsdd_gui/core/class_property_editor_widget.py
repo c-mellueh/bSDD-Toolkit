@@ -8,7 +8,7 @@ from bsdd_gui.module.class_property_editor_widget.constants import (
     SEPERATOR_STATUS,
 )
 from PySide6.QtCore import QCoreApplication
-from bsdd_gui.module.class_property_editor_widget import ui
+from bsdd_gui.module.class_property_editor_widget import ui, views, constants
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -123,22 +123,6 @@ def update_property_specific_fields(
     allowed_value_table.reset_view(allowed_value_table.get_view_from_property_editor(widget))
 
 
-def splitter_settings_accepted(
-    class_property_editor: Type[tool.ClassPropertyEditorWidget], appdata: Type[tool.Appdata]
-):
-    widget = class_property_editor.get_splitter_settings_widget()
-    return  # TODO:fix
-    is_seperator_activated = class_property_editor.get_splitter_settings_checkstate(widget)
-    text = class_property_editor.get_splitter_settings_text(widget)
-    text = text.replace("\\n", "\n")
-    text = text.replace("\\t", "\t")
-
-    appdata.set_setting(SEPERATOR_SECTION, SEPERATOR, text)
-    appdata.set_setting(SEPERATOR_SECTION, SEPERATOR_STATUS, is_seperator_activated)
-    if not text:
-        appdata.set_setting(SEPERATOR_SECTION, SEPERATOR_STATUS, False)
-
-
 def create_dialog(
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
     main_window: Type[tool.MainWindowWidget],
@@ -147,7 +131,6 @@ def create_dialog(
 ):
     bsdd_class = main_window.get_active_class()
     property_set = main_window.get_active_pset()
-
     if bsdd_class is None or property_set is None:
         return
 
@@ -175,3 +158,36 @@ def create_dialog(
         class_property_editor.signals.dialog_accepted.emit(dialog)
     else:
         class_property_editor.signals.dialog_declined.emit(dialog)
+
+
+#### Settings
+
+
+def fill_settings(func, settings: Type[tool.SettingsWidget]):
+    settings.add_page_to_toolbox(views.SplitterSettings, "pageSplitter", func)
+
+
+def setup_splitter_settings(
+    widget: views.SplitterSettings,
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
+    appdata: Type[tool.Appdata],
+):
+    class_property_editor.set_splitter_settings_widget(widget)
+    splitter = appdata.get_string_setting(constants.SEPERATOR_SECTION, constants.SEPERATOR, ";")
+    is_active = appdata.get_bool_setting(constants.SEPERATOR_SECTION, constants.SEPERATOR_STATUS)
+    widget.line_edit_seperator.setText(splitter)
+    widget.check_box_seperator.setChecked(is_active)
+
+
+def splitter_settings_accepted(
+    class_property_editor: Type[tool.ClassPropertyEditorWidget], appdata: Type[tool.Appdata]
+):
+    widget = class_property_editor.get_splitter_settings_widget()
+    is_seperator_activated = class_property_editor.get_splitter_settings_checkstate(widget)
+    text = class_property_editor.get_splitter_settings_text(widget)
+    text = text.replace("\\n", "\n")
+    text = text.replace("\\t", "\t")
+    appdata.set_setting(SEPERATOR_SECTION, SEPERATOR, text)
+    appdata.set_setting(SEPERATOR_SECTION, SEPERATOR_STATUS, is_seperator_activated)
+    if not text:
+        appdata.set_setting(SEPERATOR_SECTION, SEPERATOR_STATUS, False)

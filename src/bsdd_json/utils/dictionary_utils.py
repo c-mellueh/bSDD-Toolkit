@@ -2,7 +2,7 @@ from urllib.parse import urlparse, quote
 import re
 import unicodedata
 
-def slugify(text: str, *, delimiter: str = "-", lowercase: bool = True, max_length: int | None = None) -> str:
+def slugify(text: str, *, delimiter: str = "-", lowercase: bool = False, max_length: int | None = None) -> str:
     """
     Convert a string into a URL-friendly slug.
 

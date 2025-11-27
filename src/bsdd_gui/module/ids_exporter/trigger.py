@@ -33,9 +33,9 @@ def create_dialog(data: BsddDictionary, parent: IdsWidget):
 
 def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
-    core.register_fields(widget, tool.IdsExporter,tool.Appdata,tool.Util)
+    core.register_fields(widget, tool.IdsExporter, tool.Appdata, tool.Util)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
-    core.connect_widget(widget, tool.IdsExporter, tool.IdsClassView,tool.MainWindowWidget)
+    core.connect_widget(widget, tool.IdsExporter, tool.IdsClassView, tool.MainWindowWidget)
 
 
 def import_settings(widget: IdsWidget):
@@ -69,5 +69,13 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
     # TODO: add COntext menu handling
     # core.create_context_menu(view, pos, tool.ItemViewTool)
 
-def export_ids(widget:IdsWidget):
-    core.export_ids(widget,tool.IdsExporter,tool.IdsClassView,tool.IdsPropertyView,tool.MainWindowWidget,tool.Popups)
+
+def export_ids(widget: IdsWidget):
+    core.export_ids(
+        widget,
+        tool.IdsExporter,
+        tool.IdsClassView,
+        tool.IdsPropertyView,
+        tool.MainWindowWidget,
+        tool.Popups,
+    )

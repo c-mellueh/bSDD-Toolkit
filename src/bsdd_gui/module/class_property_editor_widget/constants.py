@@ -1,6 +1,6 @@
-SEPERATOR_SECTION = "property_set_window"
-SEPERATOR_STATUS = "seperator_status"
-SEPERATOR = "seperator"
+SEPERATOR_SECTION = "seperator"
+SEPERATOR_STATUS = "is_active"
+SEPERATOR = "value"
 
 BUTTON_MODE_EDIT = "edit"
 BUTTON_MODE_NEW = "new"
