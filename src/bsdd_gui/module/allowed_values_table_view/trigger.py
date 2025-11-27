@@ -31,4 +31,4 @@ def view_created(view: ui.AllowedValuesTable):
     core.connect_view(view, tool.AllowedValuesTableView,tool.Util)
 
 def items_pasted(view:ui.AllowedValuesTable):
-    core.item_paste_event(view,tool.AllowedValuesTableView,tool.Util)
+    core.item_paste_event(view,tool.AllowedValuesTableView,tool.Util,tool.Appdata)

@@ -22,9 +22,8 @@ class ValueTagInput(TagInput):
         super().__init__(parent, placeholder, allowed, minimum_le_width)
 
 
-class SplitterSettings(QWidget):
+class SplitterSettings(QWidget,Ui_SplitterSettings):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ui = Ui_SplitterSettings()
-        self.ui.setupUi(self)
+        self.setupUi(self)
         trigger.splitter_settings_created(self)

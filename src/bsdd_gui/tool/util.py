@@ -425,7 +425,7 @@ class Util:
         cls.set_invalid(widget, not valid)
 
     @classmethod
-    def get_clipboard_content(cls,splitter:str = None):
+    def get_clipboard_content(cls,seperator:str = None):
         def _data_to_text(d):
             raw = bytes(d)
             return raw.decode("utf-8").rstrip("\x00")
@@ -440,7 +440,7 @@ class Util:
             return csv_to_list(md.data("csv"))
         
         plain_text = content.text()
-        if splitter is None:
+        if seperator is None:
             return [plain_text]
-        return plain_text.split(splitter)
+        return plain_text.split(seperator)
          

@@ -5,7 +5,7 @@ from bsdd_json import BsddClassProperty, BsddProperty
 from bsdd_gui.module.allowed_values_table_view import ui
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_json.utils import dictionary_utils as dict_utils
-
+from bsdd_gui.module.class_property_editor_widget.constants import SEPERATOR,SEPERATOR_SECTION,SEPERATOR_STATUS
 if TYPE_CHECKING:
     from bsdd_gui import tool
 
@@ -105,8 +105,12 @@ def item_paste_event(
     view: ui.AllowedValuesTable,
     allowed_values_table: Type[tool.AllowedValuesTableView],
     util: Type[tool.Util],
+    appdata:Type[tool.Appdata],
 ):
-    content = util.get_clipboard_content()
+    seperator_text = appdata.get_string_setting(SEPERATOR_SECTION,SEPERATOR)
+    seperator_status = appdata.get_bool_setting(SEPERATOR_SECTION,SEPERATOR_STATUS)
+
+    content = util.get_clipboard_content(seperator_text if seperator_status else None)
     model = view.model().sourceModel()
     bsdd_data = model.bsdd_data
     existing_codes = {v.Code.lower() for v in bsdd_data.AllowedValues}
@@ -115,7 +119,7 @@ def item_paste_event(
     for line in content:
         if not isinstance(line, list):
             code = dict_utils.slugify(line)
-            if code.lower() in existing_codes:
+            if code.lower() in existing_codes or not code:
                 continue
             else:
                 existing_codes.add(code)

@@ -35,7 +35,6 @@ class SettingsWidget:
         if page_name not in cls.get_page_dict():
             cls.get_properties().page_dict[page_name] = list()
         cls.get_properties().page_dict[page_name].append(widget_function)
-
         cls.get_properties().accept_functions.append(accept_function)
 
     @classmethod

@@ -10,11 +10,8 @@ from . import ui, views
 
 
 def connect():
-    tool.SettingsWidget.add_page_to_toolbox(
-        views.SplitterSettings,
-        "pageSplitter",
-        lambda: core.splitter_settings_accepted(tool.ClassPropertyEditorWidget, tool.Appdata),
-    )
+    func = lambda: core.splitter_settings_accepted(tool.ClassPropertyEditorWidget, tool.Appdata)
+    core.fill_settings(func,tool.SettingsWidget)
     core.connect_signals(
         tool.ClassPropertyEditorWidget,
         tool.ClassPropertyTableView,
@@ -89,10 +86,8 @@ def copy_table_content(table_view: ui.ValueView):
 # Settings Window
 
 
-def splitter_settings_created(widget: ui.SplitterSettings):
-    return  # TODO
-
-    core.fill_splitter_settings(widget, tool.ClassPropertyEditorWidget, tool.Appdata)
+def splitter_settings_created(widget: views.SplitterSettings):
+    core.setup_splitter_settings(widget, tool.ClassPropertyEditorWidget, tool.Appdata)
 
 
 def splitter_checkstate_changed(widget: ui.SplitterSettings):

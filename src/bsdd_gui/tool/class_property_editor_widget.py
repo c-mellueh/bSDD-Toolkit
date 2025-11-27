@@ -4,7 +4,7 @@ import logging
 
 import bsdd_gui
 from bsdd_json import BsddClassProperty, BsddDictionary, BsddProperty
-from bsdd_gui.module.class_property_editor_widget import ui
+from bsdd_gui.module.class_property_editor_widget import ui, views
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor_widget import trigger
@@ -311,26 +311,26 @@ class ClassPropertyEditorWidget(DialogTool):
 
     ### Settings Window
     @classmethod
-    def set_splitter_settings_widget(cls, widget: ui.SplitterSettings):
+    def set_splitter_settings_widget(cls, widget: views.SplitterSettings):
         cls.get_properties().splitter_settings = widget
 
     @classmethod
-    def get_splitter_settings_widget(cls) -> ui.SplitterSettings:
+    def get_splitter_settings_widget(cls) -> views.SplitterSettings:
         return cls.get_properties().splitter_settings
 
     @classmethod
-    def connect_splitter_widget(cls, widget: ui.SplitterSettings):
-        widget.ui.check_box_seperator.checkStateChanged.connect(
+    def connect_splitter_widget(cls, widget: views.SplitterSettings):
+        widget.check_box_seperator.checkStateChanged.connect(
             lambda: trigger.splitter_checkstate_changed(widget)
         )
 
     @classmethod
-    def get_splitter_settings_checkstate(cls, widget: ui.SplitterSettings) -> bool:
-        return widget.ui.check_box_seperator.isChecked()
+    def get_splitter_settings_checkstate(cls, widget: views.SplitterSettings) -> bool:
+        return widget.check_box_seperator.isChecked()
 
     @classmethod
-    def get_splitter_settings_text(cls, widget: ui.SplitterSettings) -> str:
-        return widget.ui.line_edit_seperator.text()
+    def get_splitter_settings_text(cls, widget: views.SplitterSettings) -> str:
+        return widget.line_edit_seperator.text()
 
     @classmethod
     def validate_widgets(cls):
