@@ -12,7 +12,7 @@ from bsdd_gui.presets.signal_presets import DialogSignals, ViewSignals
 from bsdd_gui.presets.tool_presets import ActionTool, DialogTool, ItemViewTool
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils
-from bsdd_gui.module.ids_exporter import ui, models, model_views
+from bsdd_gui.module.ids_exporter import ui, models, model_views, constants
 from operator import itemgetter
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QDate, Signal, Qt, QObject, QThread
@@ -153,37 +153,65 @@ class IdsExporter(ActionTool, DialogTool):
             return False
         return pset_dict.get("properties", dict()).get(class_prop.Code, True)
 
+    # Copyright (c) 2024 BIM-Tools
+    # Licensed under the MIT License
     @classmethod
-    def build_property_requirements(cls, class_prop: BsddClassProperty, bsdd_dict: BsddDictionary):
-        data_type = "IfcLabel"  # IfcLabel or IfcText
+    def get_data_type(cls, dataType, propertyUri):
+        if propertyUri in constants.PROPERTY_DATATYPE_MAPPING:
+            return constants.PROPERTY_DATATYPE_MAPPING[propertyUri]
+        return constants.DATATYPE_MAPPING.get(dataType, "IFCLABEL")
 
-        bsdd_prop = prop_utils.get_property_by_class_property(class_prop)
-        if bsdd_prop:
-            uri = prop_utils.build_bsdd_uri(bsdd_prop, bsdd_dict)
-        else:
-            uri = None
-        req = PropertyFacet(class_prop.PropertySet, prop_utils.get_name(class_prop))
-        req.uri = uri
-        req.cardinality = "optional"
-        req.dataType = data_type
-        values = prop_utils.get_values(class_prop)
-        if values:
-            req.value = Restriction({"enumeration": sorted([v.Value for v in values])})
-        return [req]
+    # Copyright (c) 2024 BIM-Tools
+    # Licensed under the MIT License
+    @classmethod
+    def add_property_facet(cls, bsdd_property: BsddClassProperty):
+
+        value = None
+        pattern = bsdd_property.Pattern
+        allowed_values = bsdd_property.AllowedValues
+        predefined_value = bsdd_property.PredefinedValue
+
+        if pattern:
+            value = Restriction(options={"pattern": pattern})
+        elif allowed_values:
+            value = Restriction(
+                options={"enumeration": [x.Value for x in allowed_values if x.Value is not None]}
+            )
+        elif predefined_value:
+            value = predefined_value
+
+        property_facet = PropertyFacet(
+            bsdd_property.PropertySet,
+            bsdd_property.PropertyCode,
+            value,
+            cls.get_data_type(
+                prop_utils.get_data_type(bsdd_property), bsdd_property.PropertyUri
+            ).upper(),
+            bsdd_property.PropertyUri,
+        )
+        return property_facet
 
     @classmethod
     def build_ifc_requirements(cls, bsdd_class: BsddClass, bsdd_dict: BsddDictionary):
         from bsdd_gui.tool.ifc_helper import IfcHelper
 
+        def _get_type_class(class_name):
+            for type_class in type_classes:
+                if class_name in type_class:
+                    return type_class.upper()
+            return None
+
+        type_classes = cls.get_properties().type_classes
         classes = set()
         predefined_types = set()
         for ifc_reference in bsdd_class.RelatedIfcEntityNamesList:
             entity, predefined = IfcHelper.split_ifc_term(ifc_reference)
             classes.add(entity.upper())
-            if predefined:
-                predefined_types.add(predefined.upper())
-            else:
-                predefined_types.add("NOTDEFINED")
+            predefined = predefined if predefined else "NOTDEFINED"
+            predefined_types.add(predefined)
+            type_class = _get_type_class(entity)
+            if type_class:
+                classes.add(type_class)
         req = EntityFacet()
         class_res = Restriction({"enumeration": sorted(classes)})
         req.name = class_res
@@ -373,8 +401,9 @@ class IdsExporter(ActionTool, DialogTool):
     def build_classification_facet(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
 
         return ClassificationFacet(
-            class_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary),
-            "bSDD",
+            bsdd_class.Code,
+            bsdd_dictionary.DictionaryName,
+            uri=class_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary),
             cardinality="optional",
         )
 
@@ -414,10 +443,15 @@ class IdsExporter(ActionTool, DialogTool):
                 applicability_facet = cls.build_main_property_facet(bsdd_class, base_settings)
             spec.applicability.append(applicability_facet)
             for class_prop in bsdd_class.ClassProperties:
-                if cls.is_class_prop_active(
+                if not cls.is_class_prop_active(
                     class_prop, property_settings.get(bsdd_class.Code, dict())
                 ):
-                    spec.requirements += cls.build_property_requirements(class_prop, bsdd_dict)
+                    continue
+
+                facet = cls.add_property_facet(class_prop)
+                if facet:
+                    spec.requirements.append(facet)
+
             spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
             ids.specifications.append(spec)
 
@@ -484,12 +518,18 @@ class IdsExporter(ActionTool, DialogTool):
                     bsdd_dict = widget.bsdd_data
                     ids = ifctester.ids.open(template_path)
                     base_spec = ids.specifications[0]
-                    base_requirement: PropertyFacet = base_spec.requirements[0]
-                    base_requirement.propertySet = base_settings.get("main_pset", "")
-                    base_requirement.baseName = base_settings.get("main_property", "")
-                    base_restriction = base_requirement.value
-                    base_restriction.options = {"enumeration": [c.Code for c in bsdd_dict.Classes]}
-                    base_spec.ifcVersion = ifc_version
+                    if base_settings.get("classification", False):
+                        ids.specifications = list()
+                    else:
+                        base_requirement: PropertyFacet = base_spec.requirements[0]
+                        base_requirement.propertySet = base_settings.get("main_pset", "")
+                        base_requirement.baseName = base_settings.get("main_property", "")
+                        base_restriction = base_requirement.value
+                        base_restriction.options = {
+                            "enumeration": [c.Code for c in bsdd_dict.Classes]
+                        }
+                        base_spec.ifcVersion = ifc_version
+
                     cls.fill_ids_by_metadata(ids, metadata_settings)
                     if base_settings["inherit"]:
                         cs = cls.build_inherited_checkstate_dict(bsdd_dict.Classes, class_settings)

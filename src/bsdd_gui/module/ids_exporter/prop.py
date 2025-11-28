@@ -1,5 +1,6 @@
 from __future__ import annotations
 from bsdd_gui.presets.prop_presets import ActionsProperties, DialogProperties, ViewProperties
+from bsdd_gui.resources.data import get_ifc_type_classes
 
 
 class IdsExporterProperties(ActionsProperties, DialogProperties):
@@ -16,6 +17,7 @@ class IdsExporterProperties(ActionsProperties, DialogProperties):
         self.specification_widget = None
         self.write_worker = None
         self.write_thread = None
+        self.type_classes = get_ifc_type_classes()
 
 
 class IdsClassViewProperties(ViewProperties):

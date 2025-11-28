@@ -20,7 +20,7 @@ class Cache:
 
     @classmethod
     def get_external_property(
-        cls, property_uri: str, client: bsdd.Client | None
+        cls, property_uri: str, client: bsdd.Client | None = None
     ) -> BsddClassProperty | None:
         from bsdd_json.utils import property_utils as prop_utils
 
@@ -89,6 +89,7 @@ def get_external_property(
     class_property: BsddClassProperty, client=None
 ) -> BsddProperty | None:
     from bsdd_gui import tool
+
     if tool.Project.get_offline_mode():
         return None
     return Cache.get_external_property(class_property.PropertyUri, client)
@@ -160,9 +161,9 @@ def update_internal_relations_to_new_version(
     version = bsdd_dictionary.DictionaryVersion
     for relationship in bsdd_proeprty.PropertyRelations:
         old_uri = dict_utils.parse_bsdd_url(relationship.RelatedPropertyUri)
-        if old_uri["namespace"] != namespace: #skip external relations
+        if old_uri["namespace"] != namespace:  # skip external relations
             continue
-        new_uri = dict(old_uri) #copy
+        new_uri = dict(old_uri)  # copy
         new_uri["namespace"] = namespace
         new_uri["version"] = version
         if old_uri != new_uri:

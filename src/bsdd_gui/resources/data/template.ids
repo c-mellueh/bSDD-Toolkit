@@ -167,23 +167,7 @@
           </ids:name>
         </ids:entity>
       </ids:applicability>
-      <ids:requirements>
-        <ids:property cardinality="required" dataType="IFCLABEL">
-          <ids:propertySet>
-            <ids:simpleValue>XXX</ids:simpleValue>
-          </ids:propertySet>
-          <ids:baseName>
-            <xs:restriction base="xs:string">
-              <xs:enumeration value="X" />
-            </xs:restriction>
-          </ids:baseName>
-          <ids:value>
-            <xs:restriction base="xs:string">
-              <xs:enumeration value="xxx" />
-            </xs:restriction>
-          </ids:value>
-        </ids:property>
-      </ids:requirements>
+      <ids:requirements />
     </ids:specification>
   </ids:specifications>
 </ids:ids>

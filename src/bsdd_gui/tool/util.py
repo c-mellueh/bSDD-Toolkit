@@ -428,7 +428,16 @@ class Util:
     def get_clipboard_content(cls, seperator: str = None):
         def _data_to_text(d):
             raw = bytes(d)
-            return raw.decode("utf-8").rstrip("\x00")
+            raw = raw.rstrip(b"\x00")
+
+            for encoding in ("utf-8", "cp1252", "latin-1"):
+                try:
+                    return raw.decode(encoding)
+                except UnicodeDecodeError:
+                    pass
+
+            # last resort: replace invalid characters
+            return raw.decode("utf-8", errors="replace")
 
         def csv_to_list(data):
             csv_text = _data_to_text(data)
