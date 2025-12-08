@@ -100,7 +100,7 @@ class PropertyEditorWidget(DialogTool):
 
     @classmethod
     def is_datatype_valid(cls, datatype: str, widget: ui.PropertyEditor):
-        return datatype in ["Boolean", "Character", "Integer", "Real", "String", "Tim"]
+        return datatype in ["Boolean", "Character", "Integer", "Real", "String", "Time"]
 
     @classmethod
     def update_description_visiblility(cls, widget: ui.PropertyEditor):
