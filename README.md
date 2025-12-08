@@ -27,8 +27,8 @@ This repository contains:
 Clone the repository and install the package (editable for development or standard install):
 
 ```bash
-git clone https://github.com/<your-org-or-user>/bsdd-creator.git
-cd bsdd-creator
+git clone https://github.com/<your-org-or-user>/bsdd-Toolkit.git
+cd bsdd-Toolkit
 
 # (optional) create and activate a virtualenv
 python -m venv .venv
