@@ -55,7 +55,7 @@ class FileSelector(QWidget):
 
         path = Appdata.get_string_setting(self.section, self.option, None)
         path = Popups.get_save_path(self.file_format, self, path, title=self.title)
-        if path is not None:
+        if path:
             Appdata.set_setting(self.section, self.option, path)
             self.set_path(path)
 

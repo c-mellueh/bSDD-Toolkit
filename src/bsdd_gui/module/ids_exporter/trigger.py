@@ -16,19 +16,15 @@ def connect():
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.GraphViewWidget, tool.MainWindowWidget)
+    core.retranslate_ui(tool.IdsExporter, tool.MainWindowWidget)
 
 
 def on_new_project():
     pass
 
 
-def create_widget(data: BsddDictionary, parent: IdsWidget):
-    core.create_widget(data, parent, tool.IdsExporter)
-
-
-def create_dialog(data: BsddDictionary, parent: IdsWidget):
-    core.create_dialog(data, parent, tool.IdsExporter)
+def create_widget():
+    core.create_widget(tool.IdsExporter,tool.MainWindowWidget,tool.Project)
 
 
 def widget_created(widget: IdsWidget):
@@ -52,14 +48,14 @@ def export_settings(widget: IdsWidget):
 
 def class_view_created(view: model_views.ClassView):
     core.register_class_view(view, tool.IdsClassView)
-    core.add_columns_to_class_view(view, tool.IdsClassView, tool.IdsExporter)
+    core.add_columns_to_class_view(view, tool.IdsClassView,tool.Project)
     # core.add_context_menu_to_view(view, tool.IdsClassView, tool.ClassEditorWidget)
     core.connect_class_view(view, tool.IdsClassView)
 
 
 def property_view_created(view: model_views.PropertyView):
     core.register_property_view(view, tool.IdsPropertyView)
-    core.add_columns_to_property_view(view, tool.IdsPropertyView, tool.IdsExporter)
+    core.add_columns_to_property_view(view, tool.IdsPropertyView, tool.Project)
     # core.add_context_menu_to_view(view, tool.IdsClassView, tool.ClassEditorWidget)
     core.connect_property_view(view, tool.IdsPropertyView, tool.IdsClassView)
 
@@ -76,6 +72,5 @@ def export_ids(widget: IdsWidget):
         tool.IdsExporter,
         tool.IdsClassView,
         tool.IdsPropertyView,
-        tool.MainWindowWidget,
-        tool.Popups,
+        tool.Popups
     )
