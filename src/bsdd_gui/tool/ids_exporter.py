@@ -102,7 +102,7 @@ class IdsExporter(ActionTool, FieldTool):
         widget.cb_pset.currentIndexChanged.connect(lambda _: cls.fill_prop_combobox(widget))
         widget.pb_import.clicked.connect(lambda: trigger.import_settings(widget))
         widget.pb_export.clicked.connect(lambda: trigger.export_settings(widget))
-        widget.pb_create.clicked.connect(lambda _,w = widget:trigger.export_ids(w))
+        widget.pb_create.clicked.connect(lambda _, w=widget: trigger.export_ids(w))
         return widget
 
     @classmethod
@@ -230,7 +230,7 @@ class IdsExporter(ActionTool, FieldTool):
         return requirements
 
     @classmethod
-    def get_widget(cls,data) -> ui.IdsWidget:
+    def get_widget(cls, data) -> ui.IdsWidget:
         return super().get_widget(data)
 
     @classmethod

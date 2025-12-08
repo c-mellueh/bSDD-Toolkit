@@ -24,7 +24,7 @@ def on_new_project():
 
 
 def create_widget():
-    core.create_widget(tool.IdsExporter,tool.MainWindowWidget,tool.Project)
+    core.create_widget(tool.IdsExporter, tool.MainWindowWidget, tool.Project)
 
 
 def widget_created(widget: IdsWidget):
@@ -48,7 +48,7 @@ def export_settings(widget: IdsWidget):
 
 def class_view_created(view: model_views.ClassView):
     core.register_class_view(view, tool.IdsClassView)
-    core.add_columns_to_class_view(view, tool.IdsClassView,tool.Project)
+    core.add_columns_to_class_view(view, tool.IdsClassView, tool.Project)
     # core.add_context_menu_to_view(view, tool.IdsClassView, tool.ClassEditorWidget)
     core.connect_class_view(view, tool.IdsClassView)
 
@@ -67,10 +67,4 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
 
 
 def export_ids(widget: IdsWidget):
-    core.export_ids(
-        widget,
-        tool.IdsExporter,
-        tool.IdsClassView,
-        tool.IdsPropertyView,
-        tool.Popups
-    )
+    core.export_ids(widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Popups)

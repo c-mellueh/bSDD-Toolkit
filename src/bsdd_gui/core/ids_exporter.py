@@ -53,7 +53,11 @@ def connect_signals(
     ids_property.connect_internal_signals()
 
 
-def create_widget(widget_tool: Type[tool.IdsExporter],main_window:Type[tool.MainWindowWidget],project:Type[tool.Project]):
+def create_widget(
+    widget_tool: Type[tool.IdsExporter],
+    main_window: Type[tool.MainWindowWidget],
+    project: Type[tool.Project],
+):
     widget: ui.IdsWidget = widget_tool.show_widget(project.get(), None)
     text = QCoreApplication.translate("IdsExport", "IDS Exporter")
     widget.setWindowTitle(text)
@@ -61,6 +65,7 @@ def create_widget(widget_tool: Type[tool.IdsExporter],main_window:Type[tool.Main
     model.beginResetModel()
     model.bsdd_data = project.get()
     model.endResetModel()
+
 
 def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget_tool.register_widget(widget)
@@ -106,10 +111,10 @@ def register_fields(
             return bool(value)
         return bool(value.strip())
 
-    def _check_mail(value,widet):
-        if not _is_not_empty(value,widet):
+    def _check_mail(value, widet):
+        if not _is_not_empty(value, widet):
             return False
-        return bool(re.match(r"[^@]+@[^\.]+\..+",value))
+        return bool(re.match(r"[^@]+@[^\.]+\..+", value))
 
     # Check for Classification
     widget_tool.register_field_getter(widget, widget.cb_clsf, lambda _: _getter("classif", "bool"))
@@ -183,7 +188,8 @@ def register_fields(
     widget_tool.register_field_listener(widget, widget.cb_datatype)
     widget_tool.add_validator(widget, widget.cb_datatype, _is_not_empty, util.set_valid)
 
-    widget_tool.sync_from_model(widget,widget.bsdd_data)
+    widget_tool.sync_from_model(widget, widget.bsdd_data)
+
 
 def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
     pass
@@ -223,9 +229,7 @@ def register_property_view(
 
 
 def add_columns_to_class_view(
-    view: model_views.ClassView,
-    ids_class: Type[tool.IdsClassView],
-    project:Type[tool.Project]
+    view: model_views.ClassView, ids_class: Type[tool.IdsClassView], project: Type[tool.Project]
 ):
     def set_checkstate(model: CTM, index: QModelIndex, value: bool):
         bsdd_class = index.internalPointer()
@@ -242,8 +246,7 @@ def add_columns_to_class_view(
 def add_columns_to_property_view(
     view: model_views.PropertyView,
     ids_property: Type[tool.IdsPropertyView],
-    project:Type[tool.Project]
-
+    project: Type[tool.Project],
 ):
 
     data = project.get()
@@ -362,7 +365,7 @@ def export_ids(
 ):
 
     widget_tool.sync_to_model(widget, widget.bsdd_data)
-    
+
     class_settings = class_view.get_check_dict()
     property_settings = property_view.get_check_dict()
     base_settings = widget_tool.get_settings(widget)
@@ -399,7 +402,7 @@ def export_ids(
                 f"{len(ids.specifications)} Specifications created.",
                 "IDS Export Done!",
                 "IDS Export Done!",
-                parent=widget
+                parent=widget,
             )
         )
         write_thread.finished.connect(lambda: stop_waiting_widget(waiting_worker))

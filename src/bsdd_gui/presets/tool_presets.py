@@ -501,7 +501,11 @@ class FieldTool(WidgetTool):
                     return
                 if isinstance(value, str):
                     pattern_with_fraction = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+$"
-                    fmt = "%Y-%m-%d %H:%M:%S.%f" if re.match(pattern_with_fraction, value) else "%Y-%m-%d %H:%M:%S"
+                    fmt = (
+                        "%Y-%m-%d %H:%M:%S.%f"
+                        if re.match(pattern_with_fraction, value)
+                        else "%Y-%m-%d %H:%M:%S"
+                    )
                     value = datetime.datetime.strptime(value, fmt)
                 field.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))
             elif isinstance(field, QAbstractButton):

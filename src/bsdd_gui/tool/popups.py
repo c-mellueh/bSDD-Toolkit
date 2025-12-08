@@ -107,19 +107,20 @@ class Popups:
             path = QFileDialog.getOpenFileName(
                 window, title, path, f"{file_format} Files (*.{file_format})"
             )
-        pure_path,end = path
+        pure_path, end = path
         try:
             if not end:
                 return pure_path
-            texts = re.search(r"\(\*(\..*)\)",end).groups()
+            texts = re.search(r"\(\*(\..*)\)", end).groups()
             if not texts:
                 return pure_path
             ending = texts[0]
             if not pure_path.lower().endswith(ending.lower()):
-                pure_path+=ending
+                pure_path += ending
             return pure_path
         except:
             return pure_path
+
     @classmethod
     def get_folder(cls, window, path: str) -> str:
         """Folder Open Dialog"""

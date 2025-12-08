@@ -54,7 +54,7 @@ class ClassPropertyTableModel(ItemModel):
         bsdd_properties = tool.ClassPropertyTableView.filter_properties_by_pset(
             self.active_class, self.active_pset
         )
-        if len(bsdd_properties) <=row:
+        if len(bsdd_properties) <= row:
             return QModelIndex()
         bsdd_property = bsdd_properties[row]
         index = self.createIndex(row, column, bsdd_property)
