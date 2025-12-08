@@ -39,6 +39,7 @@ source .venv/bin/activate
 
 # install
 pip install -U pip
+cd src/bsdd_gui
 pip install -e .            # for development
 # or
 pip install .               # for a regular install
@@ -53,6 +54,7 @@ pip install -e .[dev]       # ruff, black, mypy, pytest, etc.
 Run the application module directly (optionally pass a path to a bSDD JSON file to open):
 
 ```bash
+cd src
 python -m bsdd_gui                   # start empty
 python -m bsdd_gui som-0.2.0.json    # open example dictionary
 ```
@@ -60,11 +62,12 @@ python -m bsdd_gui som-0.2.0.json    # open example dictionary
 Command-line options supported by the launcher:
 
 ```text
-python -m bsdd_gui [open_path] [-l LOG_LEVEL] [--open_last_project]
+python -m bsdd_gui [open_path] [-l LOG_LEVEL] [-ol --open_last_project] [-ofm --offline_mode]
 
 open_path           Optional path to a bSDD JSON file
 -l, --log-level     Integer log level (e.g. 10=DEBUG, 20=INFO)
 --open_last_project Open the last project on startup
+--offline_mode      Start bSDD-GUI without Internet connection
 ```
 
 
