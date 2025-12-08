@@ -65,6 +65,7 @@ import logging
 from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals
 from .models_presets import ItemModel
 import datetime
+import re
 
 BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassProperty
 
@@ -499,10 +500,9 @@ class FieldTool(WidgetTool):
                 if not value:
                     return
                 if isinstance(value, str):
-                    try:
-                        value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
-                    except ValueError:
-                        value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                    pattern_with_fraction = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+$"
+                    fmt = "%Y-%m-%d %H:%M:%S.%f" if re.match(pattern_with_fraction, value) else "%Y-%m-%d %H:%M:%S"
+                    value = datetime.datetime.strptime(value, fmt)
                 field.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))
             elif isinstance(field, QAbstractButton):
                 field.setChecked(value)
