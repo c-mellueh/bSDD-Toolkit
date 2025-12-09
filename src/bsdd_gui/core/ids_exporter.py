@@ -5,7 +5,6 @@ from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import constants
 import json
 import re
-import ifctester
 from ifctester.facet import Property as PropertyFacet
 from ifctester.facet import Entity as EntityFacet
 from ifctester.facet import Classification as ClassificationFacet
@@ -22,7 +21,14 @@ if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter import ui, model_views, models
     from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
     from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
-    from bsdd_gui.tool.ids_exporter import BasicSettingsDict, MetadataDict, PsetDict, SettingsDict
+    from bsdd_gui.tool.ids_exporter import (
+        BasicSettingsDict,
+        MetadataDict,
+        PsetDict,
+        SettingsDict,
+        PayLoadDict,
+    )
+    from ifctester.ids import Ids
 
 
 def connect_to_main_window(
@@ -120,6 +126,15 @@ def register_fields(
     widget_tool.register_field_getter(widget, widget.cb_clsf, lambda _: _getter("classif", "bool"))
     widget_tool.register_field_setter(widget, widget.cb_clsf, lambda _, v: _setter("classif", v))
     widget_tool.register_field_listener(widget, widget.cb_clsf)
+
+    # Check IfcTypeObjects
+    widget_tool.register_field_getter(
+        widget, widget.cb_type_objects, lambda _: _getter("type_obj", "bool")
+    )
+    widget_tool.register_field_setter(
+        widget, widget.cb_type_objects, lambda _, v: _setter("type_obj", v)
+    )
+    widget_tool.register_field_listener(widget, widget.cb_type_objects)
 
     # Inherit to Subclasses
     widget_tool.register_field_getter(widget, widget.cb_inh, lambda _: _getter("inherit", "bool"))
@@ -253,8 +268,8 @@ def add_columns_to_property_view(
     proxy_model, model = ids_property.create_model(data)
 
     def set_checkstate(model: CTM, index: QModelIndex, value: bool):
-        bsdd_class = index.internalPointer()
-        ids_property.set_checkstate(model, bsdd_class, value)
+        bsdd_property = index.internalPointer()
+        ids_property.set_checkstate(model, model.bsdd_data, bsdd_property, value)
 
     ids_property.add_column_to_table(model, "Name", ids_property._get_name)
     ids_property.add_column_to_table(model, "Code", ids_property._get_code)
@@ -378,7 +393,7 @@ def export_ids(
         widget, class_settings, property_settings, base_settings, metadata_settings
     )
 
-    def _start_specification(payload: dict):
+    def _start_specification(payload: PayLoadDict):
         waiting_widget.set_title("Build IDS")
 
         create_worker, creator_thread, creator_dialog = widget_tool.create_build_thread(
@@ -390,11 +405,11 @@ def export_ids(
     def _setup_failed(_exc: Exception):
         stop_waiting_widget(waiting_worker)
 
-    def _dispatch_specification(payload: dict):
+    def _dispatch_specification(payload: PayLoadDict):
         # queue execution on the main thread (mw affinity)
         QTimer.singleShot(0, widget, lambda: _start_specification(payload))
 
-    def _export(ids, out_path):
+    def _export(ids: Ids, out_path: str):
         write_worker, write_thread = widget_tool.create_write_thread(ids, out_path)
         waiting_widget.set_title("Write IDS")
         write_thread.finished.connect(

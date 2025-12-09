@@ -7,7 +7,7 @@ from ifctester.facet import Property as PropertyFacet
 from ifctester.facet import Entity as EntityFacet
 
 from ifctester.facet import Restriction
-from ifctester.ids import Specification
+from ifctester.ids import Specification, Ids
 from bsdd_gui.presets.signal_presets import FieldSignals, ViewSignals
 from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, ItemViewTool
 from bsdd_json.utils import property_utils as prop_utils
@@ -41,16 +41,28 @@ class PsetDict(TypedDict):
 class SettingsDict(TypedDict):
     class_settings: dict[str, bool]
     property_settings: dict[str, dict[str, PsetDict]]
-    settings: dict
+    settings: BasicSettingsDict
     ids_metadata: MetadataDict
 
 
 class BasicSettingsDict(TypedDict):
     inherit: bool
     classification: bool
+    type_objects: bool
     main_pset: str
     main_property: str
     datatype: Literal["IfcLabel", "IfcText"]
+
+
+class PayLoadDict(TypedDict):
+    ids: Ids
+    sorted_classes: list[BsddClass]
+    base_settings: BasicSettingsDict
+    class_settings: dict[str, bool]
+    property_settings: dict[str, dict[str, PsetDict]]
+    bsdd_dict: BsddDictionary
+    ifc_version: list[str]
+    out_path: str
 
 
 class MetadataDict(TypedDict):
@@ -192,7 +204,9 @@ class IdsExporter(ActionTool, FieldTool):
         return property_facet
 
     @classmethod
-    def build_ifc_requirements(cls, bsdd_class: BsddClass, bsdd_dict: BsddDictionary):
+    def build_ifc_requirements(
+        cls, bsdd_class: BsddClass, bsdd_dict: BsddDictionary, add_type_objects: bool = False
+    ):
         from bsdd_gui.tool.ifc_helper import IfcHelper
 
         def _get_type_class(class_name):
@@ -209,9 +223,10 @@ class IdsExporter(ActionTool, FieldTool):
             classes.add(entity.upper())
             predefined = predefined if predefined else "NOTDEFINED"
             predefined_types.add(predefined)
-            type_class = _get_type_class(entity)
-            if type_class:
-                classes.add(type_class)
+            if add_type_objects:
+                type_class = _get_type_class(entity)
+                if type_class:
+                    classes.add(type_class)
         req = EntityFacet()
         class_res = Restriction({"enumeration": sorted(classes)})
         req.name = class_res
@@ -334,6 +349,7 @@ class IdsExporter(ActionTool, FieldTool):
         settings_dict = {
             "inherit": widget.cb_inh.isChecked(),
             "classification": widget.cb_clsf.isChecked(),
+            "type_objects": widget.cb_type_objects.isChecked(),
             "main_pset": widget.cb_pset.currentText(),
             "main_property": widget.cb_prop.currentText(),
             "datatype": widget.cb_datatype.currentText(),
@@ -390,14 +406,6 @@ class IdsExporter(ActionTool, FieldTool):
             widget.cb_prop.setCurrentText(prop)
 
     @classmethod
-    def export_settings(cls, widget):
-        pass
-
-    @classmethod
-    def import_settings(cls, widget):
-        pass
-
-    @classmethod
     def build_classification_facet(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
 
         return ClassificationFacet(
@@ -420,7 +428,7 @@ class IdsExporter(ActionTool, FieldTool):
     @classmethod
     def create_build_thread(
         cls,
-        payload,
+        payload: PayLoadDict,
         parent: QWidget,
     ):
         """
@@ -452,7 +460,9 @@ class IdsExporter(ActionTool, FieldTool):
                 if facet:
                     spec.requirements.append(facet)
 
-            spec.requirements += cls.build_ifc_requirements(bsdd_class, bsdd_dict)
+            spec.requirements += cls.build_ifc_requirements(
+                bsdd_class, bsdd_dict, base_settings.get("type_objects", False)
+            )
             ids.specifications.append(spec)
 
         # initialize once in the GUI thread
@@ -537,7 +547,7 @@ class IdsExporter(ActionTool, FieldTool):
                         cs = class_settings
 
                     sorted_classes = sorted(bsdd_dict.Classes, key=lambda x: x.Code)
-                    payload = {
+                    payload: PayLoadDict = {
                         "ids": ids,
                         "sorted_classes": sorted_classes,
                         "base_settings": base_settings,
@@ -721,6 +731,7 @@ class IdsPropertyView(ItemViewTool):
     def set_checkstate(
         cls,
         model: models.PropertyTreeModel,
+        bsdd_class: BsddClass,
         bsdd_class_property: BsddClassProperty | str,
         state: bool,
     ):
@@ -733,11 +744,9 @@ class IdsPropertyView(ItemViewTool):
             else bsdd_class_property.PropertySet
         )
         property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
-        bsdd_class_code = model.bsdd_data.Code
-
-        if bsdd_class_code not in cls.get_properties().checkstate_dict:
-            cls.get_properties().checkstate_dict[bsdd_class_code] = dict()
-        checkstate_dict = cls.get_properties().checkstate_dict[bsdd_class_code]
+        if bsdd_class.Code not in cls.get_properties().checkstate_dict:
+            cls.get_properties().checkstate_dict[bsdd_class.Code] = dict()
+        checkstate_dict = cls.get_properties().checkstate_dict[bsdd_class.Code]
         if not pset_name in checkstate_dict:
             checkstate_dict[pset_name] = {"checked": True, "properties": dict()}
         if not property_code:
