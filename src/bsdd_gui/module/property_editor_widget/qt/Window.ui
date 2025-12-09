@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>631</width>
+    <width>666</width>
     <height>765</height>
    </rect>
   </property>
@@ -133,32 +133,32 @@
                 </property>
                 <item>
                  <property name="text">
-                  <string>Boolean</string>
+                  <string notr="true">Boolean</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Character</string>
+                  <string notr="true">Character</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Integer</string>
+                  <string notr="true">Integer</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Real</string>
+                  <string notr="true">Real</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>String</string>
+                  <string notr="true">String</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Time</string>
+                  <string notr="true">Time</string>
                  </property>
                 </item>
                </widget>

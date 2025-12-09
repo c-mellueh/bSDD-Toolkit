@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 import os
+import re
 import bsdd_gui
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui.module.popups import ui
@@ -100,12 +101,25 @@ class Popups:
         if save:
             path = QFileDialog.getSaveFileName(
                 window, title, path, f"{file_format} Files (*.{file_format})"
-            )[0]
+            )
+            path
         else:
             path = QFileDialog.getOpenFileName(
                 window, title, path, f"{file_format} Files (*.{file_format})"
-            )[0]
-        return path
+            )
+        pure_path, end = path
+        try:
+            if not end:
+                return pure_path
+            texts = re.search(r"\(\*(\..*)\)", end).groups()
+            if not texts:
+                return pure_path
+            ending = texts[0]
+            if not pure_path.lower().endswith(ending.lower()):
+                pure_path += ending
+            return pure_path
+        except:
+            return pure_path
 
     @classmethod
     def get_folder(cls, window, path: str) -> str:

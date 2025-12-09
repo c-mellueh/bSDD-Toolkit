@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Type, Literal
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.ids_exporter import constants
 import json
-import os
+import re
 import ifctester
 from ifctester.facet import Property as PropertyFacet
 from ifctester.facet import Entity as EntityFacet
@@ -31,15 +31,16 @@ def connect_to_main_window(
     project: Type[tool.Project],
 ):
     # Action uses the WidgetTool request to allow trigger routing
+
     action = main_window.add_action(
-        None, "Ids Exporter", lambda: ids_exporter.request_dialog(project.get(), main_window.get())
+        None, "Ids Exporter", lambda: ids_exporter.request_widget(project.get(), main_window.get())
     )
     ids_exporter.set_action(main_window.get(), "open_window", action)
 
 
 def retranslate_ui(ids_exporter: Type[tool.IdsExporter], main_window: Type[tool.MainWindowWidget]):
     action = ids_exporter.get_action(main_window.get(), "open_window")
-    action.setText(QCoreApplication.translate("IDSExport", "Graph View"))
+    action.setText(QCoreApplication.translate("IDSExport", "IDS Exporter"))
 
 
 def connect_signals(
@@ -52,26 +53,18 @@ def connect_signals(
     ids_property.connect_internal_signals()
 
 
-def create_widget(data: BsddDictionary, parent, widget_tool: Type[tool.IdsExporter]):
-    widget: ui.IdsWidget = widget_tool.show_widget(data, parent)
-
-
-def create_dialog(data: BsddDictionary, parent, dialog_tool: Type[tool.IdsExporter]):
-    dialog = dialog_tool.create_dialog(data, parent)
+def create_widget(
+    widget_tool: Type[tool.IdsExporter],
+    main_window: Type[tool.MainWindowWidget],
+    project: Type[tool.Project],
+):
+    widget: ui.IdsWidget = widget_tool.show_widget(project.get(), None)
     text = QCoreApplication.translate("IdsExport", "IDS Exporter")
-    dialog.setWindowTitle(text)
-    widget = dialog_tool.get_widget()
+    widget.setWindowTitle(text)
     model: models.ClassTreeModel = widget.tv_classes.model().sourceModel()
     model.beginResetModel()
-    model.bsdd_data = data
+    model.bsdd_data = project.get()
     model.endResetModel()
-    geom = dialog.geometry()
-    dialog.setGeometry(geom.x(), geom.y(), 1600, 900)
-    if dialog.exec():
-        dialog_tool.sync_to_model(dialog._widget, data)
-        dialog_tool.signals.dialog_accepted.emit(dialog)
-    else:
-        dialog_tool.signals.dialog_declined.emit(dialog)
 
 
 def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
@@ -118,6 +111,11 @@ def register_fields(
             return bool(value)
         return bool(value.strip())
 
+    def _check_mail(value, widet):
+        if not _is_not_empty(value, widet):
+            return False
+        return bool(re.match(r"[^@]+@[^\.]+\..+", value))
+
     # Check for Classification
     widget_tool.register_field_getter(widget, widget.cb_clsf, lambda _: _getter("classif", "bool"))
     widget_tool.register_field_setter(widget, widget.cb_clsf, lambda _, v: _setter("classif", v))
@@ -144,7 +142,7 @@ def register_fields(
     widget_tool.register_field_getter(widget, widget.le_author, lambda _: _getter("author"))
     widget_tool.register_field_setter(widget, widget.le_author, lambda _, v: _setter("author", v))
     widget_tool.register_field_listener(widget, widget.le_author)
-    widget_tool.add_validator(widget, widget.le_author, _is_not_empty, util.set_valid)
+    widget_tool.add_validator(widget, widget.le_author, _check_mail, util.set_valid)
 
     # Milestone
     widget_tool.register_field_getter(widget, widget.le_miles, lambda _: _getter("milestone"))
@@ -190,6 +188,8 @@ def register_fields(
     widget_tool.register_field_listener(widget, widget.cb_datatype)
     widget_tool.add_validator(widget, widget.cb_datatype, _is_not_empty, util.set_valid)
 
+    widget_tool.sync_from_model(widget, widget.bsdd_data)
+
 
 def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
     pass
@@ -229,15 +229,13 @@ def register_property_view(
 
 
 def add_columns_to_class_view(
-    view: model_views.ClassView,
-    ids_class: Type[tool.IdsClassView],
-    ids_exporter: Type[tool.IdsExporter],
+    view: model_views.ClassView, ids_class: Type[tool.IdsClassView], project: Type[tool.Project]
 ):
     def set_checkstate(model: CTM, index: QModelIndex, value: bool):
         bsdd_class = index.internalPointer()
         ids_class.set_checkstate(bsdd_class, value)
 
-    data = ids_exporter.get_data()
+    data = project.get()
     proxy_model, model = ids_class.create_model(data)
     ids_class.add_column_to_table(model, "Name", lambda a: a.Name)
     ids_class.add_column_to_table(model, "Code", lambda a: a.Code)
@@ -248,10 +246,10 @@ def add_columns_to_class_view(
 def add_columns_to_property_view(
     view: model_views.PropertyView,
     ids_property: Type[tool.IdsPropertyView],
-    ids_exporter: Type[tool.IdsExporter],
+    project: Type[tool.Project],
 ):
 
-    data = ids_exporter.get_data()
+    data = project.get()
     proxy_model, model = ids_property.create_model(data)
 
     def set_checkstate(model: CTM, index: QModelIndex, value: bool):
@@ -281,8 +279,8 @@ def connect_property_view(
         class_view: model_views.ClassView,
         data: BsddClass,
     ):
-        dialog: ui.IdsDialog = class_view.window()
-        property_view = dialog._widget.tv_properties
+        widget: ui.IdsWidget = class_view.window()
+        property_view = widget.tv_properties
         proxy_model: models.SortModel = property_view.model()
         model = proxy_model.sourceModel()
         model.beginResetModel()
@@ -363,11 +361,11 @@ def export_ids(
     widget_tool: Type[tool.IdsExporter],
     class_view: Type[tool.IdsClassView],
     property_view: Type[tool.IdsPropertyView],
-    main_window: Type[tool.MainWindowWidget],
     popups: Type[tool.Popups],
 ):
 
-    mw = main_window.get()
+    widget_tool.sync_to_model(widget, widget.bsdd_data)
+
     class_settings = class_view.get_check_dict()
     property_settings = property_view.get_check_dict()
     base_settings = widget_tool.get_settings(widget)
@@ -394,7 +392,7 @@ def export_ids(
 
     def _dispatch_specification(payload: dict):
         # queue execution on the main thread (mw affinity)
-        QTimer.singleShot(0, mw, lambda: _start_specification(payload))
+        QTimer.singleShot(0, widget, lambda: _start_specification(payload))
 
     def _export(ids, out_path):
         write_worker, write_thread = widget_tool.create_write_thread(ids, out_path)
@@ -404,7 +402,7 @@ def export_ids(
                 f"{len(ids.specifications)} Specifications created.",
                 "IDS Export Done!",
                 "IDS Export Done!",
-                parent=main_window.get(),
+                parent=widget,
             )
         )
         write_thread.finished.connect(lambda: stop_waiting_widget(waiting_worker))

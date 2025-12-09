@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -69,11 +69,6 @@ class Ui_Form(object):
         Form.resize(1600, 900)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName("gridLayout")
-        self.label_3 = QLabel(Form)
-        self.label_3.setObjectName("label_3")
-
-        self.gridLayout.addWidget(self.label_3, 3, 0, 1, 1)
-
         self.splitter = QSplitter(Form)
         self.splitter.setObjectName("splitter")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
@@ -176,7 +171,7 @@ class Ui_Form(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 376, 660))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 446, 607))
         self.verticalLayout_2 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -332,10 +327,30 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.splitter, 2, 0, 1, 1)
 
+        self.label_3 = QLabel(Form)
+        self.label_3.setObjectName("label_3")
+
+        self.gridLayout.addWidget(self.label_3, 3, 0, 1, 1)
+
         self.fw_output = FileSelector(Form)
         self.fw_output.setObjectName("fw_output")
 
         self.gridLayout.addWidget(self.fw_output, 4, 0, 1, 1)
+
+        self.button_layout = QHBoxLayout()
+        self.button_layout.setObjectName("button_layout")
+        self.horizontalSpacer_2 = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
+
+        self.button_layout.addItem(self.horizontalSpacer_2)
+
+        self.pb_create = QPushButton(Form)
+        self.pb_create.setObjectName("pb_create")
+
+        self.button_layout.addWidget(self.pb_create)
+
+        self.gridLayout.addLayout(self.button_layout, 5, 0, 1, 1)
 
         self.retranslateUi(Form)
 
@@ -345,7 +360,6 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", "Form", None))
-        self.label_3.setText(QCoreApplication.translate("Form", "Export:", None))
         # if QT_CONFIG(tooltip)
         self.label_classification.setToolTip(
             QCoreApplication.translate(
@@ -386,5 +400,7 @@ class Ui_Form(object):
         self.label_14.setText(QCoreApplication.translate("Form", "**IDS Metadata**", None))
         self.pb_import.setText(QCoreApplication.translate("Form", "Import", None))
         self.pb_export.setText(QCoreApplication.translate("Form", "Export", None))
+        self.label_3.setText(QCoreApplication.translate("Form", "Export:", None))
+        self.pb_create.setText(QCoreApplication.translate("Form", "Create", None))
 
     # retranslateUi

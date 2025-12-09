@@ -17,6 +17,7 @@ def connect():
         tool.ClassPropertyTableView,
         tool.MainWindowWidget,
         tool.PropertyEditorWidget,
+        tool.Project,
     )
     # core.create_context_menu_builders(tool.PropertyWidget)
 

@@ -8,8 +8,8 @@ from ifctester.facet import Entity as EntityFacet
 
 from ifctester.facet import Restriction
 from ifctester.ids import Specification
-from bsdd_gui.presets.signal_presets import DialogSignals, ViewSignals
-from bsdd_gui.presets.tool_presets import ActionTool, DialogTool, ItemViewTool
+from bsdd_gui.presets.signal_presets import FieldSignals, ViewSignals
+from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, ItemViewTool
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils
 from bsdd_gui.module.ids_exporter import ui, models, model_views, constants
@@ -65,11 +65,11 @@ class MetadataDict(TypedDict):
     ifc_versions: list[str]
 
 
-class IdsSignals(DialogSignals):
-    pass
+class IdsSignals(FieldSignals):
+    run_clicked = Signal(QWidget)
 
 
-class IdsExporter(ActionTool, DialogTool):
+class IdsExporter(ActionTool, FieldTool):
     signals = IdsSignals()
 
     @classmethod
@@ -91,7 +91,6 @@ class IdsExporter(ActionTool, DialogTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.dialog_accepted.connect(lambda d: trigger.export_ids(d._widget))
         # live sync of fields
         cls.signals.field_changed.connect(lambda w, f: cls.sync_to_model(w, w.bsdd_data, f))
 
@@ -103,6 +102,7 @@ class IdsExporter(ActionTool, DialogTool):
         widget.cb_pset.currentIndexChanged.connect(lambda _: cls.fill_prop_combobox(widget))
         widget.pb_import.clicked.connect(lambda: trigger.import_settings(widget))
         widget.pb_export.clicked.connect(lambda: trigger.export_settings(widget))
+        widget.pb_create.clicked.connect(lambda _, w=widget: trigger.export_ids(w))
         return widget
 
     @classmethod
@@ -204,7 +204,7 @@ class IdsExporter(ActionTool, DialogTool):
         type_classes = cls.get_properties().type_classes
         classes = set()
         predefined_types = set()
-        for ifc_reference in bsdd_class.RelatedIfcEntityNamesList:
+        for ifc_reference in bsdd_class.RelatedIfcEntityNamesList or []:
             entity, predefined = IfcHelper.split_ifc_term(ifc_reference)
             classes.add(entity.upper())
             predefined = predefined if predefined else "NOTDEFINED"
@@ -258,8 +258,8 @@ class IdsExporter(ActionTool, DialogTool):
         return requirements
 
     @classmethod
-    def get_widget(cls) -> ui.IdsWidget:
-        return super().get_widget()
+    def get_widget(cls, data) -> ui.IdsWidget:
+        return super().get_widget(data)
 
     @classmethod
     def count_properties_with_progress(

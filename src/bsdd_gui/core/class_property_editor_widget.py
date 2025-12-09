@@ -20,6 +20,7 @@ def connect_signals(
     property_table: Type[tool.ClassPropertyTableView],
     main_window: Type[tool.MainWindowWidget],
     property_editor: Type[tool.PropertyEditorWidget],
+    project: Type[tool.Project],
 ):
     class_property_editor.connect_internal_signals()
     property_table.signals.property_info_requested.connect(
@@ -32,6 +33,13 @@ def connect_signals(
     property_editor.signals.new_property_created.connect(
         lambda _: class_property_editor.validate_widgets()
     )
+
+    def validate_widgets():
+        for widget in class_property_editor.get_widgets():
+            class_property_editor.validate_all_fields(widget)
+
+    project.signals.property_added.connect(lambda _: validate_widgets())
+    project.signals.property_removed.connect(lambda _: validate_widgets())
 
 
 def retranslate_ui(class_property_editor: Type[tool.ClassPropertyEditorWidget]):
