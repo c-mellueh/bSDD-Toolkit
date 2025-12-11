@@ -324,7 +324,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         existing_nodes = {
             n
             for n in scene.nodes
-            if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
+            if hasattr(n, "bsdd_data")
         }
         internal_nodes = {n.bsdd_data.Code: n for n in existing_nodes if not n.is_external}
         external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
