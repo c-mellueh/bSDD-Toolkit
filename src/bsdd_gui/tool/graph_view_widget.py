@@ -756,14 +756,17 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if relation not in constants.CLASS_RELATIONS:
             return
         if relation == constants.IFC_REFERENCE_REL:
-            if not end_node.is_external:
+            if not isinstance(end_class,constants.IFC_NODE_TYPE):
                 return
-            rienl = start_class.RelatedIfcEntityNamesList or []
-            if end_class.Code not in rienl:
+            rienl = [x.lower() for x in start_class.RelatedIfcEntityNamesList or []]
+            if end_class.Code.lower() not in rienl:
                 start_class.RelatedIfcEntityNamesList.append(end_class.Code)
 
         else:
-            end_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
+            if end_class.OwnedUri:
+                end_uri = end_class.OwnedUri
+            else:
+                end_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
             existing_relations = [
                 r.RelationType for r in start_class.ClassRelations if r.RelatedClassUri == end_uri
             ]
