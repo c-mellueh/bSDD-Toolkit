@@ -50,7 +50,7 @@ def handle_drop_event(event, view):
 
 
 def load_bsdd():
-    core.popuplate_widget(tool.GraphViewWidget, tool.Project)
+    core.popuplate_widget(tool.GraphViewWidget, tool.Project,tool.IfcHelper)
 
 
 def node_double_clicked(node):
@@ -72,7 +72,7 @@ def export_requested():
 
 
 def import_requested():
-    core.import_graph(tool.GraphViewWidget, tool.Project, tool.Popups, tool.Appdata)
+    core.import_graph(tool.GraphViewWidget, tool.Project, tool.Popups, tool.Appdata,tool.IfcHelper)
 
 
 def recalculate_edges():

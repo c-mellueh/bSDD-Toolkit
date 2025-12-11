@@ -169,14 +169,17 @@ def connect_widget(widget: ui.GraphWindow, graph_view: Type[tool.GraphViewWidget
     graph_view.connect_widget_signals(widget)
 
 
-def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
+def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project],ifc_helper: Type[tool.IfcHelper]):
     widget = graph_view.get_widget()
     if widget is None:
         return
     bsdd_dictionary = project.get()
     graph_view.clear_scene()
     position = QPointF(0.0, 0.0)
-    graph_view.insert_classes_in_scene(graph_view.get_scene(), bsdd_dictionary.Classes, position)
+    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
+    graph_view.insert_classes_in_scene(
+        graph_view.get_scene(), bsdd_dictionary.Classes, position, ifc_classes=ifc_classes
+    )
     widget._apply_filters()
     graph_view.center_scene()
     position += QPointF(40.0, 40.0)
@@ -218,7 +221,10 @@ def handle_drop_event(
         return
 
     scene = view.scene()
-    new_class_nodes = graph_view.insert_classes_in_scene(scene, classes_to_add, scene_pos)
+    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
+    new_class_nodes = graph_view.insert_classes_in_scene(
+        scene, classes_to_add, scene_pos, ifc_classes=ifc_classes
+    )
     new_property_nodes = graph_view.insert_properties_in_scene(scene, properties_to_add, scene_pos)
     recalculate_edges(graph_view, project)
     event.acceptProposedAction()
@@ -347,6 +353,7 @@ def import_graph(
     project: Type[tool.Project],
     popups: Type[tool.Popups],
     appdata: Type[tool.Appdata],
+    ifc_helper: Type[tool.IfcHelper],
 ):
 
     widget = graph_view.get_widget()
@@ -385,7 +392,7 @@ def import_graph(
         if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
     }
     external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
-    ifc_classes = {c.get("code"): c for c in IfcHelperData.get_classes()}
+    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
     for item in data.get("nodes", []) or []:
         node = graph_view.import_node_from_json(item, project.get(), ifc_classes, external_nodes)
         if node is not None:

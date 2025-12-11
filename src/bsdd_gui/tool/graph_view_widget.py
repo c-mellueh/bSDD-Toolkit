@@ -310,7 +310,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def insert_classes_in_scene(
-        cls, scene: view_ui.GraphScene, classes: list[BsddClass], position: QPointF = None
+        cls,
+        scene: view_ui.GraphScene,
+        classes: list[BsddClass],
+        position: QPointF = None,
+        ifc_classes: dict[str, dict[str, str]] = dict(),
     ):
         if position is None:
             position = QPointF(scene.sceneRect().width() / 2, scene.sceneRect().height() / 2)
@@ -324,7 +328,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
         }
         internal_nodes = {n.bsdd_data.Code: n for n in existing_nodes if not n.is_external}
         external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
-        ifc_classes = {c.get("code"): c for c in IfcHelperData.get_classes()}
 
         for bsdd_class in classes:
             if not bsdd_class.Code in internal_nodes:
