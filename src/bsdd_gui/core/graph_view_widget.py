@@ -169,7 +169,11 @@ def connect_widget(widget: ui.GraphWindow, graph_view: Type[tool.GraphViewWidget
     graph_view.connect_widget_signals(widget)
 
 
-def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project],ifc_helper: Type[tool.IfcHelper]):
+def popuplate_widget(
+    graph_view: Type[tool.GraphViewWidget],
+    project: Type[tool.Project],
+    ifc_helper: Type[tool.IfcHelper],
+):
     widget = graph_view.get_widget()
     if widget is None:
         return
@@ -178,7 +182,11 @@ def popuplate_widget(graph_view: Type[tool.GraphViewWidget], project: Type[tool.
     position = QPointF(0.0, 0.0)
     ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
     graph_view.insert_classes_in_scene(
-        graph_view.get_scene(), bsdd_dictionary.Classes, position, ifc_classes=ifc_classes
+        bsdd_dictionary,
+        graph_view.get_scene(),
+        bsdd_dictionary.Classes,
+        position,
+        ifc_classes=ifc_classes,
     )
     widget._apply_filters()
     graph_view.center_scene()
@@ -223,7 +231,7 @@ def handle_drop_event(
     scene = view.scene()
     ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
     new_class_nodes = graph_view.insert_classes_in_scene(
-        scene, classes_to_add, scene_pos, ifc_classes=ifc_classes
+        bsdd_dictionary, scene, classes_to_add, scene_pos, ifc_classes=ifc_classes
     )
     new_property_nodes = graph_view.insert_properties_in_scene(scene, properties_to_add, scene_pos)
     recalculate_edges(graph_view, project)

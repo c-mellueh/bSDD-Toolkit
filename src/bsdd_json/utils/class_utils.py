@@ -183,9 +183,9 @@ def update_internal_relations_to_new_version(
     version = bsdd_dictionary.DictionaryVersion
     for relationship in bsdd_class.ClassRelations:
         old_uri = dict_utils.parse_bsdd_url(relationship.RelatedClassUri)
-        if old_uri["namespace"] != namespace: #skip external relations
+        if old_uri["namespace"] != namespace:  # skip external relations
             continue
-        new_uri = dict(old_uri) #copy
+        new_uri = dict(old_uri)  # copy
         new_uri["namespace"] = namespace
         new_uri["version"] = version
         if old_uri != new_uri:
@@ -193,6 +193,8 @@ def update_internal_relations_to_new_version(
 
 
 def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
+    if not isinstance(bsdd_class, BsddClass):
+        return None
     data = {
         "namespace": [bsdd_dictionary.OrganizationCode, bsdd_dictionary.DictionaryCode],
         "version": bsdd_dictionary.DictionaryVersion,
@@ -228,3 +230,13 @@ def set_code(bsdd_class: BsddClass, code: str) -> None:
     bsdd_class._apply_code_side_effects(code)
     # assign without recursion (no property involved)
     object.__setattr__(bsdd_class, "Code", code)
+
+def is_external_ref(bsdd_class: BsddClass) -> bool:
+    from .dictionary_utils import get_dictionary_path_from_uri,bsdd_dictionary_url
+    bsdd_dictionary = get_dictionary_from_class(bsdd_class)
+    if not bsdd_class.OwnedUri:
+        return False
+    dict_path = get_dictionary_path_from_uri(bsdd_class.OwnedUri)
+    if dict_path == bsdd_dictionary_url(bsdd_dictionary):
+        return False
+    return True

@@ -311,6 +311,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     @classmethod
     def insert_classes_in_scene(
         cls,
+        bsdd_dictionary: BsddDictionary,
         scene: view_ui.GraphScene,
         classes: list[BsddClass],
         position: QPointF = None,
@@ -321,25 +322,46 @@ class GraphViewWidget(ActionTool, WidgetTool):
         offset_step = QPointF(24.0, 18.0)
         cur = QPointF(position)
         new_nodes = list()
-        existing_nodes = {
-            n
-            for n in scene.nodes
-            if hasattr(n, "bsdd_data")
+        existing_nodes = {n for n in scene.nodes if hasattr(n, "bsdd_data")}
+        internal_nodes = {
+            cl_utils.build_bsdd_uri(n.bsdd_data, bsdd_dictionary): n
+            for n in existing_nodes
+            if not n.is_external and isinstance(n.bsdd_data, BsddClass)
         }
-        internal_nodes = {n.bsdd_data.Code: n for n in existing_nodes if not n.is_external}
         external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
 
         for bsdd_class in classes:
-            if not bsdd_class.Code in internal_nodes:
-                new_node = cls.add_node(scene, bsdd_class, pos=cur, is_external=False)
-                new_nodes.append(new_node)
+            class_uri = cl_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary)
+            if class_uri in internal_nodes:
+                continue
+            new_node = cls.add_node(scene, bsdd_class, pos=cur, is_external=False)
+            new_nodes.append(new_node)
+            internal_nodes[class_uri] = new_node
+
             ifc_entities = bsdd_class.RelatedIfcEntityNamesList or []
+            cur += offset_step
             for e in ifc_entities:
                 new_node = cls.add_ifc_node(e, cur, ifc_classes, external_nodes)
                 if new_node:
+                    cur += offset_step
                     temp_bsdd_class = new_node.bsdd_data
                     external_nodes[temp_bsdd_class.OwnedUri] = temp_bsdd_class
-            cur += offset_step
+
+            for class_relation in bsdd_class.ClassRelations:
+                related_uri = class_relation.RelatedClassUri
+                if related_uri in external_nodes:
+                    continue
+                if related_uri in internal_nodes:
+                    continue
+                related_bsdd_class = cl_utils.get_class_by_code(bsdd_dictionary,related_uri)
+                if cl_utils.is_external_ref(related_bsdd_class):
+                    new_node = cls.add_node(scene, related_bsdd_class, pos=cur, is_external=True)
+                    external_nodes[related_bsdd_class.OwnedUri] = new_node.bsdd_data
+
+                else:
+                    new_node = cls.add_node(scene, related_bsdd_class, pos=cur, is_external=False)
+                    internal_nodes[cl_utils.build_bsdd_uri(related_bsdd_class,bsdd_dictionary)] = new_node.bsdd_data
+                cur += offset_step
         return new_nodes
 
     @classmethod

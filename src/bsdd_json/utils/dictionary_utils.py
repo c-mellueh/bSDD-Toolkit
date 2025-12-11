@@ -1,6 +1,10 @@
+from __future__ import annotations
 from urllib.parse import urlparse, quote
 import re
 import unicodedata
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from bsdd_json.models import BsddDictionary, BsddClass
 
 def slugify(text: str, *, delimiter: str = "-", lowercase: bool = False, max_length: int | None = None) -> str:
     """
@@ -138,6 +142,17 @@ def parse_bsdd_url(url: str) -> dict:
 
     return result
 
+def bsdd_dictionary_url(bsdd_dictionary: BsddDictionary) -> str:
+    data = {
+        "namespace": [bsdd_dictionary.OrganizationCode, bsdd_dictionary.DictionaryCode],
+        "version": bsdd_dictionary.DictionaryVersion,
+        "resource_type": "dictionary",
+        "resource_id": "",
+    }
+    if bsdd_dictionary.UseOwnUri:
+        data["host"] = bsdd_dictionary.DictionaryUri
+
+    return build_bsdd_url(data, trailing_slash=True)
 
 def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
     """
@@ -180,7 +195,11 @@ def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
     rtype = data.get("resource_type")
     rid = data.get("resource_id")
 
-    if ns_parts and version and rtype and rid:
+    if rtype == "dictionary"  and ns_parts and version:
+        after = [*ns_parts, str(version)]
+        parts = ["uri", *after]
+        path = "/" + "/".join(q(p) for p in parts)
+    elif ns_parts and version and rtype and rid:
         after = [*ns_parts, str(version), str(rtype), str(rid)]
         parts = ["uri", *after]
         path = "/" + "/".join(q(p) for p in parts)
