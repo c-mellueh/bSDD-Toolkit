@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.dictionary_editor_widget import ui as ui_dict
     from bsdd_gui.presets.ui_presets import ToggleSwitch
-
+    from bsdd_gui.module.class_editor_widget import ui as ui_class
 
 def connect_signals(
     relationship_editor: Type[tool.RelationshipEditorWidget],
@@ -35,6 +35,15 @@ def connect_signals(
     class_editor.signals.dialog_accepted.connect(
         relationship_editor.transform_virtual_relations_to_real
     )
+
+    def unregister_widget(class_dialog: ui_class.EditDialog):
+        data = class_dialog._widget.bsdd_data
+        widget = relationship_editor.get_widget(data)
+        relationship_editor.unregister_widget(widget)
+
+    class_editor.signals.dialog_accepted.connect(unregister_widget)
+    class_editor.signals.dialog_declined.connect(unregister_widget)
+
     relationship_editor.connect_internal_signals()
 
     def handle_item_remove(item):

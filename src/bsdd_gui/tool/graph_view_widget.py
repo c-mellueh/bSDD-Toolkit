@@ -353,14 +353,16 @@ class GraphViewWidget(ActionTool, WidgetTool):
                     continue
                 if related_uri in internal_nodes:
                     continue
-                related_bsdd_class = cl_utils.get_class_by_code(bsdd_dictionary,related_uri)
-                if cl_utils.is_external_ref(related_bsdd_class):
+                related_bsdd_class = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
+                if cl_utils.is_external_ref(related_bsdd_class.OwnedUri, bsdd_dictionary):
                     new_node = cls.add_node(scene, related_bsdd_class, pos=cur, is_external=True)
                     external_nodes[related_bsdd_class.OwnedUri] = new_node.bsdd_data
 
                 else:
                     new_node = cls.add_node(scene, related_bsdd_class, pos=cur, is_external=False)
-                    internal_nodes[cl_utils.build_bsdd_uri(related_bsdd_class,bsdd_dictionary)] = new_node.bsdd_data
+                    internal_nodes[cl_utils.build_bsdd_uri(related_bsdd_class, bsdd_dictionary)] = (
+                        new_node.bsdd_data
+                    )
                 cur += offset_step
         return new_nodes
 
@@ -409,7 +411,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
         edges = scene.edges
 
         class_codes = {
-            cn.bsdd_data.Code: cn for cn in nodes if cn.node_type == constants.CLASS_NODE_TYPE
+            cn.bsdd_data.Code: cn
+            for cn in nodes
+            if cn.node_type in (constants.CLASS_NODE_TYPE, constants.EXTERNAL_CLASS_NODE_TYPE)
         }
         ifc_codes = {
             cn.bsdd_data.Code: cn for cn in nodes if cn.node_type == constants.IFC_NODE_TYPE
@@ -478,6 +482,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 edge = cls.create_edge(start_node, related_node, edge_type=constants.PARENT_CLASS)
                 new_edges.append(edge)
                 existing_relations_dict[relation_type][info] = edge
+
             for relation in start_class.ClassRelations:
                 related_node = full_class_uris.get(relation.RelatedClassUri)
                 if related_node is None:
@@ -992,8 +997,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         if isinstance(relation, BsddClassRelation):
             related_uri = relation.RelatedClassUri
-            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
-            end_data = cl_utils.get_class_by_code(bsdd_dictionary, code)
+            end_data = cl_utils.get_class_by_uri(bsdd_dictionary,related_uri)
 
         elif isinstance(relation, BsddPropertyRelation):
             related_uri = relation.RelatedPropertyUri
@@ -1044,7 +1048,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if not scene:
             return None
         start_data, end_data, relation_type = cls.read_relation(relation, bsdd_dictionary)
-        return cls.get_edge_from_nodes(start_data, end_data, relation_type)
+        start_node,end_node = cls.get_node_from_bsdd_data(start_data),cls.get_node_from_bsdd_data(end_data)
+        return cls.get_edge_from_nodes(start_node,end_node , relation_type)
 
     @classmethod
     def get_relation_from_edge(cls, edge: graphics_items.Edge, bsdd_dictionary: BsddDictionary):

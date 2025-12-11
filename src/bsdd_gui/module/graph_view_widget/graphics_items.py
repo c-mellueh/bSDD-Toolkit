@@ -284,8 +284,10 @@ class Node(QGraphicsObject):
         if isinstance(bsdd_data, BsddProperty):
             self.node_type = PROPERTY_NODE_TYPE
         elif isinstance(bsdd_data, BsddClass):
-            if is_external:
+            if cl_utils.is_ifc_reference(bsdd_data):
                 self.node_type = IFC_NODE_TYPE
+            elif self.is_external:
+                self.node_type = EXTERNAL_CLASS_NODE_TYPE
             else:
                 self.node_type = CLASS_NODE_TYPE
 

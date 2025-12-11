@@ -78,6 +78,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         data: BsddProperty | BsddClass,
         mode: Literal["dialog"] | Literal["live"] = "dialog",
     ):
+        logging.debug(f"Initializing RelationshipEditorWidget for {data.Code}")
         trigger.widget_created(widget, data, mode)
 
     @classmethod
@@ -188,7 +189,10 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
         if model_kind == "class":
             code = widget.le_related_element.text()
-            related_class = cl_utils.get_class_by_code(bsdd_dictionary, code)
+            if dict_utils.is_uri(code):
+                related_class = cl_utils.get_class_by_uri(bsdd_dictionary, code)
+            else:
+                related_class = cl_utils.get_class_by_code(bsdd_dictionary, code)
             if not related_class:
                 clear_inputs()
                 return
@@ -272,8 +276,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
         if isinstance(relation, BsddClassRelation):
             related_uri = relation.RelatedClassUri
-            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
-            end_data = cl_utils.get_class_by_code(bsdd_dictionary, code)
+            end_data = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
 
         elif isinstance(relation, BsddPropertyRelation):
             related_uri = relation.RelatedPropertyUri
@@ -289,8 +292,10 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         mode: Literal["add"] | Literal["remove"] = "add",
     ):
         start_class, end_class, relation_type = cls.read_relation(relation, bsdd_dictionary)
-        start_uri = cl_utils.build_bsdd_uri(start_class, bsdd_dictionary)
-
+        if not start_class.OwnedUri:
+            start_uri = cl_utils.build_bsdd_uri(start_class, bsdd_dictionary)
+        else:
+            start_uri = start_class.OwnedUri
         inverse_relations = {
             "IsChildOf": "IsParentOf",
             "HasPart": "IsPartOf",

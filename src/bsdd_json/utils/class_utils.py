@@ -37,6 +37,7 @@ class Cache:
             result = _make_request()
             if result is not None:
                 result = BsddClass.model_validate(result)
+                result.OwnedUri = class_uri
             cls.data[class_uri] = result
         return cls.data[class_uri]
 
@@ -83,13 +84,18 @@ def get_parent(bsdd_class: BsddClass) -> BsddClass | None:
 
 
 def get_class_by_code(bsdd_dictionary: BsddDictionary, code: str) -> BsddClass | None:
-    if dict_utils.is_uri(code):
-        bsdd_class = Cache.get_external_class(code)
+    return get_all_class_codes(bsdd_dictionary).get(code)
+
+def get_class_by_uri(bsdd_dictionary: BsddDictionary, uri: str) -> BsddClass | None:
+    if dict_utils.is_uri(uri):
+        if is_external_ref(uri,bsdd_dictionary):
+            bsdd_class = Cache.get_external_class(uri)
+        else:
+            code = dict_utils.parse_bsdd_url(uri).get("resource_id")
+            bsdd_class = get_all_class_codes(bsdd_dictionary).get(code)
     else:
-        bsdd_class = get_all_class_codes(bsdd_dictionary).get(code)
+        bsdd_class = get_all_class_codes(bsdd_dictionary).get(uri)
     return bsdd_class
-
-
 def get_all_class_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddClass]:
     return {c.Code: c for c in bsdd_dictionary.Classes}
 
@@ -231,12 +237,18 @@ def set_code(bsdd_class: BsddClass, code: str) -> None:
     # assign without recursion (no property involved)
     object.__setattr__(bsdd_class, "Code", code)
 
-def is_external_ref(bsdd_class: BsddClass) -> bool:
-    from .dictionary_utils import get_dictionary_path_from_uri,bsdd_dictionary_url
-    bsdd_dictionary = get_dictionary_from_class(bsdd_class)
-    if not bsdd_class.OwnedUri:
+def is_external_ref(uri:str,bsdd_dictionary:BsddDictionary) -> bool:
+    if not uri:
         return False
-    dict_path = get_dictionary_path_from_uri(bsdd_class.OwnedUri)
+    from .dictionary_utils import get_dictionary_path_from_uri,bsdd_dictionary_url
+    dict_path = get_dictionary_path_from_uri(uri)
     if dict_path == bsdd_dictionary_url(bsdd_dictionary):
         return False
     return True
+
+def is_ifc_reference(bsdd_class: BsddClass) -> bool:
+    if not bsdd_class.OwnedUri:
+        return False
+    if "/uri/buildingsmart/ifc/" in bsdd_class.OwnedUri:
+        return True
+    return False
