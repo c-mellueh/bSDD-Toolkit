@@ -15,7 +15,7 @@ from bsdd_json import (
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils as class_utils
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
-
+import webbrowser
 import json
 import logging
 
@@ -267,8 +267,8 @@ def node_double_clicked(
     main_window: Type[tool.MainWindowWidget],
 ):
     if node.node_type == constants.CLASS_NODE_TYPE:
-        bsdd_cass: BsddClass = node.bsdd_data
-        class_tree.select_and_expand(bsdd_cass, main_window.get_class_view())
+        bsdd_class: BsddClass = node.bsdd_data
+        class_tree.select_and_expand(bsdd_class, main_window.get_class_view())
         main_window.get().raise_()
         main_window.get().activateWindow()
 
@@ -278,6 +278,11 @@ def node_double_clicked(
         widget: PropertyWidget = property_table.get_widgets()[-1]
         property_table.select_property(bsdd_property, widget.tv_properties)
 
+    elif node.node_type in [constants.EXTERNAL_CLASS_NODE_TYPE,constants.EXTERNAL_PROPERTY_NODE_TYPE,constants.IFC_NODE_TYPE]:
+        bsdd_class: BsddClass = node.bsdd_data
+        uri = bsdd_class.OwnedUri
+        if uri.startswith("http://") or uri.startswith("https://"):
+            webbrowser.open(uri)
 
 def create_relation(
     start_node: graphics_items.Node,
