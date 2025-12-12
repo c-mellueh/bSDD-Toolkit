@@ -251,7 +251,7 @@ def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool
         return
     nodes = scene.nodes
     edges = scene.edges
-    uri_dict, relations_dict = graph_view.get_code_dicts(scene, bsdd_dict)
+    uri_dict, relations_dict = graph_view.get_uri_dicts(scene, bsdd_dict)
     new_edges = graph_view.find_class_relations(nodes, uri_dict, relations_dict, bsdd_dict)
     new_edges += graph_view.find_class_property_relations(
         nodes, uri_dict, relations_dict, bsdd_dict
@@ -486,33 +486,32 @@ def add_node_by_lineinput(
     text = window.node_input.text().strip()
     view = window.view
     bsdd_class, bsdd_property = None, None
-    scene_pos =  view.mapToScene(view.viewport().rect().center())
-    scene_pos+= QPointF(random(),random())
+    scene_pos = view.mapToScene(view.viewport().rect().center())
+    scene_pos += QPointF(random(), random())
     scene = view.scene()
 
     if not text:
         return
-    
-    uri_dict, relations_dict = graph_view.get_code_dicts(scene, project.get())
 
+    uri_dict, relations_dict = graph_view.get_uri_dicts(scene, project.get())
 
     if dict_utils.is_uri(text):
         if text in uri_dict:
             return
-        is_external = dict_utils.is_external_ref(text,project.get())
+        is_external = dict_utils.is_external_ref(text, project.get())
         resource_type = dict_utils.parse_bsdd_url(text).get("resource_type")
-        
+
         if resource_type == "class":
             bsdd_class = class_utils.get_class_by_uri(project.get(), text)
             graph_view.add_node(scene, bsdd_class, pos=scene_pos, is_external=is_external)
         elif resource_type == "prop":
-            bsdd_property = prop_utils.get_property_by_uri(text,project.get())
+            bsdd_property = prop_utils.get_property_by_uri(text, project.get())
             graph_view.add_node(scene, bsdd_property, pos=scene_pos, is_external=is_external)
         else:
             return
     else:
         bsdd_class = class_utils.get_class_by_code(project.get(), text)
-        bsdd_property = prop_utils.get_property_by_code(text,project.get())
+        bsdd_property = prop_utils.get_property_by_code(text, project.get())
 
         if bsdd_class:
             if class_utils.build_bsdd_uri(bsdd_class, project.get()) in uri_dict:

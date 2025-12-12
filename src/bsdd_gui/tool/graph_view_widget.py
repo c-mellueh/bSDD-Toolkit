@@ -443,7 +443,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         return tuple(d)
 
     @classmethod
-    def get_code_dicts(cls, scene: view_ui.GraphScene, bsdd_dictionary: BsddDictionary):
+    def get_uri_dicts(cls, scene: view_ui.GraphScene, bsdd_dictionary: BsddDictionary):
         nodes = scene.nodes
         edges = scene.edges
 
@@ -494,7 +494,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 info = cls._info(start_node, related_node, bsdd_dictionary)
 
                 if related_node is not None and info not in existing_relations_dict[relation_type]:
-                    edge = cls.create_edge(start_node, related_node, edge_type=constants.PARENT_CLASS)
+                    edge = cls.create_edge(
+                        start_node, related_node, edge_type=constants.PARENT_CLASS
+                    )
                     new_edges.append(edge)
                     existing_relations_dict[relation_type][info] = edge
 
@@ -784,7 +786,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
             ):
                 return
 
-        new_property = prop_utils.create_class_property_from_property(bsdd_property, bsdd_class,bsdd_dictionary)
+        new_property = prop_utils.create_class_property_from_property(
+            bsdd_property, bsdd_class, bsdd_dictionary
+        )
         new_property._set_parent(bsdd_class)
         bsdd_class.ClassProperties.append(new_property)
         cls.signals.new_class_property_created.emit(new_property)
