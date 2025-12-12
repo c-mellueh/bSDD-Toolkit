@@ -8,6 +8,7 @@ import bsdd_gui
 from bsdd_json import (
     BsddProperty,
     BsddClass,
+    BsddProperty,
     BsddDictionary,
     BsddClassRelation,
     BsddPropertyRelation,
@@ -78,6 +79,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         data: BsddProperty | BsddClass,
         mode: Literal["dialog"] | Literal["live"] = "dialog",
     ):
+        logging.debug(f"Initializing RelationshipEditorWidget for {data.Code}")
         trigger.widget_created(widget, data, mode)
 
     @classmethod
@@ -188,7 +190,10 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
         if model_kind == "class":
             code = widget.le_related_element.text()
-            related_class = cl_utils.get_class_by_code(bsdd_dictionary, code)
+            if dict_utils.is_uri(code):
+                related_class = cl_utils.get_class_by_uri(bsdd_dictionary, code)
+            else:
+                related_class = cl_utils.get_class_by_code(bsdd_dictionary, code)
             if not related_class:
                 clear_inputs()
                 return
@@ -208,7 +213,10 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             relation = BsddClassRelation.model_validate(data_dict)
         else:
             code = widget.le_related_element.text()
-            related_property = prop_utils.get_property_by_code(code, bsdd_dictionary)
+            if dict_utils.is_uri(code):
+                related_property = prop_utils.get_property_by_uri(code, bsdd_dictionary)
+            else:
+                related_property = prop_utils.get_property_by_code(code, bsdd_dictionary)
             if not related_property:
                 clear_inputs()
                 return
@@ -266,19 +274,18 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
     @classmethod
     def read_relation(
         cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
-    ):
+    ) -> tuple[BsddProperty | BsddClass, BsddProperty | BsddClass, str]:
         start_data = relation._parent_ref()
         relation_type = relation.RelationType
 
         if isinstance(relation, BsddClassRelation):
             related_uri = relation.RelatedClassUri
-            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
-            end_data = cl_utils.get_class_by_code(bsdd_dictionary, code)
+            end_data = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
 
         elif isinstance(relation, BsddPropertyRelation):
             related_uri = relation.RelatedPropertyUri
             code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
-            end_data = prop_utils.get_property_by_code(code)
+            end_data = prop_utils.get_property_by_code(code, bsdd_dictionary)
         return start_data, end_data, relation_type
 
     @classmethod
@@ -289,12 +296,15 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         mode: Literal["add"] | Literal["remove"] = "add",
     ):
         start_class, end_class, relation_type = cls.read_relation(relation, bsdd_dictionary)
-        start_uri = cl_utils.build_bsdd_uri(start_class, bsdd_dictionary)
-
+        if not start_class.OwnedUri:
+            start_uri = cl_utils.build_bsdd_uri(start_class, bsdd_dictionary)
+        else:
+            start_uri = start_class.OwnedUri
         inverse_relations = {
             "IsChildOf": "IsParentOf",
             "HasPart": "IsPartOf",
             "IsEqualTo": "IsEqualTo",
+            "IsSimilarTo": "IsSimilarTo",
         }
         for k, v in dict(inverse_relations).items():
             inverse_relations[v] = k
@@ -328,3 +338,54 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
                 if cr.RelatedClassUri == start_uri and cr.RelationType == end_type:
                     end_class.ClassRelations.remove(cr)
                     cls.signals.class_relation_removed.emit(cr)
+
+    @classmethod
+    def make_property_relation_bidirectional(
+        cls,
+        relation: BsddPropertyRelation,
+        bsdd_dictionary: BsddDictionary,
+        mode: Literal["add"] | Literal["remove"] = "add",
+    ):
+        start_property, end_property, relation_type = cls.read_relation(relation, bsdd_dictionary)
+        end_property: BsddProperty
+
+        if not start_property.OwnedUri:
+            start_uri = prop_utils.build_bsdd_uri(start_property, bsdd_dictionary)
+        else:
+            start_uri = start_property.OwnedUri
+        inverse_relations = {
+            "IsSimilarTo": "IsSimilarTo",
+            "IsEqualTo": "IsEqualTo",
+        }
+        for k, v in dict(inverse_relations).items():
+            inverse_relations[v] = k
+
+        if relation_type not in inverse_relations:
+            return
+
+        relation_found = False
+        for pr in end_property.PropertyRelations:
+            if (
+                pr.RelatedPropertyUri == start_uri
+                and pr.RelationType == inverse_relations[relation_type]
+            ):
+                relation_found = True
+        if relation_found and mode == "add":
+            return
+        if not relation_found and mode == "remove":
+            return
+        end_type = inverse_relations.get(relation_type)
+        if mode == "add":
+            rel = BsddPropertyRelation(
+                RelationType=end_type,
+                RelatedPropertyUri=start_uri,
+                RelatedPropertyName=start_property.Name,
+            )
+            rel._set_parent(end_property)
+            end_property.PropertyRelations.append(rel)
+            cls.signals.property_relation_added.emit(rel)
+        elif mode == "remove":
+            for pr in list(end_property.PropertyRelations):
+                if pr.RelatedPropertyUri == start_uri and pr.RelationType == end_type:
+                    end_property.PropertyRelations.remove(pr)
+                    cls.signals.property_relation_removed.emit(pr)

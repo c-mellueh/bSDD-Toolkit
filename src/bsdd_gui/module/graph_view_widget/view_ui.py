@@ -270,6 +270,14 @@ class GraphView(QGraphicsView):
         super().resizeEvent(event)
 
     def mousePressEvent(self, event):
+        # Log scene coordinates for every mouse click
+        try:
+            pos_view = self._event_qpoint(event)
+            pos_scene = self.mapToScene(pos_view)
+            print(f"[GraphView] click scene pos: ({pos_scene.x():.2f}, {pos_scene.y():.2f})")
+        except Exception:
+            pass
+
         if event.button() == Qt.MiddleButton:
             # Start manual panning with middle mouse
             self._panning_mmb = True

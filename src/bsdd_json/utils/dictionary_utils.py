@@ -1,6 +1,22 @@
+from __future__ import annotations
 from urllib.parse import urlparse, quote
 import re
 import unicodedata
+from typing import TYPE_CHECKING,TypedDict
+if TYPE_CHECKING:
+    from bsdd_json.models import BsddDictionary, BsddClass
+
+
+class UriDict(TypedDict):
+    scheme: str
+    host: str
+    path_segments: list[str]
+    after_uri: list[str]
+    namespace: str | None
+    version: str | None
+    resource_type: str | None
+    resource_id: str | None
+
 
 def slugify(text: str, *, delimiter: str = "-", lowercase: bool = False, max_length: int | None = None) -> str:
     """
@@ -98,7 +114,7 @@ def is_uri(s: str) -> bool:
         return False
 
 
-def parse_bsdd_url(url: str) -> dict:
+def parse_bsdd_url(url: str) -> UriDict:
     from urllib.parse import urlparse
 
     p = urlparse(url)
@@ -138,8 +154,19 @@ def parse_bsdd_url(url: str) -> dict:
 
     return result
 
+def bsdd_dictionary_url(bsdd_dictionary: BsddDictionary) -> str:
+    data = {
+        "namespace": [bsdd_dictionary.OrganizationCode, bsdd_dictionary.DictionaryCode],
+        "version": bsdd_dictionary.DictionaryVersion,
+        "resource_type": "dictionary",
+        "resource_id": "",
+    }
+    if bsdd_dictionary.UseOwnUri:
+        data["host"] = bsdd_dictionary.DictionaryUri
 
-def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
+    return build_bsdd_url(data, trailing_slash=True)
+
+def build_bsdd_url(data: UriDict, trailing_slash: bool = False) -> str:
     """
     Build a buildingSMART identifier URI from a dict produced by parse_bsdd_url
     or from a dict with keys:
@@ -180,7 +207,11 @@ def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
     rtype = data.get("resource_type")
     rid = data.get("resource_id")
 
-    if ns_parts and version and rtype and rid:
+    if rtype == "dictionary"  and ns_parts and version:
+        after = [*ns_parts, str(version)]
+        parts = ["uri", *after]
+        path = "/" + "/".join(q(p) for p in parts)
+    elif ns_parts and version and rtype and rid:
         after = [*ns_parts, str(version), str(rtype), str(rid)]
         parts = ["uri", *after]
         path = "/" + "/".join(q(p) for p in parts)
@@ -218,3 +249,13 @@ def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
             url = url[:-1]
 
     return url
+
+
+def is_external_ref(uri:str,bsdd_dictionary:BsddDictionary) -> bool:
+    if not uri:
+        return False
+    from .dictionary_utils import get_dictionary_path_from_uri,bsdd_dictionary_url
+    dict_path = get_dictionary_path_from_uri(uri)
+    if dict_path == bsdd_dictionary_url(bsdd_dictionary):
+        return False
+    return True

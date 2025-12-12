@@ -38,11 +38,7 @@ class RelationshipModel(ItemModel):
     def rowCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0
-        if isinstance(self.bsdd_data, BsddClass):
-            base_count = len(self.bsdd_data.ClassRelations)
-        else:
-            base_count = len(self.bsdd_data.PropertyRelations)
-        return base_count + len(self.virtual_append) - len(self.virtual_remove)
+        return len(self.get_virtual_list())
 
     def get_virtual_list(self) -> list[BsddClassRelation | BsddPropertyRelation]:
         if isinstance(self.bsdd_data, BsddClass):

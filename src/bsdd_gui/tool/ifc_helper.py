@@ -4,6 +4,7 @@ import logging
 
 import bsdd_gui
 import re
+from bsdd_gui.module.ifc_helper.data import IfcHelperData
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ifc_helper.prop import IfcHelperProperties
@@ -28,3 +29,7 @@ class IfcHelper:
             entity, predefined = match.groups()
         return entity, predefined
         return term, None
+
+    @classmethod
+    def get_classes(cls):
+        return IfcHelperData.get_classes()

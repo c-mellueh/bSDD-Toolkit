@@ -183,7 +183,7 @@ class ClassTreeModel(ItemModel):
         md = QMimeData()
         md.setData(
             JSON_MIME,
-            QByteArray(self._classes_to_json_bytes(sel, include_subtree=True)),
+            QByteArray(self._classes_to_json_bytes(sel)),
         )
         md.setData(CODES_MIME, QByteArray(json.dumps([c.Code for c in sel]).encode("utf-8")))
         md.setText(json.dumps([c.Code for c in sel], ensure_ascii=False))
@@ -232,13 +232,17 @@ class ClassTreeModel(ItemModel):
             stack.extend(cl_utils.get_children(n))
         return out
 
-    def _classes_to_json_bytes(self, classes: list[BsddClass], *, include_subtree: bool) -> bytes:
+    def _classes_to_json_bytes(
+        self, classes: list[BsddClass], *, subtree_codes: set[str] | None = None
+    ) -> bytes:
         # flat list of class dicts (optionally entire subtrees of each selection)
         export_list = []
         roots = []
         seen_class_code = set()
         seen_property_code = set()
-
+        include_subtree_codes = (
+            subtree_codes if subtree_codes is not None else {c.Code for c in classes if c.Code}
+        )
         dictionary_properties = list()
 
         def add_property(p: BsddProperty):
@@ -258,11 +262,9 @@ class ClassTreeModel(ItemModel):
 
         for c in classes:
             roots.append(c.Code)
-            if include_subtree:
-                for n in self._collect_subtree(c):
-                    add_class(n)
-            else:
-                add_class(c)
+            targets = self._collect_subtree(c) if c.Code in include_subtree_codes else [c]
+            for n in targets:
+                add_class(n)
 
         payload = {
             "kind": "BsddClassTransfer",
