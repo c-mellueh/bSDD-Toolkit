@@ -237,3 +237,13 @@ def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
             url = url[:-1]
 
     return url
+
+
+def is_external_ref(uri:str,bsdd_dictionary:BsddDictionary) -> bool:
+    if not uri:
+        return False
+    from .dictionary_utils import get_dictionary_path_from_uri,bsdd_dictionary_url
+    dict_path = get_dictionary_path_from_uri(uri)
+    if dict_path == bsdd_dictionary_url(bsdd_dictionary):
+        return False
+    return True

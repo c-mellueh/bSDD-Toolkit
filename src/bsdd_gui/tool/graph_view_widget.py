@@ -322,18 +322,17 @@ class GraphViewWidget(ActionTool, WidgetTool):
         offset_step = QPointF(24.0, 18.0)
         cur = QPointF(position)
         new_nodes = list()
+
         existing_nodes = {n for n in scene.nodes if hasattr(n, "bsdd_data")}
+        external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
         internal_nodes = {
             cl_utils.build_bsdd_uri(n.bsdd_data, bsdd_dictionary): n
             for n in existing_nodes
-            if not n.is_external and isinstance(n.bsdd_data, BsddClass)
+            if n.node_type == constants.CLASS_NODE_TYPE
         }
-        external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
 
         for bsdd_class in classes:
             class_uri = cl_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary)
-            if class_uri in internal_nodes:
-                continue
             new_node = cls.add_node(scene, bsdd_class, pos=cur, is_external=False)
             new_nodes.append(new_node)
             internal_nodes[class_uri] = new_node
@@ -354,7 +353,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 if related_uri in internal_nodes:
                     continue
                 related_bsdd_class = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
-                if cl_utils.is_external_ref(related_bsdd_class.OwnedUri, bsdd_dictionary):
+                if related_bsdd_class.OwnedUri and cl_utils.is_external_ref(
+                    related_bsdd_class.OwnedUri, bsdd_dictionary
+                ):
                     new_node = cls.add_node(scene, related_bsdd_class, pos=cur, is_external=True)
                     external_nodes[related_bsdd_class.OwnedUri] = new_node.bsdd_data
 
@@ -363,6 +364,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                     internal_nodes[cl_utils.build_bsdd_uri(related_bsdd_class, bsdd_dictionary)] = (
                         new_node.bsdd_data
                     )
+                new_nodes.append(new_node)
                 cur += offset_step
         return new_nodes
 
@@ -437,10 +439,16 @@ class GraphViewWidget(ActionTool, WidgetTool):
         }
 
         property_codes = {
-            pn.bsdd_data.Code: pn for pn in nodes if pn.node_type == constants.PROPERTY_NODE_TYPE
+            pn.bsdd_data.Code: pn
+            for pn in nodes
+            if pn.node_type in (constants.PROPERTY_NODE_TYPE, constants.EXTERNAL_PROPERTY_NODE_TYPE)
         }
         full_property_uris = {
-            prop_utils.build_bsdd_uri(pn.bsdd_data, bsdd_dictionary): pn
+            (
+                prop_utils.build_bsdd_uri(pn.bsdd_data, bsdd_dictionary)
+                if not pn.is_external
+                else pn.bsdd_data.OwnedUri
+            ): pn
             for pn in property_codes.values()
         }
 
@@ -524,6 +532,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     @classmethod
     def find_class_property_relations(
         cls,
+        bsdd_dictionary: BsddDictionary,
         nodes: list[graphics_items.Node],
         property_codes: dict,
         existing_relations_dict: dict[str, dict[tuple[str, str, str, str], graphics_items.Edge]],
@@ -535,7 +544,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 continue
             start_class = start_node.bsdd_data
             for cp in start_class.ClassProperties:
-                if prop_utils.is_external_ref(cp):
+                if cp.OwnedUri and dict_utils.is_external_ref(cp.OwnedUri, bsdd_dictionary):
                     continue
                 related_node = property_codes.get(cp.PropertyCode)
                 if related_node is None:
@@ -576,6 +585,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     @classmethod
     def insert_properties_in_scene(
         cls,
+        bsdd_dictionary: BsddDictionary,
         scene: view_ui.GraphScene,
         bsdd_properties: list[BsddProperty],
         position: QPointF = None,
@@ -584,17 +594,46 @@ class GraphViewWidget(ActionTool, WidgetTool):
             position = QPointF(scene.sceneRect().width() / 2, scene.sceneRect().height() / 2)
         offset_step = QPointF(24.0, 18.0)
         cur = QPointF(position)
-        existing_property_codes = {
-            n.bsdd_data.Code: n
-            for n in scene.nodes
-            if hasattr(n, "bsdd_data") and n.node_type == constants.PROPERTY_NODE_TYPE
-        }
 
+        new_nodes = list()
+        existing_nodes = {n for n in scene.nodes if hasattr(n, "bsdd_data")}
+        external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
+        internal_nodes = {
+            prop_utils.build_bsdd_uri(n.bsdd_data, bsdd_dictionary): n
+            for n in existing_nodes
+            if n.node_type == constants.PROPERTY_NODE_TYPE
+        }
         for bsdd_property in bsdd_properties:
-            if bsdd_property.Code in existing_property_codes:
+            prop_uri = prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
+            if prop_uri in internal_nodes:
                 continue
-            n = cls.add_node(scene, bsdd_property, pos=cur)
+            new_node = cls.add_node(scene, bsdd_property, pos=cur, is_external=False)
+            new_nodes.append(new_node)
+            internal_nodes[prop_uri] = new_node
             cur += offset_step
+
+            for property_relation in bsdd_property.PropertyRelations:
+                related_uri = property_relation.RelatedPropertyUri
+                if related_uri in external_nodes:
+                    continue
+                if related_uri in internal_nodes:
+                    continue
+                related_bsdd_property = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
+                if related_bsdd_property.OwnedUri and dict_utils.is_external_ref(
+                    related_bsdd_property.OwnedUri, bsdd_dictionary
+                ):
+                    new_node = cls.add_node(scene, related_bsdd_property, pos=cur, is_external=True)
+                    external_nodes[related_bsdd_property.OwnedUri] = new_node.bsdd_data
+                else:
+                    new_node = cls.add_node(
+                        scene, related_bsdd_property, pos=cur, is_external=False
+                    )
+                    internal_nodes[
+                        cl_utils.build_bsdd_uri(related_bsdd_property, bsdd_dictionary)
+                    ] = new_node.bsdd_data
+                new_nodes.append(new_node)
+                cur += offset_step
+        return new_nodes
 
     @classmethod
     def get_view(cls) -> view_ui.GraphView:
@@ -756,7 +795,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if relation not in constants.CLASS_RELATIONS:
             return
         if relation == constants.IFC_REFERENCE_REL:
-            if not isinstance(end_class,constants.IFC_NODE_TYPE):
+            if not isinstance(end_class, constants.IFC_NODE_TYPE):
                 return
             rienl = [x.lower() for x in start_class.RelatedIfcEntityNamesList or []]
             if end_class.Code.lower() not in rienl:
@@ -1000,7 +1039,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         if isinstance(relation, BsddClassRelation):
             related_uri = relation.RelatedClassUri
-            end_data = cl_utils.get_class_by_uri(bsdd_dictionary,related_uri)
+            end_data = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
 
         elif isinstance(relation, BsddPropertyRelation):
             related_uri = relation.RelatedPropertyUri
@@ -1051,8 +1090,10 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if not scene:
             return None
         start_data, end_data, relation_type = cls.read_relation(relation, bsdd_dictionary)
-        start_node,end_node = cls.get_node_from_bsdd_data(start_data),cls.get_node_from_bsdd_data(end_data)
-        return cls.get_edge_from_nodes(start_node,end_node , relation_type)
+        start_node, end_node = cls.get_node_from_bsdd_data(start_data), cls.get_node_from_bsdd_data(
+            end_data
+        )
+        return cls.get_edge_from_nodes(start_node, end_node, relation_type)
 
     @classmethod
     def get_relation_from_edge(cls, edge: graphics_items.Edge, bsdd_dictionary: BsddDictionary):

@@ -192,7 +192,7 @@ def popuplate_widget(
     graph_view.center_scene()
     position += QPointF(40.0, 40.0)
     graph_view.insert_properties_in_scene(
-        graph_view.get_scene(), bsdd_dictionary.Properties, position
+        bsdd_dictionary, graph_view.get_scene(), bsdd_dictionary.Properties, position
     )
     recalculate_edges(graph_view, project)
 
@@ -233,7 +233,9 @@ def handle_drop_event(
     new_class_nodes = graph_view.insert_classes_in_scene(
         bsdd_dictionary, scene, classes_to_add, scene_pos, ifc_classes=ifc_classes
     )
-    new_property_nodes = graph_view.insert_properties_in_scene(scene, properties_to_add, scene_pos)
+    new_property_nodes = graph_view.insert_properties_in_scene(
+        bsdd_dictionary, scene, properties_to_add, scene_pos
+    )
     recalculate_edges(graph_view, project)
     event.acceptProposedAction()
 
@@ -255,7 +257,7 @@ def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool
         relations_dict,
     ) = graph_view.get_code_dicts(scene, bsdd_dictionary)
     new_edges = graph_view.find_class_relations(nodes, class_codes, full_class_uris, relations_dict)
-    new_edges += graph_view.find_class_property_relations(nodes, property_codes, relations_dict)
+    new_edges += graph_view.find_class_property_relations(bsdd_dictionary,nodes, property_codes, relations_dict)
     new_edges += graph_view.find_property_relations(
         nodes, property_codes, full_property_uris, relations_dict
     )
@@ -298,7 +300,11 @@ def create_relation(
         if end_node.node_type == constants.PROPERTY_NODE_TYPE:
             if relation_type == constants.C_P_REL:
                 graph_view.create_class_property_relation(start_node, end_node, project.get())
-        elif end_node.node_type  in [constants.CLASS_NODE_TYPE,constants.IFC_NODE_TYPE,constants.EXTERNAL_CLASS_NODE_TYPE]:
+        elif end_node.node_type in [
+            constants.CLASS_NODE_TYPE,
+            constants.IFC_NODE_TYPE,
+            constants.EXTERNAL_CLASS_NODE_TYPE,
+        ]:
             graph_view.create_class_class_relation(
                 start_node, end_node, project.get(), relation_type
             )

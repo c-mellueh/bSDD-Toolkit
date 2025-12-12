@@ -42,6 +42,7 @@ class Cache:
             result = _make_request()
             if result is not None:
                 result = BsddProperty.model_validate(result)
+                result.OwnedUri = property_uri
             cls.data[property_uri] = result
         return cls.data[property_uri]
 
@@ -58,22 +59,27 @@ def get_data_type(class_property: BsddClassProperty):
         return None
     return prop.DataType
 
-
-def is_external_ref(class_property: BsddClassProperty) -> bool:
-    if class_property.PropertyUri and class_property.PropertyCode:
-        raise ValueError(
-            f"PropertyCode '{class_property.PropertyCode}'and PropertyUri '{class_property.PropertyUri}' are filled! only one is allowed!"
-        )
-    elif class_property.PropertyUri:
-        return True
-    else:
-        return False
+def get_dictionary_from_property(
+    bsdd_property: BsddClassProperty | BsddProperty,
+) -> BsddDictionary | None:
+    if isinstance(bsdd_property, BsddClassProperty):
+        bsdd_class = bsdd_property.parent()
+        if bsdd_class is None:
+            return None
+        return bsdd_class.parent()
+    elif isinstance(bsdd_property, BsddProperty):
+        return bsdd_property.parent()
+    return None
 
 
 def get_internal_property(
     class_property: BsddClassProperty, bsdd_dictionary=None
 ) -> BsddProperty | None:
-    if is_external_ref(class_property):
+    from bsdd_json.utils.dictionary_utils import is_external_ref
+
+    if class_property.OwnedUri and is_external_ref(
+        class_property.OwnedUri, bsdd_dictionary
+    ):
         return None
     bsdd_class = class_property.parent()
     if bsdd_dictionary is None and bsdd_class is None:
@@ -148,6 +154,21 @@ def get_property_by_code(
     else:
         prop = get_property_code_dict(bsdd_dictionary).get(code)
     return prop
+
+
+def get_property_by_uri(uri: str, bsdd_dictionary: BsddDictionary):
+    if dict_utils.is_uri(uri):
+        if dict_utils.is_external_ref(uri, bsdd_dictionary):
+            bsdd_property = Cache.get_external_property(uri)
+        else:
+            code = dict_utils.parse_bsdd_url(uri).get("resource_id")
+            bsdd_property = get_all_property_codes(bsdd_dictionary).get(code)
+    else:
+        bsdd_property = get_all_property_codes(bsdd_dictionary).get(uri)
+    return bsdd_property
+
+def get_all_property_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddClass]:
+    return {c.Code: c for c in bsdd_dictionary.Properties}
 
 
 def update_internal_relations_to_new_version(
@@ -267,12 +288,16 @@ def get_values(class_property: BsddClassProperty):
 
 
 def get_property_by_class_property(
-    class_prop: BsddClassProperty,
+    class_prop: BsddClassProperty, bsdd_dictionary=None
 ) -> BsddProperty | None:
-    if not is_external_ref(class_prop):
-        return get_internal_property(class_prop)
-    else:
+    if bsdd_dictionary is None:
+        bsdd_dictionary = get_dictionary_from_property(class_prop)
+    if class_prop.OwnedUri and dict_utils.is_external_ref(
+        class_prop.OwnedUri, bsdd_dictionary
+    ):
         return get_external_property(class_prop)
+    else:
+        return get_internal_property(class_prop)
 
 
 def get_class_properties_by_pset_name(bsdd_class: BsddClass, pset_name: str):
