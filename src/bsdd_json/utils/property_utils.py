@@ -59,6 +59,7 @@ def get_data_type(class_property: BsddClassProperty):
         return None
     return prop.DataType
 
+
 def get_dictionary_from_property(
     bsdd_property: BsddClassProperty | BsddProperty,
 ) -> BsddDictionary | None:
@@ -135,7 +136,7 @@ def get_classes_with_bsdd_property(property_code: str, bsdd_dictionary: BsddDict
     return list(filter(_has_prop, bsdd_dictionary.Classes))
 
 
-def get_class_properties_from_property(
+def get_class_properties_from_property_code(
     property_code: str, bsdd_dictionary: BsddDictionary
 ) -> list[BsddClassProperty]:
     bsdd_class_properties = list()
@@ -145,13 +146,23 @@ def get_class_properties_from_property(
                 bsdd_class_properties.append(bsdd_class_property)
     return bsdd_class_properties
 
+def get_class_properties_from_property_uri(
+    property_uri: str, bsdd_dictionary: BsddDictionary
+) -> list[BsddClassProperty]:
+    bsdd_class_properties = list()
+    for bsdd_class in bsdd_dictionary.Classes:
+        for bsdd_class_property in bsdd_class.ClassProperties:
+            if bsdd_class_property.PropertyUri == property_uri:
+                bsdd_class_properties.append(bsdd_class_property)
+    return bsdd_class_properties
 
 def get_property_by_code(
     code: str, bsdd_dictionary: BsddDictionary
 ) -> BsddProperty | None:
     if dict_utils.is_uri(code):
         logging.warning(
-            "function DEPRECATED get_property_by_code called with URI. Use get_property_by_uri instead.")
+            "function DEPRECATED get_property_by_code called with URI. Use get_property_by_uri instead."
+        )
         return get_property_by_uri(code, bsdd_dictionary)
     return get_property_code_dict(bsdd_dictionary).get(code)
 
@@ -166,6 +177,7 @@ def get_property_by_uri(uri: str, bsdd_dictionary: BsddDictionary):
     else:
         bsdd_property = get_all_property_codes(bsdd_dictionary).get(uri)
     return bsdd_property
+
 
 def get_all_property_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddClass]:
     return {c.Code: c for c in bsdd_dictionary.Properties}
@@ -207,9 +219,14 @@ def build_bsdd_uri(bsdd_property: BsddProperty, bsdd_dictionary: BsddDictionary)
 def get_most_used_property_set(
     bsdd_property: BsddProperty, bsdd_dictionary: BsddDictionary
 ) -> str | None:
-    class_properties = get_class_properties_from_property(
-        bsdd_property.Code, bsdd_dictionary
-    )
+    if bsdd_property.OwnedUri:
+        class_properties = get_class_properties_from_property_uri(
+            bsdd_property.OwnedUri, bsdd_dictionary
+        )
+    else:
+        class_properties = get_class_properties_from_property_code(
+            bsdd_property.Code, bsdd_dictionary
+        )
     name_dict = dict()
     for cp in class_properties:
         pset = cp.PropertySet
@@ -222,24 +239,28 @@ def get_most_used_property_set(
     return sorted_list[0][0]
 
 
-def create_class_property_from_internal_property(
-    bsdd_property: BsddProperty, bsdd_class: BsddClass
+def create_class_property_from_property(
+    bsdd_property: BsddProperty, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary
 ) -> BsddClassProperty:
     existing_codes = [p.Code for p in bsdd_class.ClassProperties]
     code = build_unique_code(bsdd_property.Code, existing_codes)
-    new_property = BsddClassProperty(Code=code, PropertyCode=bsdd_property.Code)
-    pset = get_most_used_property_set(bsdd_property, bsdd_property._parent_ref())
+    if bsdd_property.OwnedUri:
+        new_property = BsddClassProperty(Code=code, PropertyUri=bsdd_property.OwnedUri)
+    else:
+        new_property = BsddClassProperty(Code=code, PropertyCode=bsdd_property.Code)
+
+    pset = get_most_used_property_set(bsdd_property, bsdd_dictionary)
     if pset:
         new_property.PropertySet = pset
     if bsdd_property.Units:
-        new_property.Unit = BsddProperty.Units[0]
+        new_property.Unit = bsdd_property.Units[0]
     new_property.IsRequired = True
     new_property.AllowedValues = bsdd_property.AllowedValues
     return new_property
 
 
 def get_property_relation(
-    start_property: BsddProperty, end_uri:str, relation_type: str
+    start_property: BsddProperty, end_uri: str, relation_type: str
 ) -> BsddPropertyRelation | None:
     for relation in start_property.PropertyRelations:
         if (
@@ -292,8 +313,9 @@ def get_property_by_class_property(
     if bsdd_dictionary is None:
         bsdd_dictionary = get_dictionary_from_property(class_prop)
     if class_prop.PropertyUri:
-        return get_property_by_uri(class_prop.PropertyUri,bsdd_dictionary)
-    return get_property_by_code(class_prop.PropertyCode,bsdd_dictionary)
+        return get_property_by_uri(class_prop.PropertyUri, bsdd_dictionary)
+    return get_property_by_code(class_prop.PropertyCode, bsdd_dictionary)
+
 
 def get_class_properties_by_pset_name(bsdd_class: BsddClass, pset_name: str):
     return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]

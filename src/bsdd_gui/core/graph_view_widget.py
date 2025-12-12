@@ -289,7 +289,7 @@ def create_relation(
 
     if start_node.node_type == constants.CLASS_NODE_TYPE:
 
-        if end_node.node_type == constants.PROPERTY_NODE_TYPE:
+        if end_node.node_type in [constants.PROPERTY_NODE_TYPE,constants.EXTERNAL_PROPERTY_NODE_TYPE]:
             if relation_type == constants.C_P_REL:
                 graph_view.create_class_property_relation(start_node, end_node, project.get())
         elif end_node.node_type in [

@@ -772,20 +772,19 @@ class GraphViewWidget(ActionTool, WidgetTool):
         )
         bsdd_property = (
             start_node.bsdd_data
-            if start_node.node_type == constants.PROPERTY_NODE_TYPE
+            if start_node.node_type
+            in [constants.PROPERTY_NODE_TYPE, constants.EXTERNAL_PROPERTY_NODE_TYPE]
             else end_node.bsdd_data
         )
 
         # check if relationship exists allready
         for bsdd_class_property in bsdd_class.ClassProperties:
-            if bsdd_property == prop_utils.get_internal_property(
+            if bsdd_property == prop_utils.get_property_by_class_property(
                 bsdd_class_property, bsdd_dictionary
             ):
                 return
 
-        new_property = prop_utils.create_class_property_from_internal_property(
-            bsdd_property, bsdd_class
-        )
+        new_property = prop_utils.create_class_property_from_property(bsdd_property, bsdd_class,bsdd_dictionary)
         new_property._set_parent(bsdd_class)
         bsdd_class.ClassProperties.append(new_property)
         cls.signals.new_class_property_created.emit(new_property)
@@ -941,13 +940,19 @@ class GraphViewWidget(ActionTool, WidgetTool):
                     cls.signals.edge_removed.emit(edge)
                     cls.signals.class_relation_removed.emit(class_relation)
             elif isinstance(end_data, BsddProperty):
-                class_property = {cp.PropertyCode: cp for cp in start_data.ClassProperties}.get(
-                    end_data.Code
-                )
+                if end_node.is_external:
+                    class_property = {
+                        cp.PropertyUri: cp for cp in start_data.ClassProperties if cp.PropertyUri
+                    }.get(end_data.OwnedUri)
+                else:
+                    class_property = {cp.PropertyCode: cp for cp in start_data.ClassProperties}.get(
+                        end_data.Code
+                    )
                 if class_property is None:
                     return
                 start_data.ClassProperties.remove(class_property)
                 cls.signals.class_property_removed.emit(class_property, start_data)
+
         elif isinstance(start_data, BsddProperty):
             if isinstance(end_data, BsddProperty):
                 if end_node.is_external:
@@ -1067,7 +1072,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         elif isinstance(relation, BsddPropertyRelation):
             related_uri = relation.RelatedPropertyUri
-            end_data = prop_utils.get_property_by_uri(related_uri,bsdd_dictionary)
+            end_data = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
         return start_data, end_data, relation_type
 
     @classmethod
