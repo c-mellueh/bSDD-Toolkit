@@ -121,7 +121,7 @@ def connect_signals(
         relation = graph_view.get_relation_from_edge(edge, project.get())
         if isinstance(relation, BsddClassRelation):
             project.signals.class_relation_added.emit(relation)
-        if isinstance(relation, BsddClassRelation):
+        if isinstance(relation, BsddPropertyRelation):
             project.signals.property_relation_added.emit(relation)
 
     graph_view.signals.new_edge_created.connect(handle_edge_add)

@@ -92,6 +92,17 @@ def connect_signals(
             r, project.get(), mode="remove"
         )
     )
+    project.signals.property_relation_added.connect(
+        lambda r: relationship_editor.make_property_relation_bidirectional(
+            r, project.get(), mode="add"
+        )
+    )
+
+    project.signals.property_relation_removed.connect(
+        lambda r: relationship_editor.make_property_relation_bidirectional(
+            r, project.get(), mode="remove"
+        )
+    )
 
 
 def retranslate_ui(relationship_editor: Type[tool.RelationshipEditorWidget]):
