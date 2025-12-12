@@ -11,11 +11,13 @@ if TYPE_CHECKING:
     from bsdd_gui.module.dictionary_editor_widget import ui as ui_dict
     from bsdd_gui.presets.ui_presets import ToggleSwitch
     from bsdd_gui.module.class_editor_widget import ui as ui_class
+    from bsdd_gui.module.property_editor_widget import ui as ui_property
 
 def connect_signals(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     project: Type[tool.Project],
     class_editor: Type[tool.ClassEditorWidget],
+    property_editor:Type[tool.PropertyEditorWidget]
 ):
     project.signals.data_changed.connect(
         lambda n, v: relationship_editor.update_on_dict_change(n, v, project.get())
@@ -36,13 +38,20 @@ def connect_signals(
         relationship_editor.transform_virtual_relations_to_real
     )
 
-    def unregister_widget(class_dialog: ui_class.EditDialog):
+    def unregister_class_widget(class_dialog: ui_class.EditDialog):
         data = class_dialog._widget.bsdd_data
         widget = relationship_editor.get_widget(data)
         relationship_editor.unregister_widget(widget)
 
-    class_editor.signals.dialog_accepted.connect(unregister_widget)
-    class_editor.signals.dialog_declined.connect(unregister_widget)
+    def unregister_property_widget(property_widget: ui_property.PropertyEditor):
+        data = property_widget.bsdd_data
+        widget = relationship_editor.get_widget(data)
+        relationship_editor.unregister_widget(widget)
+
+    class_editor.signals.dialog_accepted.connect(unregister_class_widget)
+    class_editor.signals.dialog_declined.connect(unregister_class_widget)
+
+    property_editor.signals.widget_closed.connect(unregister_property_widget)
 
     relationship_editor.connect_internal_signals()
 
