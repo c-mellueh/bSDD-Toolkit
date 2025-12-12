@@ -15,7 +15,7 @@ from bsdd_json import (
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils as class_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
-
+from random import random
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
 import webbrowser
 import json
@@ -487,15 +487,21 @@ def add_node_by_lineinput(
     view = window.view
     bsdd_class, bsdd_property = None, None
     scene_pos =  view.mapToScene(view.viewport().rect().center())
+    scene_pos+= QPointF(random(),random())
     scene = view.scene()
 
     if not text:
         return
     
+    uri_dict, relations_dict = graph_view.get_code_dicts(scene, project.get())
+
+
     if dict_utils.is_uri(text):
+        if text in uri_dict:
+            return
         is_external = dict_utils.is_external_ref(text,project.get())
-        uri_dict = dict_utils.parse_bsdd_url(text)
-        resource_type = uri_dict.get("resource_type")
+        resource_type = dict_utils.parse_bsdd_url(text).get("resource_type")
+        
         if resource_type == "class":
             bsdd_class = class_utils.get_class_by_uri(project.get(), text)
             graph_view.add_node(scene, bsdd_class, pos=scene_pos, is_external=is_external)
@@ -509,8 +515,12 @@ def add_node_by_lineinput(
         bsdd_property = prop_utils.get_property_by_code(text,project.get())
 
         if bsdd_class:
+            if class_utils.build_bsdd_uri(bsdd_class, project.get()) in uri_dict:
+                return
             graph_view.add_node(scene, bsdd_class, pos=scene_pos, is_external=False)
         elif bsdd_property:
+            if prop_utils.build_bsdd_uri(bsdd_property, project.get()) in uri_dict:
+                return
             graph_view.add_node(scene, bsdd_property, pos=scene_pos, is_external=False)
         else:
             return

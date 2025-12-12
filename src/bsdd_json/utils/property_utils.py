@@ -249,7 +249,7 @@ def create_class_property_from_property(
     else:
         new_property = BsddClassProperty(Code=code, PropertyCode=bsdd_property.Code)
 
-    pset = get_most_used_property_set(bsdd_property, bsdd_dictionary)
+    pset = get_most_used_property_set(bsdd_property, bsdd_dictionary) or "ExternalPset"
     if pset:
         new_property.PropertySet = pset
     if bsdd_property.Units:
