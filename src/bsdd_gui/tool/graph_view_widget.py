@@ -333,12 +333,13 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
         for bsdd_class in classes:
             class_uri = cl_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary)
-            new_node = cls.add_node(scene, bsdd_class, pos=cur, is_external=False)
-            new_nodes.append(new_node)
-            internal_nodes[class_uri] = new_node
+            if class_uri not in internal_nodes:
+                new_node = cls.add_node(scene, bsdd_class, pos=cur, is_external=False)
+                new_nodes.append(new_node)
+                internal_nodes[class_uri] = new_node
+                cur += offset_step
 
             ifc_entities = bsdd_class.RelatedIfcEntityNamesList or []
-            cur += offset_step
             for e in ifc_entities:
                 new_node = cls.add_ifc_node(e, cur, ifc_classes, external_nodes)
                 if new_node:
@@ -605,12 +606,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
         }
         for bsdd_property in bsdd_properties:
             prop_uri = prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
-            if prop_uri in internal_nodes:
-                continue
-            new_node = cls.add_node(scene, bsdd_property, pos=cur, is_external=False)
-            new_nodes.append(new_node)
-            internal_nodes[prop_uri] = new_node
-            cur += offset_step
+            if prop_uri not in internal_nodes:
+                new_node = cls.add_node(scene, bsdd_property, pos=cur, is_external=False)
+                new_nodes.append(new_node)
+                internal_nodes[prop_uri] = new_node
+                cur += offset_step
 
             for property_relation in bsdd_property.PropertyRelations:
                 related_uri = property_relation.RelatedPropertyUri
