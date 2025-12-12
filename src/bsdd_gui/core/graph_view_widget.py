@@ -150,6 +150,7 @@ def create_widget(
     parent: QWidget | None,
     graph_view: Type[tool.GraphViewWidget],
     main_window: Type[tool.MainWindowWidget],
+    project: Type[tool.Project],
 ):
     # Default parent to the main window if not provided
     w = graph_view.get_widget()
@@ -163,6 +164,12 @@ def create_widget(
     w.activateWindow()
     w.raise_()
     return w
+
+
+def enter_window(
+    window: ui.GraphWindow, graph_view: tool.GraphViewWidget, project: Type[tool.Project]
+):
+    graph_view.update_add_completer(project.get())
 
 
 def register_widget(widget, graph_view: Type[tool.GraphViewWidget]):
@@ -487,13 +494,16 @@ def add_node_by_lineinput(
     view = window.view
     bsdd_class, bsdd_property = None, None
     scene_pos = view.mapToScene(view.viewport().rect().center())
-    scene_pos += QPointF(random(), random())
+    offset = QPointF(random() * 100, random() * 100)
+    print(offset)
+    scene_pos += offset  # slight random offset to avoid exact overlap
     scene = view.scene()
 
     if not text:
         return
 
     uri_dict, relations_dict = graph_view.get_uri_dicts(scene, project.get())
+    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
 
     if dict_utils.is_uri(text):
         if text in uri_dict:
@@ -503,10 +513,21 @@ def add_node_by_lineinput(
 
         if resource_type == "class":
             bsdd_class = class_utils.get_class_by_uri(project.get(), text)
-            graph_view.add_node(scene, bsdd_class, pos=scene_pos, is_external=is_external)
+            if is_external:
+                graph_view.add_node(scene, bsdd_class, pos=scene_pos, is_external=True)
+            else:
+                graph_view.insert_classes_in_scene(
+                    project.get(), scene, [bsdd_class], scene_pos, ifc_classes=ifc_classes
+                )
+
         elif resource_type == "prop":
             bsdd_property = prop_utils.get_property_by_uri(text, project.get())
-            graph_view.add_node(scene, bsdd_property, pos=scene_pos, is_external=is_external)
+            if is_external:
+                graph_view.add_node(scene, bsdd_property, pos=scene_pos, is_external=is_external)
+            else:
+                graph_view.insert_properties_in_scene(
+                    project.get(), scene, [bsdd_property], scene_pos
+                )
         else:
             return
     else:
@@ -516,13 +537,15 @@ def add_node_by_lineinput(
         if bsdd_class:
             if class_utils.build_bsdd_uri(bsdd_class, project.get()) in uri_dict:
                 return
-            graph_view.add_node(scene, bsdd_class, pos=scene_pos, is_external=False)
+            graph_view.insert_classes_in_scene(
+                project.get(), scene, [bsdd_class], scene_pos, ifc_classes=ifc_classes
+            )
+
         elif bsdd_property:
             if prop_utils.build_bsdd_uri(bsdd_property, project.get()) in uri_dict:
                 return
-            graph_view.add_node(scene, bsdd_property, pos=scene_pos, is_external=False)
+            graph_view.insert_properties_in_scene(project.get(), scene, [bsdd_property], scene_pos)
         else:
             return
-
     recalculate_edges(graph_view, project)
     window.node_input.clear()

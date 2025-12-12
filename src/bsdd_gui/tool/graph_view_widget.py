@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional, TypedDict
 import logging
 
 from PySide6.QtGui import QDropEvent, QColor
-from PySide6.QtWidgets import QWidget, QFileDialog
+from PySide6.QtWidgets import QWidget, QFileDialog,QCompleter
 from PySide6.QtCore import QPointF, QCoreApplication, QRectF, Qt
 import json
 
@@ -809,7 +809,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if relation not in constants.CLASS_RELATIONS:
             return
         if relation == constants.IFC_REFERENCE_REL:
-            if not isinstance(end_class, constants.IFC_NODE_TYPE):
+            if not end_node.node_type == constants.IFC_NODE_TYPE:
                 return
             rienl = [x.lower() for x in start_class.RelatedIfcEntityNamesList or []]
             if end_class.Code.lower() not in rienl:
@@ -1145,6 +1145,20 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 if rel.RelatedPropertyUri == end_uri:
                     return rel
 
+    @classmethod
+    def update_add_completer(cls,bsdd_dictionary:BsddDictionary):
+        if not bsdd_dictionary:
+            return
+        entries = list(cl_utils.get_all_class_codes(bsdd_dictionary).keys())
+        entries+= list(prop_utils.get_all_property_codes(bsdd_dictionary).keys())
+        widget = cls.get_widget()
+        if not widget:
+            return
+        completer = QCompleter(entries)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setFilterMode(Qt.MatchContains)  # substring match
+        completer.setCompletionMode(QCompleter.PopupCompletion)
+        widget.node_input.setCompleter(completer)
     ### BUchheim
 
     @classmethod

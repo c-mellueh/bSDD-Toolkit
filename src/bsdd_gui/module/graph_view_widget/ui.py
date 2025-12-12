@@ -94,7 +94,7 @@ class GraphWindow(QWidget):
         self.node_input = QLineEdit(bar)
         self.node_input.setPlaceholderText(self.tr("Add node by Code or URI and press Enter"))
         self.node_input.setClearButtonEnabled(True)
-        self.node_input.returnPressed.connect(lambda :trigger.add_node_by_lineinput(self))
+        self.node_input.returnPressed.connect(lambda: trigger.add_node_by_lineinput(self))
         self.node_input.setStyleSheet(
             """
             QLineEdit {
@@ -168,9 +168,9 @@ class GraphWindow(QWidget):
         cls = cl_utils.get_class_by_code(bsdd_dictionary, query) or cl_utils.get_class_by_uri(
             bsdd_dictionary, query
         )
-        prop = prop_utils.get_property_by_code(query, bsdd_dictionary) or prop_utils.get_property_by_uri(
+        prop = prop_utils.get_property_by_code(
             query, bsdd_dictionary
-        )
+        ) or prop_utils.get_property_by_uri(query, bsdd_dictionary)
         if cls:
             matches.append(("class", cls))
         if prop:
@@ -263,6 +263,9 @@ class GraphWindow(QWidget):
         self._position_edge_settings()
         return super().resizeEvent(event)
 
+    def enterEvent(self, event):
+        trigger.enter_window(self)
+        return super().enterEvent(event)
 
 
 if __name__ == "__main__":

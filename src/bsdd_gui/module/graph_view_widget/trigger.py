@@ -2,10 +2,12 @@ from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import graph_view_widget as core
-from PySide6.QtWidgets import QWidget,QLineEdit
+from PySide6.QtWidgets import QWidget, QLineEdit
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from . import ui
+
 
 def connect():
     core.connect_signals(
@@ -16,7 +18,9 @@ def connect():
         tool.Project,
     )
     core.connect_to_main_window(tool.GraphViewWidget, tool.MainWindowWidget)
-    w = core.create_widget(tool.MainWindowWidget.get(), tool.GraphViewWidget, tool.MainWindowWidget)
+    w = core.create_widget(
+        tool.MainWindowWidget.get(), tool.GraphViewWidget, tool.MainWindowWidget, tool.Project
+    )
     w.hide()
 
 
@@ -35,10 +39,10 @@ def widget_created(widget):
 
 
 def create_widget(parent: QWidget | None = None):
-    core.create_widget(parent, tool.GraphViewWidget, tool.MainWindowWidget)
+    core.create_widget(parent, tool.GraphViewWidget, tool.MainWindowWidget, tool.Project)
 
 
-def handle_drop_event(event, view:ui.GraphView):
+def handle_drop_event(event, view: ui.GraphView):
     core.handle_drop_event(
         event,
         view,
@@ -51,7 +55,7 @@ def handle_drop_event(event, view:ui.GraphView):
 
 
 def load_bsdd():
-    core.popuplate_widget(tool.GraphViewWidget, tool.Project,tool.IfcHelper)
+    core.popuplate_widget(tool.GraphViewWidget, tool.Project, tool.IfcHelper)
 
 
 def node_double_clicked(node):
@@ -65,7 +69,7 @@ def create_relation(start_node, end_node, relation_type):
 
 
 def delete_selection():
-    core.delete_selection(tool.GraphViewWidget,tool.Project)
+    core.delete_selection(tool.GraphViewWidget, tool.Project)
 
 
 def export_requested():
@@ -73,7 +77,7 @@ def export_requested():
 
 
 def import_requested():
-    core.import_graph(tool.GraphViewWidget, tool.Project, tool.Popups, tool.Appdata,tool.IfcHelper)
+    core.import_graph(tool.GraphViewWidget, tool.Project, tool.Popups, tool.Appdata, tool.IfcHelper)
 
 
 def recalculate_edges():
@@ -81,7 +85,12 @@ def recalculate_edges():
 
 
 def buchheim():
-    core.buchheim(tool.GraphViewWidget,tool.Project)
+    core.buchheim(tool.GraphViewWidget, tool.Project)
 
-def add_node_by_lineinput(window:ui.GraphWindow):
+
+def add_node_by_lineinput(window: ui.GraphWindow):
     core.add_node_by_lineinput(window, tool.GraphViewWidget, tool.Project, tool.IfcHelper)
+
+
+def enter_window(window: ui.GraphWindow):
+    core.enter_window(window, tool.GraphViewWidget, tool.Project)
