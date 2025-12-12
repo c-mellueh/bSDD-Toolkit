@@ -493,10 +493,10 @@ class GraphViewWidget(ActionTool, WidgetTool):
                 relation_type = constants.PARENT_CLASS
                 info = cls._info(start_node, related_node, bsdd_dictionary)
 
-            if related_node is not None and info not in existing_relations_dict[relation_type]:
-                edge = cls.create_edge(start_node, related_node, edge_type=constants.PARENT_CLASS)
-                new_edges.append(edge)
-                existing_relations_dict[relation_type][info] = edge
+                if related_node is not None and info not in existing_relations_dict[relation_type]:
+                    edge = cls.create_edge(start_node, related_node, edge_type=constants.PARENT_CLASS)
+                    new_edges.append(edge)
+                    existing_relations_dict[relation_type][info] = edge
 
             for relation in start_class.ClassRelations:
                 related_node = uri_dict.get(relation.RelatedClassUri)
