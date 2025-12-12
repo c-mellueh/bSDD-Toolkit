@@ -105,8 +105,9 @@ class GraphViewWidget(ActionTool, WidgetTool):
         bs.bt_tree.clicked.connect(lambda _: trigger.buchheim())
 
     @classmethod
-    def create_widget(cls, *args, **kwargs):
-        widget: ui.GraphWindow = super().create_widget(*args, **kwargs)
+    def create_widget(cls, *args, parent=None, **kwargs):
+        # Pass parent through so the window is owned by the caller (e.g., main window)
+        widget: ui.GraphWindow = super().create_widget(*args, parent=parent, **kwargs)
         return widget
 
     @classmethod

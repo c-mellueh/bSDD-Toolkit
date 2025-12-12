@@ -157,7 +157,9 @@ def create_widget(
     if w is None:
         if parent is None:
             parent = main_window.get()
-        w = graph_view.create_widget()
+        # Parent the window to the main window so it is destroyed with it,
+        # while still showing as a separate top-level window.
+        w = graph_view.create_widget(parent=parent)
         graph_view.register_widget(w)
         # Show as independent window
     w.show()
