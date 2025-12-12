@@ -495,7 +495,6 @@ def add_node_by_lineinput(
     bsdd_class, bsdd_property = None, None
     scene_pos = view.mapToScene(view.viewport().rect().center())
     offset = QPointF(random() * 100, random() * 100)
-    print(offset)
     scene_pos += offset  # slight random offset to avoid exact overlap
     scene = view.scene()
 

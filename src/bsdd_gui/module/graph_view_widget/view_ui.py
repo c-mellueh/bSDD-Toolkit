@@ -274,7 +274,6 @@ class GraphView(QGraphicsView):
         try:
             pos_view = self._event_qpoint(event)
             pos_scene = self.mapToScene(pos_view)
-            print(f"[GraphView] click scene pos: ({pos_scene.x():.2f}, {pos_scene.y():.2f})")
         except Exception:
             pass
 

@@ -144,7 +144,6 @@ class GraphWindow(QWidget):
     def _toggle_running(self):
         self.scene.set_running(not self.scene.running)
         self.btn_play.setText("Pause" if self.scene.running else "Play")
-        # print(f"[DEBUG] GraphWindow._toggle_running: now running={self.scene.running}")
 
     def _scene_center_pos(self) -> QPointF:
         vp_rect = self.view.viewport().rect()
