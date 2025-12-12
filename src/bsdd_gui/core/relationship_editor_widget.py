@@ -13,11 +13,12 @@ if TYPE_CHECKING:
     from bsdd_gui.module.class_editor_widget import ui as ui_class
     from bsdd_gui.module.property_editor_widget import ui as ui_property
 
+
 def connect_signals(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     project: Type[tool.Project],
     class_editor: Type[tool.ClassEditorWidget],
-    property_editor:Type[tool.PropertyEditorWidget]
+    property_editor: Type[tool.PropertyEditorWidget],
 ):
     project.signals.data_changed.connect(
         lambda n, v: relationship_editor.update_on_dict_change(n, v, project.get())

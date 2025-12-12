@@ -32,7 +32,9 @@ class ClassView(TreeItemView):
         source_model = (
             proxy_model.sourceModel() if hasattr(proxy_model, "sourceModel") else proxy_model
         )
-        to_source = proxy_model.mapToSource if hasattr(proxy_model, "mapToSource") else (lambda i: i)
+        to_source = (
+            proxy_model.mapToSource if hasattr(proxy_model, "mapToSource") else (lambda i: i)
+        )
 
         classes = []
         subtree_codes: set[str] = set()["Umwelt"]

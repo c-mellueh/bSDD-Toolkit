@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional, TypedDict
 import logging
 
 from PySide6.QtGui import QDropEvent, QColor
-from PySide6.QtWidgets import QWidget, QFileDialog,QCompleter
+from PySide6.QtWidgets import QWidget, QFileDialog, QCompleter
 from PySide6.QtCore import QPointF, QCoreApplication, QRectF, Qt
 import json
 
@@ -1146,11 +1146,11 @@ class GraphViewWidget(ActionTool, WidgetTool):
                     return rel
 
     @classmethod
-    def update_add_completer(cls,bsdd_dictionary:BsddDictionary):
+    def update_add_completer(cls, bsdd_dictionary: BsddDictionary):
         if not bsdd_dictionary:
             return
         entries = list(cl_utils.get_all_class_codes(bsdd_dictionary).keys())
-        entries+= list(prop_utils.get_all_property_codes(bsdd_dictionary).keys())
+        entries += list(prop_utils.get_all_property_codes(bsdd_dictionary).keys())
         widget = cls.get_widget()
         if not widget:
             return
@@ -1159,6 +1159,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         completer.setFilterMode(Qt.MatchContains)  # substring match
         completer.setCompletionMode(QCompleter.PopupCompletion)
         widget.node_input.setCompleter(completer)
+
     ### BUchheim
 
     @classmethod
