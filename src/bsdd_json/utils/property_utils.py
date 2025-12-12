@@ -150,10 +150,10 @@ def get_property_by_code(
     code: str, bsdd_dictionary: BsddDictionary
 ) -> BsddProperty | None:
     if dict_utils.is_uri(code):
-        prop = Cache.get_external_property(code)
-    else:
-        prop = get_property_code_dict(bsdd_dictionary).get(code)
-    return prop
+        logging.warning(
+            "function DEPRECATED get_property_by_code called with URI. Use get_property_by_uri instead.")
+        return get_property_by_uri(code, bsdd_dictionary)
+    return get_property_code_dict(bsdd_dictionary).get(code)
 
 
 def get_property_by_uri(uri: str, bsdd_dictionary: BsddDictionary):
@@ -239,9 +239,8 @@ def create_class_property_from_internal_property(
 
 
 def get_property_relation(
-    start_property: BsddProperty, end_property: BsddProperty, relation_type: str
+    start_property: BsddProperty, end_uri:str, relation_type: str
 ) -> BsddPropertyRelation | None:
-    end_uri = build_bsdd_uri(end_property, end_property._parent_ref())
     for relation in start_property.PropertyRelations:
         if (
             relation.RelatedPropertyUri == end_uri
@@ -292,13 +291,9 @@ def get_property_by_class_property(
 ) -> BsddProperty | None:
     if bsdd_dictionary is None:
         bsdd_dictionary = get_dictionary_from_property(class_prop)
-    if class_prop.OwnedUri and dict_utils.is_external_ref(
-        class_prop.OwnedUri, bsdd_dictionary
-    ):
-        return get_external_property(class_prop)
-    else:
-        return get_internal_property(class_prop)
-
+    if class_prop.PropertyUri:
+        return get_property_by_uri(class_prop.PropertyUri,bsdd_dictionary)
+    return get_property_by_code(class_prop.PropertyCode,bsdd_dictionary)
 
 def get_class_properties_by_pset_name(bsdd_class: BsddClass, pset_name: str):
     return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]

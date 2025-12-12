@@ -68,13 +68,13 @@ def connect_signals(
         node = graph_view.get_node_from_bsdd_data(bsdd_data)
         if not node:
             return
-        graph_view.remove_node(node)
+        graph_view.remove_node(node,project.get())
 
     def handle_relation_remove(relation: BsddClassRelation | BsddPropertyRelation):
         edge = graph_view.get_edge_from_relation(relation, project.get())
         if edge is None:
             return
-        graph_view.remove_edge(edge, only_visual=True, allow_parent_deletion=True)
+        graph_view.remove_edge(edge,project.get(), only_visual=True, allow_parent_deletion=True)
 
     def handle_relation_add(relation: BsddClassRelation | BsddPropertyRelation):
         start_data, end_data, relation_type = graph_view.read_relation(relation, project.get())
@@ -103,9 +103,9 @@ def connect_signals(
         relation = graph_view.get_edge_from_nodes(start_node, end_node, constants.IFC_REFERENCE_REL)
         if relation is None:
             return
-        graph_view.remove_edge(relation, only_visual=True, allow_parent_deletion=True)
+        graph_view.remove_edge(relation,project.get(), only_visual=True, allow_parent_deletion=True)
         if not graph_view.get_connected_edges(end_node):
-            graph_view.remove_node(end_node)
+            graph_view.remove_node(end_node,project.get())
 
     project.signals.class_removed.connect(handle_remove)
     project.signals.property_removed.connect(handle_remove)
@@ -241,30 +241,22 @@ def handle_drop_event(
 
 
 def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
-    bsdd_dictionary = project.get()
+    bsdd_dict = project.get()
     scene: GraphScene = graph_view.get_scene()
     if not scene:
         return
     nodes = scene.nodes
     edges = scene.edges
-    (
-        class_codes,
-        full_class_uris,
-        ifc_codes,
-        full_ifc_uris,
-        property_codes,
-        full_property_uris,
-        relations_dict,
-    ) = graph_view.get_code_dicts(scene, bsdd_dictionary)
-    new_edges = graph_view.find_class_relations(nodes, class_codes, full_class_uris, relations_dict)
-    new_edges += graph_view.find_class_property_relations(bsdd_dictionary,nodes, property_codes, relations_dict)
-    new_edges += graph_view.find_property_relations(
-        nodes, property_codes, full_property_uris, relations_dict
+    uri_dict, relations_dict = graph_view.get_code_dicts(scene, bsdd_dict)
+    new_edges = graph_view.find_class_relations(nodes, uri_dict, relations_dict,bsdd_dict)
+    new_edges += graph_view.find_class_property_relations(
+        nodes, uri_dict, relations_dict,bsdd_dict
     )
-    new_edges += graph_view.find_ifc_relations(nodes, full_ifc_uris, relations_dict)
+    new_edges += graph_view.find_property_relations(nodes, uri_dict, relations_dict,bsdd_dict)
+    new_edges += graph_view.find_ifc_relations(nodes, uri_dict, relations_dict,bsdd_dict)
     for edge in new_edges:
         graph_view.add_edge(scene, edge)
-        relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node)] = edge
+        relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node,bsdd_dict)] = edge
     graph_view.get_widget()._apply_filters()
 
 
@@ -319,7 +311,7 @@ def create_relation(
     widget._apply_filters()
 
 
-def delete_selection(graph_view: Type[tool.GraphViewWidget]):
+def delete_selection(graph_view: Type[tool.GraphViewWidget],project:Type[tool.Project]):
     sc = graph_view.get_scene()
     # Collect selected items
     nodes_to_remove, edges_to_remove = graph_view.get_selected_items()
@@ -329,11 +321,11 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget]):
 
     # Remove edges first
     for e in edges_to_remove:
-        graph_view.remove_edge(e)
+        graph_view.remove_edge(e,project.get())
 
     # Remove nodes
     for n in nodes_to_remove:
-        graph_view.remove_node(n, ignored_edges=edges_to_remove)
+        graph_view.remove_node(n,project.get(), ignored_edges=edges_to_remove)
 
 
 def export_graph(
@@ -423,7 +415,7 @@ def import_graph(
         pass
 
 
-def buchheim(graph_view: Type[tool.GraphViewWidget]):
+def buchheim(graph_view: Type[tool.GraphViewWidget],project:Type[tool.Project]):
     allowed = graph_view.reset_children_dict()
     if not allowed:
         # Inform the user that an edge type must be selected
@@ -459,5 +451,5 @@ def buchheim(graph_view: Type[tool.GraphViewWidget]):
     graph_view.intialize(helper_node)
     graph_view.buchheim(helper_node)
     graph_view.rearrange(helper_node, QPointF(min_x, min_y))
-    graph_view.remove_node(helper_node)
+    graph_view.remove_node(helper_node,project.get())
     graph_view.center_scene()

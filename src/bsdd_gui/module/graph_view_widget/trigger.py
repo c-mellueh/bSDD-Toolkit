@@ -64,7 +64,7 @@ def create_relation(start_node, end_node, relation_type):
 
 
 def delete_selection():
-    core.delete_selection(tool.GraphViewWidget)
+    core.delete_selection(tool.GraphViewWidget,tool.Project)
 
 
 def export_requested():
@@ -80,4 +80,4 @@ def recalculate_edges():
 
 
 def buchheim():
-    core.buchheim(tool.GraphViewWidget)
+    core.buchheim(tool.GraphViewWidget,tool.Project)

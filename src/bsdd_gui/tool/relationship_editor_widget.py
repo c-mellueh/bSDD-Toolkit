@@ -212,7 +212,10 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             relation = BsddClassRelation.model_validate(data_dict)
         else:
             code = widget.le_related_element.text()
-            related_property = prop_utils.get_property_by_code(code, bsdd_dictionary)
+            if dict_utils.is_uri(code):
+                related_property = prop_utils.get_property_by_uri(code,bsdd_dictionary)
+            else:
+                related_property = prop_utils.get_property_by_code(code, bsdd_dictionary)
             if not related_property:
                 clear_inputs()
                 return
