@@ -845,7 +845,10 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if relation not in constants.PROPERTY_RELATIONS:
             return
 
-        end_uri = prop_utils.build_bsdd_uri(end_property, bsdd_dictionary)
+        if end_node.is_external:
+            end_uri = end_property.OwnedUri
+        else:
+            end_uri = prop_utils.build_bsdd_uri(end_property, bsdd_dictionary)
         existing_relations = [
             r.RelationType
             for r in start_property.PropertyRelations
