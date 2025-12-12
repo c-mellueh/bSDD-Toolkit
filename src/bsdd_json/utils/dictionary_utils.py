@@ -2,9 +2,21 @@ from __future__ import annotations
 from urllib.parse import urlparse, quote
 import re
 import unicodedata
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING,TypedDict
 if TYPE_CHECKING:
     from bsdd_json.models import BsddDictionary, BsddClass
+
+
+class UriDict(TypedDict):
+    scheme: str
+    host: str
+    path_segments: list[str]
+    after_uri: list[str]
+    namespace: str | None
+    version: str | None
+    resource_type: str | None
+    resource_id: str | None
+
 
 def slugify(text: str, *, delimiter: str = "-", lowercase: bool = False, max_length: int | None = None) -> str:
     """
@@ -102,7 +114,7 @@ def is_uri(s: str) -> bool:
         return False
 
 
-def parse_bsdd_url(url: str) -> dict:
+def parse_bsdd_url(url: str) -> UriDict:
     from urllib.parse import urlparse
 
     p = urlparse(url)
@@ -154,7 +166,7 @@ def bsdd_dictionary_url(bsdd_dictionary: BsddDictionary) -> str:
 
     return build_bsdd_url(data, trailing_slash=True)
 
-def build_bsdd_url(data: dict, trailing_slash: bool = False) -> str:
+def build_bsdd_url(data: UriDict, trailing_slash: bool = False) -> str:
     """
     Build a buildingSMART identifier URI from a dict produced by parse_bsdd_url
     or from a dict with keys:

@@ -2,9 +2,10 @@ from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import graph_view_widget as core
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget,QLineEdit
 from typing import TYPE_CHECKING
-
+if TYPE_CHECKING:
+    from . import ui
 
 def connect():
     core.connect_signals(
@@ -37,7 +38,7 @@ def create_widget(parent: QWidget | None = None):
     core.create_widget(parent, tool.GraphViewWidget, tool.MainWindowWidget)
 
 
-def handle_drop_event(event, view):
+def handle_drop_event(event, view:ui.GraphView):
     core.handle_drop_event(
         event,
         view,
@@ -81,3 +82,6 @@ def recalculate_edges():
 
 def buchheim():
     core.buchheim(tool.GraphViewWidget,tool.Project)
+
+def add_node_by_lineinput(window:ui.GraphWindow):
+    core.add_node_by_lineinput(window, tool.GraphViewWidget, tool.Project, tool.IfcHelper)

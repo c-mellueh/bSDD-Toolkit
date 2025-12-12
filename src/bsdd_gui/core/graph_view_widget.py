@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QCoreApplication, QPointF
-from PySide6.QtWidgets import QWidget, QMessageBox
+from PySide6.QtWidgets import QWidget, QMessageBox, QLineEdit
 from PySide6.QtGui import QDropEvent
 from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
 from bsdd_json import (
@@ -14,6 +14,8 @@ from bsdd_json import (
 )
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils as class_utils
+from bsdd_json.utils import dictionary_utils as dict_utils
+
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
 import webbrowser
 import json
@@ -68,13 +70,13 @@ def connect_signals(
         node = graph_view.get_node_from_bsdd_data(bsdd_data)
         if not node:
             return
-        graph_view.remove_node(node,project.get())
+        graph_view.remove_node(node, project.get())
 
     def handle_relation_remove(relation: BsddClassRelation | BsddPropertyRelation):
         edge = graph_view.get_edge_from_relation(relation, project.get())
         if edge is None:
             return
-        graph_view.remove_edge(edge,project.get(), only_visual=True, allow_parent_deletion=True)
+        graph_view.remove_edge(edge, project.get(), only_visual=True, allow_parent_deletion=True)
 
     def handle_relation_add(relation: BsddClassRelation | BsddPropertyRelation):
         start_data, end_data, relation_type = graph_view.read_relation(relation, project.get())
@@ -103,9 +105,11 @@ def connect_signals(
         relation = graph_view.get_edge_from_nodes(start_node, end_node, constants.IFC_REFERENCE_REL)
         if relation is None:
             return
-        graph_view.remove_edge(relation,project.get(), only_visual=True, allow_parent_deletion=True)
+        graph_view.remove_edge(
+            relation, project.get(), only_visual=True, allow_parent_deletion=True
+        )
         if not graph_view.get_connected_edges(end_node):
-            graph_view.remove_node(end_node,project.get())
+            graph_view.remove_node(end_node, project.get())
 
     project.signals.class_removed.connect(handle_remove)
     project.signals.property_removed.connect(handle_remove)
@@ -248,15 +252,17 @@ def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool
     nodes = scene.nodes
     edges = scene.edges
     uri_dict, relations_dict = graph_view.get_code_dicts(scene, bsdd_dict)
-    new_edges = graph_view.find_class_relations(nodes, uri_dict, relations_dict,bsdd_dict)
+    new_edges = graph_view.find_class_relations(nodes, uri_dict, relations_dict, bsdd_dict)
     new_edges += graph_view.find_class_property_relations(
-        nodes, uri_dict, relations_dict,bsdd_dict
+        nodes, uri_dict, relations_dict, bsdd_dict
     )
-    new_edges += graph_view.find_property_relations(nodes, uri_dict, relations_dict,bsdd_dict)
-    new_edges += graph_view.find_ifc_relations(nodes, uri_dict, relations_dict,bsdd_dict)
+    new_edges += graph_view.find_property_relations(nodes, uri_dict, relations_dict, bsdd_dict)
+    new_edges += graph_view.find_ifc_relations(nodes, uri_dict, relations_dict, bsdd_dict)
     for edge in new_edges:
         graph_view.add_edge(scene, edge)
-        relations_dict[edge.edge_type][graph_view._info(edge.start_node, edge.end_node,bsdd_dict)] = edge
+        relations_dict[edge.edge_type][
+            graph_view._info(edge.start_node, edge.end_node, bsdd_dict)
+        ] = edge
     graph_view.get_widget()._apply_filters()
 
 
@@ -278,11 +284,16 @@ def node_double_clicked(
         widget: PropertyWidget = property_table.get_widgets()[-1]
         property_table.select_property(bsdd_property, widget.tv_properties)
 
-    elif node.node_type in [constants.EXTERNAL_CLASS_NODE_TYPE,constants.EXTERNAL_PROPERTY_NODE_TYPE,constants.IFC_NODE_TYPE]:
+    elif node.node_type in [
+        constants.EXTERNAL_CLASS_NODE_TYPE,
+        constants.EXTERNAL_PROPERTY_NODE_TYPE,
+        constants.IFC_NODE_TYPE,
+    ]:
         bsdd_class: BsddClass = node.bsdd_data
         uri = bsdd_class.OwnedUri
         if uri.startswith("http://") or uri.startswith("https://"):
             webbrowser.open(uri)
+
 
 def create_relation(
     start_node: graphics_items.Node,
@@ -294,7 +305,10 @@ def create_relation(
 
     if start_node.node_type == constants.CLASS_NODE_TYPE:
 
-        if end_node.node_type in [constants.PROPERTY_NODE_TYPE,constants.EXTERNAL_PROPERTY_NODE_TYPE]:
+        if end_node.node_type in [
+            constants.PROPERTY_NODE_TYPE,
+            constants.EXTERNAL_PROPERTY_NODE_TYPE,
+        ]:
             if relation_type == constants.C_P_REL:
                 graph_view.create_class_property_relation(start_node, end_node, project.get())
         elif end_node.node_type in [
@@ -308,7 +322,10 @@ def create_relation(
     elif start_node.node_type == constants.PROPERTY_NODE_TYPE:
         if end_node.node_type == constants.CLASS_NODE_TYPE:
             graph_view.create_class_property_relation(start_node, end_node, project.get())
-        elif end_node.node_type in [constants.PROPERTY_NODE_TYPE,constants.EXTERNAL_PROPERTY_NODE_TYPE]:
+        elif end_node.node_type in [
+            constants.PROPERTY_NODE_TYPE,
+            constants.EXTERNAL_PROPERTY_NODE_TYPE,
+        ]:
             graph_view.create_property_property_relation(
                 start_node, end_node, project.get(), relation_type
             )
@@ -316,7 +333,7 @@ def create_relation(
     widget._apply_filters()
 
 
-def delete_selection(graph_view: Type[tool.GraphViewWidget],project:Type[tool.Project]):
+def delete_selection(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
     sc = graph_view.get_scene()
     # Collect selected items
     nodes_to_remove, edges_to_remove = graph_view.get_selected_items()
@@ -326,11 +343,11 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget],project:Type[tool.Pr
 
     # Remove edges first
     for e in edges_to_remove:
-        graph_view.remove_edge(e,project.get())
+        graph_view.remove_edge(e, project.get())
 
     # Remove nodes
     for n in nodes_to_remove:
-        graph_view.remove_node(n,project.get(), ignored_edges=edges_to_remove)
+        graph_view.remove_node(n, project.get(), ignored_edges=edges_to_remove)
 
 
 def export_graph(
@@ -420,7 +437,7 @@ def import_graph(
         pass
 
 
-def buchheim(graph_view: Type[tool.GraphViewWidget],project:Type[tool.Project]):
+def buchheim(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
     allowed = graph_view.reset_children_dict()
     if not allowed:
         # Inform the user that an edge type must be selected
@@ -456,5 +473,43 @@ def buchheim(graph_view: Type[tool.GraphViewWidget],project:Type[tool.Project]):
     graph_view.intialize(helper_node)
     graph_view.buchheim(helper_node)
     graph_view.rearrange(helper_node, QPointF(min_x, min_y))
-    graph_view.remove_node(helper_node,project.get())
+    graph_view.remove_node(helper_node, project.get())
     graph_view.center_scene()
+
+
+def add_node_by_lineinput(
+    window: ui.GraphWindow,
+    graph_view: Type[tool.GraphViewWidget],
+    project: Type[tool.Project],
+    ifc_helper: Type[tool.IfcHelper],
+):
+    text = window.node_input.text().strip()
+    view = window.view
+    bsdd_class, bsdd_property = None, None
+
+    if not text:
+        return
+    if dict_utils.is_uri(text):
+        uri_dict = dict_utils.parse_bsdd_url(text)
+        resource_type = uri_dict.get("resource_type")
+        if resource_type == "class":
+            bsdd_class = class_utils.get_class_by_uri(project.get(), text)
+        elif resource_type == "prop":
+            bsdd_property = prop_utils.get_property_by_uri(project.get(), text)
+        else:
+            return
+    else:
+        bsdd_class = class_utils.get_class_by_code(project.get(), text)
+        if not bsdd_class:
+            bsdd_property = prop_utils.get_property_by_code(project.get(), text)
+
+    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
+    scene = view.scene()
+    
+    if bsdd_class:
+        graph_view.insert_classes_in_scene(
+            project.get(), scene, [bsdd_class], None, ifc_classes=ifc_classes
+        )
+    elif bsdd_property:
+        graph_view.insert_properties_in_scene(project.get(), scene, [bsdd_property], None)
+    recalculate_edges(graph_view, project)
