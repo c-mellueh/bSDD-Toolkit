@@ -264,6 +264,7 @@ class GraphWindow(QWidget):
         return super().resizeEvent(event)
 
 
+
 if __name__ == "__main__":
     import sys
 

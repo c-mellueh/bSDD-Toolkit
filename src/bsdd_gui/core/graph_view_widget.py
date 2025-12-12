@@ -486,6 +486,7 @@ def add_node_by_lineinput(
     text = window.node_input.text().strip()
     view = window.view
     bsdd_class, bsdd_property = None, None
+    scene_pos =  view.mapToScene(view.viewport().rect().center())
 
     if not text:
         return
@@ -495,21 +496,22 @@ def add_node_by_lineinput(
         if resource_type == "class":
             bsdd_class = class_utils.get_class_by_uri(project.get(), text)
         elif resource_type == "prop":
-            bsdd_property = prop_utils.get_property_by_uri(project.get(), text)
+            bsdd_property = prop_utils.get_property_by_uri(text,project.get())
         else:
             return
     else:
         bsdd_class = class_utils.get_class_by_code(project.get(), text)
         if not bsdd_class:
-            bsdd_property = prop_utils.get_property_by_code(project.get(), text)
+            bsdd_property = prop_utils.get_property_by_code(text,project.get())
 
     ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
     scene = view.scene()
-    
+
     if bsdd_class:
         graph_view.insert_classes_in_scene(
-            project.get(), scene, [bsdd_class], None, ifc_classes=ifc_classes
+            project.get(), scene, [bsdd_class], scene_pos, ifc_classes=ifc_classes
         )
     elif bsdd_property:
-        graph_view.insert_properties_in_scene(project.get(), scene, [bsdd_property], None)
+        graph_view.insert_properties_in_scene(project.get(), scene, [bsdd_property], scene_pos)
     recalculate_edges(graph_view, project)
+    window.node_input.clear()
