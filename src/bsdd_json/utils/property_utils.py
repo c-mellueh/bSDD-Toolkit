@@ -289,8 +289,8 @@ def delete_property(
     return removed_class_properties
 
 
-def get_name(class_property: BsddClassProperty):
-    prop = get_property_by_class_property(class_property)
+def get_name(class_property: BsddClassProperty,bsdd_dictionary=None):
+    prop = get_property_by_class_property(class_property,bsdd_dictionary)
     if not prop:
         return None
     return prop.Name
