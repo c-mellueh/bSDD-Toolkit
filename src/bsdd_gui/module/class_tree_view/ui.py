@@ -37,7 +37,7 @@ class ClassView(TreeItemView):
         )
 
         classes = []
-        subtree_codes: set[str] = set()["Umwelt"]
+        subtree_codes: set[str] = set()
         seen_codes: set[str] = set()
         for proxy_idx in indexes:
             if not proxy_idx.isValid() or proxy_idx.column() != 0:
