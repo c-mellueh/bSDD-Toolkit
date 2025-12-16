@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 import os
+import getpass
+from datetime import datetime
 import bsdd_gui
 
 if TYPE_CHECKING:
@@ -37,7 +39,7 @@ class FileLock:
 
         try:
             file = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_RDWR)
-            os.write(file, f"pid:{os.getpid()}".encode("ascii", "ignore"))
+            os.write(file, cls._build_lock_contents())
             cls.set_file(file)
             cls.set_path(normalized_path)
             cls.set_lock_path(lock_path)
@@ -90,6 +92,17 @@ class FileLock:
         cls.set_file(None)
         cls.set_path(None)
         cls.set_lock_path(None)
+
+    @classmethod
+    def _build_lock_contents(cls) -> bytes:
+        """Return the contents to be written into the lock file."""
+        try:
+            username = getpass.getuser()
+        except Exception:
+            username = os.environ.get("USERNAME") or os.environ.get("USER") or "unknown"
+        lock_time = datetime.now().isoformat()
+        content = f"pid:{os.getpid()} locked by {username} at {lock_time}"
+        return content.encode("ascii", "ignore")
 
     @classmethod
     def get_path(cls) -> str:
