@@ -7,13 +7,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from . import ui
     from bsdd_gui.module.class_editor_widget import ui as class_edit_ui
-    
 
 
 def connect():
     func = lambda: core.splitter_settings_accepted(tool.AiHelper, tool.Appdata)
     core.fill_settings(func, tool.SettingsWidget)
-    core.connect_signals(tool.AiHelper,tool.ClassEditorWidget)
+    core.connect_signals(tool.AiHelper,tool.AiClassDescription, tool.ClassEditorWidget)
+
 
 def settings_created(widget: ui.SettingsWidget):
     core.setup_settings(widget, tool.AiHelper, tool.Appdata)
@@ -26,5 +26,8 @@ def retranslate_ui():
 def on_new_project():
     pass
 
-def create_ai_definition(widget:class_edit_ui.ClassEditor):
-    core.create_ai_definition(widget,tool.ClassEditorWidget,tool.AiHelper,tool.Project,tool.Util)
+
+def generate_class_definition(widget: class_edit_ui.ClassEditor):
+    core.generate_class_definition(
+        widget, tool.ClassEditorWidget,tool.AiHelper, tool.AiClassDescription, tool.Project, tool.Util
+    )

@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QToolButton
 import qtawesome as qta
 
 import logging
-from bsdd_gui.module.ai_helper import ui, constants,trigger
+from bsdd_gui.module.ai_helper import ui, constants, trigger
 import bsdd_gui
 from bsdd_json import BsddClass
 from openai import OpenAI
@@ -14,8 +14,14 @@ import json
 import os
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.ai_helper.prop import AiHelperProperties
+    from bsdd_gui.module.ai_helper.prop import (
+        AiHelperProperties,
+        AiClassDescriptionProperties,
+        AiPropertyDescriptionProperties,
+    )
     from bsdd_gui.module.class_editor_widget import ui as class_edit_ui
+from bsdd_gui.module.property_editor_widget import ui as property_ui
+from bsdd_gui.module.class_property_editor_widget import ui as class_property_ui
 
 
 class AiHelper:
@@ -79,78 +85,43 @@ class AiHelper:
     def read_language(cls, widget: ui.SettingsWidget) -> str:
         return widget.cb_language.currentText()
 
+
+class AiClassDescription:
+    @classmethod
+    def get_properties(cls) -> AiClassDescriptionProperties:
+        return bsdd_gui.AiClassDescriptionProperties
+
     @classmethod
     def add_ai_to_classedit(cls, widget: class_edit_ui.ClassEditor):
         """Place a helper button inside the definition text edit."""
-        widget._definition_toolbutton = QToolButton(widget.te_definition.viewport())
-        widget._definition_toolbutton.setIcon(qta.icon("mdi6.creation-outline"))
-        widget._definition_toolbutton.setAutoRaise(True)
-        widget._definition_toolbutton.setCursor(Qt.PointingHandCursor)
-        widget.te_definition.textChanged.connect(lambda: cls._sync_definition_toolbutton(widget))
-        cls._position_definition_toolbutton(widget)
-        cls._sync_definition_toolbutton(widget)
-        widget._definition_toolbutton.clicked.connect(
-            lambda: trigger.create_ai_definition(widget)
-        )
-    @classmethod
-    def _position_definition_toolbutton(cls, widget) -> None:
-        margin = 6
-        widget._definition_toolbutton.move(margin, margin)
+        widget._ai_button = QToolButton(widget.te_definition.viewport())
+        widget._ai_button.setIcon(qta.icon("mdi6.creation-outline"))
+        widget._ai_button.setAutoRaise(True)
+        widget._ai_button.setCursor(Qt.PointingHandCursor)
+        widget.te_definition.textChanged.connect(lambda: cls._sync_ai_button(widget))
+        cls._position_ai_button(widget)
+        cls._sync_ai_button(widget)
+        widget._ai_button.clicked.connect(lambda: trigger.generate_class_definition(widget))
 
     @classmethod
-    def _sync_definition_toolbutton(cls, widget) -> None:
+    def _position_ai_button(cls, widget) -> None:
+        margin = 6
+        widget._ai_button.move(margin, margin)
+
+    @classmethod
+    def _sync_ai_button(cls, widget) -> None:
         is_empty = widget.te_definition.toPlainText() == ""
-        widget._definition_toolbutton.setVisible(is_empty)
+        widget._ai_button.setVisible(is_empty)
 
     @classmethod
     def build_class_instructions(cls, lang: str) -> str:
         if lang == constants.LANGUAGE_DE:
-            return (
-                "Du bist ein erfahrener BIM-Manager und Fachexperte für Infrastruktur- und Ingenieurbauwerke."
-                "Du erhältst eine einzelne bSDD-Klasse im JSON-Format gemäß buildingSMART-Struktur."
-                "Aufgabe:"
-                "Erstelle eine fachlich korrekte, prägnante Definition der Klasse in deutscher Sprache."
-                "Regeln für die Definition:"
-                "Umfang: 3-5 vollständige Sätze"
-                "Stil: technisch-neutral, sachlich, normnah"
-                "Beschreibe:"
-                "die baukonstruktive Ausführung"
-                "den primären Zweck / die Funktion"
-                "typische Einsatzbereiche"
-                "Wenn fachlich sinnvoll, nenne einschlägige Normen oder Regelwerke (z. B. DIN, EN), ohne diese zu erklären"
-                "Nutze keine Aufzählungen"
-                "Wiederhole keine JSON-Feldnamen und zähle keine Eigenschaften oder Beispielwerte auf"
-                "Verwende keine Einleitungssätze wie „Diese Klasse beschreibt …“"
-                "Ausgabe:"
-                "Gib ausschließlich die formulierte Klassendefinition als Fließtext zurück, ohne Zusatzkommentare oder Hinweise."
-            )
+            return "Du bist ein erfahrener BIM-Manager und Fachexperte für Infrastruktur- und Ingenieurbauwerke. Du erhältst eine einzelne bSDD-Klasse im JSON-Format gemäß der buildingSMART-Struktur. Deine Aufgabe ist es, eine fachlich korrekte, prägnante und technisch neutrale Definition dieser Klasse in deutscher Sprache zu verfassen. Der Text besteht aus drei bis fünf vollständigen Sätzen im normnahen Stil. Die Definition umfasst baukonstruktive Ausführung, primären Zweck bzw. Funktion sowie typische Einsatzbereiche. Falls fachlich sinnvoll, können einschlägige Normen wie DIN oder EN benannt werden, jedoch ohne nähere Erläuterung. Verzichte auf Aufzählungen, Wiederholung von JSON-Feldnamen, Eigenschaften, Beispielwerte sowie Einleitungssätze wie „Diese Klasse beschreibt …“. Gib ausschließlich die formulierte Klassendefinition als zusammenhängenden Fließtext ohne Zusatzkommentare oder Hinweise zurück."
         if lang == constants.LANGUAGE_EN:
-            return (
-                "You are an experienced BIM manager and a specialist in infrastructure and civil engineering projects."
-                "You will receive a single bSDD class in JSON format according to the buildingSMART structure."
-                "Task:"
-                "Create a technically correct, concise definition of the class in German."
-                "You are an experienced BIM manager and a specialist in infrastructure and civil engineering projects."
-                "You will receive a single bSDD class in JSON format according to the buildingSMART structure ..."
-                "Rules for the definition:"
-                "Length: 3-5 complete sentences"
-                "Style: technical-neutral, factual, and standards-compliant"
-                "Describe:"
-                "the structural design"
-                "the primary purpose/function"
-                "typical areas of application"
-                "If technically relevant, mention applicable standards or regulations (e.g., DIN, EN) without explaining them"
-                "Do not use bullet points"
-                "Do not repeat JSON field names or list properties or example values"
-                "Do not use introductory sentences such as „This class describes…“"
-                "Output:"
-                "Return only the formulated class definition as plain text, without additional comments or notes."
-            )
+            return "You are an experienced BIM manager and expert in infrastructure and civil engineering structures. You will receive a single bSDD class in JSON format according to the buildingSMART structure. Your task is to write a technically correct, concise, and neutral definition of this class in German. The text should consist of three to five complete sentences in a style close to the standards. The definition should include structural design, primary purpose or function, and typical areas of application. Where technically appropriate, relevant standards such as DIN or EN may be mentioned, but without further explanation. Avoid bullet points, repetition of JSON field names, properties, example values, and introductory sentences such as 'This class describes…'. Return only the formulated class definition as a continuous text without additional comments or notes."
         raise ValueError(f"Unsupported language. Use one of {constants.LANGUAGES}")
 
     def build_user_input(json_text: str, lang: str) -> str:
-        # Komplette Klasse mitsenden, damit das Modell alle vorhandenen Infos nutzen kann.
-        # Das Script ist absichtlich schema-agnostisch.
         if lang == constants.LANGUAGE_DE:
             header = "Hier ist eine bSDD-Klasse als JSON. Definiere diese Klasse:"
         else:
@@ -167,17 +138,17 @@ class AiHelper:
         language=None,
         model="gpt-4o-mini",
         max_output_tokens=220,
+        client=None,
     ):
-        api_key = cls.get_api_key()
-
         if not api_key:
             logging.error("ERROR: API-Key ist nicht gesetzt.")
             return None
 
         if not language:
-            language = cls.get_language()
+            language = constants.LANGUAGE_EN
 
-        client = OpenAI(api_key=api_key)
+        if client is None:
+            client = OpenAI(api_key=api_key)
         instructions = cls.build_class_instructions(language)
         user_input = cls.build_user_input(json_text, language)
 
@@ -186,7 +157,12 @@ class AiHelper:
                 model=model,
                 instructions=instructions,
                 input=user_input,
+                text={"verbosity": "low"},
+                reasoning={"effort": "minimal"},
+                store=True,
+                max_output_tokens=max_output_tokens,
             )
+
         except Exception as e:
             logging.error(f"API-Request fehlgeschlagen: {e}")
             return None
@@ -203,7 +179,7 @@ class AiHelper:
         return out
 
     @classmethod
-    def create_gen_def_thread(cls, bsdd_json):
+    def create_gen_def_thread(cls, *args, **kwargs):
         class _SetupWorker(QObject):
             finished = Signal(object)
             error = Signal(object)
@@ -212,7 +188,7 @@ class AiHelper:
                 super().__init__()
 
             def run(self):
-                value = cls.generate_class_definition(bsdd_json)
+                value = cls.generate_class_definition(*args, **kwargs)
                 self.finished.emit(value)
 
         ai_worker = _SetupWorker()
@@ -228,3 +204,4 @@ class AiHelper:
         ai_thread.finished.connect(ai_thread.deleteLater)
         ai_thread.started.connect(ai_worker.run, Qt.ConnectionType.QueuedConnection)
         return ai_worker, ai_thread
+
