@@ -114,6 +114,7 @@ def open_file_clicked(
     main_window: Type[tool.MainWindowWidget],
     popups: Type[tool.Popups],
     plugins: Type[tool.Plugins],
+    file_lock: Type[tool.FileLock],
 ):
     path = appdata.get_path(OPEN_PATH)
     title = QCoreApplication.translate("Project", "Open Project")
@@ -124,7 +125,7 @@ def open_file_clicked(
     logging.info("Load Project")
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
-    proj = open_project(path, project_tool, popups)
+    proj = open_project(path, project_tool, popups, file_lock)
     if proj is None:
         return
 
@@ -132,10 +133,21 @@ def open_file_clicked(
         plugins.on_new_project(plugin)
 
 
-def open_project(path, project: Type[tool.Project], popups: Type[tool.Popups]):
+def open_project(
+    path,
+    project: Type[tool.Project],
+    popups: Type[tool.Popups],
+    file_lock: Type[tool.FileLock] | None = None,
+):
     proj = None
     if not path:
         return
+
+    if not file_lock.lock_file(path):
+        if popups.request_overwrite_lock(path):
+            file_lock.overwrite_lock(path)
+        else:
+            return
     try:
         proj = project.load_project(path, sloppy=False)
     except ValidationError as error:
@@ -143,8 +155,13 @@ def open_project(path, project: Type[tool.Project], popups: Type[tool.Popups]):
             proj = project.load_project(path, sloppy=True)
         else:
             logging.info("User declined sloppy loading")
+    except Exception:
+        file_lock.unlock_file()
+        raise
     if proj is not None:
         bsdd_gui.on_new_project()
+    else:
+        file_lock.unlock_file()
     return proj
 
 

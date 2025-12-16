@@ -80,3 +80,9 @@ def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[t
 
 def toggle_console(main_window: Type[tool.MainWindowWidget]):
     main_window.toggle_console()
+
+def close_event(
+    main_window: Type[tool.MainWindowWidget], file_lock: Type[tool.FileLock], event
+):
+    file_lock.unlock_file()
+    event.accept()

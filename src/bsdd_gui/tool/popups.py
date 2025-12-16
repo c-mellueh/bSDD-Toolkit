@@ -205,3 +205,42 @@ class Popups:
 
         dialog.resize(420, 320)
         return dialog.exec() == QDialog.DialogCode.Accepted
+
+    @classmethod
+    def request_overwrite_lock(cls, path: str) -> bool:
+        window = QApplication.activeWindow()
+        dialog = QDialog(window)
+        dialog.setModal(True)
+        dialog.setWindowTitle(QCoreApplication.translate("Project", "Project Lock Warning"))
+        dialog.setWindowIcon(get_icon())
+
+        layout = QVBoxLayout(dialog)
+
+        message_label = QLabel(
+            QCoreApplication.translate(
+                "Project",
+                "The project file is already locked. Do you want to overwrite the lock?",
+            )
+        )
+        message_label.setWordWrap(True)
+        layout.addWidget(message_label)
+
+        path_label = QLabel(path)
+        path_label.setWordWrap(True)
+        layout.addWidget(path_label)
+
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Yes | QDialogButtonBox.StandardButton.No,
+            parent=dialog,
+        )
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        layout.addWidget(button_box)
+
+        no_button = button_box.button(QDialogButtonBox.StandardButton.No)
+        if no_button:
+            no_button.setDefault(True)
+            no_button.setFocus()
+
+        dialog.resize(400, 150)
+        return dialog.exec() == QDialog.DialogCode.Accepted
