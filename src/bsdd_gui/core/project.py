@@ -132,9 +132,16 @@ def open_file_clicked(
         plugins.on_new_project(plugin)
 
 
-def open_project(path, project: Type[tool.Project], popups: Type[tool.Popups]):
+def open_project(path, project: Type[tool.Project], popups: Type[tool.Popups],file_lock:Type[tool.FileLock]):
     proj = None
     if not path:
+        return
+    if not file_lock.lock_file(path):
+        text_title = QCoreApplication.translate("Project", "Project file is locked")
+        detail_text = QCoreApplication.translate(
+            "Project", "The selected file is already in use and cannot be opened."
+        )
+        popups.create_warning_popup(detail_text, text_title)
         return
     try:
         proj = project.load_project(path, sloppy=False)
@@ -143,8 +150,13 @@ def open_project(path, project: Type[tool.Project], popups: Type[tool.Popups]):
             proj = project.load_project(path, sloppy=True)
         else:
             logging.info("User declined sloppy loading")
+    except Exception:
+        file_lock.unlock_file()
+        raise
     if proj is not None:
         bsdd_gui.on_new_project()
+    else:
+        file_lock.unlock_file()
     return proj
 
 
