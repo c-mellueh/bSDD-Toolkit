@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>889</width>
-    <height>617</height>
+    <width>893</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,6 +53,9 @@
        </property>
        <item>
         <widget class="QToolBox" name="toolBox">
+         <property name="layoutDirection">
+          <enum>Qt::LayoutDirection::LeftToRight</enum>
+         </property>
          <property name="currentIndex">
           <number>0</number>
          </property>
@@ -61,8 +64,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>856</width>
-            <height>467</height>
+            <width>860</width>
+            <height>441</height>
            </rect>
           </property>
           <property name="layoutDirection">
@@ -79,7 +82,7 @@
             <x>0</x>
             <y>0</y>
             <width>856</width>
-            <height>467</height>
+            <height>437</height>
            </rect>
           </property>
           <property name="layoutDirection">
@@ -96,7 +99,7 @@
             <x>0</x>
             <y>0</y>
             <width>856</width>
-            <height>467</height>
+            <height>437</height>
            </rect>
           </property>
           <property name="layoutDirection">
@@ -106,6 +109,12 @@
            <string>Filter</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_10"/>
+         </widget>
+         <widget class="QWidget" name="pageAI">
+          <attribute name="label">
+           <string>OpenAI</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_14"/>
          </widget>
         </widget>
        </item>
@@ -155,8 +164,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>856</width>
-            <height>497</height>
+            <width>100</width>
+            <height>30</height>
            </rect>
           </property>
           <property name="layoutDirection">
@@ -189,8 +198,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>840</width>
-            <height>485</height>
+            <width>100</width>
+            <height>30</height>
            </rect>
           </property>
           <property name="layoutDirection">

@@ -15,7 +15,7 @@ from bsdd_gui.module.class_property_editor_widget import ui as class_property_ui
 
 
 def fill_settings(func, settings: Type[tool.SettingsWidget]):
-    settings.add_page_to_toolbox(ui.SettingsWidget, "pageGeneral", func)
+    settings.add_page_to_toolbox(ui.SettingsWidget, "pageAI", func)
 
 
 def connect_signals(
