@@ -56,7 +56,7 @@ def main(
         )
 
     set_language(None)
-    if tool.AiHelper.get_checkstate():
+    if tool.AiHelper.is_active():
         tool.AiHelper.load_client()
     sys.exit(app.exec())
 

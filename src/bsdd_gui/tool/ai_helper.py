@@ -55,7 +55,7 @@ class AiHelper:
         return cls.get_properties().settings_widget
 
     @classmethod
-    def get_checkstate(cls):
+    def is_active(cls):
         return tool.Appdata.get_bool_setting(constants.AI_HELPER_SECTION, constants.IS_ACTIVE)
 
     @classmethod
@@ -110,8 +110,11 @@ class AiClassDescription:
         return bsdd_gui.AiClassDescriptionProperties
 
     @classmethod
-    def add_ai_to_classedit(cls, widget: class_edit_ui.ClassEditor):
+    def add_ai_to_classedit(cls, widget: class_edit_ui.ClassEditor, is_active: bool):
         """Place a helper button inside the definition text edit."""
+        if not is_active:
+            return
+
         widget._ai_button = QToolButton(widget.te_definition.viewport())
         widget._ai_button.setIcon(qta.icon("mdi6.creation-outline"))
         widget._ai_button.setAutoRaise(True)
@@ -210,18 +213,22 @@ class AiClassDescription:
                 value = cls.generate_class_definition(*args, **kwargs)
                 self.finished.emit(value)
 
-        ai_worker = _SetupWorker()
-        cls.get_properties().ai_worker = ai_worker
-        ai_thread = QThread()
 
-        cls.get_properties().ai_thread = ai_thread
+        ai_thread = QThread()
+        ai_worker = _SetupWorker()
         ai_worker.moveToThread(ai_thread)
+        cls.get_properties().ai_worker = ai_worker
+        cls.get_properties().ai_thread = ai_thread
+
+        ai_thread.started.connect(ai_worker.run, Qt.ConnectionType.QueuedConnection)
+
         ai_worker.finished.connect(ai_thread.quit)
         ai_worker.finished.connect(ai_worker.deleteLater)
+
         ai_worker.error.connect(ai_thread.quit)
         ai_worker.error.connect(ai_worker.deleteLater)
+        
         ai_thread.finished.connect(ai_thread.deleteLater)
-        ai_thread.started.connect(ai_worker.run, Qt.ConnectionType.QueuedConnection)
         return ai_worker, ai_thread
 
 
@@ -241,10 +248,13 @@ class AiPropertyDescription:
 
     @classmethod
     def add_ai_to_propertyedit(
-        cls, widget: property_ui.PropertyEditor | class_property_ui.ClassPropertyEditor
+        cls,
+        widget: property_ui.PropertyEditor | class_property_ui.ClassPropertyEditor,
+        is_active: bool,
     ):
         """Place a helper button inside the definition text edit."""
-
+        if not is_active:
+            return
         text_widget = cls.get_text_widget(widget)
         widget._ai_button = QToolButton(text_widget.viewport())
         text_widget.textChanged.connect(lambda: cls._sync_ai_button(widget))

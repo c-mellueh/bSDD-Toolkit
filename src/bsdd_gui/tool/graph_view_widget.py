@@ -1000,7 +1000,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
             if e.start_node == node or e.end_node == node:
                 cls.remove_edge(
                     e,
-                    bsdd_dictionary,
                     bsdd_dictionary=bsdd_dictionary,
                     only_visual=True,
                     allow_parent_deletion=True,

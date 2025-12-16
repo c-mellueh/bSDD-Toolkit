@@ -26,11 +26,10 @@ def connect_signals(
     property_editor: Type[tool.PropertyEditorWidget],
     class_property_editor: Type[tool.PropertyEditorWidget],
 ):
-    if not ai_helper.get_checkstate():
-        return
-    class_editor.signals.widget_created.connect(ai_class.add_ai_to_classedit)
-    property_editor.signals.widget_created.connect(ai_property.add_ai_to_propertyedit)
-    class_property_editor.signals.widget_created.connect(ai_property.add_ai_to_propertyedit)
+
+    class_editor.signals.widget_created.connect(lambda w,:ai_class.add_ai_to_classedit(w,ai_helper.is_active()))
+    property_editor.signals.widget_created.connect(lambda w,:ai_property.add_ai_to_propertyedit(w,ai_helper.is_active()))
+    class_property_editor.signals.widget_created.connect(lambda w,:ai_property.add_ai_to_propertyedit(w,ai_helper.is_active()))
 
 
 def setup_settings(
@@ -98,7 +97,7 @@ def generate_class_definition(
     sentence_count = ai_helper.get_sentence_count()
 
     ai_worker, ai_thread = ai_class.create_gen_def_thread(
-        json_text, api_key, language, model, max_output_tokens, client,sentence_count
+        json_text, api_key, language, model, max_output_tokens, client, sentence_count
     )
 
     def _finished(definition):
@@ -156,6 +155,7 @@ def generate_property_definition(
         else:
             QTimer.singleShot(0, widget, lambda: widget._ai_button.show())
         stop_waiting_widget(waiting_worker)
+        ai_worker.deleteLater()
 
     ai_worker.finished.connect(_finished)
     ai_thread.start()

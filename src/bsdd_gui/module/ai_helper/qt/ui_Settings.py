@@ -15,15 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
-    QLabel, QLineEdit, QSizePolicy, QSpinBox,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QFormLayout, QLabel,
+    QLineEdit, QSizePolicy, QSpinBox, QWidget)
+
+from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(532, 122)
+        Form.resize(586, 123)
         self.formLayout = QFormLayout(Form)
         self.formLayout.setObjectName(u"formLayout")
         self.label = QLabel(Form)
@@ -31,7 +32,7 @@ class Ui_Form(object):
 
         self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label)
 
-        self.checkBox = QCheckBox(Form)
+        self.checkBox = ToggleSwitch(Form)
         self.checkBox.setObjectName(u"checkBox")
 
         self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.checkBox)
@@ -81,10 +82,10 @@ class Ui_Form(object):
         self.label.setText(QCoreApplication.translate("Form", u"use OpenAI:", None))
         self.checkBox.setText("")
         self.label_2.setText(QCoreApplication.translate("Form", u"OpenAI API-Key:", None))
-        self.label_3.setText(QCoreApplication.translate("Form", u"AI-Sprache", None))
+        self.label_3.setText(QCoreApplication.translate("Form", u"AI-Language:", None))
         self.cb_language.setItemText(0, QCoreApplication.translate("Form", u"German", None))
         self.cb_language.setItemText(1, QCoreApplication.translate("Form", u"English", None))
 
-        self.label_4.setText(QCoreApplication.translate("Form", u"Satzanzahl", None))
+        self.label_4.setText(QCoreApplication.translate("Form", u"Sentence Count:", None))
     # retranslateUi
 

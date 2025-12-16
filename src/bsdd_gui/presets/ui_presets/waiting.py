@@ -116,12 +116,12 @@ def start_waiting_widget(parent: QWidget, title: str = "Title", text: str = "Tex
     waiting_widget = WaitingWidget(parent, title=title, text=text)
     waiting_widget.show()
 
-    thread.started.connect(worker.run)
+    thread.started.connect(worker.run,Qt.ConnectionType.QueuedConnection)
+    
     worker.finished.connect(thread.quit)
+    worker.finished.connect(worker.deleteLater)
     worker.finished.connect(waiting_widget.close)
 
-    thread.finished.connect(worker.deleteLater)
-    thread.finished.connect(waiting_widget.close)
     thread.finished.connect(waiting_widget.deleteLater)
     thread.finished.connect(thread.deleteLater)
 
