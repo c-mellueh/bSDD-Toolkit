@@ -144,12 +144,10 @@ def open_project(
         return
 
     if not file_lock.lock_file(path):
-        text_title = QCoreApplication.translate("Project", "Project file is locked")
-        detail_text = QCoreApplication.translate(
-            "Project", "The selected file is already in use and cannot be opened."
-        )
-        popups.create_warning_popup(detail_text, text_title)
-        return
+        if popups.request_overwrite_lock(path):
+            file_lock.overwrite_lock(path)
+        else:
+            return
     try:
         proj = project.load_project(path, sloppy=False)
     except ValidationError as error:

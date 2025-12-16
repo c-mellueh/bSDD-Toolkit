@@ -14,6 +14,11 @@ class FileLock:
         return bsdd_gui.FileLockProperties
 
     @classmethod
+    def build_lockpath(cls, file_path: str) -> str:
+        """Build the lock file path for a given file path."""
+        return f"{os.path.abspath(file_path)}.lock"
+
+    @classmethod
     def lock_file(cls, file_path: str) -> bool:
         """Try to acquire an exclusive lock marker for the given file path."""
         normalized_path = os.path.abspath(file_path)
@@ -28,7 +33,7 @@ class FileLock:
         # Release a previous lock if we are switching files
         cls.unlock_file()
 
-        lock_path = f"{normalized_path}.lock"
+        lock_path = cls.build_lockpath(normalized_path)
 
         try:
             file = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_RDWR)
@@ -62,6 +67,18 @@ class FileLock:
         finally:
             cls.set_file(None)
             cls._cleanup()
+
+    @classmethod
+    def overwrite_lock(cls, file_path: str):
+        lock_path = cls.build_lockpath(file_path)
+        try:
+            os.remove(lock_path)
+            logging.info("Removed existing lock file: %s", lock_path)
+            cls.lock_file(file_path)
+        except Exception as exc:
+            logging.info("Unable to remove existing lock file '%s': %s", lock_path, exc)
+            cls.set_lock_path(lock_path)
+            cls.set_path(file_path)
 
     @classmethod
     def _cleanup(cls):
