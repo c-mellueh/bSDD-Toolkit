@@ -1,7 +1,14 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication, QWidget, QDialog, QDialogButtonBox, QVBoxLayout
-from PySide6.QtCore import QCoreApplication, Qt
-
+from PySide6.QtWidgets import (
+    QApplication,
+    QWidget,
+    QDialog,
+    QDialogButtonBox,
+    QVBoxLayout,
+    QToolButton,
+)
+from PySide6.QtCore import QCoreApplication, Qt, QEvent
+import qtawesome as qta
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_json import BsddClass
@@ -28,6 +35,7 @@ class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
         self.setWindowIcon(get_icon())
         self.bsdd_data: BsddClass
         trigger.widget_created(self)
+        self._init_definition_toolbutton()
 
     # Open / Close windows
     def closeEvent(self, event):
@@ -37,6 +45,30 @@ class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
 
     def paintEvent(self, event):
         super().paintEvent(event)
+
+    def _init_definition_toolbutton(self) -> None:
+        """Place a helper button inside the definition text edit."""
+        self._definition_toolbutton = QToolButton(self.te_definition.viewport())
+        self._definition_toolbutton.setIcon(qta.icon("mdi6.creation-outline"))
+        self._definition_toolbutton.setAutoRaise(True)
+        self._definition_toolbutton.setCursor(Qt.PointingHandCursor)
+        self.te_definition.viewport().installEventFilter(self)
+        self.te_definition.textChanged.connect(self._sync_definition_toolbutton)
+        self._position_definition_toolbutton()
+        self._sync_definition_toolbutton()
+
+    def _position_definition_toolbutton(self) -> None:
+        margin = 6
+        self._definition_toolbutton.move(margin, margin)
+
+    def _sync_definition_toolbutton(self) -> None:
+        is_empty = self.te_definition.toPlainText() == ""
+        self._definition_toolbutton.setVisible(is_empty)
+
+    def eventFilter(self, obj, event):
+        if obj is self.te_definition.viewport() and event.type() == QEvent.Resize:
+            self._position_definition_toolbutton()
+        return super().eventFilter(obj, event)
 
 
 class EditDialog(BaseDialog):
