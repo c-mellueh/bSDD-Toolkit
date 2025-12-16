@@ -17,7 +17,6 @@ from PySide6.QtCore import QObject, Signal
 from pydantic import ValidationError
 
 if TYPE_CHECKING:
-    from bsdd_gui.core.file_lock import FileLock
     from bsdd_gui.module.project.prop import ProjectProperties
 
 

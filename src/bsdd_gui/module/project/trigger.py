@@ -27,7 +27,7 @@ def new_clicked():
 
 def open_clicked():
     core.open_file_clicked(
-        tool.Project, tool.Appdata, tool.MainWindowWidget, tool.Popups, tool.Plugins
+        tool.Project, tool.Appdata, tool.MainWindowWidget, tool.Popups, tool.Plugins, tool.FileLock
     )
     pass
 

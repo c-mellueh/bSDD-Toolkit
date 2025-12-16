@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from bsdd_gui.presets.prop_presets import ActionsProperties
-from bsdd_gui.core.file_lock import FileLock
 
 if TYPE_CHECKING:
     from bsdd_json.models import BsddDictionary

@@ -85,3 +85,4 @@ def close_event(
     main_window: Type[tool.MainWindowWidget], file_lock: Type[tool.FileLock], event
 ):
     file_lock.unlock_file()
+    event.accept()
