@@ -24,6 +24,8 @@ import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.module.util import ui
 from bsdd_gui.module.util.constants import OPTION_SEPERATOR
+from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
+
 
 if TYPE_CHECKING:
     from bsdd_gui.module.util.prop import MenuDict, UtilProperties
@@ -452,3 +454,13 @@ class Util:
         if seperator is None:
             return [plain_text]
         return plain_text.split(seperator)
+
+    @classmethod
+    def create_waiting_widget(cls,title = "Waiting",parent_widget = None):
+        waiting_worker, waiting_thread, waiting_widget = start_waiting_widget(
+            parent_widget, title, ""
+        )
+        cls.get_properties().waiting_worker = waiting_worker
+        cls.get_properties().waiting_thread = waiting_thread
+        cls.get_properties().waiting_widget = waiting_widget
+        return waiting_worker, waiting_thread, waiting_widget

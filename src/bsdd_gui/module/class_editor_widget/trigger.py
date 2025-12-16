@@ -61,4 +61,4 @@ def group_classes(bsdd_classes: list[BsddClass]):
     )
 
 def create_ai_definition(widget:ui.ClassEditor):
-    core.create_ai_definition(widget,tool.ClassEditorWidget,tool.AiHelper,tool.Project)
+    core.create_ai_definition(widget,tool.ClassEditorWidget,tool.AiHelper,tool.Project,tool.Util)

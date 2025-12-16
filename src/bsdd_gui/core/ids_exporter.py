@@ -377,6 +377,7 @@ def export_ids(
     class_view: Type[tool.IdsClassView],
     property_view: Type[tool.IdsPropertyView],
     popups: Type[tool.Popups],
+    util:Type[tool.Util]
 ):
 
     widget_tool.sync_to_model(widget, widget.bsdd_data)
@@ -386,7 +387,9 @@ def export_ids(
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 
-    waiting_worker, waiting_thread, waiting_widget = widget_tool.create_waiting_widget()
+    title = QCoreApplication.translate("IDSExport","Export IDS")
+
+    waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
     waiting_widget.set_title("Load Data")
 
     setup_worker, setup_thread = widget_tool.create_export_setup_thread(

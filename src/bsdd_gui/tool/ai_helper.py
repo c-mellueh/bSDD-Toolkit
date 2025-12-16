@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from PySide6.QtCore import Signal,QObject,QThread,Qt
 import logging
 from bsdd_gui.module.ai_helper import ui, constants
 import bsdd_gui
@@ -173,3 +174,30 @@ class AiHelper:
             # Fallback (falls SDK-Struktur sich unterscheidet)
             out = getattr(resp, "output_text", "") or str(resp)
         return out
+
+    @classmethod
+    def create_gen_def_thread(cls,bsdd_json):
+        class _SetupWorker(QObject):
+            finished = Signal(object)
+            error = Signal(object)
+
+            def __init__(self):
+                super().__init__()
+
+            def run(self):
+                value = cls.generate_class_definition(bsdd_json)
+                self.finished.emit(value)
+
+        ai_worker = _SetupWorker()
+        cls.get_properties().ai_worker = ai_worker
+        ai_thread = QThread()
+
+        cls.get_properties().ai_thread = ai_thread
+        ai_worker.moveToThread(ai_thread)
+        ai_worker.finished.connect(ai_thread.quit)
+        ai_worker.finished.connect(ai_worker.deleteLater)
+        ai_worker.error.connect(ai_thread.quit)
+        ai_worker.error.connect(ai_worker.deleteLater)
+        ai_thread.finished.connect(ai_thread.deleteLater)
+        ai_thread.started.connect(ai_worker.run, Qt.ConnectionType.QueuedConnection)
+        return ai_worker, ai_thread

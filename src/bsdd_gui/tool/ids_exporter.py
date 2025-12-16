@@ -19,7 +19,6 @@ from PySide6.QtCore import QDate, Signal, Qt, QObject, QThread
 import datetime
 from ifctester.facet import Classification as ClassificationFacet
 from ifctester.facet import Property as PropertyFacet
-from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter.prop import (
@@ -575,16 +574,6 @@ class IdsExporter(ActionTool, FieldTool):
         setup_thread.finished.connect(setup_thread.deleteLater)
         setup_thread.started.connect(setup_worker.run, Qt.ConnectionType.QueuedConnection)
         return setup_worker, setup_thread
-
-    @classmethod
-    def create_waiting_widget(cls):
-        waiting_worker, waiting_thread, waiting_widget = start_waiting_widget(
-            None, "Export IDS", ""
-        )
-        cls.get_properties().waiting_worker = waiting_worker
-        cls.get_properties().waiting_thread = waiting_thread
-        cls.get_properties().waiting_widget = waiting_widget
-        return waiting_worker, waiting_thread, waiting_widget
 
     @classmethod
     def create_write_thread(cls, ids, out_path):
