@@ -34,8 +34,9 @@ class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
         self.setupUi(self)
         self.setWindowIcon(get_icon())
         self.bsdd_data: BsddClass
-        trigger.widget_created(self)
         self._init_definition_toolbutton()
+
+        trigger.widget_created(self)
 
     # Open / Close windows
     def closeEvent(self, event):

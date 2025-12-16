@@ -4,6 +4,9 @@ from typing import TYPE_CHECKING, Type
 from bsdd_json import BsddClass
 import logging
 from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import property_utils as prop_utils
+
+import json
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -187,3 +190,28 @@ def group_classes(
         class_editor.signals.dialog_accepted.emit(dialog)
     else:
         class_editor.signals.dialog_declined.emit(dialog)
+
+
+def create_ai_definition(
+    widget: ui.ClassEditor,
+    class_editor: Type[tool.ClassEditorWidget],
+    ai_helper: Type[tool.AiHelper],
+    project: Type[tool.Project],
+):
+    bsdd_class = class_editor.get_data()
+    dump = dict()
+    if isinstance(bsdd_class, BsddClass):
+        dump = bsdd_class.model_dump()
+    dump["Name"] = widget.le_name.text()
+    dump["RelatedIfcEntityNamesList"] = widget.ti_related_ifc_entity.tags()
+    relevant_keys = ["Name", "ParentClassCode", "RelatedIfcEntityNamesList", "ClassProperties"]
+    reduced_class_properties = [
+        prop_utils.get_name(cp, project.get()) for cp in bsdd_class.ClassProperties or []
+    ]
+    dump["ClassProperties"] = reduced_class_properties
+    reduced_dump = {key: dump.get(key) for key in relevant_keys}
+    json_text = json.dumps(reduced_dump)
+
+    definition = ai_helper.generate_class_definition(json_text)
+    if definition:
+        widget.te_definition.setText(definition)
