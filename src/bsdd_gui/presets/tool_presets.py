@@ -266,7 +266,8 @@ class FieldTool(WidgetTool):
     @classmethod
     @abstractmethod
     def create_widget(cls, *args, **kwargs) -> ItemViewType:
-        return super().create_widget(*args, **kwargs)
+        widget = super().create_widget(*args, **kwargs)
+        return widget
 
     @classmethod
     def get_widget(cls, data: object) -> ItemViewType:
@@ -292,6 +293,7 @@ class FieldTool(WidgetTool):
 
     @classmethod
     def register_widget(cls, widget: FieldWidget):
+        cls.signals.widget_created.emit(widget)
         super().register_widget(widget)
         cls.get_properties().field_getter[widget] = dict()
         cls.get_properties().field_setter[widget] = dict()

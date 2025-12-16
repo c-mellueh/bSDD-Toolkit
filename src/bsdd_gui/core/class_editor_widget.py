@@ -193,38 +193,3 @@ def group_classes(
         class_editor.signals.dialog_declined.emit(dialog)
 
 
-def create_ai_definition(
-    widget: ui.ClassEditor,
-    class_editor: Type[tool.ClassEditorWidget],
-    ai_helper: Type[tool.AiHelper],
-    project: Type[tool.Project],
-    util: Type[tool.Util],
-):
-    bsdd_class = class_editor.get_data()
-    dump = dict()
-    if isinstance(bsdd_class, BsddClass):
-        dump = bsdd_class.model_dump()
-    dump["Name"] = widget.le_name.text()
-    dump["RelatedIfcEntityNamesList"] = widget.ti_related_ifc_entity.tags()
-    relevant_keys = ["Name", "ParentClassCode", "RelatedIfcEntityNamesList", "ClassProperties"]
-    reduced_class_properties = [
-        prop_utils.get_name(cp, project.get()) for cp in bsdd_class.ClassProperties or []
-    ]
-    dump["ClassProperties"] = reduced_class_properties
-    reduced_dump = {key: dump.get(key) for key in relevant_keys}
-    json_text = json.dumps(reduced_dump)
-    widget._definition_toolbutton.hide()
-    waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(
-        "Generating Definition", parent_widget=widget.te_definition
-    )
-    ai_worker, ai_thread = ai_helper.create_gen_def_thread(json_text)
-
-    def _finished(definition):
-        if definition:
-            QTimer.singleShot(0, widget, lambda: widget.te_definition.setText(definition))
-        else:
-            QTimer.singleShot(0, widget, lambda: widget._definition_toolbutton.show())
-        stop_waiting_widget(waiting_worker)
-
-    ai_worker.finished.connect(_finished)
-    ai_thread.start()

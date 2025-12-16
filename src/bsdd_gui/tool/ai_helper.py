@@ -1,8 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtCore import Signal,QObject,QThread,Qt
+from PySide6.QtCore import Signal, QObject, QThread, Qt
+from PySide6.QtWidgets import QToolButton
+import qtawesome as qta
+
 import logging
-from bsdd_gui.module.ai_helper import ui, constants
+from bsdd_gui.module.ai_helper import ui, constants,trigger
 import bsdd_gui
 from bsdd_json import BsddClass
 from openai import OpenAI
@@ -12,6 +15,7 @@ import os
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ai_helper.prop import AiHelperProperties
+    from bsdd_gui.module.class_editor_widget import ui as class_edit_ui
 
 
 class AiHelper:
@@ -76,6 +80,29 @@ class AiHelper:
         return widget.cb_language.currentText()
 
     @classmethod
+    def add_ai_to_classedit(cls, widget: class_edit_ui.ClassEditor):
+        """Place a helper button inside the definition text edit."""
+        widget._definition_toolbutton = QToolButton(widget.te_definition.viewport())
+        widget._definition_toolbutton.setIcon(qta.icon("mdi6.creation-outline"))
+        widget._definition_toolbutton.setAutoRaise(True)
+        widget._definition_toolbutton.setCursor(Qt.PointingHandCursor)
+        widget.te_definition.textChanged.connect(lambda: cls._sync_definition_toolbutton(widget))
+        cls._position_definition_toolbutton(widget)
+        cls._sync_definition_toolbutton(widget)
+        widget._definition_toolbutton.clicked.connect(
+            lambda: trigger.create_ai_definition(widget)
+        )
+    @classmethod
+    def _position_definition_toolbutton(cls, widget) -> None:
+        margin = 6
+        widget._definition_toolbutton.move(margin, margin)
+
+    @classmethod
+    def _sync_definition_toolbutton(cls, widget) -> None:
+        is_empty = widget.te_definition.toPlainText() == ""
+        widget._definition_toolbutton.setVisible(is_empty)
+
+    @classmethod
     def build_class_instructions(cls, lang: str) -> str:
         if lang == constants.LANGUAGE_DE:
             return (
@@ -104,7 +131,7 @@ class AiHelper:
                 "Task:"
                 "Create a technically correct, concise definition of the class in German."
                 "You are an experienced BIM manager and a specialist in infrastructure and civil engineering projects."
-                "You will receive a single bSDD class in JSON format according to the buildingSMART structure ..." 
+                "You will receive a single bSDD class in JSON format according to the buildingSMART structure ..."
                 "Rules for the definition:"
                 "Length: 3-5 complete sentences"
                 "Style: technical-neutral, factual, and standards-compliant"
@@ -176,7 +203,7 @@ class AiHelper:
         return out
 
     @classmethod
-    def create_gen_def_thread(cls,bsdd_json):
+    def create_gen_def_thread(cls, bsdd_json):
         class _SetupWorker(QObject):
             finished = Signal(object)
             error = Signal(object)

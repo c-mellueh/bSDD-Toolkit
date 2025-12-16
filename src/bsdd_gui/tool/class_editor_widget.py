@@ -23,7 +23,6 @@ class Signals(DialogSignals):
     )  # the class is not added to the Dictionary So far, this gets handled by ClassTree
     related_ifc_removed = Signal(BsddClass, str)  # class, ifc code
     related_ifc_added = Signal(BsddClass, str)  # class, ifc code
-    ai_definition_requested = Signal(object)
 
 
 class ClassEditorWidget(DialogTool):
@@ -57,12 +56,9 @@ class ClassEditorWidget(DialogTool):
         cls.signals.copy_class_requested.connect(trigger.copy_class)
         cls.signals.new_class_requested.connect(trigger.create_new_class)
         cls.signals.grouping_requested.connect(trigger.group_classes)
-        cls.signals.ai_definition_requested.connect(trigger.create_ai_definition)
+
     @classmethod
     def connect_widget_signals(cls, widget: ui.ClassEditor):
-        widget._definition_toolbutton.clicked.connect(
-            lambda: cls.signals.ai_definition_requested.emit(widget)
-        )
         super().connect_widget_signals(widget)
 
     @classmethod

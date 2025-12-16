@@ -34,8 +34,6 @@ class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
         self.setupUi(self)
         self.setWindowIcon(get_icon())
         self.bsdd_data: BsddClass
-        self._init_definition_toolbutton()
-
         trigger.widget_created(self)
 
     # Open / Close windows
@@ -47,29 +45,7 @@ class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
     def paintEvent(self, event):
         super().paintEvent(event)
 
-    def _init_definition_toolbutton(self) -> None:
-        """Place a helper button inside the definition text edit."""
-        self._definition_toolbutton = QToolButton(self.te_definition.viewport())
-        self._definition_toolbutton.setIcon(qta.icon("mdi6.creation-outline"))
-        self._definition_toolbutton.setAutoRaise(True)
-        self._definition_toolbutton.setCursor(Qt.PointingHandCursor)
-        self.te_definition.viewport().installEventFilter(self)
-        self.te_definition.textChanged.connect(self._sync_definition_toolbutton)
-        self._position_definition_toolbutton()
-        self._sync_definition_toolbutton()
 
-    def _position_definition_toolbutton(self) -> None:
-        margin = 6
-        self._definition_toolbutton.move(margin, margin)
-
-    def _sync_definition_toolbutton(self) -> None:
-        is_empty = self.te_definition.toPlainText() == ""
-        self._definition_toolbutton.setVisible(is_empty)
-
-    def eventFilter(self, obj, event):
-        if obj is self.te_definition.viewport() and event.type() == QEvent.Resize:
-            self._position_definition_toolbutton()
-        return super().eventFilter(obj, event)
 
 
 class EditDialog(BaseDialog):
