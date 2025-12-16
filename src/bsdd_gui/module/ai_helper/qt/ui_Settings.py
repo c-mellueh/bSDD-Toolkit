@@ -15,14 +15,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QFormLayout, QLabel,
-    QLineEdit, QSizePolicy, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
+    QLabel, QLineEdit, QSizePolicy, QWidget)
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(532, 71)
+        Form.resize(532, 92)
         self.formLayout = QFormLayout(Form)
         self.formLayout.setObjectName(u"formLayout")
         self.label = QLabel(Form)
@@ -45,6 +45,18 @@ class Ui_Form(object):
 
         self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.lineEdit)
 
+        self.label_3 = QLabel(Form)
+        self.label_3.setObjectName(u"label_3")
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_3)
+
+        self.cb_language = QComboBox(Form)
+        self.cb_language.addItem("")
+        self.cb_language.addItem("")
+        self.cb_language.setObjectName(u"cb_language")
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.cb_language)
+
 
         self.retranslateUi(Form)
 
@@ -56,5 +68,9 @@ class Ui_Form(object):
         self.label.setText(QCoreApplication.translate("Form", u"use OpenAI:", None))
         self.checkBox.setText("")
         self.label_2.setText(QCoreApplication.translate("Form", u"OpenAI API-Key:", None))
+        self.label_3.setText(QCoreApplication.translate("Form", u"AI-Sprache", None))
+        self.cb_language.setItemText(0, QCoreApplication.translate("Form", u"German", None))
+        self.cb_language.setItemText(1, QCoreApplication.translate("Form", u"English", None))
+
     # retranslateUi
 
