@@ -1,7 +1,14 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication, QWidget, QDialog, QDialogButtonBox, QVBoxLayout
-from PySide6.QtCore import QCoreApplication, Qt
-
+from PySide6.QtWidgets import (
+    QApplication,
+    QWidget,
+    QDialog,
+    QDialogButtonBox,
+    QVBoxLayout,
+    QToolButton,
+)
+from PySide6.QtCore import QCoreApplication, Qt, QEvent
+import qtawesome as qta
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_json import BsddClass
@@ -37,6 +44,8 @@ class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
 
     def paintEvent(self, event):
         super().paintEvent(event)
+
+
 
 
 class EditDialog(BaseDialog):

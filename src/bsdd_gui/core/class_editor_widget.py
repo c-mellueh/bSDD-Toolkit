@@ -1,9 +1,13 @@
 from __future__ import annotations
-from PySide6.QtCore import QModelIndex, QCoreApplication
+from PySide6.QtCore import QModelIndex, QCoreApplication, QTimer
 from typing import TYPE_CHECKING, Type
 from bsdd_json import BsddClass
 import logging
 from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import property_utils as prop_utils
+from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
+
+import json
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -187,3 +191,5 @@ def group_classes(
         class_editor.signals.dialog_accepted.emit(dialog)
     else:
         class_editor.signals.dialog_declined.emit(dialog)
+
+

@@ -58,6 +58,10 @@ class ClassEditorWidget(DialogTool):
         cls.signals.grouping_requested.connect(trigger.group_classes)
 
     @classmethod
+    def connect_widget_signals(cls, widget: ui.ClassEditor):
+        super().connect_widget_signals(widget)
+
+    @classmethod
     def request_class_editor(cls, bsdd_class: BsddClass):
         cls.signals.edit_class_requested.emit(bsdd_class)
 
