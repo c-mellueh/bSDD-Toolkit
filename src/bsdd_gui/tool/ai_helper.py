@@ -82,6 +82,12 @@ class AiHelper:
         )
 
     @classmethod
+    def get_sentence_count(cls):
+        return tool.Appdata.get_int_setting(
+            constants.AI_HELPER_SECTION, constants.SENTENCE_COUNT, 3
+        )
+
+    @classmethod
     def read_checkstate(cls, widget: ui.SettingsWidget) -> bool:
         return widget.checkBox.isChecked()
 
@@ -92,6 +98,10 @@ class AiHelper:
     @classmethod
     def read_language(cls, widget: ui.SettingsWidget) -> str:
         return widget.cb_language.currentText()
+
+    @classmethod
+    def read_sentence_count(cls, widget: ui.SettingsWidget) -> int:
+        return widget.spinBox.value()
 
 
 class AiClassDescription:
@@ -122,11 +132,11 @@ class AiClassDescription:
         widget._ai_button.setVisible(is_empty)
 
     @classmethod
-    def build_class_instructions(cls, lang: str) -> str:
+    def build_class_instructions(cls, lang: str, sentence_count: int) -> str:
         if lang == constants.LANGUAGE_DE:
-            return "Du bist ein erfahrener BIM-Manager und Fachexperte für Infrastruktur- und Ingenieurbauwerke. Du erhältst eine einzelne bSDD-Klasse im JSON-Format gemäß der buildingSMART-Struktur. Deine Aufgabe ist es, eine fachlich korrekte, prägnante und technisch neutrale Definition dieser Klasse in deutscher Sprache zu verfassen. Der Text besteht aus drei bis fünf vollständigen Sätzen im normnahen Stil. Die Definition umfasst baukonstruktive Ausführung, primären Zweck bzw. Funktion sowie typische Einsatzbereiche. Falls fachlich sinnvoll, können einschlägige Normen wie DIN oder EN benannt werden, jedoch ohne nähere Erläuterung. Verzichte auf Aufzählungen, Wiederholung von JSON-Feldnamen, Eigenschaften, Beispielwerte sowie Einleitungssätze wie „Diese Klasse beschreibt …“. Gib ausschließlich die formulierte Klassendefinition als zusammenhängenden Fließtext ohne Zusatzkommentare oder Hinweise zurück."
+            return f"Du bist ein erfahrener BIM-Manager und Fachexperte für Infrastruktur- und Ingenieurbauwerke. Du erhältst eine einzelne bSDD-Klasse im JSON-Format gemäß der buildingSMART-Struktur. Deine Aufgabe ist es, eine fachlich korrekte, prägnante und technisch neutrale Definition dieser Klasse in deutscher Sprache zu verfassen. Der Text besteht aus {sentence_count} vollständigen Sätzen im normnahen Stil. Die Definition umfasst baukonstruktive Ausführung, primären Zweck bzw. Funktion sowie typische Einsatzbereiche. Falls fachlich sinnvoll, können einschlägige Normen wie DIN oder EN benannt werden, jedoch ohne nähere Erläuterung. Verzichte auf Aufzählungen, Wiederholung von JSON-Feldnamen, Eigenschaften, Beispielwerte sowie Einleitungssätze wie „Diese Klasse beschreibt …“. Gib ausschließlich die formulierte Klassendefinition als zusammenhängenden Fließtext ohne Zusatzkommentare oder Hinweise zurück."
         if lang == constants.LANGUAGE_EN:
-            return "You are an experienced BIM manager and expert in infrastructure and civil engineering structures. You will receive a single bSDD class in JSON format according to the buildingSMART structure. Your task is to write a technically correct, concise, and neutral definition of this class in english. The text should consist of three to five complete sentences in a style close to the standards. The definition should include structural design, primary purpose or function, and typical areas of application. Where technically appropriate, relevant standards such as DIN or EN may be mentioned, but without further explanation. Avoid bullet points, repetition of JSON field names, properties, example values, and introductory sentences such as 'This class describes…'. Return only the formulated class definition as a continuous text without additional comments or notes."
+            return f"You are an experienced BIM manager and expert in infrastructure and civil engineering structures. You will receive a single bSDD class in JSON format according to the buildingSMART structure. Your task is to write a technically correct, concise, and neutral definition of this class in english. The text should consist of {sentence_count} complete sentences in a style close to the standards. The definition should include structural design, primary purpose or function, and typical areas of application. Where technically appropriate, relevant standards such as DIN or EN may be mentioned, but without further explanation. Avoid bullet points, repetition of JSON field names, properties, example values, and introductory sentences such as 'This class describes…'. Return only the formulated class definition as a continuous text without additional comments or notes."
         raise ValueError(f"Unsupported language. Use one of {constants.LANGUAGES}")
 
     def build_user_input(json_text: str, lang: str) -> str:
@@ -147,6 +157,7 @@ class AiClassDescription:
         model="gpt-4o-mini",
         max_output_tokens=220,
         client=None,
+        sentence_count=3,
     ):
         if not api_key:
             logging.error("ERROR: API-Key ist nicht gesetzt.")
@@ -157,7 +168,7 @@ class AiClassDescription:
 
         if client is None:
             client = OpenAI(api_key=api_key)
-        instructions = cls.build_class_instructions(language)
+        instructions = cls.build_class_instructions(language, sentence_count)
         user_input = cls.build_user_input(json_text, language)
 
         try:
@@ -220,11 +231,14 @@ class AiPropertyDescription:
         return bsdd_gui.AiPropertyDescriptionProperties
 
     @classmethod
-    def get_text_widget(cls,widget: property_ui.PropertyEditor | class_property_ui.ClassPropertyEditor):
+    def get_text_widget(
+        cls, widget: property_ui.PropertyEditor | class_property_ui.ClassPropertyEditor
+    ):
         if isinstance(widget, property_ui.PropertyEditor):
             return widget.te_definition
         else:
             return widget.te_description
+
     @classmethod
     def add_ai_to_propertyedit(
         cls, widget: property_ui.PropertyEditor | class_property_ui.ClassPropertyEditor
@@ -252,11 +266,11 @@ class AiPropertyDescription:
         widget._ai_button.setVisible(is_empty)
 
     @classmethod
-    def build_class_instructions(cls, lang: str) -> str:
+    def build_class_instructions(cls, lang: str, sentence_count: int) -> str:
         if lang == constants.LANGUAGE_DE:
-            return "Du bist ein erfahrener BIM-Manager und Fachexperte für Infrastruktur- und Ingenieurbauwerke. Du erhältst ein einzelnes bSDD-Property im JSON-Format gemäß der buildingSMART-Struktur. Deine Aufgabe ist es, eine fachlich korrekte, prägnante und technisch neutrale Definition dieses Merkmals in deutscher Sprache zu verfassen. Der Text besteht aus drei bis fünf vollständigen Sätzen im normnahen Stil. Die Definition umfasst baukonstruktive Ausführung, primären Zweck bzw. Funktion sowie typische Einsatzbereiche. Falls fachlich sinnvoll, können einschlägige Normen wie DIN oder EN benannt werden, jedoch ohne nähere Erläuterung. Verzichte auf Aufzählungen, Wiederholung von JSON-Feldnamen, Beispielwerte sowie Einleitungssätze wie „Dieses Merkmal beschreibt …“. Gib ausschließlich die formulierte Merkmalsdefinition als zusammenhängenden Fließtext ohne Zusatzkommentare oder Hinweise zurück."
+            return f"Du bist ein erfahrener BIM-Manager und Fachexperte für Infrastruktur- und Ingenieurbauwerke. Du erhältst ein einzelnes bSDD-Property im JSON-Format gemäß der buildingSMART-Struktur. Deine Aufgabe ist es, eine fachlich korrekte, prägnante und technisch neutrale Definition dieses Merkmals in deutscher Sprache zu verfassen. Der Text besteht aus {sentence_count} vollständigen Sätzen im normnahen Stil. Die Definition umfasst baukonstruktive Ausführung, primären Zweck bzw. Funktion sowie typische Einsatzbereiche. Falls fachlich sinnvoll, können einschlägige Normen wie DIN oder EN benannt werden, jedoch ohne nähere Erläuterung. Verzichte auf Aufzählungen, Wiederholung von JSON-Feldnamen, Beispielwerte sowie Einleitungssätze wie „Dieses Merkmal beschreibt …“. Gib ausschließlich die formulierte Merkmalsdefinition als zusammenhängenden Fließtext ohne Zusatzkommentare oder Hinweise zurück."
         if lang == constants.LANGUAGE_EN:
-            return "You are an experienced BIM manager and expert in infrastructure and civil engineering structures. You will receive a single bSDD property in JSON format according to the buildingSMART structure. Your task is to write a technically correct, concise, and neutral definition of this property in english. The text should consist of three to five complete sentences in a style close to the standards. The definition should include structural design, primary purpose or function, and typical areas of application. Where technically appropriate, relevant standards such as DIN or EN may be mentioned, but without further explanation. Avoid bullet points, repetition of JSON field names, example values, and introductory sentences such as 'This property describes…'. Return only the formulated property definition as a continuous text without additional comments or notes."
+            return f"You are an experienced BIM manager and expert in infrastructure and civil engineering structures. You will receive a single bSDD property in JSON format according to the buildingSMART structure. Your task is to write a technically correct, concise, and neutral definition of this property in english. The text should consist of {sentence_count} complete sentences in a style close to the standards. The definition should include structural design, primary purpose or function, and typical areas of application. Where technically appropriate, relevant standards such as DIN or EN may be mentioned, but without further explanation. Avoid bullet points, repetition of JSON field names, example values, and introductory sentences such as 'This property describes…'. Return only the formulated property definition as a continuous text without additional comments or notes."
         raise ValueError(f"Unsupported language. Use one of {constants.LANGUAGES}")
 
     def build_user_input(json_text: str, lang: str) -> str:
@@ -277,6 +291,7 @@ class AiPropertyDescription:
         model="gpt-4o-mini",
         max_output_tokens=220,
         client=None,
+        sentence_count=3,
     ):
         if not api_key:
             logging.error("ERROR: API-Key ist nicht gesetzt.")
@@ -287,7 +302,7 @@ class AiPropertyDescription:
 
         if client is None:
             client = OpenAI(api_key=api_key)
-        instructions = cls.build_class_instructions(language)
+        instructions = cls.build_class_instructions(language, sentence_count)
         user_input = cls.build_user_input(json_text, language)
 
         try:

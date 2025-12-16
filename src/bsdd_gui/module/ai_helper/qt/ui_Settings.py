@@ -16,13 +16,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
-    QLabel, QLineEdit, QSizePolicy, QWidget)
+    QLabel, QLineEdit, QSizePolicy, QSpinBox,
+    QWidget)
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(532, 92)
+        Form.resize(532, 122)
         self.formLayout = QFormLayout(Form)
         self.formLayout.setObjectName(u"formLayout")
         self.label = QLabel(Form)
@@ -57,6 +58,18 @@ class Ui_Form(object):
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.cb_language)
 
+        self.label_4 = QLabel(Form)
+        self.label_4.setObjectName(u"label_4")
+
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.label_4)
+
+        self.spinBox = QSpinBox(Form)
+        self.spinBox.setObjectName(u"spinBox")
+        self.spinBox.setMinimum(1)
+        self.spinBox.setValue(3)
+
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.spinBox)
+
 
         self.retranslateUi(Form)
 
@@ -72,5 +85,6 @@ class Ui_Form(object):
         self.cb_language.setItemText(0, QCoreApplication.translate("Form", u"German", None))
         self.cb_language.setItemText(1, QCoreApplication.translate("Form", u"English", None))
 
+        self.label_4.setText(QCoreApplication.translate("Form", u"Satzanzahl", None))
     # retranslateUi
 

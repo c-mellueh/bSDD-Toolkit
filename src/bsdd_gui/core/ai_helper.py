@@ -21,16 +21,17 @@ def fill_settings(func, settings: Type[tool.SettingsWidget]):
 def connect_signals(
     ai_helper: Type[tool.AiHelper],
     ai_class: Type[tool.AiClassDescription],
-    ai_property:Type[tool.AiPropertyDescription],
+    ai_property: Type[tool.AiPropertyDescription],
     class_editor: Type[tool.ClassEditorWidget],
-    property_editor:Type[tool.PropertyEditorWidget],
-    class_property_editor:Type[tool.PropertyEditorWidget]
+    property_editor: Type[tool.PropertyEditorWidget],
+    class_property_editor: Type[tool.PropertyEditorWidget],
 ):
     if not ai_helper.get_checkstate():
         return
     class_editor.signals.widget_created.connect(ai_class.add_ai_to_classedit)
     property_editor.signals.widget_created.connect(ai_property.add_ai_to_propertyedit)
     class_property_editor.signals.widget_created.connect(ai_property.add_ai_to_propertyedit)
+
 
 def setup_settings(
     widget: ui.SettingsWidget,
@@ -41,9 +42,14 @@ def setup_settings(
     splitter = appdata.get_string_setting(constants.AI_HELPER_SECTION, constants.API_KEY, "")
     language = appdata.get_string_setting(constants.AI_HELPER_SECTION, constants.LANGUAGE, "")
     is_active = appdata.get_bool_setting(constants.AI_HELPER_SECTION, constants.IS_ACTIVE)
+    sentence_count = appdata.get_int_setting(
+        constants.AI_HELPER_SECTION, constants.SENTENCE_COUNT, 3
+    )
+
     widget.lineEdit.setText(splitter)
     widget.checkBox.setChecked(is_active)
     widget.cb_language.setCurrentText(language)
+    widget.spinBox.setValue(sentence_count)
 
 
 def splitter_settings_accepted(ai_helper: Type[tool.AiHelper], appdata: Type[tool.Appdata]):
@@ -51,9 +57,11 @@ def splitter_settings_accepted(ai_helper: Type[tool.AiHelper], appdata: Type[too
     is_seperator_activated = ai_helper.read_checkstate(widget)
     text = ai_helper.read_api_key(widget)
     language = ai_helper.read_language(widget)
+    sentence_count = ai_helper.read_sentence_count(widget)
     appdata.set_setting(constants.AI_HELPER_SECTION, constants.API_KEY, text)
     appdata.set_setting(constants.AI_HELPER_SECTION, constants.IS_ACTIVE, is_seperator_activated)
     appdata.set_setting(constants.AI_HELPER_SECTION, constants.LANGUAGE, language)
+    appdata.set_setting(constants.AI_HELPER_SECTION, constants.SENTENCE_COUNT, sentence_count)
 
     if not text:
         appdata.set_setting(constants.AI_HELPER_SECTION, constants.IS_ACTIVE, False)
@@ -87,8 +95,10 @@ def generate_class_definition(
     model = ai_helper.get_model()
     max_output_tokens = ai_helper.get_output_tokens()
     client = ai_helper.get_client()
+    sentence_count = ai_helper.get_sentence_count()
+
     ai_worker, ai_thread = ai_class.create_gen_def_thread(
-        json_text, api_key, language, model, max_output_tokens, client
+        json_text, api_key, language, model, max_output_tokens, client,sentence_count
     )
 
     def _finished(definition):
@@ -134,8 +144,9 @@ def generate_property_definition(
     model = ai_helper.get_model()
     max_output_tokens = ai_helper.get_output_tokens()
     client = ai_helper.get_client()
+    sentence_count = ai_helper.get_sentence_count()
     ai_worker, ai_thread = ai_property.create_gen_def_thread(
-        json_text, api_key, language, model, max_output_tokens, client
+        json_text, api_key, language, model, max_output_tokens, client, sentence_count
     )
 
     def _finished(definition):
