@@ -159,7 +159,7 @@ def open_project(
         file_lock.unlock_file()
         raise
     if proj is not None:
-        bsdd_gui.on_new_project()
+        project.register_project(proj)
     else:
         file_lock.unlock_file()
     return proj
@@ -203,4 +203,5 @@ def save_project(path: str, project: Type[tool.Project], appdata: Type[tool.Appd
         json.dump(bsdd_dictionary.model_dump(mode="json", exclude_none=True), file)
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
+    project.set_last_save(bsdd_dictionary)
     logging.info(f"Save Done!")

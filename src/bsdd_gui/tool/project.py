@@ -15,6 +15,7 @@ from bsdd_json import (
 from bsdd_gui.module.project import ui
 from PySide6.QtCore import QObject, Signal
 from pydantic import ValidationError
+import copy
 
 if TYPE_CHECKING:
     from bsdd_gui.module.project.prop import ProjectProperties
@@ -61,6 +62,7 @@ class Project(ActionTool):
     @classmethod
     def register_project(cls, bsdd_dictionary: BsddDictionary):
         cls.get_properties().project_dictionary = bsdd_dictionary
+        cls.set_last_save(bsdd_dictionary)
         bsdd_gui.on_new_project()
 
     @classmethod
@@ -103,3 +105,11 @@ class Project(ActionTool):
     @classmethod
     def get_offline_mode(cls) -> bool:
         return cls.get_properties().offline_mode
+
+    @classmethod
+    def set_last_save(cls, bsdd_dictionary: BsddDictionary):
+        cls.get_properties().last_save = bsdd_dictionary.model_copy(deep=True)
+
+    @classmethod
+    def get_last_save(cls) -> BsddDictionary:
+        return cls.get_properties().last_save

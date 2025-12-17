@@ -82,12 +82,29 @@ def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[t
 def toggle_console(main_window: Type[tool.MainWindowWidget]):
     main_window.toggle_console()
 
-def close_event(event,
-    main_window: Type[tool.MainWindowWidget], file_lock: Type[tool.FileLock], project:Type[tool.Project],util:Type[tool.Util]
+
+def close_event(
+    event,
+    file_lock: Type[tool.FileLock],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+    popups: Type[tool.Popups],
 ):
     bsdd_dict = project.get()
-    file_path = util.create_tempfile("_bsdd.json",add_timestamp=True)
-    bsdd_dict.save(file_path)
-    logging.info(f"File was saved before closing to: '{file_path}'")
+    last_save = project.get_last_save()
+    if bsdd_dict != last_save:
+        reply = popups.request_save_before_exit()
+        if reply is None:
+            # Dont Close Window
+            event.ignore()
+            return
+        if reply:
+            from bsdd_gui.module.project import trigger
+
+            trigger.save_clicked()
+        else:
+            file_path = util.create_tempfile("_bsdd.json", add_timestamp=True)
+            bsdd_dict.save(file_path)
+            logging.info(f"File was saved before closing to: '{file_path}'")
     file_lock.unlock_file()
     event.accept()

@@ -19,7 +19,7 @@ def retranslate_ui():
 
 
 def close_event(event):
-    core.close_event(event,tool.MainWindowWidget, tool.FileLock,tool.Project ,tool.Util)
+    core.close_event(event,tool.FileLock,tool.Project ,tool.Util,tool.Popups)
 
 
 def refresh_status_bar():
