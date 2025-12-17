@@ -5,7 +5,7 @@ import os
 import re
 import tempfile
 from typing import Callable, TYPE_CHECKING
-
+import datetime
 from PySide6.QtCore import QModelIndex, Qt
 from PySide6.QtGui import QAction, QKeySequence, QShortcut, QPalette, QBrush
 from PySide6.QtWidgets import (
@@ -144,9 +144,12 @@ class Util:
         return action
 
     @classmethod
-    def create_tempfile(cls, suffix: str | None = None) -> str:
+    def create_tempfile(cls, suffix: str | None = None,add_timestamp = False) -> str:
         suffix = ".tmp" if suffix is None else suffix
-        return os.path.abspath(tempfile.NamedTemporaryFile(suffix=suffix).name)
+        prefix = ""
+        if add_timestamp:
+            prefix = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S_")
+        return os.path.abspath(tempfile.NamedTemporaryFile(suffix=suffix,prefix=prefix).name)
 
     @classmethod
     def transform_guid(cls, guid: str, add_zero_width: bool):

@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QCoreApplication
 from typing import Type, TYPE_CHECKING
 import bsdd_gui
+import logging
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -81,8 +82,12 @@ def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[t
 def toggle_console(main_window: Type[tool.MainWindowWidget]):
     main_window.toggle_console()
 
-def close_event(
-    main_window: Type[tool.MainWindowWidget], file_lock: Type[tool.FileLock], event
+def close_event(event,
+    main_window: Type[tool.MainWindowWidget], file_lock: Type[tool.FileLock], project:Type[tool.Project],util:Type[tool.Util]
 ):
+    bsdd_dict = project.get()
+    file_path = util.create_tempfile("_bsdd.json",add_timestamp=True)
+    bsdd_dict.save(file_path)
+    logging.info(f"File was saved before closing to: '{file_path}'")
     file_lock.unlock_file()
     event.accept()
