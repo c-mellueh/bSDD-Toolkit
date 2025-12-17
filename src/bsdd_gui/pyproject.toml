@@ -21,6 +21,7 @@ dependencies = [
   "ifctester",
   "qtawesome",
   "ifcopenshell",
+  "openai"
 ]
 
 [project.optional-dependencies]
