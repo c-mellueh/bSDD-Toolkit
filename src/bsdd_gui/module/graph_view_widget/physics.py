@@ -105,7 +105,7 @@ class QuadTree:
 
 
 # ----------------------------
-# Physics engine with Barnes–Hut
+# Physics engine with Barnes-Hut
 # ----------------------------
 class Physics:
     class QuadNode:
@@ -212,6 +212,7 @@ class Physics:
             ty: float,
             theta: float,
             k_repulsion: float,
+            pos_lookup: Dict[Node, Tuple[float, float]],
             eps: float = 0.01,
         ) -> Tuple[float, float]:
             if self.mass == 0.0:
@@ -224,7 +225,7 @@ class Physics:
                     for b in self.bodies:
                         if b is target:
                             continue
-                        bx, by = b.pos().x(), b.pos().y()
+                        bx, by = pos_lookup.get(b, (b.pos().x(), b.pos().y()))
                         dx = tx - bx
                         dy = ty - by
                         d2 = dx * dx + dy * dy + eps
@@ -250,7 +251,9 @@ class Physics:
             fx = fy = 0.0
             for child in (self.nw, self.ne, self.sw, self.se):
                 if child is not None:
-                    cfx, cfy = child.compute_force(target, tx, ty, theta, k_repulsion, eps)
+                    cfx, cfy = child.compute_force(
+                        target, tx, ty, theta, k_repulsion, pos_lookup, eps
+                    )
                     fx += cfx
                     fy += cfy
             return fx, fy
@@ -265,16 +268,18 @@ class Physics:
         self.gravity_center = QPointF(0.0, 0.0)
         self.gravity_strength = 0.0  # no pull to scene center (spread out)
 
-        # Barnes–Hut parameters
+        # Barnes-Hut parameters
         self.use_barnes_hut = True
         self.bh_theta = 0.7  # smaller = more accurate, slower
         self.bh_min_size = 12  # switch to BH when nodes >= this
 
-    def _build_quadtree(self, nodes: List[Node]) -> Optional["Physics.QuadNode"]:
+    def _build_quadtree(
+        self, nodes: List[Node], pos_lookup: Dict[Node, Tuple[float, float]]
+    ) -> Optional["Physics.QuadNode"]:
         if not nodes:
             return None
-        xs = [n.pos().x() for n in nodes]
-        ys = [n.pos().y() for n in nodes]
+        xs = [pos_lookup[n][0] for n in nodes]
+        ys = [pos_lookup[n][1] for n in nodes]
         minx, maxx = min(xs), max(xs)
         miny, maxy = min(ys), max(ys)
         cx = (minx + maxx) * 0.5
@@ -283,71 +288,119 @@ class Physics:
         half = max(1.0, size * 0.5 + 1.0)
         root = Physics.QuadNode(cx, cy, half)
         for n in nodes:
-            p = n.pos()
-            root.insert(n, p.x(), p.y(), 1.0)
+            px, py = pos_lookup[n]
+            root.insert(n, px, py, 1.0)
         return root
 
     def step(self, nodes: List[Node], edges: List[Edge], dt: float = 1.0):
-        # Accumulate forces per node
-        forces: Dict[Node, QPointF] = {n: QPointF(0.0, 0.0) for n in nodes}
+        if not nodes:
+            return
 
-        # Repulsion: Barnes–Hut or pairwise
+        # Cache positions/velocities to avoid repeated Qt calls inside tight loops
+        count = len(nodes)
+        pos_x = [0.0] * count
+        pos_y = [0.0] * count
+        vel_x = [0.0] * count
+        vel_y = [0.0] * count
+        movable = [True] * count
+        pos_lookup: Dict[Node, Tuple[float, float]] = {}
+        idx_of: Dict[Node, int] = {}
+
+        for idx, node in enumerate(nodes):
+            p = node.pos()
+            v = node.velocity
+            x, y = p.x(), p.y()
+            pos_x[idx] = x
+            pos_y[idx] = y
+            vel_x[idx] = v.x()
+            vel_y[idx] = v.y()
+            movable[idx] = not (node.fixed or node.isUnderMouse())
+            pos_lookup[node] = (x, y)
+            idx_of[node] = idx
+
+        # Accumulate forces per node (float arrays for lower overhead)
+        force_x = [0.0] * count
+        force_y = [0.0] * count
+
+        # Repulsion: Barnes-Hut or pairwise
         if self.use_barnes_hut and len(nodes) >= self.bh_min_size:
-            root = self._build_quadtree(nodes)
+            root = self._build_quadtree(nodes, pos_lookup)
             if root is not None:
+                theta = self.bh_theta
+                k_rep = self.k_repulsion
                 for n in nodes:
-                    p = n.pos()
-                    fx, fy = root.compute_force(
-                        n, p.x(), p.y(), self.bh_theta, self.k_repulsion, eps=0.01
-                    )
-                    forces[n] += QPointF(fx, fy)
+                    px, py = pos_lookup[n]
+                    fx, fy = root.compute_force(n, px, py, theta, k_rep, pos_lookup, eps=0.01)
+                    idx = idx_of[n]
+                    force_x[idx] += fx
+                    force_y[idx] += fy
         else:
             # Pairwise O(N^2)
-            for i in range(len(nodes)):
-                ni = nodes[i]
-                pi = ni.pos()
-                for j in range(i + 1, len(nodes)):
-                    nj = nodes[j]
-                    pj = nj.pos()
-                    delta = pi - pj
-                    dist2 = max(0.01, delta.x() * delta.x() + delta.y() * delta.y())
-                    force_mag = self.k_repulsion / dist2
-                    d = math.sqrt(dist2)
-                    fx = force_mag * (delta.x() / d)
-                    fy = force_mag * (delta.y() / d)
-                    forces[ni] += QPointF(fx, fy)
-                    forces[nj] -= QPointF(fx, fy)
+            k_rep = self.k_repulsion
+            for i in range(count):
+                xi = pos_x[i]
+                yi = pos_y[i]
+                for j in range(i + 1, count):
+                    dx = xi - pos_x[j]
+                    dy = yi - pos_y[j]
+                    dist2 = dx * dx + dy * dy
+                    if dist2 < 0.01:
+                        dist2 = 0.01
+                    inv_d = 1.0 / math.sqrt(dist2)
+                    force_mag = k_rep / dist2
+                    fx = force_mag * dx * inv_d
+                    fy = force_mag * dy * inv_d
+                    force_x[i] += fx
+                    force_y[i] += fy
+                    force_x[j] -= fx
+                    force_y[j] -= fy
 
         # Edge springs
+        k_spring = self.k_spring
+        spring_len = self.spring_length
         for e in edges:
             a, b = e.start_node, e.end_node
-            delta = b.pos() - a.pos()
-            d = math.hypot(delta.x(), delta.y()) or 0.0001
-            force_mag = self.k_spring * (d - self.spring_length) * e.weight
-            fx = force_mag * (delta.x() / d)
-            fy = force_mag * (delta.y() / d)
-            forces[a] += QPointF(fx, fy)
-            forces[b] -= QPointF(fx, fy)
+            ai = idx_of.get(a)
+            bi = idx_of.get(b)
+            if ai is None or bi is None:
+                continue
+            dx = pos_x[bi] - pos_x[ai]
+            dy = pos_y[bi] - pos_y[ai]
+            dist = math.sqrt(dx * dx + dy * dy) or 0.0001
+            force_mag = k_spring * (dist - spring_len) * e.weight
+            fx = force_mag * (dx / dist)
+            fy = force_mag * (dy / dist)
+            force_x[ai] += fx
+            force_y[ai] += fy
+            force_x[bi] -= fx
+            force_y[bi] -= fy
 
         # Optional gravity towards center (disabled by default)
         if self.gravity_strength != 0.0:
+            gx = self.gravity_center.x()
+            gy = self.gravity_center.y()
+            g = self.gravity_strength
             for n in nodes:
-                delta = self.gravity_center - n.pos()
-                forces[n] += QPointF(
-                    delta.x() * self.gravity_strength, delta.y() * self.gravity_strength
-                )
+                idx = idx_of[n]
+                force_x[idx] += (gx - pos_x[idx]) * g
+                force_y[idx] += (gy - pos_y[idx]) * g
 
         # Integrate velocities and positions
-        for n in nodes:
-            if n.fixed or n.isUnderMouse():
+        damping = self.damping
+        max_step = self.max_step
+        for idx, n in enumerate(nodes):
+            if not movable[idx]:
                 n.velocity *= 0
                 continue
-            v = n.velocity + forces[n] * dt
-            v *= self.damping
-            step_len = math.hypot(v.x(), v.y())
-            if step_len > self.max_step:
-                v *= self.max_step / step_len
-            n.velocity = v
-            old_pos = n.pos()
-            n.setPos(old_pos + v)
-            np = n.pos()
+
+            vx = (vel_x[idx] + force_x[idx] * dt) * damping
+            vy = (vel_y[idx] + force_y[idx] * dt) * damping
+
+            step_len = math.sqrt(vx * vx + vy * vy)
+            if step_len > max_step:
+                scale = max_step / step_len
+                vx *= scale
+                vy *= scale
+
+            n.velocity = QPointF(vx, vy)
+            n.setPos(pos_x[idx] + vx, pos_y[idx] + vy)
