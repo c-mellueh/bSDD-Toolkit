@@ -16,12 +16,16 @@ from bsdd_gui.module.project import ui
 from PySide6.QtCore import QObject, Signal
 from pydantic import ValidationError
 import copy
-
+from bsdd_gui.module.project import trigger
 if TYPE_CHECKING:
     from bsdd_gui.module.project.prop import ProjectProperties
 
 
 class Signals(QObject):
+    open_requested = Signal()
+    new_requested = Signal()
+    save_requested = Signal()
+    save_as_requested = Signal()
     data_changed = Signal(str, object)  # name of datafield, new_value
     class_added = Signal(BsddClass)
     class_removed = Signal(BsddClass)
@@ -60,6 +64,14 @@ class Project(ActionTool):
         return new_dict
 
     @classmethod
+    def connect_internal_signals(cls):
+        cls.signals.save_requested.connect(trigger.save_clicked)
+        cls.signals.save_as_requested.connect(trigger.save_as_clicked)
+        cls.signals.open_requested.connect(trigger.open_clicked)
+        cls.signals.new_requested.connect(trigger.new_clicked)
+        return super().connect_internal_signals()
+
+    @classmethod
     def register_project(cls, bsdd_dictionary: BsddDictionary):
         cls.get_properties().project_dictionary = bsdd_dictionary
         cls.set_last_save(bsdd_dictionary)
@@ -90,6 +102,7 @@ class Project(ActionTool):
         cls.get_properties().plugin_save_functions.append(func)
         return len(cls.get_properties().plugin_save_functions) - 1
 
+
     @classmethod
     def remove_plugin_save_function(cls, index: int):
         cls.get_properties().plugin_save_functions[index] = None
@@ -113,3 +126,21 @@ class Project(ActionTool):
     @classmethod
     def get_last_save(cls) -> BsddDictionary:
         return cls.get_properties().last_save
+
+
+    @classmethod
+    def request_save(cls):
+        cls.signals.save_requested.emit()
+
+    @classmethod
+    def request_save_as(cls):
+        cls.signals.save_as_requested.emit()
+
+
+    @classmethod
+    def request_open(cls):
+        cls.signals.open_requested.emit()
+
+    @classmethod
+    def request_new(cls):
+        cls.signals.new_requested.emit()

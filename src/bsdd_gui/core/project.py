@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 def connect_signals(project: Type[tool.Project]):
     project.signals.data_changed.connect(lambda n, v: logging.debug(f"'{n}' changed to '{v}'"))
-
+    project.connect_internal_signals()
 
 def create_project(project: Type[tool.Project]):
     logging.debug(f"Create Project")
@@ -29,22 +29,21 @@ def create_project(project: Type[tool.Project]):
 
 
 def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool.MainWindowWidget]):
-    from bsdd_gui.module.project import trigger
 
     mw_ui = main_window.get()
-    action = main_window.add_action("menuFile", "new", trigger.new_clicked)
+    action = main_window.add_action("menuFile", "new", project.request_new)
     project.set_action(mw_ui, "new", action)
 
-    action = main_window.add_action("menuFile", "open_project", trigger.open_clicked)
+    action = main_window.add_action("menuFile", "open_project", project.request_open)
     project.set_action(mw_ui, "open_project", action)
 
-    action = main_window.add_action("menuFile", "add_project", trigger.add_clicked)
-    project.set_action(mw_ui, "add_project", action)
+    # action = main_window.add_action("menuFile", "add_project", trigger.add_clicked)
+    # project.set_action(mw_ui, "add_project", action)
 
-    action = main_window.add_action("menuFile", "save_project", trigger.save_clicked)
+    action = main_window.add_action("menuFile", "save_project", project.request_save)
     project.set_action(mw_ui, "save_project", action)
 
-    action = main_window.add_action("menuFile", "save_as_clicked", trigger.save_as_clicked)
+    action = main_window.add_action("menuFile", "save_as_clicked",  project.request_save_as)
     project.set_action(mw_ui, "save_as_clicked", action)
 
 
@@ -57,8 +56,8 @@ def retranslate_ui(project: Type[tool.Project], main_window: Type[tool.MainWindo
     action = project.get_action(mw_ui, "open_project")
     action.setText(QCoreApplication.translate("Project", "Open"))
 
-    action = project.get_action(mw_ui, "add_project")
-    action.setText(QCoreApplication.translate("Project", "Add Project"))
+    # action = project.get_action(mw_ui, "add_project")
+    # action.setText(QCoreApplication.translate("Project", "Add Project"))
 
     action = project.get_action(mw_ui, "save_project")
     action.setText(QCoreApplication.translate("Project", "Save"))

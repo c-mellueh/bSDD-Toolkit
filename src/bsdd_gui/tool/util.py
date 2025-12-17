@@ -96,10 +96,10 @@ class Util:
             menu.addAction(action)
 
     @classmethod
-    def add_shortcut(cls, sequence: str, window: QWidget, function: Callable):
+    def add_shortcut(cls, sequence: str, window: QWidget, function: Callable,context = Qt.ShortcutContext.WidgetShortcut):
         prop = cls.get_properties()
         shortcut = QShortcut(QKeySequence(sequence), window)
-        shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
+        shortcut.setContext(context)
         prop.shortcuts.append(shortcut)
         shortcut.activated.connect(function)
 

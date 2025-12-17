@@ -1,6 +1,6 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication,Qt
 from typing import Type, TYPE_CHECKING
 import bsdd_gui
 import logging
@@ -27,7 +27,10 @@ def create_main_window(application: QApplication, main_window: Type[tool.MainWin
 
 
 def connect_main_window(
-    main_window: Type[tool.MainWindowWidget], class_tree: Type[tool.ClassTreeView]
+    main_window: Type[tool.MainWindowWidget],
+    class_tree: Type[tool.ClassTreeView],
+    util: Type[tool.Util],
+    project: Type[tool.Project],
 ):
     main_window.signals.active_class_changed.connect(
         lambda c: main_window.set_class_text(c.Name if c is not None else "")
@@ -46,6 +49,7 @@ def connect_main_window(
         lambda _: class_tree.request_search(main_window.get_class_view())
     )
     main_window.connect_internal_signals()
+    util.add_shortcut("Ctrl+S",main_window.get(),project.request_save,Qt.ShortcutContext.ApplicationShortcut)
 
 
 def retranslate_ui(main_window: Type[tool.MainWindowWidget]):
@@ -99,9 +103,7 @@ def close_event(
             event.ignore()
             return
         if reply:
-            from bsdd_gui.module.project import trigger
-
-            trigger.save_clicked()
+            project.request_save_as()
         else:
             file_path = util.create_tempfile("_bsdd.json", add_timestamp=True)
             bsdd_dict.save(file_path)
