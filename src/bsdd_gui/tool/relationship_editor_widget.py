@@ -284,8 +284,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
 
         elif isinstance(relation, BsddPropertyRelation):
             related_uri = relation.RelatedPropertyUri
-            code = dict_utils.parse_bsdd_url(related_uri).get("resource_id")
-            end_data = prop_utils.get_property_by_code(code, bsdd_dictionary)
+            end_data = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
         return start_data, end_data, relation_type
 
     @classmethod
