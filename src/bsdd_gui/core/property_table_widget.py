@@ -68,8 +68,7 @@ def create_widget(
     if property_table.get_widgets():
         widget = property_table.get_widgets()[-1]
     else:
-        widget = property_table.create_widget(None)
-
+        widget = property_table.create_widget(main_window.get())
     widget.show()
     widget.raise_()
     widget.activateWindow()

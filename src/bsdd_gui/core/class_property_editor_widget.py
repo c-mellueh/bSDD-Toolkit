@@ -7,7 +7,7 @@ from bsdd_gui.module.class_property_editor_widget.constants import (
     SEPERATOR,
     SEPERATOR_STATUS,
 )
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication,Qt
 from bsdd_gui.module.class_property_editor_widget import ui, views, constants
 
 if TYPE_CHECKING:

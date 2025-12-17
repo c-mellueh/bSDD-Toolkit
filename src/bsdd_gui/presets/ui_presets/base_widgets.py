@@ -8,6 +8,9 @@ from bsdd_gui.resources.icons import get_icon
 class BaseWidget(QWidget):
     closed = Signal()
     opened = Signal()
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setWindowFlag(Qt.WindowType.Window, True)
 
 
 class BaseDialog(QDialog):
@@ -18,6 +21,7 @@ class BaseDialog(QDialog):
         # Layout
         self._layout = QVBoxLayout(self)
         self._widget: FieldWidget = widget
+        widget.setWindowFlag(Qt.WindowType.Widget)
         self._layout.addWidget(self._widget)
         self._layout.addWidget(self.button_box)
         self.setWindowIcon(get_icon())

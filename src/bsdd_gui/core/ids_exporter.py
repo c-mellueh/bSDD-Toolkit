@@ -64,7 +64,7 @@ def create_widget(
     main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ):
-    widget: ui.IdsWidget = widget_tool.show_widget(project.get(), None)
+    widget: ui.IdsWidget = widget_tool.show_widget(project.get(), main_window.get())
     text = QCoreApplication.translate("IdsExport", "IDS Exporter")
     widget.setWindowTitle(text)
     model: models.ClassTreeModel = widget.tv_classes.model().sourceModel()

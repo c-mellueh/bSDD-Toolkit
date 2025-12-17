@@ -12,10 +12,9 @@ from .qt.ui_DictionaryEditor import Ui_DictionaryForm
 class DictionaryEditor(FieldWidget, Ui_DictionaryForm):
     value_changed = Signal(str, Any)
 
-    def __init__(self, bsdd_dictionary: BsddDictionary, parent, *args, **kwargs):
-        super().__init__(bsdd_dictionary, *args, **kwargs)
+    def __init__(self,  *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.setupUi(self)
-        # self.setLayout(QFormLayout())
         trigger.widget_created(self)
 
 

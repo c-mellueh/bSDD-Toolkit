@@ -29,6 +29,7 @@ from . import trigger
 from bsdd_gui.module.graph_view_widget.view_ui import GraphScene, GraphView
 from bsdd_gui.module.graph_view_widget.constants import ALLOWED_EDGE_TYPES, ALLOWED_NODE_TYPES
 from bsdd_gui.module.graph_view_widget.ui_settings_widget import SettingsSidebar
+from bsdd_gui.presets.ui_presets import BaseWidget
 from bsdd_gui import tool
 from typing import TYPE_CHECKING
 
@@ -38,11 +39,10 @@ if TYPE_CHECKING:
 from bsdd_gui.resources.icons import get_icon
 
 
-class GraphWindow(QWidget):
+class GraphWindow(BaseWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         # Keep this as a separate window but parented to the main window so it closes with it
-        self.setWindowFlag(Qt.Window, True)
         self.setWindowTitle(self.tr("Force-Directed Relationship Graph"))
         self.setWindowIcon(get_icon())
         self.scene = GraphScene()

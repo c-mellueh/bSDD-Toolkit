@@ -51,21 +51,7 @@ def create_widget(
 ):
     if parent_widget is None:
         parent_widget = main_window.get()
-    if window := dictionary_editor.get_widget(bsdd_dictionary):
-        if window.isHidden():
-            window.close()
-            window = dictionary_editor.create_widget(
-                bsdd_dictionary,
-                parent_widget,
-            )
-    else:
-        window = dictionary_editor.create_widget(
-            bsdd_dictionary,
-            parent_widget,
-        )
-    window.show()
-    window.activateWindow()
-    window.showNormal()
+    dictionary_editor.show_widget(bsdd_dictionary,parent_widget)
     retranslate_ui(dictionary_editor, main_window, util)
 
 

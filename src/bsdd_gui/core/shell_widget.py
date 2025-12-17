@@ -24,8 +24,8 @@ def retranslate_ui(shell: Type[tool.ShellWidget], main_window: Type[tool.MainWin
     )
 
 
-def create_widget(shell: Type[tool.ShellWidget]):
-    widget: ui.PythonConsole = shell.create_widget()
+def create_widget(shell: Type[tool.ShellWidget],main_window:Type[tool.MainWindowWidget]):
+    widget: ui.PythonConsole = shell.create_widget(main_window.get())
     widget.show()
     widget.raise_()
     widget.activateWindow()

@@ -17,7 +17,7 @@ def on_new_project():
 
 
 def create_widget():
-    core.create_widget(tool.ShellWidget)
+    core.create_widget(tool.ShellWidget,tool.MainWindowWidget)
 
 
 def close_widget():

@@ -6,7 +6,7 @@ import bsdd_gui
 from bsdd_gui.module.shell_widget import ui, trigger
 from bsdd_gui.presets.tool_presets import WidgetTool, ActionTool
 from bsdd_gui.presets.signal_presets import WidgetSignals
-
+from PySide6.QtWidgets import QWidget
 if TYPE_CHECKING:
     from bsdd_gui.module.shell_widget.prop import ShellWidgetProperties
 
@@ -33,12 +33,12 @@ class ShellWidget(WidgetTool, ActionTool):
         return cls.get_widgets()[-1]
 
     @classmethod
-    def create_widget(cls):
+    def create_widget(cls,parent:QWidget):
         from bsdd_gui.tool import Project, MainWindowWidget
         from bsdd_json.utils import class_utils, property_utils, dictionary_utils
 
         if not cls.get_widgets():
-            widget: ui.Shell = super().create_widget()
+            widget: ui.Shell = super().create_widget(parent)
             widget.push_local_ns("tool", bsdd_gui.tool)
             widget.push_local_ns("P", Project)
             widget.push_local_ns("MW", MainWindowWidget)

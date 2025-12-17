@@ -67,7 +67,7 @@ class PropertyEditorWidget(DialogTool):
     ) -> ui.PropertyEditor:
         widget: ui.PropertyEditor = super().create_widget(bsdd_property, parent)
         widget.mode = mode
-        widget.setWindowFlag(Qt.Tool)
+        widget.setWindowFlag(Qt.WindowType.Widget)
         title = cls.create_window_title(bsdd_property)
         cls.get_widget(bsdd_property).setWindowTitle(title)  # TODO: Update Name Getter
         return widget

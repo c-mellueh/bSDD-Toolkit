@@ -3,7 +3,7 @@ from pyqtconsole.console import PythonConsole
 from bsdd_gui import tool
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal,Qt
 
 
 class Shell(PythonConsole):
@@ -14,6 +14,7 @@ class Shell(PythonConsole):
         super(Shell, self).__init__(*args, **kwds)
         self.setWindowIcon(get_icon())
         self.setWindowTitle(tool.Util.get_window_title("Console"))
+        self.setWindowFlag(Qt.WindowType.Window)
 
     def closeEvent(self, event):
         self.closed.emit()

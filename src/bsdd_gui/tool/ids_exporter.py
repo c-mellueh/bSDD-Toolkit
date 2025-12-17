@@ -92,10 +92,6 @@ class IdsExporter(ActionTool, FieldTool):
         return trigger
 
     @classmethod
-    def _get_dialog_class(cls):
-        return ui.IdsDialog
-
-    @classmethod
     def _get_widget_class(cls):
         return ui.IdsWidget
 
