@@ -23,8 +23,6 @@ def connect_signals(
     download_widget.connect_internal_signals()
 
     def set_project(bsdd_dictionary: BsddDictionary):
-        logging.info("SET PROJECT")
-
         save_project = appdata.get_bool_setting(constants.DOWNLAOD_APPDATA,constants.SHOULD_SAVE)
         if not save_project:
             project.register_project(bsdd_dictionary)

@@ -115,11 +115,8 @@ class Download(FieldTool, ActionTool):
             if widget.cb_save.isChecked():
                 bsdd_dictionary.save(cls.get_properties().save_path)
 
-            logging.info("Start Reset!")
 
             cls.reset(widget)
-            logging.info("End Reset!")
-
             cls.signals.import_finished.emit(bsdd_dictionary)
 
         def _on_worker_finished():
@@ -199,7 +196,6 @@ class Download(FieldTool, ActionTool):
     @classmethod
     def reset(cls, widget: ui.DownloadWidget):
         cls.set_widget_run_mode(widget, False)
-        logging.info(msg="Reset of Layout done!")
         cls.get_properties().workers = list()
         cls.get_properties().threads = list()
         cls.get_properties().done_count = 0
@@ -216,9 +212,7 @@ class Download(FieldTool, ActionTool):
         widget.le_uri.setEnabled(not state)
         widget.fs_save_path.setEnabled(not state)
         widget.cb_save.setEnabled(not state)
-        logging.info(msg="Start Adjust Size!")
         widget.adjustSize()
-        logging.info(msg="End Adjust Size!")
 
 
 class Worker(QObject):
