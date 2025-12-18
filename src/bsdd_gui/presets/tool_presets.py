@@ -132,7 +132,10 @@ class ActionTool(BaseTool):
 
     @classmethod
     def get_action(cls, widget, name) -> QAction:
-        return cls.get_properties().actions[widget][name]
+        widget_data = cls.get_properties().actions.get(widget)
+        if not widget_data:
+            return None
+        return widget_data.get(name)
 
 
 class WidgetTool(BaseTool):
