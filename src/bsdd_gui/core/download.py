@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from bsdd_json import BsddClassProperty, BsddProperty
+from bsdd_json import BsddClassProperty, BsddProperty,BsddDictionary
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 import uuid
@@ -13,14 +13,23 @@ if TYPE_CHECKING:
     from bsdd_gui.module.download import ui
 
 
-def connect_signals(download_widget: Type[tool.Download]):
+def connect_signals(download_widget: Type[tool.Download],project:Type[tool.Project],popups:Type[tool.Popups],main_window:Type[tool.MainWindowWidget]):
     download_widget.connect_internal_signals()
+    def set_project(bsdd_dictionary:BsddDictionary):
+        project.register_project(bsdd_dictionary)
+        title = QCoreApplication.translate("Download","Download Done!")
+        class_count = len(bsdd_dictionary.Classes)
+        property_count = len(bsdd_dictionary.Properties)
+        text = QCoreApplication.translate("Download","{} Classes and {} Properties Downloaded!").format(class_count,property_count)
+
+        popups.create_info_popup(text,title,title,main_window.get())
+    download_widget.signals.import_finished.connect(set_project)
 
 
 def connect_to_main_window(
     download_widget: Type[tool.Download],
     main_window: Type[tool.MainWindowWidget],
-    project: Type[tool.Project],
+    util: Type[tool.Util],
 ) -> None:
     action = main_window.add_action(
         "menuData",
@@ -28,7 +37,7 @@ def connect_to_main_window(
         lambda: download_widget.request_widget(str(uuid.uuid4()), main_window.get()),
     )
     download_widget.set_action(main_window.get(), "open_window", action)
-
+    retranslate_ui(download_widget,main_window,util)
 
 def retranslate_ui(
     download_widget: Type[tool.Download],
@@ -47,8 +56,8 @@ def retranslate_ui(
 
 
 def create_widget(data, parent, download_widget: Type[tool.Download]):
-    download_widget.show_widget(None, parent)
-
+    widget:ui.DownloadWidget = download_widget.show_widget(None, parent)
+    download_widget.set_widget_run_mode(widget,False)
 
 def register_widget(widget: ui.DownloadWidget, download_widget: Type[tool.Download]):
     download_widget.register_widget(widget)
@@ -101,12 +110,15 @@ def connect_widget(widget: ui.DownloadWidget, download_widget: Type[tool.Downloa
 
 
 def download_dictionary(widget: ui.DownloadWidget, download_widget: Type[tool.Download]):
-    download_widget.sync_to_model(widget,None)
+    download_widget.reset(widget)
+    download_widget.set_widget_run_mode(widget,True)
+    
+    download_widget.sync_to_model(widget,None)    
     bsdd_uri = widget.le_uri.text()
     save_path = widget.fs_save_path.get_path()
-    download_widget.reset_done_count()
     bsdd_dictionary = download_widget.import_dictionary(bsdd_uri)
     download_widget.set_bsdd_dictionary(bsdd_dictionary)
+    download_widget.set_save_path(save_path)
 
     download_widget.get_all_classes(widget, bsdd_uri, bsdd_dictionary)
     download_widget.get_all_properties(widget, bsdd_uri)

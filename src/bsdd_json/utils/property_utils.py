@@ -125,8 +125,8 @@ def get_property_code_dict(bsdd_dictionary: BsddDictionary) -> dict[str, BsddPro
     return {p.Code: p for p in bsdd_dictionary.Properties}
 
 
-def get_datatype(class_property: BsddClassProperty):
-    prop = get_property_by_class_property(class_property)
+def get_datatype(class_property: BsddClassProperty,bsdd_dictionary = None):
+    prop = get_property_by_class_property(class_property,bsdd_dictionary)
 
     if prop is None:
         return ""

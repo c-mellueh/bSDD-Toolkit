@@ -33,6 +33,6 @@ def context_menu_requested(view: ui.ClassPropertyTable, pos: QPoint):
 
 def view_created(view: ui.ClassPropertyTable):
     core.register_view(view, tool.ClassPropertyTableView)
-    core.add_columns_to_view(view, tool.ClassPropertyTableView)
+    core.add_columns_to_view(view, tool.ClassPropertyTableView,tool.Project)
     core.add_context_menu_to_view(view, tool.ClassPropertyTableView)
     core.connect_view(view, tool.ClassPropertyTableView)
