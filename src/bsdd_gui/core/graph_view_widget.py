@@ -101,6 +101,8 @@ def connect_signals(
 
     def handle_ifc_relation_remove(bsdd_class: BsddClass, ifc_code: str):
         start_node = graph_view.get_node_from_bsdd_data(bsdd_class)
+        if not start_node:
+            return
         end_node = graph_view.get_node_from_ifc_code(ifc_code)
         relation = graph_view.get_edge_from_nodes(start_node, end_node, constants.IFC_REFERENCE_REL)
         if relation is None:

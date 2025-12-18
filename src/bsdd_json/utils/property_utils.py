@@ -146,6 +146,7 @@ def get_class_properties_from_property_code(
                 bsdd_class_properties.append(bsdd_class_property)
     return bsdd_class_properties
 
+
 def get_class_properties_from_property_uri(
     property_uri: str, bsdd_dictionary: BsddDictionary
 ) -> list[BsddClassProperty]:
@@ -155,6 +156,7 @@ def get_class_properties_from_property_uri(
             if bsdd_class_property.PropertyUri == property_uri:
                 bsdd_class_properties.append(bsdd_class_property)
     return bsdd_class_properties
+
 
 def get_property_by_code(
     code: str, bsdd_dictionary: BsddDictionary
@@ -167,12 +169,29 @@ def get_property_by_code(
     return get_property_code_dict(bsdd_dictionary).get(code)
 
 
+def get_code_by_uri(uri: str):
+    parsed_url = dict_utils.parse_bsdd_url(uri)
+    resouce_type = parsed_url.get("resource_type")
+    resource_id = parsed_url.get("resource_id")
+    if resouce_type == "prop":
+        return resource_id
+    path_segments = parsed_url["path_segments"]
+
+    #Handle ClassProperty
+    if resouce_type == "class" and not "prop" in path_segments:
+        return None
+    code_index = path_segments.index("prop") + 2
+    if code_index >= len(path_segments):
+        return None
+    return path_segments[code_index]
+
+
 def get_property_by_uri(uri: str, bsdd_dictionary: BsddDictionary):
     if dict_utils.is_uri(uri):
         if dict_utils.is_external_ref(uri, bsdd_dictionary):
             bsdd_property = Cache.get_external_property(uri)
         else:
-            code = dict_utils.parse_bsdd_url(uri).get("resource_id")
+            code = get_code_by_uri(uri)
             bsdd_property = get_all_property_codes(bsdd_dictionary).get(code)
     else:
         bsdd_property = get_all_property_codes(bsdd_dictionary).get(uri)
@@ -289,8 +308,8 @@ def delete_property(
     return removed_class_properties
 
 
-def get_name(class_property: BsddClassProperty,bsdd_dictionary=None):
-    prop = get_property_by_class_property(class_property,bsdd_dictionary)
+def get_name(class_property: BsddClassProperty, bsdd_dictionary=None):
+    prop = get_property_by_class_property(class_property, bsdd_dictionary)
     if not prop:
         return None
     return prop.Name
