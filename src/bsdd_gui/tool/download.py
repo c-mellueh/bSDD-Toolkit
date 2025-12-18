@@ -107,7 +107,7 @@ class Download(FieldTool, ActionTool):
 
         bar.setValue(0)
         thread = QThread(widget)
-        worker = ClassWorker(bsdd_dictionary, dictionary_uri, Client())
+        worker = ClassWorker(bsdd_dictionary, dictionary_uri, cls.get_client())
         worker.moveToThread(thread)
         cls.get_properties().workers.append(worker)
         cls.get_properties().threads.append(thread)
@@ -127,6 +127,8 @@ class Download(FieldTool, ActionTool):
                 cls.set_buttons_enabled(widget, True)
 
         thread.finished.connect(_on_thread_finished)
+        print("Start Class Thread")
+
         thread.start()
 
     @classmethod
@@ -137,27 +139,27 @@ class Download(FieldTool, ActionTool):
 
     @classmethod
     def get_all_properties(cls, widget: ui.DownloadWidget, dictionary_uri: str):
-        bar = widget.pb_properties
-        label = widget.lb_properties
+        barr = widget.pb_properties
+        labell = widget.lb_properties
 
-        bar.setValue(0)
-        label.setText("Started")
+        barr.setValue(0)
+        labell.setText("Started")
         thread = QThread(widget)
-        worker = PropertyWorker(dictionary_uri, Client())
+        worker = PropertyWorker(dictionary_uri, cls.get_client())
         worker.moveToThread(thread)
         cls.get_properties().workers.append(worker)
         cls.get_properties().threads.append(thread)
 
         thread.started.connect(worker.run)
-        worker.progress.connect(bar.setValue)
-        worker.status.connect(label.setText)
+        worker.progress.connect(barr.setValue)
+        worker.status.connect(labell.setText)
 
         worker.finished.connect(thread.quit)
         worker.finished.connect(worker.deleteLater)
         worker.finished.connect(thread.deleteLater)
 
         def _on_thread_finished():
-            label.setText(f"Property import done!")
+            labell.setText(f"Property import done!")
             cls.get_properties().done_count += 1
             if cls.get_properties().done_count == 2:
                 cls.set_buttons_enabled(widget, True)
@@ -219,6 +221,8 @@ class ClassWorker(QObject):
                 total_count = cd["classesTotalCount"]
 
             total = len(classes_info)
+
+            self.status.emit(f"Processed Classes: {0}/{total}")
             for index, class_definition in enumerate(classes_info):
                 if self._cancel:
                     self.status.emit("Cancelled")
@@ -229,11 +233,11 @@ class ClassWorker(QObject):
                 self.result.append(bsdd_class)
                 pct = int((index + 1) / total * 100)
                 self.progress.emit(pct)
-                if (index + 1) % 5 == 0:
-                    self.status.emit(f"Processed {index+1}/{total}")
+                self.status.emit(f"Processed Classes: {index+1}/{total}")
             self.finished.emit()
 
         except Exception as e:
+            print(f"{e}:::ERROR"*100)
             self.error.emit(str(e))
         finally:
             self.finished.emit()
@@ -261,9 +265,9 @@ class PropertyWorker(QObject):
         try:
             self._cancel = False
             property_info = list()
-            class_count = 0
+            property_count = 0
             total_count = None
-            while total_count is None or class_count < total_count:
+            while total_count is None or property_count < total_count:
                 if self._cancel:
                     self.status.emit("Cancelled")
                     break
@@ -277,6 +281,7 @@ class PropertyWorker(QObject):
                 total_count = pd["propertiesTotalCount"]
 
             total = len(property_info)
+            self.status.emit(f"Processed Properties: {0}/{total}")
             for index, property_definition in enumerate(property_info):
                 if self._cancel:
                     self.status.emit("Cancelled")
@@ -287,11 +292,12 @@ class PropertyWorker(QObject):
                 self.result.append(bsdd_property)
                 pct = int((index + 1) / total * 100)
                 self.progress.emit(pct)
-                if (index + 1) % 5 == 0:
-                    self.status.emit(f"Processed {index+1}/{total}")
+                self.status.emit(f"Processed {index+1}/{total}")
             self.finished.emit()
 
         except Exception as e:
+            print(f"{e}:::ERROR"*100)
+
             self.error.emit(str(e))
         finally:
             self.finished.emit()

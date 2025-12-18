@@ -61,14 +61,28 @@ def register_fields(
     download_widget.register_field_getter(
         widget,
         le_widget,
-        lambda: appdata.get_string_setting(constants.DOWNLAOD_APPDATA, constants.URI),
+        lambda _: appdata.get_string_setting(constants.DOWNLAOD_APPDATA, constants.URI),
     )
     download_widget.register_field_setter(
         widget,
         le_widget,
-        lambda d, v: appdata.set_setting(constants.DOWNLAOD_APPDATA, constants.URI, v),
+        lambda _, v: appdata.set_setting(constants.DOWNLAOD_APPDATA, constants.URI, v),
     )
     download_widget.register_field_listener(widget, le_widget)
+    
+    le_path = widget.fs_save_path.line_edit
+    download_widget.register_field_getter(
+        widget,
+        le_path,
+        lambda _: appdata.get_string_setting(constants.DOWNLAOD_APPDATA, constants.SAVE_PATH),
+    )
+    download_widget.register_field_setter(
+        widget,
+        le_path,
+        lambda _, v: appdata.set_setting(constants.DOWNLAOD_APPDATA, constants.SAVE_PATH, v),
+    )
+    download_widget.register_field_listener(widget, le_path)
+    download_widget.sync_from_model(widget, None)
 
 
 def register_validators(
@@ -87,6 +101,7 @@ def connect_widget(widget: ui.DownloadWidget, download_widget: Type[tool.Downloa
 
 
 def download_dictionary(widget: ui.DownloadWidget, download_widget: Type[tool.Download]):
+    download_widget.sync_to_model(widget,None)
     bsdd_uri = widget.le_uri.text()
     save_path = widget.fs_save_path.get_path()
     download_widget.reset_done_count()
