@@ -5,6 +5,7 @@ from bsdd_json import BsddClassProperty, BsddProperty, BsddDictionary
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 import uuid
+import qtawesome as qta
 from bsdd_gui.module.download import constants
 from bsdd_json.utils import dictionary_utils
 import logging
@@ -42,11 +43,14 @@ def connect_to_main_window(
     download_widget: Type[tool.Download],
     main_window: Type[tool.MainWindowWidget],
 ) -> None:
+    
     action = main_window.add_action(
         "menuFile",
         "Download bSDD",
         lambda: download_widget.request_widget(str(uuid.uuid4()), main_window.get()),
+        qta.icon("mdi6.cloud-download-outline")
     )
+
     download_widget.set_action(main_window.get(), "open_window", action)
     download_widget.request_retranslate()
 

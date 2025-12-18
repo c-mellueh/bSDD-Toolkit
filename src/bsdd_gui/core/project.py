@@ -1,5 +1,5 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication, Qt
 from typing import Type, TYPE_CHECKING
 from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH
 import logging
@@ -7,6 +7,7 @@ import bsdd_gui
 import os
 import json
 from pydantic import ValidationError
+import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -22,6 +23,7 @@ def connect_signals(project: Type[tool.Project]):
     project.signals.data_changed.connect(lambda n, v: logging.debug(f"'{n}' changed to '{v}'"))
     project.connect_internal_signals()
 
+
 def create_project(project: Type[tool.Project]):
     logging.debug(f"Create Project")
     bsdd_dictionary = project.create_project()
@@ -31,19 +33,44 @@ def create_project(project: Type[tool.Project]):
 def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool.MainWindowWidget]):
 
     mw_ui = main_window.get()
-    action = main_window.add_action("menuFile", "new", project.request_new)
+    action = main_window.add_action(
+        "menuFile",
+        "new",
+        project.request_new,
+        qta.icon("mdi6.plus-box-multiple"),
+    )
     project.set_action(mw_ui, "new", action)
 
-    action = main_window.add_action("menuFile", "open_project", project.request_open)
+    action = main_window.add_action(
+        "menuFile",
+        "open_project",
+        project.request_open,
+        qta.icon("mdi6.folder-open"),
+    )
     project.set_action(mw_ui, "open_project", action)
 
+    #TODO: Add Combination functionality
     # action = main_window.add_action("menuFile", "add_project", trigger.add_clicked)
     # project.set_action(mw_ui, "add_project", action)
 
-    action = main_window.add_action("menuFile", "save_project", project.request_save)
+    action = main_window.add_action(
+        "menuFile",
+        "save_project",
+        project.request_save,
+        qta.icon("mdi6.content-save"),
+        "Ctrl+S",
+        Qt.ShortcutContext.ApplicationShortcut,
+    )
     project.set_action(mw_ui, "save_project", action)
 
-    action = main_window.add_action("menuFile", "save_as_clicked",  project.request_save_as)
+    action = main_window.add_action(
+        "menuFile",
+        "save_as_clicked",
+        project.request_save_as,
+        qta.icon("mdi6.content-save-edit"),
+        "Ctrl+Shift+S",
+        Qt.ShortcutContext.ApplicationShortcut,
+    )
     project.set_action(mw_ui, "save_as_clicked", action)
 
 

@@ -4,7 +4,7 @@ from PySide6.QtCore import QCoreApplication,Qt
 from typing import Type, TYPE_CHECKING
 import bsdd_gui
 import logging
-
+import qtawesome as qta
 if TYPE_CHECKING:
     from bsdd_gui import tool
 
@@ -21,7 +21,7 @@ def create_main_window(application: QApplication, main_window: Type[tool.MainWin
     main_window.hide_console()
     main_window.install_validation_styles(application)
     toggle_console_action = main_window.add_action(
-        "menuEdit", "ToggleConsole", main_window.signals.toggle_console_requested.emit
+        "menuEdit", "ToggleConsole", main_window.signals.toggle_console_requested.emit,qta.icon("mdi.swap-horizontal")
     )
     main_window.set_action(mw, "toggle_console", toggle_console_action)
 
@@ -49,7 +49,6 @@ def connect_main_window(
         lambda _: class_tree.request_search(main_window.get_class_view())
     )
     main_window.connect_internal_signals()
-    util.add_shortcut("Ctrl+S",main_window.get(),project.request_save,Qt.ShortcutContext.ApplicationShortcut)
 
 
 def retranslate_ui(main_window: Type[tool.MainWindowWidget]):

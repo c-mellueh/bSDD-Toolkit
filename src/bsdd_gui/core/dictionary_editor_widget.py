@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QCloseEvent
 from bsdd_json import BsddDictionary
 from bsdd_gui.module.dictionary_editor_widget.constants import LANGUAGE_ISO_CODES
+import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -51,7 +52,7 @@ def create_widget(
 ):
     if parent_widget is None:
         parent_widget = main_window.get()
-    dictionary_editor.show_widget(bsdd_dictionary,parent_widget)
+    dictionary_editor.show_widget(bsdd_dictionary, parent_widget)
     retranslate_ui(dictionary_editor, main_window, util)
 
 
@@ -70,6 +71,7 @@ def connect_to_main_window(
         "menuData",
         "Dictionary Data",
         lambda: dictionary_editor.request_widget(project.get(), main_window.get()),
+        qta.icon("mdi6.book-alphabet"),
     )
     dictionary_editor.set_action(main_window.get(), "open_window", action)
 
