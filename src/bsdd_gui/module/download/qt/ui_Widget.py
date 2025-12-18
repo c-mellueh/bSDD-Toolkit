@@ -19,11 +19,13 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialogButtonBox, 
     QLabel, QLineEdit, QProgressBar, QSizePolicy,
     QWidget)
 
+from bsdd_gui.presets.ui_presets import FileSelector
+
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(650, 132)
+        Form.resize(650, 148)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
         self.pb_classes = QProgressBar(Form)
@@ -32,15 +34,15 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.pb_classes, 1, 0, 1, 2)
 
-        self.le_uri = QLineEdit(Form)
-        self.le_uri.setObjectName(u"le_uri")
-
-        self.gridLayout.addWidget(self.le_uri, 0, 1, 1, 1)
-
         self.label = QLabel(Form)
         self.label.setObjectName(u"label")
 
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+
+        self.le_uri = QLineEdit(Form)
+        self.le_uri.setObjectName(u"le_uri")
+
+        self.gridLayout.addWidget(self.le_uri, 0, 1, 1, 1)
 
         self.pb_properties = QProgressBar(Form)
         self.pb_properties.setObjectName(u"pb_properties")
@@ -52,7 +54,12 @@ class Ui_Form(object):
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
 
-        self.gridLayout.addWidget(self.buttonBox, 3, 0, 1, 2)
+        self.gridLayout.addWidget(self.buttonBox, 4, 0, 1, 2)
+
+        self.fs_save_path = FileSelector(Form)
+        self.fs_save_path.setObjectName(u"fs_save_path")
+
+        self.gridLayout.addWidget(self.fs_save_path, 3, 0, 1, 2)
 
 
         self.retranslateUi(Form)
