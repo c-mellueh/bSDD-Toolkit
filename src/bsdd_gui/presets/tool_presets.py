@@ -132,7 +132,10 @@ class ActionTool(BaseTool):
 
     @classmethod
     def get_action(cls, widget, name) -> QAction:
-        return cls.get_properties().actions[widget][name]
+        widget_data = cls.get_properties().actions.get(widget)
+        if not widget_data:
+            return None
+        return widget_data.get(name)
 
 
 class WidgetTool(BaseTool):
@@ -195,11 +198,13 @@ class WidgetTool(BaseTool):
     def connect_widget_signals(cls, widget: FieldWidget):
         widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
 
+
     @classmethod
     def register_widget(cls, widget: FieldWidget):
         logging.info(f"Register {widget}")
 
         cls.get_properties().widgets.append(widget)
+        cls.request_retranslate()
 
     @classmethod
     def unregister_widget(cls, widget: FieldWidget):
@@ -215,7 +220,14 @@ class WidgetTool(BaseTool):
 
     @classmethod
     def request_widget(cls, *args, **kwargs):
+        """
+        connects to trigger.create_widget
+        """
         cls.signals.widget_requested.emit(*args, **kwargs)
+
+    @classmethod
+    def request_retranslate(cls):
+        cls._get_trigger().retranslate_ui()
 
     @classmethod
     def add_plugins_to_widget(cls, widget):
@@ -339,6 +351,9 @@ class FieldTool(WidgetTool):
 
     @classmethod
     def register_field_setter(cls, widget: FieldWidget, field: QWidget, setter_func: callable):
+        """
+        the setter func gets called with func(data,value)
+        """
         if not widget in cls.get_properties().field_setter:
             cls.get_properties().field_setter[widget] = dict()
         cls.get_properties().field_setter[widget][field] = setter_func

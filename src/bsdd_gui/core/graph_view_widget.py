@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
+import  qtawesome as   qta
 
 def connect_signals(
     graph_view: Type[tool.GraphViewWidget],
@@ -137,7 +138,7 @@ def connect_to_main_window(
     graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
 ):
     # Action uses the WidgetTool request to allow trigger routing
-    action = main_window.add_action(None, "Graph View", lambda: graph_view.request_widget())
+    action = main_window.add_action(None, "Graph Viewer", lambda: graph_view.request_widget())
     graph_view.set_action(main_window.get(), "open_window", action)
 
 
@@ -145,7 +146,7 @@ def retranslate_ui(
     graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
 ):
     action = graph_view.get_action(main_window.get(), "open_window")
-    action.setText(QCoreApplication.translate("GraphView", "Graph View"))
+    action.setText(QCoreApplication.translate("GraphView", "Graph Viewer"))
 
 
 def create_widget(

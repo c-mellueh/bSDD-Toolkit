@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING, Type
 
 from PySide6.QtCore import QCoreApplication
-
+import qtawesome as qta
 from bsdd_gui import tool
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ def create_main_menu_actions(
 ) -> None:
     from bsdd_gui.module.settings_widget import trigger
 
-    action = main_window.add_action("menuEdit", "Settings", trigger.open_window)
+    action = main_window.add_action("menuEdit", "Settings", trigger.open_window,qta.icon("mdi6.cog"))
     settings.set_action("open_window", action)
 
 

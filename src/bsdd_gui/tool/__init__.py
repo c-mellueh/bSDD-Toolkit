@@ -24,3 +24,4 @@ from .graph_view_widget import GraphViewWidget
 from .ids_exporter import IdsExporter, IdsClassView, IdsPropertyView
 from .file_lock import FileLock
 from .ai_helper import AiHelper,AiClassDescription,AiPropertyDescription
+from .download import Download

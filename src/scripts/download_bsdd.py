@@ -1,15 +1,9 @@
-from pathlib import Path
-import sys
-
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.append(str(ROOT))
-
 import bsdd
 import bsdd_json
 from bsdd_json.utils import dictionary_utils as dict_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils as class_utils
+from pathlib import Path
 import argparse
 from bsdd_json import (
     BsddClass,
@@ -106,8 +100,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-
 if __name__ == "__main__":
     args = parse_args()
-    print(args)
     main(args.bsdd_uri, args.save_path)

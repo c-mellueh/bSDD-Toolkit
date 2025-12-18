@@ -26,7 +26,3 @@ class ClassPropertyEditor(FieldWidget, Ui_PropertyWindow):
     def enterEvent(self, event):
         trigger.update_window(self)
         return super().enterEvent(event)
-
-    def closeEvent(self, event):
-        self.closed.emit()
-        return super().closeEvent(event)

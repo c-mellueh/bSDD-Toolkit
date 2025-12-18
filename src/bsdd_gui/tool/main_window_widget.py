@@ -116,13 +116,27 @@ class MainWindowWidget(ActionTool):
         cls.get().label_property_name.setText(text)
 
     @classmethod
-    def add_action(cls, parent_name: str, name: str, function: callable) -> QAction:
+    def add_action(
+        cls,
+        parent_name: str,
+        name: str,
+        function: callable,
+        icon=None,
+        shortcut=None,
+        shortcut_context=None,
+    ) -> QAction:
         if parent_name:
             menu: QMenuBar | QMenu = getattr(cls.get(), parent_name)
         else:
             menu = cls.get_menu_bar()
         action = menu.addAction(name)
         action.triggered.connect(function)
+        if icon:
+            action.setIcon(icon)
+        if shortcut:
+            action.setShortcut(shortcut)
+        if shortcut_context:
+            action.setShortcutContext(shortcut_context)
         return action
 
     @classmethod
