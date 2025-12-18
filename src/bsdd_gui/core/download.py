@@ -43,7 +43,7 @@ def connect_to_main_window(
     main_window: Type[tool.MainWindowWidget],
 ) -> None:
     action = main_window.add_action(
-        "menuData",
+        "menuFile",
         "Download bSDD",
         lambda: download_widget.request_widget(str(uuid.uuid4()), main_window.get()),
     )
