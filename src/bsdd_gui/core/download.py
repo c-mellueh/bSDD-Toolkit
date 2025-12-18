@@ -87,10 +87,11 @@ def connect_widget(widget: ui.DownloadWidget, download_widget: Type[tool.Downloa
 
 
 def download_dictionary(widget: ui.DownloadWidget, download_widget: Type[tool.Download]):
-
     bsdd_uri = widget.le_uri.text()
     save_path = widget.fs_save_path.get_path()
+    download_widget.reset_done_count()
     bsdd_dictionary = download_widget.import_dictionary(bsdd_uri)
-    bsdd_dictionary.Classes = download_widget.get_all_classes(bsdd_uri, bsdd_dictionary)
-    bsdd_dictionary.Properties = download_widget.get_all_properties(bsdd_uri)
-    bsdd_dictionary.save(save_path)
+    download_widget.set_bsdd_dictionary(bsdd_dictionary)
+
+    download_widget.get_all_classes(widget, bsdd_uri, bsdd_dictionary)
+    download_widget.get_all_properties(widget, bsdd_uri)

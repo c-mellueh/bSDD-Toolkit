@@ -31,5 +31,7 @@ def widget_created(widget: ui.DownloadWidget):
     core.register_validators(widget, tool.Download, tool.Util)
     core.connect_widget(widget, tool.Download)
 
+def start_download(widget:ui.DownloadWidget):
+    core.download_dictionary(widget,tool.Download)
 
 ### Module Specific Triggers
