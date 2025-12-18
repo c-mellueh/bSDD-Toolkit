@@ -26,17 +26,13 @@ class Ui_Form(object):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(650, 190)
+        Form.setMinimumSize(QSize(600, 0))
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.fs_save_path = FileSelector(Form)
-        self.fs_save_path.setObjectName(u"fs_save_path")
+        self.label_2 = QLabel(Form)
+        self.label_2.setObjectName(u"label_2")
 
-        self.gridLayout.addWidget(self.fs_save_path, 3, 0, 1, 2)
-
-        self.label = QLabel(Form)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_2, 2, 0, 1, 1)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -55,12 +51,27 @@ class Ui_Form(object):
         self.horizontalLayout.addWidget(self.btn_cancel)
 
 
-        self.gridLayout.addLayout(self.horizontalLayout, 4, 0, 1, 2)
+        self.gridLayout.addLayout(self.horizontalLayout, 5, 0, 1, 2)
 
         self.le_uri = QLineEdit(Form)
         self.le_uri.setObjectName(u"le_uri")
 
         self.gridLayout.addWidget(self.le_uri, 0, 1, 1, 1)
+
+        self.label = QLabel(Form)
+        self.label.setObjectName(u"label")
+
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+
+        self.fs_save_path = FileSelector(Form)
+        self.fs_save_path.setObjectName(u"fs_save_path")
+
+        self.gridLayout.addWidget(self.fs_save_path, 4, 0, 1, 2)
+
+        self.cb_save = ToggleSwitch(Form)
+        self.cb_save.setObjectName(u"cb_save")
+
+        self.gridLayout.addWidget(self.cb_save, 2, 1, 1, 1)
 
         self.wd_progressbars = QWidget(Form)
         self.wd_progressbars.setObjectName(u"wd_progressbars")
@@ -90,17 +101,7 @@ class Ui_Form(object):
         self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.pb_properties)
 
 
-        self.gridLayout.addWidget(self.wd_progressbars, 2, 0, 1, 2)
-
-        self.label_2 = QLabel(Form)
-        self.label_2.setObjectName(u"label_2")
-
-        self.gridLayout.addWidget(self.label_2, 1, 0, 1, 1)
-
-        self.cb_save = ToggleSwitch(Form)
-        self.cb_save.setObjectName(u"cb_save")
-
-        self.gridLayout.addWidget(self.cb_save, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.wd_progressbars, 1, 0, 1, 2)
 
 
         self.retranslateUi(Form)
@@ -110,12 +111,12 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
-        self.label.setText(QCoreApplication.translate("Form", u"URI:", None))
+        self.label_2.setText(QCoreApplication.translate("Form", u"Save to File:", None))
         self.btn_start.setText(QCoreApplication.translate("Form", u"Start", None))
         self.btn_cancel.setText(QCoreApplication.translate("Form", u"Cancel", None))
+        self.label.setText(QCoreApplication.translate("Form", u"URI:", None))
+        self.cb_save.setText("")
         self.lb_classes.setText(QCoreApplication.translate("Form", u"TextLabel", None))
         self.lb_properties.setText(QCoreApplication.translate("Form", u"TextLabel", None))
-        self.label_2.setText(QCoreApplication.translate("Form", u"Save to File:", None))
-        self.cb_save.setText("")
     # retranslateUi
 

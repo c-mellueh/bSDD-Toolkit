@@ -6,7 +6,7 @@ from bsdd_json import BsddDictionary, BsddClass, BsddProperty
 import logging
 from bsdd_gui.presets.tool_presets import FieldTool, ActionTool
 from bsdd_gui.presets.tool_presets import FieldSignals
-from PySide6.QtCore import Signal, QObject, Slot, QThread
+from PySide6.QtCore import Signal, QObject, Slot, QThread, QTimer
 from PySide6.QtWidgets import QProgressBar, QLabel
 import bsdd_gui
 from bsdd_json.utils import class_utils
@@ -22,6 +22,7 @@ class Signals(FieldSignals):
     progress_changed = Signal(int, object)  # value,progressbar
     bsdd_import_finished = Signal(object)
     import_finished = Signal(object)
+    reset_layout_requested = Signal(object)
 
 
 class Download(FieldTool, ActionTool):
@@ -110,11 +111,15 @@ class Download(FieldTool, ActionTool):
             bsdd_dictionary.Properties = cls.get_properties().bsdd_properies
             for bsdd_property in bsdd_dictionary.Properties:
                 bsdd_property._set_parent(bsdd_dictionary)
-            
+
             if widget.cb_save.isChecked():
                 bsdd_dictionary.save(cls.get_properties().save_path)
+
+            logging.info("Start Reset!")
+
             cls.reset(widget)
-            time.sleep(0.1)
+            logging.info("End Reset!")
+
             cls.signals.import_finished.emit(bsdd_dictionary)
 
         def _on_worker_finished():
@@ -137,12 +142,11 @@ class Download(FieldTool, ActionTool):
         worker.progress.connect(bar.setValue)
         worker.status.connect(label.setText)
         worker.error.connect(logging.error)
-
         worker.finished.connect(thread.quit)
-        worker.finished.connect(_on_worker_finished)
+        worker.finished.connect(lambda: QTimer.singleShot(0, widget, _on_worker_finished))
 
         worker.finished.connect(worker.deleteLater)
-        worker.finished.connect(thread.deleteLater)
+        thread.finished.connect(thread.deleteLater)
         thread.start()
 
     @classmethod
@@ -195,6 +199,7 @@ class Download(FieldTool, ActionTool):
     @classmethod
     def reset(cls, widget: ui.DownloadWidget):
         cls.set_widget_run_mode(widget, False)
+        logging.info(msg="Reset of Layout done!")
         cls.get_properties().workers = list()
         cls.get_properties().threads = list()
         cls.get_properties().done_count = 0
@@ -211,15 +216,9 @@ class Download(FieldTool, ActionTool):
         widget.le_uri.setEnabled(not state)
         widget.fs_save_path.setEnabled(not state)
         widget.cb_save.setEnabled(not state)
-
-        w = widget.width()
-        layout = widget.layout()
-        layout.invalidate()
-        layout.activate()
+        logging.info(msg="Start Adjust Size!")
         widget.adjustSize()
-        geometry = widget.geometry()
-        geometry.setWidth(w)
-        widget.setGeometry(geometry)
+        logging.info(msg="End Adjust Size!")
 
 
 class Worker(QObject):

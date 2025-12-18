@@ -10,21 +10,24 @@
     <height>190</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>0</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0" colspan="2">
-    <widget class="FileSelector" name="fs_save_path" native="true"/>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>URI:</string>
+      <string>Save to File:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
+   <item row="5" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -58,7 +61,24 @@
    <item row="0" column="1">
     <widget class="QLineEdit" name="le_uri"/>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>URI:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="FileSelector" name="fs_save_path" native="true"/>
+   </item>
+   <item row="2" column="1">
+    <widget class="ToggleSwitch" name="cb_save">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
     <widget class="QWidget" name="wd_progressbars" native="true">
      <layout class="QFormLayout" name="formLayout">
       <item row="0" column="0">
@@ -93,20 +113,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Save to File:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="ToggleSwitch" name="cb_save">
-     <property name="text">
-      <string/>
-     </property>
     </widget>
    </item>
   </layout>

@@ -7,7 +7,7 @@ from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 import uuid
 from bsdd_gui.module.download import constants
 from bsdd_json.utils import dictionary_utils
-
+import logging
 if TYPE_CHECKING:
     from bsdd_gui import tool as tool
     from bsdd_gui.module.download import ui
@@ -23,6 +23,8 @@ def connect_signals(
     download_widget.connect_internal_signals()
 
     def set_project(bsdd_dictionary: BsddDictionary):
+        logging.info("SET PROJECT")
+
         save_project = appdata.get_bool_setting(constants.DOWNLAOD_APPDATA,constants.SHOULD_SAVE)
         if not save_project:
             project.register_project(bsdd_dictionary)
@@ -32,6 +34,7 @@ def connect_signals(
         text = QCoreApplication.translate(
             "Download", "{} Classes and {} Properties Downloaded!"
         ).format(class_count, property_count)
+        logging.info("Create Popup")
         popups.create_info_popup(text, title, title, main_window.get())
 
     download_widget.signals.import_finished.connect(set_project)
