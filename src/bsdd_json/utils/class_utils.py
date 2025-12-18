@@ -7,38 +7,119 @@ import bsdd
 from bsdd_json.models import BsddDictionary, BsddClass, BsddClassRelation
 
 
+def load_class(
+    class_uri: str,
+    bsdd_dictionary: BsddDictionary,
+    include_properties=False,
+    include_relations=False,
+    client: bsdd.Client | None = None,
+):
+    result = _load_class_json(
+        class_uri, bsdd_dictionary, include_properties, include_relations, client
+    )
+    if not result:
+        return None
+    return BsddClass.model_validate(result)
+
+
+def _load_class_json(
+    class_uri: str,
+    bsdd_dictionary: BsddDictionary,
+    include_properties=False,
+    include_relations=False,
+    client: bsdd.Client | None = None,
+) -> None | BsddClass:
+    from . import property_utils as prop_utils
+
+    if not dict_utils.is_uri(class_uri):
+        return None
+    # Load Client
+    c = bsdd.Client() if client is None else client
+
+    # Request from bSDD
+    result = c.get_class(
+        class_uri,
+        include_class_properties=include_properties,
+        include_class_relations=include_relations,
+        include_reverse_relations=False,
+    )
+    if not result:
+        return None
+
+    if "statusCode" in result and result["statusCode"] == 400:
+        return None
+
+    for bsdd_prop in result.get("classProperties",[]):
+        code = prop_utils.get_code_by_uri(bsdd_prop.get("uri"))
+        bsdd_prop["Code"] = code
+        prop_uri = bsdd_prop["propertyUri"]
+
+        if not dict_utils.is_external_ref(prop_uri, bsdd_dictionary):
+            bsdd_prop["propertyUri"] = None
+        else:
+            bsdd_prop["propertyCode"] = None
+        if bsdd_prop.get("description") == bsdd_prop.get("definition"):
+            bsdd_prop["description"] = None
+
+        for allowed_value in bsdd_prop.get("allowedValues",[]):
+            allowed_value["uri"] = None
+
+    pr = result.get("parentClassReference")
+    if pr:
+        result["ParentClassCode"] = pr["code"]
+    result["OwnedUri"] = class_uri
+    result["RelatedIfcEntityNamesList"] = result["relatedIfcEntityNames"]
+    if result["referenceCode"] == result["code"]:
+        result["referenceCode"] = None
+    result["CreatorLanguageIsoCode"] = result.get("creatorLanguageCode")
+
+    for key, value in result.items():
+        if not value:
+            result[key] = None
+
+    #Remove IfcReferences that are handled by RelatedIfcEntityNamesList
+    filtered_class_relations = list()
+    for class_relation in list(result.get("classRelations",[])):
+        cr_uri = class_relation.get("relatedClassUri")
+        if not dict_utils.is_ifc_reference(cr_uri):
+            filtered_class_relations.append(class_relation)
+            continue
+        if not class_relation["relationType"] == "HasReference":
+            filtered_class_relations.append(class_relation)
+            continue
+        ifc_code = get_code_by_uri(cr_uri)
+        if ifc_code not in result["RelatedIfcEntityNamesList"]:
+            filtered_class_relations.append(class_relation)
+    result["classRelations"] = filtered_class_relations
+
+
+
+    return result
+
+
 class Cache:
     data = {}
 
     @classmethod
     def get_external_class(
-        cls, class_uri: str, client: bsdd.Client | None = None
+        cls,
+        class_uri: str,
+        bsdd_dictionary: BsddDictionary,
+        include_properties=False,
+        include_relations=False,
+        client: bsdd.Client | None = None,
     ) -> BsddClass | None:
         from bsdd_json.utils import property_utils as prop_utils
 
-        def _make_request():
-            if not dict_utils.is_uri(class_uri):
-                return dict()
-            c = bsdd.Client() if client is None else client
-            result = c.get_class(
-                class_uri,
-                include_class_properties=False,
-                include_class_relations=False,
-                include_reverse_relations=False,
-            )
-
-            if "statusCode" in result and result["statusCode"] == 400:
-                return None
-            return result
-
         if not class_uri:
             return None
-        if class_uri not in cls.data:
-            result = _make_request()
-            if result is not None:
-                result = BsddClass.model_validate(result)
-                result.OwnedUri = class_uri
-            cls.data[class_uri] = result
+        if class_uri in cls.data:
+            return cls.data[class_uri]
+
+        result = load_class(
+            class_uri, bsdd_dictionary, include_properties, include_relations, client
+        )
+        cls.data[class_uri] = result
         return cls.data[class_uri]
 
     @classmethod
@@ -86,16 +167,19 @@ def get_parent(bsdd_class: BsddClass) -> BsddClass | None:
 def get_class_by_code(bsdd_dictionary: BsddDictionary, code: str) -> BsddClass | None:
     return get_all_class_codes(bsdd_dictionary).get(code)
 
+
 def get_class_by_uri(bsdd_dictionary: BsddDictionary, uri: str) -> BsddClass | None:
     if dict_utils.is_uri(uri):
-        if is_external_ref(uri,bsdd_dictionary):
-            bsdd_class = Cache.get_external_class(uri)
+        if is_external_ref(uri, bsdd_dictionary):
+            bsdd_class = Cache.get_external_class(uri, bsdd_dictionary)
         else:
             code = dict_utils.parse_bsdd_url(uri).get("resource_id")
             bsdd_class = get_all_class_codes(bsdd_dictionary).get(code)
     else:
         bsdd_class = get_all_class_codes(bsdd_dictionary).get(uri)
     return bsdd_class
+
+
 def get_all_class_codes(bsdd_dictionary: BsddDictionary) -> dict[str, BsddClass]:
     return {c.Code: c for c in bsdd_dictionary.Classes}
 
@@ -237,18 +321,28 @@ def set_code(bsdd_class: BsddClass, code: str) -> None:
     # assign without recursion (no property involved)
     object.__setattr__(bsdd_class, "Code", code)
 
-def is_external_ref(uri:str,bsdd_dictionary:BsddDictionary) -> bool:
+
+def is_external_ref(uri: str, bsdd_dictionary: BsddDictionary) -> bool:
     if not uri:
         return False
-    from .dictionary_utils import get_dictionary_path_from_uri,bsdd_dictionary_url
+    from .dictionary_utils import get_dictionary_path_from_uri, bsdd_dictionary_url
+
     dict_path = get_dictionary_path_from_uri(uri)
     if dict_path == bsdd_dictionary_url(bsdd_dictionary):
         return False
     return True
 
+
 def is_ifc_reference(bsdd_class: BsddClass) -> bool:
     if not bsdd_class.OwnedUri:
         return False
-    if "/uri/buildingsmart/ifc/" in bsdd_class.OwnedUri:
-        return True
-    return False
+    return dict_utils.is_ifc_reference(bsdd_class.OwnedUri)
+
+def get_code_by_uri(uri: str):
+    parsed_url = dict_utils.parse_bsdd_url(uri)
+    resouce_type = parsed_url.get("resource_type")
+    if not resouce_type == "class":
+        return None
+    
+    resource_id = parsed_url.get("resource_id")
+    return resource_id
