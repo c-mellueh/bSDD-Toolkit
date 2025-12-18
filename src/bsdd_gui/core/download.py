@@ -5,6 +5,8 @@ from bsdd_json import BsddClassProperty, BsddProperty
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 import uuid
+from bsdd_gui.module.download import constants
+from bsdd_json.utils import dictionary_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool as tool
@@ -52,19 +54,32 @@ def register_widget(widget: ui.DownloadWidget, download_widget: Type[tool.Downlo
     download_widget.register_widget(widget)
 
 
-def register_fields(widget: ui.DownloadWidget, download_widget: Type[tool.Download],appdata:Type[tool.Appdata]):
-    return
-    
+def register_fields(
+    widget: ui.DownloadWidget, download_widget: Type[tool.Download], appdata: Type[tool.Appdata]
+):
+    le_widget = widget.le_uri
+    download_widget.register_field_getter(
+        widget,
+        le_widget,
+        lambda: appdata.get_string_setting(constants.DOWNLAOD_APPDATA, constants.URI),
+    )
+    download_widget.register_field_setter(
+        widget,
+        le_widget,
+        lambda d, v: appdata.set_setting(constants.DOWNLAOD_APPDATA, constants.URI, v),
+    )
+    download_widget.register_field_listener(widget, le_widget)
 
 
-def register_validators(widget, download_widget: Type[tool.Download], util: Type[tool.Util]):
-    return
-    # download_widget.add_validator(
-    #     widget,
-    #     widget.le_code,
-    #     lambda v, w,: download_widget.is_code_valid(v, w),
-    #     lambda w, v: util.set_invalid(w, not v),
-    # )
+def register_validators(
+    widget: ui.DownloadWidget, download_widget: Type[tool.Download], util: Type[tool.Util]
+):
+    download_widget.add_validator(
+        widget,
+        widget.le_uri,
+        lambda v, w,: dictionary_utils.is_uri(v),
+        lambda w, v: util.set_invalid(w, not v),
+    )
 
 
 def connect_widget(widget: ui.DownloadWidget, download_widget: Type[tool.Download]):

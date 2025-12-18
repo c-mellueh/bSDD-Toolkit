@@ -345,6 +345,9 @@ class FieldTool(WidgetTool):
 
     @classmethod
     def register_field_setter(cls, widget: FieldWidget, field: QWidget, setter_func: callable):
+        """
+        the setter func gets called with func(data,value)
+        """
         if not widget in cls.get_properties().field_setter:
             cls.get_properties().field_setter[widget] = dict()
         cls.get_properties().field_setter[widget][field] = setter_func
