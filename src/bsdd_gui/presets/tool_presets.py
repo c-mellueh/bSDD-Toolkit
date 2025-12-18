@@ -198,11 +198,13 @@ class WidgetTool(BaseTool):
     def connect_widget_signals(cls, widget: FieldWidget):
         widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
 
+
     @classmethod
     def register_widget(cls, widget: FieldWidget):
         logging.info(f"Register {widget}")
 
         cls.get_properties().widgets.append(widget)
+        cls.request_retranslate()
 
     @classmethod
     def unregister_widget(cls, widget: FieldWidget):
@@ -222,6 +224,10 @@ class WidgetTool(BaseTool):
         connects to trigger.create_widget
         """
         cls.signals.widget_requested.emit(*args, **kwargs)
+
+    @classmethod
+    def request_retranslate(cls):
+        cls._get_trigger().retranslate_ui()
 
     @classmethod
     def add_plugins_to_widget(cls, widget):

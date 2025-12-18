@@ -33,8 +33,10 @@ class Download(FieldTool, ActionTool):
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.DownloadWidget):
+        super().connect_widget_signals(widget)
         widget.btn_start.clicked.connect(lambda _, w=widget: trigger.start_download(w))
         widget.btn_cancel.clicked.connect(lambda w=widget: cls.cancel(w))
+        widget.cb_save.toggled.connect(lambda v: widget.fs_save_path.setVisible(v))
 
     @classmethod
     def get_properties(cls) -> DownloadProperties:
@@ -93,11 +95,11 @@ class Download(FieldTool, ActionTool):
         label: QLabel,
         widget: ui.DownloadWidget,
         worker_class: Type[ClassWorker] | Type[PropertyWorker],
-        result_save_place ,
+        result_save_place,
         *args,
         **kwargs,
     ):
-        
+
         def _handle_finish():
             logging.info("Import Done!")
             cls.set_buttons_enabled(widget, True)
@@ -108,14 +110,16 @@ class Download(FieldTool, ActionTool):
             bsdd_dictionary.Properties = cls.get_properties().bsdd_properies
             for bsdd_property in bsdd_dictionary.Properties:
                 bsdd_property._set_parent(bsdd_dictionary)
-            bsdd_dictionary.save(cls.get_properties().save_path)
+            
+            if widget.cb_save.isChecked():
+                bsdd_dictionary.save(cls.get_properties().save_path)
             cls.reset(widget)
             time.sleep(0.1)
             cls.signals.import_finished.emit(bsdd_dictionary)
-        
+
         def _on_worker_finished():
             prop = cls.get_properties()
-            setattr(prop,result_save_place,worker.result)
+            setattr(prop, result_save_place, worker.result)
             label.setText(f"Import done!")
             cls.get_properties().done_count += 1
             if cls.get_properties().done_count == 2:
@@ -181,12 +185,10 @@ class Download(FieldTool, ActionTool):
     def set_bsdd_dictionary(cls, value: BsddDictionary):
         cls.get_properties().bsdd_dictionary = value
 
-
-
     @classmethod
     def cancel(cls, widget: ui.DownloadWidget):
         for w in cls.get_properties().workers:
-            w:Worker
+            w: Worker
             w.cancel()
         cls.reset(widget)
 
@@ -208,11 +210,17 @@ class Download(FieldTool, ActionTool):
         widget.wd_progressbars.setVisible(state)
         widget.le_uri.setEnabled(not state)
         widget.fs_save_path.setEnabled(not state)
+        widget.cb_save.setEnabled(not state)
+
         w = widget.width()
+        layout = widget.layout()
+        layout.invalidate()
+        layout.activate()
         widget.adjustSize()
         geometry = widget.geometry()
         geometry.setWidth(w)
         widget.setGeometry(geometry)
+
 
 class Worker(QObject):
     progress = Signal(int)

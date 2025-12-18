@@ -19,19 +19,43 @@ from PySide6.QtWidgets import (QApplication, QFormLayout, QGridLayout, QHBoxLayo
     QLabel, QLineEdit, QProgressBar, QPushButton,
     QSizePolicy, QSpacerItem, QWidget)
 
-from bsdd_gui.presets.ui_presets import FileSelector
+from bsdd_gui.presets.ui_presets import (FileSelector, ToggleSwitch)
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(650, 168)
+        Form.resize(650, 190)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.fs_save_path = FileSelector(Form)
+        self.fs_save_path.setObjectName(u"fs_save_path")
+
+        self.gridLayout.addWidget(self.fs_save_path, 3, 0, 1, 2)
+
         self.label = QLabel(Form)
         self.label.setObjectName(u"label")
 
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.btn_start = QPushButton(Form)
+        self.btn_start.setObjectName(u"btn_start")
+
+        self.horizontalLayout.addWidget(self.btn_start)
+
+        self.btn_cancel = QPushButton(Form)
+        self.btn_cancel.setObjectName(u"btn_cancel")
+
+        self.horizontalLayout.addWidget(self.btn_cancel)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout, 4, 0, 1, 2)
 
         self.le_uri = QLineEdit(Form)
         self.le_uri.setObjectName(u"le_uri")
@@ -66,31 +90,17 @@ class Ui_Form(object):
         self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.pb_properties)
 
 
-        self.gridLayout.addWidget(self.wd_progressbars, 1, 0, 1, 2)
+        self.gridLayout.addWidget(self.wd_progressbars, 2, 0, 1, 2)
 
-        self.fs_save_path = FileSelector(Form)
-        self.fs_save_path.setObjectName(u"fs_save_path")
+        self.label_2 = QLabel(Form)
+        self.label_2.setObjectName(u"label_2")
 
-        self.gridLayout.addWidget(self.fs_save_path, 2, 0, 1, 2)
+        self.gridLayout.addWidget(self.label_2, 1, 0, 1, 1)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.cb_save = ToggleSwitch(Form)
+        self.cb_save.setObjectName(u"cb_save")
 
-        self.horizontalLayout.addItem(self.horizontalSpacer)
-
-        self.btn_start = QPushButton(Form)
-        self.btn_start.setObjectName(u"btn_start")
-
-        self.horizontalLayout.addWidget(self.btn_start)
-
-        self.btn_cancel = QPushButton(Form)
-        self.btn_cancel.setObjectName(u"btn_cancel")
-
-        self.horizontalLayout.addWidget(self.btn_cancel)
-
-
-        self.gridLayout.addLayout(self.horizontalLayout, 3, 0, 1, 2)
+        self.gridLayout.addWidget(self.cb_save, 1, 1, 1, 1)
 
 
         self.retranslateUi(Form)
@@ -100,10 +110,12 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
-        self.label.setText(QCoreApplication.translate("Form", u"URI", None))
-        self.lb_classes.setText(QCoreApplication.translate("Form", u"TextLabel", None))
-        self.lb_properties.setText(QCoreApplication.translate("Form", u"TextLabel", None))
+        self.label.setText(QCoreApplication.translate("Form", u"URI:", None))
         self.btn_start.setText(QCoreApplication.translate("Form", u"Start", None))
         self.btn_cancel.setText(QCoreApplication.translate("Form", u"Cancel", None))
+        self.lb_classes.setText(QCoreApplication.translate("Form", u"TextLabel", None))
+        self.lb_properties.setText(QCoreApplication.translate("Form", u"TextLabel", None))
+        self.label_2.setText(QCoreApplication.translate("Form", u"Save to File:", None))
+        self.cb_save.setText("")
     # retranslateUi
 
