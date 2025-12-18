@@ -15,6 +15,40 @@ from . import build_unique_code
 import logging
 
 
+def load_property(
+    uri, include_classes=False, language_code="", client: bsdd.Client | None = None
+):
+    result = _load_property_json(uri, include_classes, language_code, client)
+    if result is None:
+        return
+    return BsddProperty.model_validate(result)
+
+
+def _load_property_json(
+    uri, include_classes=False, language_code="", client: bsdd.Client | None = None
+):
+    if not dict_utils.is_uri(uri):
+        return None
+    # Load Client
+    c = bsdd.Client() if client is None else client
+
+    # Request from bSDD
+    result = c.get_property(uri, include_classes, language_code)
+    if not result:
+        return None
+
+    if "statusCode" in result and result["statusCode"] == 400:
+        return None
+    for key, value in result.items():
+        if not value:
+            result[key] = None
+
+    for allowed_value in result.get("allowedValues",[]):
+            allowed_value["uri"] = None
+
+    return result
+
+
 class Cache:
     data = {}
 
@@ -22,28 +56,13 @@ class Cache:
     def get_external_property(
         cls, property_uri: str, client: bsdd.Client | None = None
     ) -> BsddClassProperty | None:
-        from bsdd_json.utils import property_utils as prop_utils
-
-        def _make_request():
-
-            if not dict_utils.is_uri(property_uri):
-                return dict()
-            logging.debug(f"Load {property_uri}")
-            c = Client() if client is None else client
-            result = c.get_property(property_uri)
-
-            if "statusCode" in result and result["statusCode"] == 400:
-                return None
-            return result
 
         if not property_uri:
             return None
-        if property_uri not in cls.data:
-            result = _make_request()
-            if result is not None:
-                result = BsddProperty.model_validate(result)
-                result.OwnedUri = property_uri
-            cls.data[property_uri] = result
+        if property_uri in cls.data:
+            return cls.data[property_uri]
+        result = load_property(property_uri, client=client)
+        cls.data[property_uri] = result
         return cls.data[property_uri]
 
     @classmethod
@@ -177,12 +196,18 @@ def get_code_by_uri(uri: str):
         return resource_id
     path_segments = parsed_url["path_segments"]
 
-    #Handle ClassProperty
+    # Handle ClassProperty
     if resouce_type == "class" and not "prop" in path_segments:
         return None
+
     code_index = path_segments.index("prop") + 2
     if code_index >= len(path_segments):
         return None
+
+    # Catches Bug in API (See https://github.com/buildingSMART/bSDD/issues/142)
+    if path_segments.count("prop") > 1:
+        return path_segments[-1]
+
     return path_segments[code_index]
 
 

@@ -259,3 +259,8 @@ def is_external_ref(uri:str,bsdd_dictionary:BsddDictionary) -> bool:
     if dict_path == bsdd_dictionary_url(bsdd_dictionary):
         return False
     return True
+
+def is_ifc_reference(uri:str):
+    if "/uri/buildingsmart/ifc/" in uri:
+        return True
+    return False

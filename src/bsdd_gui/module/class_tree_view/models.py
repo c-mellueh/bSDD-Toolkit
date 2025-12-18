@@ -258,7 +258,10 @@ class ClassTreeModel(ItemModel):
             for cp in c.ClassProperties:
                 if not cp.PropertyCode:
                     continue
-                add_property(prop_utils.get_internal_property(cp))
+                internal_prop = prop_utils.get_internal_property(cp)
+                if not internal_prop:
+                    prop_utils.get_internal_property(cp)
+                add_property(internal_prop)
 
         for c in classes:
             roots.append(c.Code)
