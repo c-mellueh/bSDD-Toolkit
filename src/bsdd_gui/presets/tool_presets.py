@@ -215,6 +215,9 @@ class WidgetTool(BaseTool):
 
     @classmethod
     def request_widget(cls, *args, **kwargs):
+        """
+        connects to trigger.create_widget
+        """
         cls.signals.widget_requested.emit(*args, **kwargs)
 
     @classmethod
