@@ -1,5 +1,5 @@
 from __future__ import annotations
-
-class GraphViewerWindowProperties:
+from bsdd_gui.presets.prop_presets import ActionsProperties,FieldProperties
+class GraphViewerWindowProperties(ActionsProperties,FieldProperties):
     pass
 

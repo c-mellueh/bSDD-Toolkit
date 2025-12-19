@@ -85,7 +85,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
     def _get_widget_class(cls):
         # Lazy import to avoid heavy cost on module load
         from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.ui import GraphWindow
-
         return GraphWindow
 
     @classmethod

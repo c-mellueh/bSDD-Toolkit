@@ -150,13 +150,6 @@ def connect_to_main_window(
     graph_view.set_action(main_window.get(), "open_window", action)
 
 
-def retranslate_ui(
-    graph_view: Type[gv_tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
-):
-    action = graph_view.get_action(main_window.get(), "open_window")
-    action.setText(QCoreApplication.translate("GraphView", "Graph Viewer"))
-
-
 def add_icons(widget: ui.GraphWindow):
     bs = widget.settings_sidebar._button_settings
     bs.bt_clear.setIcon(qta.icon("mdi6.cancel"))
