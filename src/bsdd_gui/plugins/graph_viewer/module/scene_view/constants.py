@@ -1,3 +1,6 @@
+
+from typing import Literal
+
 OVERLAY_STYLESHEET = """
                 QLabel {
                     color: #e8e8f0;
@@ -7,3 +10,7 @@ OVERLAY_STYLESHEET = """
                     padding: 10px 14px;
                 }
                 """
+ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
+
+PROPERTY_DRAG = "property_drag"
+CLASS_DRAG = "class_drag"

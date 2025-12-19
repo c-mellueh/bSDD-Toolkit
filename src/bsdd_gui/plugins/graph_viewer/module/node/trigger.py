@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def activate():
-    core.connect_signals(gv_tool.Node,gv_tool.Edge,tool.Project)
+    core.connect_signals(gv_tool.Node,gv_tool.Edge,gv_tool.SceneView,tool.Project)
 
     
 def deactivate():

@@ -9,7 +9,10 @@ if TYPE_CHECKING:
 
 
 def connect_signals(
-    node: Type[gv_tool.Node], edge: Type[gv_tool.Edge], project: Type[tool.Project]
+    node: Type[gv_tool.Node],
+    edge: Type[gv_tool.Edge],
+    scene_view: Type[gv_tool.SceneView],
+    project: Type[tool.Project],
 ):
     node.signals.remove_edge_requested.connect(
         lambda e, s, ov, ap: edge.remove_edge(
@@ -20,3 +23,5 @@ def connect_signals(
             ap,
         )
     )
+    node.signals.node_created.connect(lambda n: node.get_properties().nodes.append(n))
+    node.signals.node_created.connect(scene_view.add_item)

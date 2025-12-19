@@ -2,14 +2,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 import bsdd_gui.plugins.graph_viewer.tool as gv_tool
+from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import property_utils as prop_utils
 
+from bsdd_json import BsddClass, BsddDictionary, BsddProperty
 from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint
+from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QLabel, QGraphicsItem
 
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.scene_view import ui, trigger, constants
 from bsdd_gui.presets.tool_presets import BaseTool
-
+from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
+from bsdd_gui.module.property_table_widget.constants import JSON_MIME as PROPERTY_JSON_MIME
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.prop import GraphViewerSceneViewProperties
@@ -17,9 +22,12 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
+
 class Signals:
     delete_selection_requested = Signal()
-
+    classes_insert_requested = Signal(list, QPoint)
+    properties_insert_requested = Signal(list, QPoint)
+    recalculate_edges_requested = Signal()
 
 class SceneView(BaseTool):
     signals = Signals()
@@ -31,6 +39,9 @@ class SceneView(BaseTool):
     @classmethod
     def connect_internal_signals(cls):
         cls.signals.delete_selection_requested.connect(trigger.delete_selection)
+        cls.signals.classes_insert_requested.connect(trigger.insert_classes)
+        cls.signals.properties_insert_requested.connect(trigger.insert_properties)
+        cls.signals.recalculate_edges_requested.connect(trigger.recalculate_edges)
         return super().connect_internal_signals()
 
     @classmethod
@@ -120,6 +131,7 @@ class SceneView(BaseTool):
     def get_selected_items(cls):
         from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
         from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
+
         scene = cls.get_scene()
         selected_nodes: list[Node] = []
         selected_edges: list[Edge] = []
@@ -217,3 +229,80 @@ class SceneView(BaseTool):
             show_edge = edge_filters.get(e.edge_type, True)
             show_edge = show_edge and e.start_node.isVisible() and e.end_node.isVisible()
             e.setVisible(show_edge)
+
+    @classmethod
+    def get_position_from_event(cls, event: QDropEvent):
+        view = cls.get_view()
+        try:
+            pos_view = event.position()
+            # mapToScene expects int coordinates
+            scene_pos = view.mapToScene(int(pos_view.x()), int(pos_view.y()))
+        except Exception:
+            scene_pos = view.mapToScene(event.pos())
+        return scene_pos
+
+    # ---------- Drag & Drop --------------------------------------
+    @classmethod
+    def _mime_has_bsdd_class(cls, md) -> bool:
+
+        try:
+            if md.hasFormat(CLASS_JSON_MIME):
+                return True
+            if md.hasFormat("application/json"):
+                return True
+            if md.hasFormat("text/plain"):
+                # expecting JSON array of codes as text
+                return True
+        except Exception:
+            pass
+        return False
+
+    @classmethod
+    def get_mime_type(cls, mime_data) -> constants.ALLOWED_DRAG_TYPES | None:
+        if mime_data.hasFormat(PROPERTY_JSON_MIME):
+            return constants.PROPERTY_DRAG
+        if mime_data.hasFormat(CLASS_JSON_MIME):
+            return constants.CLASS_DRAG
+        return None
+
+    @classmethod
+    def read_classes_to_add(cls, payload: dict, bsdd_dictionary: BsddDictionary):
+        classes_to_add = list()
+        if not "classes" in payload:
+            return []
+        for rc in payload["classes"]:
+            code = rc.get("Code", None)
+            if not code:
+                continue
+            bsdd_class = cl_utils.get_class_by_code(bsdd_dictionary, code)
+            if not bsdd_class:
+                continue
+            classes_to_add.append(bsdd_class)
+        return classes_to_add
+
+    @classmethod
+    def read_properties_to_add(cls, payload: dict, bsdd_dictionary: BsddDictionary):
+        properties_to_add = list()
+        if not "properties" in payload:
+            return []
+        for rp in payload["properties"]:
+            code = rp.get("Code")
+            if not code:
+                continue
+            bsdd_property = prop_utils.get_property_by_code(code, bsdd_dictionary)
+            if not bsdd_property:
+                continue
+            properties_to_add.append(bsdd_property)
+        return properties_to_add
+
+    @classmethod
+    def request_classes_insert(cls, classes: list[BsddClass], postion: QPoint):
+        cls.signals.classes_insert_requested.emit(classes, postion)
+
+    @classmethod
+    def request_properties_insert(cls, properties: list[BsddProperty], postion: QPoint):
+        cls.signals.properties_insert_requested.emit(properties, postion)
+
+    @classmethod
+    def request_recalculate_edges(cls):
+        cls.signals.recalculate_edges_requested.emit()

@@ -16,7 +16,7 @@ from bsdd_json import (
 )
 from PySide6.QtCore import Signal, Qt, QPointF
 from PySide6.QtGui import QColor, QPen, QPainterPath
-from PySide6.QtWidgets import QGraphicsPathItem,QWidget
+from PySide6.QtWidgets import QGraphicsPathItem, QWidget
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
 from bsdd_gui.presets.tool_presets import BaseTool
@@ -25,6 +25,9 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.ui import GraphScene
     from bsdd_gui.plugins.graph_viewer.module.edge.prop import GraphViewerEdgeProperties
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
+from bsdd_gui.module.ifc_helper.data import IfcHelperData
+
+RelationsDict = dict[constants.ALLOWED_EDGE_TYPES_TYPING, dict[tuple[str, str, str, str], ui.Edge]]
 
 
 class Signals(QWidget):
@@ -164,7 +167,7 @@ class Edge(BaseTool):
     def add_edge(
         cls,
         edge: ui.Edge,
-    ) -> ui.Edge:
+    ) -> ui.Edge | None:
 
         for existing_edge in cls.get_edges():
             if existing_edge.start_node.bsdd_data != edge.start_node.bsdd_data:
@@ -173,7 +176,7 @@ class Edge(BaseTool):
                 continue
             if existing_edge.edge_type == edge.edge_type:
                 logging.info(f"Edge allread exists {edge}")
-                return None
+                return
         cls.signals.new_edge_created.emit(edge)
         return edge
 
@@ -436,3 +439,166 @@ class Edge(BaseTool):
         start_property.PropertyRelations.append(new_relation)
         new_edge = cls.create_edge(start_node, end_node, edge_type=relation)
         cls.add_edge(new_edge)
+
+    @classmethod
+    def get_relations_dict(cls, bsdd_dictionary: BsddDictionary):
+        relations_dict: RelationsDict = {et: dict() for et in constants.ALLOWED_EDGE_TYPES}
+        for edge in cls.get_edges():
+            info = cls._info(edge.start_node, edge.end_node, bsdd_dictionary)
+            if info in relations_dict[edge.edge_type]:
+                logging.info(f"Relationship duplicate found")
+            relations_dict[edge.edge_type][info] = edge
+        return relations_dict
+
+    @classmethod
+    def find_class_relations(
+        cls,
+        nodes: list[Node],
+        uri_dict: dict[str, Node],
+        existing_relations_dict: dict[str, dict[tuple[str, str, str, str], ui.Edge]],
+        bsdd_dictionary: BsddDictionary,
+    ) -> list[ui.Edge]:
+        new_edges = list()
+        for start_node in nodes:
+            if start_node.node_type != node_constants.CLASS_NODE_TYPE:
+                continue
+            start_class = start_node.bsdd_data
+            parent_class = cl_utils.get_class_by_code(bsdd_dictionary, start_class.ParentClassCode)
+            if parent_class:
+                parent_uri = cl_utils.build_bsdd_uri(parent_class, bsdd_dictionary)
+                related_node = uri_dict.get(parent_uri)
+                relation_type = constants.PARENT_CLASS
+                info = cls._info(start_node, related_node, bsdd_dictionary)
+
+                if related_node is not None and info not in existing_relations_dict[relation_type]:
+                    edge = cls.create_edge(
+                        start_node, related_node, edge_type=constants.PARENT_CLASS
+                    )
+                    new_edges.append(edge)
+                    existing_relations_dict[relation_type][info] = edge
+
+            for relation in start_class.ClassRelations:
+                related_node = uri_dict.get(relation.RelatedClassUri)
+                if related_node is None:
+                    continue
+                info = cls._info(start_node, related_node, bsdd_dictionary)
+                relation_type = relation.RelationType
+                if related_node is not None and info not in existing_relations_dict[relation_type]:
+                    edge = cls.create_edge(start_node, related_node, edge_type=relation_type)
+                    new_edges.append(edge)
+                    existing_relations_dict[relation_type][info] = edge
+        return new_edges
+
+    @classmethod
+    def find_class_property_relations(
+        cls,
+        nodes: list[Node],
+        uri_dict: dict[str, Node],
+        existing_relations_dict: RelationsDict,
+        bsdd_dictionary: BsddDictionary,
+    ) -> list[ui.Edge]:
+
+        new_edges = list()
+        for start_node in nodes:
+            if start_node.node_type != node_constants.CLASS_NODE_TYPE:
+                continue
+            start_class = start_node.bsdd_data
+            for cp in start_class.ClassProperties:
+                if cp.PropertyUri:
+                    related_node = uri_dict.get(cp.PropertyUri)
+                else:
+                    bsdd_property = prop_utils.get_property_by_class_property(cp, bsdd_dictionary)
+                    related_node = uri_dict.get(
+                        prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
+                    )
+                if related_node is None:
+                    continue
+                info = cls._info(start_node, related_node, bsdd_dictionary)
+                relation_type = constants.C_P_REL
+                if info not in existing_relations_dict[relation_type]:
+                    edge = cls.create_edge(start_node, related_node, edge_type=relation_type)
+                    new_edges.append(edge)
+                    existing_relations_dict[relation_type][info] = edge
+        return new_edges
+
+    @classmethod
+    def find_property_relations(
+        cls,
+        nodes: list[Node],
+        uri_dict: dict[str, Node],
+        existing_relations_dict: dict[str, dict[tuple[str, str, str, str], ui.Edge]],
+        bsdd_dictionary: BsddDictionary,
+    ) -> list[ui.Edge]:
+        new_edges = list()
+        for start_node in nodes:
+            if start_node.node_type != node_constants.PROPERTY_NODE_TYPE:
+                continue
+            start_property = start_node.bsdd_data
+            for relation in start_property.PropertyRelations:
+                related_node = uri_dict.get(relation.RelatedPropertyUri)
+                if related_node is None:
+                    continue
+                info = cls._info(start_node, related_node, bsdd_dictionary)
+                relation_type = relation.RelationType
+                if related_node is not None and info not in existing_relations_dict[relation_type]:
+                    edge = cls.create_edge(start_node, related_node, edge_type=relation_type)
+                    new_edges.append(edge)
+                    existing_relations_dict[relation_type][info] = edge
+        return new_edges
+
+    @classmethod
+    def find_ifc_relations(
+        cls,
+        nodes: list[Node],
+        uri_dict: dict[str, Node],
+        existing_relations_dict: dict[str, dict[tuple[str, str, str, str], ui.Edge]],
+        bsdd_dictionary: BsddDictionary,
+    ):
+        ifc_dict = {c["code"]: c for c in IfcHelperData.get_classes()}
+        new_edges = list()
+        relation_type = constants.IFC_REFERENCE_REL
+        for start_node in nodes:
+            if start_node.node_type != node_constants.CLASS_NODE_TYPE or start_node.is_external:
+                continue
+            start_class = start_node.bsdd_data
+            for ifc_name in start_class.RelatedIfcEntityNamesList or []:
+                ifc_uri = ifc_dict.get(ifc_name).get("uri")
+                related_node = uri_dict.get(ifc_uri)
+                if not related_node:
+                    continue
+                info = cls._info(start_node, related_node, bsdd_dictionary)
+                if related_node is not None and info not in existing_relations_dict[relation_type]:
+                    edge = cls.create_edge(start_node, related_node, edge_type=relation_type)
+                    new_edges.append(edge)
+                    existing_relations_dict[relation_type][info] = edge
+        return new_edges
+
+    @classmethod
+    def _info(
+        cls,
+        start_node: Node,
+        end_node: Node,
+        bsdd_dictionary: BsddDictionary,
+    ):
+        def get_uri_from_node(node: Node, bsdd_dictionary: BsddDictionary):
+            if node.node_type in [
+                node_constants.EXTERNAL_CLASS_NODE_TYPE,
+                node_constants.EXTERNAL_PROPERTY_NODE_TYPE,
+                node_constants.IFC_NODE_TYPE,
+            ]:
+                uri = node.bsdd_data.OwnedUri
+            elif node.node_type == node_constants.CLASS_NODE_TYPE:
+                uri = cl_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+            elif node.node_type == node_constants.PROPERTY_NODE_TYPE:
+                uri = prop_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+            else:
+                uri = None
+            return uri
+
+        d = [None, None, None, None]
+        d[0] = start_node.node_type
+        d[1] = get_uri_from_node(start_node, bsdd_dictionary)
+        if end_node:
+            d[2] = end_node.node_type
+            d[3] = get_uri_from_node(end_node, bsdd_dictionary)
+        return tuple(d)

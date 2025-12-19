@@ -1,7 +1,15 @@
 from __future__ import annotations
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QMouseEvent
+from PySide6.QtCore import Qt, QPoint, QPointF
+from PySide6.QtGui import QMouseEvent, QDropEvent
 from typing import TYPE_CHECKING, Type
+from bsdd_gui.plugins.graph_viewer.module.scene_view import constants
+from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
+
+from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import property_utils as prop_utils
+from bsdd_json.utils import dictionary_utils as dict_utils
+
+from bsdd_json import BsddClass, BsddProperty
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -136,3 +144,178 @@ def mouse_move_event(
         edge._update_edge_drag(scene_pos)
         event.accept()
         return
+
+
+def drag_enter_event(event, scene_view: Type[gv_tool.SceneView]):
+    if scene_view._mime_has_bsdd_class(event.mimeData()):
+        event.acceptProposedAction()
+    else:
+        return
+
+
+def dragMoveEvent(event, scene_view: Type[gv_tool.SceneView]):
+    if scene_view._mime_has_bsdd_class(event.mimeData()):
+        event.acceptProposedAction()
+    else:
+        super().dragMoveEvent(event)
+
+
+def drop_event(
+    event: QDropEvent,
+    scene_view: Type[gv_tool.SceneView],
+    class_tree: Type[tool.ClassTreeView],
+    property_table: Type[tool.PropertyTableWidget],
+    project: Type[tool.Project]
+):
+    mime_data = event.mimeData()
+    mime_type = scene_view.get_mime_type(mime_data)
+    if mime_type is None:
+        event.ignore()
+        return
+    scene_pos = scene_view.get_position_from_event(event)
+    bsdd_dictionary = project.get()
+
+    classes_to_add: list[BsddClass] = list()
+    properties_to_add = list()
+    if mime_type == constants.CLASS_DRAG:
+        payload = class_tree.get_payload_from_data(mime_data)
+        classes_to_add += scene_view.read_classes_to_add(payload, bsdd_dictionary)
+
+    elif mime_type == constants.PROPERTY_DRAG:
+        payload = property_table.get_payload_from_data(mime_data)
+        properties_to_add += scene_view.read_properties_to_add(payload, bsdd_dictionary)
+
+    if not classes_to_add and not properties_to_add:
+        event.ignore()
+        return
+
+    scene_view.request_classes_insert(classes_to_add, scene_pos)
+    scene_view.request_properties_insert(properties_to_add, scene_pos)
+
+    scene_view.request_recalculate_edges()
+    event.acceptProposedAction()
+
+
+def insert_classes_in_scene(
+    classes: list[BsddClass],
+    position: QPoint,
+    scene_view: Type[gv_tool.SceneView],
+    node: Type[gv_tool.Node],
+    ifc_helper: Type[tool.IfcHelper],
+    project: Type[tool.Project],
+):
+    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
+    bsdd_dictionary = project.get()
+    scene = scene_view.get_scene()
+
+    if position is None:
+        position = QPointF(scene.sceneRect().width() / 2, scene.sceneRect().height() / 2)
+    offset_step = QPointF(24.0, 18.0)
+    cur_position = QPointF(position)
+
+    external_nodes = node.get_external_nodes()
+    internal_nodes = node.get_internal_nodes(bsdd_dictionary)
+
+    for bsdd_class in classes:
+        class_uri = cl_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary)
+        if class_uri not in internal_nodes:
+            new_node = node.add_node(bsdd_class, pos=cur_position, is_external=False)
+            internal_nodes[class_uri] = new_node
+            cur_position += offset_step
+
+        ifc_entities = bsdd_class.RelatedIfcEntityNamesList or []
+        for e in ifc_entities:
+            new_node = node.add_ifc_node(e, cur_position, ifc_classes, external_nodes)
+            if new_node:
+                cur_position += offset_step
+                external_nodes[new_node.bsdd_data.OwnedUri] = new_node.bsdd_data
+
+        for class_relation in bsdd_class.ClassRelations:
+            related_uri = class_relation.RelatedClassUri
+            if related_uri in external_nodes or related_uri in internal_nodes:
+                continue
+
+            related_bsdd_class = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
+            if related_bsdd_class.OwnedUri and cl_utils.is_external_ref(
+                related_bsdd_class.OwnedUri, bsdd_dictionary
+            ):
+                new_node = node.add_node(related_bsdd_class, pos=cur_position, is_external=True)
+                external_nodes[related_bsdd_class.OwnedUri] = new_node.bsdd_data
+
+            else:
+                new_node = node.add_node(related_bsdd_class, pos=cur_position, is_external=False)
+                uri = cl_utils.build_bsdd_uri(related_bsdd_class, bsdd_dictionary)
+                internal_nodes[uri] = new_node.bsdd_data
+            cur_position += offset_step
+
+
+def insert_properties_in_scene(
+    bsdd_properties: list[BsddProperty],
+    position: QPoint,
+    scene_view: Type[gv_tool.SceneView],
+    node: Type[gv_tool.Node],
+    project: Type[tool.Project],
+):
+    scene = scene_view.get_scene()
+    bsdd_dictionary = project.get()
+    if position is None:
+        position = QPointF(scene.sceneRect().width() / 2, scene.sceneRect().height() / 2)
+
+    offset_step = QPointF(24.0, 18.0)
+    cur_position = QPointF(position)
+
+    external_nodes = node.get_external_nodes()
+    internal_nodes = node.get_internal_nodes(bsdd_dictionary)
+
+    for bsdd_property in bsdd_properties:
+        prop_uri = prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
+        if prop_uri not in internal_nodes:
+            new_node = node.add_node(scene, bsdd_property, pos=cur_position, is_external=False)
+            internal_nodes[prop_uri] = new_node
+            cur_position += offset_step
+
+        for property_relation in bsdd_property.PropertyRelations:
+            related_uri = property_relation.RelatedPropertyUri
+            if related_uri in external_nodes or related_uri in internal_nodes:
+                continue
+
+            related_bsdd_property = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
+            if related_bsdd_property.OwnedUri and dict_utils.is_external_ref(
+                related_bsdd_property.OwnedUri, bsdd_dictionary
+            ):
+                new_node = node.add_node(
+                    scene, related_bsdd_property, pos=cur_position, is_external=True
+                )
+                external_nodes[related_bsdd_property.OwnedUri] = new_node.bsdd_data
+            else:
+                new_node = node.add_node(
+                    scene, related_bsdd_property, pos=cur_position, is_external=False
+                )
+                uri = cl_utils.build_bsdd_uri(related_bsdd_property, bsdd_dictionary)
+                internal_nodes[uri] = new_node.bsdd_data
+            cur_position += offset_step
+
+
+def recalculate_edges(
+    scene_view: Type[gv_tool.SceneView],
+    node: Type[gv_tool.Node],
+    edge: Type[gv_tool.Edge],
+    project: Type[tool.Project],
+):
+    bsdd_dict = project.get()
+    scene = scene_view.get_scene()
+    if not scene:
+        return
+    nodes = node.get_nodes()
+    relations_dict = edge.get_relations_dict(bsdd_dict)
+    uri_dict = node.get_uri_dict(bsdd_dict)
+
+    new_edges = edge.find_class_relations(nodes, uri_dict, relations_dict, bsdd_dict)
+    new_edges += edge.find_class_property_relations(nodes, uri_dict, relations_dict, bsdd_dict)
+    new_edges += edge.find_property_relations(nodes, uri_dict, relations_dict, bsdd_dict)
+    new_edges += edge.find_ifc_relations(nodes, uri_dict, relations_dict, bsdd_dict)
+    for e in new_edges:
+        edge.add_edge(e)
+        relations_dict[e.edge_type][edge._info(e.start_node, e.end_node, bsdd_dict)] = e
+
+    scene_view.apply_filters(edge.get_filters(), node.get_filters())

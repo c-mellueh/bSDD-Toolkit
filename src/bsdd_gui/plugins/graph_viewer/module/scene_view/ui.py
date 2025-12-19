@@ -1,32 +1,12 @@
 from __future__ import annotations
-from bsdd_json.utils import class_utils as cl_utils
-from bsdd_json.utils import property_utils as prop_utils
-from bsdd_json.utils import dictionary_utils as dict_utils
-from bsdd_json import BsddClass, BsddProperty, BsddDictionary
-import math
-import random
-from dataclasses import dataclass
-from typing import List, Tuple, Optional, Dict, Literal
+from typing import List, Dict
 
-from PySide6.QtCore import QPoint, QPointF, QRectF, Qt, QTimer
-from PySide6.QtGui import QBrush, QColor, QFontMetrics, QPainter, QPainterPath, QPen
+from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
 from PySide6.QtWidgets import (
-    QApplication,
-    QGraphicsItem,
-    QGraphicsObject,
-    QGraphicsPathItem,
     QGraphicsScene,
     QGraphicsView,
-    QLabel,
-    QMainWindow,
-    QSlider,
-    QToolBar,
-    QToolButton,
-    QFileDialog,
 )
 
-from typing import TYPE_CHECKING
-from bsdd_gui import tool
 from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.graphics_items import Node, Edge
 from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.physics import Physics
 from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
@@ -90,37 +70,14 @@ class GraphView(QGraphicsView):
         super().mouseMoveEvent(event)
 
     # ---- Drag & Drop integration ----
-    def _mime_has_bsdd_class(self, md) -> bool:
-        try:
-            if md.hasFormat(CLASS_JSON_MIME):
-                return True
-            if md.hasFormat("application/json"):
-                return True
-            if md.hasFormat("text/plain"):
-                # expecting JSON array of codes as text
-                return True
-        except Exception:
-            pass
-        return False
-
-    def _get_drag_type(self, md) -> ALLOWED_DRAG_TYPES | None:
-        if md.hasFormat(PROPERTY_JSON_MIME):
-            return PROPERTY_DRAG
-        if md.hasFormat(CLASS_JSON_MIME):
-            return CLASS_DRAG
-        return None
 
     def dragEnterEvent(self, event):
-        if self._mime_has_bsdd_class(event.mimeData()):
-            event.acceptProposedAction()
-        else:
-            super().dragEnterEvent(event)
+        trigger.drag_enter_event(event)
+        super().dragEnterEvent(event)
 
     def dragMoveEvent(self, event):
-        if self._mime_has_bsdd_class(event.mimeData()):
-            event.acceptProposedAction()
-        else:
-            super().dragMoveEvent(event)
+        trigger.drag_move_event(event)
+        super().dragMoveEvent(event)
 
     def dropEvent(self, event):
         trigger.handle_drop_event(event, self)

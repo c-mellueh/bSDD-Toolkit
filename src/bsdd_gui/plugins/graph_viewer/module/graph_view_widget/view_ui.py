@@ -359,12 +359,7 @@ class GraphView(QGraphicsView):
             pass
         return False
 
-    def _get_drag_type(self, md) -> ALLOWED_DRAG_TYPES | None:
-        if md.hasFormat(PROPERTY_JSON_MIME):
-            return PROPERTY_DRAG
-        if md.hasFormat(CLASS_JSON_MIME):
-            return CLASS_DRAG
-        return None
+
 
     def dragEnterEvent(self, event):
         if self._mime_has_bsdd_class(event.mimeData()):

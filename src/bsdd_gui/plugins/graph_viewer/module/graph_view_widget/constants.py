@@ -28,9 +28,9 @@ from PySide6.QtWidgets import (
     QFileDialog,
 )
 
-PROPERTY_DRAG = "property_drag"
-CLASS_DRAG = "class_drag"
-ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
+PROPERTY_DRAG = None#Movede to constants.sceneView
+CLASS_DRAG = None #Movede to constants.sceneView
+ALLOWED_DRAG_TYPES =None #Movede to constants.sceneView
 
 
 # Edge Type

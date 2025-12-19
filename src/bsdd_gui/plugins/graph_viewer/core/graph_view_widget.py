@@ -269,25 +269,7 @@ def handle_drop_event(
 
 
 def recalculate_edges(graph_view: Type[gv_tool.GraphViewWidget], project: Type[tool.Project]):
-    bsdd_dict = project.get()
-    scene: GraphScene = graph_view.get_scene()
-    if not scene:
-        return
-    nodes = scene.nodes
-    edges = scene.edges
-    uri_dict, relations_dict = graph_view.get_uri_dicts(scene, bsdd_dict)
-    new_edges = graph_view.find_class_relations(nodes, uri_dict, relations_dict, bsdd_dict)
-    new_edges += graph_view.find_class_property_relations(
-        nodes, uri_dict, relations_dict, bsdd_dict
-    )
-    new_edges += graph_view.find_property_relations(nodes, uri_dict, relations_dict, bsdd_dict)
-    new_edges += graph_view.find_ifc_relations(nodes, uri_dict, relations_dict, bsdd_dict)
-    for edge in new_edges:
-        graph_view.add_edge(scene, edge)
-        relations_dict[edge.edge_type][
-            graph_view._info(edge.start_node, edge.end_node, bsdd_dict)
-        ] = edge
-    graph_view.get_widget()._apply_filters()
+    return None #core.SceneView
 
 
 def node_double_clicked(
