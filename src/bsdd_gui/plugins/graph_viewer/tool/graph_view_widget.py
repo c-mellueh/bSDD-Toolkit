@@ -244,18 +244,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
         edge: graphics_items.Edge,
     ) -> graphics_items.Edge:
 
-        for existing_edge in scene.edges:
-            if existing_edge.start_node.bsdd_data != edge.start_node.bsdd_data:
-                continue
-            if existing_edge.end_node.bsdd_data != edge.end_node.bsdd_data:
-                continue
-            if existing_edge.edge_type == edge.edge_type:
-                logging.info(f"Edge allread exists {edge}")
-                return None
-        scene.addItem(edge)
-        scene.edges.append(edge)
-        return edge
-
+        return None # tool.Edge
+    
     @classmethod
     def add_node(
         cls,
@@ -285,21 +275,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
     ):
         return None # Moved To Node
 
-    @classmethod
-    def get_uri_from_node(cls, node: Node, bsdd_dictionary: BsddDictionary):
-        if node.node_type in [
-            constants.EXTERNAL_CLASS_NODE_TYPE,
-            constants.EXTERNAL_PROPERTY_NODE_TYPE,
-            constants.IFC_NODE_TYPE,
-        ]:
-            uri = node.bsdd_data.OwnedUri
-        elif node.node_type == constants.CLASS_NODE_TYPE:
-            uri = cl_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
-        elif node.node_type == constants.PROPERTY_NODE_TYPE:
-            uri = prop_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
-        else:
-            uri = None
-        return uri
 
     @classmethod
     def _info(
@@ -308,13 +283,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         end_node: graphics_items.Node,
         bsdd_dictionary: BsddDictionary,
     ):
-        d = [None, None, None, None]
-        d[0] = start_node.node_type
-        d[1] = cls.get_uri_from_node(start_node, bsdd_dictionary)
-        if end_node:
-            d[2] = end_node.node_type
-            d[3] = cls.get_uri_from_node(end_node, bsdd_dictionary)
-        return tuple(d)
+        return None #Moved to tool.Edge
 
     @classmethod
     def get_uri_dicts(cls, scene: view_ui.GraphScene, bsdd_dictionary: BsddDictionary):
@@ -339,24 +308,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
         existing_relations_dict: dict[str, dict[tuple[str, str, str, str], graphics_items.Edge]],
         bsdd_dictionary: BsddDictionary,
     ):
-        ifc_dict = {c["code"]: c for c in IfcHelperData.get_classes()}
-        new_edges = list()
-        relation_type = constants.IFC_REFERENCE_REL
-        for start_node in nodes:
-            if start_node.node_type != constants.CLASS_NODE_TYPE or start_node.is_external:
-                continue
-            start_class = start_node.bsdd_data
-            for ifc_name in start_class.RelatedIfcEntityNamesList or []:
-                ifc_uri = ifc_dict.get(ifc_name).get("uri")
-                related_node = uri_dict.get(ifc_uri)
-                if not related_node:
-                    continue
-                info = cls._info(start_node, related_node, bsdd_dictionary)
-                if related_node is not None and info not in existing_relations_dict[relation_type]:
-                    edge = cls.create_edge(start_node, related_node, edge_type=relation_type)
-                    new_edges.append(edge)
-                    existing_relations_dict[relation_type][info] = edge
-        return new_edges
+        return None #Moved to tool.Edge
+
 
     @classmethod
     def find_class_property_relations(
@@ -388,63 +341,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         bsdd_properties: list[BsddProperty],
         position: QPointF = None,
     ):
-        if position is None:
-            position = QPointF(scene.sceneRect().width() / 2, scene.sceneRect().height() / 2)
-        offset_step = QPointF(24.0, 18.0)
-        cur = QPointF(position)
-
-        new_nodes = list()
-        existing_nodes = {n for n in scene.nodes if hasattr(n, "bsdd_data")}
-        external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
-        internal_nodes = {
-            prop_utils.build_bsdd_uri(n.bsdd_data, bsdd_dictionary): n
-            for n in existing_nodes
-            if n.node_type == constants.PROPERTY_NODE_TYPE
-        }
-        for bsdd_property in bsdd_properties:
-            prop_uri = prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
-            if prop_uri not in internal_nodes:
-                new_node = cls.add_node(scene, bsdd_property, pos=cur, is_external=False)
-                new_nodes.append(new_node)
-                internal_nodes[prop_uri] = new_node
-                cur += offset_step
-
-            for property_relation in bsdd_property.PropertyRelations:
-                related_uri = property_relation.RelatedPropertyUri
-                if related_uri in external_nodes:
-                    continue
-                if related_uri in internal_nodes:
-                    continue
-                related_bsdd_property = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
-                if related_bsdd_property.OwnedUri and dict_utils.is_external_ref(
-                    related_bsdd_property.OwnedUri, bsdd_dictionary
-                ):
-                    new_node = cls.add_node(scene, related_bsdd_property, pos=cur, is_external=True)
-                    external_nodes[related_bsdd_property.OwnedUri] = new_node.bsdd_data
-                else:
-                    new_node = cls.add_node(
-                        scene, related_bsdd_property, pos=cur, is_external=False
-                    )
-                    internal_nodes[
-                        cl_utils.build_bsdd_uri(related_bsdd_property, bsdd_dictionary)
-                    ] = new_node.bsdd_data
-                new_nodes.append(new_node)
-                cur += offset_step
-        return new_nodes
-
-    @classmethod
-    def get_view(cls) -> view_ui.GraphView:
-        widget: ui.GraphWindow = cls.get_widget()
-        if not widget:
-            return None
-        return widget.view
-
-    @classmethod
-    def get_scene(cls) -> view_ui.GraphScene | None:
-        view: view_ui.GraphView = cls.get_view()
-        if not view:
-            return None
-        return view.scene()
+        return None #core.SceneView
 
     @classmethod
     def get_settings_widget(cls) -> ui_settings_widget.SettingsSidebar:
