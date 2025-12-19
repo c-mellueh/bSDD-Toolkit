@@ -6,21 +6,29 @@ from PySide6.QtWidgets import QLabel
 
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.scene_view import ui, trigger, constants
+from bsdd_gui.presets.tool_presets import BaseTool
+from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
+from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.prop import GraphViewerSceneViewProperties
 
 
 class Signals:
-    pass
+    delete_selection_requested = Signal(ui.GraphView)
 
 
-class SceneView:
+class SceneView(BaseTool):
     signals = Signals()
 
     @classmethod
     def get_properties(cls) -> GraphViewerSceneViewProperties:
         return bsdd_gui.GraphViewerSceneViewProperties
+
+    @classmethod
+    def connect_internal_signals(cls):
+        cls.signals.delete_selection_requested.connect(trigger.delete_selection)
+        return super().connect_internal_signals()
 
     @classmethod
     def _get_trigger(cls):
@@ -102,5 +110,29 @@ class SceneView:
         cls.get_properties()._help_overlay.setVisible(not has_nodes)
 
     @classmethod
-    def on_scene_changed(cls, scene: ui.GraphScene):
-        pass
+    def get_selected_items(cls, scene: ui.GraphScene):
+        selected_nodes: list[Node] = []
+        selected_edges: list[Edge] = []
+        if not scene:
+            return [], []
+        try:
+            selected = list(scene.selectedItems())
+        except Exception:
+            selected = []
+        if not selected:
+            return [], []
+        for it in selected:
+            if isinstance(it, Node):
+                selected_nodes.append(it)
+            elif isinstance(it, Edge):
+                selected_edges.append(it)
+        return selected_nodes, selected_edges
+
+    @classmethod
+    def toggle_running(cls, view: ui.GraphView):
+        scene = view.scene()
+        scene.running = not scene.running
+
+    @classmethod
+    def request_delete_selection(cls, view: ui.GraphScene):
+        cls.signals.delete_selection_requested.emit(view)

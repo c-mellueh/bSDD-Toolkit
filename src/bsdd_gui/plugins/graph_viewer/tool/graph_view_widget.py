@@ -746,8 +746,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def toggle_running(cls):
-        scene = cls.get_scene()
-        scene.running = not scene.running
         cls.retranslate_buttons()
 
     @classmethod

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from PySide6.QtCore import QCoreApplication, QPointF
+from PySide6.QtCore import QCoreApplication, Qt
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -21,26 +21,35 @@ def connect_to_main_window(
     window.set_action(main_window.get(), "open_window", action)
 
 
-def connect_signals(window:Type[gv_tool.Window]):
+def connect_signals(window: Type[gv_tool.Window]):
     window.connect_internal_signals()
+
 
 def retranslate_ui(window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]):
     action = window.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("GraphView", "Graph Viewer"))
 
 
-def create_widget(
-    data,
-    parent,
-    window: Type[gv_tool.Window],
-    scene_view:Type[gv_tool.SceneView]
-):
+def create_widget(data, parent, window: Type[gv_tool.Window], scene_view: Type[gv_tool.SceneView]):
     widget = window.show_widget(data, parent)
     scene_view.reposition_help_overlay(widget.view)
-    
+
+
 def register_widget(widget: ui.GraphWidget, window: gv_tool.Window):
     window.register_widget(widget)
 
 
-def connect_widget(widget: ui.GraphWidget,  window: gv_tool.Window):
+def connect_widget(widget: ui.GraphWidget, window: gv_tool.Window, util: Type[tool.Util]):
     window.connect_widget_signals(widget)
+    util.add_shortcut(
+        Qt.Key.Key_Space,
+        widget,
+        lambda w=widget: window.request_toggle_running(w),
+        Qt.ShortcutContext.WidgetWithChildrenShortcut,
+    )
+    util.add_shortcut(
+        Qt.Key.Key_Delete,
+        widget,
+        lambda w=widget: window.request_delete_selection(w),
+        Qt.ShortcutContext.WidgetWithChildrenShortcut,
+    )

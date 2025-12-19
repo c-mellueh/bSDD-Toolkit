@@ -357,23 +357,6 @@ def create_relation(
     widget._apply_filters()
 
 
-def delete_selection(graph_view: Type[gv_tool.GraphViewWidget], project: Type[tool.Project]):
-    sc = graph_view.get_scene()
-    # Collect selected items
-    nodes_to_remove, edges_to_remove = graph_view.get_selected_items()
-
-    # Deduplicate
-    edges_to_remove = list(set(edges_to_remove))
-
-    # Remove edges first
-    for e in edges_to_remove:
-        graph_view.remove_edge(e, project.get())
-
-    # Remove nodes
-    for n in nodes_to_remove:
-        graph_view.remove_node(n, project.get(), ignored_edges=edges_to_remove)
-
-
 def export_graph(
     graph_view: Type[gv_tool.GraphViewWidget], popups: Type[tool.Popups], appdata: Type[tool.Appdata]
 ):

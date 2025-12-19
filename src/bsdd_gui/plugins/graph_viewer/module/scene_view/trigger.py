@@ -22,3 +22,6 @@ def retranslate_ui():
     
 def on_new_project():
     pass
+
+def delete_selection(view:ui.GraphView):
+    core.delete_selection(view,gv_tool.SceneView, tool.Project)

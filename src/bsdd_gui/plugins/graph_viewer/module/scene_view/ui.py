@@ -42,29 +42,8 @@ class GraphView(QGraphicsView):
     def __init__(self, scene: QGraphicsScene):
         super().__init__(scene)
 
-    # --- keyboard shortcuts ---------------------------------------------
-    def keyPressEvent(self, event):
-        key = event.key()
-        # Toggle physics with Spacebar
-        if key == Qt.Key_Space:
-            try:
-                gv_tool.GraphViewWidget.toggle_running()
-            except Exception:
-                sc: GraphScene = self.scene()
-                sc.set_running(not sc.running)
-            event.accept()
-            return
-        # Delete selected nodes/relationships with Delete key
-        if key in (Qt.Key_Delete,):
-            sc: GraphScene = self.scene()
-            if sc is not None:
-                self._delete_selected(sc)
-                event.accept()
-                return
-        super().keyPressEvent(event)
-
-    def _delete_selected(self, sc: "GraphScene") -> None:
-        trigger.delete_selection()
+    def scene(self) ->GraphScene:
+        return super().scene()
 
     # --- public API ------------------------------------------------------
     def set_create_edge_type(self, edge_type: str | None) -> None:

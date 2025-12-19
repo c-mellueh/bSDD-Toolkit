@@ -31,4 +31,4 @@ def create_widget(data: object, parent: QWidget):
 
 def widget_created(widget: ui.GraphWidget):
     core.register_widget(widget, gv_tool.Window)
-    core.connect_widget(widget, gv_tool.Window)
+    core.connect_widget(widget, gv_tool.Window,tool.Util)

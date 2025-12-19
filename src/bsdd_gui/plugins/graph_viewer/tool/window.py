@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from PySide6.QtCore import Signal
 import logging
 
 import bsdd_gui
@@ -12,7 +13,8 @@ if TYPE_CHECKING:
 
 
 class Signals(FieldSignals):
-    pass
+    toggle_running_requested = Signal(ui.GraphWidget)
+    delete_selection_requested = Signal(ui.GraphWidget)
 
 
 class Window(ActionTool, FieldTool):
@@ -25,8 +27,21 @@ class Window(ActionTool, FieldTool):
     @classmethod
     def _get_trigger(cls):
         return trigger
-    
+
     @classmethod
     def _get_widget_class(cls):
         # Lazy import to avoid heavy cost on module load
         return ui.GraphWidget
+
+    @classmethod
+    def request_toggle_running(cls,widget:ui.GraphWidget):
+        cls.signals.toggle_running_requested.emit(widget)
+
+    @classmethod
+    def request_delete_selection(cls,widget:ui.GraphWidget):
+        cls.signals.delete_selection_requested.emit(widget)
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.toggle_running_requested.connect(lambda: print("TEST"))
