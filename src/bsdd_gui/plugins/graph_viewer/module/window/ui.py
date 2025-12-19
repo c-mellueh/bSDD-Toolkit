@@ -2,9 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui.presets.ui_presets import FieldWidget
-
+from .qt.ui_Widget import Ui_Form
 
 from PySide6.QtWidgets import QWidget
 
-class GraphWidget(FieldWidget):
-    pass
+
+class GraphWidget(FieldWidget, Ui_Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setupUi(self)
