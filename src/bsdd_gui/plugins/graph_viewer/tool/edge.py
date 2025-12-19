@@ -3,8 +3,11 @@ from typing import TYPE_CHECKING
 import logging
 from bsdd_json import BsddDictionary
 import bsdd_gui
+from PySide6.QtCore import Signal, Qt
+from PySide6.QtGui import QColor
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
-from bsdd_gui.plugins.graph_viewer.module.node import  constants as node_constants
+from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
+from bsdd_gui.presets.tool_presets import BaseTool
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.ui import GraphScene
@@ -12,15 +15,20 @@ if TYPE_CHECKING:
 
 
 class Signals:
-    pass
+    active_edgetype_requested = Signal(str)
 
 
-class Edge:
+class Edge(BaseTool):
     signals = Signals()
 
     @classmethod
     def get_properties(cls) -> GraphViewerEdgeProperties:
         return bsdd_gui.GraphViewerEdgeProperties
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.active_edgetype_requested.connect(trigger.set_active_edge)
 
     @classmethod
     def _get_trigger(cls):
@@ -114,3 +122,58 @@ class Edge:
                     return
                 end_data.ClassProperties.remove(class_property)
                 cls.signals.class_property_removed.emit(class_property, end_data)
+
+    @classmethod
+    def request_active_edge(cls, value):
+        cls.signals.active_edgetype_requested.emit(value)
+
+    @classmethod
+    def set_active_edge(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING | None):
+        cls.get_properties().active_edge = edge_type
+
+    @classmethod
+    def get_active_edge(cls) -> constants.ALLOWED_EDGE_TYPES_TYPING | None:
+        return cls.get_properties().active_edge
+
+    @classmethod
+    def get_edge_style_map(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING) -> dict:
+        return constants.EDGE_STYLE_MAP.get(edge_type, constants.EDGE_STYLE_DEFAULT)
+
+    @classmethod
+    def get_edge_color(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        style = cls.get_edge_style_map(edge_type)
+        return style.get("color", constants.EDGE_STYLE_DEFAULT["color"])
+
+    @classmethod
+    def get_edge_style(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        style = cls.get_edge_style_map(edge_type)
+        return style.get("style", constants.EDGE_STYLE_DEFAULT["style"])
+
+    @classmethod
+    def get_edge_width(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        style = cls.get_edge_style_map(edge_type)
+        return float(style.get("width", constants.EDGE_STYLE_DEFAULT["width"]))
+
+    @classmethod
+    def get_edge_stylesheet(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        color = cls.get_edge_color(edge_type)
+        width = cls.get_edge_width(edge_type)
+        style = cls.get_edge_style(edge_type)
+
+        css_style = "solid"
+        try:
+            if style == Qt.PenStyle.DotLine:
+                css_style = "dotted"
+            elif style in (
+                Qt.PenStyle.DashLine,
+                Qt.PenStyle.DashDotLine,
+                Qt.PenStyle.DashDotDotLine,
+            ):
+                css_style = "dashed"
+        except Exception:
+            css_style = "solid"
+        if isinstance(color, QColor):
+            r, g, b, a = color.red(), color.green(), color.blue(), color.alpha()
+        else:
+            r, g, b, a = 130, 130, 150, 255
+        css = f"QGraphicsView {{ border: {max(1, int(round(width)))}px {css_style} rgba({r}, {g}, {b}, 255); }}"

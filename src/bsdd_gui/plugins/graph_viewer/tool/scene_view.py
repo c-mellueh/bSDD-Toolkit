@@ -145,14 +145,6 @@ class SceneView(BaseTool):
         cls.signals.delete_selection_requested.emit()
 
     @classmethod
-    def set_active_edge_type(cls, edge_type: edge_constants.ALLOWED_EDGE_TYPES_TYPING | None):
-        view = cls.get_view()
-
-        cls.get_properties()._create_edge_type = edge_type
-        if not edge_type:
-            pass
-
-    @classmethod
     def get_view(cls) -> ui.GraphView:
         return cls.get_properties().view
 
