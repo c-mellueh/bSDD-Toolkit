@@ -23,5 +23,6 @@ def connect_signals(
             ap,
         )
     )
+    
     node.signals.node_created.connect(lambda n: node.get_properties().nodes.append(n))
     node.signals.node_created.connect(scene_view.add_item)

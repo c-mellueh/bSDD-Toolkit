@@ -30,7 +30,7 @@ def on_new_project():
 
 
 def delete_selection():
-    core.delete_selection(gv_tool.SceneView, tool.Project)
+    core.delete_selection(gv_tool.SceneView, tool.Project,gv_tool.Edge,gv_tool.Node)
 
 
 def resize_event(event):

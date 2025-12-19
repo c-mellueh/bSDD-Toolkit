@@ -12,6 +12,7 @@ from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constant
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 
+import bsdd_gui.plugins.graph_viewer.tool as gv_tool
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
 
 if TYPE_CHECKING:
@@ -25,6 +26,7 @@ class Signals(QObject):
         object, object, bool, bool
     )  # edge,Scene, only visual, allow parent deletion
     node_created = Signal(ui.Node)
+    remove_node_requested = Signal(ui.Node)
 
 
 class Node(BaseDialog):
@@ -45,30 +47,17 @@ class Node(BaseDialog):
         scene: GraphScene,
         ignored_edges: list[Edge] = None,
     ):
-        pass
-
-        ignored_edges = list() if ignored_edges is None else ignored_edges
-        if not scene:
+        if node not in cls.get_nodes():
             return
-        for e in list(scene.edges):
+        ignored_edges = list() if ignored_edges is None else ignored_edges
+        for e in list(gv_tool.Edge.get_edges()):
             if e.edge_type != edge_constants.PARENT_CLASS and e in ignored_edges:
                 continue
             if e.start_node == node or e.end_node == node:
-                cls.signals.remove_edge_requested.emit(
-                    e,
-                    scene,
-                    only_visual=True,
-                    allow_parent_deletion=True,
-                )
+                cls.signals.remove_edge_requested.emit(e, scene, True, True)
 
-        try:
-            scene.removeItem(node)
-        except Exception:
-            pass
-        try:
-            scene.nodes.remove(node)
-        except ValueError:
-            pass
+        scene.removeItem(node)
+        cls.get_properties().nodes.remove(node)
 
     @classmethod
     def add_node(

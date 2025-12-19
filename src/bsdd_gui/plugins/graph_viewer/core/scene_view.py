@@ -24,6 +24,7 @@ def connect_signals(window: Type[gv_tool.Window], scene_view: Type[gv_tool.Scene
     window.signals.delete_selection_requested.connect(scene_view.request_delete_selection)
     scene_view.connect_internal_signals()
 
+
 def handle_widget_creation(widget: ui_window.GraphWidget, scene_view: Type[gv_tool.SceneView]):
     scene_view.set_view(widget.view)
     widget.view.setScene(scene_view.create_scene())
@@ -46,6 +47,8 @@ def delete_selection(
 
     for n in selected_nodes:
         node.remove_node(n, scene, ignored_edges=edges_to_remove)
+
+    scene_view.request_recalculate_edges()
 
 
 def resize_event(event, scene_view: Type[gv_tool.SceneView]):
@@ -157,12 +160,14 @@ def drag_enter_event(event, scene_view: Type[gv_tool.SceneView]):
     else:
         return True
 
+
 def drag_move_event(event, scene_view: Type[gv_tool.SceneView]):
     if scene_view._mime_has_bsdd_class(event.mimeData()):
-        event.acceptProposedAction() 
+        event.acceptProposedAction()
         return False
     else:
         return True
+
 
 def drop_event(
     event: QDropEvent,

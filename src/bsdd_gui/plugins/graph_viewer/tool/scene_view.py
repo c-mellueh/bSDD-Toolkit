@@ -118,8 +118,7 @@ class SceneView(BaseTool):
 
     @classmethod
     def update_help_overlay_visibility(cls):
-        view = cls.get_view()
-        if cls.get_properties()._help_overlay:
+        if not cls.get_properties()._help_overlay:
             return
         try:
             has_nodes = bool(cls.get_nodes())

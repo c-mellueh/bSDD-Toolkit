@@ -14,7 +14,7 @@ from bsdd_json import (
     BsddClassRelation,
     BsddPropertyRelation,
 )
-from PySide6.QtCore import Signal, Qt, QPointF,QObject
+from PySide6.QtCore import Signal, Qt, QPointF, QObject
 from PySide6.QtGui import QColor, QPen, QPainterPath
 from PySide6.QtWidgets import QGraphicsPathItem, QWidget
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
@@ -69,9 +69,7 @@ class Edge(BaseTool):
         only_visual=False,
         allow_parent_deletion=False,
     ):
-        pass
-
-        if edge is None:
+        if not edge in cls.get_edges():
             return
 
         start_node, end_node = edge.start_node, edge.end_node
@@ -82,21 +80,12 @@ class Edge(BaseTool):
         if relation_type == constants.PARENT_CLASS and not allow_parent_deletion:
             return
 
-        if not scene:
-            return
-        try:
-            scene.removeItem(edge)
-        except Exception:
-            pass
-        try:
-            if edge in scene.edges:
-                scene.edges.remove(edge)
-        except ValueError:
-            pass
+        scene.removeItem(edge)
+        cls.get_properties().edges.remove(edge)
+
         if only_visual:
             return
         start_data, end_data = start_node.bsdd_data, end_node.bsdd_data
-
         if isinstance(start_data, BsddClass):
             if isinstance(end_data, BsddClass):
                 if relation_type == constants.IFC_REFERENCE_REL:
