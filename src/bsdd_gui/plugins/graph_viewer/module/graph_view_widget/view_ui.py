@@ -35,6 +35,7 @@ from bsdd_gui.module.property_table_widget.constants import (
 )
 from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.constants import *
 from . import trigger
+from bsdd_gui.plugins.graph_viewer import tool as gv_tool
 
 
 class GraphView(QGraphicsView):
@@ -106,7 +107,7 @@ class GraphView(QGraphicsView):
         # Toggle physics with Spacebar
         if key == Qt.Key_Space:
             try:
-                tool.GraphViewWidget.toggle_running()
+                gv_tool.GraphViewWidget.toggle_running()
             except Exception:
                 sc: GraphScene = self.scene()
                 sc.set_running(not sc.running)
@@ -388,7 +389,7 @@ class GraphView(QGraphicsView):
             node = self._node_from_item(item)
             if node is not None:
                 try:
-                    tool.GraphViewWidget.signals.node_double_clicked.emit(node)
+                    gv_tool.GraphViewWidget.signals.node_double_clicked.emit(node)
                 except Exception:
                     pass
                 event.accept()

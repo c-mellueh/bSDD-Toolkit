@@ -29,12 +29,18 @@ if TYPE_CHECKING:
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_table_widget.ui import PropertyWidget
-
+    from bsdd_gui.plugins.graph_viewer import tool as gv_tool
 import qtawesome as qta
+
+def remove_main_menu_actions(
+    window: Type[gv_tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
+):
+    action = window.get_action("open_window")
+    main_window.remove_action(None, action)
 
 
 def connect_signals(
-    graph_view: Type[tool.GraphViewWidget],
+    graph_view: Type[gv_tool.GraphViewWidget],
     relationship_editor: Type[tool.RelationshipEditorWidget],
     class_property_table: Type[tool.ClassPropertyTableView],
     property_set_table: Type[tool.PropertySetTableView],
@@ -137,7 +143,7 @@ def connect_signals(
 
 
 def connect_to_main_window(
-    graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
+    graph_view: Type[gv_tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
 ):
     # Action uses the WidgetTool request to allow trigger routing
     action = main_window.add_action(None, "Graph Viewer", lambda: graph_view.request_widget())
@@ -145,7 +151,7 @@ def connect_to_main_window(
 
 
 def retranslate_ui(
-    graph_view: Type[tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
+    graph_view: Type[gv_tool.GraphViewWidget], main_window: Type[tool.MainWindowWidget]
 ):
     action = graph_view.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("GraphView", "Graph Viewer"))
@@ -164,7 +170,7 @@ def add_icons(widget: ui.GraphWindow):
 
 def create_widget(
     parent: QWidget | None,
-    graph_view: Type[tool.GraphViewWidget],
+    graph_view: Type[gv_tool.GraphViewWidget],
     main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ):
@@ -185,21 +191,21 @@ def create_widget(
 
 
 def enter_window(
-    window: ui.GraphWindow, graph_view: tool.GraphViewWidget, project: Type[tool.Project]
+    window: ui.GraphWindow, graph_view: gv_tool.GraphViewWidget, project: Type[tool.Project]
 ):
     graph_view.update_add_completer(project.get())
 
 
-def register_widget(widget, graph_view: Type[tool.GraphViewWidget]):
+def register_widget(widget, graph_view: Type[gv_tool.GraphViewWidget]):
     graph_view.register_widget(widget)
 
 
-def connect_widget(widget: ui.GraphWindow, graph_view: Type[tool.GraphViewWidget]):
+def connect_widget(widget: ui.GraphWindow, graph_view: Type[gv_tool.GraphViewWidget]):
     graph_view.connect_widget_signals(widget)
 
 
 def popuplate_widget(
-    graph_view: Type[tool.GraphViewWidget],
+    graph_view: Type[gv_tool.GraphViewWidget],
     project: Type[tool.Project],
     ifc_helper: Type[tool.IfcHelper],
 ):
@@ -229,7 +235,7 @@ def popuplate_widget(
 def handle_drop_event(
     event: QDropEvent,
     view: GraphView,
-    graph_view: Type[tool.GraphViewWidget],
+    graph_view: Type[gv_tool.GraphViewWidget],
     class_tree: Type[tool.ClassTreeView],
     property_table: Type[tool.PropertyTableWidget],
     project: Type[tool.Project],
@@ -269,7 +275,7 @@ def handle_drop_event(
     event.acceptProposedAction()
 
 
-def recalculate_edges(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
+def recalculate_edges(graph_view: Type[gv_tool.GraphViewWidget], project: Type[tool.Project]):
     bsdd_dict = project.get()
     scene: GraphScene = graph_view.get_scene()
     if not scene:
@@ -324,7 +330,7 @@ def create_relation(
     start_node: graphics_items.Node,
     end_node: graphics_items.Node,
     relation_type: constants.ALLOWED_EDGE_TYPES_TYPING,
-    graph_view: Type[tool.GraphViewWidget],
+    graph_view: Type[gv_tool.GraphViewWidget],
     project: Type[tool.Project],
 ):
 
@@ -358,7 +364,7 @@ def create_relation(
     widget._apply_filters()
 
 
-def delete_selection(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
+def delete_selection(graph_view: Type[gv_tool.GraphViewWidget], project: Type[tool.Project]):
     sc = graph_view.get_scene()
     # Collect selected items
     nodes_to_remove, edges_to_remove = graph_view.get_selected_items()
@@ -376,7 +382,7 @@ def delete_selection(graph_view: Type[tool.GraphViewWidget], project: Type[tool.
 
 
 def export_graph(
-    graph_view: Type[tool.GraphViewWidget], popups: Type[tool.Popups], appdata: Type[tool.Appdata]
+    graph_view: Type[gv_tool.GraphViewWidget], popups: Type[tool.Popups], appdata: Type[tool.Appdata]
 ):
     widget = graph_view.get_widget()
     if widget is None:
@@ -403,7 +409,7 @@ def export_graph(
 
 
 def import_graph(
-    graph_view: Type[tool.GraphViewWidget],
+    graph_view: Type[gv_tool.GraphViewWidget],
     project: Type[tool.Project],
     popups: Type[tool.Popups],
     appdata: Type[tool.Appdata],
@@ -462,7 +468,7 @@ def import_graph(
         pass
 
 
-def buchheim(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]):
+def buchheim(graph_view: Type[gv_tool.GraphViewWidget], project: Type[tool.Project]):
     allowed = graph_view.reset_children_dict()
     if not allowed:
         # Inform the user that an edge type must be selected
@@ -504,7 +510,7 @@ def buchheim(graph_view: Type[tool.GraphViewWidget], project: Type[tool.Project]
 
 def add_node_by_lineinput(
     window: ui.GraphWindow,
-    graph_view: Type[tool.GraphViewWidget],
+    graph_view: Type[gv_tool.GraphViewWidget],
     project: Type[tool.Project],
     ifc_helper: Type[tool.IfcHelper],
 ):
