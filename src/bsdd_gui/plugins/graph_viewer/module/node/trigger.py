@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def activate():
-    pass
+    core.connect_signals(gv_tool.Node,gv_tool.Edge,tool.Project)
 
     
 def deactivate():

@@ -38,4 +38,4 @@ def delete_selection(
         edge.remove_edge(edge, scene, bsdd_dictionary)
 
     for n in selected_nodes:
-        node.remove_node(n, scene, project.get(), ignored_edges=edges_to_remove)
+        node.remove_node(n, scene, ignored_edges=edges_to_remove)
