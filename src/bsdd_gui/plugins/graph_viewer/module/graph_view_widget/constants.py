@@ -32,22 +32,7 @@ PROPERTY_DRAG = "property_drag"
 CLASS_DRAG = "class_drag"
 ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
 
-# Node Types
-PROPERTY_NODE_TYPE = "Property"
-CLASS_NODE_TYPE = "Class"
-EXTERNAL_PROPERTY_NODE_TYPE = "ExternalProperty"
-EXTERNAL_CLASS_NODE_TYPE = "ExternalClass"
-IFC_NODE_TYPE = "IfcReference"
 
-GENERIC_NODE_TYPE = "generic"
-
-ALLOWED_NODE_TYPES = [
-    EXTERNAL_PROPERTY_NODE_TYPE,
-    PROPERTY_NODE_TYPE,
-    CLASS_NODE_TYPE,
-    EXTERNAL_CLASS_NODE_TYPE,
-    IFC_NODE_TYPE,
-]
 # Edge Type
 C_P_REL = "ClassProperty"
 MATERIAL_REL = "HasMaterial"
@@ -202,6 +187,36 @@ EDGE_TYPE_LABEL_MAP: dict[str, str] = {
     GENERIC_REL: "Generic",
 }
 
+
+
+# Scene sizing
+# Extra padding added around the bounding box of current nodes when
+# computing the scene rect, to allow panning into empty space.
+SCENE_PADDING = 800  # pixels
+# Minimum scene size to guarantee ample panning room even for tiny graphs.
+SCENE_MIN_SIZE = 100_000  # width and height in pixels
+
+
+X_MARGIN = 20
+Y_MARGIN = 65
+
+# Node Types
+PROPERTY_NODE_TYPE = "Property"
+CLASS_NODE_TYPE = "Class"
+EXTERNAL_PROPERTY_NODE_TYPE = "ExternalProperty"
+EXTERNAL_CLASS_NODE_TYPE = "ExternalClass"
+IFC_NODE_TYPE = "IfcReference"
+
+GENERIC_NODE_TYPE = "generic"
+
+ALLOWED_NODE_TYPES = [
+    EXTERNAL_PROPERTY_NODE_TYPE,
+    PROPERTY_NODE_TYPE,
+    CLASS_NODE_TYPE,
+    EXTERNAL_CLASS_NODE_TYPE,
+    IFC_NODE_TYPE,
+]
+
 NODE_TYPE_LABEL_MAP: dict[str, str] = {
     CLASS_NODE_TYPE: "Class",
     EXTERNAL_CLASS_NODE_TYPE: "External Class",
@@ -210,6 +225,7 @@ NODE_TYPE_LABEL_MAP: dict[str, str] = {
     IFC_NODE_TYPE: "IfcReference",
     GENERIC_NODE_TYPE: "Generic",
 }
+
 
 # Node colors and shapes
 NODE_COLOR_DEFAULT = QColor(80, 140, 255)
@@ -232,14 +248,3 @@ NODE_SHAPE_MAP: dict[str, str] = {
     EXTERNAL_PROPERTY_NODE_TYPE: SHAPE_STYLE_ROUNDED_RECT,
     "generic": SHAPE_STYLE_RECT,
 }
-
-# Scene sizing
-# Extra padding added around the bounding box of current nodes when
-# computing the scene rect, to allow panning into empty space.
-SCENE_PADDING = 800  # pixels
-# Minimum scene size to guarantee ample panning room even for tiny graphs.
-SCENE_MIN_SIZE = 100_000  # width and height in pixels
-
-
-X_MARGIN = 20
-Y_MARGIN = 65
