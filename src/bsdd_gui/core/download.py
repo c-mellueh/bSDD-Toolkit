@@ -9,6 +9,7 @@ import qtawesome as qta
 from bsdd_gui.module.download import constants
 from bsdd_json.utils import dictionary_utils
 import logging
+
 if TYPE_CHECKING:
     from bsdd_gui import tool as tool
     from bsdd_gui.module.download import ui
@@ -19,12 +20,12 @@ def connect_signals(
     project: Type[tool.Project],
     popups: Type[tool.Popups],
     main_window: Type[tool.MainWindowWidget],
-    appdata:Type[tool.Appdata]
+    appdata: Type[tool.Appdata],
 ):
     download_widget.connect_internal_signals()
 
     def set_project(bsdd_dictionary: BsddDictionary):
-        save_project = appdata.get_bool_setting(constants.DOWNLAOD_APPDATA,constants.SHOULD_SAVE)
+        save_project = appdata.get_bool_setting(constants.DOWNLAOD_APPDATA, constants.SHOULD_SAVE)
         if not save_project:
             project.register_project(bsdd_dictionary)
         title = QCoreApplication.translate("Download", "Download Done!")
@@ -43,12 +44,12 @@ def connect_to_main_window(
     download_widget: Type[tool.Download],
     main_window: Type[tool.MainWindowWidget],
 ) -> None:
-    
+
     action = main_window.add_action(
         "menuFile",
         "Download bSDD",
         lambda: download_widget.request_widget(str(uuid.uuid4()), main_window.get()),
-        qta.icon("mdi6.cloud-download-outline")
+        qta.icon("mdi6.cloud-download-outline"),
     )
 
     download_widget.set_action(main_window.get(), "open_window", action)
@@ -76,6 +77,7 @@ def create_widget(data, parent, download_widget: Type[tool.Download]):
     download_widget.set_widget_run_mode(widget, False)
     widget.fs_save_path.setVisible(widget.cb_save.isChecked())
 
+
 def register_widget(widget: ui.DownloadWidget, download_widget: Type[tool.Download]):
     download_widget.register_widget(widget)
 
@@ -100,12 +102,12 @@ def register_fields(
     download_widget.register_field_getter(
         widget,
         le_path,
-        lambda _: appdata.get_string_setting(constants.DOWNLAOD_APPDATA, constants.SAVE_PATH),
+        lambda _: appdata.get_path(constants.SAVE_PATH),
     )
     download_widget.register_field_setter(
         widget,
         le_path,
-        lambda _, v: appdata.set_setting(constants.DOWNLAOD_APPDATA, constants.SAVE_PATH, v),
+        lambda _, v: appdata.set_path(constants.SAVE_PATH, v),
     )
     download_widget.register_field_listener(widget, le_path)
 
