@@ -1,7 +1,7 @@
 from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
-from bsdd_gui.core import graph_view_widget as core
+from bsdd_gui.plugins.graph_viewer.core import graph_view_widget as core
 from PySide6.QtWidgets import QWidget, QLineEdit
 from typing import TYPE_CHECKING
 

@@ -16,7 +16,9 @@ import random
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.graph_view_widget.prop import GraphViewWidgetProperties
+    from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.prop import (
+        GraphViewWidgetProperties,
+    )
 from bsdd_json import (
     BsddDictionary,
     BsddClass,
@@ -29,7 +31,7 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
 
-from bsdd_gui.module.graph_view_widget import (
+from bsdd_gui.plugins.graph_viewer.module.graph_view_widget import (
     trigger,
     ui,
     constants,
@@ -37,7 +39,7 @@ from bsdd_gui.module.graph_view_widget import (
     graphics_items,
     view_ui,
 )
-from bsdd_gui.module.graph_view_widget.graphics_items import Node
+from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.graphics_items import Node
 from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
 from bsdd_gui.module.property_table_widget.constants import JSON_MIME as PROPERTY_JSON_MIME
 
@@ -82,7 +84,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     @classmethod
     def _get_widget_class(cls):
         # Lazy import to avoid heavy cost on module load
-        from bsdd_gui.module.graph_view_widget.ui import GraphWindow
+        from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.ui import GraphWindow
 
         return GraphWindow
 

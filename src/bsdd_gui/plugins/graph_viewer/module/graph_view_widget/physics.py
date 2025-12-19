@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (
 )
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
+    from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.graphics_items import Node, Edge
 
 
 class QuadTree:

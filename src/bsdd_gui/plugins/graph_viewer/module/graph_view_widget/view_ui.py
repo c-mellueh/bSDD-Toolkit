@@ -27,13 +27,13 @@ from PySide6.QtWidgets import (
 
 from typing import TYPE_CHECKING
 from bsdd_gui import tool
-from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
-from bsdd_gui.module.graph_view_widget.physics import Physics
+from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.graphics_items import Node, Edge
+from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.physics import Physics
 from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
 from bsdd_gui.module.property_table_widget.constants import (
     JSON_MIME as PROPERTY_JSON_MIME,
 )
-from bsdd_gui.module.graph_view_widget.constants import *
+from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.constants import *
 from . import trigger
 
 

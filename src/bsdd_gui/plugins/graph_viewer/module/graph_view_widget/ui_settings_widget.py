@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QPainter, QPen, QColor, QBrush
 
-from bsdd_gui.module.graph_view_widget.constants import (
+from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.constants import (
     EDGE_STYLE_MAP,
     EDGE_STYLE_DEFAULT,
     NODE_COLOR_MAP,
@@ -518,7 +518,7 @@ class SettingsSidebar(QWidget):
         self._routing_settings = EdgeRoutingWidget(scene, None)
         # Node types panel
         try:
-            from bsdd_gui.module.graph_view_widget import constants as _const
+            from bsdd_gui.plugins.graph_viewer.module.graph_view_widget import constants as _const
 
             allowed_node_types = getattr(_const, "ALLOWED_NODE_TYPES", [])
         except Exception:

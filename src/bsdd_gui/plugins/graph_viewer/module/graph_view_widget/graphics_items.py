@@ -3,7 +3,7 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
 from bsdd_json import *
-from bsdd_gui.module.graph_view_widget.constants import *
+from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.constants import *
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, Dict
 from . import constants
@@ -395,7 +395,7 @@ class Node(QGraphicsObject):
     def mouseDoubleClickEvent(self, event):
         # Emit tool signal when this node is double-clicked
         try:
-            from bsdd_gui.tool.graph_view_widget import GraphViewWidget
+            from bsdd_gui.plugins.graph_viewer.tool.graph_view_widget import GraphViewWidget
 
             GraphViewWidget.signals.node_double_clicked.emit(self)
         except Exception:

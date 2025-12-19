@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QCoreApplication, QPointF
 from PySide6.QtWidgets import QWidget, QMessageBox, QLineEdit
 from PySide6.QtGui import QDropEvent
-from bsdd_gui.module.graph_view_widget import constants, ui_settings_widget
+from bsdd_gui.plugins.graph_viewer.module.graph_view_widget import constants, ui_settings_widget
 from bsdd_json import (
     BsddClass,
     BsddProperty,
@@ -21,15 +21,17 @@ import webbrowser
 import json
 import logging
 import qtawesome as qta
+
 if TYPE_CHECKING:
-    from bsdd_gui.module.graph_view_widget.view_ui import GraphView, GraphScene
-    from bsdd_gui.module.graph_view_widget import graphics_items, ui
+    from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.view_ui import GraphView, GraphScene
+    from bsdd_gui.plugins.graph_viewer.module.graph_view_widget import graphics_items, ui
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
-import  qtawesome as   qta
+import qtawesome as qta
+
 
 def connect_signals(
     graph_view: Type[tool.GraphViewWidget],
@@ -148,7 +150,8 @@ def retranslate_ui(
     action = graph_view.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("GraphView", "Graph Viewer"))
 
-def add_icons(widget:ui.GraphWindow):
+
+def add_icons(widget: ui.GraphWindow):
     bs = widget.settings_sidebar._button_settings
     bs.bt_clear.setIcon(qta.icon("mdi6.cancel"))
     bs.bt_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
@@ -157,6 +160,7 @@ def add_icons(widget:ui.GraphWindow):
     bs.bt_center.setIcon(qta.icon("mdi6.arrow-collapse-all"))
     bs.bt_start_stop.setIcon(qta.icon("mdi6.pause"))
     bs.bt_tree.setIcon(qta.icon("mdi6.graph"))
+
 
 def create_widget(
     parent: QWidget | None,
