@@ -33,5 +33,14 @@ def create_widget(
     data,
     parent,
     window: Type[gv_tool.Window],
+    scene_view:Type[gv_tool.SceneView]
 ):
-    window.show_widget(data, parent)
+    widget = window.show_widget(data, parent)
+    scene_view.reposition_help_overlay(widget.view)
+    
+def register_widget(widget: ui.GraphWidget, window: gv_tool.Window):
+    window.register_widget(widget)
+
+
+def connect_widget(widget: ui.GraphWidget,  window: gv_tool.Window):
+    window.connect_widget_signals(widget)

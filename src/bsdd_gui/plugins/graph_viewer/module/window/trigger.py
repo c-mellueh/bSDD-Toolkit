@@ -27,4 +27,8 @@ def on_new_project():
 
 
 def create_widget(data: object, parent: QWidget):
-    core.create_widget(data,parent, gv_tool.Window)
+    core.create_widget(data,parent, gv_tool.Window,gv_tool.SceneView)
+
+def widget_created(widget: ui.GraphWidget):
+    core.register_widget(widget, gv_tool.Window)
+    core.connect_widget(widget, gv_tool.Window)

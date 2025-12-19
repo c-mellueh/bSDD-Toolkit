@@ -1,5 +1,13 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from .ui import Node
+    from PySide6.QtWidgets import QGraphicsPathItem
 class GraphViewerEdgeProperties:
-    pass
+    def __init__(self):
+        self.edge_drag_active:bool = False
+        self.edge_drag_start:None|None = None
+        self.edge_preview_item:QGraphicsPathItem|None = None
+
 

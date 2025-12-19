@@ -41,65 +41,6 @@ from bsdd_gui.plugins.graph_viewer import tool as gv_tool
 class GraphView(QGraphicsView):
     def __init__(self, scene: QGraphicsScene):
         super().__init__(scene)
-        self.setRenderHint(QPainter.Antialiasing)
-        self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
-        self.setDragMode(QGraphicsView.RubberBandDrag)
-        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
-        self.setAcceptDrops(True)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # Enable receiving key events
-        try:
-            self.setFocusPolicy(Qt.StrongFocus)
-        except Exception:
-            pass
-
-        # Edge-drawing interaction state
-        self._edge_drag_active: bool = False
-        self._edge_drag_start: Node | None = None
-        self._edge_preview_item: QGraphicsPathItem | None = None
-        # Selected edge type for creation (None = auto/heuristic)
-        self._create_edge_type: str | None = None
-        # Middle-button panning state
-        self._panning_mmb: bool = False
-        self._pan_last_pos: QPoint | None = None
-
-        # Help overlay: centered, non-interactive notification
-        self._help_overlay: QLabel | None = None
-        try:
-            txt = self.tr(
-                "Drag & drop classes or properties in the view to edit their relations.\n"
-                "Hold Shift and drag between nodes to create relations.\n"
-                "Double-click an edge legend in the settings tab to change relation style.\n"
-                "Editing Parent-Class-Code relations isn't supported so far."
-            )
-            self._help_overlay = QLabel(txt, self.viewport())
-            self._help_overlay.setWordWrap(True)
-            self._help_overlay.setAlignment(Qt.AlignCenter)
-            self._help_overlay.setTextInteractionFlags(Qt.NoTextInteraction)
-            self._help_overlay.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-            self._help_overlay.setStyleSheet(
-                """
-                QLabel {
-                    color: #e8e8f0;
-                    background: rgba(25, 25, 35, 180);
-                    border: 1px solid rgba(80, 90, 120, 160);
-                    border-radius: 8px;
-                    padding: 10px 14px;
-                }
-                """
-            )
-            self._reposition_help_overlay()
-            self._update_help_overlay_visibility()
-        except Exception:
-            self._help_overlay = None
-
-        # React to scene modifications to show/hide the help overlay
-        try:
-            self.scene().changed.connect(self._on_scene_changed)
-        except Exception:
-            pass
 
     # --- keyboard shortcuts ---------------------------------------------
     def keyPressEvent(self, event):
