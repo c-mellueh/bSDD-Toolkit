@@ -26,8 +26,8 @@ def on_new_project():
 def delete_selection():
     core.delete_selection(gv_tool.SceneView, tool.Project)
 
-def resize_event():
-    core.resize_event(gv_tool.SceneView)
+def resize_event(event):
+    core.resize_event(event,gv_tool.SceneView)
 
-def mouse_press_event():
-    core.mouse_press_event(gv_tool.SceneView)
+def mouse_press_event(event):
+    core.mouse_press_event(gv_tool.SceneView,gv_tool.Node,gv_tool.Edge)

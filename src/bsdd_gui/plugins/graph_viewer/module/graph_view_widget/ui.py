@@ -214,9 +214,8 @@ class GraphWindow(BaseWidget):
 
     def _apply_filters(self):
         # Use node type flags from the sidebar; fall back to showing all when missing
-        node_flags: Dict[str, bool] = dict(self._node_type_flags)
-        # Apply to scene
-        self.scene.apply_filters(node_flags, self._edge_type_flags)
+        #moved to gv_tool.SceneView.apply_filters
+        pass
 
     def _on_edge_type_toggled(self, edge_type: str, checked: bool) -> None:
         self._edge_type_flags[edge_type] = checked

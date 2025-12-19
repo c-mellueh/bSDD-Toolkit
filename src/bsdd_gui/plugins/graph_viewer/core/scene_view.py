@@ -1,5 +1,6 @@
 from __future__ import annotations
-
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QMouseEvent
 from typing import TYPE_CHECKING, Type
 
 if TYPE_CHECKING:
@@ -39,9 +40,45 @@ def delete_selection(
         node.remove_node(n, scene, ignored_edges=edges_to_remove)
 
 
-def resize_event(scene_view: Type[gv_tool.SceneView]):
+def resize_event(event, scene_view: Type[gv_tool.SceneView]):
     scene_view.reposition_help_overlay()
 
 
-def mouse_press_event(scene_view: Type[gv_tool.SceneView]):
-    pass
+def mouse_press_event(
+    event: QMouseEvent,
+    scene_view: Type[gv_tool.SceneView],
+    node: Type[gv_tool.Node],
+    edge: Type[gv_tool.Edge],
+):
+    view = scene_view.get_view()
+    try:
+        pos_view = scene_view._event_qpoint(event)
+        pos_scene = view.mapToScene(pos_view)
+    except Exception:
+        pass
+
+    middle_pressed = event.button() == Qt.MouseButton.MiddleButton
+    left_clicked = event.button() == Qt.MouseButton.LeftButton
+    shift_pressed = event.modifiers() & Qt.KeyboardModifier.ShiftModifier
+
+    if middle_pressed:
+        # Start manual panning with middle mouse
+        scene_view.set_panning_mmb(True)
+        scene_view.set_pan_last_pos(scene_view._event_qpoint(event))
+        try:
+            view.setCursor(Qt.CursorShape.ClosedHandCursor)
+        except Exception:
+            pass
+        event.accept()
+        return
+
+    elif left_clicked and shift_pressed:
+        # Begin edge drawing if pressed on a Node
+        pos_view = scene_view._event_qpoint(event)
+        item = scene_view._item_at_pos(pos_view)
+        n = node._node_from_item(item)
+        if n is None:
+            return
+        scene_pos = view.mapToScene(pos_view)
+        edge._start_edge_drag(n, scene_pos)
+        event.accept()

@@ -156,6 +156,22 @@ class SceneView(BaseTool):
     def get_scene(cls) -> ui.GraphScene:
         return cls.get_properties().view.scene()
 
+    @classmethod
+    def get_panning_mmb(cls) -> bool:
+        return cls.get_properties()._panning_mmb
+
+    @classmethod
+    def set_panning_mmb(cls,value:bool):
+        cls.get_properties()._panning_mmb= value
+
+    @classmethod
+    def get_pan_last_pos(cls):
+        return cls.get_properties()._pan_last_pos
+
+    @classmethod
+    def set_pan_last_pos(cls,value:QPoint):
+        cls.get_properties()._pan_last_pos = value
+
     # --- Helper -------------------------------------------------------------
     @classmethod
     def _event_qpoint(cls, event) -> QPoint:

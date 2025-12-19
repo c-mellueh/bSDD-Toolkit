@@ -17,5 +17,6 @@ class GraphViewerSceneViewProperties:
             None  # Help overlay: centered, non-interactive notification
         )
         self._create_edge_type: edge_constants.ALLOWED_EDGE_TYPES_TYPING = None
+        self._panning_mmb = False
         self.view:ui.GraphView = None
         self.scene:ui.GraphScene = None

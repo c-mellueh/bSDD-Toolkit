@@ -73,37 +73,12 @@ class GraphView(QGraphicsView):
 
     def resizeEvent(self, event):
         # Keep overlays anchored in viewport coordinates
-        trigger.resize_event()
+        trigger.resize_event(event)
         super().resizeEvent(event)
 
     def mousePressEvent(self, event):
         # Log scene coordinates for every mouse click
-        try:
-            pos_view = self._event_qpoint(event)
-            pos_scene = self.mapToScene(pos_view)
-        except Exception:
-            pass
-
-        if event.button() == Qt.MiddleButton:
-            # Start manual panning with middle mouse
-            self._panning_mmb = True
-            self._pan_last_pos = self._event_qpoint(event)
-            try:
-                self.setCursor(Qt.ClosedHandCursor)
-            except Exception:
-                pass
-            event.accept()
-            return
-        elif event.button() == Qt.LeftButton and (event.modifiers() & Qt.ShiftModifier):
-            # Begin edge drawing if pressed on a Node
-            pos_view = self._event_qpoint(event)
-            item = self._item_at_pos(pos_view)
-            node = self._node_from_item(item)
-            if node is not None:
-                scene_pos = self.mapToScene(pos_view)
-                self._start_edge_drag(node, scene_pos)
-                event.accept()
-                return
+        trigger.mouse_press_event(event)
         super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
