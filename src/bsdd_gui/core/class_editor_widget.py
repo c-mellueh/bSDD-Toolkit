@@ -187,7 +187,7 @@ def group_classes(
         class_editor.sync_to_model(widget, new_class)
         class_editor.signals.new_class_created.emit(new_class)
         for child_class in bsdd_classes:
-            class_tree.move_class(child_class, new_class, tool.Project)
+            class_tree.move_class(child_class, new_class, project.get())
         class_editor.signals.dialog_accepted.emit(dialog)
     else:
         class_editor.signals.dialog_declined.emit(dialog)
