@@ -82,3 +82,57 @@ def mouse_press_event(
         scene_pos = view.mapToScene(pos_view)
         edge._start_edge_drag(n, scene_pos)
         event.accept()
+
+
+def mouse_release_event(
+    event: QMouseEvent,
+    scene_view: Type[gv_tool.SceneView],
+    node: Type[gv_tool.Node],
+    edge: Type[gv_tool.Edge],
+):
+    view = scene_view.get_view()
+    if scene_view.get_panning_mmb() and event.button() == Qt.MiddleButton:
+        scene_view.set_panning_mmb(False)
+        scene_view.set_pan_last_pos(None)
+        try:
+            view.setCursor(Qt.ArrowCursor)
+        except Exception:
+            pass
+        event.accept()
+        return
+    elif edge.is_edge_drag_active() and event.button() == Qt.LeftButton:
+        pos_view = scene_view._event_qpoint(event)
+        item = scene_view._item_at_pos(pos_view)
+        n = node._node_from_item(item)
+        edge._finish_edge_drag(n)
+        event.accept()
+        return
+
+
+def mouse_move_event(
+    event: QMouseEvent,
+    scene_view: Type[gv_tool.SceneView],
+    edge: Type[gv_tool.Edge],
+):
+    view = scene_view.get_view()
+    if scene_view.get_panning_mmb():
+        # Drag the view by adjusting scrollbars
+        cur = scene_view._event_qpoint(event)
+        if scene_view.get_pan_last_pos() is not None and cur is not None:
+            delta = cur - scene_view.get_pan_last_pos()
+            try:
+                view.horizontalScrollBar().setValue(
+                    view.horizontalScrollBar().value() - int(delta.x())
+                )
+                view.verticalScrollBar().setValue(view.verticalScrollBar().value() - int(delta.y()))
+            except Exception:
+                pass
+        scene_view.set_pan_last_pos(cur)
+        event.accept()
+        return
+    if edge.is_edge_drag_active():
+        pos_view = scene_view._event_qpoint(event)
+        scene_pos = view.mapToScene(pos_view)
+        edge._update_edge_drag(scene_pos)
+        event.accept()
+        return

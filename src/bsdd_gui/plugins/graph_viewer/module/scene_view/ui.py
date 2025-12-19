@@ -48,19 +48,19 @@ class GraphView(QGraphicsView):
     # --- helpers ---------------------------------------------------------
 
     def _node_from_item(self, item) -> Node | None:
-        #Moved to gv_tool.Node
+        # Moved to gv_tool.Node
         return None
 
     def _start_edge_drag(self, start_node: Node, scene_pos: QPointF) -> None:
-        #Move to gv_tool.Edge
+        # Move to gv_tool.Edge
         pass
 
     def _update_edge_drag(self, scene_pos: QPointF) -> None:
-        #Move to gv_tool.Edge
+        # Move to gv_tool.Edge
         pass
 
     def _finish_edge_drag(self, end_node: Node | None) -> None:
-        #Move to gv_tool.Edge
+        # Move to gv_tool.Edge
         pass
 
     def wheelEvent(self, event):
@@ -82,48 +82,11 @@ class GraphView(QGraphicsView):
         super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if self._panning_mmb and event.button() == Qt.MiddleButton:
-            self._panning_mmb = False
-            self._pan_last_pos = None
-            try:
-                self.setCursor(Qt.ArrowCursor)
-            except Exception:
-                pass
-            event.accept()
-            return
-        elif self._edge_drag_active and event.button() == Qt.LeftButton:
-            pos_view = self._event_qpoint(event)
-            item = self._item_at_pos(pos_view)
-            node = self._node_from_item(item)
-            self._finish_edge_drag(node)
-            event.accept()
-            return
+        trigger.mouse_release_event(event)
         super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self._panning_mmb:
-            # Drag the view by adjusting scrollbars
-            cur = self._event_qpoint(event)
-            if self._pan_last_pos is not None and cur is not None:
-                delta = cur - self._pan_last_pos
-                try:
-                    self.horizontalScrollBar().setValue(
-                        self.horizontalScrollBar().value() - int(delta.x())
-                    )
-                    self.verticalScrollBar().setValue(
-                        self.verticalScrollBar().value() - int(delta.y())
-                    )
-                except Exception:
-                    pass
-            self._pan_last_pos = cur
-            event.accept()
-            return
-        if self._edge_drag_active:
-            pos_view = self._event_qpoint(event)
-            scene_pos = self.mapToScene(pos_view)
-            self._update_edge_drag(scene_pos)
-            event.accept()
-            return
+        trigger.mouse_move_event(event)
         super().mouseMoveEvent(event)
 
     # ---- Drag & Drop integration ----

@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from bsdd_gui.resources.icons import get_icon
-from __future__ import annotations
 
 from bsdd_json import *
 from dataclasses import dataclass

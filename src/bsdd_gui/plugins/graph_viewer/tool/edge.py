@@ -278,6 +278,7 @@ class Edge(BaseTool):
         cls.get_properties().edge_preview_item = path_item
         cls._update_edge_drag(scene_pos)
 
+    @classmethod
     def _update_edge_drag(cls, scene_pos: QPointF) -> None:
         is_active = cls.is_edge_drag_active()
         preview_item = cls.get_properties().edge_preview_item
@@ -309,6 +310,7 @@ class Edge(BaseTool):
             p.lineTo(scene_pos)
         preview_item.setPath(p)
 
+    @classmethod
     def _finish_edge_drag(cls, end_node: Node | None) -> None:
         # Remove preview
         if cls.get_properties().edge_preview_item is not None:
