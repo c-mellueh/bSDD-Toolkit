@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def activate():
-    core.connect_signals(gv_tool.Window,gv_tool.SceneView)
+    core.connect_signals(gv_tool.Window,gv_tool.SceneView,gv_tool.Edge)
 
     
 def deactivate():
@@ -25,3 +25,9 @@ def on_new_project():
 
 def delete_selection():
     core.delete_selection(gv_tool.SceneView, tool.Project)
+
+def resize_event():
+    core.resize_event(gv_tool.SceneView)
+
+def mouse_press_event():
+    core.mouse_press_event(gv_tool.SceneView)

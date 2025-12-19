@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 from PySide6.QtCore import Signal
+from PySide6.QtWidgets import QGraphicsItem
+
 import bsdd_gui
 from bsdd_json import BsddDictionary
 from bsdd_gui.presets.tool_presets import BaseDialog
@@ -62,3 +64,33 @@ class Node(BaseDialog):
             scene.nodes.remove(node)
         except ValueError:
             pass
+
+    # --- Helper -------------------------------------------------------------
+
+    @classmethod
+    def _node_from_item(cls, item: QGraphicsItem) -> Node | None:
+        it = item
+        while it is not None:
+            if isinstance(it, Node):
+                return it
+            try:
+                it = it.parentItem()
+            except Exception:
+                break
+        return None
+
+    @classmethod
+    def get_filter_state(cls, key: constants.ALLOWED_NODE_TYPES_TYPING) -> bool:
+        return cls.get_properties().filters.get(key, True)
+
+    @classmethod
+    def get_filters(cls):
+        return cls.get_properties().filters
+
+    @classmethod
+    def set_filters(cls, key: str, value: bool):
+        cls.get_properties().filters[key] = value
+
+    @classmethod
+    def get_nodes(cls):
+        return cls.get_properties().nodes

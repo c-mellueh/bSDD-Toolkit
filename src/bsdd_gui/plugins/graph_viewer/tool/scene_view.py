@@ -1,14 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
-from PySide6.QtCore import QCoreApplication, Qt, Signal
-from PySide6.QtWidgets import QLabel
+from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint
+from PySide6.QtWidgets import QLabel, QGraphicsItem
 
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.scene_view import ui, trigger, constants
 from bsdd_gui.presets.tool_presets import BaseTool
 from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
+import bsdd_gui.plugins.graph_viewer.tool as gv_tool
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.prop import GraphViewerSceneViewProperties
@@ -109,8 +110,7 @@ class SceneView(BaseTool):
         if cls.get_properties()._help_overlay:
             return
         try:
-            sc: ui.GraphScene = view.scene()
-            has_nodes = bool(getattr(sc, "nodes", []) or [])
+            has_nodes = bool(cls.get_nodes())
         except Exception:
             has_nodes = True
         cls.get_properties()._help_overlay.setVisible(not has_nodes)
@@ -155,3 +155,46 @@ class SceneView(BaseTool):
     @classmethod
     def get_scene(cls) -> ui.GraphScene:
         return cls.get_properties().view.scene()
+
+    # --- Helper -------------------------------------------------------------
+    @classmethod
+    def _event_qpoint(cls, event) -> QPoint:
+        try:
+            p = event.position()
+            return QPoint(int(p.x()), int(p.y()))
+        except Exception:
+            return event.pos()
+
+    @classmethod
+    def _item_at_pos(cls, pos_view: QPoint) -> QGraphicsItem | None:
+        try:
+            return cls.get_view().itemAt(pos_view)
+        except Exception:
+            # Fallback if itemAt signature differs
+            return None
+
+    @classmethod
+    def add_item(cls, item: QGraphicsItem):
+        cls.get_scene().addItem(item)
+
+    @classmethod
+    def remove_item(cls, item: QGraphicsItem):
+        cls.get_scene().removeItem(item)
+
+    @classmethod
+    def get_nodes(cls) -> list[Node]:
+        return gv_tool.Node.get_nodes()
+
+    @classmethod
+    def get_edges(cls) -> list[Edge]:
+        return  gv_tool.Edge.get_edges()
+
+    @classmethod
+    def apply_filters(cls, edge_filters: dict[str, bool], node_filters: dict[str, bool]):
+        for n in cls.get_nodes():
+            show = node_filters.get(n.node_type, True)
+            n.setVisible(show)
+        for e in cls.get_edges():
+            show_edge = edge_filters.get(e.edge_type, True)
+            show_edge = show_edge and e.start_node.isVisible() and e.end_node.isVisible()
+            e.setVisible(show_edge)

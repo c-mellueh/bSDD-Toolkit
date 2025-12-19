@@ -42,105 +42,26 @@ class GraphView(QGraphicsView):
     def __init__(self, scene: QGraphicsScene):
         super().__init__(scene)
 
-    def scene(self) ->GraphScene:
+    def scene(self) -> GraphScene:
         return super().scene()
 
     # --- helpers ---------------------------------------------------------
-    def _event_qpoint(self, event) -> QPoint:
-        try:
-            p = event.position()
-            return QPoint(int(p.x()), int(p.y()))
-        except Exception:
-            return event.pos()
-
-    def _item_at_pos(self, pos_view: QPoint) -> QGraphicsItem | None:
-        try:
-            return self.itemAt(pos_view)
-        except Exception:
-            # Fallback if itemAt signature differs
-            return None
 
     def _node_from_item(self, item) -> Node | None:
-        it = item
-        while it is not None:
-            if isinstance(it, Node):
-                return it
-            try:
-                it = it.parentItem()
-            except Exception:
-                break
+        #Moved to gv_tool.Node
         return None
 
     def _start_edge_drag(self, start_node: Node, scene_pos: QPointF) -> None:
-        self._edge_drag_active = True
-        self._edge_drag_start = start_node
-        # Create a lightweight preview path
-        path_item = QGraphicsPathItem()
-        pen = QPen(QColor(200, 200, 210, 220))
-        pen.setStyle(Qt.PenStyle.DashLine)
-        pen.setCosmetic(True)
-        pen.setWidthF(1.2)
-        path_item.setPen(pen)
-        path_item.setZValue(-0.5)  # above edges (-1), below nodes (0)
-        self.scene().addItem(path_item)
-        self._edge_preview_item = path_item
-        self._update_edge_drag(scene_pos)
+        #Move to gv_tool.Edge
+        pass
 
     def _update_edge_drag(self, scene_pos: QPointF) -> None:
-        if not self._edge_drag_active or self._edge_preview_item is None:
-            return
-        if self._edge_drag_start is None:
-            return
-        start = self._edge_drag_start.pos()
-        p = QPainterPath()
-        p.moveTo(start)
-        # Match the scene's routing mode for the preview path
-        orth = False
-        try:
-            sc: GraphScene = self.scene()
-            orth = bool(getattr(sc, "orthogonal_edges", False))
-        except Exception:
-            orth = False
-        if not orth:
-            p.lineTo(scene_pos)
-        else:
-            # Create a short stub that leaves the node perpendicular (axis-aligned)
-            dx = scene_pos.x() - start.x()
-            dy = scene_pos.y() - start.y()
-            stub_len = 14.0
-            if abs(dx) >= abs(dy):
-                s1 = QPointF(start.x() + (stub_len if dx >= 0 else -stub_len), start.y())
-                m = QPointF(s1.x(), scene_pos.y())
-            else:
-                s1 = QPointF(start.x(), start.y() + (stub_len if dy >= 0 else -stub_len))
-                m = QPointF(scene_pos.x(), s1.y())
-            p.lineTo(s1)
-            p.lineTo(m)
-            p.lineTo(scene_pos)
-        self._edge_preview_item.setPath(p)
+        #Move to gv_tool.Edge
+        pass
 
     def _finish_edge_drag(self, end_node: Node | None) -> None:
-        # Remove preview
-        if self._edge_preview_item is not None:
-            try:
-                self.scene().removeItem(self._edge_preview_item)
-            except Exception:
-                pass
-            self._edge_preview_item = None
-
-        start_node = self._edge_drag_start
-        # Reset state
-        self._edge_drag_active = False
-        self._edge_drag_start = None
-
-        if start_node is None or end_node is None:
-            return
-        if end_node is start_node:
-            return
-
-        # Decide edge type: use selected type if set, otherwise heuristic
-        etype = self._create_edge_type
-        trigger.create_relation(start_node, end_node, etype)
+        #Move to gv_tool.Edge
+        pass
 
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:
@@ -152,10 +73,7 @@ class GraphView(QGraphicsView):
 
     def resizeEvent(self, event):
         # Keep overlays anchored in viewport coordinates
-        try:
-            self._reposition_help_overlay()
-        except Exception:
-            pass
+        trigger.resize_event()
         super().resizeEvent(event)
 
     def mousePressEvent(self, event):

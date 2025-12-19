@@ -45,6 +45,14 @@ ALLOWED_NODE_TYPES = [
     IFC_NODE_TYPE,
 ]
 
+ALLOWED_NODE_TYPES_TYPING = Literal[
+    "Property",
+    "ExternalProperty",
+    "Class",
+    "ExternalClass",
+    "IfcReference",
+]
+
 NODE_TYPE_LABEL_MAP: dict[str, str] = {
     CLASS_NODE_TYPE: "Class",
     EXTERNAL_CLASS_NODE_TYPE: "External Class",

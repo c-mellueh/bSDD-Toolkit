@@ -37,3 +37,11 @@ def delete_selection(
 
     for n in selected_nodes:
         node.remove_node(n, scene, ignored_edges=edges_to_remove)
+
+
+def resize_event(scene_view: Type[gv_tool.SceneView]):
+    scene_view.reposition_help_overlay()
+
+
+def mouse_press_event(scene_view: Type[gv_tool.SceneView]):
+    pass

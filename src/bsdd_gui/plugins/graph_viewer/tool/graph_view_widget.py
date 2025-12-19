@@ -273,16 +273,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
         return properties_to_add
 
     @classmethod
-    def create_edge(
-        cls,
-        start_node: Node,
-        end_node: Node,
-        edge_type,
-        weight: float = 1.0,
-    ):
-        return graphics_items.Edge(start_node, end_node, edge_type, weight)
-
-    @classmethod
     def add_edge(
         cls,
         scene: view_ui.GraphScene,
@@ -761,114 +751,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
         if not scene:
             return
         scene.running = True
-
-    @classmethod
-    def create_class_property_relation(
-        cls,
-        start_node: graphics_items.Node,
-        end_node: graphics_items.Node,
-        bsdd_dictionary: BsddDictionary,
-    ):
-        bsdd_class = (
-            start_node.bsdd_data
-            if start_node.node_type == constants.CLASS_NODE_TYPE
-            else end_node.bsdd_data
-        )
-        bsdd_property = (
-            start_node.bsdd_data
-            if start_node.node_type
-            in [constants.PROPERTY_NODE_TYPE, constants.EXTERNAL_PROPERTY_NODE_TYPE]
-            else end_node.bsdd_data
-        )
-
-        # check if relationship exists allready
-        for bsdd_class_property in bsdd_class.ClassProperties:
-            if bsdd_property == prop_utils.get_property_by_class_property(
-                bsdd_class_property, bsdd_dictionary
-            ):
-                return
-
-        new_property = prop_utils.create_class_property_from_property(
-            bsdd_property, bsdd_class, bsdd_dictionary
-        )
-        new_property._set_parent(bsdd_class)
-        bsdd_class.ClassProperties.append(new_property)
-        cls.signals.new_class_property_created.emit(new_property)
-        new_edge = cls.create_edge(start_node, end_node, edge_type=constants.C_P_REL)
-        cls.add_edge(cls.get_scene(), new_edge)
-
-    @classmethod
-    def create_class_class_relation(
-        cls,
-        start_node: graphics_items.Node,
-        end_node: graphics_items.Node,
-        bsdd_dictionary: BsddDictionary,
-        relation: constants.ALLOWED_EDGE_TYPES_TYPING,
-    ):
-        start_class: BsddClass = start_node.bsdd_data
-        end_class: BsddClass = end_node.bsdd_data
-
-        if relation not in constants.CLASS_RELATIONS:
-            return
-        if relation == constants.IFC_REFERENCE_REL:
-            if not end_node.node_type == constants.IFC_NODE_TYPE:
-                return
-            rienl = [x.lower() for x in start_class.RelatedIfcEntityNamesList or []]
-            if end_class.Code.lower() not in rienl:
-                start_class.RelatedIfcEntityNamesList.append(end_class.Code)
-
-        else:
-            if end_class.OwnedUri:
-                end_uri = end_class.OwnedUri
-            else:
-                end_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
-            existing_relations = [
-                r.RelationType for r in start_class.ClassRelations if r.RelatedClassUri == end_uri
-            ]
-            if relation in existing_relations:
-                return
-            new_relation = BsddClassRelation(
-                RelationType=relation, RelatedClassUri=end_uri, RelatedClassName=end_class.Name
-            )
-            new_relation._set_parent(start_class)
-            start_class.ClassRelations.append(new_relation)
-        new_edge = cls.create_edge(start_node, end_node, edge_type=relation)
-        cls.add_edge(cls.get_scene(), new_edge)
-        cls.signals.new_edge_created.emit(new_edge)
-
-    @classmethod
-    def create_property_property_relation(
-        cls,
-        start_node: graphics_items.Node,
-        end_node: graphics_items.Node,
-        bsdd_dictionary: BsddDictionary,
-        relation: constants.ALLOWED_EDGE_TYPES_TYPING,
-    ):
-        start_property: BsddProperty = start_node.bsdd_data
-        end_property: BsddProperty = end_node.bsdd_data
-
-        if relation not in constants.PROPERTY_RELATIONS:
-            return
-
-        if end_node.is_external:
-            end_uri = end_property.OwnedUri
-        else:
-            end_uri = prop_utils.build_bsdd_uri(end_property, bsdd_dictionary)
-        existing_relations = [
-            r.RelationType
-            for r in start_property.PropertyRelations
-            if r.RelatedPropertyUri == end_uri
-        ]
-        if relation in existing_relations:
-            return
-        new_relation = BsddPropertyRelation(
-            RelationType=relation, RelatedPropertyUri=end_uri, RelatedPropertyName=end_property.Name
-        )
-        new_relation._set_parent(start_property)
-        start_property.PropertyRelations.append(new_relation)
-        new_edge = cls.create_edge(start_node, end_node, edge_type=relation)
-        cls.add_edge(cls.get_scene(), new_edge)
-        cls.signals.new_edge_created.emit(new_edge)
 
     @classmethod
     def get_selected_items(cls) -> tuple[list[graphics_items.Node], list[graphics_items.Edge]]:
