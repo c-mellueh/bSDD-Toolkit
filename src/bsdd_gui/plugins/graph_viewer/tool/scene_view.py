@@ -1,20 +1,21 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
+import bsdd_gui.plugins.graph_viewer.tool as gv_tool
+
 from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint
 from PySide6.QtWidgets import QLabel, QGraphicsItem
 
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.scene_view import ui, trigger, constants
 from bsdd_gui.presets.tool_presets import BaseTool
-from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
-from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
-import bsdd_gui.plugins.graph_viewer.tool as gv_tool
+
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.prop import GraphViewerSceneViewProperties
     from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
-
+    from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
+    from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
 class Signals:
     delete_selection_requested = Signal()
@@ -117,6 +118,8 @@ class SceneView(BaseTool):
 
     @classmethod
     def get_selected_items(cls):
+        from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
+        from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
         scene = cls.get_scene()
         selected_nodes: list[Node] = []
         selected_edges: list[Edge] = []
@@ -161,15 +164,15 @@ class SceneView(BaseTool):
         return cls.get_properties()._panning_mmb
 
     @classmethod
-    def set_panning_mmb(cls,value:bool):
-        cls.get_properties()._panning_mmb= value
+    def set_panning_mmb(cls, value: bool):
+        cls.get_properties()._panning_mmb = value
 
     @classmethod
     def get_pan_last_pos(cls):
         return cls.get_properties()._pan_last_pos
 
     @classmethod
-    def set_pan_last_pos(cls,value:QPoint):
+    def set_pan_last_pos(cls, value: QPoint):
         cls.get_properties()._pan_last_pos = value
 
     # --- Helper -------------------------------------------------------------
@@ -203,7 +206,7 @@ class SceneView(BaseTool):
 
     @classmethod
     def get_edges(cls) -> list[Edge]:
-        return  gv_tool.Edge.get_edges()
+        return gv_tool.Edge.get_edges()
 
     @classmethod
     def apply_filters(cls, edge_filters: dict[str, bool], node_filters: dict[str, bool]):

@@ -16,7 +16,7 @@ from bsdd_json import (
 )
 from PySide6.QtCore import Signal, Qt, QPointF
 from PySide6.QtGui import QColor, QPen, QPainterPath
-from PySide6.QtWidgets import QGraphicsPathItem
+from PySide6.QtWidgets import QGraphicsPathItem,QWidget
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
 from bsdd_gui.presets.tool_presets import BaseTool
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
 
-class Signals:
+class Signals(QWidget):
     active_edgetype_requested = Signal(str)
     edge_drag_started = Signal(QGraphicsPathItem)
     edge_drag_finished = Signal(QGraphicsPathItem)

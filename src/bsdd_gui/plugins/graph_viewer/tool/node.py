@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QGraphicsItem
+from PySide6.QtWidgets import QGraphicsItem,QWidget
 
 import bsdd_gui
 from bsdd_json import BsddDictionary
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
 
 
-class Signals:
+class Signals(QWidget):
     remove_edge_requested = Signal(
         object, object, bool, bool
     )  # edge,Scene, only visual, allow parent deletion

@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from . import constants
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
-    from . import constants
     from PySide6.QtWidgets import QGraphicsPathItem
 
 

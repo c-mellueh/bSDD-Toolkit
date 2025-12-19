@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def activate():
-    core.connect_signals(gv_tool.Window, gv_tool.SceneView, gv_tool.Edge)
+    core.connect_signals(gv_tool.Window, gv_tool.SceneView)
 
 
 def deactivate():
