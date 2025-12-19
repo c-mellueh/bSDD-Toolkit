@@ -73,8 +73,6 @@ class GraphView(QGraphicsView):
 class GraphScene(QGraphicsScene):
     def __init__(self):
         super().__init__()
-        self.nodes: List[Node] = []
-        self.edges: List[Edge] = []
         self.physics = Physics()
         self.timer = QTimer()
         self.timer.setInterval(30)
@@ -85,24 +83,8 @@ class GraphScene(QGraphicsScene):
         self.orthogonal_edges: bool = False
 
     def _tick(self):
-        if not self.running or not self.nodes:
-            return
-        self.physics.gravity_center = self.sceneRect().center()
-        # Only simulate visible items
-        vis_nodes = [n for n in self.nodes if n.isVisible()]
-        vis_edges = [
-            e
-            for e in self.edges
-            if e.isVisible() and e.start_node.isVisible() and e.end_node.isVisible()
-        ]
-        if vis_nodes:
-            self.physics.step(vis_nodes, vis_edges, dt=1.0)
-        # Update visible edges' geometry
-        for e in vis_edges:
-            e.update_path()
+        return #core.Physics
 
-    def set_running(self, run: bool):
-        self.running = run
 
     def set_orthogonal_edges(self, enabled: bool) -> None:
         """Enable/disable right-angle routing for edges and refresh paths."""

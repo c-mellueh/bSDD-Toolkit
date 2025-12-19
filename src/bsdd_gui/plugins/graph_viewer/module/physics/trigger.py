@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def activate():
-    pass
+    core.connect_signals(gv_tool.Physics,gv_tool.Window)
 
     
 def deactivate():
@@ -22,3 +22,6 @@ def retranslate_ui():
     
 def on_new_project():
     pass
+
+def tick():
+    core.tick(gv_tool.Physics,gv_tool.Node,gv_tool.Edge,gv_tool.SceneView)
