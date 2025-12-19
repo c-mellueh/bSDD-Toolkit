@@ -30,10 +30,17 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QGraphicsView" name="view"/>
+    <widget class="GraphView" name="view"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GraphView</class>
+   <extends>QGraphicsView</extends>
+   <header>bsdd_gui.plugins.graph_viewer.module.scene_view.ui</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

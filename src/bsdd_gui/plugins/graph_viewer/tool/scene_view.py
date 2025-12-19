@@ -22,3 +22,7 @@ class SceneView:
     @classmethod
     def _get_trigger(cls):
         return trigger
+    
+    @classmethod
+    def create_scene(cls):
+        return ui.GraphScene()
