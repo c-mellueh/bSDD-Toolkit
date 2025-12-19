@@ -32,6 +32,7 @@ from bsdd_gui.module.graph_view_widget.ui_settings_widget import SettingsSidebar
 from bsdd_gui.presets.ui_presets import BaseWidget
 from bsdd_gui import tool
 from typing import TYPE_CHECKING
+import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui.module.graph_view_widget.graphics_items import Node, Edge
@@ -141,11 +142,6 @@ class GraphWindow(BaseWidget):
             return getattr(self.view, "_create_edge_type", None)
         except Exception:
             return None
-
-    # ---- Actions ----
-    def _toggle_running(self):
-        self.scene.set_running(not self.scene.running)
-        self.btn_play.setText("Pause" if self.scene.running else "Play")
 
     def _scene_center_pos(self) -> QPointF:
         vp_rect = self.view.viewport().rect()

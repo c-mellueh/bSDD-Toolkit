@@ -11,7 +11,7 @@ import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, WidgetTool
 from bsdd_gui.presets.signal_presets import WidgetSignals
 from PySide6.QtCore import Signal
-
+import qtawesome as qta
 import random
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
 
@@ -740,6 +740,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
         pause_text = QCoreApplication.translate("GraphView", "Pause")
         play_text = QCoreApplication.translate("GraphView", "Play")
         button_widget.bt_start_stop.setText(pause_text if scene.running else play_text)
+        icon = qta.icon("mdi6.pause") if scene.running else qta.icon("mdi6.play")
+        button_widget.bt_start_stop.setIcon(icon)
 
     @classmethod
     def toggle_running(cls):

@@ -36,7 +36,7 @@ def on_new_project():
 def widget_created(widget):
     core.register_widget(widget, tool.GraphViewWidget)
     core.connect_widget(widget, tool.GraphViewWidget)
-
+    core.add_icons(widget)
 
 def create_widget(parent: QWidget | None = None):
     core.create_widget(parent, tool.GraphViewWidget, tool.MainWindowWidget, tool.Project)

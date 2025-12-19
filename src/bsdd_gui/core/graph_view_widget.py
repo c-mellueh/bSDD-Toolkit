@@ -20,7 +20,7 @@ from bsdd_gui.module.ifc_helper.data import IfcHelperData
 import webbrowser
 import json
 import logging
-
+import qtawesome as qta
 if TYPE_CHECKING:
     from bsdd_gui.module.graph_view_widget.view_ui import GraphView, GraphScene
     from bsdd_gui.module.graph_view_widget import graphics_items, ui
@@ -148,6 +148,15 @@ def retranslate_ui(
     action = graph_view.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("GraphView", "Graph Viewer"))
 
+def add_icons(widget:ui.GraphWindow):
+    bs = widget.settings_sidebar._button_settings
+    bs.bt_clear.setIcon(qta.icon("mdi6.cancel"))
+    bs.bt_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
+    bs.bt_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
+    bs.bt_load.setIcon(qta.icon("mdi6.tray-full"))
+    bs.bt_center.setIcon(qta.icon("mdi6.arrow-collapse-all"))
+    bs.bt_start_stop.setIcon(qta.icon("mdi6.pause"))
+    bs.bt_tree.setIcon(qta.icon("mdi6.graph"))
 
 def create_widget(
     parent: QWidget | None,
