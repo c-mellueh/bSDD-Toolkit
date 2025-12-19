@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QAbstractItemView, QWidget
 from PySide6.QtCore import QAbstractItemModel
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QIcon
 from typing import TypedDict, Callable, TypeAlias
 from bsdd_gui.presets.ui_presets import ItemViewType, FieldWidget
 from .models_presets import ItemModel
@@ -18,6 +18,8 @@ class ContextMenuDict(TypedDict, total=False):
     allow_multi: bool  # available for multi-selection
     require_selection: bool  # only enabled if something is selected
     action: QAction | None  # actual QAction object, set when menu is built
+    icon: QIcon | None
+    shortcut: str | None
 
 
 class ActionsProperties:

@@ -6,7 +6,7 @@ import logging
 import json
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
-
+import qtawesome as qta
 from bsdd_gui.module.class_tree_view.constants import JSON_MIME, CODES_MIME
 from bsdd_json.models import BsddClass, BsddDictionary, BsddProperty
 
@@ -78,6 +78,8 @@ def add_context_menu_to_view(
         True,
         True,
         False,
+        icon=qta.icon("mdi6.content-copy"),
+        shortcut="Ctrl+C",
     )
     class_tree.add_context_menu_entry(
         view,
@@ -86,14 +88,18 @@ def add_context_menu_to_view(
         True,
         True,
         True,
+        icon=qta.icon("mdi6.delete"),
+        shortcut="Del",
     )
     class_tree.add_context_menu_entry(
         view,
-        lambda: QCoreApplication.translate("Class", "Extend"),
+        lambda: QCoreApplication.translate("Class", "Extend All"),
         lambda: class_tree.signals.expand_selection_requested.emit(view),
         True,
         True,
         True,
+        icon=qta.icon("mdi6.arrow-expand"),
+        shortcut="Ctrl+E",
     )
     class_tree.add_context_menu_entry(
         view,
@@ -102,6 +108,8 @@ def add_context_menu_to_view(
         True,
         True,
         True,
+        icon=qta.icon("mdi6.arrow-collapse"),
+        shortcut="Ctrl+Alt+E",
     )
     class_tree.add_context_menu_entry(
         view,
@@ -110,7 +118,22 @@ def add_context_menu_to_view(
         True,
         True,
         True,
+        icon=qta.icon("mdi6.group"),
+        shortcut="Ctrl+G",
     )
+
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Search"),
+        lambda: class_tree.signals.search_requested.emit(view),
+        False,
+        True,
+        True,
+        icon=qta.icon("mdi6.magnify"),
+        shortcut="Ctrl+F",
+    )
+
+
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Info"),
@@ -118,6 +141,7 @@ def add_context_menu_to_view(
         True,
         True,
         False,
+        icon=qta.icon("mdi6.information"),
     )
 
     class_tree.add_context_menu_entry(
@@ -127,6 +151,7 @@ def add_context_menu_to_view(
         False,
         True,
         True,
+        icon=qta.icon("mdi6.refresh"),
     )
 
 
@@ -140,20 +165,49 @@ def connect_to_main_window(
     util: Type[tool.Util],
 ):
     view = main_window.get_class_view()
-    util.add_shortcut("Del", view, lambda: class_tree.signals.delete_selection_requested.emit(view))
+
     util.add_shortcut(
-        "Ctrl+G", view, lambda: class_tree.signals.group_selection_requested.emit(view)
-    )
-    util.add_shortcut("Ctrl+F", view, lambda: class_tree.signals.search_requested.emit(view))
-    util.add_shortcut(
-        "Ctrl+C", view, lambda: main_window.signals.copy_active_class_requested.emit()
+        "Ctrl+C",
+        view,
+        lambda: main_window.signals.copy_active_class_requested.emit(),
     )
 
-    util.add_shortcut("Ctrl+N", view, lambda: main_window.signals.new_class_requested.emit())
+    util.add_shortcut(
+        "Del",
+        view,
+        lambda: class_tree.signals.delete_selection_requested.emit(view),
+    )
 
-    util.add_shortcut("Ctrl+E", view, view.expandAll)
+    util.add_shortcut(
+        "Ctrl+E",
+        view,
+        view.expandAll,
+    )
+    util.add_shortcut(
+        "Ctrl+Alt+E",
+        view,
+        view.collapseAll,
+    )
+
+    util.add_shortcut(
+        "Ctrl+G",
+        view,
+        lambda: class_tree.signals.group_selection_requested.emit(view),
+    )
+    util.add_shortcut(
+        "Ctrl+F",
+        view,
+        lambda: class_tree.signals.search_requested.emit(view),
+    )
+
+    util.add_shortcut(
+        "Ctrl+N",
+        view,
+        lambda: main_window.signals.new_class_requested.emit(),
+    )
+
     class_tree.signals.selection_changed.connect(
-        lambda v, n: (main_window.set_active_class(n) if v == view else None)
+        lambda v, n: (main_window.set_active_class(n) if v == view else None),
     )
 
 

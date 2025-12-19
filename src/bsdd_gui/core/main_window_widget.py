@@ -1,10 +1,11 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QCoreApplication,Qt
+from PySide6.QtCore import QCoreApplication, Qt
 from typing import Type, TYPE_CHECKING
 import bsdd_gui
 import logging
 import qtawesome as qta
+
 if TYPE_CHECKING:
     from bsdd_gui import tool
 
@@ -21,10 +22,14 @@ def create_main_window(application: QApplication, main_window: Type[tool.MainWin
     main_window.hide_console()
     main_window.install_validation_styles(application)
     toggle_console_action = main_window.add_action(
-        "menuEdit", "ToggleConsole", main_window.signals.toggle_console_requested.emit,qta.icon("mdi.swap-horizontal")
+        "menuEdit", "ToggleConsole", main_window.signals.toggle_console_requested.emit
     )
     main_window.set_action(mw, "toggle_console", toggle_console_action)
-
+    plus_icon = "mdi6.plus"
+    mw.button_classes_add.setIcon(qta.icon(plus_icon))
+    mw.button_property_add.setIcon(qta.icon(plus_icon))
+    mw.button_Pset_add.setIcon(qta.icon(plus_icon))
+    mw.button_search.setIcon(qta.icon("mdi6.magnify"))
 
 def connect_main_window(
     main_window: Type[tool.MainWindowWidget],
@@ -58,8 +63,10 @@ def retranslate_ui(main_window: Type[tool.MainWindowWidget]):
 
     if main_window.is_console_visible():
         action.setText(QCoreApplication.translate("MainWindow", "Hide Console"))
+        action.setIcon(qta.icon("mdi6.eye-off"))
     else:
         action.setText(QCoreApplication.translate("MainWindow", "Show Console"))
+        action.setIcon(qta.icon("mdi6.eye"))
 
 
 def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[tool.Project]):

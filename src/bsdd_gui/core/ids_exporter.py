@@ -86,8 +86,6 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
 
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
-    widget.pb_import.setText("")
-    widget.pb_export.setText("")
     widget.fw_output.load_path()
 
 

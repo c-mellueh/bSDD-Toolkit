@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1468</width>
-    <height>822</height>
+    <height>813</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -65,8 +65,21 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_class_name">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
-           <widget class="QPushButton" name="button_search">
+           <widget class="QToolButton" name="button_search">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -85,6 +98,9 @@
               <height>24</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Search for Class</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -96,19 +112,6 @@
               <width>16</width>
               <height>16</height>
              </size>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_class_name">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
             </property>
            </widget>
           </item>

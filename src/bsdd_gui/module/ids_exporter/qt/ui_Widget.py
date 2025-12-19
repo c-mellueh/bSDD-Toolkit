@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -18,7 +18,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
     QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
-    QSplitter, QVBoxLayout, QWidget)
+    QSplitter, QToolButton, QVBoxLayout, QWidget)
 
 from bsdd_gui.module.ids_exporter.model_views import (ClassView, PropertyView, TagInput_IfcVersion)
 from bsdd_gui.presets.ui_presets import (DateTimeWithNow, FileSelector, ToggleSwitch)
@@ -142,7 +142,7 @@ class Ui_Form(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 409, 606))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 406, 591))
         self.verticalLayout_2 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -267,25 +267,29 @@ class Ui_Form(object):
         self.fr_download.setFrameShape(QFrame.Shape.StyledPanel)
         self.fr_download.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout = QHBoxLayout(self.fr_download)
+        self.horizontalLayout.setSpacing(6)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 5)
         self.horizontalSpacer = QSpacerItem(1, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
-        self.pb_import = QPushButton(self.fr_download)
+        self.pb_import = QToolButton(self.fr_download)
         self.pb_import.setObjectName(u"pb_import")
-        self.pb_import.setMinimumSize(QSize(0, 30))
+        self.pb_import.setMinimumSize(QSize(30, 30))
+        self.pb_import.setMaximumSize(QSize(24, 24))
 
         self.horizontalLayout.addWidget(self.pb_import)
 
-        self.pb_export = QPushButton(self.fr_download)
+        self.pb_export = QToolButton(self.fr_download)
         self.pb_export.setObjectName(u"pb_export")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.pb_export.sizePolicy().hasHeightForWidth())
         self.pb_export.setSizePolicy(sizePolicy2)
+        self.pb_export.setMinimumSize(QSize(30, 30))
+        self.pb_export.setMaximumSize(QSize(24, 24))
 
         self.horizontalLayout.addWidget(self.pb_export)
 
@@ -359,8 +363,14 @@ class Ui_Form(object):
         self.label_5.setText(QCoreApplication.translate("Form", u"Description", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"IFC-Versions", None))
         self.label_14.setText(QCoreApplication.translate("Form", u"**IDS Metadata**", None))
-        self.pb_import.setText(QCoreApplication.translate("Form", u"Import", None))
-        self.pb_export.setText(QCoreApplication.translate("Form", u"Export", None))
+#if QT_CONFIG(tooltip)
+        self.pb_import.setToolTip(QCoreApplication.translate("Form", u"Import", None))
+#endif // QT_CONFIG(tooltip)
+        self.pb_import.setText("")
+#if QT_CONFIG(tooltip)
+        self.pb_export.setToolTip(QCoreApplication.translate("Form", u"Export", None))
+#endif // QT_CONFIG(tooltip)
+        self.pb_export.setText("")
         self.label_3.setText(QCoreApplication.translate("Form", u"Export:", None))
         self.pb_create.setText(QCoreApplication.translate("Form", u"Create", None))
     # retranslateUi

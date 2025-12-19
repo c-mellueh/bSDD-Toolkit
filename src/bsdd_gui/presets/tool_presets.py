@@ -50,7 +50,7 @@ from PySide6.QtCore import (
     QModelIndex,
     QItemSelectionModel,
 )
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QIcon
 from bsdd_gui.presets.ui_presets import (
     TagInput,
     DateTimeWithNow,
@@ -197,7 +197,6 @@ class WidgetTool(BaseTool):
     @classmethod
     def connect_widget_signals(cls, widget: FieldWidget):
         widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
-
 
     @classmethod
     def register_widget(cls, widget: FieldWidget):
@@ -814,6 +813,8 @@ class ItemViewTool(BaseTool):
         require_selection: bool,  # clearer than "on_selection"
         allow_single: bool,  # clearer than "single"
         allow_multi: bool,  # clearer than "multi"
+        icon: QIcon = None,
+        shortcut: str = None,
     ) -> ContextMenuDict:
         """
         Adds an entry to the context menu.
@@ -823,6 +824,8 @@ class ItemViewTool(BaseTool):
         :param require_selection: Entry only available if at least one item is selected.
         :param allow_single: Entry is available for single selection.
         :param allow_multi: Entry is available for multi-selection.
+        :param icon: icon of action
+        :parma shortcut: shortcut of action e.g. "Ctrl+X"
         :return: A dictionary representing the context menu entry.
         """
 
@@ -832,6 +835,8 @@ class ItemViewTool(BaseTool):
         entry["allow_multi"] = allow_multi
         entry["allow_single"] = allow_single
         entry["require_selection"] = require_selection
+        entry["icon"] = icon
+        entry["shortcut"] = shortcut
 
         props = cls.get_properties()
         props.context_menu_list[view].append(entry)
@@ -868,7 +873,11 @@ class ItemViewTool(BaseTool):
             action.triggered.connect(e["action_func"])
             # If you still want to store the last-built QAction:
             e["action"] = action
+            if e["icon"]:
+                action.setIcon(e["icon"])
 
+            if e["shortcut"]:
+                action.setShortcut(e["shortcut"])
         return menu
 
     @classmethod
