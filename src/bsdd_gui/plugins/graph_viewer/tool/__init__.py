@@ -4,3 +4,4 @@ from .scene_view import SceneView
 from .edge import Edge
 from .node import Node
 from .settings import Settings
+from .physics import Physics
