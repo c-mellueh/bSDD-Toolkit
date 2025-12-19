@@ -43,6 +43,11 @@ def main(
     app = QApplication(sys.argv)
     bsdd_gui.core.main_window_widget.create_main_window(app, tool.MainWindowWidget)
     bsdd_gui.load_ui_triggers()
+    
+    for plugin_names in tool.Plugins.get_available_plugins():
+        if tool.Plugins.is_plugin_active(plugin_names):
+            module = importlib.import_module(f"bsdd_gui.plugins.{plugin_names}")
+            module.activate()
 
     bsdd_gui.core.project.create_project(tool.Project)
 

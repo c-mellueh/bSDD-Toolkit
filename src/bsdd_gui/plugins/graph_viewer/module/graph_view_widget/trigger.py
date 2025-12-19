@@ -19,10 +19,10 @@ def activate():
         tool.Project,
     )
     core.connect_to_main_window(gv_tool.GraphViewWidget, tool.MainWindowWidget)
-    w = core.create_widget(
-        tool.MainWindowWidget.get(), gv_tool.GraphViewWidget, tool.MainWindowWidget, tool.Project
-    )
-    w.hide()
+    # w = core.create_widget(
+    #     tool.MainWindowWidget.get(), gv_tool.GraphViewWidget, tool.MainWindowWidget, tool.Project
+    # )
+    # w.hide()
 
 
 def deactivate():

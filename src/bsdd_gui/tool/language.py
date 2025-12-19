@@ -54,7 +54,8 @@ class Language:
                 module = importlib.import_module(text)
                 module.load_language(app, lang_code)
             except ModuleNotFoundError:
-                logging.warning(f"Plugin '{plugin_name}' has no translation")
+                #TODO: Add Plugin Translation for Graph Viewer
+                logging.info(f"Plugin '{plugin_name}' has no translation")
 
     @classmethod
     def retranslate_main_ui(cls):
