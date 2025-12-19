@@ -61,6 +61,10 @@ class Edge(BaseTool):
         return trigger
 
     @classmethod
+    def clear(cls):
+        cls.get_properties().edges = list()
+
+    @classmethod
     def remove_edge(
         cls,
         edge: ui.Edge,
@@ -219,6 +223,8 @@ class Edge(BaseTool):
     @classmethod
     def set_orthogonal_mode(cls, value: str):
         cls.get_properties().orthogonal_edges = value
+        for e in cls.get_edges():
+            e.update_path()
 
     @classmethod
     def is_edge_drag_active(cls):

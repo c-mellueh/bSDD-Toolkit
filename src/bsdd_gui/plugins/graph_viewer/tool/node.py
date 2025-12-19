@@ -47,6 +47,10 @@ class Node(BaseTool):
         return trigger
 
     @classmethod
+    def clear(cls):
+        cls.get_properties().nodes = list()
+
+    @classmethod
     def remove_node(
         cls,
         node: ui.Node,

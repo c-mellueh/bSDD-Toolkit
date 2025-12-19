@@ -35,6 +35,18 @@ def handle_widget_creation(widget: ui_window.GraphWidget, scene_view: Type[gv_to
     scene_view.connect_view()
 
 
+def clear_graph(
+    scene_view: Type[gv_tool.SceneView], node: Type[gv_tool.Node], edge: Type[gv_tool.Edge]
+):
+    scene = scene_view.get_scene()
+    for e in edge.get_edges():
+        scene.removeItem(e)
+    for n in node.get_nodes():
+        scene.removeItem(n)
+    node.clear()
+    edge.clear()
+
+
 def delete_selection(
     scene_view: Type[gv_tool.SceneView],
     project: Type[tool.Project],
@@ -69,6 +81,7 @@ def double_click_event(
     node.emit_node_double_clicked(node)
     event.accept()
     return False
+
 
 def mouse_press_event(
     event: QMouseEvent,
