@@ -529,11 +529,11 @@ class SettingsSidebar(QWidget):
             parent=None,
         )
         self._button_settings = ButtonWidget(None)
-        self._scroll_layout.addWidget(self._view_settings)
+        self._scroll_layout.addWidget(self._button_settings)
         self._scroll_layout.addWidget(self._routing_settings)
         self._scroll_layout.addWidget(self._node_types_panel)
         self._scroll_layout.addWidget(self._edge_types_panel)
-        self._scroll_layout.addWidget(self._button_settings)
+        self._scroll_layout.addWidget(self._view_settings)
 
         self._scroll_layout.addStretch(1)
 
