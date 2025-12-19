@@ -12,10 +12,11 @@ from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.prop import GraphViewerSceneViewProperties
+    from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
 
 
 class Signals:
-    delete_selection_requested = Signal(ui.GraphView)
+    delete_selection_requested = Signal()
 
 
 class SceneView(BaseTool):
@@ -36,12 +37,14 @@ class SceneView(BaseTool):
 
     @classmethod
     def create_scene(cls):
-        return ui.GraphScene()
+        cls.get_properties().scene = ui.GraphScene()
+        return cls.get_properties().scene
 
     @classmethod
-    def connect_view(cls, view: ui.GraphView):
+    def connect_view(cls):
+        view = cls.get_view()
         scene = view.scene()
-        scene.changed.connect(lambda *_, v=view: cls.update_help_overlay_visibility(v))
+        scene.changed.connect(lambda *_,: cls.update_help_overlay_visibility())
 
     @classmethod
     def set_edge_drag_active(cls, state: bool):
@@ -51,7 +54,8 @@ class SceneView(BaseTool):
         cls.get_properties()
 
     @classmethod
-    def create_help_overlay(cls, view: ui.GraphView):
+    def create_help_overlay(cls):
+        view = cls.get_view()
         text = QCoreApplication.translate(
             "GraphViewer",
             "Drag & drop classes or properties in the view to edit their relations.\n"
@@ -66,11 +70,12 @@ class SceneView(BaseTool):
         overlay.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         overlay.setStyleSheet(constants.OVERLAY_STYLESHEET)
         cls.get_properties()._help_overlay = overlay
-        cls.reposition_help_overlay(view)
-        cls.update_help_overlay_visibility(view)
+        cls.reposition_help_overlay()
+        cls.update_help_overlay_visibility()
 
     @classmethod
-    def reposition_help_overlay(cls, view: ui.GraphView):
+    def reposition_help_overlay(cls):
+        view = cls.get_view()
         overlay = cls.get_properties()._help_overlay
         overlay.adjustSize()
 
@@ -99,7 +104,8 @@ class SceneView(BaseTool):
             pass
 
     @classmethod
-    def update_help_overlay_visibility(cls, view: ui.GraphView):
+    def update_help_overlay_visibility(cls):
+        view = cls.get_view()
         if cls.get_properties()._help_overlay:
             return
         try:
@@ -110,7 +116,8 @@ class SceneView(BaseTool):
         cls.get_properties()._help_overlay.setVisible(not has_nodes)
 
     @classmethod
-    def get_selected_items(cls, scene: ui.GraphScene):
+    def get_selected_items(cls):
+        scene = cls.get_scene()
         selected_nodes: list[Node] = []
         selected_edges: list[Edge] = []
         if not scene:
@@ -129,10 +136,30 @@ class SceneView(BaseTool):
         return selected_nodes, selected_edges
 
     @classmethod
-    def toggle_running(cls, view: ui.GraphView):
-        scene = view.scene()
+    def toggle_running(cls):
+        scene = cls.get_scene()
         scene.running = not scene.running
 
     @classmethod
-    def request_delete_selection(cls, view: ui.GraphScene):
-        cls.signals.delete_selection_requested.emit(view)
+    def request_delete_selection(cls):
+        cls.signals.delete_selection_requested.emit()
+
+    @classmethod
+    def set_active_edge_type(cls, edge_type: edge_constants.ALLOWED_EDGE_TYPES_TYPING | None):
+        view = cls.get_view()
+
+        cls.get_properties()._create_edge_type = edge_type
+        if not edge_type:
+            pass
+
+    @classmethod
+    def get_view(cls) -> ui.GraphView:
+        return cls.get_properties().view
+
+    @classmethod
+    def set_view(cls, view: ui.GraphView):
+        cls.get_properties().view = view
+
+    @classmethod
+    def get_scene(cls) -> ui.GraphScene:
+        return cls.get_properties().view.scene()

@@ -32,7 +32,7 @@ def retranslate_ui(window: Type[gv_tool.Window], main_window: Type[tool.MainWind
 
 def create_widget(data, parent, window: Type[gv_tool.Window], scene_view: Type[gv_tool.SceneView]):
     widget = window.show_widget(data, parent)
-    scene_view.reposition_help_overlay(widget.view)
+    scene_view.reposition_help_overlay()
 
 
 def register_widget(widget: ui.GraphWidget, window: gv_tool.Window):
@@ -44,12 +44,12 @@ def connect_widget(widget: ui.GraphWidget, window: gv_tool.Window, util: Type[to
     util.add_shortcut(
         Qt.Key.Key_Space,
         widget,
-        lambda w=widget: window.request_toggle_running(w),
+        window.request_toggle_running,
         Qt.ShortcutContext.WidgetWithChildrenShortcut,
     )
     util.add_shortcut(
         Qt.Key.Key_Delete,
         widget,
-        lambda w=widget: window.request_delete_selection(w),
+        window.request_delete_selection,
         Qt.ShortcutContext.WidgetWithChildrenShortcut,
     )
