@@ -6,7 +6,7 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 
 from bsdd_json import BsddClass, BsddDictionary, BsddProperty
-from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint,QObject,QPointF
+from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint, QObject, QPointF
 from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QLabel, QGraphicsItem
 
@@ -28,6 +28,7 @@ class Signals(QObject):
     classes_insert_requested = Signal(list, QPointF)
     properties_insert_requested = Signal(list, QPointF)
     recalculate_edges_requested = Signal()
+
 
 class SceneView(BaseTool):
     signals = Signals()

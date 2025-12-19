@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QGraphicsItem, QWidget
 import random
 import bsdd_gui
 from bsdd_json import BsddDictionary, BsddClass, BsddProperty
-from bsdd_gui.presets.tool_presets import BaseDialog
+from bsdd_gui.presets.tool_presets import BaseTool
 from bsdd_gui.plugins.graph_viewer.module.node import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
 from bsdd_json.utils import class_utils as cl_utils
@@ -27,14 +27,20 @@ class Signals(QObject):
     )  # edge,Scene, only visual, allow parent deletion
     node_created = Signal(ui.Node)
     remove_node_requested = Signal(ui.Node)
+    node_double_clicked = Signal(ui.Node)
 
 
-class Node(BaseDialog):
+class Node(BaseTool):
     signals = Signals()
 
     @classmethod
     def get_properties(cls) -> GraphViewerNodeProperties:
         return bsdd_gui.GraphViewerNodeProperties
+
+    @classmethod
+    def connect_internal_signals(cls):
+        cls.signals.node_double_clicked.connect(trigger.node_double_clicked)
+        super().connect_internal_signals()
 
     @classmethod
     def _get_trigger(cls):
@@ -164,3 +170,6 @@ class Node(BaseDialog):
                 continue
             uri_dict[uri] = node
         return uri_dict
+
+    def emit_node_double_clicked(cls, node: ui.Node):
+        cls.signals.node_double_clicked.emit(node)

@@ -2,13 +2,14 @@ from __future__ import annotations
 from PySide6.QtCore import Qt, QPoint, QPointF
 from PySide6.QtGui import QMouseEvent, QDropEvent
 from typing import TYPE_CHECKING, Type
+import webbrowser
+
+
 from bsdd_gui.plugins.graph_viewer.module.scene_view import constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
-
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
-
 from bsdd_json import BsddClass, BsddProperty
 
 if TYPE_CHECKING:
@@ -16,6 +17,8 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer import tool as gv_tool
     from bsdd_gui.plugins.graph_viewer.module.scene_view import ui
     from bsdd_gui.plugins.graph_viewer.module.window import ui as ui_window
+    from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
+    from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
 
 def connect_signals(window: Type[gv_tool.Window], scene_view: Type[gv_tool.SceneView]):
@@ -54,6 +57,18 @@ def delete_selection(
 def resize_event(event, scene_view: Type[gv_tool.SceneView]):
     scene_view.reposition_help_overlay()
 
+
+def double_click_event(
+    event: QMouseEvent, scene_view: Type[gv_tool.SceneView], node: Type[gv_tool.Node]
+):
+    pos_view = scene_view._event_qpoint(event)
+    item = scene_view._item_at_pos(pos_view)
+    node = node._node_from_item(item)
+    if node is None:
+        return True
+    node.emit_node_double_clicked(node)
+    event.accept()
+    return False
 
 def mouse_press_event(
     event: QMouseEvent,

@@ -25,24 +25,6 @@ class GraphView(QGraphicsView):
     def scene(self) -> GraphScene:
         return super().scene()
 
-    # --- helpers ---------------------------------------------------------
-
-    def _node_from_item(self, item) -> Node | None:
-        # Moved to gv_tool.Node
-        return None
-
-    def _start_edge_drag(self, start_node: Node, scene_pos: QPointF) -> None:
-        # Move to gv_tool.Edge
-        pass
-
-    def _update_edge_drag(self, scene_pos: QPointF) -> None:
-        # Move to gv_tool.Edge
-        pass
-
-    def _finish_edge_drag(self, end_node: Node | None) -> None:
-        # Move to gv_tool.Edge
-        pass
-
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:
             factor = 1.25 if event.angleDelta().y() > 0 else 0.8
@@ -80,63 +62,12 @@ class GraphView(QGraphicsView):
             super().dragMoveEvent(event)
 
     def dropEvent(self, event):
-        trigger.handle_drop_event(event)
+        trigger.drop_event(event)
 
     def mouseDoubleClickEvent(self, event):
         # On double-click, emit a tool-level signal when a Node is hit
-        try:
-            pos_view = self._event_qpoint(event)
-            item = self._item_at_pos(pos_view)
-            node = self._node_from_item(item)
-            if node is not None:
-                try:
-                    gv_tool.GraphViewWidget.signals.node_double_clicked.emit(node)
-                except Exception:
-                    pass
-                event.accept()
-                return
-        except Exception:
-            pass
-        super().mouseDoubleClickEvent(event)
-
-    # ---- Help overlay helpers -------------------------------------------
-    def _reposition_help_overlay(self) -> None:
-        if not self._help_overlay:
-            return
-        vp = self.viewport()
-        if vp is None:
-            return
-        margin = 16
-        max_w = int(min(720, vp.width() - 2 * margin))
-        if max_w < 120:
-            max_w = max(120, vp.width() - 2 * margin)
-        try:
-            self._help_overlay.setMaximumWidth(max_w)
-            self._help_overlay.adjustSize()
-        except Exception:
-            pass
-        w = min(self._help_overlay.width(), max_w)
-        h = self._help_overlay.height()
-        x = int((vp.width() - w) / 2)
-        y = int((vp.height() - h) / 2)
-        self._help_overlay.setGeometry(x, y, w, h)
-        try:
-            self._help_overlay.raise_()
-        except Exception:
-            pass
-
-    def _update_help_overlay_visibility(self) -> None:
-        if not self._help_overlay:
-            return
-        try:
-            sc: GraphScene = self.scene()
-            has_nodes = bool(getattr(sc, "nodes", []) or [])
-        except Exception:
-            has_nodes = True
-        self._help_overlay.setVisible(not has_nodes)
-
-    def _on_scene_changed(self, *_):
-        self._update_help_overlay_visibility()
+        if trigger.double_click_event(event):
+            super().mouseDoubleClickEvent(event)
 
 
 class GraphScene(QGraphicsScene):

@@ -30,7 +30,7 @@ def on_new_project():
 
 
 def delete_selection():
-    core.delete_selection(gv_tool.SceneView, tool.Project,gv_tool.Edge,gv_tool.Node)
+    core.delete_selection(gv_tool.SceneView, tool.Project, gv_tool.Edge, gv_tool.Node)
 
 
 def resize_event(event):
@@ -57,10 +57,13 @@ def drag_move_event(event):
     return core.drag_move_event(event, gv_tool.SceneView)
 
 
-def handle_drop_event(event):
+def drop_event(event):
     core.drop_event(
         event, gv_tool.SceneView, tool.ClassTreeView, tool.PropertyTableWidget, tool.Project
     )
+
+def double_click_event(event):
+    return core.double_click_event(event,gv_tool.SceneView,gv_tool.Node)
 
 
 def insert_classes(classes: list[BsddClass], postion: QPointF):

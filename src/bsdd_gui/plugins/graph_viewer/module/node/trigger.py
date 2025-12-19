@@ -4,21 +4,28 @@ from bsdd_gui import tool
 from bsdd_gui.plugins.graph_viewer.core import node as core
 from typing import TYPE_CHECKING
 from bsdd_gui.plugins.graph_viewer import tool as gv_tool
+
 if TYPE_CHECKING:
     from . import ui
 
 
 def activate():
-    core.connect_signals(gv_tool.Node,gv_tool.Edge,gv_tool.SceneView,tool.Project)
+    core.connect_signals(gv_tool.Node, gv_tool.Edge, gv_tool.SceneView, tool.Project)
 
-    
+
 def deactivate():
     pass
 
-    
+
 def retranslate_ui():
     pass
 
-    
+
 def on_new_project():
     pass
+
+
+def node_double_clicked(node):
+    core.node_double_clicked(
+        node, tool.PropertyTableWidget, tool.ClassTreeView, tool.MainWindowWidget
+    )
