@@ -38,6 +38,14 @@ class SearchWidget(WidgetTool):
         cls.signals.strict_state_changed.connect(trigger.set_strict_state)
 
     @classmethod
+    def _get_trigger(cls):
+        return trigger
+    
+    @classmethod
+    def _get_widget_class(cls):
+        return ui.SearchDialog
+
+    @classmethod
     def _search(cls, search_mode: int, search_items: list, data_getters: list[Callable]):
         """
         Create Search Window
@@ -115,15 +123,19 @@ class SearchWidget(WidgetTool):
         """
         if search_mode == 1:
             return [
-                QCoreApplication.translate("Search", "Class"),
-                QCoreApplication.translate("Search", "Identifier"),
-                QCoreApplication.translate("Search", "Abbreviation"),
+                QCoreApplication.translate("Search", "Code"),
+                QCoreApplication.translate("Search", "Name"),
+                QCoreApplication.translate("Search", "Classtyp"),
             ]
         if search_mode == 2:
             return [
-                QCoreApplication.translate("Search", "PropertySet"),
-                QCoreApplication.translate("Search", "Property"),
+                QCoreApplication.translate("Search", "Code"),
+                QCoreApplication.translate("Search", "Name"),
             ]
+
+    @classmethod
+    def get_widgets(cls)-> list[ui.SearchDialog]:
+        return super().get_widgets()
 
     @classmethod
     def retranslate_title(cls, dialog: ui.SearchDialog, search_mode: int):

@@ -64,6 +64,6 @@ def retranslate_ui(search: Type[tool.SearchWidget]):
     :return:
     """
     for dialog in search.get_widgets():
-        dialog.ui.retranslateUi(dialog)
+        dialog.retranslateUi(dialog)
         update_filter_table(dialog, search)
         search.retranslate_title(dialog, search.get_search_mode(dialog))
