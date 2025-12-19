@@ -22,7 +22,7 @@ def connect_signals(window: Type[gv_tool.Window], scene_view: Type[gv_tool.Scene
     window.signals.widget_created.connect(lambda w: handle_widget_creation(w, scene_view))
     window.signals.toggle_running_requested.connect(scene_view.toggle_running)
     window.signals.delete_selection_requested.connect(scene_view.request_delete_selection)
-
+    scene_view.connect_internal_signals()
 
 def handle_widget_creation(widget: ui_window.GraphWidget, scene_view: Type[gv_tool.SceneView]):
     scene_view.set_view(widget.view)
@@ -78,7 +78,7 @@ def mouse_press_event(
         except Exception:
             pass
         event.accept()
-        return
+        return False
 
     elif left_clicked and shift_pressed:
         # Begin edge drawing if pressed on a Node
@@ -86,10 +86,11 @@ def mouse_press_event(
         item = scene_view._item_at_pos(pos_view)
         n = node._node_from_item(item)
         if n is None:
-            return
+            return False
         scene_pos = view.mapToScene(pos_view)
         edge._start_edge_drag(n, scene_pos)
         event.accept()
+    return True
 
 
 def mouse_release_event(
@@ -107,14 +108,15 @@ def mouse_release_event(
         except Exception:
             pass
         event.accept()
-        return
+        return False
     elif edge.is_edge_drag_active() and event.button() == Qt.LeftButton:
         pos_view = scene_view._event_qpoint(event)
         item = scene_view._item_at_pos(pos_view)
         n = node._node_from_item(item)
         edge._finish_edge_drag(n)
         event.accept()
-        return
+        return False
+    return True
 
 
 def mouse_move_event(
@@ -137,35 +139,37 @@ def mouse_move_event(
                 pass
         scene_view.set_pan_last_pos(cur)
         event.accept()
-        return
+        return False
     if edge.is_edge_drag_active():
         pos_view = scene_view._event_qpoint(event)
         scene_pos = view.mapToScene(pos_view)
         edge._update_edge_drag(scene_pos)
         event.accept()
-        return
+        return False
+    return True
 
 
 def drag_enter_event(event, scene_view: Type[gv_tool.SceneView]):
     if scene_view._mime_has_bsdd_class(event.mimeData()):
         event.acceptProposedAction()
+        return False
+
     else:
-        return
+        return True
 
-
-def dragMoveEvent(event, scene_view: Type[gv_tool.SceneView]):
+def drag_move_event(event, scene_view: Type[gv_tool.SceneView]):
     if scene_view._mime_has_bsdd_class(event.mimeData()):
-        event.acceptProposedAction()
+        event.acceptProposedAction() 
+        return False
     else:
-        super().dragMoveEvent(event)
-
+        return True
 
 def drop_event(
     event: QDropEvent,
     scene_view: Type[gv_tool.SceneView],
     class_tree: Type[tool.ClassTreeView],
     property_table: Type[tool.PropertyTableWidget],
-    project: Type[tool.Project]
+    project: Type[tool.Project],
 ):
     mime_data = event.mimeData()
     mime_type = scene_view.get_mime_type(mime_data)
@@ -187,7 +191,6 @@ def drop_event(
 
     if not classes_to_add and not properties_to_add:
         event.ignore()
-        return
 
     scene_view.request_classes_insert(classes_to_add, scene_pos)
     scene_view.request_properties_insert(properties_to_add, scene_pos)
@@ -198,7 +201,7 @@ def drop_event(
 
 def insert_classes_in_scene(
     classes: list[BsddClass],
-    position: QPoint,
+    position: QPointF,
     scene_view: Type[gv_tool.SceneView],
     node: Type[gv_tool.Node],
     ifc_helper: Type[tool.IfcHelper],
@@ -251,7 +254,7 @@ def insert_classes_in_scene(
 
 def insert_properties_in_scene(
     bsdd_properties: list[BsddProperty],
-    position: QPoint,
+    position: QPointF,
     scene_view: Type[gv_tool.SceneView],
     node: Type[gv_tool.Node],
     project: Type[tool.Project],

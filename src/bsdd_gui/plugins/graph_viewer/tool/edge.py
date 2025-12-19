@@ -14,7 +14,7 @@ from bsdd_json import (
     BsddClassRelation,
     BsddPropertyRelation,
 )
-from PySide6.QtCore import Signal, Qt, QPointF
+from PySide6.QtCore import Signal, Qt, QPointF,QObject
 from PySide6.QtGui import QColor, QPen, QPainterPath
 from PySide6.QtWidgets import QGraphicsPathItem, QWidget
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
@@ -30,7 +30,7 @@ from bsdd_gui.module.ifc_helper.data import IfcHelperData
 RelationsDict = dict[constants.ALLOWED_EDGE_TYPES_TYPING, dict[tuple[str, str, str, str], ui.Edge]]
 
 
-class Signals(QWidget):
+class Signals(QObject):
     active_edgetype_requested = Signal(str)
     edge_drag_started = Signal(QGraphicsPathItem)
     edge_drag_finished = Signal(QGraphicsPathItem)
@@ -156,8 +156,8 @@ class Edge(BaseTool):
         end_node: Node,
         edge_type,
         weight: float = 1.0,
-    ):
-        return Edge(start_node, end_node, edge_type, weight)
+    ) -> ui.Edge:
+        return ui.Edge(start_node, end_node, edge_type, weight)
 
     @classmethod
     def get_edges(cls) -> list[ui.Edge]:

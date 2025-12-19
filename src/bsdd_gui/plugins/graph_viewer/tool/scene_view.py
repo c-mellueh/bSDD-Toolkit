@@ -6,7 +6,7 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 
 from bsdd_json import BsddClass, BsddDictionary, BsddProperty
-from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint
+from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint,QObject,QPointF
 from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QLabel, QGraphicsItem
 
@@ -23,10 +23,10 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
 
-class Signals:
+class Signals(QObject):
     delete_selection_requested = Signal()
-    classes_insert_requested = Signal(list, QPoint)
-    properties_insert_requested = Signal(list, QPoint)
+    classes_insert_requested = Signal(list, QPointF)
+    properties_insert_requested = Signal(list, QPointF)
     recalculate_edges_requested = Signal()
 
 class SceneView(BaseTool):
@@ -296,11 +296,11 @@ class SceneView(BaseTool):
         return properties_to_add
 
     @classmethod
-    def request_classes_insert(cls, classes: list[BsddClass], postion: QPoint):
+    def request_classes_insert(cls, classes: list[BsddClass], postion: QPointF):
         cls.signals.classes_insert_requested.emit(classes, postion)
 
     @classmethod
-    def request_properties_insert(cls, properties: list[BsddProperty], postion: QPoint):
+    def request_properties_insert(cls, properties: list[BsddProperty], postion: QPointF):
         cls.signals.properties_insert_requested.emit(properties, postion)
 
     @classmethod

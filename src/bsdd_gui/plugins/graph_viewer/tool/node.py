@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
-from PySide6.QtCore import Signal, QPointF
+from PySide6.QtCore import Signal, QPointF, QObject
 from PySide6.QtWidgets import QGraphicsItem, QWidget
 import random
 import bsdd_gui
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
 
 
-class Signals(QWidget):
+class Signals(QObject):
     remove_edge_requested = Signal(
         object, object, bool, bool
     )  # edge,Scene, only visual, allow parent deletion
@@ -72,9 +72,9 @@ class Node(BaseDialog):
 
     @classmethod
     def add_node(
-        cls, bsdd_data: BsddClass | BsddProperty, pos, color, is_external=False
+        cls, bsdd_data: BsddClass | BsddProperty, pos=None, color=None, is_external=False
     ) -> ui.Node:
-        n = ui.Node(bsdd_data, color, is_external)
+        n = ui.Node(bsdd_data, color=color, is_external=is_external)
         p = (
             pos
             if pos is not None

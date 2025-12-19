@@ -58,29 +58,29 @@ class GraphView(QGraphicsView):
 
     def mousePressEvent(self, event):
         # Log scene coordinates for every mouse click
-        trigger.mouse_press_event(event)
-        super().mousePressEvent(event)
+        if trigger.mouse_press_event(event):
+            super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
-        trigger.mouse_release_event(event)
-        super().mouseReleaseEvent(event)
+        if trigger.mouse_release_event(event):
+            super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
-        trigger.mouse_move_event(event)
-        super().mouseMoveEvent(event)
+        if trigger.mouse_move_event(event):
+            super().mouseMoveEvent(event)
 
     # ---- Drag & Drop integration ----
 
     def dragEnterEvent(self, event):
-        trigger.drag_enter_event(event)
-        super().dragEnterEvent(event)
+        if trigger.drag_enter_event(event):
+            super().dragEnterEvent(event)
 
     def dragMoveEvent(self, event):
-        trigger.drag_move_event(event)
-        super().dragMoveEvent(event)
+        if trigger.drag_move_event(event):
+            super().dragMoveEvent(event)
 
     def dropEvent(self, event):
-        trigger.handle_drop_event(event, self)
+        trigger.handle_drop_event(event)
 
     def mouseDoubleClickEvent(self, event):
         # On double-click, emit a tool-level signal when a Node is hit

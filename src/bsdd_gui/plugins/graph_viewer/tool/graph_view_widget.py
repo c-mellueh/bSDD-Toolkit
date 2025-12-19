@@ -266,7 +266,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
         classes: list[BsddClass],
         position: QPointF = None,
         ifc_classes: dict[str, dict[str, str]] = dict(),
-    )
+    ):
         return #Moved to core.SceneView
 
     @classmethod
