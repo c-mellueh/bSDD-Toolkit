@@ -53,6 +53,8 @@ class ClassTreeView(ItemViewTool):
         cls.signals.copy_selection_requested.connect(trigger.copy_selected_class)
         cls.signals.group_selection_requested.connect(trigger.group_selection)
         cls.signals.search_requested.connect(trigger.search_class)
+        cls.signals.expand_selection_requested.connect(cls.expand_selection)
+        cls.signals.collapse_selection_requested.connect(cls.collapse_selection)
 
     @classmethod
     def get_selected(cls, view: ui.ClassView) -> list[BsddClass]:
@@ -206,3 +208,13 @@ class ClassTreeView(ItemViewTool):
             # if invalid, skip this one (or log)
             node = None
         return node
+
+    @classmethod
+    def expand_selection(cls, tree: ui.ClassView):
+        for index in tree.selectedIndexes():
+            tree.expandRecursively(index)
+
+    @classmethod
+    def collapse_selection(cls, tree: ui.ClassView):
+        for index in tree.selectedIndexes():
+            tree.collapse(index)

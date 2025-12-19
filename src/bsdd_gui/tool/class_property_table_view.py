@@ -86,6 +86,8 @@ class ClassPropertyTableView(ItemViewTool):
 
     @classmethod
     def connect_view_signals(cls, view: ui.ClassPropertyTable):
+        view.doubleClicked.connect(lambda _, v=view: cls.request_info(v))
+
         super().connect_view_signals(view)
 
     @classmethod
@@ -117,3 +119,12 @@ class ClassPropertyTableView(ItemViewTool):
         if not index.isValid():
             return
         view.setCurrentIndex(index)
+
+    @classmethod
+    def request_info(cls, view: ui.ClassPropertyTable):
+        index = view.selectedIndexes()[0]
+        index = view.model().mapToSource(index)
+        bsdd_class_property = index.internalPointer()
+        if not bsdd_class_property:
+            return
+        cls.signals.property_info_requested.emit(bsdd_class_property)

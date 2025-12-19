@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_set_table_view.models import PsetTableModel
 
+import qtawesome as qta
 from bsdd_gui.module.property_set_table_view import ui
 from PySide6.QtCore import QCoreApplication, QPoint, QModelIndex
 from PySide6.QtWidgets import QApplication, QListView
@@ -229,6 +230,13 @@ def connect_to_main_window(
             pset_view, property_set_table, property_table, main_window, util
         ),
     )
+
+    util.add_shortcut(
+        "Del",
+        pset_view,
+        lambda: property_set_table.signals.delete_selection_requested.emit(pset_view),
+    )
+
     property_set_table.signals.selection_changed.connect(
         lambda v, n: (main_window.set_active_pset(n) if v == main_window.get_pset_view() else None)
     )
@@ -252,7 +260,7 @@ def create_new_property_set(
     property_set_table.signals.model_refresh_requested.emit()
 
 
-def define_context_menu(
+def add_context_menu_to_view(
     main_window: Type[tool.MainWindowWidget],
     property_set_table: Type[tool.PropertySetTableView],
     util: Type[tool.Util],
@@ -268,6 +276,8 @@ def define_context_menu(
         True,
         True,
         True,
+        icon=qta.icon("mdi6.content-copy"),
+        shortcut="Ctrl+C",
     )
     property_set_table.add_context_menu_entry(
         view,
@@ -278,6 +288,8 @@ def define_context_menu(
         False,
         True,
         True,
+        icon=qta.icon("mdi6.content-paste"),
+        shortcut="Ctrl+V",
     )
     property_set_table.add_context_menu_entry(
         view,
@@ -286,6 +298,8 @@ def define_context_menu(
         True,
         True,
         True,
+        icon=qta.icon("mdi6.delete"),
+        shortcut="Del",
     )
 
     property_set_table.add_context_menu_entry(
@@ -295,6 +309,7 @@ def define_context_menu(
         True,
         True,
         False,
+        icon=qta.icon("mdi6.rename"),
     )
 
 

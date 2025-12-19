@@ -14,7 +14,7 @@ def connect():
     core.connect_to_main_window(
         tool.PropertySetTableView, tool.MainWindowWidget, tool.Util, tool.ClassPropertyTableView
     )
-    core.define_context_menu(
+    core.add_context_menu_to_view(
         tool.MainWindowWidget, tool.PropertySetTableView, tool.Util, tool.ClassPropertyTableView
     )
 

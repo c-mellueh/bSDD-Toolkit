@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QTreeView
 from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.property_table_widget import views, ui, models
 from bsdd_json import BsddProperty, BsddClass, BsddClassProperty
+import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -69,11 +70,13 @@ def create_widget(
         widget = property_table.get_widgets()[-1]
     else:
         widget = property_table.create_widget(main_window.get())
+    widget:ui.PropertyWidget
     widget.show()
     widget.raise_()
     widget.activateWindow()
+    widget.tb_new.setIcon(qta.icon("mdi6.plus"))
     retranslate_ui(property_table, main_window, util)
-
+    
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTableWidget]):
     property_table.register_widget(widget)
@@ -134,6 +137,28 @@ def add_context_menu_to_view(
             True,
             True,
             True,
+            icon=qta.icon("mdi6.delete"),
+            shortcut="Del",
+        )
+        property_table.add_context_menu_entry(
+            view,
+            lambda: QCoreApplication.translate("PropertySet", "Search"),
+            lambda: property_table.signals.search_requested.emit(view),
+            False,
+            True,
+            True,
+            icon=qta.icon("mdi6.magnify"),
+            shortcut="Ctrl+F",
+        )
+        property_table.add_context_menu_entry(
+            view,
+            lambda: QCoreApplication.translate("PropertySet", "New"),
+            lambda: property_table.request_new_property(),
+            False,
+            True,
+            True,
+            icon=qta.icon("mdi6.plus"),
+            shortcut="Ctrl+N",
         )
     else:
         property_table.add_context_menu_entry(
@@ -143,6 +168,8 @@ def add_context_menu_to_view(
             True,
             True,
             True,
+            icon=qta.icon("mdi6.delete"),
+            shortcut="Del",
         )
 
 
@@ -152,13 +179,23 @@ def connect_view(
     util: Type[tool.Util],
 ):
     property_table.connect_view_signals(view)
+
     if isinstance(view, views.PropertyTable):
         util.add_shortcut(
             "Ctrl+F",
             view,
             lambda: property_table.signals.search_requested.emit(view),
         )
-
+        util.add_shortcut(
+            "Ctrl+N",
+            view,
+            lambda: property_table.request_new_property(),
+        )
+    util.add_shortcut(
+        "Del",
+        view,
+        lambda: property_table.request_delete_selection(view),
+    )
 
 def create_context_menu(
     view: views.PropertyTable | views.ClassTable,

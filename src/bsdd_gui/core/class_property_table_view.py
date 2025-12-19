@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QApplication, QTableView
 from typing import Type, TYPE_CHECKING
 from PySide6.QtCore import QModelIndex, QCoreApplication, QPoint
 from bsdd_json.utils import property_utils as prop_utils
+import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -57,8 +58,18 @@ def add_context_menu_to_view(
         True,
         True,
         True,
+        icon=qta.icon("mdi6.delete"),
+        shortcut="Del",
     )
-
+    property_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("ClassPropertyTable", "Edit"),
+        lambda: property_table.request_info(view),
+        True,
+        True,
+        True,
+        icon=qta.icon("mdi6.rename"),
+    )
 
 def create_context_menu(
     view: ui.ClassPropertyTable, pos: QPoint, property_table: Type[tool.ClassPropertyTableView]
@@ -70,15 +81,7 @@ def create_context_menu(
 
 
 def connect_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]):
-    def emit_info_requested(index: QModelIndex):
-        index = view.model().mapToSource(index)
-        bsdd_class_property = index.internalPointer()
-        if not bsdd_class_property:
-            return
-        property_table.signals.property_info_requested.emit(bsdd_class_property)
-
     property_table.connect_view_signals(view)
-    view.doubleClicked.connect(emit_info_requested)
 
 
 def reset_views(property_table: Type[tool.ClassPropertyTableView], project: Type[tool.Project]):

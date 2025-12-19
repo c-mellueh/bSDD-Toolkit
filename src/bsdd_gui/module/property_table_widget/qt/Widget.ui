@@ -42,6 +42,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="tb_new">
+         <property name="toolTip">
+          <string>create new property</string>
+         </property>
          <property name="text">
           <string>New</string>
          </property>

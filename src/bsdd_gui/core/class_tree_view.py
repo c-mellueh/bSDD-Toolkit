@@ -93,7 +93,7 @@ def add_context_menu_to_view(
     )
     class_tree.add_context_menu_entry(
         view,
-        lambda: QCoreApplication.translate("Class", "Extend All"),
+        lambda: QCoreApplication.translate("Class", "Extend Selection"),
         lambda: class_tree.signals.expand_selection_requested.emit(view),
         True,
         True,
@@ -103,7 +103,7 @@ def add_context_menu_to_view(
     )
     class_tree.add_context_menu_entry(
         view,
-        lambda: QCoreApplication.translate("Class", "Collapse"),
+        lambda: QCoreApplication.translate("Class", "Collapse Selection"),
         lambda: class_tree.signals.collapse_selection_requested.emit(view),
         True,
         True,
@@ -133,17 +133,6 @@ def add_context_menu_to_view(
         shortcut="Ctrl+F",
     )
 
-
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Info"),
-        lambda: class_editor.request_class_editor(get_first_selection(view)),
-        True,
-        True,
-        False,
-        icon=qta.icon("mdi6.information"),
-    )
-
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Reset View"),
@@ -152,7 +141,21 @@ def add_context_menu_to_view(
         True,
         True,
         icon=qta.icon("mdi6.refresh"),
+        shortcut="Ctrl+R",
     )
+
+
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Edit"),
+        lambda: class_editor.request_class_editor(get_first_selection(view)),
+        True,
+        True,
+        False,
+        icon=qta.icon("mdi6.rename"),
+    )
+
+
 
 
 def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTreeView]):
@@ -181,12 +184,12 @@ def connect_to_main_window(
     util.add_shortcut(
         "Ctrl+E",
         view,
-        view.expandAll,
+        lambda:class_tree.signals.expand_selection_requested.emit(view),
     )
     util.add_shortcut(
         "Ctrl+Alt+E",
         view,
-        view.collapseAll,
+        lambda:class_tree.signals.collapse_selection_requested.emit(view),
     )
 
     util.add_shortcut(
@@ -199,7 +202,11 @@ def connect_to_main_window(
         view,
         lambda: class_tree.signals.search_requested.emit(view),
     )
-
+    util.add_shortcut(
+        "Ctrl+R",
+        view,
+        lambda: class_tree.signals.model_refresh_requested.emit(),
+    )
     util.add_shortcut(
         "Ctrl+N",
         view,
