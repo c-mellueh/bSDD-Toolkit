@@ -1,5 +1,14 @@
 from __future__ import annotations
+from bsdd_gui.presets.prop_presets import WidgetProperties
+from typing import TYPE_CHECKING
 
-class GraphViewerSettingsProperties:
-    pass
+if TYPE_CHECKING:
+    from . import ui
 
+
+class GraphViewerSettingsProperties(WidgetProperties):
+    def __init__(self):
+        super().__init__()
+        self.button_widget: ui.ButtonWidget = None
+        self.expanded_width = 160
+        self.is_expanded = True

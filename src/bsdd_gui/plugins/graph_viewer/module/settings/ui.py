@@ -14,8 +14,8 @@ from PySide6.QtWidgets import (
     QSpacerItem,
 )
 
-from .qt import ui_Buttons
-from . import constants
+from .qt import ui_Buttons, ui_Widget
+from . import constants, trigger
 
 if TYPE_CHECKING:
     from .ui import GraphWindow
@@ -40,6 +40,18 @@ class ButtonWidget(_SettingsWidget, ui_Buttons.Ui_Form):
         self.setupUi(self)
 
 
+class SettingsWidget(QWidget, ui_Widget.Ui_SettingsSidebar):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setupUi(self)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        self.scroll_area.setStyleSheet(constants.SETTINGS_STYLE_SHEET)
+        self.scroll_area.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        self.scroll_area.viewport().setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        trigger.widget_created(self)
+
+
 class SettingsSidebar(QWidget):
     """Right-side overlay that hosts the EdgeTypeSettingsWidget and a
     collapsible arrow button. Intended to be parented to a QGraphicsView's
@@ -58,69 +70,7 @@ class SettingsSidebar(QWidget):
         expanded_width: int = 240,
     ) -> None:
         super().__init__(parent)
-        self.graph_window = graph_window
-        self._expanded_width = max(160, int(expanded_width))
-        self._expanded = True
-
-        self.setObjectName("SettingsSidebar")
-        self.setAttribute(Qt.WA_StyledBackground, True)
-        # Ensure the overlay itself is fully transparent
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setStyleSheet(
-            """
-            QWidget#SettingsSidebar {
-                background: transparent;
-            }
-            """
-        )
-
-        root = QHBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.setSpacing(0)
-
-        self._button_layout = QVBoxLayout()
-        self._btn_layout_widget = QWidget()
-        self._btn_layout_widget.setLayout(self._button_layout)
-        self._btn_layout_widget.setContentsMargins(QMargins(0.0, 0.0, 0.0, 0.0))
-        self._button_layout.setContentsMargins(QMargins(0.0, 0.0, 0.0, 0.0))
-
-        # Collapse/Expand handle
-        self._btn = QToolButton(self)
-        self._btn.setArrowType(Qt.ArrowType.LeftArrow)
-        self._btn.setCheckable(True)
-        self._btn.setChecked(True)
-        self._btn.clicked.connect(self._on_toggle_clicked)
-        self._btn.setToolTip(
-            QCoreApplication.translate("GraphViewSettings", "Show/Hide edge types")
-        )
-        self._btn.setFixedWidth(18)
-        self._btn.setFixedHeight(18)
-
-        self._btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self._button_layout.addWidget(self._btn)
-        self.spacer_item = QSpacerItem(
-            20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
-        )
-        self._button_layout.addItem(self.spacer_item)
-        root.addWidget(self._btn_layout_widget)
-        # Scroll area hosting a vertical stack of panels
-        self._scroll = QScrollArea(self)
-        self._scroll.setFrameShape(QFrame.NoFrame)
-        self._scroll.setWidgetResizable(True)
-        # Make scroll area and its viewport fully transparent
-        try:
-            self._scroll.setAttribute(Qt.WA_TranslucentBackground, True)
-            self._scroll.viewport().setAttribute(Qt.WA_TranslucentBackground, True)
-        except Exception:
-            pass
-        self._scroll.setStyleSheet(constants.SETTINGS_STYLE_SHEET)
-
-        self._scroll_content = QWidget(self._scroll)
-        self._scroll_content.setObjectName("ScrollContent")
-        self._scroll_content.setAttribute(Qt.WA_StyledBackground, True)
-        self._scroll_layout = QVBoxLayout(self._scroll_content)
-        self._scroll_layout.setContentsMargins(0, 0, 0, 0)
-        self._scroll_layout.setSpacing(8)
+        trigger.widget_created(self)
 
         # Primary edge-type panel (kept for API methods below)
         from ..edge.ui import EdgeTypeSettingsWidget, EdgeRoutingWidget

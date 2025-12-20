@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
+from PySide6.QtGui import QPainter
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -11,7 +12,10 @@ if TYPE_CHECKING:
 
 
 def connect_signals(
-    edge: Type[gv_tool.Edge], window: Type[gv_tool.Window], scene_view: Type[gv_tool.SceneView]
+    edge: Type[gv_tool.Edge],
+    window: Type[gv_tool.Window],
+    scene_view: Type[gv_tool.SceneView],
+    settings: Type[gv_tool.Settings],
 ):
     window.signals.active_edgetype_requested.connect(edge.request_active_edge)
     edge.signals.edge_drag_started.connect(scene_view.add_item)
@@ -19,6 +23,17 @@ def connect_signals(
     edge.signals.new_edge_created.connect(scene_view.add_item)
 
     edge.connect_internal_signals()
+    settings.signals.widget_created.connect(lambda sw: edge.add_settings(sw, edge, settings))
+
+
+def add_settings(parent_widget, edge: Type[gv_tool.Edge], settings: Type[gv_tool.Settings]):
+    type_widget = edge.create_edge_type_settings_widget()
+
+    for row in edge.create_edge_toggles():
+        type_widget._root.addLayout(row)
+
+    routing_widget = edge.create_edge_routing_settings_widget()
+    edge.connect_settings_widgets(type_widget, routing_widget)
 
 
 def set_active_edge(
@@ -71,3 +86,14 @@ def create_relation(
             )
 
     scene_view.apply_filters(edge.get_filters(), node.get_filters())
+
+
+def paint_edge_legend(edge_legend: ui._EdgeLegendIcon, edge: Type[gv_tool.Edge]):
+    p = QPainter(edge_legend)
+    p.setRenderHint(QPainter.Antialiasing, True)
+    rect = edge_legend.rect()
+    y = rect.center().y()
+    x1 = rect.left() + 2
+    x2 = rect.right() - 2
+    p.setPen(edge.create_pen_for_edgestyle())
+    p.drawLine(int(x1), int(y), int(x2), int(y))

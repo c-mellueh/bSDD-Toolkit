@@ -16,6 +16,8 @@ from PySide6.QtWidgets import (
     QWidget,
     QSizePolicy,
 )
+from . import trigger
+from .qt import ui_RoutingWidget
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
@@ -253,44 +255,12 @@ class Edge(QGraphicsPathItem):
         return rect.adjusted(-12, -12, 12, 12)
 
 
-class EdgeRoutingWidget(_SettingsWidget):
+class EdgeRoutingWidget(_SettingsWidget, ui_RoutingWidget.Ui_Form):
     """Simple panel to toggle between straight and right-angle edges."""
 
-    def __init__(self, scene: "GraphScene", parent: QWidget | None = None) -> None:
-        super().__init__(parent, f=Qt.Window)
-        self._scene = scene
-        self._build_ui()
-
-    def _build_ui(self) -> None:
-        lay = QVBoxLayout(self)
-        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Edge Routing"))
-        title.setObjectName("titleLabel")
-        lay.addWidget(title)
-
-        row = QHBoxLayout()
-        row.setContentsMargins(0, 0, 0, 0)
-        row.setSpacing(6)
-        lbl = QLabel(QCoreApplication.translate("GraphViewSettings", "Right-angle edges"))
-        self.sw_ortho = ToggleSwitch(checked=False)
-        self.sw_ortho.toggled.connect(self._on_toggled)
-        row.addWidget(lbl, 1)
-        row.addWidget(self.sw_ortho, 0, alignment=Qt.AlignRight)
-        lay.addLayout(row)
-
-    def _on_toggled(self, checked: bool) -> None:
-        try:
-            self._scene.set_orthogonal_edges(bool(checked))
-        except Exception:
-            # Fallback in case method not available (older scene)
-            try:
-                setattr(self._scene, "orthogonal_edges", bool(checked))
-                for e in getattr(self._scene, "edges", []) or []:
-                    try:
-                        e.update_path()
-                    except Exception:
-                        pass
-            except Exception:
-                pass
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, f=Qt.Window, **kwargs)
+        self.setupUi(self)
 
 
 class EdgeTypeSettingsWidget(_SettingsWidget):
@@ -305,71 +275,27 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
     # Emitted when a legend icon is double-clicked to choose creation type
     edgeTypeActivated = Signal(str)
 
-    def __init__(
-        self,
-        allowed_edge_types: Iterable[str],
-        on_toggle: Callable[[str, bool], None],
-        parent: QWidget | None = None,
-    ) -> None:
-        super().__init__(parent)
-        self._on_toggle = on_toggle
-        self._switches: Dict[str, ToggleSwitch] = {}
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._root = QVBoxLayout(self)
+        self._root.setContentsMargins(8, 8, 8, 8)
+        self._root.setSpacing(6)
 
-        root = QVBoxLayout(self)
-        root.setContentsMargins(8, 8, 8, 8)
-        root.setSpacing(6)
         # Ensure it can stretch vertically when hosted in a sidebar
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.setLayout(self._root)
 
-        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Edge Types"))
-        title.setObjectName("titleLabel")
-        root.addWidget(title)
+    # def get_flags(self) -> Dict[str, bool]:
+    #     return {et: sw.isChecked() for et, sw in self._switches.items()}
 
-        for et in allowed_edge_types:
-            row = QHBoxLayout()
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(6)
-            # Legend icon
-            icon = _EdgeLegendIcon(str(et))
-            try:
-                icon.edgeTypeActivated.connect(
-                    lambda etype=str(et): self.edgeTypeActivated.emit(etype)
-                )
-            except Exception:
-                pass
-            # Map internal key to human-friendly label and translate it
-            _raw_label = constants.EDGE_TYPE_LABEL_MAP.get(str(et), str(et))
-            _tr_label = QCoreApplication.translate("GraphViewSettings", _raw_label)
-            lbl = QLabel(_tr_label)
-            lbl.setToolTip(_tr_label)
-            sw = ToggleSwitch(checked=True)
-            sw.toggled.connect(self._make_handler(et))
-
-            sw.setChecked(constants.EDGE_STYLE_MAP.get(str(et), dict()).get("enabled", True))
-            self._switches[et] = sw
-            row.addWidget(icon, 0)
-            row.addWidget(lbl, 1)
-            row.addWidget(sw, 0, alignment=Qt.AlignRight)
-            root.addLayout(row)
-
-    def _make_handler(self, edge_type: str):
-        def _handler(checked: bool):
-            if callable(self._on_toggle):
-                self._on_toggle(edge_type, checked)
-
-        return _handler
-
-    def get_flags(self) -> Dict[str, bool]:
-        return {et: sw.isChecked() for et, sw in self._switches.items()}
-
-    def set_flag(self, edge_type: str, value: bool) -> None:
-        sw = self._switches.get(edge_type)
-        if sw is not None:
-            sw.blockSignals(True)
-            try:
-                sw.setChecked(bool(value))
-            finally:
-                sw.blockSignals(False)
+    # def set_flag(self, edge_type: str, value: bool) -> None:
+    #     sw = self._switches.get(edge_type)
+    #     if sw is not None:
+    #         sw.blockSignals(True)
+    #         try:
+    #             sw.setChecked(bool(value))
+    #         finally:
+    #             sw.blockSignals(False)
 
 
 class _EdgeLegendIcon(QWidget):
@@ -377,49 +303,19 @@ class _EdgeLegendIcon(QWidget):
     color/width/style for a given edge type.
     """
 
+    edgeTypeActivated = Signal(str)
+
     def __init__(self, edge_type: str, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._edge_type = edge_type
         self.setFixedWidth(28)
         self.setFixedHeight(14)
-        # Signal for activation (double-click selection)
-        try:
-            from PySide6.QtCore import Signal as _Signal  # type: ignore
-        except Exception:
-            _Signal = None
-        # Dynamically attach a signal attribute if possible
-        # But better: declare on class; see above in EdgeTypeSettingsWidget connection
-
-    # Custom signal declared on class via Qt meta-object (added above)
-    edgeTypeActivated = Signal(str)
 
     def sizeHint(self):
         return QSize(28, 14)
 
-    def _pen_for_edge(self) -> QPen:
-        cfg = constants.EDGE_STYLE_MAP.get(self._edge_type, constants.EDGE_STYLE_DEFAULT)
-        color = cfg.get("color", constants.EDGE_STYLE_DEFAULT["color"])  # type: ignore[index]
-        width = float(cfg.get("width", constants.EDGE_STYLE_DEFAULT["width"]))
-        style = cfg.get("style", constants.EDGE_STYLE_DEFAULT["style"])  # type: ignore[index]
-        pen = QPen(color if isinstance(color, QColor) else QColor(130, 130, 150))
-        pen.setCosmetic(True)
-        pen.setWidthF(width)
-        try:
-            pen.setStyle(style)  # type: ignore[arg-type]
-        except Exception:
-            pass
-        return pen
-
     def paintEvent(self, _):
-        p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing, True)
-        rect = self.rect()
-        y = rect.center().y()
-        x1 = rect.left() + 2
-        x2 = rect.right() - 2
-        pen = self._pen_for_edge()
-        p.setPen(pen)
-        p.drawLine(int(x1), int(y), int(x2), int(y))
+        trigger.paint_edge_legend(self)
 
     def mouseDoubleClickEvent(self, event):
         try:

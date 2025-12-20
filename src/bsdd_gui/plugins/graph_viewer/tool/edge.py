@@ -14,12 +14,13 @@ from bsdd_json import (
     BsddClassRelation,
     BsddPropertyRelation,
 )
-from PySide6.QtCore import Signal, Qt, QPointF, QObject
+from PySide6.QtCore import Signal, Qt, QPointF, QObject, QCoreApplication
 from PySide6.QtGui import QColor, QPen, QPainterPath
-from PySide6.QtWidgets import QGraphicsPathItem, QWidget
+from PySide6.QtWidgets import QGraphicsPathItem, QHBoxLayout, QLabel
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
 from bsdd_gui.presets.tool_presets import BaseTool
+from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.ui import GraphScene
@@ -31,7 +32,7 @@ RelationsDict = dict[constants.ALLOWED_EDGE_TYPES_TYPING, dict[tuple[str, str, s
 
 
 class Signals(QObject):
-    active_edgetype_requested = Signal(str)
+    activate_edgetype_requested = Signal(str)
     edge_drag_started = Signal(QGraphicsPathItem)
     edge_drag_finished = Signal(QGraphicsPathItem)
     new_class_property_created = Signal(object)
@@ -41,6 +42,7 @@ class Signals(QObject):
     class_relation_removed = Signal(BsddClassRelation)
     class_property_removed = Signal(BsddClassProperty, BsddClass)
     property_relation_removed = Signal(BsddPropertyRelation)
+    edge_hide_requested = Signal(str)
 
 
 class Edge(BaseTool):
@@ -53,7 +55,7 @@ class Edge(BaseTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.active_edgetype_requested.connect(trigger.set_active_edge)
+        cls.signals.activate_edgetype_requested.connect(trigger.set_active_edge)
         cls.signals.new_edge_created.connect(lambda e: cls.get_properties().edges.append(e))
 
     @classmethod
@@ -175,7 +177,7 @@ class Edge(BaseTool):
 
     @classmethod
     def request_active_edge(cls, value):
-        cls.signals.active_edgetype_requested.emit(value)
+        cls.signals.activate_edgetype_requested.emit(value)
 
     @classmethod
     def set_active_edge(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING | None):
@@ -196,35 +198,6 @@ class Edge(BaseTool):
     @classmethod
     def get_active_edge(cls) -> constants.ALLOWED_EDGE_TYPES_TYPING | None:
         return cls.get_properties().active_edge
-
-    @classmethod
-    def get_edge_style_map(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING) -> dict:
-        return constants.EDGE_STYLE_MAP.get(edge_type, constants.EDGE_STYLE_DEFAULT)
-
-    @classmethod
-    def get_edge_color(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
-        style = cls.get_edge_style_map(edge_type)
-        return style.get("color", constants.EDGE_STYLE_DEFAULT["color"])
-
-    @classmethod
-    def get_edge_style(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
-        style = cls.get_edge_style_map(edge_type)
-        return style.get("style", constants.EDGE_STYLE_DEFAULT["style"])
-
-    @classmethod
-    def get_edge_width(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
-        style = cls.get_edge_style_map(edge_type)
-        return float(style.get("width", constants.EDGE_STYLE_DEFAULT["width"]))
-
-    @classmethod
-    def is_orthogonal_mode(cls) -> bool:
-        return cls.get_properties().orthogonal_edges
-
-    @classmethod
-    def set_orthogonal_mode(cls, value: str):
-        cls.get_properties().orthogonal_edges = value
-        for e in cls.get_edges():
-            e.update_path()
 
     @classmethod
     def is_edge_drag_active(cls):
@@ -597,3 +570,112 @@ class Edge(BaseTool):
             d[2] = end_node.node_type
             d[3] = get_uri_from_node(end_node, bsdd_dictionary)
         return tuple(d)
+
+    @classmethod
+    def get_allowed_edge_types(cls) -> list[constants.ALLOWED_EDGE_TYPES_TYPING]:
+        return cls.get_properties().allowed_edge_types
+
+    @classmethod
+    def get_edgetype_name(cls, key: str):
+        text = constants.EDGE_TYPE_LABEL_MAP.get(str(key), str(key))
+        QCoreApplication.translate("GaphViewer", text)
+        return text
+
+    @classmethod
+    def request_edge_hide(cls, edge_type: str):
+        cls.signals.edge_hide_requested(edge_type)
+
+    @classmethod
+    def toggle_edge_type_visibility(cls, edge_type: str):
+        pass  # TODO
+
+    @classmethod
+    def create_pen_for_edgestyle(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        color = cls.get_edge_color(edge_type)
+        width = cls.get_edge_width(edge_type)
+        style = cls.get_edge_style(edge_type)
+        pen = QPen(color if isinstance(color, QColor) else QColor(130, 130, 150))
+        pen.setCosmetic(True)
+        pen.setWidthF(width)
+        pen.setStyle(style)
+        return pen
+
+    # ------- Settings ------------------------
+
+    @classmethod
+    def get_edge_style_map(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING) -> dict:
+        return constants.EDGE_STYLE_MAP.get(edge_type, constants.EDGE_STYLE_DEFAULT)
+
+    @classmethod
+    def get_edge_color(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        style = cls.get_edge_style_map(edge_type)
+        return style.get("color", constants.EDGE_STYLE_DEFAULT["color"])
+
+    @classmethod
+    def get_edge_style(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        style = cls.get_edge_style_map(edge_type)
+        return style.get("style", constants.EDGE_STYLE_DEFAULT["style"])
+
+    @classmethod
+    def get_edge_width(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        style = cls.get_edge_style_map(edge_type)
+        return float(style.get("width", constants.EDGE_STYLE_DEFAULT["width"]))
+
+    @classmethod
+    def is_orthogonal_mode(cls) -> bool:
+        return cls.get_properties().orthogonal_edges
+
+    @classmethod
+    def set_orthogonal_mode(cls, value: bool):
+        cls.get_properties().orthogonal_edges = value
+        for e in cls.get_edges():
+            e.update_path()
+
+    @classmethod
+    def is_edge_type_enabled(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
+        cls.get_edge_style_map(edge_type).get("enabled")
+
+    @classmethod
+    def create_edge_type_settings_widget(cls) -> ui.EdgeTypeSettingsWidget:
+        widget = ui.EdgeTypeSettingsWidget()
+        cls.get_properties().edge_type_settings_widget = widget
+        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Edge Types"))
+        title.setObjectName("titleLabel")
+        widget._root.addWidget(title)
+        return widget
+
+    @classmethod
+    def create_edge_toggles(cls):
+        toggles = list()
+        for edge_type in cls.get_allowed_edge_types():
+            row = QHBoxLayout()
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(6)
+            icon = ui._EdgeLegendIcon(str(edge_type))
+            icon.edgeTypeActivated.connect(cls.signals.activate_edgetype_requested)
+            name = cls.get_edgetype_name(edge_type)
+            label = QLabel(name)
+            label.setToolTip(name)
+            switch = ToggleSwitch(checked=True)
+            switch.toggled.connect(lambda et=edge_type: cls.toggle_edge_type_visibility(et))
+            switch.setChecked(cls.is_edge_type_enabled(edge_type))
+            row.addWidget(icon, 0)
+            row.addWidget(label, 1)
+            row.addWidget(switch, 0, alignment=Qt.AlignmentFlag.AlignRight)
+            toggles.append(row)
+        return toggles
+
+    @classmethod
+    def create_edge_routing_settings_widget(cls) -> ui.EdgeRoutingWidget:
+        widget = ui.EdgeRoutingWidget()
+        cls.get_properties().edge_routing_settings_widget = widget
+        widget.checkBox.toggled.connect(
+            lambda: cls.set_orthogonal_mode(not cls.is_orthogonal_mode())
+        )
+        return widget
+
+    @classmethod
+    def connect_settings_widgets(
+        cls, type_widget: ui.EdgeTypeSettingsWidget, routing_widget: ui.EdgeRoutingWidget
+    ):
+        pass

@@ -5,6 +5,7 @@ from . import constants
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
     from PySide6.QtWidgets import QGraphicsPathItem
+    from . import ui
 
 
 class GraphViewerEdgeProperties:
@@ -18,3 +19,7 @@ class GraphViewerEdgeProperties:
         self.filters: dict[constants.ALLOWED_EDGE_TYPES_TYPING, bool] = {
             et: True for et in constants.ALLOWED_EDGE_TYPES
         }
+        self.edge_type_settings_widget: ui.EdgeTypeSettingsWidget = None
+        self.edge_routing_settings_widget: ui.EdgeRoutingWidget = None
+
+        self.allowed_edge_types = constants.ALLOWED_EDGE_TYPES
