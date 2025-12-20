@@ -18,17 +18,23 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QSizePolicy, QStatusBar, QVBoxLayout,
     QWidget)
 
+from bsdd_gui.plugins.graph_viewer.module.input_bar.ui import InputBar
 from bsdd_gui.plugins.graph_viewer.module.scene_view.ui import GraphView
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(1000, 700)
+        Form.resize(1001, 693)
         self.verticalLayout = QVBoxLayout(Form)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.widget = InputBar(Form)
+        self.widget.setObjectName(u"widget")
+
+        self.verticalLayout.addWidget(self.widget)
+
         self.view = GraphView(Form)
         self.view.setObjectName(u"view")
 

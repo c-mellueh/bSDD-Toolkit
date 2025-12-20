@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def activate():
-    pass
+    core.connect_signals(gv_tool.InputBar,gv_tool.Window)
 
     
 def deactivate():
@@ -22,3 +22,13 @@ def retranslate_ui():
     
 def on_new_project():
     pass
+
+def create_widget():
+    core.create_widget(gv_tool.InputBar)
+
+def widget_created(widget):
+    core.register_widget(widget,gv_tool.InputBar,gv_tool.Window)
+    core.connect_widget(widget,gv_tool.InputBar)
+
+def add_node():
+    core.add_node_by_lineinput(gv_tool.InputBar,gv_tool.SceneView,gv_tool.Node,tool.Project)
