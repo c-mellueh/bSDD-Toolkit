@@ -6,7 +6,8 @@ import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.settings import ui, trigger
 from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import Signal, Qt
+from PySide6.QtWidgets import QWidget
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.settings.prop import GraphViewerSettingsProperties
@@ -15,7 +16,7 @@ import qtawesome as qta
 
 
 class Signals(WidgetSignals):
-    toggle_sidebar_requested = Signal()
+    expanded_changed = Signal(bool)
 
 
 class Settings(WidgetTool):
@@ -38,9 +39,13 @@ class Settings(WidgetTool):
         return super().connect_internal_signals()
 
     @classmethod
+    def get_widget(cls) -> ui.SettingsWidget:
+        return cls.get_widgets()[0]
+
+    @classmethod
     def connect_widget_signals(cls, widget: ui.SettingsWidget):
         super().connect_widget_signals(widget)
-        widget.expand_button.clicked.connect(cls.request_toggle_sidebar)
+        widget.expand_button.clicked.connect(cls.toggle_sidebar)
 
     @classmethod
     def create_button_widget(cls):
@@ -61,8 +66,8 @@ class Settings(WidgetTool):
         return super().create_widget(*args, **kwargs)
 
     @classmethod
-    def request_toggle_sidebar(cls):
-        cls.signals.toggle_sidebar_requested.emit()
+    def toggle_sidebar(cls):
+        cls.set_expanded(not cls.is_expanded())
 
     @classmethod
     def set_expanded_width(cls, value: int):
@@ -74,8 +79,52 @@ class Settings(WidgetTool):
 
     @classmethod
     def set_expanded(cls, value: bool):
+        if cls.is_expanded() == value:
+            return
+
         cls.get_properties().is_expanded = value
+        widget = cls.get_widget()
+        widget.expand_button.setCheckable(value)
+        cls.apply_expanded_state()
+        cls.signals.expanded_changed.emit(value)
 
     @classmethod
     def is_expanded(cls) -> bool:
         return cls.get_properties().is_expanded
+
+    @classmethod
+    def apply_expanded_state(cls) -> None:
+        widget = cls.get_widget()
+        widget.scroll_area.setVisible(cls.is_expanded())
+        widget.expand_button.setArrowType(
+            Qt.ArrowType.LeftArrow if not cls.is_expanded() else Qt.ArrowType.RightArrow
+        )
+        widget.updateGeometry()
+
+    @classmethod
+    def add_content_widget(cls, widget: QWidget, index=None) -> None:
+        """Append an arbitrary widget below the edge-type panel inside the
+        scroll area. Useful for adding legends or extra controls.
+        """
+        # Insert before the final stretch, so it stays at the bottom
+        # but above the stretchable spacer
+        widget = cls.get_widget()
+        if index is None:
+            index = widget.scroll_layout.count() - 1
+            if index < 0:
+                index = 0
+        widget.scroll_layout.insertWidget(index, widget)
+
+    @classmethod
+    def position_and_resize(
+        cls, viewport_width: int, viewport_height: int, margin: int = 6
+    ) -> None:
+        widget = cls.get_widget()
+        """Anchor to top-right of the given viewport size and stretch to full height."""
+        width = widget.expand_button.width() + (
+            cls.get_expanded_width() if cls.is_expanded() else 0
+        )
+        x = max(0, viewport_width - width - margin)
+        y = margin
+        h = max(0, viewport_height - 2 * margin)
+        widget.setGeometry(x, y, width, h)

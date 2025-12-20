@@ -633,7 +633,7 @@ class Edge(BaseTool):
 
     @classmethod
     def is_edge_type_enabled(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
-        cls.get_edge_style_map(edge_type).get("enabled")
+        return cls.get_edge_style_map(edge_type).get("enabled")
 
     @classmethod
     def create_edge_type_settings_widget(cls) -> ui.EdgeTypeSettingsWidget:
@@ -652,7 +652,7 @@ class Edge(BaseTool):
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(6)
             icon = ui._EdgeLegendIcon(str(edge_type))
-            icon.edgeTypeActivated.connect(cls.signals.activate_edgetype_requested)
+            icon.edgeTypeActivated.connect(cls.signals.activate_edgetype_requested.emit)
             name = cls.get_edgetype_name(edge_type)
             label = QLabel(name)
             label.setToolTip(name)

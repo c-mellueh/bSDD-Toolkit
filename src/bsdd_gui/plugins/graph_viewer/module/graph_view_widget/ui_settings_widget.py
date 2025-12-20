@@ -28,7 +28,7 @@ from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.constants import (
 )
 
 from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
-from .qt import ui_Buttons
+#from .qt import ui_Buttons
 
 if TYPE_CHECKING:
     from .ui import GraphWindow
@@ -63,7 +63,7 @@ class _SettingsWidget(QFrame):
         self.setAttribute(Qt.WA_TranslucentBackground, False)
 
 
-class ButtonWidget(_SettingsWidget, ui_Buttons.Ui_Form):
+class ButtonWidget(_SettingsWidget,):
     """Floating settings panel for Graph physics sliders."""
 
     def __init__(self, parent=None):

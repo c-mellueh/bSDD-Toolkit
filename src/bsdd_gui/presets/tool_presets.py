@@ -201,9 +201,10 @@ class WidgetTool(BaseTool):
     @classmethod
     def register_widget(cls, widget: FieldWidget):
         logging.info(f"Register {widget}")
-
         cls.get_properties().widgets.append(widget)
         cls.request_retranslate()
+        cls.signals.widget_created.emit(widget)
+
 
     @classmethod
     def unregister_widget(cls, widget: FieldWidget):
@@ -304,7 +305,6 @@ class FieldTool(WidgetTool):
 
     @classmethod
     def register_widget(cls, widget: FieldWidget):
-        cls.signals.widget_created.emit(widget)
         super().register_widget(widget)
         cls.get_properties().field_getter[widget] = dict()
         cls.get_properties().field_setter[widget] = dict()

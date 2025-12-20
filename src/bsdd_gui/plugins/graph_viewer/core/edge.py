@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.edge import ui, constants
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
     from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
+    from bsdd_gui.plugins.graph_viewer.module.settings import ui as setting_ui
 
 
 def connect_signals(
@@ -23,10 +24,10 @@ def connect_signals(
     edge.signals.new_edge_created.connect(scene_view.add_item)
 
     edge.connect_internal_signals()
-    settings.signals.widget_created.connect(lambda sw: edge.add_settings(sw, edge, settings))
+    settings.signals.widget_created.connect(lambda sw: add_settings(edge, settings))
 
 
-def add_settings(parent_widget, edge: Type[gv_tool.Edge], settings: Type[gv_tool.Settings]):
+def add_settings(edge: Type[gv_tool.Edge], settings: Type[gv_tool.Settings]):
     type_widget = edge.create_edge_type_settings_widget()
 
     for row in edge.create_edge_toggles():
@@ -34,6 +35,8 @@ def add_settings(parent_widget, edge: Type[gv_tool.Edge], settings: Type[gv_tool
 
     routing_widget = edge.create_edge_routing_settings_widget()
     edge.connect_settings_widgets(type_widget, routing_widget)
+    settings.add_content_widget(routing_widget)
+    settings.add_content_widget(type_widget)
 
 
 def set_active_edge(

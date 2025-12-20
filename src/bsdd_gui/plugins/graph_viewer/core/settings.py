@@ -8,14 +8,32 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.settings import ui
 
 
-def connect_signals(settings: Type[gv_tool.Settings], window: Type[gv_tool.Window]):
+def connect_signals(
+    settings: Type[gv_tool.Settings],
+    window: Type[gv_tool.Window],
+    scene_view: Type[gv_tool.SceneView],
+):
     settings.connect_internal_signals()
-    window.signals.widget_created.connect(lambda w: create_widget(w, settings, window))
+
+    def reposition(*_, **__):
+        viewport = scene_view.get_view().viewport()
+        margin = 6
+        settings.position_and_resize(viewport.width(), viewport.height(), margin)
+
+    window.signals.widget_created.connect(lambda w: create_widget(settings, scene_view))
+    settings.signals.expanded_changed.connect(reposition)
+    window.signals.widget_resized.connect(reposition)
 
 
-def create_widget(parent_window, settings: Type[gv_tool.Settings], window: Type[gv_tool.Window]):
-    widget = settings.create_widget(parent_window)
-    button_widget = widget.layout().add
+def create_widget(settings: Type[gv_tool.Settings], scene_view: Type[gv_tool.SceneView]):
+    viewport = scene_view.get_view().viewport()
+    widget = settings.create_widget(viewport)
+    button_widget = settings.create_button_widget()
+    widget.scroll_layout.addWidget(button_widget)
+    settings.apply_expanded_state()
+    widget.setParent(viewport)
+    widget.show()
+    settings.position_and_resize(viewport.width(), viewport.height())
 
 
 def register_widget(widget: ui.SettingsWidget, settings: Type[gv_tool.Settings]):

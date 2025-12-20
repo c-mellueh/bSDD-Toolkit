@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSpacerItem,
 )
-
+from bsdd_gui.presets.ui_presets import BaseWidget
 from .qt import ui_Buttons, ui_Widget
 from . import constants, trigger
 
@@ -41,9 +41,12 @@ class ButtonWidget(_SettingsWidget, ui_Buttons.Ui_Form):
 
 
 class SettingsWidget(QWidget, ui_Widget.Ui_SettingsSidebar):
+    closed = Signal()
+    opened = Signal()
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
+        #self.setWindowFlag(Qt.WindowType.Widget,False)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.scroll_area.setStyleSheet(constants.SETTINGS_STYLE_SHEET)
@@ -101,18 +104,11 @@ class SettingsSidebar(QWidget):
             parent=None,
         )
         self._button_settings = ButtonWidget(None)
-        self._scroll_layout.addWidget(self._button_settings)
-        self._scroll_layout.addWidget(self._routing_settings)
         self._scroll_layout.addWidget(self._node_types_panel)
-        self._scroll_layout.addWidget(self._edge_types_panel)
         self._scroll_layout.addWidget(self._view_settings)
-
-        self._scroll_layout.addStretch(1)
-
         self._scroll.setWidget(self._scroll_content)
         root.addWidget(self._scroll, 1)
 
-        self._apply_expanded_state()
 
     # Public API
     def get_flags(self) -> Dict[str, bool]:
@@ -121,65 +117,7 @@ class SettingsSidebar(QWidget):
     def set_flag(self, edge_type: str, value: bool) -> None:
         self._edge_types_panel.set_flag(edge_type, value)
 
-    def add_content_widget(self, widget: QWidget) -> None:
-        """Append an arbitrary widget below the edge-type panel inside the
-        scroll area. Useful for adding legends or extra controls.
-        """
-        # Insert before the final stretch, so it stays at the bottom
-        # but above the stretchable spacer
-        stretch_index = self._scroll_layout.count() - 1
-        if stretch_index < 0:
-            stretch_index = 0
-        self._scroll_layout.insertWidget(stretch_index, widget)
 
-    def set_expanded(self, expanded: bool) -> None:
-        if self._expanded == bool(expanded):
-            return
-        self._expanded = bool(expanded)
-        self._btn.setChecked(self._expanded)
-        self._apply_expanded_state()
-        # Notify owner (e.g., GraphWindow) to re-anchor on the right edge
-        try:
-            self.expandedChanged.emit(self._expanded)
-        except Exception:
-            pass
-
-    def toggle(self) -> None:
-        self.set_expanded(not self._expanded)
-
-    def position_and_resize(
-        self, viewport_width: int, viewport_height: int, margin: int = 0
-    ) -> None:
-        """Anchor to top-right of the given viewport size and stretch to full height."""
-        width = self._btn.width() + (self._expanded_width if self._expanded else 0)
-        x = max(0, viewport_width - width - margin)
-        y = margin
-        h = max(0, viewport_height - 2 * margin)
-        self.setGeometry(x, y, width, h)
-
-    # Internal
-    def _apply_expanded_state(self) -> None:
-        self._scroll.setVisible(self._expanded)
-        self._btn.setArrowType(
-            Qt.ArrowType.LeftArrow if not self._expanded else Qt.ArrowType.RightArrow
-        )
-        self.updateGeometry()
-
-    def _on_toggle_clicked(self):
-        self.set_expanded(self._btn.isChecked())
-
-    def _on_edge_type_chosen(self, edge_type: str) -> None:
-        try:
-            # Toggle selection if same type chosen again
-            gw: GraphWindow = self.graph_window
-            if hasattr(gw, "get_active_edge_type") and callable(gw.get_active_edge_type):
-                cur = gw.get_active_edge_type()
-                if cur == edge_type:
-                    edge_type = None  # deselect
-            if hasattr(gw, "set_active_edge_type") and callable(gw.set_active_edge_type):
-                gw.set_active_edge_type(edge_type)
-        except Exception:
-            pass
 
     def _on_node_type_toggled(self, node_type: str, checked: bool) -> None:
         try:

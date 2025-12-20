@@ -74,7 +74,7 @@
         <height>924</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="scroll_layout" stretch="">
        <property name="spacing">
         <number>8</number>
        </property>
