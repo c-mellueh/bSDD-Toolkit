@@ -1,13 +1,24 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Callable, Iterable, Dict
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui.presets.ui_presets import BaseWidget
 from bsdd_json import BsddProperty, BsddClass
 from . import constants
-from PySide6.QtWidgets import QGraphicsObject, QApplication, QGraphicsItem
-from PySide6.QtCore import Qt, QPointF, QRectF, QPointF
+from PySide6.QtWidgets import (
+    QGraphicsObject,
+    QApplication,
+    QGraphicsItem,
+    QWidget,
+    QSizePolicy,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+)
+from PySide6.QtCore import Qt, QPointF, QRectF, QPointF, QSize, QCoreApplication
 from PySide6.QtGui import QColor, QBrush, QPen, QFontMetrics, QPainterPath, QPainter
 from bsdd_json.utils import class_utils as cl_utils
+from bsdd_gui.plugins.graph_viewer.module.settings.ui import _SettingsWidget
+from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 
 class Node(QGraphicsObject):
@@ -168,3 +179,94 @@ class Node(QGraphicsObject):
                     ):
                         edge.update_path()
         return super().itemChange(change, value)
+
+
+class NodeTypeSettingsWidget(_SettingsWidget):
+    """Panel mirroring EdgeTypeSettingsWidget, but for node types."""
+
+    def __init__(
+        self,
+        allowed_node_types: Iterable[str],
+        on_toggle: Callable[[str, bool], None],
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self._on_toggle = on_toggle
+        self._switches: Dict[str, ToggleSwitch] = {}
+
+        root = QVBoxLayout(self)
+        root.setContentsMargins(8, 8, 8, 8)
+        root.setSpacing(6)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
+        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Node Types"))
+        title.setObjectName("titleLabel")
+        root.addWidget(title)
+
+        for nt in allowed_node_types:
+            row = QHBoxLayout()
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(6)
+            icon = _NodeLegendIcon(str(nt))
+            _raw_label = constants.NODE_TYPE_LABEL_MAP.get(str(nt), str(nt))
+            _tr_label = QCoreApplication.translate("GraphViewSettings", _raw_label)
+            lbl = QLabel(_tr_label)
+            lbl.setToolTip(_tr_label)
+            sw = ToggleSwitch(checked=True)
+            sw.toggled.connect(self._make_handler(nt))
+            self._switches[nt] = sw
+            row.addWidget(icon, 0)
+            row.addWidget(lbl, 1)
+            row.addWidget(sw, 0, alignment=Qt.AlignRight)
+            root.addLayout(row)
+
+    def _make_handler(self, node_type: str):
+        def _handler(checked: bool):
+            if callable(self._on_toggle):
+                self._on_toggle(node_type, checked)
+
+        return _handler
+
+    def get_flags(self) -> Dict[str, bool]:
+        return {nt: sw.isChecked() for nt, sw in self._switches.items()}
+
+    def set_flag(self, node_type: str, value: bool) -> None:
+        sw = self._switches.get(node_type)
+        if sw is not None:
+            sw.blockSignals(True)
+            try:
+                sw.setChecked(bool(value))
+            finally:
+                sw.blockSignals(False)
+
+
+class _NodeLegendIcon(QWidget):
+    """Small icon preview of node color/shape."""
+
+    def __init__(self, node_type: str, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self._node_type = node_type
+        self.setFixedWidth(28)
+        self.setFixedHeight(14)
+
+    def sizeHint(self):
+        return QSize(28, 14)
+
+    def paintEvent(self, _):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing, True)
+        rect = self.rect().adjusted(2, 2, -2, -2)
+        color = constants.NODE_COLOR_MAP.get(self._node_type, QColor("#FF0000"))
+        shape = constants.NODE_SHAPE_MAP.get(self._node_type, "rect")
+        pen = QPen(color)
+        pen.setCosmetic(True)
+        p.setPen(pen)
+        brush = QBrush(Qt.BrushStyle.SolidPattern)
+        brush.setColor(color)
+        p.setBrush(brush)
+        if shape == "ellipse":
+            p.drawEllipse(rect)
+        elif shape == "roundrect":
+            p.drawRoundedRect(rect, 4, 4)
+        else:
+            p.drawRect(rect)
