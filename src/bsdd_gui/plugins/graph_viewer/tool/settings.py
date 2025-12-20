@@ -40,7 +40,10 @@ class Settings(WidgetTool):
 
     @classmethod
     def get_widget(cls) -> ui.SettingsWidget:
-        return cls.get_widgets()[0]
+        widgets = cls.get_widgets()
+        if len(widgets) == 0:
+            return None
+        return widgets[0]
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.SettingsWidget):
@@ -102,7 +105,7 @@ class Settings(WidgetTool):
         widget.updateGeometry()
 
     @classmethod
-    def add_content_widget(cls, widget: QWidget, index=None) -> None:
+    def add_content_widget(cls, input_widget: QWidget, index=None) -> None:
         """Append an arbitrary widget below the edge-type panel inside the
         scroll area. Useful for adding legends or extra controls.
         """
@@ -113,13 +116,14 @@ class Settings(WidgetTool):
             index = widget.scroll_layout.count() - 1
             if index < 0:
                 index = 0
-        widget.scroll_layout.addWidget(widget)
-
+        widget.scroll_layout.addWidget(input_widget)
     @classmethod
     def position_and_resize(
         cls, viewport_width: int, viewport_height: int, margin: int = 0
     ) -> None:
         widget = cls.get_widget()
+        if not widget:
+            return
         """Anchor to top-right of the given viewport size and stretch to full height."""
         width = widget.expand_button.width() + (
             cls.get_expanded_width() if cls.is_expanded() else 0

@@ -98,5 +98,5 @@ def paint_edge_legend(edge_legend: ui._EdgeLegendIcon, edge: Type[gv_tool.Edge])
     y = rect.center().y()
     x1 = rect.left() + 2
     x2 = rect.right() - 2
-    p.setPen(edge.create_pen_for_edgestyle())
+    p.setPen(edge.create_pen_for_edgestyle(edge_legend._edge_type))
     p.drawLine(int(x1), int(y), int(x2), int(y))

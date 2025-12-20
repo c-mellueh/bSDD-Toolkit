@@ -20,24 +20,28 @@ def connect_signals(
         margin = 6
         settings.position_and_resize(viewport.width(), viewport.height(), margin)
 
-    window.signals.widget_created.connect(lambda w: create_widget(settings, scene_view))
+    window.signals.widget_created.connect(lambda w: settings.create_widget())
     settings.signals.expanded_changed.connect(reposition)
     window.signals.widget_resized.connect(reposition)
+    window.signals.widget_closed.connect(lambda: settings.unregister_widget(settings.get_widget()))
 
 
-def create_widget(settings: Type[gv_tool.Settings], scene_view: Type[gv_tool.SceneView]):
+def create_widget(settings: Type[gv_tool.Settings]):
+    settings.create_widget()
+
+
+def register_widget(
+    widget: ui.SettingsWidget, settings: Type[gv_tool.Settings], scene_view: Type[gv_tool.SceneView]
+):
+    settings.register_widget(widget)
+
     viewport = scene_view.get_view().viewport()
-    widget = settings.create_widget(viewport)
     button_widget = settings.create_button_widget()
-    widget.scroll_layout.addWidget(button_widget)
+    settings.add_content_widget(button_widget)
     settings.apply_expanded_state()
     widget.setParent(viewport)
     widget.show()
-    settings.position_and_resize(viewport.width(), viewport.height(),6)
-
-
-def register_widget(widget: ui.SettingsWidget, settings: Type[gv_tool.Settings]):
-    settings.register_widget(widget)
+    settings.position_and_resize(viewport.width(), viewport.height(), 6)
 
 
 def connect_widget(widget: ui.SettingsWidget, setting: Type[gv_tool.Settings]):
