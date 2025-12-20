@@ -40,6 +40,7 @@ def add_settings(scene_view: Type[gv_tool.SceneView], settings: Type[gv_tool.Set
 def handle_widget_creation(widget: ui_window.GraphWidget, scene_view: Type[gv_tool.SceneView]):
     scene_view.set_view(widget.view)
     widget.view.setScene(scene_view.create_scene())
+    scene_view.create_scene_rect()
     scene_view.create_help_overlay()
     scene_view.connect_view()
 

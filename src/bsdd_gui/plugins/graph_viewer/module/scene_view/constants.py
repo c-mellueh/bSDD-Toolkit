@@ -14,3 +14,10 @@ ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
 
 PROPERTY_DRAG = "property_drag"
 CLASS_DRAG = "class_drag"
+
+# Scene sizing
+# Extra padding added around the bounding box of current nodes when
+# computing the scene rect, to allow panning into empty space.
+SCENE_PADDING = 800  # pixels
+# Minimum scene size to guarantee ample panning room even for tiny graphs.
+SCENE_MIN_SIZE = 100_000  # width and height in pixels

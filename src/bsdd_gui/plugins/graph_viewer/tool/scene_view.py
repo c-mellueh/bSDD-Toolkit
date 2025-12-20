@@ -6,7 +6,7 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 
 from bsdd_json import BsddClass, BsddDictionary, BsddProperty
-from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint, QObject, QPointF
+from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint, QObject, QPointF,QRectF
 from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QLabel, QGraphicsItem
 
@@ -188,6 +188,13 @@ class SceneView(BaseTool):
     @classmethod
     def set_pan_last_pos(cls, value: QPoint):
         cls.get_properties()._pan_last_pos = value
+
+    @classmethod
+    def create_scene_rect(cls):
+        # Fit to visible nodes if any, with generous padding and minimum size
+        scene = cls.get_scene()
+        half = constants.SCENE_MIN_SIZE / 2.0
+        scene.setSceneRect(QRectF(-half, -half, constants.SCENE_MIN_SIZE, constants.SCENE_MIN_SIZE))
 
     # --- Helper -------------------------------------------------------------
     @classmethod
