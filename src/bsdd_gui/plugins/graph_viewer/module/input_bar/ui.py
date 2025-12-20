@@ -7,7 +7,7 @@ from PySide6.QtCore import Signal
 from . import constants, trigger
 
 
-class InputBar(QWidget):
+class InputBar(BaseWidget):
     closed = Signal()
     opened = Signal()
 

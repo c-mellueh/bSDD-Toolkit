@@ -35,7 +35,7 @@ class _SettingsWidget(QFrame):
 
 
 
-class SettingsWidget(QWidget, ui_Widget.Ui_SettingsSidebar):
+class SettingsWidget(BaseWidget, ui_Widget.Ui_SettingsSidebar):
     closed = Signal()
     opened = Signal()
     def __init__(self, *args, **kwargs):

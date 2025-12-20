@@ -33,7 +33,7 @@ def retranslate_ui(window: Type[gv_tool.Window], main_window: Type[tool.MainWind
 def create_widget(data, parent, window: Type[gv_tool.Window], scene_view: Type[gv_tool.SceneView]):
     widget = window.show_widget(data, parent)
     scene_view.reposition_help_overlay()
-    window.signals.widget_resized.emit()
+    window.signals.widget_resized.emit(widget)
 
 def register_widget(widget: ui.GraphWidget, window: gv_tool.Window):
     window.register_widget(widget)

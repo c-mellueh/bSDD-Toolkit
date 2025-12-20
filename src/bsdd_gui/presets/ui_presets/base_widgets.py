@@ -15,7 +15,7 @@ class BaseWidget(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setWindowFlag(Qt.WindowType.Window, True)
+        #self.setWindowFlag(Qt.WindowType.Window, True)
 
     def hideEvent(self, event):
         result = super().hideEvent(event)
