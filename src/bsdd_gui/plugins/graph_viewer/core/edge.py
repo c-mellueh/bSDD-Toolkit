@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 def connect_signals(
     edge: Type[gv_tool.Edge],
+    node: Type[gv_tool.Node],
     window: Type[gv_tool.Window],
     scene_view: Type[gv_tool.SceneView],
     settings: Type[gv_tool.Settings],
@@ -25,13 +26,16 @@ def connect_signals(
 
     edge.connect_internal_signals()
     settings.signals.widget_created.connect(lambda sw: add_settings(edge, settings))
+    edge.signals.filter_changed.connect(
+        lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
+    )
 
 
 def add_settings(edge: Type[gv_tool.Edge], settings: Type[gv_tool.Settings]):
     type_widget = edge.create_edge_type_settings_widget()
 
     for row in edge.create_edge_toggles():
-        type_widget._root.addLayout(row)
+        type_widget.layout().addLayout(row)
 
     routing_widget = edge.create_edge_routing_settings_widget()
     edge.connect_settings_widgets(type_widget, routing_widget)

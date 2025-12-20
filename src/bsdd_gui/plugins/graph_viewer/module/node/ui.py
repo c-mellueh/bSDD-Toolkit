@@ -19,6 +19,7 @@ from PySide6.QtGui import QColor, QBrush, QPen, QFontMetrics, QPainterPath, QPai
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_gui.plugins.graph_viewer.module.settings.ui import _SettingsWidget
 from bsdd_gui.presets.ui_presets import ToggleSwitch
+from . import trigger
 
 
 class Node(QGraphicsObject):
@@ -185,60 +186,12 @@ class NodeTypeSettingsWidget(_SettingsWidget):
     """Panel mirroring EdgeTypeSettingsWidget, but for node types."""
 
     def __init__(
-        self,
-        allowed_node_types: Iterable[str],
-        on_toggle: Callable[[str, bool], None],
-        parent: QWidget | None = None,
-    ) -> None:
-        super().__init__(parent)
-        self._on_toggle = on_toggle
-        self._switches: Dict[str, ToggleSwitch] = {}
-
-        root = QVBoxLayout(self)
-        root.setContentsMargins(8, 8, 8, 8)
-        root.setSpacing(6)
+        self,*args,**kwargs   ) -> None:
+        super().__init__(*args,**kwargs  )
+        self.setLayout(QVBoxLayout(self))
+        self.layout().setContentsMargins(8, 8, 8, 8)
+        self.layout().setSpacing(6)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-
-        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Node Types"))
-        title.setObjectName("titleLabel")
-        root.addWidget(title)
-
-        for nt in allowed_node_types:
-            row = QHBoxLayout()
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(6)
-            icon = _NodeLegendIcon(str(nt))
-            _raw_label = constants.NODE_TYPE_LABEL_MAP.get(str(nt), str(nt))
-            _tr_label = QCoreApplication.translate("GraphViewSettings", _raw_label)
-            lbl = QLabel(_tr_label)
-            lbl.setToolTip(_tr_label)
-            sw = ToggleSwitch(checked=True)
-            sw.toggled.connect(self._make_handler(nt))
-            self._switches[nt] = sw
-            row.addWidget(icon, 0)
-            row.addWidget(lbl, 1)
-            row.addWidget(sw, 0, alignment=Qt.AlignRight)
-            root.addLayout(row)
-
-    def _make_handler(self, node_type: str):
-        def _handler(checked: bool):
-            if callable(self._on_toggle):
-                self._on_toggle(node_type, checked)
-
-        return _handler
-
-    def get_flags(self) -> Dict[str, bool]:
-        return {nt: sw.isChecked() for nt, sw in self._switches.items()}
-
-    def set_flag(self, node_type: str, value: bool) -> None:
-        sw = self._switches.get(node_type)
-        if sw is not None:
-            sw.blockSignals(True)
-            try:
-                sw.setChecked(bool(value))
-            finally:
-                sw.blockSignals(False)
-
 
 class _NodeLegendIcon(QWidget):
     """Small icon preview of node color/shape."""
@@ -253,20 +206,4 @@ class _NodeLegendIcon(QWidget):
         return QSize(28, 14)
 
     def paintEvent(self, _):
-        p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing, True)
-        rect = self.rect().adjusted(2, 2, -2, -2)
-        color = constants.NODE_COLOR_MAP.get(self._node_type, QColor("#FF0000"))
-        shape = constants.NODE_SHAPE_MAP.get(self._node_type, "rect")
-        pen = QPen(color)
-        pen.setCosmetic(True)
-        p.setPen(pen)
-        brush = QBrush(Qt.BrushStyle.SolidPattern)
-        brush.setColor(color)
-        p.setBrush(brush)
-        if shape == "ellipse":
-            p.drawEllipse(rect)
-        elif shape == "roundrect":
-            p.drawRoundedRect(rect, 4, 4)
-        else:
-            p.drawRect(rect)
+        trigger.paint_node_legend(self)

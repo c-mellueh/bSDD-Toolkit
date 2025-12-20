@@ -1,8 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
-from PySide6.QtCore import Signal, QPointF, QObject
-from PySide6.QtWidgets import QGraphicsItem, QWidget
+from PySide6.QtCore import Signal, QPointF, QObject, QCoreApplication, Qt
+from PySide6.QtWidgets import QGraphicsItem, QHBoxLayout, QLabel
+from PySide6.QtGui import QColor
 import random
 import bsdd_gui
 from bsdd_json import BsddDictionary, BsddClass, BsddProperty
@@ -14,6 +15,7 @@ from bsdd_json.utils import property_utils as prop_utils
 
 import bsdd_gui.plugins.graph_viewer.tool as gv_tool
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
+from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.prop import GraphViewerNodeProperties
@@ -28,6 +30,7 @@ class Signals(QObject):
     node_created = Signal(ui.Node)
     remove_node_requested = Signal(ui.Node)
     node_double_clicked = Signal(ui.Node)
+    filter_changed = Signal(str, bool)
 
 
 class Node(BaseTool):
@@ -115,6 +118,14 @@ class Node(BaseTool):
     # --- Helper -------------------------------------------------------------
 
     @classmethod
+    def get_color(cls, node_type: constants.ALLOWED_NODE_TYPES_TYPING):
+        return cls.get_properties().color_map.get(node_type, constants.NODE_COLOR_DEFAULT)
+
+    @classmethod
+    def get_shape(cls, node_type: constants.ALLOWED_NODE_TYPES_TYPING):
+        return cls.get_properties().shape_map.get(node_type, constants.SHAPE_STYLE_RECT)
+
+    @classmethod
     def _node_from_item(cls, item: QGraphicsItem) -> Node | None:
         it = item
         while it is not None:
@@ -137,6 +148,11 @@ class Node(BaseTool):
     @classmethod
     def set_filters(cls, key: str, value: bool):
         cls.get_properties().filters[key] = value
+        cls.signals.filter_changed.emit(key, value)
+
+    @classmethod
+    def toggle_filter_state(cls, node_type: str):
+        cls.set_filters(node_type, not cls.get_filter_state(node_type))
 
     @classmethod
     def get_nodes(cls):
@@ -175,5 +191,47 @@ class Node(BaseTool):
             uri_dict[uri] = node
         return uri_dict
 
+    @classmethod
     def emit_node_double_clicked(cls, node: ui.Node):
         cls.signals.node_double_clicked.emit(node)
+
+    @classmethod
+    def get_node_name(cls, node_type: constants.ALLOWED_NODE_TYPES_TYPING):
+        l = constants.NODE_TYPE_LABEL_MAP.get(str(node_type), str(node_type))
+        return QCoreApplication.translate("GraphViewer", l)
+
+    @classmethod
+    def get_allowed_node_types(cls):
+        return cls.get_properties().allowed_nodes_types
+
+    @classmethod
+    def create_settings_widget(cls):
+        widget = ui.NodeTypeSettingsWidget()
+        cls.get_properties().settings_widget = widget
+        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Node Types"))
+        title.setObjectName("titleLabel")
+        widget.layout().addWidget(title)
+        return widget
+
+    @classmethod
+    def create_node_toggles(cls):
+        rows = list()
+        for node_type in cls.get_allowed_node_types():
+            row = QHBoxLayout()
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(6)
+            icon = ui._NodeLegendIcon(str(node_type))
+            name = cls.get_node_name(node_type)
+            lbl = QLabel(name)
+            lbl.setToolTip(name)
+            sw = ToggleSwitch(checked=True)
+            sw.toggled.connect(lambda _,nt=node_type: cls.toggle_filter_state(nt))
+            row.addWidget(icon, 0)
+            row.addWidget(lbl, 1)
+            row.addWidget(sw, 0, alignment=Qt.AlignRight)
+            rows.append(row)
+        return rows
+
+    @classmethod
+    def create_pen(cls, node_type: constants.ALLOWED_NODE_TYPES_TYPING):
+        cls.get_col

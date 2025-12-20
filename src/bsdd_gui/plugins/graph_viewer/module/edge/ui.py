@@ -271,31 +271,14 @@ class EdgeTypeSettingsWidget(_SettingsWidget):
     Parent should typically be the QGraphicsView viewport, so it overlays
     the scene and can be anchored in the bottom-right corner by the owner.
     """
-
-    # Emitted when a legend icon is double-clicked to choose creation type
-    edgeTypeActivated = Signal(str)
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self._root = QVBoxLayout(self)
-        self._root.setContentsMargins(8, 8, 8, 8)
-        self._root.setSpacing(6)
+        self.setLayout(QVBoxLayout(self))
+        self.layout().setContentsMargins(8, 8, 8, 8)
+        self.layout().setSpacing(6)
 
         # Ensure it can stretch vertically when hosted in a sidebar
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        self.setLayout(self._root)
-
-    # def get_flags(self) -> Dict[str, bool]:
-    #     return {et: sw.isChecked() for et, sw in self._switches.items()}
-
-    # def set_flag(self, edge_type: str, value: bool) -> None:
-    #     sw = self._switches.get(edge_type)
-    #     if sw is not None:
-    #         sw.blockSignals(True)
-    #         try:
-    #             sw.setChecked(bool(value))
-    #         finally:
-    #             sw.blockSignals(False)
 
 
 class _EdgeLegendIcon(QWidget):

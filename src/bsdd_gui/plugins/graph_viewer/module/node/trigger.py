@@ -10,7 +10,9 @@ if TYPE_CHECKING:
 
 
 def activate():
-    core.connect_signals(gv_tool.Node, gv_tool.Edge, gv_tool.SceneView, tool.Project)
+    core.connect_signals(
+        gv_tool.Node, gv_tool.Edge, gv_tool.SceneView, gv_tool.Settings, tool.Project
+    )
 
 
 def deactivate():
@@ -29,3 +31,7 @@ def node_double_clicked(node):
     core.node_double_clicked(
         node, tool.PropertyTableWidget, tool.ClassTreeView, tool.MainWindowWidget
     )
+
+
+def paint_node_legend(node_legend):
+    core.paint_node_legend(node_legend, gv_tool.Node)

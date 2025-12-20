@@ -1,8 +1,13 @@
 from __future__ import annotations
-from . import constants,ui
+from . import constants, ui
 
 
 class GraphViewerNodeProperties:
     def __init__(self):
         self.filters: dict[str, bool] = {nt: True for nt in constants.ALLOWED_NODE_TYPES}
-        self.nodes:list[ui.Node] = list()
+        self.nodes: list[ui.Node] = list()
+        self.settings_widget: ui.NodeTypeSettingsWidget = None
+        self.allowed_nodes_types = constants.ALLOWED_NODE_TYPES
+
+        self.color_map = constants.NODE_COLOR_MAP
+        self.shape_map = constants.NODE_SHAPE_MAP

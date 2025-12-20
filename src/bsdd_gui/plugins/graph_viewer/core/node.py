@@ -4,6 +4,8 @@ import webbrowser
 
 
 from bsdd_gui.plugins.graph_viewer.module.node import constants
+from PySide6.QtGui import QPainter, QPen, QBrush
+from PySide6.QtCore import Qt
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -17,6 +19,7 @@ def connect_signals(
     node: Type[gv_tool.Node],
     edge: Type[gv_tool.Edge],
     scene_view: Type[gv_tool.SceneView],
+    settings: Type[gv_tool.Settings],
     project: Type[tool.Project],
 ):
     node.signals.remove_edge_requested.connect(
@@ -31,6 +34,17 @@ def connect_signals(
 
     node.signals.node_created.connect(lambda n: node.get_properties().nodes.append(n))
     node.signals.node_created.connect(scene_view.add_item)
+    settings.signals.widget_created.connect(lambda sw: add_settings(node, settings))
+    node.signals.filter_changed.connect(
+        lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
+    )
+
+
+def add_settings(node: Type[gv_tool.Node], settings: Type[gv_tool.Settings]):
+    widget = node.create_settings_widget()
+    for row in node.create_node_toggles():
+        widget.layout().addLayout(row)
+    settings.add_content_widget(widget)
 
 
 def node_double_clicked(
@@ -60,3 +74,23 @@ def node_double_clicked(
         uri = bsdd_class.OwnedUri
         if uri.startswith("http://") or uri.startswith("https://"):
             webbrowser.open(uri)
+
+
+def paint_node_legend(node_legend: ui._NodeLegendIcon, node: Type[gv_tool.Node]):
+    p = QPainter(node_legend)
+    p.setRenderHint(QPainter.Antialiasing, True)
+    rect = node_legend.rect().adjusted(2, 2, -2, -2)
+    color = node.get_color(node_legend._node_type)
+    shape = node.get_shape(node_legend._node_type)
+    pen = QPen(color)
+    pen.setCosmetic(True)
+    p.setPen(pen)
+    brush = QBrush(Qt.BrushStyle.SolidPattern)
+    brush.setColor(color)
+    p.setBrush(brush)
+    if shape == constants.SHAPE_STYPE_ELLIPSE:
+        p.drawEllipse(rect)
+    elif shape == constants.SHAPE_STYLE_ROUNDED_RECT:
+        p.drawRoundedRect(rect, 4, 4)
+    else:
+        p.drawRect(rect)

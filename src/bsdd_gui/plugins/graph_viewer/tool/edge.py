@@ -43,6 +43,7 @@ class Signals(QObject):
     class_property_removed = Signal(BsddClassProperty, BsddClass)
     property_relation_removed = Signal(BsddPropertyRelation)
     edge_hide_requested = Signal(str)
+    filter_changed = Signal(str,bool)
 
 
 class Edge(BaseTool):
@@ -194,6 +195,11 @@ class Edge(BaseTool):
     @classmethod
     def set_filters(cls, key: constants.ALLOWED_EDGE_TYPES_TYPING, value: bool):
         cls.get_properties().filters[key] = value
+        cls.signals.filter_changed.emit(key,value)
+
+    @classmethod
+    def toggle_filter_state(cls, edge_type: str):
+        cls.set_filters(edge_type, not cls.get_filter_state(edge_type))
 
     @classmethod
     def get_active_edge(cls) -> constants.ALLOWED_EDGE_TYPES_TYPING | None:
@@ -586,10 +592,6 @@ class Edge(BaseTool):
         cls.signals.edge_hide_requested(edge_type)
 
     @classmethod
-    def toggle_edge_type_visibility(cls, edge_type: str):
-        pass  # TODO
-
-    @classmethod
     def create_pen_for_edgestyle(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
         color = cls.get_edge_color(edge_type)
         width = cls.get_edge_width(edge_type)
@@ -641,7 +643,7 @@ class Edge(BaseTool):
         cls.get_properties().edge_type_settings_widget = widget
         title = QLabel(QCoreApplication.translate("GraphViewSettings", "Edge Types"))
         title.setObjectName("titleLabel")
-        widget._root.addWidget(title)
+        widget.layout().addWidget(title)
         return widget
 
     @classmethod
@@ -657,7 +659,7 @@ class Edge(BaseTool):
             label = QLabel(name)
             label.setToolTip(name)
             switch = ToggleSwitch(checked=True)
-            switch.toggled.connect(lambda et=edge_type: cls.toggle_edge_type_visibility(et))
+            switch.toggled.connect(lambda _,et=edge_type: cls.toggle_filter_state(et))
             switch.setChecked(cls.is_edge_type_enabled(edge_type))
             row.addWidget(icon, 0)
             row.addWidget(label, 1)
