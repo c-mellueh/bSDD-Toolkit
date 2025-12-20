@@ -15,7 +15,7 @@ class BaseWidget(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #self.setWindowFlag(Qt.WindowType.Window, True)
+        # self.setWindowFlag(Qt.WindowType.Window, True)
 
     def hideEvent(self, event):
         result = super().hideEvent(event)
@@ -38,6 +38,13 @@ class BaseWidget(QWidget):
         return result
 
 
+class BaseWindow(BaseWidget):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setWindowFlag(Qt.WindowType.Window, True)
+
+
 class BaseDialog(QDialog):
 
     def __init__(self, widget: FieldWidget, parent, *args, **kwargs):
@@ -52,7 +59,7 @@ class BaseDialog(QDialog):
         self.setWindowIcon(get_icon())
 
 
-class FieldWidget(BaseWidget):
+class FieldWidget(BaseWindow):
 
     def __init__(self, bsdd_data, *args, **kwargs):
         super().__init__(*args, **kwargs)

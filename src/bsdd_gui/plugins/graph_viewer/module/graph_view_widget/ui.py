@@ -34,7 +34,7 @@ from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.constants import (
 from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.ui_settings_widget import (
     SettingsSidebar,
 )
-from bsdd_gui.presets.ui_presets import BaseWidget
+from bsdd_gui.presets.ui_presets import BaseWindow
 from bsdd_gui import tool
 from typing import TYPE_CHECKING
 import qtawesome as qta
@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 from bsdd_gui.resources.icons import get_icon
 
 
-class GraphWindow(BaseWidget):
+class GraphWindow(BaseWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
 

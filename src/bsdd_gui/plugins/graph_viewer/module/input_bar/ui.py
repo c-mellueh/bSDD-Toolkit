@@ -8,9 +8,6 @@ from . import constants, trigger
 
 
 class InputBar(BaseWidget):
-    closed = Signal()
-    opened = Signal()
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setObjectName("nodeInputBar")

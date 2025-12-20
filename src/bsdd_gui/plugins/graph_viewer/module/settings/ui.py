@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
     QSpacerItem,
 )
 from bsdd_gui.presets.ui_presets import BaseWidget
-from .qt import  ui_Widget
+from .qt import ui_Widget
 from . import constants, trigger
 
 if TYPE_CHECKING:
@@ -32,16 +32,12 @@ class _SettingsWidget(QFrame):
         self.setAttribute(Qt.WA_TranslucentBackground, False)
 
 
-
-
-
 class SettingsWidget(BaseWidget, ui_Widget.Ui_SettingsSidebar):
-    closed = Signal()
-    opened = Signal()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
-        #self.setWindowFlag(Qt.WindowType.Widget,False)
+        # self.setWindowFlag(Qt.WindowType.Widget,False)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.scroll_area.setStyleSheet(constants.SETTINGS_STYLE_SHEET)
@@ -105,15 +101,12 @@ class SettingsSidebar(QWidget):
         self._scroll.setWidget(self._scroll_content)
         root.addWidget(self._scroll, 1)
 
-
     # Public API
     def get_flags(self) -> Dict[str, bool]:
         return self._edge_types_panel.get_flags()
 
     def set_flag(self, edge_type: str, value: bool) -> None:
         self._edge_types_panel.set_flag(edge_type, value)
-
-
 
     def _on_node_type_toggled(self, node_type: str, checked: bool) -> None:
         try:

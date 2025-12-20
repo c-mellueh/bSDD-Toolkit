@@ -3,17 +3,18 @@ from typing import Any
 from PySide6.QtWidgets import QWidget, QAbstractItemView
 
 from PySide6.QtCore import QObject, Signal
-from bsdd_gui.presets.ui_presets import FieldWidget, BaseDialog, BaseWidget
+from bsdd_gui.presets.ui_presets import FieldWidget, BaseDialog, BaseWindow
 
 
 class WidgetSignals(QObject):
     widget_requested = Signal()
-    widget_closed = Signal(BaseWidget)
-    widget_created = Signal(BaseWidget)
-    widget_shown = Signal(BaseWidget)
-    widget_hidden = Signal(BaseWidget)
-    widget_resized = Signal(BaseWidget)
-    widget_entered = Signal(BaseWidget)
+    widget_closed = Signal(BaseWindow)
+    widget_created = Signal(BaseWindow)
+    widget_shown = Signal(BaseWindow)
+    widget_hidden = Signal(BaseWindow)
+    widget_resized = Signal(BaseWindow)
+    widget_entered = Signal(BaseWindow)
+
 
 class FieldSignals(WidgetSignals):
     field_changed = Signal(

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from bsdd_gui.resources.icons import get_icon
-from bsdd_gui.presets.ui_presets import BaseWidget
+from bsdd_gui.presets.ui_presets import BaseWindow
 from bsdd_gui.plugins.graph_viewer.module.settings.ui import _SettingsWidget
 
 from typing import Callable, Dict, Iterable, TYPE_CHECKING
@@ -31,6 +31,7 @@ from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.constants import (
 )
 
 from bsdd_gui.presets.ui_presets.toggle_switch import ToggleSwitch
+
 
 class SettingsWidget(_SettingsWidget):
     """Floating settings panel for Graph physics sliders."""

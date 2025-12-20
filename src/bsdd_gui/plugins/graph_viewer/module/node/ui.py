@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Callable, Iterable, Dict
 from bsdd_gui.resources.icons import get_icon
-from bsdd_gui.presets.ui_presets import BaseWidget
+from bsdd_gui.presets.ui_presets import BaseWindow
 from bsdd_json import BsddProperty, BsddClass
 from . import constants
 from PySide6.QtWidgets import (
@@ -185,13 +185,13 @@ class Node(QGraphicsObject):
 class NodeTypeSettingsWidget(_SettingsWidget):
     """Panel mirroring EdgeTypeSettingsWidget, but for node types."""
 
-    def __init__(
-        self,*args,**kwargs   ) -> None:
-        super().__init__(*args,**kwargs  )
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.setLayout(QVBoxLayout(self))
         self.layout().setContentsMargins(8, 8, 8, 8)
         self.layout().setSpacing(6)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
 
 class _NodeLegendIcon(QWidget):
     """Small icon preview of node color/shape."""
