@@ -186,8 +186,7 @@ def create_widget(
 def enter_window(
     window: ui.GraphWindow, graph_view: gv_tool.GraphViewWidget, project: Type[tool.Project]
 ):
-    graph_view.update_add_completer(project.get())
-
+    return #Moved to core.Inputbar
 
 def register_widget(widget, graph_view: Type[gv_tool.GraphViewWidget]):
     graph_view.register_widget(widget)

@@ -1,10 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
-
+from bsdd_json import BsddDictionary
 import bsdd_gui
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QCompleter
 from bsdd_gui.plugins.graph_viewer.module.input_bar import ui, trigger
 from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
+from bsdd_json.utils import class_utils
+from bsdd_json.utils import property_utils as prop_utils
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.input_bar.prop import GraphViewerInputBarProperties
@@ -51,5 +55,20 @@ class InputBar(WidgetTool):
     def clear(cls):
         widget = cls.get_widget()
         if not widget:
-            return 
+            return
         widget.line_edit.clear()
+
+    @classmethod
+    def update_completer(cls, bsdd_dictionary: BsddDictionary):
+        if not bsdd_dictionary:
+            return
+        entries = list(class_utils.get_all_class_codes(bsdd_dictionary).keys())
+        entries += list(prop_utils.get_all_property_codes(bsdd_dictionary).keys())
+        widget = cls.get_widget()
+        if not widget:
+            return
+        completer = QCompleter(entries)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setFilterMode(Qt.MatchContains)  # substring match
+        completer.setCompletionMode(QCompleter.PopupCompletion)
+        widget.line_edit.setCompleter(completer)

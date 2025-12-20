@@ -197,6 +197,10 @@ class WidgetTool(BaseTool):
     @classmethod
     def connect_widget_signals(cls, widget: FieldWidget):
         widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
+        widget.shown.connect(lambda w=widget: cls.signals.widget_shown.emit(w))
+        widget.hidden.connect(lambda w=widget: cls.signals.widget_hidden.emit(w))
+        widget.resized.connect(lambda w=widget: cls.signals.widget_resized.emit(w))
+        widget.entered.connect(lambda w=widget: cls.signals.widget_entered.emit(w))
 
     @classmethod
     def register_widget(cls, widget: FieldWidget):
@@ -204,7 +208,6 @@ class WidgetTool(BaseTool):
         cls.get_properties().widgets.append(widget)
         cls.request_retranslate()
         cls.signals.widget_created.emit(widget)
-
 
     @classmethod
     def unregister_widget(cls, widget: FieldWidget):

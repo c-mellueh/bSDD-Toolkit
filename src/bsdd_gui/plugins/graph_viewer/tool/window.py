@@ -17,8 +17,7 @@ class Signals(FieldSignals):
     toggle_running_requested = Signal()
     delete_selection_requested = Signal()
     active_edgetype_requested = Signal(object)
-    widget_resized = Signal()
-
+    shown  = Signal()
 
 class Window(ActionTool, FieldTool):
     signals = Signals()
@@ -51,7 +50,6 @@ class Window(ActionTool, FieldTool):
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.GraphWidget):
-        widget.window_resized.connect(cls.signals.widget_resized.emit)
         return super().connect_widget_signals(widget)
 
     @classmethod

@@ -8,9 +8,34 @@ from bsdd_gui.resources.icons import get_icon
 class BaseWidget(QWidget):
     closed = Signal()
     opened = Signal()
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
+    hidden = Signal()
+    shown = Signal()
+    resized = Signal()
+    entered = Signal()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.setWindowFlag(Qt.WindowType.Window, True)
+
+    def hideEvent(self, event):
+        result = super().hideEvent(event)
+        self.hidden.emit()
+        return result
+
+    def showEvent(self, event):
+        result = super().showEvent(event)
+        self.shown.emit()
+        return result
+
+    def resizeEvent(self, event):
+        result = super().resizeEvent(event)
+        self.resized.emit()
+        return result
+
+    def enterEvent(self, event):
+        result = super().enterEvent(event)
+        self.entered.emit()
+        return result
 
 
 class BaseDialog(QDialog):

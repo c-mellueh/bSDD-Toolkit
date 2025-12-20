@@ -11,7 +11,8 @@ if TYPE_CHECKING:
 def connect_signals(phyiscs: Type[gv_tool.Physics], window: Type[gv_tool.Window]):
     phyiscs.connect_internal_signals()
     window.signals.widget_created.connect(lambda _: build_phyiscs(phyiscs))
-
+    window.signals.widget_hidden.connect(phyiscs.handle_hide)
+    window.signals.widget_shown.connect(phyiscs.handle_shown)
 
 def build_phyiscs(phyiscs: Type[gv_tool.Physics]):
     ph = phyiscs.create_physics()

@@ -9,7 +9,6 @@ from PySide6.QtCore import Signal
 
 
 class GraphWidget(FieldWidget, Ui_Form):
-    window_resized = Signal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -17,5 +16,4 @@ class GraphWidget(FieldWidget, Ui_Form):
         trigger.widget_created(self)
 
     def resizeEvent(self, event):
-        self.window_resized.emit()
         return super().resizeEvent(event)

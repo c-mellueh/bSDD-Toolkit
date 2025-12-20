@@ -57,3 +57,24 @@ class Physics(BaseTool):
     @classmethod
     def get_running(cls) -> bool:
         return cls.get_properties().running
+
+    @classmethod
+    def get_auto_paused(cls) -> bool:
+        return cls.get_properties().auto_paused
+
+    @classmethod
+    def set_auto_paused(cls, value: bool):
+        cls.get_properties().auto_paused = value
+
+    @classmethod
+    def handle_hide(cls,_=None):
+        if not cls.get_running():
+            return
+        cls.set_running(False)
+        cls.set_auto_paused(True)
+
+    @classmethod
+    def handle_shown(cls,_=None):
+        if cls.get_auto_paused():
+            cls.set_running(True)
+            cls.set_auto_paused(False)

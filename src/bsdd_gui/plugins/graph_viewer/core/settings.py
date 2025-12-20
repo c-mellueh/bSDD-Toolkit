@@ -23,6 +23,7 @@ def connect_signals(
     window.signals.widget_created.connect(lambda w: settings.create_widget())
     settings.signals.expanded_changed.connect(reposition)
     window.signals.widget_resized.connect(reposition)
+    window.signals.widget_shown.connect(reposition)
     window.signals.widget_closed.connect(lambda: settings.unregister_widget(settings.get_widget()))
 
 

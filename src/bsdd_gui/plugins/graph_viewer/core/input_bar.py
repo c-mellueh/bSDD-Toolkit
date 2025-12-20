@@ -13,9 +13,12 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.input_bar import ui
 
 
-def connect_signals(input_bar: Type[gv_tool.InputBar], window: Type[gv_tool.Window]):
+def connect_signals(
+    input_bar: Type[gv_tool.InputBar], window: Type[gv_tool.Window], project: Type[tool.Project]
+):
     # window.signals.widget_created.connect(lambda *_: input_bar.request_widget)
     input_bar.connect_internal_signals()
+    window.signals.widget_entered.connect(lambda w: input_bar.update_completer(project.get()))
 
 
 def create_widget(input_bar: Type[gv_tool.InputBar]):
