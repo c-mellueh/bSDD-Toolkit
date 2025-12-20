@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
     QSpacerItem,
 )
 from bsdd_gui.presets.ui_presets import BaseWidget
-from .qt import ui_Buttons, ui_Widget
+from .qt import  ui_Widget
 from . import constants, trigger
 
 if TYPE_CHECKING:
@@ -32,12 +32,7 @@ class _SettingsWidget(QFrame):
         self.setAttribute(Qt.WA_TranslucentBackground, False)
 
 
-class ButtonWidget(_SettingsWidget, ui_Buttons.Ui_Form):
-    """Floating settings panel for Graph physics sliders."""
 
-    def __init__(self, parent=None):
-        super().__init__(parent, f=Qt.Window)
-        self.setupUi(self)
 
 
 class SettingsWidget(QWidget, ui_Widget.Ui_SettingsSidebar):

@@ -20,11 +20,21 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
 
-def connect_signals(window: Type[gv_tool.Window], scene_view: Type[gv_tool.SceneView]):
+def connect_signals(
+    window: Type[gv_tool.Window],
+    scene_view: Type[gv_tool.SceneView],
+    settings: Type[gv_tool.Settings],
+):
     window.signals.widget_created.connect(lambda w: handle_widget_creation(w, scene_view))
     window.signals.toggle_running_requested.connect(scene_view.toggle_running)
     window.signals.delete_selection_requested.connect(scene_view.request_delete_selection)
     scene_view.connect_internal_signals()
+    settings.signals.widget_created.connect(lambda sw: add_settings(scene_view, settings))
+
+
+def add_settings(scene_view: Type[gv_tool.SceneView], settings: Type[gv_tool.Settings]):
+    widget = scene_view.create_button_widget()
+    settings.add_content_widget(widget)
 
 
 def handle_widget_creation(widget: ui_window.GraphWidget, scene_view: Type[gv_tool.SceneView]):

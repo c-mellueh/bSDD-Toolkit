@@ -20,3 +20,4 @@ class GraphViewerSceneViewProperties:
         self._panning_mmb = False
         self.view:ui.GraphView = None
         self.scene:ui.GraphScene = None
+        self.button_widget: ui.ButtonWidget = None

@@ -9,6 +9,5 @@ if TYPE_CHECKING:
 class GraphViewerSettingsProperties(WidgetProperties):
     def __init__(self):
         super().__init__()
-        self.button_widget: ui.ButtonWidget = None
         self.expanded_width = 240
         self.is_expanded = True

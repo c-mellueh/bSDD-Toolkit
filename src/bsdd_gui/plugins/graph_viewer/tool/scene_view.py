@@ -16,6 +16,8 @@ from bsdd_gui.presets.tool_presets import BaseTool
 from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
 from bsdd_gui.module.property_table_widget.constants import JSON_MIME as PROPERTY_JSON_MIME
 
+import qtawesome as qta
+
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.prop import GraphViewerSceneViewProperties
     from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
@@ -306,3 +308,17 @@ class SceneView(BaseTool):
     @classmethod
     def request_recalculate_edges(cls):
         cls.signals.recalculate_edges_requested.emit()
+
+    @classmethod
+    def create_button_widget(cls):
+        button_widget = ui.ButtonWidget()
+        button_widget.bt_clear.setIcon(qta.icon("mdi6.cancel"))
+        button_widget.bt_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
+        button_widget.bt_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
+        button_widget.bt_load.setIcon(qta.icon("mdi6.tray-full"))
+        button_widget.bt_center.setIcon(qta.icon("mdi6.arrow-collapse-all"))
+        button_widget.bt_start_stop.setIcon(qta.icon("mdi6.pause"))
+        button_widget.bt_tree.setIcon(qta.icon("mdi6.graph"))
+        cls.get_properties().button_widget = button_widget
+
+        return cls.get_properties().button_widget

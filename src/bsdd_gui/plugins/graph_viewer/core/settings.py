@@ -36,8 +36,7 @@ def register_widget(
     settings.register_widget(widget)
 
     viewport = scene_view.get_view().viewport()
-    button_widget = settings.create_button_widget()
-    settings.add_content_widget(button_widget)
+
     settings.apply_expanded_state()
     widget.setParent(viewport)
     widget.show()

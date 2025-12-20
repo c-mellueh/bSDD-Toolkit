@@ -50,19 +50,7 @@ class Settings(WidgetTool):
         super().connect_widget_signals(widget)
         widget.expand_button.clicked.connect(cls.toggle_sidebar)
 
-    @classmethod
-    def create_button_widget(cls):
-        button_widget = ui.ButtonWidget()
-        button_widget.bt_clear.setIcon(qta.icon("mdi6.cancel"))
-        button_widget.bt_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
-        button_widget.bt_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
-        button_widget.bt_load.setIcon(qta.icon("mdi6.tray-full"))
-        button_widget.bt_center.setIcon(qta.icon("mdi6.arrow-collapse-all"))
-        button_widget.bt_start_stop.setIcon(qta.icon("mdi6.pause"))
-        button_widget.bt_tree.setIcon(qta.icon("mdi6.graph"))
-        cls.get_properties().button_widget = button_widget
 
-        return cls.get_properties().button_widget
 
     @classmethod
     def create_widget(cls, *args, **kwargs) -> ui.SettingsWidget:
@@ -116,7 +104,7 @@ class Settings(WidgetTool):
             index = widget.scroll_layout.count() - 1
             if index < 0:
                 index = 0
-        widget.scroll_layout.addWidget(input_widget)
+        widget.scroll_layout.insertWidget(0,input_widget)
     @classmethod
     def position_and_resize(
         cls, viewport_width: int, viewport_height: int, margin: int = 0

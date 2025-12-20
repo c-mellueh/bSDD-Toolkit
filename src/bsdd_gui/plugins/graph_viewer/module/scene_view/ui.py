@@ -2,7 +2,8 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QGraphicsScene, QGraphicsView
 from . import trigger
-
+from .qt import ui_Buttons
+from bsdd_gui.plugins.graph_viewer.module.settings.ui import _SettingsWidget
 
 class GraphView(QGraphicsView):
     def __init__(self, scene: QGraphicsScene):
@@ -59,3 +60,11 @@ class GraphView(QGraphicsView):
 class GraphScene(QGraphicsScene):
     def __init__(self):
         super().__init__()
+
+
+class ButtonWidget(_SettingsWidget, ui_Buttons.Ui_Form):
+    """Floating settings panel for Graph physics sliders."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent, f=Qt.Window)
+        self.setupUi(self)
