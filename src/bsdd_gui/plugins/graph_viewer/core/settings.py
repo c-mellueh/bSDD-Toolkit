@@ -33,7 +33,7 @@ def create_widget(settings: Type[gv_tool.Settings], scene_view: Type[gv_tool.Sce
     settings.apply_expanded_state()
     widget.setParent(viewport)
     widget.show()
-    settings.position_and_resize(viewport.width(), viewport.height())
+    settings.position_and_resize(viewport.width(), viewport.height(),6)
 
 
 def register_widget(widget: ui.SettingsWidget, settings: Type[gv_tool.Settings]):

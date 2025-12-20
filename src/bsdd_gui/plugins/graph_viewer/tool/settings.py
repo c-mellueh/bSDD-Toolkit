@@ -113,18 +113,18 @@ class Settings(WidgetTool):
             index = widget.scroll_layout.count() - 1
             if index < 0:
                 index = 0
-        widget.scroll_layout.insertWidget(index, widget)
+        widget.scroll_layout.addWidget(widget)
 
     @classmethod
     def position_and_resize(
-        cls, viewport_width: int, viewport_height: int, margin: int = 6
+        cls, viewport_width: int, viewport_height: int, margin: int = 0
     ) -> None:
         widget = cls.get_widget()
         """Anchor to top-right of the given viewport size and stretch to full height."""
         width = widget.expand_button.width() + (
             cls.get_expanded_width() if cls.is_expanded() else 0
         )
-        x = max(0, viewport_width - width - margin)
+        x = max(0, viewport_width - width)
         y = margin
         h = max(0, viewport_height - 2 * margin)
         widget.setGeometry(x, y, width, h)

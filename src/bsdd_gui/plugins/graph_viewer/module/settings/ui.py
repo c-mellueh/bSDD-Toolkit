@@ -52,6 +52,7 @@ class SettingsWidget(QWidget, ui_Widget.Ui_SettingsSidebar):
         self.scroll_area.setStyleSheet(constants.SETTINGS_STYLE_SHEET)
         self.scroll_area.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.scroll_area.viewport().setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        self.scroll_layout.addStretch(1)
         trigger.widget_created(self)
 
 
