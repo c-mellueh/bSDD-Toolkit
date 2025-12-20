@@ -1,21 +1,7 @@
 from __future__ import annotations
-from typing import List, Dict
-
-from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
-from PySide6.QtWidgets import (
-    QGraphicsScene,
-    QGraphicsView,
-)
-
-from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.graphics_items import Node, Edge
-from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.physics import Physics
-from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
-from bsdd_gui.module.property_table_widget.constants import (
-    JSON_MIME as PROPERTY_JSON_MIME,
-)
-from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.constants import *
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGraphicsScene, QGraphicsView
 from . import trigger
-from bsdd_gui.plugins.graph_viewer import tool as gv_tool
 
 
 class GraphView(QGraphicsView):

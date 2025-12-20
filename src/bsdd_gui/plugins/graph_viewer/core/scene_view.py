@@ -2,7 +2,6 @@ from __future__ import annotations
 from PySide6.QtCore import Qt, QPoint, QPointF
 from PySide6.QtGui import QMouseEvent, QDropEvent
 from typing import TYPE_CHECKING, Type
-import webbrowser
 
 
 from bsdd_gui.plugins.graph_viewer.module.scene_view import constants
