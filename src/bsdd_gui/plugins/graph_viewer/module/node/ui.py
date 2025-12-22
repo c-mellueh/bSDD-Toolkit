@@ -169,16 +169,17 @@ class Node(QGraphicsObject):
         super().mouseDoubleClickEvent(event)
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
-        from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
+        from bsdd_gui.plugins.graph_viewer.module.edge import ui as edge_ui
+        from bsdd_gui.plugins.graph_viewer.tool import Edge
 
         if change == QGraphicsItem.ItemPositionHasChanged:
             sc = self.scene()
             if sc:
                 for edge in sc.items():
-                    if isinstance(edge, Edge) and (
+                    if isinstance(edge, edge_ui.Edge) and (
                         edge.start_node is self or edge.end_node is self
                     ):
-                        edge.update_path()
+                        Edge.requeste_path_update(edge)
         return super().itemChange(change, value)
 
 

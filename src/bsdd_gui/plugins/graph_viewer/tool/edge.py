@@ -15,8 +15,8 @@ from bsdd_json import (
     BsddPropertyRelation,
 )
 from PySide6.QtCore import Signal, Qt, QPointF, QObject, QCoreApplication
-from PySide6.QtGui import QColor, QPen, QPainterPath
-from PySide6.QtWidgets import QGraphicsPathItem, QHBoxLayout, QLabel
+from PySide6.QtGui import QColor, QPen, QPainterPath, QPolygonF, QBrush
+from PySide6.QtWidgets import QGraphicsPathItem, QHBoxLayout, QLabel, QGraphicsItem
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
 from bsdd_gui.presets.tool_presets import BaseTool
@@ -43,7 +43,7 @@ class Signals(QObject):
     class_property_removed = Signal(BsddClassProperty, BsddClass)
     property_relation_removed = Signal(BsddPropertyRelation)
     edge_hide_requested = Signal(str)
-    filter_changed = Signal(str,bool)
+    filter_changed = Signal(str, bool)
 
 
 class Edge(BaseTool):
@@ -146,14 +146,13 @@ class Edge(BaseTool):
                 cls.signals.class_property_removed.emit(class_property, end_data)
 
     @classmethod
-    def create_edge(
-        cls,
-        start_node: Node,
-        end_node: Node,
-        edge_type,
-        weight: float = 1.0,
-    ) -> ui.Edge:
-        return ui.Edge(start_node, end_node, edge_type, weight)
+    def create_edge(cls, start_node: Node, end_node: Node, edge_type) -> ui.Edge:
+        edge = ui.Edge(start_node, end_node, edge_type)
+        cls.requeste_path_update(edge)
+        cls.update_pen(edge)
+        if edge.edge_type != constants.PARENT_CLASS:
+            edge.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        return edge
 
     @classmethod
     def get_edges(cls) -> list[ui.Edge]:
@@ -195,7 +194,7 @@ class Edge(BaseTool):
     @classmethod
     def set_filters(cls, key: constants.ALLOWED_EDGE_TYPES_TYPING, value: bool):
         cls.get_properties().filters[key] = value
-        cls.signals.filter_changed.emit(key,value)
+        cls.signals.filter_changed.emit(key, value)
 
     @classmethod
     def toggle_filter_state(cls, edge_type: str):
@@ -631,7 +630,7 @@ class Edge(BaseTool):
     def set_orthogonal_mode(cls, value: bool):
         cls.get_properties().orthogonal_edges = value
         for e in cls.get_edges():
-            e.update_path()
+            cls.requeste_path_update(e)
 
     @classmethod
     def is_edge_type_enabled(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
@@ -659,7 +658,7 @@ class Edge(BaseTool):
             label = QLabel(name)
             label.setToolTip(name)
             switch = ToggleSwitch(checked=True)
-            switch.toggled.connect(lambda _,et=edge_type: cls.toggle_filter_state(et))
+            switch.toggled.connect(lambda _, et=edge_type: cls.toggle_filter_state(et))
             switch.setChecked(cls.is_edge_type_enabled(edge_type))
             row.addWidget(icon, 0)
             row.addWidget(label, 1)
@@ -681,3 +680,167 @@ class Edge(BaseTool):
         cls, type_widget: ui.EdgeTypeSettingsWidget, routing_widget: ui.EdgeRoutingWidget
     ):
         pass
+
+        # ---------- Edge Drawing ----------------------
+
+    @classmethod
+    def requeste_path_update(cls, edge: ui.Edge):
+        trigger.update_path(edge)
+
+    @classmethod
+    def update_pen(cls, edge: ui.Edge):
+        # Style edges using registry; falls back to default
+        edge_type = edge.edge_type
+        color = cls.get_edge_color(edge_type)
+        width = cls.get_edge_width(edge_type)
+        style = cls.get_edge_style(edge_type)
+        pen = QPen(color if isinstance(color, QColor) else QColor(130, 130, 150), width)
+        pen.setCosmetic(True)
+        try:
+            pen.setStyle(style)  # type: ignore[arg-type]
+        except Exception:
+            pen.setStyle(Qt.SolidLine)
+        edge.setPen(pen)
+        # No fill for arrow head
+        edge._arrow_brush = QBrush(Qt.NoBrush)
+
+    @classmethod
+    def _calculate_anchor_on_node(cls, node: Node, toward: QPointF):
+        """Return point on node boundary in direction of 'toward'.
+        Approximates node shape as its rectangle for rect/roundedrect, and
+        as ellipse for ellipse shape.
+        """
+
+        c = node.pos()
+        v = QPointF(toward.x() - c.x(), toward.y() - c.y())
+        length = (v.x() ** 2 + v.y() ** 2) ** 0.5
+        if length < 1e-6:
+            return QPointF(c)
+        normalized_x, normalized_y = v.x() / length, v.y() / length
+
+        half_width, half_height = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
+        # Ellipse intersection distance from center along direction u
+        if getattr(node, "node_shape", None) == node_constants.SHAPE_STYPE_ELLIPSE:
+            import math
+
+            denom = (normalized_x / max(half_width, 1e-6)) ** 2 + (
+                normalized_y / max(half_height, 1e-6)
+            ) ** 2
+            t = 1.0 / math.sqrt(max(denom, 1e-9))
+        else:
+            # Rect/roundedrect: distance to edge along u
+            tx = half_width / abs(normalized_x) if abs(normalized_x) > 1e-6 else float("inf")
+            ty = half_height / abs(normalized_y) if abs(normalized_y) > 1e-6 else float("inf")
+            t = min(tx, ty)
+        if not cls.is_orthogonal_mode():
+            return QPointF(c.x() + normalized_x * t, c.y() + normalized_y * t)
+
+        if abs(v.y()) < half_height:
+            dw = normalized_x / abs(normalized_x) * half_width
+            return QPointF(c.x() + dw, c.y())
+        else:
+            dh = normalized_y / abs(normalized_y) * half_height
+            return QPointF(c.x(), c.y() + dh)
+
+    @classmethod
+    def _ortho_mode_is_hor(cls, node: Node, toward: QPointF):
+        c = node.pos()
+        v = QPointF(toward.x() - c.x(), toward.y() - c.y())
+        return abs(v.y()) < cls.get_properties().arrow_length * 3
+
+    @classmethod
+    def _ortho_start(cls, node: Node, toward: QPointF, hor_mode):
+        c = node.pos()
+        v = QPointF(toward.x() - c.x(), toward.y() - c.y())
+        halfe_width, half_height = getattr(node, "_w", 24.0) / 2.0, getattr(node, "_h", 24.0) / 2.0
+        if hor_mode:
+            dw = v.x() / abs(v.x()) * halfe_width if abs(v.x()) > 1e-6 else 0.0
+            return QPointF(c.x() + dw, c.y())
+        else:
+            dh = v.y() / abs(v.y()) * half_height if abs(v.y()) > 1e-6 else 0.0
+            return QPointF(c.x(), c.y() + dh)
+
+    @classmethod
+    def _compute_arrow(cls, p1: QPointF, p2: QPointF) -> QPolygonF:
+        """Create an arrowhead polygon at p2, pointing from p1 -> p2."""
+        dx = p2.x() - p1.x()
+        dy = p2.y() - p1.y()
+        d = (dx * dx + dy * dy) ** 0.5
+        if d < 1e-6:
+            return QPolygonF()
+        ux, uy = dx / d, dy / d
+        # Orthogonal vector
+
+        nx, ny = -uy, ux
+        tail_x = p2.x() - ux * cls.get_properties().arrow_length
+        tail_y = p2.y() - uy * cls.get_properties().arrow_length
+        half_w = cls.get_properties().arrow_width / 2.0
+        left = QPointF(tail_x + nx * half_w, tail_y + ny * half_w)
+        right = QPointF(tail_x - nx * half_w, tail_y - ny * half_w)
+        return QPolygonF([p2, left, right])
+
+    @classmethod
+    def draw_straight_line(cls, path: QPainterPath, p_start: QPointF, p_end_tip: QPointF):
+        path.moveTo(p_start)
+        # Straight line with arrow margin
+        v = QPointF(p_end_tip.x() - p_start.x(), p_end_tip.y() - p_start.y())
+        d = (v.x() ** 2 + v.y() ** 2) ** 0.5
+        if d > 1e-6:
+            ux, uy = v.x() / d, v.y() / d
+            p_end_line = QPointF(
+                p_end_tip.x() - ux * cls.get_properties().arrow_length,
+                p_end_tip.y() - uy * cls.get_properties().arrow_length,
+            )
+            last_base = QPointF(p_start)
+        else:
+            p_end_line = QPointF(p_end_tip)
+            last_base = QPointF(p_start)
+        path.lineTo(p_end_line)
+        return last_base
+
+    @classmethod
+    def draw_ortho_line(
+        cls, path: QPainterPath, p_start: QPointF, p_end_tip: QPointF, horizontal_mode: bool
+    ):
+        delta_x = p_end_tip.x() - p_start.x()
+        delta_y = p_end_tip.y() - p_start.y()
+        x_dir = delta_x / abs(delta_x) if abs(delta_x) > 1e-6 else 0.0
+        y_dir = delta_y / abs(delta_y) if abs(delta_y) > 1e-6 else 0.0
+        if horizontal_mode:
+            x_height = p_end_tip.x() - cls.get_properties().arrow_length * x_dir * 3
+            p1 = QPointF(x_height, p_start.y())
+            p2 = QPointF(x_height, p_end_tip.y())
+            p3 = QPointF(p_end_tip.x() - x_dir * cls.get_properties().arrow_length, p_end_tip.y())
+
+        else:
+            y_height = p_end_tip.y() - cls.get_properties().arrow_length * y_dir * 3
+            p1 = QPointF(p_start.x(), y_height)
+            p2 = QPointF(p_end_tip.x(), y_height)
+            p3 = QPointF(p_end_tip.x(), p_end_tip.y() - y_dir * cls.get_properties().arrow_length)
+        path.moveTo(p_start)
+        path.lineTo(p1)
+        path.lineTo(p2)
+        path.lineTo(p3)
+        return QPointF(p3)
+
+    @classmethod
+    def get_selected_pen(cls, edge: ui.Edge):
+        """
+        Return PenStyle for Selected edges
+        """
+        base_pen = edge.pen()
+        glow_color = QColor(base_pen.color())
+        try:
+            glow_color.setAlpha(110)
+        except Exception:
+            pass
+        glow_width = max(float(base_pen.widthF()) * 5.0, 10.0)
+        glow_pen = QPen(glow_color, glow_width)
+        glow_pen.setCosmetic(True)
+        try:
+            glow_pen.setStyle(Qt.SolidLine)
+            glow_pen.setCapStyle(Qt.RoundCap)
+            glow_pen.setJoinStyle(Qt.RoundJoin)
+        except Exception:
+            pass
+        return glow_pen

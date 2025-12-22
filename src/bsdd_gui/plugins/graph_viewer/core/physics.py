@@ -53,4 +53,4 @@ def tick(
         ph.step(vis_nodes, vis_edges, dt=1.0)
     # Update visible edges' geometry
     for e in vis_edges:
-        e.update_path()
+        edge.requeste_path_update(e)

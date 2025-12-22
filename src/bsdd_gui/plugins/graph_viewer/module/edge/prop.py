@@ -23,3 +23,5 @@ class GraphViewerEdgeProperties:
         self.edge_routing_settings_widget: ui.EdgeRoutingWidget = None
 
         self.allowed_edge_types = constants.ALLOWED_EDGE_TYPES
+        self.arrow_length = 12.
+        self.arrow_width = 8.

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from PySide6.QtGui import QPainter
+from PySide6.QtGui import QPainter, QPainterPath, QBrush, QPen
+from PySide6.QtCore import Qt
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -104,3 +105,64 @@ def paint_edge_legend(edge_legend: ui._EdgeLegendIcon, edge: Type[gv_tool.Edge])
     x2 = rect.right() - 2
     p.setPen(edge.create_pen_for_edgestyle(edge_legend._edge_type))
     p.drawLine(int(x1), int(y), int(x2), int(y))
+
+
+def update_path(focus_edge: ui.Edge, edge: Type[gv_tool.Edge], scene_view: Type[gv_tool.SceneView]):
+    # Determine routing mode from scene
+    sc = scene_view.get_scene()
+    orth = False
+    try:
+        orth = bool(getattr(sc, "orthogonal_edges", False))
+    except Exception:
+        orth = False
+
+    # Compute anchors on node boundaries
+
+    path = QPainterPath()
+    if not edge.is_orthogonal_mode():
+        p_start = edge._calculate_anchor_on_node(focus_edge.start_node, focus_edge.end_node.pos())
+        p_end_tip = edge._calculate_anchor_on_node(focus_edge.end_node, focus_edge.start_node.pos())
+        last_base = edge.draw_straight_line(path, p_start, p_end_tip)
+
+    else:
+        horizontal_mode = edge._ortho_mode_is_hor(focus_edge.start_node, focus_edge.end_node.pos())
+        p_start = edge._ortho_start(
+            focus_edge.start_node, focus_edge.end_node.pos(), horizontal_mode
+        )
+        p_end_tip = edge._ortho_start(
+            focus_edge.end_node, focus_edge.start_node.pos(), horizontal_mode
+        )
+        last_base = edge.draw_ortho_line(path, p_start, p_end_tip, horizontal_mode)
+
+    focus_edge.setPath(path)
+    # Arrow head aligned with the last segment direction
+    focus_edge._arrow_polygon = edge._compute_arrow(last_base, p_end_tip)
+
+
+def paint_path(painter: QPainter, focus_edge: ui.Edge, edge: Type[gv_tool.Edge]):
+    painter.setRenderHint(QPainter.Antialiasing, True)
+    painter.setBrush(QBrush(Qt.NoBrush))
+    path = focus_edge.path()
+
+    # Custom selection visualization: soft glow under the edge instead of Qt's default rectangle
+    if focus_edge.isSelected():
+        glow_pen = edge.get_selected_pen(focus_edge)
+        painter.setPen(glow_pen)
+        painter.drawPath(path)
+        # Glow around arrow outline too
+        if focus_edge._arrow_polygon is not None and not focus_edge._arrow_polygon.isEmpty():
+            painter.drawPolygon(focus_edge._arrow_polygon)
+
+    # Draw the edge with its configured style
+    painter.setPen(focus_edge.pen())
+    painter.drawPath(path)
+
+    # Draw arrow head on top (solid outline)
+    if focus_edge._arrow_polygon is not None and not focus_edge._arrow_polygon.isEmpty():
+        solid_pen = QPen(focus_edge.pen())
+        try:
+            solid_pen.setStyle(Qt.SolidLine)
+        except Exception:
+            pass
+        painter.setPen(solid_pen)
+        painter.drawPolygon(focus_edge._arrow_polygon)
