@@ -241,6 +241,7 @@ class Edge(BaseTool):
         else:
             r, g, b, a = 130, 130, 150, 255
         css = f"QGraphicsView {{ border: {max(1, int(round(width)))}px {css_style} rgba({r}, {g}, {b}, 255); }}"
+        print(css)
         return css
 
     @classmethod

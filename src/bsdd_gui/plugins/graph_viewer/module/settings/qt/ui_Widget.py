@@ -27,15 +27,22 @@ class Ui_SettingsSidebar(object):
         SettingsSidebar.setStyleSheet(u" QWidget#SettingsSidebar {\n"
 "                background: transparent; }")
         self.horizontalLayout = QHBoxLayout(SettingsSidebar)
+        self.horizontalLayout.setSpacing(3)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.button_layout = QVBoxLayout()
         self.button_layout.setObjectName(u"button_layout")
         self.expand_button = QToolButton(SettingsSidebar)
         self.expand_button.setObjectName(u"expand_button")
+        self.expand_button.setStyleSheet(u"QToolButton {\n"
+"    background: transparent;\n"
+"    border: none;\n"
+"    padding: 0px;\n"
+"}")
+        self.expand_button.setIconSize(QSize(20, 20))
         self.expand_button.setCheckable(True)
-        self.expand_button.setChecked(True)
-        self.expand_button.setArrowType(Qt.ArrowType.LeftArrow)
+        self.expand_button.setChecked(False)
+        self.expand_button.setArrowType(Qt.ArrowType.NoArrow)
 
         self.button_layout.addWidget(self.expand_button)
 
@@ -52,7 +59,7 @@ class Ui_SettingsSidebar(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_content = QWidget()
         self.scroll_content.setObjectName(u"scroll_content")
-        self.scroll_content.setGeometry(QRect(0, 0, 741, 942))
+        self.scroll_content.setGeometry(QRect(0, 0, 744, 942))
         self.scroll_layout = QVBoxLayout(self.scroll_content)
         self.scroll_layout.setSpacing(8)
         self.scroll_layout.setObjectName(u"scroll_layout")
@@ -72,6 +79,6 @@ class Ui_SettingsSidebar(object):
 #if QT_CONFIG(tooltip)
         self.expand_button.setToolTip(QCoreApplication.translate("SettingsSidebar", u"Show/Hide Settings", None))
 #endif // QT_CONFIG(tooltip)
-        self.expand_button.setText(QCoreApplication.translate("SettingsSidebar", u"...", None))
+        self.expand_button.setText("")
     # retranslateUi
 

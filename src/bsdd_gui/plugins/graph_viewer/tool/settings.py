@@ -87,8 +87,8 @@ class Settings(WidgetTool):
     def apply_expanded_state(cls) -> None:
         widget = cls.get_widget()
         widget.scroll_area.setVisible(cls.is_expanded())
-        widget.expand_button.setArrowType(
-            Qt.ArrowType.LeftArrow if not cls.is_expanded() else Qt.ArrowType.RightArrow
+        widget.expand_button.setIcon(
+            qta.icon("mdi6.chevron-left") if not cls.is_expanded() else qta.icon("mdi6.chevron-right")
         )
         widget.updateGeometry()
 
