@@ -8,9 +8,12 @@ if TYPE_CHECKING:
     from . import ui
     from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
 
+from bsdd_gui.presets.prop_presets import BaseProperties
 
-class GraphViewerSceneViewProperties:
+
+class GraphViewerSceneViewProperties(BaseProperties):
     def __init__(self):
+        super().__init__()
         self._panning_mmb: bool = False
         self._pan_last_pos: QPoint | None = None
         self._help_overlay: QLabel | None = (

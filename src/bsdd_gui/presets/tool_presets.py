@@ -115,6 +115,10 @@ class BaseTool(ABC):
         cls.get_properties().signal_handlers.append((signal, func))
 
     @classmethod
+    def disconnect_internal_signals(cls):
+        cls.signals.dk()
+
+    @classmethod
     def disconnect_external_signals(cls):
         for signal, func in cls.get_properties().signal_handlers:
             try:

@@ -6,8 +6,12 @@ if TYPE_CHECKING:
     from PySide6.QtCore import QTimer
     from . import ui
 
-class GraphViewerPhysicsProperties:
+from bsdd_gui.presets.prop_presets import BaseProperties
+
+
+class GraphViewerPhysicsProperties(BaseProperties):
     def __init__(self):
+        super().__init__()
         self.physics: Physics = None
         self.timer: QTimer = None
         self.running: bool = True

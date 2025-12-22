@@ -64,10 +64,6 @@ class Edge(BaseTool):
         cls.signals.new_edge_created.connect(lambda e: cls.get_properties().edges.append(e))
 
     @classmethod
-    def disconnect_internal_signals(cls):
-        cls.signals.dk()
-
-    @classmethod
     def _get_trigger(cls):
         return trigger
 

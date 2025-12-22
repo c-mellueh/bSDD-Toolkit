@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 
-from bsdd_gui.presets.tool_presets import BaseTool
+from bsdd_gui.presets.tool_presets import BaseTool,BaseSignal
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.buchheim import ui, trigger, constants
 from PySide6.QtWidgets import QWidget, QMessageBox
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
 
-class Signals(QObject):
+class Signals(BaseSignal):
     buchheim_requested = Signal()
 
 
@@ -37,10 +37,6 @@ class Buchheim(BaseTool):
     def connect_internal_signals(cls):
         cls.signals.buchheim_requested.connect(trigger.create_tree)
         return super().connect_internal_signals()
-
-    @classmethod
-    def disconnect_internal_signals(cls):
-        cls.signals.buchheim_requested.disconnect()
 
     @classmethod
     def reset_children_dict(cls, nodes: list[Node], edges: list[Edge], active_edge_type: str):

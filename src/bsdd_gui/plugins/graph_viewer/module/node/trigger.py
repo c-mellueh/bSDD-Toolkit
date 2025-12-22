@@ -18,8 +18,7 @@ def activate():
 
 
 def deactivate():
-    pass
-
+    core.disconnect_signals(gv_tool.Node)
 
 def retranslate_ui():
     pass

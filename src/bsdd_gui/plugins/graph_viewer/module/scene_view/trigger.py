@@ -18,7 +18,7 @@ def activate():
 
 
 def deactivate():
-    pass
+    core.disconnect_signals(gv_tool.SceneView)
 
 
 def retranslate_ui():

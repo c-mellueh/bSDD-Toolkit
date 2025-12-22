@@ -16,7 +16,7 @@ def activate():
 
 def deactivate():
     core.remove_main_menu_actions(gv_tool.Window,tool.MainWindowWidget)
-
+    core.disconnect_signals(gv_tool.Window)
 
 def retranslate_ui():
     core.retranslate_ui(gv_tool.Window, tool.MainWindowWidget)

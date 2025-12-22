@@ -1,9 +1,10 @@
 from __future__ import annotations
 from . import constants, ui
+from bsdd_gui.presets.prop_presets import BaseProperties
 
-
-class GraphViewerNodeProperties:
+class GraphViewerNodeProperties(BaseProperties):
     def __init__(self):
+        super().__init__()
         self.filters: dict[str, bool] = {nt: True for nt in constants.ALLOWED_NODE_TYPES}
         self.nodes: list[ui.Node] = list()
         self.settings_widget: ui.NodeTypeSettingsWidget = None

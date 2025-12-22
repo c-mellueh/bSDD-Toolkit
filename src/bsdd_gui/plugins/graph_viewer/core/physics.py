@@ -23,6 +23,10 @@ def connect_signals(
     scene_view.signals.toggle_running_requested.connect(phyiscs.toggle_running)
 
 
+def disconnect_signals(physics:Type[gv_tool.Physics]):
+    physics.disconnect_internal_signals()
+    physics.disconnect_external_signals()
+
 def build_phyiscs(phyiscs: Type[gv_tool.Physics]):
     ph = phyiscs.create_physics()
     timer = phyiscs.create_timer()

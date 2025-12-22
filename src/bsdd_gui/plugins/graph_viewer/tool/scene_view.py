@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QLabel, QGraphicsItem
 
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.scene_view import ui, trigger, constants
-from bsdd_gui.presets.tool_presets import BaseTool
+from bsdd_gui.presets.tool_presets import BaseTool,BaseSignal
 from bsdd_gui.module.class_tree_view.constants import JSON_MIME as CLASS_JSON_MIME
 from bsdd_gui.module.property_table_widget.constants import JSON_MIME as PROPERTY_JSON_MIME
 
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
 
-class Signals(QObject):
+class Signals(BaseSignal):
     delete_selection_requested = Signal()
     classes_insert_requested = Signal(list, QPointF)
     properties_insert_requested = Signal(list, QPointF)

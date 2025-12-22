@@ -4,13 +4,13 @@ import logging
 from PySide6.QtCore import QObject, QTimer,Signal
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.physics import data, trigger, ui
-from bsdd_gui.presets.tool_presets import BaseTool
+from bsdd_gui.presets.tool_presets import BaseTool,BaseSignal
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.physics.prop import GraphViewerPhysicsProperties
 
 
-class Signals(QObject):
+class Signals(BaseSignal):
     is_running_changed =Signal(bool)
 
 

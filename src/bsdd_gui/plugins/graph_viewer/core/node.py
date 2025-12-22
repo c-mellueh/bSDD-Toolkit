@@ -24,7 +24,7 @@ def connect_signals(
     scene_view: Type[gv_tool.SceneView],
     settings: Type[gv_tool.Settings],
     project: Type[tool.Project],
-    window:Type[gv_tool.Window]
+    window: Type[gv_tool.Window],
 ):
     node.signals.remove_edge_requested.connect(
         lambda e, s, ov, ap: edge.remove_edge(e, s, project.get(), ov, ap)
@@ -60,9 +60,14 @@ def connect_to_project_signals(node: Type[gv_tool.Node], project: Type[tool.Proj
             return
         node.remove_node(active_node, project.get())
 
-    project.signals.class_removed.connect(handle_remove)
-    project.signals.property_removed.connect(handle_remove)
-    project.signals.class_property_removed.connect(handle_remove)
+    node.connect_external_signal(project.signals.class_removed, handle_remove)
+    node.connect_external_signal(project.signals.property_removed, handle_remove)
+    node.connect_external_signal(project.signals.class_property_removed, handle_remove)
+
+
+def disconnect_signals(node: Type[gv_tool.Node]):
+    node.disconnect_external_signals()
+    node.disconnect_internal_signals()
 
 
 def clear_all_nodes(node: Type[gv_tool.Node], scene_view: Type[gv_tool.SceneView]):

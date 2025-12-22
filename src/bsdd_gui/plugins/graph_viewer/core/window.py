@@ -9,11 +9,6 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.window import ui
 
 
-def remove_main_menu_actions(
-    window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]
-):
-    action = window.get_action(main_window.get(), "open_window")
-    main_window.remove_action(None, action)
 
 
 def connect_to_main_window(
@@ -30,6 +25,16 @@ def connect_to_main_window(
 
 def connect_signals(window: Type[gv_tool.Window]):
     window.connect_internal_signals()
+
+def disconnect_signals(window: Type[gv_tool.Window]):
+    window.disconnect_internal_signals()
+    window.disconnect_external_signals()
+
+def remove_main_menu_actions(
+    window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]
+):
+    action = window.get_action(main_window.get(), "open_window")
+    main_window.remove_action(None, action)
 
 
 def retranslate_ui(window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]):

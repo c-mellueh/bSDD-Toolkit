@@ -35,6 +35,11 @@ def connect_signals(
     physics.signals.is_running_changed.connect(scene_view.request_retranslate)
 
 
+def disconnect_signals(scene_view: Type[gv_tool.SceneView]):
+    scene_view.disconnect_internal_signals()
+    scene_view.disconnect_external_signals()
+
+
 def add_settings(scene_view: Type[gv_tool.SceneView], settings: Type[gv_tool.Settings]):
     widget = scene_view.create_button_widget()
     scene_view.connect_button_settings()

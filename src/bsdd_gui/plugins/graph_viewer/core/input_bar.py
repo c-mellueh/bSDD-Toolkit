@@ -21,6 +21,10 @@ def connect_signals(
     window.signals.widget_entered.connect(lambda w: input_bar.update_completer(project.get()))
 
 
+def disconnect_signals(input_bar: Type[gv_tool.InputBar]):
+    input_bar.disconnect_internal_signals()
+    input_bar.disconnect_external_signals()
+
 def create_widget(input_bar: Type[gv_tool.InputBar]):
     input_bar.create_widget()
 

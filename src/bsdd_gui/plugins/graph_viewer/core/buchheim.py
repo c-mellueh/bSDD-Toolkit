@@ -14,10 +14,9 @@ def connect_signals(buchheim: Type[gv_tool.Buchheim], scene_view: Type[gv_tool.S
     scene_view.signals.buchheim_requested.connect(buchheim.request_tree_creation)
     buchheim.connect_internal_signals()
 
-def disconnect_signals(buchheim: Type[gv_tool.Buchheim], scene_view: Type[gv_tool.SceneView]):
-    scene_view.signals.buchheim_requested.disconnect(buchheim.request_tree_creation)
-    buchheim.connect_internal_signals()
-
+def disconnect_signals(buchheim: Type[gv_tool.Buchheim]):
+    buchheim.disconnect_internal_signals()
+    buchheim.disconnect_external_signals()
 
 def create_tree(
     buchheim: Type[gv_tool.Buchheim],

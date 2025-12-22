@@ -14,7 +14,7 @@ def activate():
 
 
 def deactivate():
-    core.disconnect_signals(gv_tool.Buchheim,gv_tool.SceneView)
+    core.disconnect_signals(gv_tool.Buchheim)
 
 
 def retranslate_ui():

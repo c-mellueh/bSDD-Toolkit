@@ -26,6 +26,9 @@ def connect_signals(
     window.signals.widget_shown.connect(reposition)
     window.signals.widget_closed.connect(lambda: settings.unregister_widget(settings.get_widget()))
 
+def disconnect_signals(settings: Type[gv_tool.Settings]):
+    settings.disconnect_internal_signals()
+    settings.disconnect_external_signals()
 
 def create_widget(settings: Type[gv_tool.Settings]):
     widget = settings.create_widget()
