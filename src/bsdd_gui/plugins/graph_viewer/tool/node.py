@@ -352,3 +352,19 @@ class Node(BaseTool):
             return node
         except Exception:
             return
+
+    @classmethod
+    def get_node_from_bsdd_data(
+        cls, bsdd_data: BsddClass | BsddProperty
+    ) -> ui.Node | None:
+        for node in cls.get_nodes():
+            if node.bsdd_data == bsdd_data:
+                return node
+        return None
+    
+    @classmethod
+    def get_node_from_ifc_code(cls, ifc_code: str):
+
+        for node in cls.get_nodes():
+            if node.is_external and node.bsdd_data.Code == ifc_code:
+                return node

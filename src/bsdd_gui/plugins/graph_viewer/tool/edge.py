@@ -54,7 +54,7 @@ class Edge(BaseTool):
         return bsdd_gui.GraphViewerEdgeProperties
 
     @classmethod
-    def get_edge_class(cls)->Type[ui.Edge]:
+    def get_edge_class(cls) -> Type[ui.Edge]:
         return ui.Edge
 
     @classmethod
@@ -680,10 +680,80 @@ class Edge(BaseTool):
         return widget
 
     @classmethod
-    def connect_settings_widgets(
-        cls, type_widget: ui.EdgeTypeSettingsWidget, routing_widget: ui.EdgeRoutingWidget
+    def read_relation(
+        cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
     ):
-        pass
+        start_data = relation._parent_ref()
+        relation_type = relation.RelationType
+
+        if isinstance(relation, BsddClassRelation):
+            related_uri = relation.RelatedClassUri
+            end_data = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
+
+        elif isinstance(relation, BsddPropertyRelation):
+            related_uri = relation.RelatedPropertyUri
+            end_data = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
+        return start_data, end_data, relation_type
+
+    @classmethod
+    def get_connected_edges(cls, node: Node) -> set[ui.Edge]:
+        connected_edges = set()
+        for edge in cls.get_edges():
+            if edge.start_node == node or edge.end_node == node:
+                connected_edges.add(edge)
+        return connected_edges
+
+    @classmethod
+    def get_edge_from_nodes(
+        cls,
+        start_node: Node,
+        end_node: Node | str,
+        edge_type: str,
+    ) -> ui.Edge | None:
+        for edge in cls.get_edges():
+            if edge.start_node.bsdd_data != start_node.bsdd_data:
+                continue
+            if edge_type == constants.IFC_REFERENCE_REL and isinstance(end_node, str):
+                if not edge.end_node.is_external:
+                    continue
+                if edge.end_node.bsdd_data.Code == end_node:
+                    continue
+            elif edge.end_node.bsdd_data != end_node.bsdd_data:
+                continue
+            if edge.edge_type == edge_type:
+                return edge
+        return None
+
+    @classmethod
+    def get_edge_from_relation(
+        cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
+    ):
+        from bsdd_gui.plugins.graph_viewer.tool import Node as NodeTool
+
+        start_data, end_data, relation_type = cls.read_relation(relation, bsdd_dictionary)
+        start_node, end_node = NodeTool.get_node_from_bsdd_data(
+            start_data
+        ), NodeTool.get_node_from_bsdd_data(end_data)
+        return cls.get_edge_from_nodes(start_node, end_node, relation_type)
+
+    @classmethod
+    def get_relation_from_edge(cls, edge: ui.Edge, bsdd_dictionary: BsddDictionary):
+        start_data, end_data = edge.start_node.bsdd_data, edge.end_node.bsdd_data
+        if isinstance(start_data, BsddClass):
+            if not isinstance(end_data, BsddClass):
+                return
+            end_uri = cl_utils.build_bsdd_uri(end_data, bsdd_dictionary)
+            for rel in start_data.ClassRelations:
+                if rel.RelatedClassUri == end_uri:
+                    return rel
+        elif isinstance(start_data, BsddProperty):
+            if not isinstance(end_data, BsddProperty):
+                return
+            end_uri = prop_utils.build_bsdd_uri(end_data, bsdd_dictionary)
+            for rel in start_data.PropertyRelations:
+                if rel.RelatedPropertyUri == end_uri:
+                    return rel
+
 
         # ---------- Edge Drawing ----------------------
 

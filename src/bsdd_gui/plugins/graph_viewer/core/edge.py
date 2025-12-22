@@ -46,7 +46,6 @@ def add_settings(edge: Type[gv_tool.Edge], settings: Type[gv_tool.Settings]):
         type_widget.layout().addLayout(row)
 
     routing_widget = edge.create_edge_routing_settings_widget()
-    edge.connect_settings_widgets(type_widget, routing_widget)
     settings.add_content_widget(routing_widget)
     settings.add_content_widget(type_widget)
 
