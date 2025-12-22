@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def activate():
-    core.connect_signals(gv_tool.Window, gv_tool.SceneView,gv_tool.Settings)
+    core.connect_signals(gv_tool.Window, gv_tool.SceneView, gv_tool.Settings,gv_tool.Physics)
 
 
 def deactivate():
@@ -22,7 +22,7 @@ def deactivate():
 
 
 def retranslate_ui():
-    pass
+    core.retranslate_ui(gv_tool.SceneView,gv_tool.Physics)
 
 
 def on_new_project():
@@ -62,8 +62,9 @@ def drop_event(event):
         event, gv_tool.SceneView, tool.ClassTreeView, tool.PropertyTableWidget, tool.Project
     )
 
+
 def double_click_event(event):
-    return core.double_click_event(event,gv_tool.SceneView,gv_tool.Node)
+    return core.double_click_event(event, gv_tool.SceneView, gv_tool.Node)
 
 
 def insert_classes(classes: list[BsddClass], postion: QPointF):
@@ -80,3 +81,19 @@ def insert_properties(properties: list[BsddProperty], postion: QPointF):
 
 def recalculate_edges():
     core.recalculate_edges(gv_tool.SceneView, gv_tool.Node, gv_tool.Edge, tool.Project)
+
+
+def load_bsdd():
+    core.load_bsdd()
+
+
+def center_scene():
+    core.center_scene(gv_tool.Node,gv_tool.SceneView)
+
+
+def export_requested():
+    core.export_requested()
+
+
+def import_requested():
+    core.import_requested()

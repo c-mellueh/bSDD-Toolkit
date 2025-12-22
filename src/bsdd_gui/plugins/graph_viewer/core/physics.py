@@ -9,13 +9,18 @@ if TYPE_CHECKING:
 
 
 def connect_signals(
-    phyiscs: Type[gv_tool.Physics], window: Type[gv_tool.Window], settings: Type[gv_tool.Settings]
+    phyiscs: Type[gv_tool.Physics],
+    window: Type[gv_tool.Window],
+    settings: Type[gv_tool.Settings],
+    scene_view: Type[gv_tool.SceneView],
 ):
     phyiscs.connect_internal_signals()
     window.signals.widget_created.connect(lambda _: build_phyiscs(phyiscs))
     window.signals.widget_hidden.connect(phyiscs.handle_hide)
     window.signals.widget_shown.connect(phyiscs.handle_shown)
     settings.signals.widget_created.connect(lambda sw: add_settings(phyiscs, settings))
+    window.signals.toggle_running_requested.connect(phyiscs.toggle_running)
+    scene_view.signals.toggle_running_requested.connect(phyiscs.toggle_running)
 
 
 def build_phyiscs(phyiscs: Type[gv_tool.Physics]):
@@ -37,7 +42,7 @@ def tick(
     edge: Type[gv_tool.Edge],
     scene_view: Type[gv_tool.SceneView],
 ):
-    if not phyiscs.get_running() or not node.get_nodes():
+    if not phyiscs.is_running() or not node.get_nodes():
         return
     ph = phyiscs.get_physics()
     scene = scene_view.get_scene()

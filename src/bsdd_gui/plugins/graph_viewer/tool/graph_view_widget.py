@@ -376,52 +376,15 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def clear_scene(cls):
-        scene = cls.get_scene()
-        if scene is None:
-            return
-        for e in scene.edges:
-            scene.removeItem(e)
-        for n in scene.nodes:
-            scene.removeItem(n)
-        scene.nodes.clear()
-        scene.edges.clear()
-
+        return None# Split into core.Edge and core.Node with Signal from Scene.clear_scene_requested
+   
     @classmethod
     def center_scene(cls):
-        scene = cls.get_scene()
-        view = cls.get_view()
-        if scene is None:
-            return
-        # Fit to visible nodes if any, with a small buffer
-        vis = [n for n in scene.nodes if n.isVisible()]
-        items = vis if vis else scene.nodes
-        if not items:
-            # Fallback to a reasonable default area
-            scene.setSceneRect(QRectF(-500, -500, 1000, 1000))
-            return
-        xs = [n.pos().x() for n in items]
-        ys = [n.pos().y() for n in items]
-        minx, maxx = min(xs), max(xs)
-        miny, maxy = min(ys), max(ys)
-        pad = 120.0
-        w = max(1.0, (maxx - minx)) + 2 * pad
-        h = max(1.0, (maxy - miny)) + 2 * pad
-        # scene.setSceneRect()
-
-        view.fitInView(QRectF(minx - pad, miny - pad, w, h), Qt.KeepAspectRatio)
-
+        return None # Moved to core.SceneView
+    
     @classmethod
     def retranslate_buttons(cls):
-        scene = cls.get_scene()
-        if not scene:
-            return
-        button_widget = cls.get_settings_widget()._button_settings
-        button_widget.retranslateUi(button_widget)
-        pause_text = QCoreApplication.translate("GraphView", "Pause")
-        play_text = QCoreApplication.translate("GraphView", "Play")
-        button_widget.bt_start_stop.setText(pause_text if scene.running else play_text)
-        icon = qta.icon("mdi6.pause") if scene.running else qta.icon("mdi6.play")
-        button_widget.bt_start_stop.setIcon(icon)
+        return None #Moved to core.SceneView
 
     @classmethod
     def toggle_running(cls):

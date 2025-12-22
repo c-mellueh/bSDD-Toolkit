@@ -24,15 +24,8 @@ def connect_signals(
     project: Type[tool.Project],
 ):
     node.signals.remove_edge_requested.connect(
-        lambda e, s, ov, ap: edge.remove_edge(
-            e,
-            s,
-            project.get(),
-            ov,
-            ap,
-        )
+        lambda e, s, ov, ap: edge.remove_edge(e, s, project.get(), ov, ap)
     )
-
     node.signals.node_created.connect(lambda n: node.get_properties().nodes.append(n))
     node.signals.node_created.connect(scene_view.add_item)
     settings.signals.widget_created.connect(lambda sw: add_settings(node, settings))
@@ -47,6 +40,15 @@ def connect_signals(
                     edge.requeste_path_update(e)
 
     node.signals.node_changed.connect(update_paths)
+
+    scene_view.signals.clear_scene_requested.connect(lambda: clear_all_nodes(node, scene_view))
+
+
+def clear_all_nodes(node: Type[gv_tool.Node], scene_view: Type[gv_tool.SceneView]):
+    scene = scene_view.get_scene()
+    for n in node.get_nodes():
+        scene.removeItem(n)
+    node.clear()
 
 
 def add_settings(node: Type[gv_tool.Node], settings: Type[gv_tool.Settings]):

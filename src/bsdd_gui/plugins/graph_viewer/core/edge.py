@@ -30,6 +30,14 @@ def connect_signals(
     edge.signals.filter_changed.connect(
         lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
     )
+    scene_view.signals.clear_scene_requested.connect(lambda: clear_all_edges(edge, scene_view))
+
+
+def clear_all_edges(edge: Type[gv_tool.Edge], scene_view: Type[gv_tool.SceneView]):
+    scene = scene_view.get_scene()
+    for n in edge.get_edges():
+        scene.removeItem(n)
+    edge.clear()
 
 
 def add_settings(edge: Type[gv_tool.Edge], settings: Type[gv_tool.Settings]):

@@ -1,9 +1,9 @@
 from __future__ import annotations
-from PySide6.QtCore import Qt, QPoint, QPointF
+from PySide6.QtCore import Qt, QRectF, QPointF, QCoreApplication
 from PySide6.QtGui import QMouseEvent, QDropEvent
 from typing import TYPE_CHECKING, Type
 
-
+import qtawesome as qta
 from bsdd_gui.plugins.graph_viewer.module.scene_view import constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
 from bsdd_json.utils import class_utils as cl_utils
@@ -24,17 +24,32 @@ def connect_signals(
     window: Type[gv_tool.Window],
     scene_view: Type[gv_tool.SceneView],
     settings: Type[gv_tool.Settings],
+    physics: Type[gv_tool.Physics],
 ):
     window.signals.widget_created.connect(lambda w: handle_widget_creation(w, scene_view))
-    window.signals.toggle_running_requested.connect(scene_view.toggle_running)
     window.signals.delete_selection_requested.connect(scene_view.request_delete_selection)
     scene_view.connect_internal_signals()
     settings.signals.widget_created.connect(lambda sw: add_settings(scene_view, settings))
+    physics.signals.is_running_changed.connect(scene_view.request_retranslate)
 
 
 def add_settings(scene_view: Type[gv_tool.SceneView], settings: Type[gv_tool.Settings]):
     widget = scene_view.create_button_widget()
+    scene_view.connect_button_settings()
     settings.add_content_widget(widget)
+
+
+def retranslate_ui(scene_view: Type[gv_tool.SceneView], phyiscs: Type[gv_tool.Physics]):
+    scene = scene_view.get_scene()
+    if not scene:
+        return
+    button_widget = scene_view.get_buttons_widget()
+    button_widget.retranslateUi(button_widget)
+    pause_text = QCoreApplication.translate("GraphView", "Pause")
+    play_text = QCoreApplication.translate("GraphView", "Play")
+    button_widget.bt_start_stop.setText(pause_text if phyiscs.is_running() else play_text)
+    icon = qta.icon("mdi6.pause") if phyiscs.is_running() else qta.icon("mdi6.play")
+    button_widget.bt_start_stop.setIcon(icon)
 
 
 def handle_widget_creation(widget: ui_window.GraphWidget, scene_view: Type[gv_tool.SceneView]):
@@ -45,16 +60,27 @@ def handle_widget_creation(widget: ui_window.GraphWidget, scene_view: Type[gv_to
     scene_view.connect_view()
 
 
-def clear_graph(
-    scene_view: Type[gv_tool.SceneView], node: Type[gv_tool.Node], edge: Type[gv_tool.Edge]
-):
+def center_scene(node: Type[gv_tool.Node], scene_view: Type[gv_tool.SceneView]):
     scene = scene_view.get_scene()
-    for e in edge.get_edges():
-        scene.removeItem(e)
-    for n in node.get_nodes():
-        scene.removeItem(n)
-    node.clear()
-    edge.clear()
+    view = scene_view.get_view()
+    if scene is None:
+        return
+    # Fit to visible nodes if any, with a small buffer
+    vis = [n for n in node.get_nodes() if n.isVisible()]
+    items = vis if vis else node.get_nodes()
+    if not items:
+        # Fallback to a reasonable default area
+        scene.setSceneRect(QRectF(-500, -500, 1000, 1000))
+        return
+    xs = [n.pos().x() for n in items]
+    ys = [n.pos().y() for n in items]
+    minx, maxx = min(xs), max(xs)
+    miny, maxy = min(ys), max(ys)
+    pad = 120.0
+    w = max(1.0, (maxx - minx)) + 2 * pad
+    h = max(1.0, (maxy - miny)) + 2 * pad
+    # scene.setSceneRect()
+    view.fitInView(QRectF(minx - pad, miny - pad, w, h), Qt.KeepAspectRatio)
 
 
 def delete_selection(
@@ -316,7 +342,7 @@ def insert_properties_in_scene(
     for bsdd_property in bsdd_properties:
         prop_uri = prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
         if prop_uri not in internal_nodes:
-            new_node = node.add_node( bsdd_property, pos=cur_position, is_external=False)
+            new_node = node.add_node(bsdd_property, pos=cur_position, is_external=False)
             internal_nodes[prop_uri] = new_node
             cur_position += offset_step
 
@@ -329,14 +355,10 @@ def insert_properties_in_scene(
             if related_bsdd_property.OwnedUri and dict_utils.is_external_ref(
                 related_bsdd_property.OwnedUri, bsdd_dictionary
             ):
-                new_node = node.add_node(
-                     related_bsdd_property, pos=cur_position, is_external=True
-                )
+                new_node = node.add_node(related_bsdd_property, pos=cur_position, is_external=True)
                 external_nodes[related_bsdd_property.OwnedUri] = new_node.bsdd_data
             else:
-                new_node = node.add_node(
-                     related_bsdd_property, pos=cur_position, is_external=False
-                )
+                new_node = node.add_node(related_bsdd_property, pos=cur_position, is_external=False)
                 uri = cl_utils.build_bsdd_uri(related_bsdd_property, bsdd_dictionary)
                 internal_nodes[uri] = new_node.bsdd_data
             cur_position += offset_step

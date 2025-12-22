@@ -297,7 +297,7 @@ class Physics:
             pos_y[idx] = y
             vel_x[idx] = v.x()
             vel_y[idx] = v.y()
-            movable[idx] = not (node.fixed or node.isUnderMouse())
+            movable[idx] = not node.isUnderMouse()
             pos_lookup[node] = (x, y)
             idx_of[node] = idx
 

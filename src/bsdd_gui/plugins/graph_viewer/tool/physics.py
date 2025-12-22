@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
-from PySide6.QtCore import QObject, QTimer
+from PySide6.QtCore import QObject, QTimer,Signal
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.physics import data, trigger, ui
 from bsdd_gui.presets.tool_presets import BaseTool
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class Signals(QObject):
-    pass
+    is_running_changed =Signal(bool)
 
 
 class Physics(BaseTool):
@@ -55,8 +55,14 @@ class Physics(BaseTool):
         cls.get_properties().running = value
 
     @classmethod
-    def get_running(cls) -> bool:
+    def is_running(cls) -> bool:
         return cls.get_properties().running
+
+    @classmethod
+    def toggle_running(cls):
+        cls.set_running(not cls.is_running())
+        cls.signals.is_running_changed.emit(cls.is_running())
+        return 
 
     @classmethod
     def get_auto_paused(cls) -> bool:
@@ -68,7 +74,7 @@ class Physics(BaseTool):
 
     @classmethod
     def handle_hide(cls, _=None):
-        if not cls.get_running():
+        if not cls.is_running():
             return
         cls.set_running(False)
         cls.set_auto_paused(True)

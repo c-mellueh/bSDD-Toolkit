@@ -97,6 +97,16 @@ class BaseTool(ABC):
     def connect_internal_signals(cls):
         return None
 
+    @classmethod
+    @abstractmethod
+    def _get_trigger(cls) -> ModuleType:
+        return None
+
+    @classmethod
+    def request_retranslate(cls):
+        cls._get_trigger().retranslate_ui()
+
+
 
 class ActionTool(BaseTool):
     """Preset to standardize QAction management.
@@ -169,10 +179,7 @@ class WidgetTool(BaseTool):
     def get_properties(cls) -> WidgetProperties:
         return None
 
-    @classmethod
-    @abstractmethod
-    def _get_trigger(cls) -> ModuleType:
-        return None
+
 
     @classmethod
     @abstractmethod
@@ -227,10 +234,6 @@ class WidgetTool(BaseTool):
         connects to trigger.create_widget
         """
         cls.signals.widget_requested.emit(*args, **kwargs)
-
-    @classmethod
-    def request_retranslate(cls):
-        cls._get_trigger().retranslate_ui()
 
     @classmethod
     def add_plugins_to_widget(cls, widget):

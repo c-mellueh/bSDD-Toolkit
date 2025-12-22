@@ -6,7 +6,7 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 
 from bsdd_json import BsddClass, BsddDictionary, BsddProperty
-from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint, QObject, QPointF,QRectF
+from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint, QObject, QPointF, QRectF
 from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QLabel, QGraphicsItem
 
@@ -30,6 +30,13 @@ class Signals(QObject):
     classes_insert_requested = Signal(list, QPointF)
     properties_insert_requested = Signal(list, QPointF)
     recalculate_edges_requested = Signal()
+    buchheim_requested = Signal()
+    clear_scene_requested = Signal()
+    center_scene_requested = Signal()
+    export_requested = Signal()
+    import_requested = Signal()
+    load_bsdd_requested = Signal()
+    toggle_running_requested = Signal()
 
 
 class SceneView(BaseTool):
@@ -45,6 +52,11 @@ class SceneView(BaseTool):
         cls.signals.classes_insert_requested.connect(trigger.insert_classes)
         cls.signals.properties_insert_requested.connect(trigger.insert_properties)
         cls.signals.recalculate_edges_requested.connect(trigger.recalculate_edges)
+        cls.signals.load_bsdd_requested.connect(trigger.load_bsdd)
+        cls.signals.center_scene_requested.connect(trigger.center_scene)
+        cls.signals.export_requested.connect(trigger.export_requested)
+        cls.signals.import_requested.connect(trigger.import_requested)
+
         return super().connect_internal_signals()
 
     @classmethod
@@ -153,11 +165,6 @@ class SceneView(BaseTool):
         return selected_nodes, selected_edges
 
     @classmethod
-    def toggle_running(cls):
-        scene = cls.get_scene()
-        scene.running = not scene.running
-
-    @classmethod
     def request_delete_selection(cls):
         cls.signals.delete_selection_requested.emit()
 
@@ -171,6 +178,8 @@ class SceneView(BaseTool):
 
     @classmethod
     def get_scene(cls) -> ui.GraphScene:
+        if not cls.get_properties().view:
+            return None
         return cls.get_properties().view.scene()
 
     @classmethod
@@ -328,4 +337,23 @@ class SceneView(BaseTool):
         button_widget.bt_tree.setIcon(qta.icon("mdi6.graph"))
         cls.get_properties().button_widget = button_widget
 
+        return cls.get_properties().button_widget
+
+    @classmethod
+    def connect_button_settings(cls):
+        button_widget = cls.get_buttons_widget()
+        button_widget.bt_load.clicked.connect(lambda _: trigger.load_bsdd())
+        button_widget.bt_start_stop.clicked.connect(
+            lambda _: cls.signals.toggle_running_requested.emit()
+        )
+        button_widget.bt_clear.clicked.connect(lambda _: cls.signals.clear_scene_requested.emit())
+        button_widget.bt_center.clicked.connect(lambda _: cls.signals.center_scene_requested.emit())
+
+        # Import/Export current graph layout (nodes + positions)
+        button_widget.bt_export.clicked.connect(lambda _: cls.signals.export_requested.emit())
+        button_widget.bt_import.clicked.connect(lambda _: cls.signals.import_requested.emit())
+        button_widget.bt_tree.clicked.connect(lambda _: cls.signals.buchheim_requested.emit())
+
+    @classmethod
+    def get_buttons_widget(cls):
         return cls.get_properties().button_widget
