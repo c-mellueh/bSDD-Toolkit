@@ -25,7 +25,6 @@ class Node(QGraphicsObject):
         self.brush: QBrush = None
         self.border: QPen = None
         self.velocity = QPointF(0.0, 0.0)
-        self.fixed = False
         self._w = 1.0
         self._h = 1.0
         self.node_shape = None

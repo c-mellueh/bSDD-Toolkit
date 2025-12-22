@@ -7,7 +7,9 @@ from PySide6.QtCore import QPointF
 
 
 if TYPE_CHECKING:
-    from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.graphics_items import Node, Edge
+    from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
+    from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
+
 
 
 class QuadTree:
