@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type, Callable
 import logging
 from bsdd_json import BsddDictionary
 import bsdd_gui
@@ -19,7 +19,7 @@ from PySide6.QtGui import QColor, QPen, QPainterPath, QPolygonF, QBrush
 from PySide6.QtWidgets import QGraphicsPathItem, QHBoxLayout, QLabel, QGraphicsItem
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
-from bsdd_gui.presets.tool_presets import BaseTool
+from bsdd_gui.presets.tool_presets import BaseTool, BaseSignal
 from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 if TYPE_CHECKING:
@@ -31,7 +31,7 @@ from bsdd_gui.module.ifc_helper.data import IfcHelperData
 RelationsDict = dict[constants.ALLOWED_EDGE_TYPES_TYPING, dict[tuple[str, str, str, str], ui.Edge]]
 
 
-class Signals(QObject):
+class Signals(BaseSignal):
     activate_edgetype_requested = Signal(str)
     edge_drag_started = Signal(QGraphicsPathItem)
     edge_drag_finished = Signal(QGraphicsPathItem)
@@ -43,7 +43,6 @@ class Signals(QObject):
     class_relation_removed = Signal(BsddClassRelation)
     class_property_removed = Signal(BsddClassProperty, BsddClass)
     property_relation_removed = Signal(BsddPropertyRelation)
-    edge_hide_requested = Signal(str)
     filter_changed = Signal(str, bool)
 
 
@@ -63,6 +62,10 @@ class Edge(BaseTool):
         super().connect_internal_signals()
         cls.signals.activate_edgetype_requested.connect(trigger.set_active_edge)
         cls.signals.new_edge_created.connect(lambda e: cls.get_properties().edges.append(e))
+
+    @classmethod
+    def disconnect_internal_signals(cls):
+        cls.signals.dk()
 
     @classmethod
     def _get_trigger(cls):
@@ -592,10 +595,6 @@ class Edge(BaseTool):
         text = constants.EDGE_TYPE_LABEL_MAP.get(str(key), str(key))
         QCoreApplication.translate("GaphViewer", text)
         return text
-
-    @classmethod
-    def request_edge_hide(cls, edge_type: str):
-        cls.signals.edge_hide_requested(edge_type)
 
     @classmethod
     def create_pen_for_edgestyle(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):

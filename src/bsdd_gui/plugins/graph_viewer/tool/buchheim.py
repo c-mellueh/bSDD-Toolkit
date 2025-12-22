@@ -39,6 +39,10 @@ class Buchheim(BaseTool):
         return super().connect_internal_signals()
 
     @classmethod
+    def disconnect_internal_signals(cls):
+        cls.signals.buchheim_requested.disconnect()
+
+    @classmethod
     def reset_children_dict(cls, nodes: list[Node], edges: list[Edge], active_edge_type: str):
         if not active_edge_type:
             return False

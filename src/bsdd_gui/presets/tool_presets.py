@@ -62,7 +62,7 @@ from bsdd_gui.presets.ui_presets import (
 )
 from bsdd_json import *
 import logging
-from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals
+from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals, BaseSignal
 from .models_presets import ItemModel
 import datetime
 import re
@@ -71,6 +71,7 @@ BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassP
 
 if TYPE_CHECKING:
     from .prop_presets import (
+        BaseProperties,
         ActionsProperties,
         ViewProperties,
         WidgetProperties,
@@ -81,6 +82,8 @@ if TYPE_CHECKING:
 
 
 class BaseTool(ABC):
+    signals = BaseSignal()
+
     """Abstract base for all tool presets.
 
     Subclasses provide a typed Properties object via get_properties(), and
@@ -89,7 +92,7 @@ class BaseTool(ABC):
 
     @classmethod
     @abstractmethod
-    def get_properties(cls) -> object:
+    def get_properties(cls) -> BaseProperties:
         return None
 
     @classmethod
@@ -106,6 +109,19 @@ class BaseTool(ABC):
     def request_retranslate(cls):
         cls._get_trigger().retranslate_ui()
 
+    @classmethod
+    def connect_external_signal(cls, signal: Signal, func: Callable):
+        signal.connect(func)
+        cls.get_properties().signal_handlers.append((signal, func))
+
+    @classmethod
+    def disconnect_external_signals(cls):
+        for signal, func in cls.get_properties().signal_handlers:
+            try:
+                signal.disconnect(func)
+            except Exception as e:
+                logging.debug(str(e))
+        cls.get_properties().signal_handlers = list()
 
 
 class ActionTool(BaseTool):
@@ -178,8 +194,6 @@ class WidgetTool(BaseTool):
     @abstractmethod
     def get_properties(cls) -> WidgetProperties:
         return None
-
-
 
     @classmethod
     @abstractmethod

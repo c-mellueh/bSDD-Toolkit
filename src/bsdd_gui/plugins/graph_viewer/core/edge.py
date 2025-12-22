@@ -28,7 +28,6 @@ def connect_signals(
     edge.signals.edge_drag_finished.connect(scene_view.remove_item)
     edge.signals.new_edge_created.connect(scene_view.add_item)
 
-    edge.connect_internal_signals()
     settings.signals.widget_created.connect(lambda sw: add_settings(edge, settings))
     edge.signals.filter_changed.connect(
         lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
@@ -52,8 +51,8 @@ def connect_signals(
     edge.signals.edge_removed.connect(_handle_rel_update)
     edge.signals.new_class_property_created.connect(_handle_prop_update)
     edge.signals.class_property_removed.connect(_handle_prop_update)
-
     window.signals.widget_closed.connect(edge.clear)
+    edge.connect_internal_signals()
 
 
 def connect_to_project_signals(
@@ -115,12 +114,12 @@ def connect_to_project_signals(
         if not edge.get_connected_edges(end_node):
             node.remove_node(end_node, scene_view.get_scene())
 
-    project.signals.class_relation_added.connect(handle_relation_add)
-    project.signals.class_relation_removed.connect(handle_relation_remove)
-    project.signals.property_relation_added.connect(handle_relation_add)
-    project.signals.property_relation_removed.connect(handle_relation_remove)
-    project.signals.ifc_relation_addded.connect(handle_ifc_relation_add)
-    project.signals.ifc_relation_removed.connect(handle_ifc_relation_remove)
+    edge.connect_external_signal(project.signals.class_relation_added, handle_relation_add)
+    edge.connect_external_signal(project.signals.class_relation_removed, handle_relation_remove)
+    edge.connect_external_signal(project.signals.property_relation_added, handle_relation_add)
+    edge.connect_external_signal(project.signals.property_relation_removed, handle_relation_remove)
+    edge.connect_external_signal(project.signals.ifc_relation_addded, handle_ifc_relation_add)
+    edge.connect_external_signal(project.signals.ifc_relation_removed, handle_ifc_relation_remove)
 
     # Out
 
@@ -136,6 +135,11 @@ def connect_to_project_signals(
     edge.signals.ifc_reference_added.connect(project.signals.ifc_relation_addded.emit)
     edge.signals.ifc_reference_removed.connect(project.signals.ifc_relation_removed.emit)
     edge.signals.new_edge_created.connect(handle_edge_add)
+
+
+def disconnect_signals(edge: Type[gv_tool.Edge]):
+    edge.disconnect_internal_signals()
+    edge.disconnect_external_signals()
 
 
 def clear_all_edges(edge: Type[gv_tool.Edge], scene_view: Type[gv_tool.SceneView]):

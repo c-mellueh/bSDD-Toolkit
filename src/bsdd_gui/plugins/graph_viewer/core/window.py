@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 def remove_main_menu_actions(
     window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]
 ):
-    action = window.get_action("open_window")
+    action = window.get_action(main_window.get(), "open_window")
     main_window.remove_action(None, action)
 
 

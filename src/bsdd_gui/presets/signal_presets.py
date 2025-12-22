@@ -5,8 +5,25 @@ from PySide6.QtWidgets import QWidget, QAbstractItemView
 from PySide6.QtCore import QObject, Signal
 from bsdd_gui.presets.ui_presets import FieldWidget, BaseDialog, BaseWindow
 
+import logging
 
-class WidgetSignals(QObject):
+
+class BaseSignal(QObject):
+
+    def get_signals(self) -> dict[str, Signal]:
+        return {name: obj for name, obj in self.__dict__.items() if isinstance(obj, Signal)}
+
+    def dk(self):
+        s_dict = self.get_signals()
+        for signal in s_dict.keys():
+            try:
+                getattr(self, signal).disconnect()
+            except Exception as e:
+                logging.debug(str(e))
+
+
+
+class WidgetSignals(BaseSignal):
     widget_requested = Signal()
     widget_closed = Signal(BaseWindow)
     widget_created = Signal(BaseWindow)
@@ -29,7 +46,7 @@ class DialogSignals(FieldSignals):
     dialog_requested = Signal(Any, QWidget)  # Data, Parent
 
 
-class ViewSignals(QObject):
+class ViewSignals(BaseSignal):
     model_refresh_requested = Signal()
     selection_changed = Signal(
         QAbstractItemView, Any

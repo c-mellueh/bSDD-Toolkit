@@ -25,7 +25,7 @@ def activate():
     core.connect_to_project_signals(gv_tool.Node,gv_tool.Edge,gv_tool.SceneView,tool.Project)
 
 def deactivate():
-    pass
+    core.disconnect_signals(gv_tool.Edge)
 
 
 def retranslate_ui():

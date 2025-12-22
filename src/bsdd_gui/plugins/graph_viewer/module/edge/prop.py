@@ -1,15 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from . import constants
-
+from bsdd_gui.presets.prop_presets import BaseProperties
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
     from PySide6.QtWidgets import QGraphicsPathItem
     from . import ui
 
 
-class GraphViewerEdgeProperties:
+class GraphViewerEdgeProperties(BaseProperties):
+    
     def __init__(self):
+        super().__init__()
         self.edge_drag_active: bool = False
         self.edge_drag_start_node: Node | None = None
         self.edge_preview_item: QGraphicsPathItem | None = None
