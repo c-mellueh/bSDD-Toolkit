@@ -318,12 +318,20 @@ class SceneView(BaseTool):
         cls.signals.classes_insert_requested.emit(classes, postion)
 
     @classmethod
+    def request_center_scene(cls):
+        cls.signals.center_scene_requested.emit()
+
+    @classmethod
     def request_properties_insert(cls, properties: list[BsddProperty], postion: QPointF):
         cls.signals.properties_insert_requested.emit(properties, postion)
 
     @classmethod
     def request_recalculate_edges(cls):
         cls.signals.recalculate_edges_requested.emit()
+
+    @classmethod
+    def request_clear_scene(cls):
+        cls.signals.clear_scene_requested.emit()
 
     @classmethod
     def create_button_widget(cls):
@@ -346,8 +354,8 @@ class SceneView(BaseTool):
         button_widget.bt_start_stop.clicked.connect(
             lambda _: cls.signals.toggle_running_requested.emit()
         )
-        button_widget.bt_clear.clicked.connect(lambda _: cls.signals.clear_scene_requested.emit())
-        button_widget.bt_center.clicked.connect(lambda _: cls.signals.center_scene_requested.emit())
+        button_widget.bt_clear.clicked.connect(lambda _: cls.request_clear_scene())
+        button_widget.bt_center.clicked.connect(lambda _: cls.request_center_scene())
 
         # Import/Export current graph layout (nodes + positions)
         button_widget.bt_export.clicked.connect(lambda _: cls.signals.export_requested.emit())

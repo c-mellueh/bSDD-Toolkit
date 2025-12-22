@@ -165,10 +165,10 @@ class Node(BaseTool):
         return cls.get_properties().shape_map.get(node_type, constants.SHAPE_STYLE_RECT)
 
     @classmethod
-    def _node_from_item(cls, item: QGraphicsItem) -> Node | None:
+    def _node_from_item(cls, item: QGraphicsItem) -> ui.Node | None:
         it = item
         while it is not None:
-            if isinstance(it, Node):
+            if isinstance(it, ui.Node):
                 return it
             try:
                 it = it.parentItem()

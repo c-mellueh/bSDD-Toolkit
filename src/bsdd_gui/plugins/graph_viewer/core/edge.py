@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer import tool as gv_tool
     from bsdd_gui.plugins.graph_viewer.module.edge import ui, constants
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
-    from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
     from bsdd_gui.plugins.graph_viewer.module.settings import ui as setting_ui
 
 
@@ -75,6 +74,7 @@ def create_relation(
     scene_view: Type[gv_tool.SceneView],
     project: Type[tool.Project],
 ):
+    from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
 
     if start_node.node_type == node_constants.CLASS_NODE_TYPE:
 

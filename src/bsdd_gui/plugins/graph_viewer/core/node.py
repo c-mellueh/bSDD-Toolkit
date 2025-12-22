@@ -32,6 +32,7 @@ def connect_signals(
     node.signals.filter_changed.connect(
         lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
     )
+    node.connect_internal_signals()
 
     def update_paths(change: QGraphicsItem.GraphicsItemChange, n: ui.Node):
         if change == QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged:

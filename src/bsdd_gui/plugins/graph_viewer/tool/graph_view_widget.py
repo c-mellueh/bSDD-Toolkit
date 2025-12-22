@@ -388,21 +388,16 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def toggle_running(cls):
-        cls.retranslate_buttons()
+        return None# Moved to Phyiscs
 
     @classmethod
     def pause(cls):
-        scene = cls.get_scene()
-        if not scene:
-            return
-        scene.running = False
+        return None# Moved to Phyiscs
+
 
     @classmethod
     def play(cls):
-        scene = cls.get_scene()
-        if not scene:
-            return
-        scene.running = True
+        return None# Moved to Phyiscs
 
     @classmethod
     def get_selected_items(cls) -> tuple[list[graphics_items.Node], list[graphics_items.Edge]]:

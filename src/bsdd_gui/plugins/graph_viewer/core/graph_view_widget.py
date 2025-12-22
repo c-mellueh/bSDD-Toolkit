@@ -201,27 +201,7 @@ def popuplate_widget(
     project: Type[tool.Project],
     ifc_helper: Type[tool.IfcHelper],
 ):
-    widget = graph_view.get_widget()
-    if widget is None:
-        return
-    bsdd_dictionary = project.get()
-    graph_view.clear_scene()
-    position = QPointF(0.0, 0.0)
-    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
-    graph_view.insert_classes_in_scene(
-        bsdd_dictionary,
-        graph_view.get_scene(),
-        bsdd_dictionary.Classes,
-        position,
-        ifc_classes=ifc_classes,
-    )
-    widget._apply_filters()
-    graph_view.center_scene()
-    position += QPointF(40.0, 40.0)
-    graph_view.insert_properties_in_scene(
-        bsdd_dictionary, graph_view.get_scene(), bsdd_dictionary.Properties, position
-    )
-    recalculate_edges(graph_view, project)
+    return None # Moved to core.SceneView
 
 
 def handle_drop_event(
@@ -233,38 +213,7 @@ def handle_drop_event(
     project: Type[tool.Project],
     ifc_helper: Type[tool.IfcHelper],
 ):
-    mime_data = event.mimeData()
-    mime_type = graph_view.get_mime_type(mime_data)
-    if mime_type is None:
-        event.ignore()
-        return
-    scene_pos = graph_view.get_position_from_event(event, view)
-    bsdd_dictionary = project.get()
-
-    classes_to_add: list[BsddClass] = list()
-    properties_to_add = list()
-    if mime_type == constants.CLASS_DRAG:
-        payload = class_tree.get_payload_from_data(mime_data)
-        classes_to_add += graph_view.read_classes_to_add(payload, bsdd_dictionary)
-
-    elif mime_type == constants.PROPERTY_DRAG:
-        payload = property_table.get_payload_from_data(mime_data)
-        properties_to_add += graph_view.read_properties_to_add(payload, bsdd_dictionary)
-
-    if not classes_to_add and not properties_to_add:
-        event.ignore()
-        return
-
-    scene = view.scene()
-    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
-    new_class_nodes = graph_view.insert_classes_in_scene(
-        bsdd_dictionary, scene, classes_to_add, scene_pos, ifc_classes=ifc_classes
-    )
-    new_property_nodes = graph_view.insert_properties_in_scene(
-        bsdd_dictionary, scene, properties_to_add, scene_pos
-    )
-    recalculate_edges(graph_view, project)
-    event.acceptProposedAction()
+    return None #core.SceneView
 
 
 def recalculate_edges(graph_view: Type[gv_tool.GraphViewWidget], project: Type[tool.Project]):

@@ -84,7 +84,7 @@ def recalculate_edges():
 
 
 def load_bsdd():
-    core.load_bsdd()
+    core.popuplate_widget(gv_tool.SceneView,gv_tool.Edge,gv_tool.Node,tool.Project)
 
 
 def center_scene():

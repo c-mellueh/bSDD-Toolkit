@@ -111,10 +111,10 @@ def double_click_event(
 ):
     pos_view = scene_view._event_qpoint(event)
     item = scene_view._item_at_pos(pos_view)
-    node = node._node_from_item(item)
-    if node is None:
+    n = node._node_from_item(item)
+    if n is None:
         return True
-    node.emit_node_double_clicked(node)
+    node.emit_node_double_clicked(n)
     event.accept()
     return False
 
@@ -387,3 +387,21 @@ def recalculate_edges(
         relations_dict[e.edge_type][edge._info(e.start_node, e.end_node, bsdd_dict)] = e
 
     scene_view.apply_filters(edge.get_filters(), node.get_filters())
+
+def popuplate_widget(
+    scene_view: Type[gv_tool.SceneView],
+    edge:Type[gv_tool.Edge],
+    node:Type[gv_tool.Node],
+    project: Type[tool.Project],
+):
+
+    bsdd_dictionary = project.get()
+    scene_view.request_clear_scene()
+    position = QPointF(0.0, 0.0)
+    scene_view.request_classes_insert(bsdd_dictionary.Classes,position)
+    scene_view.apply_filters(edge.get_filters(),node.get_filters())
+    scene_view.request_center_scene()
+
+    position += QPointF(40.0, 40.0)
+    scene_view.request_properties_insert(bsdd_dictionary.Properties,position)
+    scene_view.request_recalculate_edges()
