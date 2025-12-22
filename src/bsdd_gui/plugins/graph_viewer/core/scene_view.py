@@ -316,7 +316,7 @@ def insert_properties_in_scene(
     for bsdd_property in bsdd_properties:
         prop_uri = prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
         if prop_uri not in internal_nodes:
-            new_node = node.add_node(scene, bsdd_property, pos=cur_position, is_external=False)
+            new_node = node.add_node( bsdd_property, pos=cur_position, is_external=False)
             internal_nodes[prop_uri] = new_node
             cur_position += offset_step
 
@@ -330,12 +330,12 @@ def insert_properties_in_scene(
                 related_bsdd_property.OwnedUri, bsdd_dictionary
             ):
                 new_node = node.add_node(
-                    scene, related_bsdd_property, pos=cur_position, is_external=True
+                     related_bsdd_property, pos=cur_position, is_external=True
                 )
                 external_nodes[related_bsdd_property.OwnedUri] = new_node.bsdd_data
             else:
                 new_node = node.add_node(
-                    scene, related_bsdd_property, pos=cur_position, is_external=False
+                     related_bsdd_property, pos=cur_position, is_external=False
                 )
                 uri = cl_utils.build_bsdd_uri(related_bsdd_property, bsdd_dictionary)
                 internal_nodes[uri] = new_node.bsdd_data

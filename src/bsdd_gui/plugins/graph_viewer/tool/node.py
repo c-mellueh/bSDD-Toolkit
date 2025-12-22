@@ -1,9 +1,9 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 import logging
-from PySide6.QtCore import Signal, QPointF, QObject, QCoreApplication, Qt
-from PySide6.QtWidgets import QGraphicsItem, QHBoxLayout, QLabel
-from PySide6.QtGui import QColor
+from PySide6.QtCore import Signal, QPointF, QObject, QCoreApplication, Qt, QRectF
+from PySide6.QtWidgets import QGraphicsItem, QHBoxLayout, QLabel, QApplication
+from PySide6.QtGui import QColor, QPen, QBrush, QFontMetrics, QPainterPath, QPainter
 import random
 import bsdd_gui
 from bsdd_json import BsddDictionary, BsddClass, BsddProperty
@@ -30,6 +30,7 @@ class Signals(QObject):
     node_created = Signal(ui.Node)
     remove_node_requested = Signal(ui.Node)
     node_double_clicked = Signal(ui.Node)
+    node_changed = Signal(QGraphicsItem.GraphicsItemChange, ui.Node)
     filter_changed = Signal(str, bool)
 
 
@@ -73,10 +74,48 @@ class Node(BaseTool):
         cls.get_properties().nodes.remove(node)
 
     @classmethod
-    def add_node(
-        cls, bsdd_data: BsddClass | BsddProperty, pos=None, color=None, is_external=False
-    ) -> ui.Node:
-        n = ui.Node(bsdd_data, color=color, is_external=is_external)
+    def calculate_node_type(cls, node: ui.Node):
+        bsdd_data, is_external = node.bsdd_data, node.is_external
+        if isinstance(bsdd_data, BsddProperty):
+            if is_external:
+                node_type = constants.EXTERNAL_PROPERTY_NODE_TYPE
+            else:
+                node_type = constants.PROPERTY_NODE_TYPE
+        elif isinstance(bsdd_data, BsddClass):
+            if cl_utils.is_ifc_reference(bsdd_data):
+                node_type = constants.IFC_NODE_TYPE
+            elif is_external:
+                node_type = constants.EXTERNAL_CLASS_NODE_TYPE
+            else:
+                node_type = constants.CLASS_NODE_TYPE
+        else:
+            node_type = "generic"
+        return node_type
+
+    @classmethod
+    def setup_node(cls, node: ui.Node):
+
+        node.node_type = cls.calculate_node_type(node)
+        node.color = cls.get_color(node.node_type)
+        node.brush = QBrush(node.color)
+        node.border = QPen(QColor(40, 60, 90), 1.2)
+        node.border.setCosmetic(True)
+        node.node_shape = cls.get_shape(node.node_type)
+        flags = (
+            QGraphicsItem.ItemIsMovable
+            | QGraphicsItem.ItemSendsGeometryChanges
+            | QGraphicsItem.ItemIsSelectable
+        )
+        node.setFlags(flags)
+        node.setAcceptHoverEvents(True)
+        node.double_clicked.connect(lambda n=node: cls.signals.node_double_clicked.emit(n))
+        node.item_changed.connect(lambda c,n=node: cls.signals.node_changed.emit(c,n))
+
+    @classmethod
+    def add_node(cls, bsdd_data: BsddClass | BsddProperty, pos=None, is_external=False) -> ui.Node:
+        n = ui.Node(bsdd_data, is_external=is_external)
+        cls.setup_node(n)
+
         p = (
             pos
             if pos is not None
@@ -225,7 +264,7 @@ class Node(BaseTool):
             lbl = QLabel(name)
             lbl.setToolTip(name)
             sw = ToggleSwitch(checked=True)
-            sw.toggled.connect(lambda _,nt=node_type: cls.toggle_filter_state(nt))
+            sw.toggled.connect(lambda _, nt=node_type: cls.toggle_filter_state(nt))
             row.addWidget(icon, 0)
             row.addWidget(lbl, 1)
             row.addWidget(sw, 0, alignment=Qt.AlignRight)
@@ -233,5 +272,31 @@ class Node(BaseTool):
         return rows
 
     @classmethod
-    def create_pen(cls, node_type: constants.ALLOWED_NODE_TYPES_TYPING):
-        cls.get_col
+    def path_from_node_shape(
+        cls, node_shape: constants.ALLOWED_NODE_SHAPES_TYPING, width: float, height: float
+    ) -> QPainterPath:
+        path = QPainterPath()
+        if node_shape == constants.SHAPE_STYPE_ELLIPSE:
+            path.addEllipse(QRectF(-width / 2, -height / 2, width, height))
+        elif node_shape == constants.SHAPE_STYLE_ROUNDED_RECT:
+            path.addRoundedRect(QRectF(-width / 2, -height / 2, width, height), 6, 6)
+        elif node_shape == constants.SHAPE_STYLE_RECT:  # rect
+            path.addRect(QRectF(-width / 2, -height / 2, width, height))
+        return path
+
+    @classmethod
+    def _update_size_for_text(cls, node: ui.Node, painter: Optional[QPainter] = None):
+        # Compute size from current font metrics so the rectangle fits the text
+        try:
+            fm = painter.fontMetrics() if painter is not None else QFontMetrics(QApplication.font())
+        except Exception:
+            return  # can't compute metrics safely right now
+        tr = fm.boundingRect(node.label)
+        pad_x, pad_y = cls.get_properties().text_padding
+        new_w = tr.width() + 2 * pad_x
+        new_h = tr.height() + 2 * pad_y
+        # Avoid excessive geometry changes for tiny fluctuations
+        if abs(new_w - node._w) > 0.5 or abs(new_h - node._h) > 0.5:
+            node.prepareGeometryChange()
+            node._w = new_w
+            node._h = new_h

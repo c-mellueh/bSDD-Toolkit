@@ -11,3 +11,4 @@ class GraphViewerNodeProperties:
 
         self.color_map = constants.NODE_COLOR_MAP
         self.shape_map = constants.NODE_SHAPE_MAP
+        self.text_padding = 10.0, 6.0

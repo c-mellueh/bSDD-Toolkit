@@ -7,6 +7,7 @@ from bsdd_gui.plugins.graph_viewer import tool as gv_tool
 
 if TYPE_CHECKING:
     from . import ui
+    from PySide6.QtGui import QPainter
 
 
 def activate():
@@ -35,3 +36,7 @@ def node_double_clicked(node):
 
 def paint_node_legend(node_legend):
     core.paint_node_legend(node_legend, gv_tool.Node)
+
+
+def paint_node(painter:QPainter,node:ui.Node):
+    core.paint_node(node,painter,gv_tool.Node)

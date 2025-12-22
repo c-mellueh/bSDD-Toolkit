@@ -76,6 +76,13 @@ NODE_COLOR_MAP: dict[str, QColor] = {
 SHAPE_STYPE_ELLIPSE = "ellipse"
 SHAPE_STYLE_RECT = "rect"
 SHAPE_STYLE_ROUNDED_RECT = "roundrect"
+
+ALLOWED_NODE_SHAPES_TYPING = Literal[
+    "ellipse",
+    "rect",
+    "roundrect",
+]
+
 NODE_SHAPE_MAP: dict[str, str] = {
     CLASS_NODE_TYPE: SHAPE_STYLE_RECT,
     EXTERNAL_CLASS_NODE_TYPE: SHAPE_STYLE_RECT,

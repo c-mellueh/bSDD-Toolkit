@@ -54,6 +54,10 @@ class Edge(BaseTool):
         return bsdd_gui.GraphViewerEdgeProperties
 
     @classmethod
+    def get_edge_class(cls)->Type[ui.Edge]:
+        return ui.Edge
+
+    @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
         cls.signals.activate_edgetype_requested.connect(trigger.set_active_edge)

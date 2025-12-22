@@ -4,8 +4,9 @@ import webbrowser
 
 
 from bsdd_gui.plugins.graph_viewer.module.node import constants
-from PySide6.QtGui import QPainter, QPen, QBrush
-from PySide6.QtCore import Qt
+from PySide6.QtGui import QPainter, QPen, QBrush, QColor
+from PySide6.QtWidgets import QGraphicsItem
+from PySide6.QtCore import Qt, QRectF
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -38,6 +39,14 @@ def connect_signals(
     node.signals.filter_changed.connect(
         lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
     )
+
+    def update_paths(change: QGraphicsItem.GraphicsItemChange, n: ui.Node):
+        if change == QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged:
+            for e in scene_view.get_scene().items():
+                if isinstance(e, edge.get_edge_class()) and (e.start_node is n or e.end_node is n):
+                    edge.requeste_path_update(e)
+
+    node.signals.node_changed.connect(update_paths)
 
 
 def add_settings(node: Type[gv_tool.Node], settings: Type[gv_tool.Settings]):
@@ -94,3 +103,22 @@ def paint_node_legend(node_legend: ui._NodeLegendIcon, node: Type[gv_tool.Node])
         p.drawRoundedRect(rect, 4, 4)
     else:
         p.drawRect(rect)
+
+
+def paint_node(focus_node: ui.Node, painter: QPainter, node: Type[gv_tool.Node]):
+    painter.setRenderHint(QPainter.Antialiasing)
+    # Ensure our rectangle matches current text size and font
+    node._update_size_for_text(focus_node, painter)
+    painter.setPen(focus_node.border)
+    painter.setBrush(
+        focus_node.brush if not focus_node.isSelected() else QBrush(QColor(255, 180, 90))
+    )
+    rect = QRectF(-focus_node._w / 2, -focus_node._h / 2, focus_node._w, focus_node._h)
+    if focus_node.node_shape == "ellipse":
+        painter.drawEllipse(rect)
+    elif focus_node.node_shape == "roundrect":
+        painter.drawRoundedRect(rect, 6, 6)
+    else:
+        painter.drawRect(rect)
+    painter.setPen(QPen(QColor(20, 20, 30)))
+    painter.drawText(rect, Qt.AlignCenter, focus_node.label)
