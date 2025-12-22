@@ -20,7 +20,7 @@ def connect_signals(
         margin = 6
         settings.position_and_resize(viewport.width(), viewport.height(), margin)
 
-    window.signals.widget_created.connect(lambda w: settings.create_widget())
+    window.signals.widget_created.connect(lambda w: settings.create_widget(scene_view.get_view().viewport()))
     settings.signals.expanded_changed.connect(reposition)
     window.signals.widget_resized.connect(reposition)
     window.signals.widget_shown.connect(reposition)
@@ -35,11 +35,8 @@ def register_widget(
     widget: ui.SettingsWidget, settings: Type[gv_tool.Settings], scene_view: Type[gv_tool.SceneView]
 ):
     settings.register_widget(widget)
-
     viewport = scene_view.get_view().viewport()
-
     settings.apply_expanded_state()
-    widget.setParent(viewport)
     widget.show()
     settings.position_and_resize(viewport.width(), viewport.height(), 6)
 

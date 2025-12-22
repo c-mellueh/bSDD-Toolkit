@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1001</width>
-    <height>693</height>
+    <width>1000</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,29 @@
     <widget class="InputBar" name="widget" native="true"/>
    </item>
    <item>
-    <widget class="GraphView" name="view"/>
+    <widget class="GraphView" name="view">
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="renderHints">
+      <set>QPainter::RenderHint::Antialiasing</set>
+     </property>
+     <property name="dragMode">
+      <enum>QGraphicsView::DragMode::RubberBandDrag</enum>
+     </property>
+     <property name="transformationAnchor">
+      <enum>QGraphicsView::ViewportAnchor::AnchorUnderMouse</enum>
+     </property>
+     <property name="resizeAnchor">
+      <enum>QGraphicsView::ViewportAnchor::AnchorViewCenter</enum>
+     </property>
+     <property name="viewportUpdateMode">
+      <enum>QGraphicsView::ViewportUpdateMode::FullViewportUpdate</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QStatusBar" name="statusbar"/>

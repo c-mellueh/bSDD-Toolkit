@@ -5,6 +5,7 @@ from . import trigger
 from .qt import ui_Buttons
 from bsdd_gui.plugins.graph_viewer.module.settings.ui import _SettingsWidget
 
+
 class GraphView(QGraphicsView):
     def __init__(self, scene: QGraphicsScene):
         super().__init__(scene)
