@@ -141,7 +141,7 @@ EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
 
 # Display label mappings (to be translated in UI)
 # These provide human-friendly names for types; UI should wrap with
-# QCoreApplication.translate("GraphViewSettings", ...)
+
 EDGE_TYPE_LABEL_MAP: dict[str, str] = {
     PARENT_CLASS: "Parent Class Code",
     C_P_REL: "Class Property",

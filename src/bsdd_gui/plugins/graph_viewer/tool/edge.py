@@ -367,7 +367,7 @@ class Edge(BaseTool):
             rienl = [x.lower() for x in start_class.RelatedIfcEntityNamesList or []]
             if end_class.Code.lower() not in rienl:
                 start_class.RelatedIfcEntityNamesList.append(end_class.Code)
-                cls.signals.ifc_reference_added.emit(start_class,end_class.Code)
+                cls.signals.ifc_reference_added.emit(start_class, end_class.Code)
 
         else:
             if end_class.OwnedUri:
@@ -647,7 +647,7 @@ class Edge(BaseTool):
     def create_edge_type_settings_widget(cls) -> ui.EdgeTypeSettingsWidget:
         widget = ui.EdgeTypeSettingsWidget()
         cls.get_properties().edge_type_settings_widget = widget
-        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Edge Types"))
+        title = QLabel(QCoreApplication.translate("GraphViewer", "Edge Types"))
         title.setObjectName("titleLabel")
         widget.layout().addWidget(title)
         return widget

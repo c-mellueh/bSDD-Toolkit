@@ -6,7 +6,7 @@ from bsdd_gui.presets.tool_presets import BaseTool
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.buchheim import ui, trigger, constants
 from PySide6.QtWidgets import QWidget, QMessageBox
-from PySide6.QtCore import QCoreApplication, QPointF, Signal,QObject
+from PySide6.QtCore import QCoreApplication, QPointF, Signal, QObject
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.buchheim.prop import GraphViewerBuchheimProperties
@@ -70,7 +70,7 @@ class Buchheim(BaseTool):
     def create_information(cls, parent_widget: QWidget):
         # Inform the user that an edge type must be selected
         try:
-            title = QCoreApplication.translate("GraphView", "Create Tree")
+            title = QCoreApplication.translate("GraphViewer", "Create Tree")
             msg = QCoreApplication.translate(
                 "GraphView",
                 "Select an edge type in the sidebar (Edge Types) by double-clicking the legend to activate it, then run Create Tree.",

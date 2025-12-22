@@ -251,7 +251,7 @@ class Node(BaseTool):
     def create_settings_widget(cls):
         widget = ui.NodeTypeSettingsWidget()
         cls.get_properties().settings_widget = widget
-        title = QLabel(QCoreApplication.translate("GraphViewSettings", "Node Types"))
+        title = QLabel(QCoreApplication.translate("GraphViewer", "Node Types"))
         title.setObjectName("titleLabel")
         widget.layout().addWidget(title)
         return widget
@@ -354,14 +354,12 @@ class Node(BaseTool):
             return
 
     @classmethod
-    def get_node_from_bsdd_data(
-        cls, bsdd_data: BsddClass | BsddProperty
-    ) -> ui.Node | None:
+    def get_node_from_bsdd_data(cls, bsdd_data: BsddClass | BsddProperty) -> ui.Node | None:
         for node in cls.get_nodes():
             if node.bsdd_data == bsdd_data:
                 return node
         return None
-    
+
     @classmethod
     def get_node_from_ifc_code(cls, ifc_code: str):
 

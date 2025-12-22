@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer import tool as gv_tool
     from bsdd_gui.plugins.graph_viewer.module.window import ui
 
+
 def remove_main_menu_actions(
     window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]
 ):
@@ -33,17 +34,19 @@ def connect_signals(window: Type[gv_tool.Window]):
 
 def retranslate_ui(window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]):
     action = window.get_action(main_window.get(), "open_window")
-    action.setText(QCoreApplication.translate("GraphView", "Graph Viewer"))
+    action.setText(QCoreApplication.translate("GraphViewer", "Graph Viewer"))
     widget = window.get_widget()
     if not widget:
         return
     widget.retranslateUi(widget)
-    widget.setWindowTitle(QCoreApplication.translate("GraphView","Graph Viewer"))
+    widget.setWindowTitle(QCoreApplication.translate("GraphViewer", "Graph Viewer"))
+
 
 def create_widget(data, parent, window: Type[gv_tool.Window], scene_view: Type[gv_tool.SceneView]):
     widget = window.show_widget(data, parent)
     scene_view.reposition_help_overlay()
     window.signals.widget_resized.emit(widget)
+
 
 def register_widget(widget: ui.GraphWidget, window: gv_tool.Window):
     window.register_widget(widget)

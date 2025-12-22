@@ -47,8 +47,8 @@ def retranslate_ui(scene_view: Type[gv_tool.SceneView], phyiscs: Type[gv_tool.Ph
         return
     button_widget = scene_view.get_buttons_widget()
     button_widget.retranslateUi(button_widget)
-    pause_text = QCoreApplication.translate("GraphView", "Pause")
-    play_text = QCoreApplication.translate("GraphView", "Play")
+    pause_text = QCoreApplication.translate("GraphViewer", "Pause")
+    play_text = QCoreApplication.translate("GraphViewer", "Play")
     button_widget.bt_start_stop.setText(pause_text if phyiscs.is_running() else play_text)
     icon = qta.icon("mdi6.pause") if phyiscs.is_running() else qta.icon("mdi6.play")
     button_widget.bt_start_stop.setIcon(icon)
@@ -418,7 +418,7 @@ def export_graph(
 ):
 
     last_path = appdata.get_path(constants.PATH_NAME) or "graph_layout.json"
-    text = QCoreApplication.translate("Graph View", "Export Graph View")
+    text = QCoreApplication.translate("GraphViewer", "Export Graph View")
     path = popups.get_save_path(constants.FILETYPE, window.get_widget(), last_path, text)
     if not path:
         return
@@ -429,7 +429,7 @@ def export_graph(
             json.dump(payload, f, ensure_ascii=False, indent=2)
         try:
             window.set_status(
-                QCoreApplication.translate("GraphView", "Layout exported: ") + str(path),
+                QCoreApplication.translate("GraphViewer", "Layout exported: ") + str(path),
                 3000,
             )
         except Exception:
@@ -449,7 +449,7 @@ def import_graph(
 ):
 
     last_path = appdata.get_path(constants.PATH_NAME)
-    title = QCoreApplication.translate("Graph View", "Export Graph View")
+    title = QCoreApplication.translate("GraphViewer", "Export Graph View")
 
     path = popups.get_open_path(constants.FILETYPE, window.get_widget(), last_path, title)
     if not path:
@@ -478,7 +478,7 @@ def import_graph(
     scene_view.request_recalculate_edges()
     try:
         window.set_status(
-            QCoreApplication.translate("GraphView", "Layout imported: ") + str(path),
+            QCoreApplication.translate("GraphViewer", "Layout imported: ") + str(path),
             3000,
         )
     except Exception:
