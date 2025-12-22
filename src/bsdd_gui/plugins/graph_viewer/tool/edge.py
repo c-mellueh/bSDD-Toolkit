@@ -19,7 +19,7 @@ from PySide6.QtGui import QColor, QPen, QPainterPath, QPolygonF, QBrush
 from PySide6.QtWidgets import QGraphicsPathItem, QHBoxLayout, QLabel, QGraphicsItem
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
-from bsdd_gui.presets.tool_presets import BaseTool, BaseSignal
+from bsdd_gui.presets.tool_presets import PluginTool, PluginSignals
 from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 if TYPE_CHECKING:
@@ -31,7 +31,7 @@ from bsdd_gui.module.ifc_helper.data import IfcHelperData
 RelationsDict = dict[constants.ALLOWED_EDGE_TYPES_TYPING, dict[tuple[str, str, str, str], ui.Edge]]
 
 
-class Signals(BaseSignal):
+class Signals(PluginSignals):
     activate_edgetype_requested = Signal(str)
     edge_drag_started = Signal(QGraphicsPathItem)
     edge_drag_finished = Signal(QGraphicsPathItem)
@@ -46,7 +46,7 @@ class Signals(BaseSignal):
     filter_changed = Signal(str, bool)
 
 
-class Edge(BaseTool):
+class Edge(PluginTool):
     signals = Signals()
 
     @classmethod

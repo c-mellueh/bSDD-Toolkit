@@ -1,7 +1,8 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import BaseProperties
+from bsdd_gui.presets.prop_presets import PluginProperties
 
-class GraphViewerBuchheimProperties(BaseProperties):
+
+class GraphViewerBuchheimProperties(PluginProperties):
     def __init__(self):
         super().__init__()
         self.children_dict = dict()

@@ -8,12 +8,12 @@ from bsdd_gui.presets.ui_presets import FieldWidget, BaseDialog, BaseWindow
 import logging
 
 
-class BaseSignal(QObject):
+class PluginSignals(QObject):
 
     def get_signals(self) -> dict[str, Signal]:
         return {name: obj for name, obj in self.__dict__.items() if isinstance(obj, Signal)}
 
-    def dk(self):
+    def disconnect_all_signals(self):
         s_dict = self.get_signals()
         for signal in s_dict.keys():
             try:
@@ -22,8 +22,7 @@ class BaseSignal(QObject):
                 logging.debug(str(e))
 
 
-
-class WidgetSignals(BaseSignal):
+class WidgetSignals(QObject):
     widget_requested = Signal()
     widget_closed = Signal(BaseWindow)
     widget_created = Signal(BaseWindow)
@@ -46,7 +45,7 @@ class DialogSignals(FieldSignals):
     dialog_requested = Signal(Any, QWidget)  # Data, Parent
 
 
-class ViewSignals(BaseSignal):
+class ViewSignals(PluginSignals):
     model_refresh_requested = Signal()
     selection_changed = Signal(
         QAbstractItemView, Any

@@ -5,7 +5,7 @@ import logging
 
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.window import ui, trigger
-from bsdd_gui.presets.tool_presets import ActionTool, FieldTool
+from bsdd_gui.presets.tool_presets import ActionTool, FieldTool,PluginTool,PluginSignals
 from bsdd_gui.presets.signal_presets import FieldSignals
 
 if TYPE_CHECKING:
@@ -13,14 +13,14 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
 
 
-class Signals(FieldSignals):
+class Signals(PluginSignals,FieldSignals):
     toggle_running_requested = Signal()
     delete_selection_requested = Signal()
     active_edgetype_requested = Signal(object)
     shown = Signal()
 
 
-class Window(ActionTool, FieldTool):
+class Window(PluginTool,ActionTool, FieldTool):
     signals = Signals()
 
     @classmethod

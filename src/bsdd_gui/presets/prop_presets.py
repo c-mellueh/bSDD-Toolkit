@@ -40,13 +40,13 @@ class PluginProperty:
     value_test: Callable
 
 
-class BaseProperties:
+class PluginProperties:
     def __init__(self):
         super().__init__()
         self.signal_handlers = list()
 
 
-class WidgetProperties(BaseProperties):
+class WidgetProperties:
     def __init__(self):
         super().__init__()
         self.widgets = list()
@@ -70,7 +70,7 @@ class DialogProperties(FieldProperties):
         self.dialog: BaseDialog | None = None
 
 
-class ViewProperties(BaseProperties):
+class ViewProperties:
     def __init__(self):
         super().__init__()
         self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()

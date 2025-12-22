@@ -4,7 +4,7 @@ import logging
 
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.settings import ui, trigger
-from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
+from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals, PluginTool, PluginSignals
 
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import QWidget
@@ -15,11 +15,11 @@ if TYPE_CHECKING:
 import qtawesome as qta
 
 
-class Signals(WidgetSignals):
+class Signals(PluginSignals, WidgetSignals):
     expanded_changed = Signal(bool)
 
 
-class Settings(WidgetTool):
+class Settings(PluginTool, WidgetTool):
     signals = Signals()
 
     @classmethod
@@ -49,8 +49,6 @@ class Settings(WidgetTool):
     def connect_widget_signals(cls, widget: ui.SettingsWidget):
         super().connect_widget_signals(widget)
         widget.expand_button.clicked.connect(cls.toggle_sidebar)
-
-
 
     @classmethod
     def create_widget(cls, *args, **kwargs) -> ui.SettingsWidget:
@@ -88,7 +86,9 @@ class Settings(WidgetTool):
         widget = cls.get_widget()
         widget.scroll_area.setVisible(cls.is_expanded())
         widget.expand_button.setIcon(
-            qta.icon("mdi6.chevron-left") if not cls.is_expanded() else qta.icon("mdi6.chevron-right")
+            qta.icon("mdi6.chevron-left")
+            if not cls.is_expanded()
+            else qta.icon("mdi6.chevron-right")
         )
         widget.updateGeometry()
 
@@ -104,7 +104,8 @@ class Settings(WidgetTool):
             index = widget.scroll_layout.count() - 1
             if index < 0:
                 index = 0
-        widget.scroll_layout.insertWidget(0,input_widget)
+        widget.scroll_layout.insertWidget(0, input_widget)
+
     @classmethod
     def position_and_resize(
         cls, viewport_width: int, viewport_height: int, margin: int = 0

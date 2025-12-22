@@ -8,10 +8,10 @@ if TYPE_CHECKING:
     from . import ui
     from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
 
-from bsdd_gui.presets.prop_presets import BaseProperties
+from bsdd_gui.presets.prop_presets import PluginProperties
 
 
-class GraphViewerSceneViewProperties(BaseProperties):
+class GraphViewerSceneViewProperties(PluginProperties):
     def __init__(self):
         super().__init__()
         self._panning_mmb: bool = False
@@ -21,6 +21,6 @@ class GraphViewerSceneViewProperties(BaseProperties):
         )
         self._create_edge_type: edge_constants.ALLOWED_EDGE_TYPES_TYPING = None
         self._panning_mmb = False
-        self.view:ui.GraphView = None
-        self.scene:ui.GraphScene = None
+        self.view: ui.GraphView = None
+        self.scene: ui.GraphScene = None
         self.button_widget: ui.ButtonWidget = None

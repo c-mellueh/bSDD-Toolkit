@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 
-from bsdd_gui.presets.tool_presets import BaseTool,BaseSignal
+from bsdd_gui.presets.tool_presets import PluginTool, PluginSignals
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.buchheim import ui, trigger, constants
 from PySide6.QtWidgets import QWidget, QMessageBox
@@ -14,11 +14,11 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
 
-class Signals(BaseSignal):
+class Signals(PluginSignals):
     buchheim_requested = Signal()
 
 
-class Buchheim(BaseTool):
+class Buchheim(PluginTool):
     signals = Signals()
 
     @classmethod

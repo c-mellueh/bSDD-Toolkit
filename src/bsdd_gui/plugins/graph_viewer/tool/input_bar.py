@@ -6,7 +6,7 @@ import bsdd_gui
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QCompleter
 from bsdd_gui.plugins.graph_viewer.module.input_bar import ui, trigger
-from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
+from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals, PluginTool, PluginSignals
 from bsdd_json.utils import class_utils
 from bsdd_json.utils import property_utils as prop_utils
 
@@ -14,11 +14,11 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.input_bar.prop import GraphViewerInputBarProperties
 
 
-class Signals(WidgetSignals):
+class Signals(PluginSignals, WidgetSignals):
     pass
 
 
-class InputBar(WidgetTool):
+class InputBar(PluginTool, WidgetTool):
     signals = Signals()
 
     @classmethod

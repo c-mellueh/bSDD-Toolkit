@@ -1,15 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from . import constants
-from bsdd_gui.presets.prop_presets import BaseProperties
+from bsdd_gui.presets.prop_presets import PluginProperties
+
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
     from PySide6.QtWidgets import QGraphicsPathItem
     from . import ui
 
 
-class GraphViewerEdgeProperties(BaseProperties):
-    
+class GraphViewerEdgeProperties(PluginProperties):
+
     def __init__(self):
         super().__init__()
         self.edge_drag_active: bool = False
@@ -25,5 +26,5 @@ class GraphViewerEdgeProperties(BaseProperties):
         self.edge_routing_settings_widget: ui.EdgeRoutingWidget = None
 
         self.allowed_edge_types = constants.ALLOWED_EDGE_TYPES
-        self.arrow_length = 12.
-        self.arrow_width = 8.
+        self.arrow_length = 12.0
+        self.arrow_width = 8.0

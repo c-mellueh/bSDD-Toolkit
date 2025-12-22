@@ -1,8 +1,9 @@
 from __future__ import annotations
 from . import constants, ui
-from bsdd_gui.presets.prop_presets import BaseProperties
+from bsdd_gui.presets.prop_presets import PluginProperties
 
-class GraphViewerNodeProperties(BaseProperties):
+
+class GraphViewerNodeProperties(PluginProperties):
     def __init__(self):
         super().__init__()
         self.filters: dict[str, bool] = {nt: True for nt in constants.ALLOWED_NODE_TYPES}

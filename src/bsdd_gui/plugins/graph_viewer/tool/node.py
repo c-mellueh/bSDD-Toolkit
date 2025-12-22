@@ -7,7 +7,7 @@ from PySide6.QtGui import QColor, QPen, QBrush, QFontMetrics, QPainterPath, QPai
 import random
 import bsdd_gui
 from bsdd_json import BsddDictionary, BsddClass, BsddProperty
-from bsdd_gui.presets.tool_presets import BaseTool,BaseSignal
+from bsdd_gui.presets.tool_presets import PluginTool, PluginSignals
 from bsdd_gui.plugins.graph_viewer.module.node import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
 from bsdd_json.utils import class_utils as cl_utils
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
 
 
-class Signals(BaseSignal):
+class Signals(PluginSignals):
     remove_edge_requested = Signal(
         object, object, bool, bool
     )  # edge,Scene, only visual, allow parent deletion
@@ -33,7 +33,7 @@ class Signals(BaseSignal):
     filter_changed = Signal(str, bool)
 
 
-class Node(BaseTool):
+class Node(PluginTool):
     signals = Signals()
 
     @classmethod
