@@ -21,7 +21,6 @@ def activate():
         tool.RelationshipEditorWidget,
         tool.ClassPropertyTableView,
         tool.PropertySetTableView,
-        tool.Project
     )
     core.connect_to_project_signals(gv_tool.Node,gv_tool.Edge,gv_tool.SceneView,tool.Project)
 

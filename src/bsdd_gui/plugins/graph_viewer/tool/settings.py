@@ -120,3 +120,4 @@ class Settings(WidgetTool):
         y = margin
         h = max(0, viewport_height - 2 * margin)
         widget.setGeometry(x, y, width, h)
+        widget.raise_()

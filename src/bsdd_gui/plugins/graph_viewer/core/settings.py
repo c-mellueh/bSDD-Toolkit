@@ -28,7 +28,7 @@ def connect_signals(
 
 
 def create_widget(settings: Type[gv_tool.Settings]):
-    settings.create_widget()
+    widget = settings.create_widget()
 
 
 def register_widget(

@@ -53,7 +53,6 @@ class Window(ActionTool, FieldTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.toggle_running_requested.connect(lambda: print("TEST"))
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.GraphWidget):

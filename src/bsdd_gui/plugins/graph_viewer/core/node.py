@@ -24,6 +24,7 @@ def connect_signals(
     scene_view: Type[gv_tool.SceneView],
     settings: Type[gv_tool.Settings],
     project: Type[tool.Project],
+    window:Type[gv_tool.Window]
 ):
     node.signals.remove_edge_requested.connect(
         lambda e, s, ov, ap: edge.remove_edge(e, s, project.get(), ov, ap)
@@ -45,6 +46,7 @@ def connect_signals(
     node.signals.node_changed.connect(update_paths)
 
     scene_view.signals.clear_scene_requested.connect(lambda: clear_all_nodes(node, scene_view))
+    window.signals.widget_closed.connect(node.clear)
 
 
 def connect_to_project_signals(node: Type[gv_tool.Node], project: Type[tool.Project]):

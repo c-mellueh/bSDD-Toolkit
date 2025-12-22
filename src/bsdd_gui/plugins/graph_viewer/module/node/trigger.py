@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 def activate():
     core.connect_signals(
-        gv_tool.Node, gv_tool.Edge, gv_tool.SceneView, gv_tool.Settings, tool.Project
+        gv_tool.Node, gv_tool.Edge, gv_tool.SceneView, gv_tool.Settings, tool.Project,gv_tool.Window
     )
     core.connect_to_project_signals(gv_tool.Node,tool.Project)
 

@@ -21,7 +21,6 @@ def connect_signals(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     class_property_table: Type[tool.ClassPropertyTableView],
     property_set_table: Type[tool.PropertySetTableView],
-    project: Type[tool.Project],
 ):
 
     window.signals.active_edgetype_requested.connect(edge.request_active_edge)
@@ -53,6 +52,8 @@ def connect_signals(
     edge.signals.edge_removed.connect(_handle_rel_update)
     edge.signals.new_class_property_created.connect(_handle_prop_update)
     edge.signals.class_property_removed.connect(_handle_prop_update)
+
+    window.signals.widget_closed.connect(edge.clear)
 
 
 def connect_to_project_signals(
