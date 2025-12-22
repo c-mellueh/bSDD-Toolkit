@@ -340,13 +340,8 @@ class GraphViewWidget(ActionTool, WidgetTool):
     ### BUchheim
 
     @classmethod
-    def find_roots(cls) -> list[graphics_items.Node]:
-        sc = cls.get_scene()
-        roots = list()
-        for node in sc.nodes:
-            if cls.parent(node) is None:
-                roots.append(node)
-        return roots
+    def find_roots(cls,nodes) -> list[graphics_items.Node]:
+        return None #Mobed to Buchheim
 
     @classmethod
     def intialize(cls, v: graphics_items.Node, depth=0, number: int = 1):
@@ -370,25 +365,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
 
     @classmethod
     def reset_children_dict(cls):
-        sc = cls.get_scene()
-        children_dict = dict()  # list all children
-        parent_dict = {node: None for node in sc.nodes}
-        edge_type = cls.get_widget().get_active_edge_type()
-        if edge_type not in constants.ALLOWED_EDGE_TYPES:
-            return False
-        for edge in sc.edges:
-            if edge.edge_type != edge_type:
-                continue
-            start_node = edge.start_node
-            end_node = edge.end_node
-            parent_dict[start_node] = end_node
-            if end_node not in children_dict:
-                children_dict[end_node] = list()
-            children_dict[end_node].append(start_node)
-        cls.get_properties().children_dict = children_dict
-        cls.get_properties().parent_dict = parent_dict
-        return True
-        return True
+        return True # Moved to Buchheim
 
     @classmethod
     def firstwalk(cls, v: view_ui.Node, depth):
