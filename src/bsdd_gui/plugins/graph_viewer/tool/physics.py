@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import logging
 from PySide6.QtCore import QObject, QTimer
 import bsdd_gui
-from bsdd_gui.plugins.graph_viewer.module.physics import data, trigger
+from bsdd_gui.plugins.graph_viewer.module.physics import data, trigger, ui
 from bsdd_gui.presets.tool_presets import BaseTool
 
 if TYPE_CHECKING:
@@ -67,14 +67,48 @@ class Physics(BaseTool):
         cls.get_properties().auto_paused = value
 
     @classmethod
-    def handle_hide(cls,_=None):
+    def handle_hide(cls, _=None):
         if not cls.get_running():
             return
         cls.set_running(False)
         cls.set_auto_paused(True)
 
     @classmethod
-    def handle_shown(cls,_=None):
+    def handle_shown(cls, _=None):
         if cls.get_auto_paused():
             cls.set_running(True)
             cls.set_auto_paused(False)
+
+    @classmethod
+    def create_settings_widget(cls):
+        widget = ui.SettingsWidget()
+        cls.get_properties().settings_widget = widget
+
+        # Avoid feedback loops by blocking signals while setting initial values
+        widget.sl_l0.blockSignals(True)
+        widget.sl_ks.blockSignals(True)
+        widget.sl_rep.blockSignals(True)
+        physics = cls.get_properties().physics
+        try:
+            widget.sl_l0.setValue(int(physics.spring_length))
+            widget.sl_ks.setValue(int(physics.k_spring * 100))
+            widget.sl_rep.setValue(int(physics.k_repulsion))
+        finally:
+            widget.sl_l0.blockSignals(False)
+            widget.sl_ks.blockSignals(False)
+            widget.sl_rep.blockSignals(False)
+        return cls.get_properties().settings_widget
+
+    @classmethod
+    def connect_settings_widget(cls):
+        physics = cls.get_properties().physics
+
+        def handle_value_change(_):
+            physics.spring_length = float(widget.sl_l0.value())
+            physics.k_spring = float(widget.sl_ks.value()) / 1000.0
+            physics.k_repulsion = float(widget.sl_rep.value())
+
+        widget = cls.get_properties().settings_widget
+        widget.sl_l0.valueChanged.connect(handle_value_change)
+        widget.sl_ks.valueChanged.connect(handle_value_change)
+        widget.sl_rep.valueChanged.connect(handle_value_change)

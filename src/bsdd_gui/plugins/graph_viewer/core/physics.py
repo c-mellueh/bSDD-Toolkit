@@ -8,17 +8,27 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.physics import ui
 
 
-def connect_signals(phyiscs: Type[gv_tool.Physics], window: Type[gv_tool.Window]):
+def connect_signals(
+    phyiscs: Type[gv_tool.Physics], window: Type[gv_tool.Window], settings: Type[gv_tool.Settings]
+):
     phyiscs.connect_internal_signals()
     window.signals.widget_created.connect(lambda _: build_phyiscs(phyiscs))
     window.signals.widget_hidden.connect(phyiscs.handle_hide)
     window.signals.widget_shown.connect(phyiscs.handle_shown)
+    settings.signals.widget_created.connect(lambda sw: add_settings(phyiscs, settings))
+
 
 def build_phyiscs(phyiscs: Type[gv_tool.Physics]):
     ph = phyiscs.create_physics()
     timer = phyiscs.create_timer()
     phyiscs.set_running(True)
     timer.start()
+
+
+def add_settings(phyiscs: Type[gv_tool.Physics], settings: Type[gv_tool.Settings]):
+    widget = phyiscs.create_settings_widget()
+    phyiscs.connect_settings_widget()
+    settings.add_content_widget(widget)
 
 
 def tick(
