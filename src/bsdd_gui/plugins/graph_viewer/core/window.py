@@ -34,7 +34,11 @@ def connect_signals(window: Type[gv_tool.Window]):
 def retranslate_ui(window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]):
     action = window.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("GraphView", "Graph Viewer"))
-
+    widget = window.get_widget()
+    if not widget:
+        return
+    widget.retranslateUi(widget)
+    widget.setWindowTitle(QCoreApplication.translate("GraphView","Graph Viewer"))
 
 def create_widget(data, parent, window: Type[gv_tool.Window], scene_view: Type[gv_tool.SceneView]):
     widget = window.show_widget(data, parent)

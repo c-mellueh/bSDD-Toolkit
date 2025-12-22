@@ -96,7 +96,7 @@ def delete_selection(
     selected_nodes, selected_edges = scene_view.get_selected_items()
     edges_to_remove = list(set(selected_edges))
     for e in edges_to_remove:
-        edge.remove_edge(edge, scene, bsdd_dictionary)
+        edge.remove_edge(e, scene, bsdd_dictionary)
 
     for n in selected_nodes:
         node.remove_node(n, scene, ignored_edges=edges_to_remove)

@@ -66,9 +66,3 @@ class Window(ActionTool, FieldTool):
             widget.statusbar.showMessage(text)
         else:
             widget.statusbar.clearMessage()
-
-    @classmethod
-    def set_active_edge(cls, edge_type: edge_constants.ALLOWED_EDGE_TYPES_TYPING | None):
-        cls.signals.active_edgetype_requested.emit(edge_type)
-        text = QCoreApplication.translate("GraphViewer", "Create {} Relationship").format(edge_type)
-        cls.set_status(text)

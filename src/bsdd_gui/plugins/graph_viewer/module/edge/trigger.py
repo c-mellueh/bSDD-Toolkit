@@ -38,7 +38,7 @@ def on_new_project():
 
 
 def set_active_edge(edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
-    core.set_active_edge(edge_type, gv_tool.SceneView, gv_tool.Edge)
+    core.set_active_edge(edge_type, gv_tool.SceneView, gv_tool.Edge,gv_tool.Window)
 
 
 def create_relation(start_node, end_node, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):

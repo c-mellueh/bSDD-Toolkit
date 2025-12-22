@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from PySide6.QtGui import QPainter, QPainterPath, QBrush, QPen
-from PySide6.QtCore import Qt, QPointF
+from PySide6.QtCore import Qt, QPointF, QCoreApplication
 from bsdd_json import BsddClass, BsddClassRelation, BsddPropertyRelation
 
 if TYPE_CHECKING:
@@ -159,14 +159,19 @@ def set_active_edge(
     edge_type: constants.ALLOWED_EDGE_TYPES_TYPING,
     scene_view: Type[gv_tool.SceneView],
     edge: Type[gv_tool.Edge],
+    window: Type[gv_tool.Window],
 ):
     view = scene_view.get_view()
     edge.set_active_edge(edge_type)
     if edge_type:
         style_sheet = edge.get_edge_stylesheet(edge_type)
     else:
+        window.set_status("")
+
         style_sheet = ""
     view.setStyleSheet(style_sheet)
+    text = QCoreApplication.translate("GraphViewer", "Create {} Relationship").format(edge_type)
+    window.set_status(text)
 
 
 def create_relation(
