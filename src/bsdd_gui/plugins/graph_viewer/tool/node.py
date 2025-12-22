@@ -109,7 +109,7 @@ class Node(BaseTool):
         node.setFlags(flags)
         node.setAcceptHoverEvents(True)
         node.double_clicked.connect(lambda n=node: cls.signals.node_double_clicked.emit(n))
-        node.item_changed.connect(lambda c,n=node: cls.signals.node_changed.emit(c,n))
+        node.item_changed.connect(lambda c, n=node: cls.signals.node_changed.emit(c, n))
 
     @classmethod
     def add_node(cls, bsdd_data: BsddClass | BsddProperty, pos=None, is_external=False) -> ui.Node:
@@ -196,6 +196,10 @@ class Node(BaseTool):
     @classmethod
     def get_nodes(cls):
         return cls.get_properties().nodes
+
+    @classmethod
+    def get_class_nodes(cls) -> list[ui.Node]:
+        return [n for n in cls.get_nodes() if n.node_type == constants.CLASS_NODE_TYPE]
 
     @classmethod
     def get_internal_nodes(cls, bsdd_dictionary: BsddDictionary):
@@ -300,3 +304,51 @@ class Node(BaseTool):
             node.prepareGeometryChange()
             node._w = new_w
             node._h = new_h
+
+    @classmethod
+    def _collect_layout(cls) -> dict:
+        nodes = cls.get_nodes()
+        nodes_payload = []
+        for n in nodes:
+            try:
+                code = getattr(n.bsdd_data, "Code", None)
+                if code is None:
+                    continue
+                p = n.pos()
+                nodes_payload.append(
+                    {
+                        "type": getattr(n, "node_type", None),
+                        "code": code,
+                        "pos": [float(p.x()), float(p.y())],
+                    }
+                )
+            except Exception:
+                continue
+        return {"version": 1, "nodes": nodes_payload}
+
+    @classmethod
+    def import_node_from_json(
+        cls, item: dict, bsdd_dictionary: BsddDictionary, ifc_classes, external_nodes
+    ):
+        try:
+            ntype = item.get("type")
+            code = item.get("code")
+            pos = item.get("pos") or [0.0, 0.0]
+            if not code or not ntype:
+                return
+            x, y = float(pos[0]), float(pos[1])
+            bsdd_obj = None
+            if bsdd_dictionary is not None:
+                if ntype == constants.CLASS_NODE_TYPE:
+                    bsdd_obj = cl_utils.get_class_by_code(bsdd_dictionary, code)
+                elif ntype == constants.PROPERTY_NODE_TYPE:
+                    bsdd_obj = prop_utils.get_property_by_code(code, bsdd_dictionary)
+                elif ntype == constants.IFC_NODE_TYPE:
+                    node = cls.add_ifc_node(code, QPointF(x, y), ifc_classes, external_nodes)
+                    return node
+            if bsdd_obj is None:
+                return
+            node = cls.add_node(bsdd_obj, pos=QPointF(x, y))
+            return node
+        except Exception:
+            return

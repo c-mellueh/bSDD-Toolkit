@@ -3,6 +3,8 @@ from PySide6.QtCore import Qt, QRectF, QPointF, QCoreApplication
 from PySide6.QtGui import QMouseEvent, QDropEvent
 from typing import TYPE_CHECKING, Type
 
+import json
+import logging
 import qtawesome as qta
 from bsdd_gui.plugins.graph_viewer.module.scene_view import constants
 from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
@@ -388,20 +390,96 @@ def recalculate_edges(
 
     scene_view.apply_filters(edge.get_filters(), node.get_filters())
 
+
 def popuplate_widget(
     scene_view: Type[gv_tool.SceneView],
-    edge:Type[gv_tool.Edge],
-    node:Type[gv_tool.Node],
+    edge: Type[gv_tool.Edge],
+    node: Type[gv_tool.Node],
     project: Type[tool.Project],
 ):
 
     bsdd_dictionary = project.get()
     scene_view.request_clear_scene()
     position = QPointF(0.0, 0.0)
-    scene_view.request_classes_insert(bsdd_dictionary.Classes,position)
-    scene_view.apply_filters(edge.get_filters(),node.get_filters())
+    scene_view.request_classes_insert(bsdd_dictionary.Classes, position)
+    scene_view.apply_filters(edge.get_filters(), node.get_filters())
     scene_view.request_center_scene()
 
     position += QPointF(40.0, 40.0)
-    scene_view.request_properties_insert(bsdd_dictionary.Properties,position)
+    scene_view.request_properties_insert(bsdd_dictionary.Properties, position)
     scene_view.request_recalculate_edges()
+
+
+def export_graph(
+    window: Type[gv_tool.Window],
+    node: Type[gv_tool.Node],
+    popups: Type[tool.Popups],
+    appdata: Type[tool.Appdata],
+):
+
+    last_path = appdata.get_path(constants.PATH_NAME) or "graph_layout.json"
+    text = QCoreApplication.translate("Graph View", "Export Graph View")
+    path = popups.get_save_path(constants.FILETYPE, window.get_widget(), last_path, text)
+    if not path:
+        return
+    appdata.set_path(constants.PATH_NAME, path)
+    payload = node._collect_layout()
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        try:
+            window.set_status(
+                QCoreApplication.translate("GraphView", "Layout exported: ") + str(path),
+                3000,
+            )
+        except Exception:
+            pass
+    except Exception as e:
+        logging.exception("Failed to export layout: %s", e)
+
+
+def import_graph(
+    scene_view: Type[gv_tool.SceneView],
+    window: Type[gv_tool.Window],
+    node: Type[gv_tool.Node],
+    project: Type[tool.Project],
+    popups: Type[tool.Popups],
+    appdata: Type[tool.Appdata],
+    ifc_helper: Type[tool.IfcHelper],
+):
+
+    last_path = appdata.get_path(constants.PATH_NAME)
+    title = QCoreApplication.translate("Graph View", "Export Graph View")
+
+    path = popups.get_open_path(constants.FILETYPE, window.get_widget(), last_path, title)
+    if not path:
+        return
+    appdata.set_path(constants.PATH_NAME, path)
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        logging.exception("Failed to load layout: %s", e)
+        return
+
+    # Resolve bsDD dictionary from current project lazily to avoid import cycles
+    if not isinstance(data, dict) or "nodes" not in data:
+        return
+
+    # Clear current scene
+    scene_view.request_clear_scene()
+    existing_nodes = node.get_class_nodes()
+    external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
+    ifc_classes = {c.get("code"): c for c in ifc_helper.get_classes()}
+    for item in data.get("nodes", []) or []:
+        node.import_node_from_json(item, project.get(), ifc_classes, external_nodes)
+    # Recreate implied edges based on current dictionary relationships
+    scene_view.request_recalculate_edges()
+    try:
+        window.set_status(
+            QCoreApplication.translate("GraphView", "Layout imported: ") + str(path),
+            3000,
+        )
+    except Exception:
+        pass

@@ -92,8 +92,8 @@ def center_scene():
 
 
 def export_requested():
-    core.export_requested()
+    core.export_graph(gv_tool.Window,gv_tool.Node,tool.Popups,tool.Appdata)
 
 
 def import_requested():
-    core.import_requested()
+    core.import_graph(gv_tool.SceneView,gv_tool.Window,gv_tool.Node,tool.Project,tool.Popups,tool.Appdata,tool.IfcHelper)

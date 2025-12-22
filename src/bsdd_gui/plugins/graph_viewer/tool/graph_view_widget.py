@@ -353,26 +353,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     # --- Import/Export ----------------------------------------------------
     @classmethod
     def _collect_layout(cls) -> dict:
-        scene = cls.get_scene()
-        if scene is None:
-            return {"version": 1, "nodes": []}
-        nodes_payload = []
-        for n in scene.nodes:
-            try:
-                code = getattr(n.bsdd_data, "Code", None)
-                if code is None:
-                    continue
-                p = n.pos()
-                nodes_payload.append(
-                    {
-                        "type": getattr(n, "node_type", None),
-                        "code": code,
-                        "pos": [float(p.x()), float(p.y())],
-                    }
-                )
-            except Exception:
-                continue
-        return {"version": 1, "nodes": nodes_payload}
+        return #Moved to Node
 
     @classmethod
     def clear_scene(cls):
@@ -548,30 +529,7 @@ class GraphViewWidget(ActionTool, WidgetTool):
     def import_node_from_json(
         cls, item: dict, bsdd_dictionary: BsddDictionary, ifc_classes, external_nodes
     ):
-        scene = cls.get_scene()
-        try:
-            ntype = item.get("type")
-            code = item.get("code")
-            pos = item.get("pos") or [0.0, 0.0]
-            if not code or not ntype:
-                return
-            x, y = float(pos[0]), float(pos[1])
-            bsdd_obj = None
-            if bsdd_dictionary is not None:
-                if ntype == constants.CLASS_NODE_TYPE:
-                    bsdd_obj = cl_utils.get_class_by_code(bsdd_dictionary, code)
-                elif ntype == constants.PROPERTY_NODE_TYPE:
-                    bsdd_obj = prop_utils.get_property_by_code(code, bsdd_dictionary)
-                elif ntype == constants.IFC_NODE_TYPE:
-                    node = cls.add_ifc_node(code, QPointF(x, y), ifc_classes, external_nodes)
-                    return node
-            if bsdd_obj is None:
-                return
-            node = cls.add_node(scene, bsdd_obj, pos=QPointF(x, y))
-            return node
-        except Exception:
-            return
-
+        return None # Moved to Node
     @classmethod
     def get_node_from_bsdd_data(
         cls, bsdd_data: BsddClass | BsddProperty

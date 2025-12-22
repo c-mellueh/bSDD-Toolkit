@@ -17,7 +17,8 @@ class Signals(FieldSignals):
     toggle_running_requested = Signal()
     delete_selection_requested = Signal()
     active_edgetype_requested = Signal(object)
-    shown  = Signal()
+    shown = Signal()
+
 
 class Window(ActionTool, FieldTool):
     signals = Signals()
@@ -34,6 +35,12 @@ class Window(ActionTool, FieldTool):
     def _get_widget_class(cls):
         # Lazy import to avoid heavy cost on module load
         return ui.GraphWidget
+
+    @classmethod
+    def get_widget(cls, data=None) -> ui.GraphWidget:
+        if cls.get_widgets():
+            return cls.get_widgets()[-1]
+        return None
 
     @classmethod
     def request_toggle_running(cls):
@@ -54,7 +61,7 @@ class Window(ActionTool, FieldTool):
 
     @classmethod
     def set_status(cls, text):
-        widget: ui.GraphWidget = cls.get_widgets()[0]
+        widget: ui.GraphWidget = cls.get_widget()
         if text:
             widget.statusbar.showMessage(text)
         else:

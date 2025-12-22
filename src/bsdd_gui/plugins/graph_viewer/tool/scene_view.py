@@ -365,3 +365,5 @@ class SceneView(BaseTool):
     @classmethod
     def get_buttons_widget(cls):
         return cls.get_properties().button_widget
+ 
+ # --- Import/Export ----------------------------------------------------

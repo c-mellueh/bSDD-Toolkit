@@ -1,6 +1,9 @@
 
 from typing import Literal
 
+PATH_NAME = "graph_viewer"
+FILETYPE = "JSON Files (*.json);;all (*.*)"
+
 OVERLAY_STYLESHEET = """
                 QLabel {
                     color: #e8e8f0;
