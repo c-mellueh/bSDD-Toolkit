@@ -38,6 +38,7 @@ class Signals(QObject):
     new_class_property_created = Signal(object)
     new_edge_created = Signal(ui.Edge)
     ifc_reference_removed = Signal(object, str)
+    ifc_reference_added = Signal(BsddClass, str)
     edge_removed = Signal(ui.Edge)
     class_relation_removed = Signal(BsddClassRelation)
     class_property_removed = Signal(BsddClassProperty, BsddClass)
@@ -176,6 +177,7 @@ class Edge(BaseTool):
             if existing_edge.edge_type == edge.edge_type:
                 logging.info(f"Edge allread exists {edge}")
                 return
+
         cls.signals.new_edge_created.emit(edge)
         return edge
 
@@ -365,6 +367,7 @@ class Edge(BaseTool):
             rienl = [x.lower() for x in start_class.RelatedIfcEntityNamesList or []]
             if end_class.Code.lower() not in rienl:
                 start_class.RelatedIfcEntityNamesList.append(end_class.Code)
+                cls.signals.ifc_reference_added.emit(start_class,end_class.Code)
 
         else:
             if end_class.OwnedUri:
@@ -753,7 +756,6 @@ class Edge(BaseTool):
             for rel in start_data.PropertyRelations:
                 if rel.RelatedPropertyUri == end_uri:
                     return rel
-
 
         # ---------- Edge Drawing ----------------------
 

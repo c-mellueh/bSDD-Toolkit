@@ -8,6 +8,12 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer import tool as gv_tool
     from bsdd_gui.plugins.graph_viewer.module.window import ui
 
+def remove_main_menu_actions(
+    window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]
+):
+    action = window.get_action("open_window")
+    main_window.remove_action(None, action)
+
 
 def connect_to_main_window(
     window: Type[gv_tool.Window],

@@ -84,10 +84,6 @@ class GraphViewWidget(ActionTool, WidgetTool):
         from bsdd_gui.plugins.graph_viewer.module.graph_view_widget.ui import GraphWindow
         return GraphWindow
 
-    @classmethod
-    def connect_internal_signals(cls):
-        super().connect_internal_signals()
-        cls.signals.node_double_clicked.connect(trigger.node_double_clicked)
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.GraphWindow):

@@ -15,7 +15,7 @@ def activate():
     core.connect_signals(gv_tool.Window)
 
 def deactivate():
-    pass
+    core.remove_main_menu_actions(gv_tool.Window,tool.MainWindowWidget)
 
 
 def retranslate_ui():

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 import webbrowser
+from bsdd_json.utils import property_utils as prop_utils
 
 
 from bsdd_gui.plugins.graph_viewer.module.node import constants
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node import ui
     from bsdd_json import BsddClass, BsddProperty
     from bsdd_gui.module.property_table_widget.ui import PropertyWidget
+    from bsdd_json import BsddClass, BsddClassRelation, BsddClassProperty, BsddPropertyRelation
 
 
 def connect_signals(
@@ -43,6 +45,22 @@ def connect_signals(
     node.signals.node_changed.connect(update_paths)
 
     scene_view.signals.clear_scene_requested.connect(lambda: clear_all_nodes(node, scene_view))
+
+
+def connect_to_project_signals(node: Type[gv_tool.Node], project: Type[tool.Project]):
+    def handle_remove(bsdd_data):
+        if isinstance(bsdd_data, BsddClassProperty):
+            bsdd_data = prop_utils.get_internal_property(bsdd_data)
+        if not bsdd_data:
+            return
+        active_node = node.get_node_from_bsdd_data(bsdd_data)
+        if not active_node:
+            return
+        node.remove_node(active_node, project.get())
+
+    project.signals.class_removed.connect(handle_remove)
+    project.signals.property_removed.connect(handle_remove)
+    project.signals.class_property_removed.connect(handle_remove)
 
 
 def clear_all_nodes(node: Type[gv_tool.Node], scene_view: Type[gv_tool.SceneView]):

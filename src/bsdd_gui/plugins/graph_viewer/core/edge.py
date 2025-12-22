@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from PySide6.QtGui import QPainter, QPainterPath, QBrush, QPen
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPointF
+from bsdd_json import BsddClass, BsddClassRelation, BsddPropertyRelation
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.plugins.graph_viewer import tool as gv_tool
     from bsdd_gui.plugins.graph_viewer.module.edge import ui, constants
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
-    from bsdd_gui.plugins.graph_viewer.module.settings import ui as setting_ui
 
 
 def connect_signals(
@@ -18,7 +18,12 @@ def connect_signals(
     window: Type[gv_tool.Window],
     scene_view: Type[gv_tool.SceneView],
     settings: Type[gv_tool.Settings],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
+    class_property_table: Type[tool.ClassPropertyTableView],
+    property_set_table: Type[tool.PropertySetTableView],
+    project: Type[tool.Project],
 ):
+
     window.signals.active_edgetype_requested.connect(edge.request_active_edge)
     edge.signals.edge_drag_started.connect(scene_view.add_item)
     edge.signals.edge_drag_finished.connect(scene_view.remove_item)
@@ -30,6 +35,106 @@ def connect_signals(
         lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
     )
     scene_view.signals.clear_scene_requested.connect(lambda: clear_all_edges(edge, scene_view))
+
+    # Connect Outside Signals
+
+    def _handle_rel_update(edge: ui.Edge):
+        start_data = edge.start_node.bsdd_data
+        widget = relationship_editor.get_widget(start_data)
+        if not widget:
+            return
+        relationship_editor.reset_view(widget.tv_relations)
+
+    def _handle_prop_update(*args, **kwargs):
+        class_property_table.reset_views()
+        property_set_table.reset_views()
+
+    edge.signals.new_edge_created.connect(_handle_rel_update)
+    edge.signals.edge_removed.connect(_handle_rel_update)
+    edge.signals.new_class_property_created.connect(_handle_prop_update)
+    edge.signals.class_property_removed.connect(_handle_prop_update)
+
+
+def connect_to_project_signals(
+    node: Type[gv_tool.Node],
+    edge: Type[gv_tool.Edge],
+    scene_view: Type[gv_tool.SceneView],
+    project: Type[tool.Project],
+):
+
+    # In
+    def handle_relation_remove(relation: BsddClassRelation | BsddPropertyRelation):
+        active_edge = edge.get_edge_from_relation(relation, project.get())
+        if active_edge is None:
+            return
+        edge.remove_edge(
+            active_edge,
+            scene_view.get_scene(),
+            project.get(),
+            only_visual=True,
+            allow_parent_deletion=True,
+        )
+
+    def handle_relation_add(relation: BsddClassRelation | BsddPropertyRelation):
+        start_data, end_data, relation_type = edge.read_relation(relation, project.get())
+        start_node = node.get_node_from_bsdd_data(start_data)
+        end_node = node.get_node_from_bsdd_data(end_data)
+        if not (start_node and end_node):
+            return
+        active_edge = edge.create_edge(start_node, end_node, edge_type=relation_type)
+        edge.add_edge(active_edge)
+
+    def handle_ifc_relation_add(bsdd_class: BsddClass, ifc_code: str):
+        start_node = node.get_node_from_bsdd_data(bsdd_class)
+        end_node = node.get_node_from_ifc_code(ifc_code)
+        if not start_node:
+            return
+        if not end_node:
+            end_node = node.add_ifc_node(ifc_code, start_node.pos() + QPointF(10.0, 10.0))
+        if not (start_node and end_node):
+            return
+        active_edge = edge.create_edge(start_node, end_node, edge_type=constants.IFC_REFERENCE_REL)
+        edge.add_edge(active_edge)
+
+    def handle_ifc_relation_remove(bsdd_class: BsddClass, ifc_code: str):
+        start_node = node.get_node_from_bsdd_data(bsdd_class)
+        if not start_node:
+            return
+        end_node = node.get_node_from_ifc_code(ifc_code)
+        relation = edge.get_edge_from_nodes(start_node, end_node, constants.IFC_REFERENCE_REL)
+        if relation is None:
+            return
+        edge.remove_edge(
+            relation,
+            scene_view.get_scene(),
+            project.get(),
+            only_visual=True,
+            allow_parent_deletion=True,
+        )
+        if not edge.get_connected_edges(end_node):
+            node.remove_node(end_node, scene_view.get_scene())
+
+    project.signals.class_relation_added.connect(handle_relation_add)
+    project.signals.class_relation_removed.connect(handle_relation_remove)
+    project.signals.property_relation_added.connect(handle_relation_add)
+    project.signals.property_relation_removed.connect(handle_relation_remove)
+    project.signals.ifc_relation_addded.connect(handle_ifc_relation_add)
+    project.signals.ifc_relation_removed.connect(handle_ifc_relation_remove)
+
+    # Out
+
+    def handle_edge_add(active_edge: ui.Edge):
+        relation = edge.get_relation_from_edge(active_edge, project.get())
+        if isinstance(relation, BsddClassRelation):
+            project.signals.class_relation_added.emit(relation)
+        if isinstance(relation, BsddPropertyRelation):
+            project.signals.property_relation_added.emit(relation)
+
+    edge.signals.class_relation_removed.connect(project.signals.class_relation_removed.emit)
+    edge.signals.property_relation_removed.connect(project.signals.property_relation_removed.emit)
+    edge.signals.ifc_reference_added.connect(project.signals.ifc_relation_addded.emit)
+    edge.signals.ifc_reference_removed.connect(project.signals.ifc_relation_removed.emit)
+    edge.signals.new_edge_created.connect(handle_edge_add)
 
 
 def clear_all_edges(edge: Type[gv_tool.Edge], scene_view: Type[gv_tool.SceneView]):
