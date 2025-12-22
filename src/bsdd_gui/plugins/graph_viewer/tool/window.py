@@ -1,0 +1,67 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from PySide6.QtCore import Signal, QCoreApplication
+import logging
+
+import bsdd_gui
+from bsdd_gui.plugins.graph_viewer.module.window import ui, trigger
+from bsdd_gui.presets.tool_presets import ActionTool, FieldTool,PluginTool,PluginSignals
+from bsdd_gui.presets.signal_presets import FieldSignals
+
+if TYPE_CHECKING:
+    from bsdd_gui.plugins.graph_viewer.module.window.prop import GraphViewerWindowProperties
+    from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
+
+
+class Signals(PluginSignals,FieldSignals):
+    toggle_running_requested = Signal()
+    delete_selection_requested = Signal()
+    active_edgetype_requested = Signal(object)
+    shown = Signal()
+
+
+class Window(PluginTool,ActionTool, FieldTool):
+    signals = Signals()
+
+    @classmethod
+    def get_properties(cls) -> GraphViewerWindowProperties:
+        return bsdd_gui.GraphViewerWindowProperties
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def _get_widget_class(cls):
+        # Lazy import to avoid heavy cost on module load
+        return ui.GraphWidget
+
+    @classmethod
+    def get_widget(cls, data=None) -> ui.GraphWidget:
+        if cls.get_widgets():
+            return cls.get_widgets()[-1]
+        return None
+
+    @classmethod
+    def request_toggle_running(cls):
+        cls.signals.toggle_running_requested.emit()
+
+    @classmethod
+    def request_delete_selection(cls):
+        cls.signals.delete_selection_requested.emit()
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+
+    @classmethod
+    def connect_widget_signals(cls, widget: ui.GraphWidget):
+        return super().connect_widget_signals(widget)
+
+    @classmethod
+    def set_status(cls, text):
+        widget: ui.GraphWidget = cls.get_widget()
+        if text:
+            widget.statusbar.showMessage(text)
+        else:
+            widget.statusbar.clearMessage()

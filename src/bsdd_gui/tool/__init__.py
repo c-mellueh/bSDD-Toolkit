@@ -20,7 +20,6 @@ from .property_editor_widget import PropertyEditorWidget
 from .property_table_widget import PropertyTableWidget
 from .search_widget import SearchWidget
 from .relationship_editor_widget import RelationshipEditorWidget
-from .graph_view_widget import GraphViewWidget
 from .ids_exporter import IdsExporter, IdsClassView, IdsPropertyView
 from .file_lock import FileLock
 from .ai_helper import AiHelper,AiClassDescription,AiPropertyDescription

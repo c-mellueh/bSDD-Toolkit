@@ -3,13 +3,34 @@ from typing import Any
 from PySide6.QtWidgets import QWidget, QAbstractItemView
 
 from PySide6.QtCore import QObject, Signal
-from bsdd_gui.presets.ui_presets import FieldWidget, BaseDialog,BaseWidget
+from bsdd_gui.presets.ui_presets import FieldWidget, BaseDialog, BaseWindow
+
+import logging
+
+
+class PluginSignals(QObject):
+
+    def get_signals(self) -> dict[str, Signal]:
+        return {name: obj for name, obj in self.__dict__.items() if isinstance(obj, Signal)}
+
+    def disconnect_all_signals(self):
+        s_dict = self.get_signals()
+        for signal in s_dict.keys():
+            try:
+                getattr(self, signal).disconnect()
+            except Exception as e:
+                logging.debug(str(e))
 
 
 class WidgetSignals(QObject):
     widget_requested = Signal()
-    widget_closed = Signal(BaseWidget)
-    widget_created = Signal(BaseWidget)
+    widget_closed = Signal(BaseWindow)
+    widget_created = Signal(BaseWindow)
+    widget_shown = Signal(BaseWindow)
+    widget_hidden = Signal(BaseWindow)
+    widget_resized = Signal(BaseWindow)
+    widget_entered = Signal(BaseWindow)
+
 
 class FieldSignals(WidgetSignals):
     field_changed = Signal(
@@ -24,7 +45,7 @@ class DialogSignals(FieldSignals):
     dialog_requested = Signal(Any, QWidget)  # Data, Parent
 
 
-class ViewSignals(QObject):
+class ViewSignals(PluginSignals):
     model_refresh_requested = Signal()
     selection_changed = Signal(
         QAbstractItemView, Any

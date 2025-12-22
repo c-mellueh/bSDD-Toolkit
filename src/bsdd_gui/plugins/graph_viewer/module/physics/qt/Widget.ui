@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>312</width>
+    <height>166</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="text">
+      <string>Physics Settings</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lb_l0">
+     <property name="text">
+      <string>L₀ (spring length)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="sl_l0">
+     <property name="minimum">
+      <number>100</number>
+     </property>
+     <property name="maximum">
+      <number>750</number>
+     </property>
+     <property name="singleStep">
+      <number>5</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lb_ks">
+     <property name="text">
+      <string>k_spring</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="sl_ks">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lb_rep">
+     <property name="text">
+      <string>repulsion</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="sl_rep">
+     <property name="minimum">
+      <number>10</number>
+     </property>
+     <property name="maximum">
+      <number>2500</number>
+     </property>
+     <property name="singleStep">
+      <number>10</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

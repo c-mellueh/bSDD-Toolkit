@@ -9,10 +9,9 @@ from bsdd_json import BsddClass, BsddProperty
 from . import trigger
 from bsdd_gui import tool
 from .qt.ui_Widget import Ui_Form
+from bsdd_gui.presets.ui_presets import BaseWidget
 
-
-class RelationshipWidget(QWidget, Ui_Form):
-    closed = Signal()
+class RelationshipWidget(BaseWidget, Ui_Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

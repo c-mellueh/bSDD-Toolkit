@@ -62,7 +62,7 @@ from bsdd_gui.presets.ui_presets import (
 )
 from bsdd_json import *
 import logging
-from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals
+from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals, PluginSignals
 from .models_presets import ItemModel
 import datetime
 import re
@@ -71,6 +71,7 @@ BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassP
 
 if TYPE_CHECKING:
     from .prop_presets import (
+        PluginProperties,
         ActionsProperties,
         ViewProperties,
         WidgetProperties,
@@ -96,6 +97,42 @@ class BaseTool(ABC):
     @abstractmethod
     def connect_internal_signals(cls):
         return None
+
+    @classmethod
+    @abstractmethod
+    def _get_trigger(cls) -> ModuleType:
+        return None
+
+    @classmethod
+    def request_retranslate(cls):
+        cls._get_trigger().retranslate_ui()
+
+
+class PluginTool(BaseTool):
+    signals = PluginSignals()
+
+    @classmethod
+    @abstractmethod
+    def get_properties(cls) -> PluginProperties:
+        return None
+
+    @classmethod
+    def connect_external_signal(cls, signal: Signal, func: Callable):
+        signal.connect(func)
+        cls.get_properties().signal_handlers.append((signal, func))
+
+    @classmethod
+    def disconnect_internal_signals(cls):
+        cls.signals.disconnect_all_signals()
+
+    @classmethod
+    def disconnect_external_signals(cls):
+        for signal, func in cls.get_properties().signal_handlers:
+            try:
+                signal.disconnect(func)
+            except Exception as e:
+                logging.debug(str(e))
+        cls.get_properties().signal_handlers = list()
 
 
 class ActionTool(BaseTool):
@@ -171,11 +208,6 @@ class WidgetTool(BaseTool):
 
     @classmethod
     @abstractmethod
-    def _get_trigger(cls) -> ModuleType:
-        return None
-
-    @classmethod
-    @abstractmethod
     def _get_widget_class(cls) -> Type[FieldWidget]:
         logging.error(f"This function needs to be subclassed")
         return None
@@ -197,13 +229,17 @@ class WidgetTool(BaseTool):
     @classmethod
     def connect_widget_signals(cls, widget: FieldWidget):
         widget.closed.connect(lambda w=widget: cls.signals.widget_closed.emit(w))
+        widget.shown.connect(lambda w=widget: cls.signals.widget_shown.emit(w))
+        widget.hidden.connect(lambda w=widget: cls.signals.widget_hidden.emit(w))
+        widget.resized.connect(lambda w=widget: cls.signals.widget_resized.emit(w))
+        widget.entered.connect(lambda w=widget: cls.signals.widget_entered.emit(w))
 
     @classmethod
     def register_widget(cls, widget: FieldWidget):
         logging.info(f"Register {widget}")
-
         cls.get_properties().widgets.append(widget)
         cls.request_retranslate()
+        cls.signals.widget_created.emit(widget)
 
     @classmethod
     def unregister_widget(cls, widget: FieldWidget):
@@ -223,10 +259,6 @@ class WidgetTool(BaseTool):
         connects to trigger.create_widget
         """
         cls.signals.widget_requested.emit(*args, **kwargs)
-
-    @classmethod
-    def request_retranslate(cls):
-        cls._get_trigger().retranslate_ui()
 
     @classmethod
     def add_plugins_to_widget(cls, widget):
@@ -304,7 +336,6 @@ class FieldTool(WidgetTool):
 
     @classmethod
     def register_widget(cls, widget: FieldWidget):
-        cls.signals.widget_created.emit(widget)
         super().register_widget(widget)
         cls.get_properties().field_getter[widget] = dict()
         cls.get_properties().field_setter[widget] = dict()

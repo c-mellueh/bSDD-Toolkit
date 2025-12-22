@@ -1,0 +1,2 @@
+X_MARGIN = 20
+Y_MARGIN = 65

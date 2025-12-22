@@ -40,6 +40,12 @@ class PluginProperty:
     value_test: Callable
 
 
+class PluginProperties:
+    def __init__(self):
+        super().__init__()
+        self.signal_handlers = list()
+
+
 class WidgetProperties:
     def __init__(self):
         super().__init__()

@@ -148,7 +148,6 @@ class AiClassDescription:
         else:
             header = "Here is a bSDD class as JSON. Define this class:"
         text = header + "\n\n" + json_text
-        print(text)
         return text
 
     @classmethod
