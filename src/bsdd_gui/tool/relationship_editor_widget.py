@@ -391,3 +391,12 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
                 if pr.RelatedPropertyUri == start_uri and pr.RelationType == end_type:
                     end_property.PropertyRelations.remove(pr)
                     cls.signals.property_relation_removed.emit(pr)
+
+    # -- Settings Widget
+
+    @classmethod
+    def set_settings_widget(cls, widget: ui.SettingsWidget):
+        cls.get_properties().settings_widget = widget
+    @classmethod
+    def get_settings_widget(cls) -> ui.SettingsWidget:
+        return cls.get_properties().settings_widget

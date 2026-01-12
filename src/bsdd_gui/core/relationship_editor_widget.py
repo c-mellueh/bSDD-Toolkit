@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Type, Literal
 from bsdd_json import BsddProperty, BsddClass, BsddClassRelation, BsddPropertyRelation
 from PySide6.QtWidgets import QWidget, QTableView
 from PySide6.QtCore import QCoreApplication, QPoint
-from bsdd_gui.module.relationship_editor_widget import ui
+from bsdd_gui.module.relationship_editor_widget import ui, constants
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -21,10 +21,28 @@ def add_settings(
     settings_widget.add_page_to_toolbox(ui.SettingsWidget, "pageGeneral", func)
 
 
+def load_splitter_settings(
+    widget: ui.SettingsWidget,
+    relationship_editor: Type[tool.RelationshipEditorWidget],
+    appdata: Type[tool.Appdata],
+):
+    settings = appdata.get_bool_setting(
+        constants.APPDATA_SECTION, constants.APPDATA_OPTION_ALLOW_UKN_URI, default=True
+    )
+    widget.checkBox.setChecked(settings)
+    relationship_editor.set_settings_widget(widget)
+
+
 def splitter_settings_accepted(
     relationship_editor: Type[tool.RelationshipEditorWidget], appdata: Type[tool.Appdata]
 ):
-    pass
+    widget = relationship_editor.get_settings_widget()
+    if not widget:
+        return
+    allow_unknown_uri = widget.checkBox.isChecked()
+    appdata.set_setting(
+        constants.APPDATA_SECTION, constants.APPDATA_OPTION_ALLOW_UKN_URI, allow_unknown_uri
+    )
 
 
 def connect_signals(
