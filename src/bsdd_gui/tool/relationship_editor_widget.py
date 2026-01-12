@@ -19,10 +19,10 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.class_editor_widget import ui as class_editor_ui
 from bsdd_gui.presets.ui_presets import BaseDialog
+from bsdd_gui.module.relationship_editor_widget import ui, trigger, models, constants
 
 if TYPE_CHECKING:
     from bsdd_gui.module.relationship_editor_widget.prop import RelationshipEditorWidgetProperties
-from bsdd_gui.module.relationship_editor_widget import ui, trigger, models
 
 
 class Signals(ViewSignals, FieldSignals):
@@ -397,6 +397,15 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
     @classmethod
     def set_settings_widget(cls, widget: ui.SettingsWidget):
         cls.get_properties().settings_widget = widget
+
     @classmethod
     def get_settings_widget(cls) -> ui.SettingsWidget:
         return cls.get_properties().settings_widget
+
+    @classmethod
+    def is_unknown_uri_allowed(cls) -> bool:
+        from bsdd_gui.tool import Appdata
+
+        return Appdata.get_bool_setting(
+            constants.APPDATA_SECTION, constants.APPDATA_OPTION_ALLOW_UKN_URI, True
+        )
