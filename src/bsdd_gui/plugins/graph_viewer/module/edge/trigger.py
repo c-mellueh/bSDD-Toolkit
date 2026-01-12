@@ -22,7 +22,14 @@ def activate():
         tool.ClassPropertyTableView,
         tool.PropertySetTableView,
     )
-    core.connect_to_project_signals(gv_tool.Node,gv_tool.Edge,gv_tool.SceneView,tool.Project)
+    core.connect_to_project_signals(
+        gv_tool.Node,
+        gv_tool.Edge,
+        gv_tool.SceneView,
+        tool.Project,
+        tool.RelationshipEditorWidget,
+    )
+
 
 def deactivate():
     core.disconnect_signals(gv_tool.Edge)
@@ -37,7 +44,7 @@ def on_new_project():
 
 
 def set_active_edge(edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
-    core.set_active_edge(edge_type, gv_tool.SceneView, gv_tool.Edge,gv_tool.Window)
+    core.set_active_edge(edge_type, gv_tool.SceneView, gv_tool.Edge, gv_tool.Window)
 
 
 def create_relation(start_node, end_node, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):

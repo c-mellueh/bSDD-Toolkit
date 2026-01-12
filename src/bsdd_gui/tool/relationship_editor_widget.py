@@ -281,10 +281,13 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         if isinstance(relation, BsddClassRelation):
             related_uri = relation.RelatedClassUri
             end_data = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
-
+            if end_data is None:
+                end_data = cl_utils.build_dummy_class(related_uri)
         elif isinstance(relation, BsddPropertyRelation):
             related_uri = relation.RelatedPropertyUri
             end_data = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
+            if end_data is None:
+                end_data = prop_utils.build_dummy_property(related_uri)
         return start_data, end_data, relation_type
 
     @classmethod

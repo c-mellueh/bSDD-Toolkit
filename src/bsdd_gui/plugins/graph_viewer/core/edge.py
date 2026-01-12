@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, Type
 from PySide6.QtGui import QPainter, QPainterPath, QBrush, QPen
 from PySide6.QtCore import Qt, QPointF, QCoreApplication
 from bsdd_json import BsddClass, BsddClassRelation, BsddPropertyRelation
+from bsdd_gui.plugins.graph_viewer.module.edge import ui, constants
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.plugins.graph_viewer import tool as gv_tool
-    from bsdd_gui.plugins.graph_viewer.module.edge import ui, constants
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
 
@@ -60,6 +60,7 @@ def connect_to_project_signals(
     edge: Type[gv_tool.Edge],
     scene_view: Type[gv_tool.SceneView],
     project: Type[tool.Project],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
 ):
 
     # In
@@ -76,7 +77,7 @@ def connect_to_project_signals(
         )
 
     def handle_relation_add(relation: BsddClassRelation | BsddPropertyRelation):
-        start_data, end_data, relation_type = edge.read_relation(relation, project.get())
+        start_data, end_data, relation_type = relationship_editor.read_relation(relation, project.get())
         start_node = node.get_node_from_bsdd_data(start_data)
         end_node = node.get_node_from_bsdd_data(end_data)
         if not (start_node and end_node):
