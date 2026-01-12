@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QPushButton
 import qtawesome as qta
+
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.shell_widget import ui
@@ -14,7 +15,9 @@ def connect_signals(shell: Type[tool.ShellWidget]):
 
 
 def connect_to_main_window(main_menu: Type[tool.MainWindowWidget], shell: Type[tool.ShellWidget]):
-    toggle_console_action = main_menu.add_action("menuEdit", "Show Shell", shell.request_widget,qta.icon("mdi6.console"),"Ctrl+Alt+S")
+    toggle_console_action = main_menu.add_action(
+        "menuEdit", "Show Shell", shell.request_widget, qta.icon("mdi6.console"), "Ctrl+Alt+S"
+    )
     shell.set_action(main_menu.get(), "toggle_console", toggle_console_action)
 
 
@@ -24,7 +27,7 @@ def retranslate_ui(shell: Type[tool.ShellWidget], main_window: Type[tool.MainWin
     )
 
 
-def create_widget(shell: Type[tool.ShellWidget],main_window:Type[tool.MainWindowWidget]):
+def create_widget(shell: Type[tool.ShellWidget], main_window: Type[tool.MainWindowWidget]):
     widget: ui.PythonConsole = shell.create_widget(main_window.get())
     widget.show()
     widget.raise_()

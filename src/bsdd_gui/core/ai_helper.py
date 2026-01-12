@@ -27,9 +27,15 @@ def connect_signals(
     class_property_editor: Type[tool.PropertyEditorWidget],
 ):
 
-    class_editor.signals.widget_created.connect(lambda w,:ai_class.add_ai_to_classedit(w,ai_helper.is_active()))
-    property_editor.signals.widget_created.connect(lambda w,:ai_property.add_ai_to_propertyedit(w,ai_helper.is_active()))
-    class_property_editor.signals.widget_created.connect(lambda w,:ai_property.add_ai_to_propertyedit(w,ai_helper.is_active()))
+    class_editor.signals.widget_created.connect(
+        lambda w,: ai_class.add_ai_to_classedit(w, ai_helper.is_active())
+    )
+    property_editor.signals.widget_created.connect(
+        lambda w,: ai_property.add_ai_to_propertyedit(w, ai_helper.is_active())
+    )
+    class_property_editor.signals.widget_created.connect(
+        lambda w,: ai_property.add_ai_to_propertyedit(w, ai_helper.is_active())
+    )
 
 
 def setup_settings(

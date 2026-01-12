@@ -12,7 +12,9 @@ if TYPE_CHECKING:
 
 def connect():
     core.connect_to_main_window(tool.Download, tool.MainWindowWidget)
-    core.connect_signals(tool.Download, tool.Project, tool.Popups,tool.MainWindowWidget,tool.Appdata)
+    core.connect_signals(
+        tool.Download, tool.Project, tool.Popups, tool.MainWindowWidget, tool.Appdata
+    )
 
 
 def retranslate_ui():

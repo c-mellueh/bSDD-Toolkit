@@ -20,15 +20,19 @@ def connect_signals(
         margin = 6
         settings.position_and_resize(viewport.width(), viewport.height(), margin)
 
-    window.signals.widget_created.connect(lambda w: settings.create_widget(scene_view.get_view().viewport()))
+    window.signals.widget_created.connect(
+        lambda w: settings.create_widget(scene_view.get_view().viewport())
+    )
     settings.signals.expanded_changed.connect(reposition)
     window.signals.widget_resized.connect(reposition)
     window.signals.widget_shown.connect(reposition)
     window.signals.widget_closed.connect(lambda: settings.unregister_widget(settings.get_widget()))
 
+
 def disconnect_signals(settings: Type[gv_tool.Settings]):
     settings.disconnect_internal_signals()
     settings.disconnect_external_signals()
+
 
 def create_widget(settings: Type[gv_tool.Settings]):
     widget = settings.create_widget()

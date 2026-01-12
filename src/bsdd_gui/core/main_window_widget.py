@@ -31,6 +31,7 @@ def create_main_window(application: QApplication, main_window: Type[tool.MainWin
     mw.button_Pset_add.setIcon(qta.icon(plus_icon))
     mw.button_search.setIcon(qta.icon("mdi6.magnify"))
 
+
 def connect_main_window(
     main_window: Type[tool.MainWindowWidget],
     class_tree: Type[tool.ClassTreeView],

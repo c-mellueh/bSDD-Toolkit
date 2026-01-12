@@ -144,7 +144,6 @@ def add_context_menu_to_view(
         shortcut="Ctrl+R",
     )
 
-
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Edit"),
@@ -154,8 +153,6 @@ def add_context_menu_to_view(
         False,
         icon=qta.icon("mdi6.rename"),
     )
-
-
 
 
 def connect_view(view: ui.ClassView, class_tree: Type[tool.ClassTreeView]):
@@ -184,12 +181,12 @@ def connect_to_main_window(
     util.add_shortcut(
         "Ctrl+E",
         view,
-        lambda:class_tree.signals.expand_selection_requested.emit(view),
+        lambda: class_tree.signals.expand_selection_requested.emit(view),
     )
     util.add_shortcut(
         "Ctrl+Alt+E",
         view,
-        lambda:class_tree.signals.collapse_selection_requested.emit(view),
+        lambda: class_tree.signals.collapse_selection_requested.emit(view),
     )
 
     util.add_shortcut(

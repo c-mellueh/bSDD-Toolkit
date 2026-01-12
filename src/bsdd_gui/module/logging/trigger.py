@@ -5,9 +5,8 @@ from . import ui
 
 def connect():
     func = lambda: core.settings_accepted(tool.Logging, tool.Util)
-    core.add_settings_page(func,tool.SettingsWidget)
+    core.add_settings_page(func, tool.SettingsWidget)
     core.create_logger(tool.Logging, tool.Util, tool.MainWindowWidget)
-
 
 
 def on_new_project():

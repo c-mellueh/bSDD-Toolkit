@@ -7,6 +7,7 @@ from bsdd_gui.module.shell_widget import ui, trigger
 from bsdd_gui.presets.tool_presets import WidgetTool, ActionTool
 from bsdd_gui.presets.signal_presets import WidgetSignals
 from PySide6.QtWidgets import QWidget
+
 if TYPE_CHECKING:
     from bsdd_gui.module.shell_widget.prop import ShellWidgetProperties
 
@@ -33,7 +34,7 @@ class ShellWidget(WidgetTool, ActionTool):
         return cls.get_widgets()[-1]
 
     @classmethod
-    def create_widget(cls,parent:QWidget):
+    def create_widget(cls, parent: QWidget):
         from bsdd_gui.tool import Project, MainWindowWidget
         from bsdd_json.utils import class_utils, property_utils, dictionary_utils
 

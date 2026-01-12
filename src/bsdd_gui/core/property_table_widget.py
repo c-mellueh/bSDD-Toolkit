@@ -70,13 +70,13 @@ def create_widget(
         widget = property_table.get_widgets()[-1]
     else:
         widget = property_table.create_widget(main_window.get())
-    widget:ui.PropertyWidget
+    widget: ui.PropertyWidget
     widget.show()
     widget.raise_()
     widget.activateWindow()
     widget.tb_new.setIcon(qta.icon("mdi6.plus"))
     retranslate_ui(property_table, main_window, util)
-    
+
 
 def register_widget(widget: ui.PropertyWidget, property_table: Type[tool.PropertyTableWidget]):
     property_table.register_widget(widget)
@@ -196,6 +196,7 @@ def connect_view(
         view,
         lambda: property_table.request_delete_selection(view),
     )
+
 
 def create_context_menu(
     view: views.PropertyTable | views.ClassTable,

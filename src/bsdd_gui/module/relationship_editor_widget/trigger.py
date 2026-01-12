@@ -65,5 +65,6 @@ def widget_closed(widget: ui.RelationshipWidget):
 def settings_created(widget: ui.SettingsWidget):
     core.load_splitter_settings(widget, tool.RelationshipEditorWidget, tool.Appdata)
 
+
 def show_unknown_uri_warning(uri: str):
     core.show_unknown_uri_warning(uri, tool.Popups)

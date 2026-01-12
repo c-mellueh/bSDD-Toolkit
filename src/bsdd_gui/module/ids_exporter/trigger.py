@@ -67,4 +67,6 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
 
 
 def export_ids(widget: IdsWidget):
-    core.export_ids(widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Popups,tool.Util)
+    core.export_ids(
+        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Popups, tool.Util
+    )

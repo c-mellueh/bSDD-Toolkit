@@ -171,7 +171,7 @@ class IdsExporter(ActionTool, FieldTool):
     # Copyright (c) 2024 BIM-Tools
     # Licensed under the MIT License
     @classmethod
-    def add_property_facet(cls, bsdd_property: BsddClassProperty,bsdd_dictionary):
+    def add_property_facet(cls, bsdd_property: BsddClassProperty, bsdd_dictionary):
 
         value = None
         pattern = bsdd_property.Pattern
@@ -189,7 +189,7 @@ class IdsExporter(ActionTool, FieldTool):
 
         property_facet = PropertyFacet(
             bsdd_property.PropertySet,
-            prop_utils.get_name(bsdd_property,bsdd_dictionary),
+            prop_utils.get_name(bsdd_property, bsdd_dictionary),
             value,
             cls.get_data_type(
                 prop_utils.get_data_type(bsdd_property), bsdd_property.PropertyUri
@@ -452,7 +452,7 @@ class IdsExporter(ActionTool, FieldTool):
                 ):
                     continue
 
-                facet = cls.add_property_facet(class_prop,bsdd_dict)
+                facet = cls.add_property_facet(class_prop, bsdd_dict)
                 if facet:
                     spec.requirements.append(facet)
 

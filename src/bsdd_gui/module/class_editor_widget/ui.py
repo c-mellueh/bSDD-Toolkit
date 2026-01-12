@@ -46,8 +46,6 @@ class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
         super().paintEvent(event)
 
 
-
-
 class EditDialog(BaseDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

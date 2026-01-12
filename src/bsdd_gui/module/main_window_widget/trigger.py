@@ -7,7 +7,7 @@ TOOGLE_CONSOLE_ACTION = "toggle_console"
 
 
 def connect():
-    core.connect_main_window(tool.MainWindowWidget, tool.ClassTreeView,tool.Util,tool.Project)
+    core.connect_main_window(tool.MainWindowWidget, tool.ClassTreeView, tool.Util, tool.Project)
 
 
 def on_new_project():
@@ -19,7 +19,7 @@ def retranslate_ui():
 
 
 def close_event(event):
-    core.close_event(event,tool.FileLock,tool.Project ,tool.Util,tool.Popups)
+    core.close_event(event, tool.FileLock, tool.Project, tool.Util, tool.Popups)
 
 
 def refresh_status_bar():

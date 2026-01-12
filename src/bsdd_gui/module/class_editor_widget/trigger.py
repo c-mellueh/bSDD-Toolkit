@@ -59,4 +59,3 @@ def group_classes(bsdd_classes: list[BsddClass]):
         tool.Project,
         tool.ClassTreeView,
     )
-

@@ -12,8 +12,9 @@ import logging
 from bsdd_gui.module.logging import constants
 
 
-def add_settings_page(func,settings:Type[tool.SettingsWidget]):
-    settings.add_page_to_toolbox(ui.SettingsWidget,"pageLogging",func)
+def add_settings_page(func, settings: Type[tool.SettingsWidget]):
+    settings.add_page_to_toolbox(ui.SettingsWidget, "pageLogging", func)
+
 
 def create_logger(
     logging_tool: Type[tool.Logging],

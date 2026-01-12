@@ -40,7 +40,7 @@ class SearchWidget(WidgetTool):
     @classmethod
     def _get_trigger(cls):
         return trigger
-    
+
     @classmethod
     def _get_widget_class(cls):
         return ui.SearchDialog
@@ -134,7 +134,7 @@ class SearchWidget(WidgetTool):
             ]
 
     @classmethod
-    def get_widgets(cls)-> list[ui.SearchDialog]:
+    def get_widgets(cls) -> list[ui.SearchDialog]:
         return super().get_widgets()
 
     @classmethod

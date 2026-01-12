@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from bsdd_gui.presets.prop_presets import ActionsProperties
+
 if TYPE_CHECKING:
     from bsdd_json.models import BsddDictionary
 
@@ -12,4 +13,4 @@ class ProjectProperties(ActionsProperties):
         self.dialog = None
         self.plugin_save_functions = list()
         self.offline_mode = False
-        self.last_save:BsddDictionary = None
+        self.last_save: BsddDictionary = None

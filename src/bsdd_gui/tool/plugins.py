@@ -52,7 +52,7 @@ class Plugins:
 
     @classmethod
     def is_plugin_active(cls, plugin_name: str) -> bool:
-        return tool.Appdata.get_bool_setting(constants.PLUGINS, plugin_name,True)
+        return tool.Appdata.get_bool_setting(constants.PLUGINS, plugin_name, True)
 
     @classmethod
     def set_plugin_active(cls, plugin_name: str, state: bool) -> None:

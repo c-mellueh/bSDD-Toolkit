@@ -54,7 +54,7 @@ class Language:
                 module = importlib.import_module(text)
                 module.load_language(app, lang_code)
             except ModuleNotFoundError:
-                #TODO: Add Plugin Translation for Graph Viewer
+                # TODO: Add Plugin Translation for Graph Viewer
                 logging.info(f"Plugin '{plugin_name}' has no translation")
 
     @classmethod

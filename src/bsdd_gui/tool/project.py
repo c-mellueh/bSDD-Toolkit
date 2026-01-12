@@ -17,6 +17,7 @@ from PySide6.QtCore import QObject, Signal
 from pydantic import ValidationError
 import copy
 from bsdd_gui.module.project import trigger
+
 if TYPE_CHECKING:
     from bsdd_gui.module.project.prop import ProjectProperties
 
@@ -102,7 +103,6 @@ class Project(ActionTool):
         cls.get_properties().plugin_save_functions.append(func)
         return len(cls.get_properties().plugin_save_functions) - 1
 
-
     @classmethod
     def remove_plugin_save_function(cls, index: int):
         cls.get_properties().plugin_save_functions[index] = None
@@ -127,7 +127,6 @@ class Project(ActionTool):
     def get_last_save(cls) -> BsddDictionary:
         return cls.get_properties().last_save
 
-
     @classmethod
     def request_save(cls):
         cls.signals.save_requested.emit()
@@ -135,7 +134,6 @@ class Project(ActionTool):
     @classmethod
     def request_save_as(cls):
         cls.signals.save_as_requested.emit()
-
 
     @classmethod
     def request_open(cls):

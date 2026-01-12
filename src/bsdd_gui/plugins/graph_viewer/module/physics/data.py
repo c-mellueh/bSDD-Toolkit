@@ -5,11 +5,9 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QPointF
 
 
-
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
     from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
-
 
 
 class QuadTree:

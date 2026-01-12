@@ -8,48 +8,88 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-    QCursor, QFont, QFontDatabase, QGradient,
-    QIcon, QImage, QKeySequence, QLinearGradient,
-    QPainter, QPalette, QPixmap, QRadialGradient,
-    QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QMenu,
-    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
-    QSplitter, QStatusBar, QToolButton, QVBoxLayout,
-    QWidget)
+from PySide6.QtCore import (
+    QCoreApplication,
+    QDate,
+    QDateTime,
+    QLocale,
+    QMetaObject,
+    QObject,
+    QPoint,
+    QRect,
+    QSize,
+    QTime,
+    QUrl,
+    Qt,
+)
+from PySide6.QtGui import (
+    QAction,
+    QBrush,
+    QColor,
+    QConicalGradient,
+    QCursor,
+    QFont,
+    QFontDatabase,
+    QGradient,
+    QIcon,
+    QImage,
+    QKeySequence,
+    QLinearGradient,
+    QPainter,
+    QPalette,
+    QPixmap,
+    QRadialGradient,
+    QTransform,
+)
+from PySide6.QtWidgets import (
+    QAbstractItemView,
+    QApplication,
+    QGridLayout,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QMainWindow,
+    QMenu,
+    QMenuBar,
+    QPushButton,
+    QSizePolicy,
+    QSpacerItem,
+    QSplitter,
+    QStatusBar,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from bsdd_gui.module.class_property_table_view.ui import ClassPropertyTable
 from bsdd_gui.module.class_tree_view.ui import ClassView
 from bsdd_gui.module.property_set_table_view.ui import PsetTableView
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
+            MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1468, 813)
         MainWindow.setMinimumSize(QSize(0, 0))
         self.actiondqwd = QAction(MainWindow)
-        self.actiondqwd.setObjectName(u"actiondqwd")
+        self.actiondqwd.setObjectName("actiondqwd")
         self.verticalLayout_main = QWidget(MainWindow)
-        self.verticalLayout_main.setObjectName(u"verticalLayout_main")
+        self.verticalLayout_main.setObjectName("verticalLayout_main")
         self.verticalLayout = QVBoxLayout(self.verticalLayout_main)
-        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setObjectName("verticalLayout")
         self.splitter = QSplitter(self.verticalLayout_main)
-        self.splitter.setObjectName(u"splitter")
+        self.splitter.setObjectName("splitter")
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.layoutWidget = QWidget(self.splitter)
-        self.layoutWidget.setObjectName(u"layoutWidget")
+        self.layoutWidget.setObjectName("layoutWidget")
         self.verticalLayout_classes = QVBoxLayout(self.layoutWidget)
-        self.verticalLayout_classes.setObjectName(u"verticalLayout_classes")
+        self.verticalLayout_classes.setObjectName("verticalLayout_classes")
         self.verticalLayout_classes.setContentsMargins(0, 0, 5, 0)
         self.gridLayout_classes = QGridLayout()
-        self.gridLayout_classes.setObjectName(u"gridLayout_classes")
+        self.gridLayout_classes.setObjectName("gridLayout_classes")
         self.label_class = QLabel(self.layoutWidget)
-        self.label_class.setObjectName(u"label_class")
+        self.label_class.setObjectName("label_class")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -61,13 +101,13 @@ class Ui_MainWindow(object):
         self.gridLayout_classes.addWidget(self.label_class, 0, 1, 1, 1)
 
         self.button_classes_add = QPushButton(self.layoutWidget)
-        self.button_classes_add.setObjectName(u"button_classes_add")
+        self.button_classes_add.setObjectName("button_classes_add")
         self.button_classes_add.setAutoDefault(True)
 
         self.gridLayout_classes.addWidget(self.button_classes_add, 0, 3, 1, 1)
 
         self.label_class_name = QLabel(self.layoutWidget)
-        self.label_class_name.setObjectName(u"label_class_name")
+        self.label_class_name.setObjectName("label_class_name")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(1)
         sizePolicy1.setVerticalStretch(0)
@@ -77,7 +117,7 @@ class Ui_MainWindow(object):
         self.gridLayout_classes.addWidget(self.label_class_name, 0, 2, 1, 1)
 
         self.button_search = QToolButton(self.layoutWidget)
-        self.button_search.setObjectName(u"button_search")
+        self.button_search.setObjectName("button_search")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
@@ -91,11 +131,10 @@ class Ui_MainWindow(object):
 
         self.gridLayout_classes.addWidget(self.button_search, 0, 0, 1, 1)
 
-
         self.verticalLayout_classes.addLayout(self.gridLayout_classes)
 
         self.tree_class = ClassView(self.layoutWidget)
-        self.tree_class.setObjectName(u"tree_class")
+        self.tree_class.setObjectName("tree_class")
         self.tree_class.setEnabled(True)
         self.tree_class.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tree_class.setAcceptDrops(True)
@@ -112,38 +151,37 @@ class Ui_MainWindow(object):
 
         self.splitter.addWidget(self.layoutWidget)
         self.verticalLayoutWidget = QWidget(self.splitter)
-        self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.vertical_layout_pset = QVBoxLayout(self.verticalLayoutWidget)
-        self.vertical_layout_pset.setObjectName(u"vertical_layout_pset")
+        self.vertical_layout_pset.setObjectName("vertical_layout_pset")
         self.vertical_layout_pset.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_pSet_button = QHBoxLayout()
-        self.horizontalLayout_pSet_button.setObjectName(u"horizontalLayout_pSet_button")
+        self.horizontalLayout_pSet_button.setObjectName("horizontalLayout_pSet_button")
         self.label_pset = QLabel(self.verticalLayoutWidget)
-        self.label_pset.setObjectName(u"label_pset")
+        self.label_pset.setObjectName("label_pset")
         self.label_pset.setMinimumSize(QSize(30, 0))
 
         self.horizontalLayout_pSet_button.addWidget(self.label_pset)
 
         self.label_pset_name = QLabel(self.verticalLayoutWidget)
-        self.label_pset_name.setObjectName(u"label_pset_name")
+        self.label_pset_name.setObjectName("label_pset_name")
         sizePolicy1.setHeightForWidth(self.label_pset_name.sizePolicy().hasHeightForWidth())
         self.label_pset_name.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_pSet_button.addWidget(self.label_pset_name)
 
         self.button_Pset_add = QPushButton(self.verticalLayoutWidget)
-        self.button_Pset_add.setObjectName(u"button_Pset_add")
+        self.button_Pset_add.setObjectName("button_Pset_add")
         sizePolicy.setHeightForWidth(self.button_Pset_add.sizePolicy().hasHeightForWidth())
         self.button_Pset_add.setSizePolicy(sizePolicy)
         self.button_Pset_add.setAutoDefault(True)
 
         self.horizontalLayout_pSet_button.addWidget(self.button_Pset_add)
 
-
         self.vertical_layout_pset.addLayout(self.horizontalLayout_pSet_button)
 
         self.table_pset = PsetTableView(self.verticalLayoutWidget)
-        self.table_pset.setObjectName(u"table_pset")
+        self.table_pset.setObjectName("table_pset")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
@@ -151,11 +189,15 @@ class Ui_MainWindow(object):
         self.table_pset.setSizePolicy(sizePolicy3)
         self.table_pset.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.table_pset.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.table_pset.setEditTriggers(QAbstractItemView.EditTrigger.AnyKeyPressed|QAbstractItemView.EditTrigger.DoubleClicked|QAbstractItemView.EditTrigger.SelectedClicked)
+        self.table_pset.setEditTriggers(
+            QAbstractItemView.EditTrigger.AnyKeyPressed
+            | QAbstractItemView.EditTrigger.DoubleClicked
+            | QAbstractItemView.EditTrigger.SelectedClicked
+        )
         self.table_pset.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.table_pset.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table_pset.setSortingEnabled(True)
-        self.table_pset.horizontalHeader().setProperty(u"showSortIndicator", True)
+        self.table_pset.horizontalHeader().setProperty("showSortIndicator", True)
         self.table_pset.horizontalHeader().setStretchLastSection(True)
         self.table_pset.verticalHeader().setVisible(False)
 
@@ -163,36 +205,37 @@ class Ui_MainWindow(object):
 
         self.splitter.addWidget(self.verticalLayoutWidget)
         self.verticalLayoutWidget_2 = QWidget(self.splitter)
-        self.verticalLayoutWidget_2.setObjectName(u"verticalLayoutWidget_2")
+        self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
         self.vertical_layout_properties = QVBoxLayout(self.verticalLayoutWidget_2)
-        self.vertical_layout_properties.setObjectName(u"vertical_layout_properties")
+        self.vertical_layout_properties.setObjectName("vertical_layout_properties")
         self.vertical_layout_properties.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_properties = QHBoxLayout()
-        self.horizontalLayout_properties.setObjectName(u"horizontalLayout_properties")
+        self.horizontalLayout_properties.setObjectName("horizontalLayout_properties")
         self.label_property = QLabel(self.verticalLayoutWidget_2)
-        self.label_property.setObjectName(u"label_property")
+        self.label_property.setObjectName("label_property")
 
         self.horizontalLayout_properties.addWidget(self.label_property)
 
         self.label_property_name = QLabel(self.verticalLayoutWidget_2)
-        self.label_property_name.setObjectName(u"label_property_name")
+        self.label_property_name.setObjectName("label_property_name")
 
         self.horizontalLayout_properties.addWidget(self.label_property_name)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
 
         self.horizontalLayout_properties.addItem(self.horizontalSpacer)
 
         self.button_property_add = QPushButton(self.verticalLayoutWidget_2)
-        self.button_property_add.setObjectName(u"button_property_add")
+        self.button_property_add.setObjectName("button_property_add")
 
         self.horizontalLayout_properties.addWidget(self.button_property_add)
-
 
         self.vertical_layout_properties.addLayout(self.horizontalLayout_properties)
 
         self.table_property = ClassPropertyTable(self.verticalLayoutWidget_2)
-        self.table_property.setObjectName(u"table_property")
+        self.table_property.setObjectName("table_property")
         self.table_property.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.table_property.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_property.setDragEnabled(True)
@@ -210,17 +253,17 @@ class Ui_MainWindow(object):
 
         MainWindow.setCentralWidget(self.verticalLayout_main)
         self.menubar = QMenuBar(MainWindow)
-        self.menubar.setObjectName(u"menubar")
+        self.menubar.setObjectName("menubar")
         self.menubar.setGeometry(QRect(0, 0, 1468, 33))
         self.menuFile = QMenu(self.menubar)
-        self.menuFile.setObjectName(u"menuFile")
+        self.menuFile.setObjectName("menuFile")
         self.menuEdit = QMenu(self.menubar)
-        self.menuEdit.setObjectName(u"menuEdit")
+        self.menuEdit.setObjectName("menuEdit")
         self.menuData = QMenu(self.menubar)
-        self.menuData.setObjectName(u"menuData")
+        self.menuData.setObjectName("menuData")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
-        self.statusbar.setObjectName(u"statusbar")
+        self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         QWidget.setTabOrder(self.button_classes_add, self.tree_class)
         QWidget.setTabOrder(self.tree_class, self.button_search)
@@ -234,26 +277,29 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
+
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"bSDD-Toolkit", None))
-        self.actiondqwd.setText(QCoreApplication.translate("MainWindow", u"dqwd", None))
-        self.label_class.setText(QCoreApplication.translate("MainWindow", u"Class:", None))
-        self.button_classes_add.setText(QCoreApplication.translate("MainWindow", u"New", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", "bSDD-Toolkit", None))
+        self.actiondqwd.setText(QCoreApplication.translate("MainWindow", "dqwd", None))
+        self.label_class.setText(QCoreApplication.translate("MainWindow", "Class:", None))
+        self.button_classes_add.setText(QCoreApplication.translate("MainWindow", "New", None))
         self.label_class_name.setText("")
-#if QT_CONFIG(tooltip)
-        self.button_search.setToolTip(QCoreApplication.translate("MainWindow", u"Search for Class", None))
-#endif // QT_CONFIG(tooltip)
+        # if QT_CONFIG(tooltip)
+        self.button_search.setToolTip(
+            QCoreApplication.translate("MainWindow", "Search for Class", None)
+        )
+        # endif // QT_CONFIG(tooltip)
         self.button_search.setText("")
-        self.label_pset.setText(QCoreApplication.translate("MainWindow", u"PropertySet:", None))
+        self.label_pset.setText(QCoreApplication.translate("MainWindow", "PropertySet:", None))
         self.label_pset_name.setText("")
-        self.button_Pset_add.setText(QCoreApplication.translate("MainWindow", u"New", None))
-        self.label_property.setText(QCoreApplication.translate("MainWindow", u"Property:", None))
+        self.button_Pset_add.setText(QCoreApplication.translate("MainWindow", "New", None))
+        self.label_property.setText(QCoreApplication.translate("MainWindow", "Property:", None))
         self.label_property_name.setText("")
-        self.button_property_add.setText(QCoreApplication.translate("MainWindow", u"New", None))
-        self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
-        self.menuEdit.setTitle(QCoreApplication.translate("MainWindow", u"Edit", None))
-        self.menuData.setTitle(QCoreApplication.translate("MainWindow", u"Data", None))
-    # retranslateUi
+        self.button_property_add.setText(QCoreApplication.translate("MainWindow", "New", None))
+        self.menuFile.setTitle(QCoreApplication.translate("MainWindow", "File", None))
+        self.menuEdit.setTitle(QCoreApplication.translate("MainWindow", "Edit", None))
+        self.menuData.setTitle(QCoreApplication.translate("MainWindow", "Data", None))
 
+    # retranslateUi

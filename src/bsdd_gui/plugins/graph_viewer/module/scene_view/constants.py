@@ -1,4 +1,3 @@
-
 from typing import Literal
 
 PATH_NAME = "graph_viewer"

@@ -1,6 +1,6 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import WidgetProperties,PluginProperties
+from bsdd_gui.presets.prop_presets import WidgetProperties, PluginProperties
 
 
-class GraphViewerInputBarProperties(PluginProperties,WidgetProperties):
+class GraphViewerInputBarProperties(PluginProperties, WidgetProperties):
     pass

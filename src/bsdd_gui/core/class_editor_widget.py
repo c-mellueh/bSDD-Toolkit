@@ -191,5 +191,3 @@ def group_classes(
         class_editor.signals.dialog_accepted.emit(dialog)
     else:
         class_editor.signals.dialog_declined.emit(dialog)
-
-

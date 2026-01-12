@@ -34,13 +34,19 @@ def register_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPr
 
 
 def add_columns_to_view(
-    view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView],project:Type[tool.Project]
+    view: ui.ClassPropertyTable,
+    property_table: Type[tool.ClassPropertyTableView],
+    project: Type[tool.Project],
 ):
 
     sort_model, model = property_table.create_model(None)
-    property_table.add_column_to_table(model, "Name", lambda p:prop_utils.get_name(p,project.get()))
+    property_table.add_column_to_table(
+        model, "Name", lambda p: prop_utils.get_name(p, project.get())
+    )
     property_table.add_column_to_table(model, "Code", lambda a: a.Code)
-    property_table.add_column_to_table(model, "Datatype", lambda p:prop_utils.get_datatype(p,project.get()))
+    property_table.add_column_to_table(
+        model, "Datatype", lambda p: prop_utils.get_datatype(p, project.get())
+    )
     property_table.add_column_to_table(model, "Unit", prop_utils.get_units)
     property_table.add_column_to_table(model, "Values", property_table.get_allowed_values)
     property_table.add_column_to_table(model, "Is Required", lambda a: a.IsRequired)
@@ -70,6 +76,7 @@ def add_context_menu_to_view(
         True,
         icon=qta.icon("mdi6.rename"),
     )
+
 
 def create_context_menu(
     view: ui.ClassPropertyTable, pos: QPoint, property_table: Type[tool.ClassPropertyTableView]

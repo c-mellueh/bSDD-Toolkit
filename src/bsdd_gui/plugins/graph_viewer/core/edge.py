@@ -77,7 +77,9 @@ def connect_to_project_signals(
         )
 
     def handle_relation_add(relation: BsddClassRelation | BsddPropertyRelation):
-        start_data, end_data, relation_type = relationship_editor.read_relation(relation, project.get())
+        start_data, end_data, relation_type = relationship_editor.read_relation(
+            relation, project.get()
+        )
         start_node = node.get_node_from_bsdd_data(start_data)
         end_node = node.get_node_from_bsdd_data(end_data)
         if not (start_node and end_node):

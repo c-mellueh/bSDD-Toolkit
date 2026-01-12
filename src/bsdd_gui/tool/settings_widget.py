@@ -4,7 +4,7 @@ from typing import Callable, TYPE_CHECKING, Type
 
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QTabWidget, QToolBox, QWidget,QVBoxLayout
+from PySide6.QtWidgets import QTabWidget, QToolBox, QWidget, QVBoxLayout
 
 import bsdd_gui
 from bsdd_gui.module.settings_widget import ui
@@ -50,8 +50,8 @@ class SettingsWidget:
         settings_dialog = ui.Dialog()
         cls.set_widget(settings_dialog)
         for name, widgets in cls.get_page_dict().items():
-            page:QWidget = getattr(cls.get_widget().ui, name)
-            layout:QVBoxLayout = page.layout()
+            page: QWidget = getattr(cls.get_widget().ui, name)
+            layout: QVBoxLayout = page.layout()
             for widget in widgets:
                 layout.insertWidget(layout.count() - 1, widget())
         settings_dialog.resize(QSize(800, 500))

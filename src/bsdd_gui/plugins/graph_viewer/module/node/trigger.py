@@ -12,13 +12,19 @@ if TYPE_CHECKING:
 
 def activate():
     core.connect_signals(
-        gv_tool.Node, gv_tool.Edge, gv_tool.SceneView, gv_tool.Settings, tool.Project,gv_tool.Window
+        gv_tool.Node,
+        gv_tool.Edge,
+        gv_tool.SceneView,
+        gv_tool.Settings,
+        tool.Project,
+        gv_tool.Window,
     )
-    core.connect_to_project_signals(gv_tool.Node,tool.Project)
+    core.connect_to_project_signals(gv_tool.Node, tool.Project)
 
 
 def deactivate():
     core.disconnect_signals(gv_tool.Node)
+
 
 def retranslate_ui():
     pass
@@ -38,5 +44,5 @@ def paint_node_legend(node_legend):
     core.paint_node_legend(node_legend, gv_tool.Node)
 
 
-def paint_node(painter:QPainter,node:ui.Node):
-    core.paint_node(node,painter,gv_tool.Node)
+def paint_node(painter: QPainter, node: ui.Node):
+    core.paint_node(node, painter, gv_tool.Node)

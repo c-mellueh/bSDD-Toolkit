@@ -22,5 +22,5 @@ from .search_widget import SearchWidget
 from .relationship_editor_widget import RelationshipEditorWidget
 from .ids_exporter import IdsExporter, IdsClassView, IdsPropertyView
 from .file_lock import FileLock
-from .ai_helper import AiHelper,AiClassDescription,AiPropertyDescription
+from .ai_helper import AiHelper, AiClassDescription, AiPropertyDescription
 from .download import Download

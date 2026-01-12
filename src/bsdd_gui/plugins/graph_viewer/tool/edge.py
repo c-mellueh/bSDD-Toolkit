@@ -712,7 +712,10 @@ class Edge(PluginTool):
     ):
         from bsdd_gui.plugins.graph_viewer.tool import Node as NodeTool
         from bsdd_gui.tool import RelationshipEditorWidget
-        start_data, end_data, relation_type = RelationshipEditorWidget.read_relation(relation, bsdd_dictionary)
+
+        start_data, end_data, relation_type = RelationshipEditorWidget.read_relation(
+            relation, bsdd_dictionary
+        )
         start_node, end_node = NodeTool.get_node_from_bsdd_data(
             start_data
         ), NodeTool.get_node_from_bsdd_data(end_data)

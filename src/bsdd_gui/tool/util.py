@@ -96,7 +96,13 @@ class Util:
             menu.addAction(action)
 
     @classmethod
-    def add_shortcut(cls, sequence: str, window: QWidget, function: Callable,context = Qt.ShortcutContext.WidgetShortcut):
+    def add_shortcut(
+        cls,
+        sequence: str,
+        window: QWidget,
+        function: Callable,
+        context=Qt.ShortcutContext.WidgetShortcut,
+    ):
         prop = cls.get_properties()
         shortcut = QShortcut(QKeySequence(sequence), window)
         shortcut.setContext(context)
@@ -144,12 +150,12 @@ class Util:
         return action
 
     @classmethod
-    def create_tempfile(cls, suffix: str | None = None,add_timestamp = False) -> str:
+    def create_tempfile(cls, suffix: str | None = None, add_timestamp=False) -> str:
         suffix = ".tmp" if suffix is None else suffix
         prefix = ""
         if add_timestamp:
             prefix = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S_")
-        return os.path.abspath(tempfile.NamedTemporaryFile(suffix=suffix,prefix=prefix).name)
+        return os.path.abspath(tempfile.NamedTemporaryFile(suffix=suffix, prefix=prefix).name)
 
     @classmethod
     def transform_guid(cls, guid: str, add_zero_width: bool):
@@ -459,7 +465,7 @@ class Util:
         return plain_text.split(seperator)
 
     @classmethod
-    def create_waiting_widget(cls,title = "Waiting",parent_widget = None):
+    def create_waiting_widget(cls, title="Waiting", parent_widget=None):
         waiting_worker, waiting_thread, waiting_widget = start_waiting_widget(
             parent_widget, title, ""
         )

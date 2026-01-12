@@ -212,7 +212,6 @@ class AiClassDescription:
                 value = cls.generate_class_definition(*args, **kwargs)
                 self.finished.emit(value)
 
-
         ai_thread = QThread()
         ai_worker = _SetupWorker()
         ai_worker.moveToThread(ai_thread)
@@ -226,7 +225,7 @@ class AiClassDescription:
 
         ai_worker.error.connect(ai_thread.quit)
         ai_worker.error.connect(ai_worker.deleteLater)
-        
+
         ai_thread.finished.connect(ai_thread.deleteLater)
         return ai_worker, ai_thread
 

@@ -49,7 +49,7 @@ def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool
     )
     project.set_action(mw_ui, "open_project", action)
 
-    #TODO: Add Combination functionality
+    # TODO: Add Combination functionality
     # action = main_window.add_action("menuFile", "add_project", trigger.add_clicked)
     # project.set_action(mw_ui, "add_project", action)
 

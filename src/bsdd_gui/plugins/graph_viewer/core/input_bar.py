@@ -25,6 +25,7 @@ def disconnect_signals(input_bar: Type[gv_tool.InputBar]):
     input_bar.disconnect_internal_signals()
     input_bar.disconnect_external_signals()
 
+
 def create_widget(input_bar: Type[gv_tool.InputBar]):
     input_bar.create_widget()
 

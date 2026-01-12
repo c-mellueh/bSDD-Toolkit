@@ -1,12 +1,12 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import WidgetProperties,PluginProperties
+from bsdd_gui.presets.prop_presets import WidgetProperties, PluginProperties
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from . import ui
 
 
-class GraphViewerSettingsProperties(PluginProperties,WidgetProperties):
+class GraphViewerSettingsProperties(PluginProperties, WidgetProperties):
     def __init__(self):
         super().__init__()
         self.expanded_width = 240

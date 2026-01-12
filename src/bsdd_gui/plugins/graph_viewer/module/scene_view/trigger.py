@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def activate():
-    core.connect_signals(gv_tool.Window, gv_tool.SceneView, gv_tool.Settings,gv_tool.Physics)
+    core.connect_signals(gv_tool.Window, gv_tool.SceneView, gv_tool.Settings, gv_tool.Physics)
 
 
 def deactivate():
@@ -22,7 +22,7 @@ def deactivate():
 
 
 def retranslate_ui():
-    core.retranslate_ui(gv_tool.SceneView,gv_tool.Physics)
+    core.retranslate_ui(gv_tool.SceneView, gv_tool.Physics)
 
 
 def on_new_project():
@@ -84,16 +84,24 @@ def recalculate_edges():
 
 
 def load_bsdd():
-    core.popuplate_widget(gv_tool.SceneView,gv_tool.Edge,gv_tool.Node,tool.Project)
+    core.popuplate_widget(gv_tool.SceneView, gv_tool.Edge, gv_tool.Node, tool.Project)
 
 
 def center_scene():
-    core.center_scene(gv_tool.Node,gv_tool.SceneView)
+    core.center_scene(gv_tool.Node, gv_tool.SceneView)
 
 
 def export_requested():
-    core.export_graph(gv_tool.Window,gv_tool.Node,tool.Popups,tool.Appdata)
+    core.export_graph(gv_tool.Window, gv_tool.Node, tool.Popups, tool.Appdata)
 
 
 def import_requested():
-    core.import_graph(gv_tool.SceneView,gv_tool.Window,gv_tool.Node,tool.Project,tool.Popups,tool.Appdata,tool.IfcHelper)
+    core.import_graph(
+        gv_tool.SceneView,
+        gv_tool.Window,
+        gv_tool.Node,
+        tool.Project,
+        tool.Popups,
+        tool.Appdata,
+        tool.IfcHelper,
+    )

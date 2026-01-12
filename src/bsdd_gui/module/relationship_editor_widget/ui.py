@@ -12,6 +12,7 @@ from .qt.ui_Widget import Ui_Form
 from .qt.ui_Settings import Ui_Form as Ui_SettingsForm
 from bsdd_gui.presets.ui_presets import BaseWidget
 
+
 class RelationshipWidget(BaseWidget, Ui_Form):
 
     def __init__(self, *args, **kwargs):
@@ -24,7 +25,8 @@ class RelationshipWidget(BaseWidget, Ui_Form):
         self.closed.emit()
         return super().closeEvent(event)
 
-class SettingsWidget(BaseWidget,Ui_SettingsForm):
+
+class SettingsWidget(BaseWidget, Ui_SettingsForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)

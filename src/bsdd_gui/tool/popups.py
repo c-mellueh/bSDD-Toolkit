@@ -244,13 +244,14 @@ class Popups:
 
         dialog.resize(400, 150)
         return dialog.exec() == QDialog.DialogCode.Accepted
-    
+
     @classmethod
     def request_save_before_exit(cls):
         icon = get_icon()
         title = QCoreApplication.translate("Popups", "Save before exit")
         text = QCoreApplication.translate(
-            "Popups", "You have some unsaved Changes!\nDo you want to save the project before leaving?"
+            "Popups",
+            "You have some unsaved Changes!\nDo you want to save the project before leaving?",
         )
         msg_box = QMessageBox(
             QMessageBox.Icon.Question,

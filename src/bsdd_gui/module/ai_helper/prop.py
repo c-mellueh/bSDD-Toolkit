@@ -6,10 +6,10 @@ class AiHelperProperties:
     client = None
 
 
-
 class AiClassDescriptionProperties:
     ai_worker = None
     ai_thread = None
+
 
 class AiPropertyDescriptionProperties:
     ai_worker = None

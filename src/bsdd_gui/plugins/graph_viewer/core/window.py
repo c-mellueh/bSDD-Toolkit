@@ -9,8 +9,6 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.window import ui
 
 
-
-
 def connect_to_main_window(
     window: Type[gv_tool.Window],
     main_window: Type[tool.MainWindowWidget],
@@ -26,9 +24,11 @@ def connect_to_main_window(
 def connect_signals(window: Type[gv_tool.Window]):
     window.connect_internal_signals()
 
+
 def disconnect_signals(window: Type[gv_tool.Window]):
     window.disconnect_internal_signals()
     window.disconnect_external_signals()
+
 
 def remove_main_menu_actions(
     window: Type[gv_tool.Window], main_window: Type[tool.MainWindowWidget]

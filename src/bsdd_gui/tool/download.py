@@ -115,7 +115,6 @@ class Download(FieldTool, ActionTool):
             if widget.cb_save.isChecked():
                 bsdd_dictionary.save(cls.get_properties().save_path)
 
-
             cls.reset(widget)
             cls.signals.import_finished.emit(bsdd_dictionary)
 

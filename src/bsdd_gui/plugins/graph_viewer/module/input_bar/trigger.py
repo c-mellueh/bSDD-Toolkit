@@ -35,4 +35,10 @@ def widget_created(widget):
 
 
 def add_node():
-    core.add_node_by_lineinput(gv_tool.InputBar, gv_tool.SceneView, gv_tool.Node, tool.Project,tool.RelationshipEditorWidget)
+    core.add_node_by_lineinput(
+        gv_tool.InputBar,
+        gv_tool.SceneView,
+        gv_tool.Node,
+        tool.Project,
+        tool.RelationshipEditorWidget,
+    )
