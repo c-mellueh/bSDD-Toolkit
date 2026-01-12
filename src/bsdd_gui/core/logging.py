@@ -6,11 +6,14 @@ from PySide6.QtCore import QCoreApplication
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.logging import ui
+from bsdd_gui.module.logging import ui
 import os
 import logging
 from bsdd_gui.module.logging import constants
 
+
+def add_settings_page(func,settings:Type[tool.SettingsWidget]):
+    settings.add_page_to_toolbox(ui.SettingsWidget,"pageLogging",func)
 
 def create_logger(
     logging_tool: Type[tool.Logging],
