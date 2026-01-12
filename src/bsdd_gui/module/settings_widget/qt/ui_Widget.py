@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QSizePolicy, QTabWidget, QToolBox, QVBoxLayout,
-    QWidget)
+    QSizePolicy, QSpacerItem, QTabWidget, QToolBox,
+    QVBoxLayout, QWidget)
 
 class Ui_Settings(object):
     def setupUi(self, Settings):
@@ -41,80 +41,70 @@ class Ui_Settings(object):
         self.toolBox.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.pageGeneral = QWidget()
         self.pageGeneral.setObjectName(u"pageGeneral")
-        self.pageGeneral.setGeometry(QRect(0, 0, 860, 441))
+        self.pageGeneral.setGeometry(QRect(0, 0, 860, 469))
         self.pageGeneral.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.verticalLayout_9 = QVBoxLayout(self.pageGeneral)
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_9.addItem(self.verticalSpacer)
+
         self.toolBox.addItem(self.pageGeneral, u"General")
         self.pageLogging = QWidget()
         self.pageLogging.setObjectName(u"pageLogging")
-        self.pageLogging.setGeometry(QRect(0, 0, 856, 437))
+        self.pageLogging.setGeometry(QRect(0, 0, 860, 469))
         self.pageLogging.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.verticalLayout_8 = QVBoxLayout(self.pageLogging)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_8.addItem(self.verticalSpacer_2)
+
         self.toolBox.addItem(self.pageLogging, u"Logging")
-        self.pageFilter = QWidget()
-        self.pageFilter.setObjectName(u"pageFilter")
-        self.pageFilter.setGeometry(QRect(0, 0, 856, 437))
-        self.pageFilter.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.verticalLayout_10 = QVBoxLayout(self.pageFilter)
-        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.toolBox.addItem(self.pageFilter, u"Filter")
         self.pageAI = QWidget()
         self.pageAI.setObjectName(u"pageAI")
+        self.pageAI.setGeometry(QRect(0, 0, 860, 469))
         self.verticalLayout_14 = QVBoxLayout(self.pageAI)
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_14.addItem(self.verticalSpacer_3)
+
         self.toolBox.addItem(self.pageAI, u"OpenAI")
 
         self.verticalLayout_4.addWidget(self.toolBox)
 
         self.tabWidget.addTab(self.tabGeneral, "")
-        self.tabPath = QWidget()
-        self.tabPath.setObjectName(u"tabPath")
-        self.verticalLayout_3 = QVBoxLayout(self.tabPath)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalLayout_3.setContentsMargins(1, 3, 1, 3)
-        self.tbPath = QToolBox(self.tabPath)
-        self.tbPath.setObjectName(u"tbPath")
-        self.pageProject = QWidget()
-        self.pageProject.setObjectName(u"pageProject")
-        self.pageProject.setGeometry(QRect(0, 0, 856, 497))
-        self.pageProject.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.verticalLayout_6 = QVBoxLayout(self.pageProject)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.tbPath.addItem(self.pageProject, u"Project")
-        self.pageExport = QWidget()
-        self.pageExport.setObjectName(u"pageExport")
-        self.pageExport.setGeometry(QRect(0, 0, 100, 30))
-        self.pageExport.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.verticalLayout_7 = QVBoxLayout(self.pageExport)
-        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
-        self.tbPath.addItem(self.pageExport, u"Export")
-
-        self.verticalLayout_3.addWidget(self.tbPath)
-
-        self.tabWidget.addTab(self.tabPath, "")
         self.tabProperty = QWidget()
         self.tabProperty.setObjectName(u"tabProperty")
         self.verticalLayout_11 = QVBoxLayout(self.tabProperty)
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.verticalLayout_11.setContentsMargins(1, 3, 1, 3)
         self.tb_property_set = QToolBox(self.tabProperty)
         self.tb_property_set.setObjectName(u"tb_property_set")
         self.tb_property_set.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)
         self.pageSplitter = QWidget()
         self.pageSplitter.setObjectName(u"pageSplitter")
-        self.pageSplitter.setGeometry(QRect(0, 0, 100, 30))
+        self.pageSplitter.setGeometry(QRect(0, 0, 860, 499))
         self.pageSplitter.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.verticalLayout_12 = QVBoxLayout(self.pageSplitter)
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_12.addItem(self.verticalSpacer_4)
+
         self.tb_property_set.addItem(self.pageSplitter, u"Splitter")
         self.pageUnits = QWidget()
         self.pageUnits.setObjectName(u"pageUnits")
-        self.pageUnits.setGeometry(QRect(0, 0, 840, 485))
+        self.pageUnits.setGeometry(QRect(0, 0, 860, 499))
         self.pageUnits.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)
         self.pageUnits.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.verticalLayout_13 = QVBoxLayout(self.pageUnits)
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
+        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_13.addItem(self.verticalSpacer_5)
+
         self.tb_property_set.addItem(self.pageUnits, u"Units")
 
         self.verticalLayout_11.addWidget(self.tb_property_set)
@@ -129,10 +119,14 @@ class Ui_Settings(object):
         self.tbPlugins.setObjectName(u"tbPlugins")
         self.pagePlugins = QWidget()
         self.pagePlugins.setObjectName(u"pagePlugins")
-        self.pagePlugins.setGeometry(QRect(0, 0, 856, 527))
+        self.pagePlugins.setGeometry(QRect(0, 0, 860, 529))
         self.pagePlugins.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.verticalLayout_5 = QVBoxLayout(self.pagePlugins)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer_6)
+
         self.tbPlugins.addItem(self.pagePlugins, u"Plugins")
 
         self.verticalLayout_2.addWidget(self.tbPlugins)
@@ -155,8 +149,7 @@ class Ui_Settings(object):
 
         self.tabWidget.setCurrentIndex(0)
         self.toolBox.setCurrentIndex(0)
-        self.tbPath.setCurrentIndex(0)
-        self.tb_property_set.setCurrentIndex(1)
+        self.tb_property_set.setCurrentIndex(0)
         self.tbPlugins.setCurrentIndex(0)
 
 
@@ -167,12 +160,8 @@ class Ui_Settings(object):
         Settings.setWindowTitle(QCoreApplication.translate("Settings", u"Dialog", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.pageGeneral), QCoreApplication.translate("Settings", u"General", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.pageLogging), QCoreApplication.translate("Settings", u"Logging", None))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.pageFilter), QCoreApplication.translate("Settings", u"Filter", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.pageAI), QCoreApplication.translate("Settings", u"OpenAI", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabGeneral), QCoreApplication.translate("Settings", u"General", None))
-        self.tbPath.setItemText(self.tbPath.indexOf(self.pageProject), QCoreApplication.translate("Settings", u"Project", None))
-        self.tbPath.setItemText(self.tbPath.indexOf(self.pageExport), QCoreApplication.translate("Settings", u"Export", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabPath), QCoreApplication.translate("Settings", u"Path", None))
         self.tb_property_set.setItemText(self.tb_property_set.indexOf(self.pageSplitter), QCoreApplication.translate("Settings", u"Splitter", None))
         self.tb_property_set.setItemText(self.tb_property_set.indexOf(self.pageUnits), QCoreApplication.translate("Settings", u"Units", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabProperty), QCoreApplication.translate("Settings", u"Properties", None))

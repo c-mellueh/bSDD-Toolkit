@@ -65,7 +65,7 @@
             <x>0</x>
             <y>0</y>
             <width>860</width>
-            <height>441</height>
+            <height>469</height>
            </rect>
           </property>
           <property name="layoutDirection">
@@ -74,15 +74,29 @@
           <attribute name="label">
            <string>General</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_9"/>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="pageLogging">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>856</width>
-            <height>437</height>
+            <width>860</width>
+            <height>469</height>
            </rect>
           </property>
           <property name="layoutDirection">
@@ -91,40 +105,59 @@
           <attribute name="label">
            <string>Logging</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_8"/>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
-         <widget class="QWidget" name="pageFilter">
+         <widget class="QWidget" name="pageAI">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>856</width>
-            <height>437</height>
+            <width>860</width>
+            <height>469</height>
            </rect>
           </property>
-          <property name="layoutDirection">
-           <enum>Qt::LayoutDirection::LeftToRight</enum>
-          </property>
-          <attribute name="label">
-           <string>Filter</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_10"/>
-         </widget>
-         <widget class="QWidget" name="pageAI">
           <attribute name="label">
            <string>OpenAI</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_14"/>
+          <layout class="QVBoxLayout" name="verticalLayout_14">
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabPath">
+     <widget class="QWidget" name="tabProperty">
       <attribute name="title">
-       <string>Path</string>
+       <string>Properties</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_11">
        <property name="leftMargin">
         <number>1</number>
        </property>
@@ -138,68 +171,20 @@
         <number>3</number>
        </property>
        <item>
-        <widget class="QToolBox" name="tbPath">
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="QWidget" name="pageProject">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>856</width>
-            <height>497</height>
-           </rect>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LayoutDirection::LeftToRight</enum>
-          </property>
-          <attribute name="label">
-           <string>Project</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_6"/>
-         </widget>
-         <widget class="QWidget" name="pageExport">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>100</width>
-            <height>30</height>
-           </rect>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LayoutDirection::LeftToRight</enum>
-          </property>
-          <attribute name="label">
-           <string>Export</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_7"/>
-         </widget>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabProperty">
-      <attribute name="title">
-       <string>Properties</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_11">
-       <item>
         <widget class="QToolBox" name="tb_property_set">
          <property name="contextMenuPolicy">
           <enum>Qt::ContextMenuPolicy::PreventContextMenu</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="pageSplitter">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>30</height>
+            <width>860</width>
+            <height>499</height>
            </rect>
           </property>
           <property name="layoutDirection">
@@ -208,15 +193,29 @@
           <attribute name="label">
            <string>Splitter</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_12"/>
+          <layout class="QVBoxLayout" name="verticalLayout_12">
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="pageUnits">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>840</width>
-            <height>485</height>
+            <width>860</width>
+            <height>499</height>
            </rect>
           </property>
           <property name="contextMenuPolicy">
@@ -228,7 +227,21 @@
           <attribute name="label">
            <string>Units</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_13"/>
+          <layout class="QVBoxLayout" name="verticalLayout_13">
+           <item>
+            <spacer name="verticalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>
@@ -261,8 +274,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>856</width>
-            <height>527</height>
+            <width>860</width>
+            <height>529</height>
            </rect>
           </property>
           <property name="layoutDirection">
@@ -271,7 +284,21 @@
           <attribute name="label">
            <string>Plugins</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_5"/>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>
