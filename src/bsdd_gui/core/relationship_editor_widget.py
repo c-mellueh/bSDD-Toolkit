@@ -14,6 +14,19 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_editor_widget import ui as ui_property
 
 
+def add_settings(
+    func,
+    settings_widget: Type[tool.SettingsWidget],
+):
+    settings_widget.add_page_to_toolbox(ui.SettingsWidget, "pageGeneral", func)
+
+
+def splitter_settings_accepted(
+    relationship_editor: Type[tool.RelationshipEditorWidget], appdata: Type[tool.Appdata]
+):
+    pass
+
+
 def connect_signals(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     project: Type[tool.Project],

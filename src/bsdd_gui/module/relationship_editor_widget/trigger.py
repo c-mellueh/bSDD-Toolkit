@@ -18,6 +18,8 @@ def connect():
         tool.ClassEditorWidget,
         tool.PropertyEditorWidget,
     )
+    func = core.splitter_settings_accepted(tool.RelationshipEditorWidget, tool.Appdata)
+    core.add_settings(func, tool.SettingsWidget)
 
 
 def retranslate_ui():
