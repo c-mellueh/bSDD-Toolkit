@@ -31,6 +31,7 @@ class Signals(ViewSignals, FieldSignals):
 
     property_relation_added = Signal(BsddPropertyRelation)
     property_relation_removed = Signal(BsddPropertyRelation)
+    unknown_uri_entered = Signal(str)
 
 
 class RelationshipEditorWidget(FieldTool, ItemViewTool):
@@ -81,6 +82,11 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
     ):
         logging.debug(f"Initializing RelationshipEditorWidget for {data.Code}")
         trigger.widget_created(widget, data, mode)
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.unknown_uri_entered.connect(trigger.show_unknown_uri_warning)
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.RelationshipWidget, bsdd_dictionary: BsddDictionary):
@@ -192,8 +198,14 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             code = widget.le_related_element.text()
             if dict_utils.is_uri(code):
                 related_class = cl_utils.get_class_by_uri(bsdd_dictionary, code)
+                if related_class is None:
+                    if not cls.is_unknown_uri_allowed():
+                        cls.request_unkwnown_uri_popup(code)
+                    else:
+                        related_class = cl_utils.build_dummy_class(code)
             else:
                 related_class = cl_utils.get_class_by_code(bsdd_dictionary, code)
+
             if not related_class:
                 clear_inputs()
                 return
@@ -215,6 +227,11 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
             code = widget.le_related_element.text()
             if dict_utils.is_uri(code):
                 related_property = prop_utils.get_property_by_uri(code, bsdd_dictionary)
+                if related_property is None:
+                    if not cls.is_unknown_uri_allowed():
+                        cls.request_unkwnown_uri_popup(code)
+                    else:
+                        related_property = prop_utils.build_dummy_property(code)
             else:
                 related_property = prop_utils.get_property_by_code(code, bsdd_dictionary)
             if not related_property:
@@ -409,3 +426,7 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
         return Appdata.get_bool_setting(
             constants.APPDATA_SECTION, constants.APPDATA_OPTION_ALLOW_UKN_URI, True
         )
+
+    @classmethod
+    def request_unkwnown_uri_popup(cls, uri: str):
+        cls.signals.unknown_uri_entered.emit(uri)

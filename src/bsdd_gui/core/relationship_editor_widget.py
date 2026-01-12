@@ -262,3 +262,13 @@ def remove_widget(
     widget: ui.RelationshipWidget, relationship_editor: Type[tool.RelationshipEditorWidget]
 ):
     relationship_editor.unregister_widget(widget)
+
+
+def show_unknown_uri_warning(uri: str, popups: Type[tool.Popups]):
+    title = QCoreApplication.translate("RelationshipEditor", "Unknown URI")
+    text = QCoreApplication.translate(
+        "RelationshipEditor",
+        "The specified URI '{}' is not recognized in the current dictionary.",
+    )
+    text = text.format(uri)
+    popups.create_warning_popup(text, title, title)
