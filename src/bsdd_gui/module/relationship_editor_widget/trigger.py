@@ -18,6 +18,8 @@ def connect():
         tool.ClassEditorWidget,
         tool.PropertyEditorWidget,
     )
+    func = lambda: core.splitter_settings_accepted(tool.RelationshipEditorWidget, tool.Appdata)
+    core.add_settings(func, tool.SettingsWidget)
 
 
 def retranslate_ui():
@@ -58,3 +60,10 @@ def context_menu_requested(view: QTableView, pos: QPoint):
 def widget_closed(widget: ui.RelationshipWidget):
     core.remove_widget(widget, tool.RelationshipEditorWidget)
     core.remove_view(widget.tv_relations, tool.RelationshipEditorWidget)
+
+
+def settings_created(widget: ui.SettingsWidget):
+    core.load_splitter_settings(widget, tool.RelationshipEditorWidget, tool.Appdata)
+
+def show_unknown_uri_warning(uri: str):
+    core.show_unknown_uri_warning(uri, tool.Popups)

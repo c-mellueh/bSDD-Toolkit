@@ -43,8 +43,8 @@ def _load_property_json(
         if not value:
             result[key] = None
 
-    for allowed_value in result.get("allowedValues",[]):
-            allowed_value["uri"] = None
+    for allowed_value in result.get("allowedValues", []):
+        allowed_value["uri"] = None
 
     return result
 
@@ -125,8 +125,8 @@ def get_property_code_dict(bsdd_dictionary: BsddDictionary) -> dict[str, BsddPro
     return {p.Code: p for p in bsdd_dictionary.Properties}
 
 
-def get_datatype(class_property: BsddClassProperty,bsdd_dictionary = None):
-    prop = get_property_by_class_property(class_property,bsdd_dictionary)
+def get_datatype(class_property: BsddClassProperty, bsdd_dictionary=None):
+    prop = get_property_by_class_property(class_property, bsdd_dictionary)
 
     if prop is None:
         return ""
@@ -363,3 +363,9 @@ def get_property_by_class_property(
 
 def get_class_properties_by_pset_name(bsdd_class: BsddClass, pset_name: str):
     return [p for p in bsdd_class.ClassProperties if p.PropertySet == pset_name]
+
+
+def build_dummy_property(uri: str) -> BsddProperty:
+    code = get_code_by_uri(uri)
+    dummy_property = BsddProperty(Code=code, Name=uri, OwnedUri=uri)
+    return dummy_property

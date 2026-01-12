@@ -45,6 +45,7 @@ def add_node_by_lineinput(
     scene_view: Type[gv_tool.SceneView],
     node: Type[gv_tool.Node],
     project: Type[tool.Project],
+    relationship_editor: Type[tool.RelationshipEditorWidget],
 ):
     text = input_bar.get_text()
     view = scene_view.get_view()
@@ -65,6 +66,12 @@ def add_node_by_lineinput(
 
         if resource_type == "class":
             bsdd_class = class_utils.get_class_by_uri(project.get(), text)
+            if bsdd_class is None:
+                if relationship_editor.is_unknown_uri_allowed():
+                    bsdd_class = class_utils.build_dummy_class(text)
+                else:
+                    relationship_editor.request_unkwnown_uri_popup(text)
+                    return
             if is_external:
                 node.add_node(bsdd_class, pos=scene_pos, is_external=True)
             else:
@@ -72,6 +79,11 @@ def add_node_by_lineinput(
 
         elif resource_type == "prop":
             bsdd_property = prop_utils.get_property_by_uri(text, project.get())
+            if relationship_editor.is_unknown_uri_allowed():
+                bsdd_property = prop_utils.build_dummy_property(text)
+            else:
+                relationship_editor.request_unkwnown_uri_popup(text)
+                return
             if is_external:
                 node.add_node(bsdd_property, pos=scene_pos, is_external=is_external)
             else:

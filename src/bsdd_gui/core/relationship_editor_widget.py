@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Type, Literal
 from bsdd_json import BsddProperty, BsddClass, BsddClassRelation, BsddPropertyRelation
 from PySide6.QtWidgets import QWidget, QTableView
 from PySide6.QtCore import QCoreApplication, QPoint
-from bsdd_gui.module.relationship_editor_widget import ui
+from bsdd_gui.module.relationship_editor_widget import ui, constants
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -12,6 +12,37 @@ if TYPE_CHECKING:
     from bsdd_gui.presets.ui_presets import ToggleSwitch
     from bsdd_gui.module.class_editor_widget import ui as ui_class
     from bsdd_gui.module.property_editor_widget import ui as ui_property
+
+
+def add_settings(
+    func,
+    settings_widget: Type[tool.SettingsWidget],
+):
+    settings_widget.add_page_to_toolbox(ui.SettingsWidget, "pageGeneral", func)
+
+
+def load_splitter_settings(
+    widget: ui.SettingsWidget,
+    relationship_editor: Type[tool.RelationshipEditorWidget],
+    appdata: Type[tool.Appdata],
+):
+    settings = appdata.get_bool_setting(
+        constants.APPDATA_SECTION, constants.APPDATA_OPTION_ALLOW_UKN_URI, default=True
+    )
+    widget.checkBox.setChecked(settings)
+    relationship_editor.set_settings_widget(widget)
+
+
+def splitter_settings_accepted(
+    relationship_editor: Type[tool.RelationshipEditorWidget], appdata: Type[tool.Appdata]
+):
+    widget = relationship_editor.get_settings_widget()
+    if not widget:
+        return
+    allow_unknown_uri = widget.checkBox.isChecked()
+    appdata.set_setting(
+        constants.APPDATA_SECTION, constants.APPDATA_OPTION_ALLOW_UKN_URI, allow_unknown_uri
+    )
 
 
 def connect_signals(
@@ -231,3 +262,13 @@ def remove_widget(
     widget: ui.RelationshipWidget, relationship_editor: Type[tool.RelationshipEditorWidget]
 ):
     relationship_editor.unregister_widget(widget)
+
+
+def show_unknown_uri_warning(uri: str, popups: Type[tool.Popups]):
+    title = QCoreApplication.translate("RelationshipEditor", "Unknown URI")
+    text = QCoreApplication.translate(
+        "RelationshipEditor",
+        "The specified URI '{}' is not recognized in the current dictionary.",
+    )
+    text = text.format(uri)
+    popups.create_warning_popup(text, title, title)

@@ -678,22 +678,6 @@ class Edge(PluginTool):
         return widget
 
     @classmethod
-    def read_relation(
-        cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
-    ):
-        start_data = relation._parent_ref()
-        relation_type = relation.RelationType
-
-        if isinstance(relation, BsddClassRelation):
-            related_uri = relation.RelatedClassUri
-            end_data = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
-
-        elif isinstance(relation, BsddPropertyRelation):
-            related_uri = relation.RelatedPropertyUri
-            end_data = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
-        return start_data, end_data, relation_type
-
-    @classmethod
     def get_connected_edges(cls, node: Node) -> set[ui.Edge]:
         connected_edges = set()
         for edge in cls.get_edges():
@@ -727,8 +711,8 @@ class Edge(PluginTool):
         cls, relation: BsddClassRelation | BsddPropertyRelation, bsdd_dictionary: BsddDictionary
     ):
         from bsdd_gui.plugins.graph_viewer.tool import Node as NodeTool
-
-        start_data, end_data, relation_type = cls.read_relation(relation, bsdd_dictionary)
+        from bsdd_gui.tool import RelationshipEditorWidget
+        start_data, end_data, relation_type = RelationshipEditorWidget.read_relation(relation, bsdd_dictionary)
         start_node, end_node = NodeTool.get_node_from_bsdd_data(
             start_data
         ), NodeTool.get_node_from_bsdd_data(end_data)

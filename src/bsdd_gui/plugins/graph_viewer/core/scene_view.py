@@ -315,6 +315,9 @@ def insert_classes_in_scene(
                 continue
 
             related_bsdd_class = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
+            if related_bsdd_class is None:
+                related_bsdd_class = cl_utils.build_dummy_class(related_uri)
+
             if related_bsdd_class.OwnedUri and cl_utils.is_external_ref(
                 related_bsdd_class.OwnedUri, bsdd_dictionary
             ):
@@ -359,6 +362,8 @@ def insert_properties_in_scene(
                 continue
 
             related_bsdd_property = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
+            if related_bsdd_property is None:
+                related_bsdd_property = prop_utils.build_dummy_property(related_uri)
             if related_bsdd_property.OwnedUri and dict_utils.is_external_ref(
                 related_bsdd_property.OwnedUri, bsdd_dictionary
             ):

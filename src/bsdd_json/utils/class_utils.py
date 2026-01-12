@@ -49,7 +49,7 @@ def _load_class_json(
     if "statusCode" in result and result["statusCode"] == 400:
         return None
 
-    for bsdd_prop in result.get("classProperties",[]):
+    for bsdd_prop in result.get("classProperties", []):
         code = prop_utils.get_code_by_uri(bsdd_prop.get("uri"))
         bsdd_prop["Code"] = code
         prop_uri = bsdd_prop["propertyUri"]
@@ -61,14 +61,14 @@ def _load_class_json(
         if bsdd_prop.get("description") == bsdd_prop.get("definition"):
             bsdd_prop["description"] = None
 
-        for allowed_value in bsdd_prop.get("allowedValues",[]):
+        for allowed_value in bsdd_prop.get("allowedValues", []):
             allowed_value["uri"] = None
 
     pr = result.get("parentClassReference")
     if pr:
         result["ParentClassCode"] = pr["code"]
     result["OwnedUri"] = class_uri
-    result["RelatedIfcEntityNamesList"] = result["relatedIfcEntityNames"]
+    result["RelatedIfcEntityNamesList"] = result.get("relatedIfcEntityNames", [])
     if result["referenceCode"] == result["code"]:
         result["referenceCode"] = None
     result["CreatorLanguageIsoCode"] = result.get("creatorLanguageCode")
@@ -77,9 +77,9 @@ def _load_class_json(
         if not value:
             result[key] = None
 
-    #Remove IfcReferences that are handled by RelatedIfcEntityNamesList
+    # Remove IfcReferences that are handled by RelatedIfcEntityNamesList
     filtered_class_relations = list()
-    for class_relation in list(result.get("classRelations",[])):
+    for class_relation in list(result.get("classRelations", [])):
         cr_uri = class_relation.get("relatedClassUri")
         if not dict_utils.is_ifc_reference(cr_uri):
             filtered_class_relations.append(class_relation)
@@ -91,8 +91,6 @@ def _load_class_json(
         if ifc_code not in result["RelatedIfcEntityNamesList"]:
             filtered_class_relations.append(class_relation)
     result["classRelations"] = filtered_class_relations
-
-
 
     return result
 
@@ -338,11 +336,21 @@ def is_ifc_reference(bsdd_class: BsddClass) -> bool:
         return False
     return dict_utils.is_ifc_reference(bsdd_class.OwnedUri)
 
+
 def get_code_by_uri(uri: str):
     parsed_url = dict_utils.parse_bsdd_url(uri)
     resouce_type = parsed_url.get("resource_type")
     if not resouce_type == "class":
         return None
-    
+
     resource_id = parsed_url.get("resource_id")
     return resource_id
+
+
+def build_dummy_class(class_uri: str) -> BsddClass:
+    class_code = get_code_by_uri(class_uri)
+    return BsddClass(
+        Code=class_code,
+        Name=class_uri,
+        OwnedUri=class_uri,
+    )
