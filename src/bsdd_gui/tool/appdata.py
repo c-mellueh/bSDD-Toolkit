@@ -11,6 +11,7 @@ from bsdd_gui import tool
 
 OPTION_SEPERATOR = ";"
 PATHS_SECTION = "paths"
+MAX_RECENT_PATHS = 10
 
 
 class CustomConfigParser(ConfigParser):
@@ -75,15 +76,49 @@ class Appdata:
         return os.path.join(cls.get_appdata_folder(), "config.ini")
 
     @classmethod
-    def get_path(cls, value: str) -> str | list | set:
-        logging.info(f"Appdata Path '{value}' requested")
+    def get_path(cls, option: str) -> str | list | set:
+        #TODO rewrite all functions that us get_path to use get paths if list is expected
+        logging.info(f"Appdata Path '{option}' requested")
         config = cls._get_config()
-        path = config.get(PATHS_SECTION, value)
+        path = config.get(PATHS_SECTION, option)
         if not path:
             return ""
         if OPTION_SEPERATOR in path:
             return path.split(OPTION_SEPERATOR)
         return path
+
+    @classmethod
+    def get_paths(cls,option:str) -> list[str]:
+        logging.info(f"Appdata Path '{option}' requested")
+        config = cls._get_config()
+        path = config.get(PATHS_SECTION, option)
+        if not path:
+            return []
+        if not OPTION_SEPERATOR in path:
+            return [path]
+        cleaned = []
+        for p in path.split(OPTION_SEPERATOR):
+            if p and p not in cleaned:
+                cleaned.append(p)        
+        return cleaned
+
+
+    @classmethod
+    def add_path(cls,option:str,value:str,max_entries: int = MAX_RECENT_PATHS):
+        path = os.path.abspath(os.fspath(value))
+        all_paths = [p for p in cls.get_paths(option) if p != path]
+        all_paths.insert(0, path)
+        if max_entries and len(all_paths) > max_entries:
+            all_paths = all_paths[:max_entries]
+        cls.set_path(option, all_paths)
+
+    @classmethod
+    def remove_path(cls,option:str, path: str):
+        if not path:
+            return
+        path = os.path.abspath(os.fspath(path))
+        all_paths = [p for p in cls.get_paths(option) if os.path.abspath(os.fspath(p)) != path]
+        cls.set_path(all_paths, all_paths)
 
     @classmethod
     def set_path(cls, path, value: str | list | set) -> None:

@@ -25,9 +25,15 @@ def new_clicked():
     pass
 
 
-def open_clicked():
+def open_clicked(path: str = None):
     core.open_file_clicked(
-        tool.Project, tool.Appdata, tool.MainWindowWidget, tool.Popups, tool.Plugins, tool.FileLock
+        path,
+        tool.Project,
+        tool.Appdata,
+        tool.MainWindowWidget,
+        tool.Popups,
+        tool.Plugins,
+        tool.FileLock,
     )
     pass
 
@@ -45,3 +51,7 @@ def save_clicked():
 def save_as_clicked():
     core.save_as_clicked(tool.Project, tool.Popups, tool.Appdata, tool.MainWindowWidget)
     pass
+
+
+def populate_recent_menu():
+    core.populate_recent_menu(tool.Project, tool.Appdata)

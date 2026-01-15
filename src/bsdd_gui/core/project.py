@@ -1,7 +1,8 @@
 from __future__ import annotations
 from PySide6.QtCore import QCoreApplication, Qt
+from PySide6.QtWidgets import QMenu
 from typing import Type, TYPE_CHECKING
-from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH
+from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH, RECENT_PATHS
 import logging
 import bsdd_gui
 import os
@@ -30,6 +31,24 @@ def create_project(project: Type[tool.Project]):
     project.register_project(bsdd_dictionary)
 
 
+def populate_recent_menu(project_tool: Type[tool.Project], appdata: Type[tool.Appdata]):
+    menu = project_tool.get_recent_menu()
+    if menu is None:
+        return
+    menu.clear()
+    recent_paths = appdata.get_paths(RECENT_PATHS)
+    if not recent_paths:
+        action = menu.addAction(QCoreApplication.translate("Project", "No Recent Files"))
+        action.setEnabled(False)
+        return
+
+    for path in recent_paths:
+        label = os.path.basename(path) or path
+        action = menu.addAction(label)
+        action.setToolTip(path)
+        action.triggered.connect(lambda _, p=path: project_tool.request_open(p))
+
+
 def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool.MainWindowWidget]):
 
     mw_ui = main_window.get()
@@ -48,6 +67,8 @@ def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool
         qta.icon("mdi6.folder-open"),
     )
     project.set_action(mw_ui, "open_project", action)
+    recent_menu = main_window.add_submenu("menuFile", "Open Recent",icon = qta.icon("mdi.history"))
+    project.set_recent_menu(recent_menu)
 
     # TODO: Add Combination functionality
     # action = main_window.add_action("menuFile", "add_project", trigger.add_clicked)
@@ -82,6 +103,11 @@ def retranslate_ui(project: Type[tool.Project], main_window: Type[tool.MainWindo
 
     action = project.get_action(mw_ui, "open_project")
     action.setText(QCoreApplication.translate("Project", "Open"))
+
+    if project.get_properties().recent_menu is not None:
+        project.get_properties().recent_menu.setTitle(
+            QCoreApplication.translate("Project", "Open Recent")
+        )
 
     # action = project.get_action(mw_ui, "add_project")
     # action.setText(QCoreApplication.translate("Project", "Add Project"))
@@ -135,6 +161,7 @@ def new_file_clicked(
 
 
 def open_file_clicked(
+    path: str,
     project_tool: Type[tool.Project],
     appdata: Type[tool.Appdata],
     main_window: Type[tool.MainWindowWidget],
@@ -142,16 +169,26 @@ def open_file_clicked(
     plugins: Type[tool.Plugins],
     file_lock: Type[tool.FileLock],
 ):
-    path = appdata.get_path(OPEN_PATH)
-    title = QCoreApplication.translate("Project", "Open Project")
-    path = popups.get_open_path(FILETYPE, main_window.get(), path, title)
     if not path:
+        path = appdata.get_path(OPEN_PATH)
+        title = QCoreApplication.translate("Project", "Open Project")
+        path = popups.get_open_path(FILETYPE, main_window.get(), path, title)
+        if not path:
+            return
+
+    if not os.path.exists(path):
+        appdata.remove_path(RECENT_PATHS, path)
+        popups.create_warning_popup(
+            path or "",
+            QCoreApplication.translate("Project", "File Missing"),
+            QCoreApplication.translate("Project", "Recent file not found"),
+        )
         return
 
     logging.info("Load Project")
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
-    proj = open_project(path, project_tool, popups, file_lock)
+    proj = open_project(path, project_tool, popups, file_lock, appdata=appdata)
     if proj is None:
         return
 
@@ -164,6 +201,7 @@ def open_project(
     project: Type[tool.Project],
     popups: Type[tool.Popups],
     file_lock: Type[tool.FileLock] | None = None,
+    appdata: Type[tool.Appdata] | None = None,
 ):
     proj = None
     if not path:
@@ -186,6 +224,8 @@ def open_project(
         raise
     if proj is not None:
         project.register_project(proj)
+        if appdata is not None:
+            appdata.add_path(RECENT_PATHS, path)
     else:
         file_lock.unlock_file()
     return proj
@@ -229,5 +269,6 @@ def save_project(path: str, project: Type[tool.Project], appdata: Type[tool.Appd
         json.dump(bsdd_dictionary.model_dump(mode="json", exclude_none=True), file)
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
+    appdata.add_path(RECENT_PATHS, path)
     project.set_last_save(bsdd_dictionary)
     logging.info(f"Save Done!")

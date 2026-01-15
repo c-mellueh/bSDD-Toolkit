@@ -8,7 +8,7 @@ import bsdd_gui
 from bsdd_gui.module.main_window_widget import ui
 from bsdd_json.models import BsddClass, BsddClassProperty
 from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction,QIcon
 from bsdd_gui.module.main_window_widget import trigger
 from bsdd_gui.presets.tool_presets import ActionTool
 
@@ -152,12 +152,14 @@ class MainWindowWidget(ActionTool):
         return cls.get().menubar
 
     @classmethod
-    def add_submenu(cls, parent_name: str, name) -> QMenu:
+    def add_submenu(cls, parent_name: str, name:str,icon:QIcon) -> QMenu:
         if parent_name:
             menu: QMenuBar | QMenu = getattr(cls.get(), parent_name)
         else:
             menu = cls.get_menu_bar()
-        return menu.addMenu(name)
+        new_menu = menu.addMenu(name)
+        new_menu.setIcon(icon)
+        return new_menu
 
     @classmethod
     def remove_submenu(cls, parent_name: str, sub_menu: QMenu):

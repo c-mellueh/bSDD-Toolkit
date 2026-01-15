@@ -14,8 +14,7 @@ from bsdd_json import (
 )
 from bsdd_gui.module.project import ui
 from PySide6.QtCore import QObject, Signal
-from pydantic import ValidationError
-import copy
+from PySide6.QtWidgets import QMenu
 from bsdd_gui.module.project import trigger
 
 if TYPE_CHECKING:
@@ -23,7 +22,7 @@ if TYPE_CHECKING:
 
 
 class Signals(QObject):
-    open_requested = Signal()
+    open_requested = Signal(object)
     new_requested = Signal()
     save_requested = Signal()
     save_as_requested = Signal()
@@ -40,6 +39,7 @@ class Signals(QObject):
     property_relation_removed = Signal(BsddPropertyRelation)
     ifc_relation_addded = Signal(BsddClass, str)  # IfcRelationName
     ifc_relation_removed = Signal(BsddClass, str)  # IfcRelationName
+    recent_menu_about_to_show = Signal()
 
 
 class Project(ActionTool):
@@ -70,6 +70,7 @@ class Project(ActionTool):
         cls.signals.save_as_requested.connect(trigger.save_as_clicked)
         cls.signals.open_requested.connect(trigger.open_clicked)
         cls.signals.new_requested.connect(trigger.new_clicked)
+        cls.signals.recent_menu_about_to_show.connect(trigger.populate_recent_menu)
         return super().connect_internal_signals()
 
     @classmethod
@@ -136,9 +137,20 @@ class Project(ActionTool):
         cls.signals.save_as_requested.emit()
 
     @classmethod
-    def request_open(cls):
-        cls.signals.open_requested.emit()
+    def request_open(cls,path = None):
+        cls.signals.open_requested.emit(path)
 
     @classmethod
     def request_new(cls):
         cls.signals.new_requested.emit()
+
+    # Recent Menu
+    @classmethod
+    def set_recent_menu(cls, recent_menu: QMenu):
+        cls.get_properties().recent_menu = recent_menu
+        recent_menu.aboutToShow.connect(cls.signals.recent_menu_about_to_show.emit)
+
+    @classmethod
+    def get_recent_menu(cls) -> QMenu:
+        return cls.get_properties().recent_menu
+    
