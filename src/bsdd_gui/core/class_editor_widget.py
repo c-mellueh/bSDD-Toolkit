@@ -131,7 +131,7 @@ def create_new_class(
     main_window: Type[tool.MainWindowWidget],
 ):
 
-    new_class = BsddClass(Code="Code", Name="Name", ClassType="Class")
+    new_class = BsddClass(Code="New", Name="New", ClassType="Class")
     new_class.ParentClassCode = parent.Code if parent is not None else None
     dialog = class_editor.create_dialog(new_class, main_window.get())
     widget = dialog._widget

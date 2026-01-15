@@ -224,7 +224,6 @@ def connect_widget(
     widget.mode = mode
     relationship_editor.connect_widget_signals(widget, project.get())
 
-
 def register_validators(
     widget: ui.RelationshipWidget,
     relationship_editor: Type[tool.RelationshipEditorWidget],

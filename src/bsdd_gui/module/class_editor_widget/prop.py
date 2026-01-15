@@ -10,3 +10,4 @@ if TYPE_CHECKING:
 class ClassEditorWidgetProperties(DialogProperties):
     def __init__(self):
         super().__init__()
+        self.old_name_value = None
