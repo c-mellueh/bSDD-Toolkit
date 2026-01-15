@@ -4,6 +4,7 @@ from bsdd_gui.presets.prop_presets import ActionsProperties
 
 if TYPE_CHECKING:
     from bsdd_json.models import BsddDictionary
+    from PySide6.QtWidgets import QMenu
 
 
 class ProjectProperties(ActionsProperties):
@@ -14,3 +15,4 @@ class ProjectProperties(ActionsProperties):
         self.plugin_save_functions = list()
         self.offline_mode = False
         self.last_save: BsddDictionary = None
+        self.recent_menu: QMenu | None = None
