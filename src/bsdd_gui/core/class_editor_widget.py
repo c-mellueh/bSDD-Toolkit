@@ -130,8 +130,8 @@ def create_new_class(
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],
 ):
-
-    new_class = BsddClass(Code="New", Name="New", ClassType="Class")
+    new_text = QCoreApplication.translate("ClassEditor","New")
+    new_class = BsddClass(Code=new_text, Name=new_text, ClassType="Class")
     new_class.ParentClassCode = parent.Code if parent is not None else None
     dialog = class_editor.create_dialog(new_class, main_window.get())
     widget = dialog._widget
