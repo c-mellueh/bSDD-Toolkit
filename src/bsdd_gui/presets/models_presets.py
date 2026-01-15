@@ -49,7 +49,7 @@ class ItemModel(QAbstractItemModel):
 
         return None
 
-    def setData(self, index, value, /, role=...):
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         if not index.isValid():
             return False
 
@@ -61,7 +61,7 @@ class ItemModel(QAbstractItemModel):
             setter_func(self, index, value)
             self.dataChanged.emit(index, index, [Qt.DisplayRole, Qt.EditRole])
             return True
-        setter_func = self.tool.value_setter_functions(self)[index.column()]
+    
         if role == Qt.ItemDataRole.CheckStateRole:
             # CheckStateRole passes an enum/int; convert to bool for the setter.
             check_state = Qt.CheckState(value)
