@@ -67,7 +67,7 @@ def create_main_menu_actions(project: Type[tool.Project], main_window: Type[tool
         qta.icon("mdi6.folder-open"),
     )
     project.set_action(mw_ui, "open_project", action)
-    recent_menu = main_window.add_submenu("menuFile", "Open Recent")
+    recent_menu = main_window.add_submenu("menuFile", "Open Recent",icon = qta.icon("mdi.history"))
     project.set_recent_menu(recent_menu)
 
     # TODO: Add Combination functionality
