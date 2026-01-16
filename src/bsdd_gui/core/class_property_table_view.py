@@ -257,7 +257,6 @@ def paste_property_from_clipboard(
         class_property_table.add_class_property(new_property, model.active_class)
         existing_codes.append(code)
 
-
     existing_property_codes = [p.Code for p in project.get().Properties]
     for bsdd_property in properties:
         if bsdd_property.get("Code") in existing_property_codes:
