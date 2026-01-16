@@ -75,6 +75,7 @@ class Ui_ClassEditor(object):
         ClassEditor.resize(650, 750)
         self.verticalLayout_5 = QVBoxLayout(ClassEditor)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.tabWidget = QTabWidget(ClassEditor)
         self.tabWidget.setObjectName("tabWidget")
         self.tab_basics = QWidget()

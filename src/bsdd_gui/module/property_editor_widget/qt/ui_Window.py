@@ -53,7 +53,6 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSizePolicy,
     QSpacerItem,
-    QSpinBox,
     QTabWidget,
     QTextEdit,
     QVBoxLayout,
@@ -65,6 +64,7 @@ from bsdd_gui.module.relationship_editor_widget.ui import RelationshipWidget
 from bsdd_gui.presets.ui_presets import (
     ComboBoxWithToggleSwitch,
     DateTimeWithNow,
+    SpinBoxWithToggleSwitch,
     TagInput,
     ToggleSwitch,
 )
@@ -326,7 +326,7 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_revision_number)
 
-        self.sb_revision_number = QSpinBox(self.bt_version_control)
+        self.sb_revision_number = SpinBoxWithToggleSwitch(self.bt_version_control)
         self.sb_revision_number.setObjectName("sb_revision_number")
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.sb_revision_number)
@@ -356,7 +356,7 @@ class Ui_PropertyWindow(object):
 
         self.formLayout.setWidget(6, QFormLayout.ItemRole.LabelRole, self.lb_version_number)
 
-        self.sb_version_number = QSpinBox(self.bt_version_control)
+        self.sb_version_number = SpinBoxWithToggleSwitch(self.bt_version_control)
         self.sb_version_number.setObjectName("sb_version_number")
 
         self.formLayout.setWidget(6, QFormLayout.ItemRole.FieldRole, self.sb_version_number)

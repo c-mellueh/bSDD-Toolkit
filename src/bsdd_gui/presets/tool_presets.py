@@ -563,9 +563,9 @@ class FieldTool(WidgetTool):
             elif isinstance(field, TagInput):
                 field.setTags(value or [])
             elif isinstance(field, QSpinBox):
-                field.setValue(value)
+                field.setValue(value or None)
             elif isinstance(field, QDoubleSpinBox):
-                field.setValue(value)
+                field.setValue(value or None)
             elif isinstance(field, QDateTimeEdit):
                 if not value:
                     return
