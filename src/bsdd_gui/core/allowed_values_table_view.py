@@ -11,6 +11,8 @@ from bsdd_gui.module.class_property_editor_widget.constants import (
     SEPERATOR_STATUS,
 )
 
+import qtawesome as qta
+
 if TYPE_CHECKING:
     from bsdd_gui import tool
 
@@ -78,6 +80,7 @@ def add_context_menu_to_view(
         True,
         True,
         True,
+        qta.icon("mdi.delete")
     )
 
 
