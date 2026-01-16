@@ -53,8 +53,6 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSizePolicy,
     QSpacerItem,
-    QSpinBox,
-    QSplitter,
     QTabWidget,
     QTextEdit,
     QVBoxLayout,
@@ -66,6 +64,7 @@ from bsdd_gui.module.relationship_editor_widget.ui import RelationshipWidget
 from bsdd_gui.presets.ui_presets import (
     ComboBoxWithToggleSwitch,
     DateTimeWithNow,
+    SpinBoxWithToggleSwitch,
     TagInput,
     ToggleSwitch,
 )
@@ -75,7 +74,7 @@ class Ui_PropertyWindow(object):
     def setupUi(self, PropertyWindow):
         if not PropertyWindow.objectName():
             PropertyWindow.setObjectName("PropertyWindow")
-        PropertyWindow.resize(666, 765)
+        PropertyWindow.resize(650, 750)
         self.verticalLayout = QVBoxLayout(PropertyWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QTabWidget(PropertyWindow)
@@ -84,8 +83,8 @@ class Ui_PropertyWindow(object):
         self.tabWidget.setStyleSheet("")
         self.tab_basics = QWidget()
         self.tab_basics.setObjectName("tab_basics")
-        self.verticalLayout_6 = QVBoxLayout(self.tab_basics)
-        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.verticalLayout_5 = QVBoxLayout(self.tab_basics)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.gb_basics = QGroupBox(self.tab_basics)
         self.gb_basics.setObjectName("gb_basics")
         self.verticalLayout_2 = QVBoxLayout(self.gb_basics)
@@ -198,7 +197,7 @@ class Ui_PropertyWindow(object):
 
         self.verticalLayout_2.addLayout(self.fl_code)
 
-        self.verticalLayout_6.addWidget(self.gb_basics)
+        self.verticalLayout_5.addWidget(self.gb_basics)
 
         self.gb_values = QGroupBox(self.tab_basics)
         self.gb_values.setObjectName("gb_values")
@@ -225,36 +224,9 @@ class Ui_PropertyWindow(object):
 
         self.vl_values.addWidget(self.tv_allowed_values)
 
-        self.verticalLayout_6.addWidget(self.gb_values)
+        self.verticalLayout_5.addWidget(self.gb_values)
 
-        self.tabWidget.addTab(self.tab_basics, "")
-        self.tab_def_and_rel = QWidget()
-        self.tab_def_and_rel.setObjectName("tab_def_and_rel")
-        self.verticalLayout_5 = QVBoxLayout(self.tab_def_and_rel)
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
-        self.splitter_2 = QSplitter(self.tab_def_and_rel)
-        self.splitter_2.setObjectName("splitter_2")
-        self.splitter_2.setOrientation(Qt.Orientation.Vertical)
-        self.gb_relations = QGroupBox(self.splitter_2)
-        self.gb_relations.setObjectName("gb_relations")
-        self.verticalLayout_4 = QVBoxLayout(self.gb_relations)
-        self.verticalLayout_4.setSpacing(6)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.verticalLayout_4.setContentsMargins(6, 6, 6, 6)
-        self.relationship_widget = RelationshipWidget(self.gb_relations)
-        self.relationship_widget.setObjectName("relationship_widget")
-
-        self.verticalLayout_4.addWidget(self.relationship_widget)
-
-        self.line = QFrame(self.gb_relations)
-        self.line.setObjectName("line")
-        self.line.setFrameShape(QFrame.Shape.HLine)
-        self.line.setFrameShadow(QFrame.Shadow.Sunken)
-
-        self.verticalLayout_4.addWidget(self.line)
-
-        self.splitter_2.addWidget(self.gb_relations)
-        self.gb_description = QGroupBox(self.splitter_2)
+        self.gb_description = QGroupBox(self.tab_basics)
         self.gb_description.setObjectName("gb_description")
         self.verticalLayout_3 = QVBoxLayout(self.gb_description)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -298,194 +270,279 @@ class Ui_PropertyWindow(object):
 
         self.verticalLayout_3.addWidget(self.te_description)
 
-        self.splitter_2.addWidget(self.gb_description)
+        self.verticalLayout_5.addWidget(self.gb_description)
 
-        self.verticalLayout_5.addWidget(self.splitter_2)
+        self.tabWidget.addTab(self.tab_basics, "")
+        self.tab_relations = QWidget()
+        self.tab_relations.setObjectName("tab_relations")
+        self.verticalLayout_6 = QVBoxLayout(self.tab_relations)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.gb_relations = QGroupBox(self.tab_relations)
+        self.gb_relations.setObjectName("gb_relations")
+        self.verticalLayout_4 = QVBoxLayout(self.gb_relations)
+        self.verticalLayout_4.setSpacing(6)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(6, 6, 6, 6)
+        self.relationship_widget = RelationshipWidget(self.gb_relations)
+        self.relationship_widget.setObjectName("relationship_widget")
 
-        self.tabWidget.addTab(self.tab_def_and_rel, "")
-        self.tab_advanced = QWidget()
-        self.tab_advanced.setObjectName("tab_advanced")
-        self.formLayout = QFormLayout(self.tab_advanced)
+        self.verticalLayout_4.addWidget(self.relationship_widget)
+
+        self.line = QFrame(self.gb_relations)
+        self.line.setObjectName("line")
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_4.addWidget(self.line)
+
+        self.verticalLayout_6.addWidget(self.gb_relations)
+
+        self.bt_version_control = QGroupBox(self.tab_relations)
+        self.bt_version_control.setObjectName("bt_version_control")
+        self.formLayout = QFormLayout(self.bt_version_control)
         self.formLayout.setObjectName("formLayout")
-        self.lb_example = QLabel(self.tab_advanced)
-        self.lb_example.setObjectName("lb_example")
-
-        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lb_example)
-
-        self.le_example = QLineEdit(self.tab_advanced)
-        self.le_example.setObjectName("le_example")
-
-        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.le_example)
-
-        self.lb_activation_time = QLabel(self.tab_advanced)
+        self.lb_activation_time = QLabel(self.bt_version_control)
         self.lb_activation_time.setObjectName("lb_activation_time")
 
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lb_activation_time)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lb_activation_time)
 
-        self.lb_connected_properties = QLabel(self.tab_advanced)
-        self.lb_connected_properties.setObjectName("lb_connected_properties")
+        self.de_activation_time = DateTimeWithNow(self.bt_version_control)
+        self.de_activation_time.setObjectName("de_activation_time")
 
-        self.formLayout.setWidget(5, QFormLayout.ItemRole.LabelRole, self.lb_connected_properties)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.de_activation_time)
 
-        self.ti_connect_properties = TagInput(self.tab_advanced)
-        self.ti_connect_properties.setObjectName("ti_connect_properties")
+        self.lb_revision_date = QLabel(self.bt_version_control)
+        self.lb_revision_date.setObjectName("lb_revision_date")
 
-        self.formLayout.setWidget(5, QFormLayout.ItemRole.FieldRole, self.ti_connect_properties)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lb_revision_date)
 
-        self.lb_country_use = QLabel(self.tab_advanced)
-        self.lb_country_use.setObjectName("lb_country_use")
+        self.de_revision_time = DateTimeWithNow(self.bt_version_control)
+        self.de_revision_time.setObjectName("de_revision_time")
 
-        self.formLayout.setWidget(6, QFormLayout.ItemRole.LabelRole, self.lb_country_use)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.de_revision_time)
 
-        self.ti_countries = TagInput(self.tab_advanced)
-        self.ti_countries.setObjectName("ti_countries")
+        self.lb_revision_number = QLabel(self.bt_version_control)
+        self.lb_revision_number.setObjectName("lb_revision_number")
 
-        self.formLayout.setWidget(6, QFormLayout.ItemRole.FieldRole, self.ti_countries)
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_revision_number)
 
-        self.lb_country_origin = QLabel(self.tab_advanced)
-        self.lb_country_origin.setObjectName("lb_country_origin")
+        self.sb_revision_number = SpinBoxWithToggleSwitch(self.bt_version_control)
+        self.sb_revision_number.setObjectName("sb_revision_number")
 
-        self.formLayout.setWidget(7, QFormLayout.ItemRole.LabelRole, self.lb_country_origin)
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.sb_revision_number)
 
-        self.cb_country_origin = ComboBoxWithToggleSwitch(self.tab_advanced)
-        self.cb_country_origin.setObjectName("cb_country_origin")
-
-        self.formLayout.setWidget(7, QFormLayout.ItemRole.FieldRole, self.cb_country_origin)
-
-        self.lb_creator_iso = QLabel(self.tab_advanced)
-        self.lb_creator_iso.setObjectName("lb_creator_iso")
-
-        self.formLayout.setWidget(8, QFormLayout.ItemRole.LabelRole, self.lb_creator_iso)
-
-        self.cb_creator_iso = ComboBoxWithToggleSwitch(self.tab_advanced)
-        self.cb_creator_iso.setObjectName("cb_creator_iso")
-
-        self.formLayout.setWidget(8, QFormLayout.ItemRole.FieldRole, self.cb_creator_iso)
-
-        self.lb_deactivation_time = QLabel(self.tab_advanced)
+        self.lb_deactivation_time = QLabel(self.bt_version_control)
         self.lb_deactivation_time.setObjectName("lb_deactivation_time")
 
         self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lb_deactivation_time)
 
-        self.lb_document_ref = QLabel(self.tab_advanced)
-        self.lb_document_ref.setObjectName("lb_document_ref")
-
-        self.formLayout.setWidget(9, QFormLayout.ItemRole.LabelRole, self.lb_document_ref)
-
-        self.cb_document_ref = ComboBoxWithToggleSwitch(self.tab_advanced)
-        self.cb_document_ref.setObjectName("cb_document_ref")
-
-        self.formLayout.setWidget(9, QFormLayout.ItemRole.FieldRole, self.cb_document_ref)
-
-        self.lb_measurement = QLabel(self.tab_advanced)
-        self.lb_measurement.setObjectName("lb_measurement")
-
-        self.formLayout.setWidget(10, QFormLayout.ItemRole.LabelRole, self.lb_measurement)
-
-        self.le_measurement = QLineEdit(self.tab_advanced)
-        self.le_measurement.setObjectName("le_measurement")
-
-        self.formLayout.setWidget(10, QFormLayout.ItemRole.FieldRole, self.le_measurement)
-
-        self.lb_replaced_objects = QLabel(self.tab_advanced)
-        self.lb_replaced_objects.setObjectName("lb_replaced_objects")
-
-        self.formLayout.setWidget(11, QFormLayout.ItemRole.LabelRole, self.lb_replaced_objects)
-
-        self.lb_replacing_objects = QLabel(self.tab_advanced)
-        self.lb_replacing_objects.setObjectName("lb_replacing_objects")
-
-        self.formLayout.setWidget(12, QFormLayout.ItemRole.LabelRole, self.lb_replacing_objects)
-
-        self.ti_replaced_objects = TagInput(self.tab_advanced)
-        self.ti_replaced_objects.setObjectName("ti_replaced_objects")
-
-        self.formLayout.setWidget(11, QFormLayout.ItemRole.FieldRole, self.ti_replaced_objects)
-
-        self.ti_replacing_objects = TagInput(self.tab_advanced)
-        self.ti_replacing_objects.setObjectName("ti_replacing_objects")
-
-        self.formLayout.setWidget(12, QFormLayout.ItemRole.FieldRole, self.ti_replacing_objects)
-
-        self.lb_revision_date = QLabel(self.tab_advanced)
-        self.lb_revision_date.setObjectName("lb_revision_date")
-
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_revision_date)
-
-        self.lb_subdivision = QLabel(self.tab_advanced)
-        self.lb_subdivision.setObjectName("lb_subdivision")
-
-        self.formLayout.setWidget(13, QFormLayout.ItemRole.LabelRole, self.lb_subdivision)
-
-        self.ti_subdivision = TagInput(self.tab_advanced)
-        self.ti_subdivision.setObjectName("ti_subdivision")
-
-        self.formLayout.setWidget(13, QFormLayout.ItemRole.FieldRole, self.ti_subdivision)
-
-        self.lb_text_format = QLabel(self.tab_advanced)
-        self.lb_text_format.setObjectName("lb_text_format")
-
-        self.formLayout.setWidget(14, QFormLayout.ItemRole.LabelRole, self.lb_text_format)
-
-        self.le_text_format = QLineEdit(self.tab_advanced)
-        self.le_text_format.setObjectName("le_text_format")
-
-        self.formLayout.setWidget(14, QFormLayout.ItemRole.FieldRole, self.le_text_format)
-
-        self.lb_uid = QLabel(self.tab_advanced)
-        self.lb_uid.setObjectName("lb_uid")
-
-        self.formLayout.setWidget(15, QFormLayout.ItemRole.LabelRole, self.lb_uid)
-
-        self.le_uid = QLineEdit(self.tab_advanced)
-        self.le_uid.setObjectName("le_uid")
-
-        self.formLayout.setWidget(15, QFormLayout.ItemRole.FieldRole, self.le_uid)
-
-        self.lb_version_date = QLabel(self.tab_advanced)
-        self.lb_version_date.setObjectName("lb_version_date")
-
-        self.formLayout.setWidget(4, QFormLayout.ItemRole.LabelRole, self.lb_version_date)
-
-        self.lb_version_number = QLabel(self.tab_advanced)
-        self.lb_version_number.setObjectName("lb_version_number")
-
-        self.formLayout.setWidget(16, QFormLayout.ItemRole.LabelRole, self.lb_version_number)
-
-        self.sb_version_number = QSpinBox(self.tab_advanced)
-        self.sb_version_number.setObjectName("sb_version_number")
-
-        self.formLayout.setWidget(16, QFormLayout.ItemRole.FieldRole, self.sb_version_number)
-
-        self.lb_visual_rep = QLabel(self.tab_advanced)
-        self.lb_visual_rep.setObjectName("lb_visual_rep")
-
-        self.formLayout.setWidget(17, QFormLayout.ItemRole.LabelRole, self.lb_visual_rep)
-
-        self.le_visual_rep = QLineEdit(self.tab_advanced)
-        self.le_visual_rep.setObjectName("le_visual_rep")
-
-        self.formLayout.setWidget(17, QFormLayout.ItemRole.FieldRole, self.le_visual_rep)
-
-        self.de_activation_time = DateTimeWithNow(self.tab_advanced)
-        self.de_activation_time.setObjectName("de_activation_time")
-
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.de_activation_time)
-
-        self.de_revision_time = DateTimeWithNow(self.tab_advanced)
-        self.de_revision_time.setObjectName("de_revision_time")
-
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.de_revision_time)
-
-        self.de_deactivation_time = DateTimeWithNow(self.tab_advanced)
+        self.de_deactivation_time = DateTimeWithNow(self.bt_version_control)
         self.de_deactivation_time.setObjectName("de_deactivation_time")
 
         self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.de_deactivation_time)
 
-        self.de_version_date = DateTimeWithNow(self.tab_advanced)
+        self.lb_version_date = QLabel(self.bt_version_control)
+        self.lb_version_date.setObjectName("lb_version_date")
+
+        self.formLayout.setWidget(5, QFormLayout.ItemRole.LabelRole, self.lb_version_date)
+
+        self.de_version_date = DateTimeWithNow(self.bt_version_control)
         self.de_version_date.setObjectName("de_version_date")
 
-        self.formLayout.setWidget(4, QFormLayout.ItemRole.FieldRole, self.de_version_date)
+        self.formLayout.setWidget(5, QFormLayout.ItemRole.FieldRole, self.de_version_date)
+
+        self.lb_version_number = QLabel(self.bt_version_control)
+        self.lb_version_number.setObjectName("lb_version_number")
+
+        self.formLayout.setWidget(6, QFormLayout.ItemRole.LabelRole, self.lb_version_number)
+
+        self.sb_version_number = SpinBoxWithToggleSwitch(self.bt_version_control)
+        self.sb_version_number.setObjectName("sb_version_number")
+
+        self.formLayout.setWidget(6, QFormLayout.ItemRole.FieldRole, self.sb_version_number)
+
+        self.lb_replaced_objects = QLabel(self.bt_version_control)
+        self.lb_replaced_objects.setObjectName("lb_replaced_objects")
+
+        self.formLayout.setWidget(7, QFormLayout.ItemRole.LabelRole, self.lb_replaced_objects)
+
+        self.ti_replaced_objects = TagInput(self.bt_version_control)
+        self.ti_replaced_objects.setObjectName("ti_replaced_objects")
+
+        self.formLayout.setWidget(7, QFormLayout.ItemRole.FieldRole, self.ti_replaced_objects)
+
+        self.lb_replacing_objects = QLabel(self.bt_version_control)
+        self.lb_replacing_objects.setObjectName("lb_replacing_objects")
+
+        self.formLayout.setWidget(8, QFormLayout.ItemRole.LabelRole, self.lb_replacing_objects)
+
+        self.ti_replacing_objects = TagInput(self.bt_version_control)
+        self.ti_replacing_objects.setObjectName("ti_replacing_objects")
+
+        self.formLayout.setWidget(8, QFormLayout.ItemRole.FieldRole, self.ti_replacing_objects)
+
+        self.lb_deprecation_explanation = QLabel(self.bt_version_control)
+        self.lb_deprecation_explanation.setObjectName("lb_deprecation_explanation")
+
+        self.formLayout.setWidget(
+            4, QFormLayout.ItemRole.LabelRole, self.lb_deprecation_explanation
+        )
+
+        self.le_deprecation_explanation = QLineEdit(self.bt_version_control)
+        self.le_deprecation_explanation.setObjectName("le_deprecation_explanation")
+
+        self.formLayout.setWidget(
+            4, QFormLayout.ItemRole.FieldRole, self.le_deprecation_explanation
+        )
+
+        self.verticalLayout_6.addWidget(self.bt_version_control)
+
+        self.tabWidget.addTab(self.tab_relations, "")
+        self.tab_advanced = QWidget()
+        self.tab_advanced.setObjectName("tab_advanced")
+        self.verticalLayout_7 = QVBoxLayout(self.tab_advanced)
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.groupBox = QGroupBox(self.tab_advanced)
+        self.groupBox.setObjectName("groupBox")
+        self.formLayout_3 = QFormLayout(self.groupBox)
+        self.formLayout_3.setObjectName("formLayout_3")
+        self.lb_example = QLabel(self.groupBox)
+        self.lb_example.setObjectName("lb_example")
+
+        self.formLayout_3.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lb_example)
+
+        self.le_example = QLineEdit(self.groupBox)
+        self.le_example.setObjectName("le_example")
+
+        self.formLayout_3.setWidget(0, QFormLayout.ItemRole.FieldRole, self.le_example)
+
+        self.label = QLabel(self.groupBox)
+        self.label.setObjectName("label")
+
+        self.formLayout_3.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label)
+
+        self.le_owned_uri = QLineEdit(self.groupBox)
+        self.le_owned_uri.setObjectName("le_owned_uri")
+
+        self.formLayout_3.setWidget(1, QFormLayout.ItemRole.FieldRole, self.le_owned_uri)
+
+        self.lb_connected_properties = QLabel(self.groupBox)
+        self.lb_connected_properties.setObjectName("lb_connected_properties")
+
+        self.formLayout_3.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_connected_properties)
+
+        self.ti_connect_properties = TagInput(self.groupBox)
+        self.ti_connect_properties.setObjectName("ti_connect_properties")
+
+        self.formLayout_3.setWidget(2, QFormLayout.ItemRole.FieldRole, self.ti_connect_properties)
+
+        self.lb_document_ref = QLabel(self.groupBox)
+        self.lb_document_ref.setObjectName("lb_document_ref")
+
+        self.formLayout_3.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lb_document_ref)
+
+        self.cb_document_ref = ComboBoxWithToggleSwitch(self.groupBox)
+        self.cb_document_ref.setObjectName("cb_document_ref")
+
+        self.formLayout_3.setWidget(3, QFormLayout.ItemRole.FieldRole, self.cb_document_ref)
+
+        self.lb_measurement = QLabel(self.groupBox)
+        self.lb_measurement.setObjectName("lb_measurement")
+
+        self.formLayout_3.setWidget(4, QFormLayout.ItemRole.LabelRole, self.lb_measurement)
+
+        self.le_measurement = QLineEdit(self.groupBox)
+        self.le_measurement.setObjectName("le_measurement")
+
+        self.formLayout_3.setWidget(4, QFormLayout.ItemRole.FieldRole, self.le_measurement)
+
+        self.lb_subdivision = QLabel(self.groupBox)
+        self.lb_subdivision.setObjectName("lb_subdivision")
+
+        self.formLayout_3.setWidget(5, QFormLayout.ItemRole.LabelRole, self.lb_subdivision)
+
+        self.ti_subdivision = TagInput(self.groupBox)
+        self.ti_subdivision.setObjectName("ti_subdivision")
+
+        self.formLayout_3.setWidget(5, QFormLayout.ItemRole.FieldRole, self.ti_subdivision)
+
+        self.lb_text_format = QLabel(self.groupBox)
+        self.lb_text_format.setObjectName("lb_text_format")
+
+        self.formLayout_3.setWidget(6, QFormLayout.ItemRole.LabelRole, self.lb_text_format)
+
+        self.le_text_format = QLineEdit(self.groupBox)
+        self.le_text_format.setObjectName("le_text_format")
+
+        self.formLayout_3.setWidget(6, QFormLayout.ItemRole.FieldRole, self.le_text_format)
+
+        self.lb_uid = QLabel(self.groupBox)
+        self.lb_uid.setObjectName("lb_uid")
+
+        self.formLayout_3.setWidget(7, QFormLayout.ItemRole.LabelRole, self.lb_uid)
+
+        self.le_uid = QLineEdit(self.groupBox)
+        self.le_uid.setObjectName("le_uid")
+
+        self.formLayout_3.setWidget(7, QFormLayout.ItemRole.FieldRole, self.le_uid)
+
+        self.lb_visual_rep = QLabel(self.groupBox)
+        self.lb_visual_rep.setObjectName("lb_visual_rep")
+
+        self.formLayout_3.setWidget(8, QFormLayout.ItemRole.LabelRole, self.lb_visual_rep)
+
+        self.le_visual_rep = QLineEdit(self.groupBox)
+        self.le_visual_rep.setObjectName("le_visual_rep")
+
+        self.formLayout_3.setWidget(8, QFormLayout.ItemRole.FieldRole, self.le_visual_rep)
+
+        self.le_dimension = QLineEdit(self.groupBox)
+        self.le_dimension.setObjectName("le_dimension")
+
+        self.formLayout_3.setWidget(9, QFormLayout.ItemRole.FieldRole, self.le_dimension)
+
+        self.lb_dimension = QLabel(self.groupBox)
+        self.lb_dimension.setObjectName("lb_dimension")
+
+        self.formLayout_3.setWidget(9, QFormLayout.ItemRole.LabelRole, self.lb_dimension)
+
+        self.verticalLayout_7.addWidget(self.groupBox)
+
+        self.gb_language = QGroupBox(self.tab_advanced)
+        self.gb_language.setObjectName("gb_language")
+        self.formLayout_2 = QFormLayout(self.gb_language)
+        self.formLayout_2.setObjectName("formLayout_2")
+        self.lb_country_use = QLabel(self.gb_language)
+        self.lb_country_use.setObjectName("lb_country_use")
+
+        self.formLayout_2.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lb_country_use)
+
+        self.ti_countries = TagInput(self.gb_language)
+        self.ti_countries.setObjectName("ti_countries")
+
+        self.formLayout_2.setWidget(0, QFormLayout.ItemRole.FieldRole, self.ti_countries)
+
+        self.lb_country_origin = QLabel(self.gb_language)
+        self.lb_country_origin.setObjectName("lb_country_origin")
+
+        self.formLayout_2.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lb_country_origin)
+
+        self.cb_country_origin = ComboBoxWithToggleSwitch(self.gb_language)
+        self.cb_country_origin.setObjectName("cb_country_origin")
+
+        self.formLayout_2.setWidget(1, QFormLayout.ItemRole.FieldRole, self.cb_country_origin)
+
+        self.lb_creator_iso = QLabel(self.gb_language)
+        self.lb_creator_iso.setObjectName("lb_creator_iso")
+
+        self.formLayout_2.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_creator_iso)
+
+        self.cb_creator_iso = ComboBoxWithToggleSwitch(self.gb_language)
+        self.cb_creator_iso.setObjectName("cb_creator_iso")
+
+        self.formLayout_2.setWidget(2, QFormLayout.ItemRole.FieldRole, self.cb_creator_iso)
+
+        self.verticalLayout_7.addWidget(self.gb_language)
 
         self.tabWidget.addTab(self.tab_advanced, "")
 
@@ -628,13 +685,6 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate("PropertyWindow", "Allowed Values", None)
         )
         self.pb_new_value.setText(QCoreApplication.translate("PropertyWindow", "+", None))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_basics),
-            QCoreApplication.translate("PropertyWindow", "Basics", None),
-        )
-        self.gb_relations.setTitle(
-            QCoreApplication.translate("PropertyWindow", "PropertyRelations", None)
-        )
         self.gb_description.setTitle(
             QCoreApplication.translate("PropertyWindow", "Definition", None)
         )
@@ -645,18 +695,68 @@ class Ui_PropertyWindow(object):
             QCoreApplication.translate("PropertyWindow", "Description:", None)
         )
         self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_def_and_rel),
-            QCoreApplication.translate("PropertyWindow", "Definitions and Relations", None),
+            self.tabWidget.indexOf(self.tab_basics),
+            QCoreApplication.translate("PropertyWindow", "Basics", None),
         )
+        self.gb_relations.setTitle(
+            QCoreApplication.translate("PropertyWindow", "PropertyRelations", None)
+        )
+        self.bt_version_control.setTitle(
+            QCoreApplication.translate("PropertyWindow", "Version Control", None)
+        )
+        self.lb_activation_time.setText(
+            QCoreApplication.translate("PropertyWindow", "Activation Date:", None)
+        )
+        self.lb_revision_date.setText(
+            QCoreApplication.translate("PropertyWindow", "Revision Date:", None)
+        )
+        self.lb_revision_number.setText(
+            QCoreApplication.translate("PropertyWindow", "Revision Number:", None)
+        )
+        self.lb_deactivation_time.setText(
+            QCoreApplication.translate("PropertyWindow", "De Activation Date:", None)
+        )
+        self.lb_version_date.setText(
+            QCoreApplication.translate("PropertyWindow", "Version Date:", None)
+        )
+        self.lb_version_number.setText(
+            QCoreApplication.translate("PropertyWindow", "Version number:", None)
+        )
+        # if QT_CONFIG(tooltip)
+        self.lb_replaced_objects.setToolTip(
+            QCoreApplication.translate(
+                "PropertyWindow", "List of Property Codes this Property replaces", None
+            )
+        )
+        # endif // QT_CONFIG(tooltip)
+        self.lb_replaced_objects.setText(
+            QCoreApplication.translate("PropertyWindow", "Replaced Object Codes:", None)
+        )
+        # if QT_CONFIG(tooltip)
+        self.lb_replacing_objects.setToolTip(
+            QCoreApplication.translate(
+                "PropertyWindow", "List of Property Codes this Property is replaced by", None
+            )
+        )
+        # endif // QT_CONFIG(tooltip)
+        self.lb_replacing_objects.setText(
+            QCoreApplication.translate("PropertyWindow", "Replacing Object Codes:", None)
+        )
+        self.lb_deprecation_explanation.setText(
+            QCoreApplication.translate("PropertyWindow", "DeprecationExplanation", None)
+        )
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_relations),
+            QCoreApplication.translate("PropertyWindow", "Relations & + Version", None),
+        )
+        self.groupBox.setTitle(QCoreApplication.translate("PropertyWindow", "Identification", None))
         # if QT_CONFIG(tooltip)
         self.lb_example.setToolTip(
             QCoreApplication.translate("PropertyWindow", "Example value of the Property", None)
         )
         # endif // QT_CONFIG(tooltip)
         self.lb_example.setText(QCoreApplication.translate("PropertyWindow", "Example:", None))
-        self.lb_activation_time.setText(
-            QCoreApplication.translate("PropertyWindow", "Activation Date:", None)
-        )
+        self.label.setText(QCoreApplication.translate("PropertyWindow", "OwnedUri:", None))
         # if QT_CONFIG(tooltip)
         self.lb_connected_properties.setToolTip(
             QCoreApplication.translate(
@@ -670,43 +770,6 @@ class Ui_PropertyWindow(object):
         # endif // QT_CONFIG(tooltip)
         self.lb_connected_properties.setText(
             QCoreApplication.translate("PropertyWindow", "Connected Property Codes:", None)
-        )
-        # if QT_CONFIG(tooltip)
-        self.lb_country_use.setToolTip(
-            QCoreApplication.translate(
-                "PropertyWindow",
-                "List of country ISO codes this Property is being\n"
-                "                                            used.",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.lb_country_use.setText(
-            QCoreApplication.translate("PropertyWindow", "Countries of Use:", None)
-        )
-        # if QT_CONFIG(tooltip)
-        self.lb_country_origin.setToolTip(
-            QCoreApplication.translate(
-                "PropertyWindow",
-                "ISO Country Code of the country of origin of this\n"
-                "                                            Property",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.lb_country_origin.setText(
-            QCoreApplication.translate("PropertyWindow", "Country of origin:", None)
-        )
-        # if QT_CONFIG(tooltip)
-        self.lb_creator_iso.setToolTip(
-            QCoreApplication.translate("PropertyWindow", "Language ISO code of the creator. ", None)
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.lb_creator_iso.setText(
-            QCoreApplication.translate("PropertyWindow", "Creator Language IsoCode:", None)
-        )
-        self.lb_deactivation_time.setText(
-            QCoreApplication.translate("PropertyWindow", "De Activation Date:", None)
         )
         # if QT_CONFIG(tooltip)
         self.lb_document_ref.setToolTip(
@@ -733,29 +796,6 @@ class Ui_PropertyWindow(object):
         # endif // QT_CONFIG(tooltip)
         self.lb_measurement.setText(
             QCoreApplication.translate("PropertyWindow", "Method of Measurement:", None)
-        )
-        # if QT_CONFIG(tooltip)
-        self.lb_replaced_objects.setToolTip(
-            QCoreApplication.translate(
-                "PropertyWindow", "List of Property Codes this Property replaces", None
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.lb_replaced_objects.setText(
-            QCoreApplication.translate("PropertyWindow", "Replaced Object Codes:", None)
-        )
-        # if QT_CONFIG(tooltip)
-        self.lb_replacing_objects.setToolTip(
-            QCoreApplication.translate(
-                "PropertyWindow", "List of Property Codes this Property is replaced by", None
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.lb_replacing_objects.setText(
-            QCoreApplication.translate("PropertyWindow", "Replacing Object Codes:", None)
-        )
-        self.lb_revision_date.setText(
-            QCoreApplication.translate("PropertyWindow", "Revision Date:", None)
         )
         # if QT_CONFIG(tooltip)
         self.lb_subdivision.setToolTip(
@@ -796,14 +836,44 @@ class Ui_PropertyWindow(object):
         )
         # endif // QT_CONFIG(tooltip)
         self.lb_uid.setText(QCoreApplication.translate("PropertyWindow", "Uid:", None))
-        self.lb_version_date.setText(
-            QCoreApplication.translate("PropertyWindow", "Version Date:", None)
-        )
-        self.lb_version_number.setText(
-            QCoreApplication.translate("PropertyWindow", "Version number:", None)
-        )
         self.lb_visual_rep.setText(
             QCoreApplication.translate("PropertyWindow", "Visual Representation:", None)
+        )
+        self.lb_dimension.setText(QCoreApplication.translate("PropertyWindow", "Dimension:", None))
+        self.gb_language.setTitle(QCoreApplication.translate("PropertyWindow", "Language", None))
+        # if QT_CONFIG(tooltip)
+        self.lb_country_use.setToolTip(
+            QCoreApplication.translate(
+                "PropertyWindow",
+                "List of country ISO codes this Property is being\n"
+                "                                            used.",
+                None,
+            )
+        )
+        # endif // QT_CONFIG(tooltip)
+        self.lb_country_use.setText(
+            QCoreApplication.translate("PropertyWindow", "Countries of Use:", None)
+        )
+        # if QT_CONFIG(tooltip)
+        self.lb_country_origin.setToolTip(
+            QCoreApplication.translate(
+                "PropertyWindow",
+                "ISO Country Code of the country of origin of this\n"
+                "                                            Property",
+                None,
+            )
+        )
+        # endif // QT_CONFIG(tooltip)
+        self.lb_country_origin.setText(
+            QCoreApplication.translate("PropertyWindow", "Country of origin:", None)
+        )
+        # if QT_CONFIG(tooltip)
+        self.lb_creator_iso.setToolTip(
+            QCoreApplication.translate("PropertyWindow", "Language ISO code of the creator. ", None)
+        )
+        # endif // QT_CONFIG(tooltip)
+        self.lb_creator_iso.setText(
+            QCoreApplication.translate("PropertyWindow", "Creator Language IsoCode:", None)
         )
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.tab_advanced),

@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from types import ModuleType
 import logging
-from PySide6.QtCore import Qt, QModelIndex, QCoreApplication, Signal
-from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Qt, QModelIndex, QCoreApplication, Signal, QAbstractItemModel
+from PySide6.QtWidgets import QWidget, QAbstractItemDelegate, QLineEdit
 import bsdd_gui
 
 if TYPE_CHECKING:
@@ -12,12 +12,16 @@ if TYPE_CHECKING:
 
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
 from bsdd_json import BsddClassProperty, BsddProperty, BsddAllowedValue
+from bsdd_json.utils import dictionary_utils as dict_utils
 from bsdd_gui.module.allowed_values_table_view import models, ui, trigger
 from bsdd_gui import tool
 
 
 class Signals(ViewSignals):
     items_pasted = Signal(QWidget)  # View
+    value_changed = Signal(QModelIndex, str, str)  # Index, Old_Text, New_Text
+    value_setted = Signal(QModelIndex, str)  # Index, New_Text
+    edit_closed = Signal(object, object)  # Index
 
 
 class AllowedValuesTableView(ItemViewTool):
@@ -31,6 +35,24 @@ class AllowedValuesTableView(ItemViewTool):
     def connect_internal_signals(cls):
         super().connect_internal_signals()
         cls.signals.items_pasted.connect(trigger.items_pasted)
+        cls.signals.value_changed.connect(cls.update_code)
+        cls.signals.value_setted.connect(cls.set_value)
+        cls.signals.edit_closed.connect(cls.editor_closed)
+
+    @classmethod
+    def connect_view_signals(cls, view: ui.AllowedValuesTable):
+        super().connect_view_signals(view)
+
+        view.editor_closed.connect(cls.signals.edit_closed.emit)
+        delegate: ui.LiveEditDelegate = view.itemDelegateForColumn(0)
+        delegate.text_edited.connect(cls.signals.value_changed.emit)
+        delegate.text_set.connect(cls.signals.value_setted.emit)
+
+    @classmethod
+    def editor_closed(cls, editor: QLineEdit, hints):
+        if hints == QAbstractItemDelegate.EndEditHint.RevertModelCache:
+            bsdd_data: BsddAllowedValue = editor._bsdd_value
+            bsdd_data.Code = dict_utils.slugify(bsdd_data.Value)
 
     @classmethod
     def _get_model_class(cls) -> models.AllowedValuesModel:
@@ -80,14 +102,28 @@ class AllowedValuesTableView(ItemViewTool):
         allowed_value.Code = value
 
     @classmethod
-    def set_value(cls, model: models.AllowedValuesModel, index: QModelIndex, value: str):
+    def update_code(cls, index: QModelIndex, old_text: str, new_text: str):
+
+        if not new_text:
+            return
+        allowed_value: BsddAllowedValue = index.internalPointer()
+        if allowed_value is None:
+            return
+
+        model: models.AllowedValuesModel = index.model()
+        if allowed_value.Code == dict_utils.slugify(old_text):
+            sibling = model.index(index.row(), index.column() + 1)
+            model.setData(sibling, dict_utils.slugify(new_text), Qt.ItemDataRole.EditRole)
+
+    @classmethod
+    def set_value(cls, index: QModelIndex, value: str):
         if not value:
             return
         allowed_value: BsddAllowedValue = index.internalPointer()
         if allowed_value is None:
             return
-        if allowed_value.Code == allowed_value.Value:
-            allowed_value.Code = value
+        if allowed_value.Code == dict_utils.slugify(allowed_value.Value):
+            allowed_value.Code = dict_utils.slugify(value)
         allowed_value.Value = value
 
     @classmethod
@@ -118,11 +154,11 @@ class AllowedValuesTableView(ItemViewTool):
         :type view: ui.AllowedValuesTable
         """
         bsdd_property = cls.get_property_from_view(view)
-        new_name = QCoreApplication.translate("AllowedValuesTable", "New Value")
+        new_name = dict_utils.slugify(QCoreApplication.translate("AllowedValuesTable", "New-Value"))
         new_name = tool.Util.get_unique_name(
             new_name, [v.Code for v in bsdd_property.AllowedValues]
         )
-        av = BsddAllowedValue(Code=new_name, Value=new_name)
+        av = BsddAllowedValue(Code=dict_utils.slugify(new_name), Value=new_name)
         bsdd_property.AllowedValues.append(av)
         cls.reset_view(view)
         return len(bsdd_property.AllowedValues) - 1

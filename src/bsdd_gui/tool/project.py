@@ -137,7 +137,7 @@ class Project(ActionTool):
         cls.signals.save_as_requested.emit()
 
     @classmethod
-    def request_open(cls,path = None):
+    def request_open(cls, path=None):
         cls.signals.open_requested.emit(path)
 
     @classmethod
@@ -153,4 +153,3 @@ class Project(ActionTool):
     @classmethod
     def get_recent_menu(cls) -> QMenu:
         return cls.get_properties().recent_menu
-    

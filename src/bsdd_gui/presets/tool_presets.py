@@ -40,6 +40,8 @@ from PySide6.QtWidgets import (
     QTreeView,
     QLayout,
     QDateTimeEdit,
+    QSpinBox,
+    QDoubleSpinBox,
 )
 from PySide6.QtCore import (
     QObject,
@@ -66,6 +68,7 @@ from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSign
 from .models_presets import ItemModel
 import datetime
 import re
+from .ui_presets import ComboBoxWithToggleSwitch
 
 BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassProperty
 
@@ -352,13 +355,17 @@ class FieldTool(WidgetTool):
         super().connect_internal_signals()
 
     @classmethod
-    def register_basic_field(cls, widget: FieldWidget, field: QWidget, variable_name: str):
+    def register_basic_field(
+        cls, widget: FieldWidget, field: QWidget, variable_name: str, nosync=False
+    ):
         cls.register_field_getter(widget, field, lambda e, vn=variable_name: getattr(e, vn))
         cls.register_field_setter(
             widget,
             field,
             lambda e, v, vn=variable_name: setattr(e, vn, v if v is not None else None),
         )
+        if nosync:
+            return
         if hasattr(widget, "bsdd_data"):
             cls.sync_from_model(widget, widget.bsdd_data, explicit_field=field)
         else:
@@ -416,6 +423,10 @@ class FieldTool(WidgetTool):
             c_field.dateTimeChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
         elif isinstance(c_field, QAbstractButton):
             c_field.toggled.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QSpinBox):
+            c_field.valueChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QDoubleSpinBox):
+            c_field.valueChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
@@ -475,6 +486,10 @@ class FieldTool(WidgetTool):
             f.dateTimeChanged.connect(func)
         elif isinstance(f, QAbstractButton):
             f.toggled.connect(func)
+        elif isinstance(f, QSpinBox):
+            f.valueChanged.connect(func)
+        elif isinstance(f, QDoubleSpinBox):
+            f.valueChanged.connect(func)
         else:
             logging.info("ClassType not Found")
             return
@@ -509,6 +524,10 @@ class FieldTool(WidgetTool):
             value = field.dateTime().toPython()
         elif isinstance(field, QAbstractButton):
             value = field.isChecked()
+        elif isinstance(field, QSpinBox):
+            value = field.value()
+        elif isinstance(field, QDoubleSpinBox):
+            value = field.value()
         else:
             value = None
         return value
@@ -543,6 +562,10 @@ class FieldTool(WidgetTool):
                 field.setChecked(value or False)
             elif isinstance(field, TagInput):
                 field.setTags(value or [])
+            elif isinstance(field, QSpinBox):
+                field.setValue(value or None)
+            elif isinstance(field, QDoubleSpinBox):
+                field.setValue(value or None)
             elif isinstance(field, QDateTimeEdit):
                 if not value:
                     return
@@ -610,6 +633,19 @@ class FieldTool(WidgetTool):
                 value = cls.get_value_from_field(f)
                 is_valid = validator_function(value, widget)
                 result_function(f, is_valid)
+
+    @classmethod
+    def setup_combo_box(cls, widget, cb_widget: ComboBoxWithToggleSwitch, values: list[str]):
+        from bsdd_gui.tool.util import Util as util
+
+        cb_widget.item.addItems(values)
+        cb_widget.item.setEditable(True)
+        cls.add_validator(
+            widget,
+            cb_widget,
+            lambda v, w,: v in values or not cb_widget.is_active(),
+            lambda w, v: util.set_invalid(w, not v),
+        )
 
 
 class DialogTool(FieldTool):

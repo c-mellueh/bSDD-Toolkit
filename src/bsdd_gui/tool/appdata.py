@@ -77,7 +77,7 @@ class Appdata:
 
     @classmethod
     def get_path(cls, option: str) -> str | list | set:
-        #TODO rewrite all functions that us get_path to use get paths if list is expected
+        # TODO rewrite all functions that us get_path to use get paths if list is expected
         logging.info(f"Appdata Path '{option}' requested")
         config = cls._get_config()
         path = config.get(PATHS_SECTION, option)
@@ -88,7 +88,7 @@ class Appdata:
         return path
 
     @classmethod
-    def get_paths(cls,option:str) -> list[str]:
+    def get_paths(cls, option: str) -> list[str]:
         logging.info(f"Appdata Path '{option}' requested")
         config = cls._get_config()
         path = config.get(PATHS_SECTION, option)
@@ -99,12 +99,11 @@ class Appdata:
         cleaned = []
         for p in path.split(OPTION_SEPERATOR):
             if p and p not in cleaned:
-                cleaned.append(p)        
+                cleaned.append(p)
         return cleaned
 
-
     @classmethod
-    def add_path(cls,option:str,value:str,max_entries: int = MAX_RECENT_PATHS):
+    def add_path(cls, option: str, value: str, max_entries: int = MAX_RECENT_PATHS):
         path = os.path.abspath(os.fspath(value))
         all_paths = [p for p in cls.get_paths(option) if p != path]
         all_paths.insert(0, path)
@@ -113,7 +112,7 @@ class Appdata:
         cls.set_path(option, all_paths)
 
     @classmethod
-    def remove_path(cls,option:str, path: str):
+    def remove_path(cls, option: str, path: str):
         if not path:
             return
         path = os.path.abspath(os.fspath(path))

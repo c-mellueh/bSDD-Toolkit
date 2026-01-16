@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>666</width>
-    <height>765</height>
+    <width>650</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
       <attribute name="title">
        <string>Basics</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
         <widget class="QGroupBox" name="gb_basics">
          <property name="title">
@@ -327,119 +327,221 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <widget class="QGroupBox" name="gb_description">
+         <property name="title">
+          <string>Definition</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="leftMargin">
+           <number>6</number>
+          </property>
+          <property name="topMargin">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>6</number>
+          </property>
+          <property name="bottomMargin">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QTextEdit" name="te_definition">
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:
+                                                            rgba(0, 0, 0,10);</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="hl_defintion">
+            <item>
+             <widget class="QLabel" name="lb_description">
+              <property name="text">
+               <string>Description</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="ToggleSwitch" name="cb_description">
+              <property name="text">
+               <string>Description:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTextEdit" name="te_description">
+            <property name="styleSheet">
+             <string notr="true">background-color:
+                                                            rgba(0, 0, 0,10);</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_def_and_rel">
+     <widget class="QWidget" name="tab_relations">
       <attribute name="title">
-       <string>Definitions and Relations</string>
+       <string>Relations &amp; + Version</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QSplitter" name="splitter_2">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+        <widget class="QGroupBox" name="gb_relations">
+         <property name="title">
+          <string>PropertyRelations</string>
          </property>
-         <widget class="QGroupBox" name="gb_relations">
-          <property name="title">
-           <string>PropertyRelations</string>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="spacing">
+           <number>6</number>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <property name="spacing">
-            <number>6</number>
-           </property>
-           <property name="leftMargin">
-            <number>6</number>
-           </property>
-           <property name="topMargin">
-            <number>6</number>
-           </property>
-           <property name="rightMargin">
-            <number>6</number>
-           </property>
-           <property name="bottomMargin">
-            <number>6</number>
-           </property>
-           <item>
-            <widget class="RelationshipWidget" name="relationship_widget" native="true"/>
-           </item>
-           <item>
-            <widget class="Line" name="line">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QGroupBox" name="gb_description">
-          <property name="title">
-           <string>Definition</string>
+          <property name="leftMargin">
+           <number>6</number>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <property name="leftMargin">
-            <number>6</number>
-           </property>
-           <property name="topMargin">
-            <number>6</number>
-           </property>
-           <property name="rightMargin">
-            <number>6</number>
-           </property>
-           <property name="bottomMargin">
-            <number>6</number>
-           </property>
-           <item>
-            <widget class="QTextEdit" name="te_definition">
-             <property name="autoFillBackground">
-              <bool>true</bool>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color:
-                                                            rgba(0, 0, 0,10);</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="hl_defintion">
-             <item>
-              <widget class="QLabel" name="lb_description">
-               <property name="text">
-                <string>Description</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="ToggleSwitch" name="cb_description">
-               <property name="text">
-                <string>Description:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QTextEdit" name="te_description">
-             <property name="styleSheet">
-              <string notr="true">background-color:
-                                                            rgba(0, 0, 0,10);</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+          <property name="topMargin">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>6</number>
+          </property>
+          <property name="bottomMargin">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="RelationshipWidget" name="relationship_widget" native="true"/>
+          </item>
+          <item>
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="bt_version_control">
+         <property name="title">
+          <string>Version Control</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lb_activation_time">
+            <property name="text">
+             <string>Activation Date:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="DateTimeWithNow" name="de_activation_time" native="true"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lb_revision_date">
+            <property name="text">
+             <string>Revision Date:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="DateTimeWithNow" name="de_revision_time" native="true"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lb_revision_number">
+            <property name="text">
+             <string>Revision Number:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="SpinBoxWithToggleSwitch" name="sb_revision_number"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lb_deactivation_time">
+            <property name="text">
+             <string>De Activation Date:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="DateTimeWithNow" name="de_deactivation_time" native="true"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="lb_version_date">
+            <property name="text">
+             <string>Version Date:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="DateTimeWithNow" name="de_version_date" native="true"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="lb_version_number">
+            <property name="text">
+             <string>Version number:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="SpinBoxWithToggleSwitch" name="sb_version_number"/>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="lb_replaced_objects">
+            <property name="toolTip">
+             <string>List of Property Codes this Property replaces</string>
+            </property>
+            <property name="text">
+             <string>Replaced Object Codes:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="TagInput" name="ti_replaced_objects" native="true"/>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="lb_replacing_objects">
+            <property name="toolTip">
+             <string>List of Property Codes this Property is replaced by</string>
+            </property>
+            <property name="text">
+             <string>Replacing Object Codes:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="TagInput" name="ti_replacing_objects" native="true"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lb_deprecation_explanation">
+            <property name="text">
+             <string>DeprecationExplanation</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="le_deprecation_explanation"/>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -448,233 +550,195 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="lb_example">
-         <property name="toolTip">
-          <string>Example value of the Property</string>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Identification</string>
          </property>
-         <property name="text">
-          <string>Example:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="le_example"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="lb_activation_time">
-         <property name="text">
-          <string>Activation Date:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="lb_connected_properties">
-         <property name="toolTip">
-          <string> List of codes of one or more connected properties.
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lb_example">
+            <property name="toolTip">
+             <string>Example value of the Property</string>
+            </property>
+            <property name="text">
+             <string>Example:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="le_example"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>OwnedUri:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="le_owned_uri"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lb_connected_properties">
+            <property name="toolTip">
+             <string> List of codes of one or more connected properties.
                                             Can also be full URI instead of code, in case it is a
                                             property of another dictionary.</string>
-         </property>
-         <property name="text">
-          <string>Connected Property Codes:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="TagInput" name="ti_connect_properties" native="true"/>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="lb_country_use">
-         <property name="toolTip">
-          <string>List of country ISO codes this Property is being
-                                            used.</string>
-         </property>
-         <property name="text">
-          <string>Countries of Use:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="TagInput" name="ti_countries" native="true"/>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="lb_country_origin">
-         <property name="toolTip">
-          <string>ISO Country Code of the country of origin of this
-                                            Property</string>
-         </property>
-         <property name="text">
-          <string>Country of origin:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="ComboBoxWithToggleSwitch" name="cb_country_origin"/>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="lb_creator_iso">
-         <property name="toolTip">
-          <string>Language ISO code of the creator. </string>
-         </property>
-         <property name="text">
-          <string>Creator Language IsoCode:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="ComboBoxWithToggleSwitch" name="cb_creator_iso"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="lb_deactivation_time">
-         <property name="text">
-          <string>De Activation Date:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="lb_document_ref">
-         <property name="toolTip">
-          <string>Reference to document with the full or official
+            </property>
+            <property name="text">
+             <string>Connected Property Codes:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="TagInput" name="ti_connect_properties" native="true"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lb_document_ref">
+            <property name="toolTip">
+             <string>Reference to document with the full or official
                                             definition of the Property</string>
-         </property>
-         <property name="text">
-          <string>Document Reference:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <widget class="ComboBoxWithToggleSwitch" name="cb_document_ref"/>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="lb_measurement">
-         <property name="toolTip">
-          <string>Example: &quot;Thermal transmittance according to
+            </property>
+            <property name="text">
+             <string>Document Reference:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="ComboBoxWithToggleSwitch" name="cb_document_ref"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lb_measurement">
+            <property name="toolTip">
+             <string>Example: &quot;Thermal transmittance according to
                                             ISO 10077-1&quot;</string>
-         </property>
-         <property name="text">
-          <string>Method of Measurement:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="1">
-        <widget class="QLineEdit" name="le_measurement"/>
-       </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="lb_replaced_objects">
-         <property name="toolTip">
-          <string>List of Property Codes this Property replaces</string>
-         </property>
-         <property name="text">
-          <string>Replaced Object Codes:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QLabel" name="lb_replacing_objects">
-         <property name="toolTip">
-          <string>List of Property Codes this Property is replaced by</string>
-         </property>
-         <property name="text">
-          <string>Replacing Object Codes:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="1">
-        <widget class="TagInput" name="ti_replaced_objects" native="true"/>
-       </item>
-       <item row="12" column="1">
-        <widget class="TagInput" name="ti_replacing_objects" native="true"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="lb_revision_date">
-         <property name="text">
-          <string>Revision Date:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="lb_subdivision">
-         <property name="toolTip">
-          <string>List of geographical regions of use Example:
+            </property>
+            <property name="text">
+             <string>Method of Measurement:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="le_measurement"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="lb_subdivision">
+            <property name="toolTip">
+             <string>List of geographical regions of use Example:
                                             &quot;US-MT&quot;</string>
-         </property>
-         <property name="text">
-          <string>Subdivision of Use:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="1">
-        <widget class="TagInput" name="ti_subdivision" native="true"/>
-       </item>
-       <item row="14" column="0">
-        <widget class="QLabel" name="lb_text_format">
-         <property name="toolTip">
-          <string>Pair for text type (encoding, number of characters)
+            </property>
+            <property name="text">
+             <string>Subdivision of Use:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="TagInput" name="ti_subdivision" native="true"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="lb_text_format">
+            <property name="toolTip">
+             <string>Pair for text type (encoding, number of characters)
                                             The encoding is set according to &quot;Name of encoding
                                             standard&quot; of IANA, RFC 2978, Example:
                                             &quot;(UTF-8,32)&quot;</string>
-         </property>
-         <property name="text">
-          <string>Text Format:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="1">
-        <widget class="QLineEdit" name="le_text_format"/>
-       </item>
-       <item row="15" column="0">
-        <widget class="QLabel" name="lb_uid">
-         <property name="toolTip">
-          <string>Unique identification (ID), in case the URI is not
+            </property>
+            <property name="text">
+             <string>Text Format:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="le_text_format"/>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="lb_uid">
+            <property name="toolTip">
+             <string>Unique identification (ID), in case the URI is not
                                             enough.</string>
-         </property>
-         <property name="text">
-          <string>Uid:</string>
-         </property>
+            </property>
+            <property name="text">
+             <string>Uid:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QLineEdit" name="le_uid"/>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="lb_visual_rep">
+            <property name="text">
+             <string>Visual Representation:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QLineEdit" name="le_visual_rep"/>
+          </item>
+          <item row="9" column="1">
+           <widget class="QLineEdit" name="le_dimension"/>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="lb_dimension">
+            <property name="text">
+             <string>Dimension:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="15" column="1">
-        <widget class="QLineEdit" name="le_uid"/>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="lb_version_date">
-         <property name="text">
-          <string>Version Date:</string>
+       <item>
+        <widget class="QGroupBox" name="gb_language">
+         <property name="title">
+          <string>Language</string>
          </property>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lb_country_use">
+            <property name="toolTip">
+             <string>List of country ISO codes this Property is being
+                                            used.</string>
+            </property>
+            <property name="text">
+             <string>Countries of Use:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="TagInput" name="ti_countries" native="true"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lb_country_origin">
+            <property name="toolTip">
+             <string>ISO Country Code of the country of origin of this
+                                            Property</string>
+            </property>
+            <property name="text">
+             <string>Country of origin:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="ComboBoxWithToggleSwitch" name="cb_country_origin"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lb_creator_iso">
+            <property name="toolTip">
+             <string>Language ISO code of the creator. </string>
+            </property>
+            <property name="text">
+             <string>Creator Language IsoCode:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="ComboBoxWithToggleSwitch" name="cb_creator_iso"/>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item row="16" column="0">
-        <widget class="QLabel" name="lb_version_number">
-         <property name="text">
-          <string>Version number:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="1">
-        <widget class="QSpinBox" name="sb_version_number"/>
-       </item>
-       <item row="17" column="0">
-        <widget class="QLabel" name="lb_visual_rep">
-         <property name="text">
-          <string>Visual Representation:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="17" column="1">
-        <widget class="QLineEdit" name="le_visual_rep"/>
-       </item>
-       <item row="1" column="1">
-        <widget class="DateTimeWithNow" name="de_activation_time" native="true"/>
-       </item>
-       <item row="2" column="1">
-        <widget class="DateTimeWithNow" name="de_revision_time" native="true"/>
-       </item>
-       <item row="3" column="1">
-        <widget class="DateTimeWithNow" name="de_deactivation_time" native="true"/>
-       </item>
-       <item row="4" column="1">
-        <widget class="DateTimeWithNow" name="de_version_date" native="true"/>
        </item>
       </layout>
      </widget>
@@ -684,15 +748,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DateTimeWithNow</class>
-   <extends>QWidget</extends>
-   <header>bsdd_gui.presets.ui_presets</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>RelationshipWidget</class>
    <extends>QWidget</extends>
    <header>bsdd_gui.module.relationship_editor_widget.ui</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DateTimeWithNow</class>
+   <extends>QWidget</extends>
+   <header>bsdd_gui.presets.ui_presets</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -714,6 +778,11 @@
   <customwidget>
    <class>ComboBoxWithToggleSwitch</class>
    <extends>QComboBox</extends>
+   <header>bsdd_gui.presets.ui_presets</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBoxWithToggleSwitch</class>
+   <extends>QSpinBox</extends>
    <header>bsdd_gui.presets.ui_presets</header>
   </customwidget>
  </customwidgets>

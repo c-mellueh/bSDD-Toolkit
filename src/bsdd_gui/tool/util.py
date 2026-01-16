@@ -25,6 +25,8 @@ from bsdd_gui import tool
 from bsdd_gui.module.util import ui
 from bsdd_gui.module.util.constants import OPTION_SEPERATOR
 from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
+from bsdd_gui.presets.ui_presets import ComboBoxWithToggleSwitch
+from bsdd_gui.presets.tool_presets import FieldTool
 
 
 if TYPE_CHECKING:
@@ -196,7 +198,7 @@ class Util:
             return base_name
         index = 2
         while True:
-            new_name = f"{base_name} ({index})"
+            new_name = f"{base_name}-{index}"
             if new_name not in existing_names:
                 return new_name
             index += 1

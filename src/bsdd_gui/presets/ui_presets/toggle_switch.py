@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QComboBox,
     QLineEdit,
+    QSpinBox,
 )
 from typing import Literal, overload
 
@@ -184,34 +185,6 @@ class ToggleSwitch(QAbstractButton):
     handlePos = Property(float, getHandlePos, setHandlePos)
 
 
-# ---- Demo ----
-if __name__ == "__main__":
-    import sys
-
-    app = QApplication(sys.argv)
-
-    w = QWidget()
-    lay = QHBoxLayout(w)
-
-    # lbl = QLabel("Aus")
-    sw = ToggleSwitch(checked=False)
-    sw.setAnimationDuration(180)
-    # Farben optional:
-    # sw.setOnColor(QColor("#4caf50"))
-    # sw.setOffColor(QColor("#9e9e9e"))
-    # sw.setHandleColor(QColor("#ffffff"))
-
-    # sw.toggled.connect(lambda c: lbl.setText("Ein" if c else "Aus"))
-
-    lay.addWidget(sw)
-    # lay.addWidget(lbl)
-
-    w.setWindowTitle("ToggleSwitch Demo – PySide6")
-    w.resize(260, 80)
-    w.show()
-    sys.exit(app.exec())
-
-
 class ItemWithToggleSwitch(QWidget):
     def __init__(
         self,
@@ -292,4 +265,21 @@ class ComboBoxWithToggleSwitch(ItemWithToggleSwitch):
 
     @property
     def item(self) -> QComboBox:
+        return super().item
+
+
+class SpinBoxWithToggleSwitch(ItemWithToggleSwitch):
+    def __init__(self, *args, is_enabled=False, **kwargs):
+
+        spin_box = QSpinBox()
+        super().__init__(
+            spin_box,
+            *args,
+            toggle_pos="Right",
+            toggle_is_on=is_enabled,
+            **kwargs,
+        )
+
+    @property
+    def item(self) -> QSpinBox:
         return super().item
