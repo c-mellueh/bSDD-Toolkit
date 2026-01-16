@@ -14,9 +14,7 @@ from PySide6.QtWidgets import QApplication, QListView
 from pydantic import ValidationError
 from bsdd_json.models import BsddClass, BsddClassProperty
 from bsdd_json.utils import build_unique_code
-
-PSET_CLIPBOARD_KIND = "BsddPropertySetTransfer"
-
+from bsdd_gui.module.util.constants import PSET_CLIPBOARD_KIND
 
 def connect_signals(property_set_table: Type[tool.PropertySetTableView]):
     property_set_table.connect_internal_signals()

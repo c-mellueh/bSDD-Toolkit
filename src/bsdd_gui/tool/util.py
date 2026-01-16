@@ -27,7 +27,7 @@ from bsdd_gui.module.util.constants import OPTION_SEPERATOR
 from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
 from bsdd_gui.presets.ui_presets import ComboBoxWithToggleSwitch
 from bsdd_gui.presets.tool_presets import FieldTool
-
+from bsdd_json.utils import dictionary_utils as dict_utils
 
 if TYPE_CHECKING:
     from bsdd_gui.module.util.prop import MenuDict, UtilProperties
@@ -193,14 +193,14 @@ class Util:
                 os.mkdir(p)
 
     @classmethod
-    def get_unique_name(cls, base_name: str, existing_names: list[str]) -> str:
+    def get_unique_name(cls, base_name: str, existing_names: list[str], slugify=False) -> str:
         if base_name not in existing_names:
-            return base_name
+            return dict_utils.slugify(base_name) if slugify else base_name
         index = 2
         while True:
             new_name = f"{base_name}-{index}"
             if new_name not in existing_names:
-                return new_name
+                return dict_utils.slugify(new_name) if slugify else new_name
             index += 1
 
     @classmethod

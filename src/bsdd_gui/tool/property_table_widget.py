@@ -37,6 +37,8 @@ class Signals(ViewSignals, WidgetSignals):
     active_property_changed = Signal(object)
     bsdd_class_double_clicked = Signal(object)
     search_requested = Signal(QWidget)
+    paste_requested = Signal(views.PropertyTable)
+    copy_requested = Signal(views.PropertyTable)
 
 
 class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
@@ -122,6 +124,8 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         super().connect_internal_signals()
         cls.signals.selection_changed.connect(cls.on_selection_change)
         cls.signals.search_requested.connect(trigger.search_requested)
+        cls.signals.paste_requested.connect(trigger.paste_property_from_clipboard)
+        cls.signals.copy_requested.connect(trigger.copy_property_to_clipboard)
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.PropertyWidget):
@@ -298,3 +302,11 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
                 except Exception:
                     pass
         return payload
+
+    @classmethod
+    def request_property_paste(cls, view: views.PropertyTable):
+        cls.signals.paste_requested.emit(view)
+
+    @classmethod
+    def request_property_copy(cls, view: views.PropertyTable):
+        cls.signals.copy_requested.emit(view)
