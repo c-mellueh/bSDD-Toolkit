@@ -252,10 +252,10 @@ class ClassTreeView(ItemViewTool):
 
     @classmethod
     def classes_to_payload(
-        cls, classes: list[BsddClass], subtree_codes: set[str] | None = None
+        cls, classes: list[BsddClass], unexpanded_classes: set[str] | None = None
     ) -> constants.PAYLOAD:
         # flat list of class dicts (optionally entire subtrees of each selection)
-        def _collect_subtree(root: BsddClass) -> list[BsddClass]:
+        def _collect_unexpanded(root: BsddClass) -> list[BsddClass]:
             out, stack = [], [root]
             seen_codes: set[str] = set()
             while stack:
@@ -290,13 +290,15 @@ class ClassTreeView(ItemViewTool):
         seen_class_code = set()
         seen_property_code = set()
         include_subtree_codes = (
-            subtree_codes if subtree_codes is not None else {c.Code for c in classes if c.Code}
+            unexpanded_classes
+            if unexpanded_classes is not None
+            else {c.Code for c in classes if c.Code}
         )
         dictionary_properties = list()
 
         for c in classes:
             roots.append(c.Code)
-            targets = _collect_subtree(c) if c.Code in include_subtree_codes else [c]
+            targets = _collect_unexpanded(c) if c.Code in include_subtree_codes else [c]
             for n in targets:
                 add_class(n)
 
@@ -310,9 +312,9 @@ class ClassTreeView(ItemViewTool):
         return payload
 
     @classmethod
-    def generate_mime_data(cls, classes: list[BsddClass], subtree_codes=None):
+    def generate_mime_data(cls, classes: list[BsddClass], unexpanded_classes: list[str] = []):
         md = QMimeData()
-        payload = cls.classes_to_payload(classes, subtree_codes)
+        payload = cls.classes_to_payload(classes, unexpanded_classes)
         byte_payload = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         md.setData(
             constants.JSON_MIME,
@@ -330,3 +332,8 @@ class ClassTreeView(ItemViewTool):
     @classmethod
     def request_paste(cls, view: ui.ClassView):
         cls.signals.paste_requested.emit(view)
+
+    @classmethod
+    def get_index_from_bsdd_class(cls, bsdd_dictionary: BsddDictionary, bsdd_class: BsddClass):
+        model: models.ClassTreeModel = cls.get_model(bsdd_dictionary)
+        return model._index_for_class(bsdd_class)

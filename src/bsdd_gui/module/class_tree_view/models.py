@@ -1,13 +1,9 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QTreeView, QTreeWidget, QWidget
 from PySide6.QtCore import (
-    QAbstractItemModel,
     Qt,
-    QCoreApplication,
     QModelIndex,
     QSortFilterProxyModel,
-    QMimeData,
-    QByteArray,
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
@@ -65,9 +61,6 @@ class ClassTreeModel(ItemModel):
         if 0 <= row < len(children):
             return self.createIndex(row, column, children[row])
         return QModelIndex()
-
-    #    def setData(self, index, value, /, role=...):
-    #        return False
 
     def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():

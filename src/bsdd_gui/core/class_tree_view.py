@@ -323,59 +323,19 @@ def handle_mime_copy(
         payload, dest_parent_node, bsdd_dictionary, class_tree, property_table, util
     )
 
-    return
-
-    if not class_tree.is_payload_valid(payload):
-        return
-
-    raw_classes = payload["classes"]
-    raw_properties = payload["properties"]
-    root_codes = set(payload.get("roots", []))
-
-    # 1) build code -> raw map; compute depth to sort parents before children
-    class_code_dict = {
-        rc["Code"]: rc for rc in raw_classes if isinstance(rc, dict) and "Code" in rc
-    }
-
-    ordered_class_codes = sorted(
-        class_code_dict.keys(), key=lambda c, ccd=class_code_dict: class_tree.depth_of(c, ccd)
-    )  # parents first
-
-    # 2) conflict-safe code mapping
-    old2new = {}
-
-    # 3) create & insert classes (parents first), adjusting codes/parents
-    for class_code in ordered_class_codes:
-        rc = dict(class_code_dict[class_code])  # copy
-        # new code (unique in target)
-        new_code = util.get_unique_name(rc["Code"], old2new)
-        old2new[rc["Code"]] = new_code
-        node = class_tree.create_class_from_mime(
-            rc, new_code, old2new, root_codes, dest_parent_node
-        )
-        if node is None:
-            continue
-        # insert with proper signals (parent must exist now)
-        class_tree.add_class_to_dictionary(node, bsdd_dictionary)
-
-    # 4) Insert Properties
-    #
-    # that don't exist so far
-    new_properties = property_table.get_properties_from_mime_payload(payload, bsdd_dictionary)
-    for p in new_properties:
-        property_table.add_property_to_dictionary(p, bsdd_dictionary)
-    return True
-
 
 def copy_selected_classes_to_clipboard(
-    view: ui.ClassView,
-    class_tree: Type[tool.ClassTreeView],
+    view: ui.ClassView, class_tree: Type[tool.ClassTreeView], project: Type[tool.Project]
 ):
     classes = class_tree.get_selected(view)
-
+    unexpanded = set()
+    for c in classes:
+        index = class_tree.get_index_from_bsdd_class(project.get(), c)
+        if not view.isExpanded(view.model().mapFromSource(index)):
+            unexpanded.add(c.Code)
     if not classes:
         return
-    payload = class_tree.classes_to_payload(classes)
+    payload = class_tree.classes_to_payload(classes, unexpanded)
     QApplication.clipboard().setText(json.dumps(payload, ensure_ascii=False))
 
 

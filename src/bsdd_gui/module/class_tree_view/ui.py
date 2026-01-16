@@ -25,7 +25,7 @@ class ClassView(TreeItemView):
         return super().model()
 
     def mimeData(self, indexes):
-        def _generate_subtree_codes():
+        def _generate_unexpanded_classes():
             # Subtrees are expanded Trees which also will be added as root
             subtree_codes: set[str] = set()
             seen_codes: set[str] = set()
@@ -51,17 +51,14 @@ class ClassView(TreeItemView):
         proxy_model = self.model()
         if proxy_model is None:
             return super().mimeData(indexes)
-        source_model = (
-            proxy_model.sourceModel() if hasattr(proxy_model, "sourceModel") else proxy_model
-        )
         to_source = (
             proxy_model.mapToSource if hasattr(proxy_model, "mapToSource") else (lambda i: i)
         )
 
-        subtree_codes, classes = _generate_subtree_codes()
+        unexpanded_classes, classes = _generate_unexpanded_classes()
         if not classes:
             return super().mimeData(indexes)
-        return ClassTreeView.generate_mime_data(classes, subtree_codes)
+        return ClassTreeView.generate_mime_data(classes, unexpanded_classes)
 
     def startDrag(self, supported_actions):
         indexes = self.selectedIndexes()
