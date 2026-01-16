@@ -80,7 +80,7 @@ def add_context_menu_to_view(
         True,
         True,
         True,
-        qta.icon("mdi.delete")
+        qta.icon("mdi.delete"),
     )
 
 

@@ -29,6 +29,9 @@ def connect_signals(
     main_window.signals.new_property_requested.connect(
         class_property_editor.signals.create_new_class_property_requested.emit
     )
+    property_table.signals.new_property_requested.connect(
+        class_property_editor.signals.create_new_class_property_requested.emit
+    )
     property_editor.signals.field_changed.connect(class_property_editor.handle_field_changed)
     property_editor.signals.new_property_created.connect(
         lambda _: class_property_editor.validate_widgets()

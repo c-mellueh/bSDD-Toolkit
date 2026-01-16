@@ -1,14 +1,10 @@
 from __future__ import annotations
-from PySide6.QtCore import QModelIndex, QCoreApplication, QTimer
+from PySide6.QtCore import QModelIndex, QCoreApplication
 from typing import TYPE_CHECKING, Type
 from bsdd_json import BsddClass
-import logging
 from bsdd_json.utils import class_utils as cl_utils
-from bsdd_json.utils import property_utils as prop_utils
-from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
 from typing import get_args
 from bsdd_json.type_hints import COUNTRY_CODE, LANGUAGE_ISO_CODE, DOCUMENT_TYPE
-import json
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -142,9 +138,6 @@ def connect_to_main_window(
     main_window.signals.new_class_requested.connect(
         lambda: class_editor.request_new_class(cl_utils.get_parent(main_window.get_active_class()))
     )
-    main_window.signals.copy_active_class_requested.connect(
-        lambda: class_editor.request_class_copy(main_window.get_active_class())
-    )
 
 
 def create_new_class(
@@ -166,27 +159,6 @@ def create_new_class(
     else:
         class_editor.signals.dialog_declined.emit(dialog)
 
-    class_editor.unregister_widget(widget)
-
-
-def copy_class(
-    old_class: BsddClass,
-    class_editor: Type[tool.ClassEditorWidget],
-    main_window: Type[tool.MainWindowWidget],
-):
-    if not old_class:
-        return
-    new_class = class_editor.copy_class(old_class)
-    dialog = class_editor.create_dialog(new_class, main_window.get())
-    widget = dialog._widget
-    text = QCoreApplication.translate("ClassEditor", "Copy Class")
-    dialog.setWindowTitle(text)
-    if dialog.exec():
-        class_editor.sync_to_model(widget, new_class)
-        class_editor.signals.new_class_created.emit(new_class)
-        class_editor.signals.dialog_accepted.emit(dialog)
-    else:
-        class_editor.signals.dialog_declined.emit(dialog)
     class_editor.unregister_widget(widget)
 
 

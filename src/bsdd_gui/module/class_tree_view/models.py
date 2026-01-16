@@ -1,13 +1,9 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QTreeView, QTreeWidget, QWidget
 from PySide6.QtCore import (
-    QAbstractItemModel,
     Qt,
-    QCoreApplication,
     QModelIndex,
     QSortFilterProxyModel,
-    QMimeData,
-    QByteArray,
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
@@ -65,9 +61,6 @@ class ClassTreeModel(ItemModel):
         if 0 <= row < len(children):
             return self.createIndex(row, column, children[row])
         return QModelIndex()
-
-    #    def setData(self, index, value, /, role=...):
-    #        return False
 
     def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():
@@ -167,27 +160,10 @@ class ClassTreeModel(ItemModel):
         return [JSON_MIME, "application/json", CODES_MIME, "text/plain"]
 
     def mimeData(self, indexes):
-        sel = []
-        seen_codes: set[str] = set()
+        from bsdd_gui.tool import ClassTreeView
 
-        for idx in indexes:
-            if not idx.isValid() or idx.column() != 0:
-                continue
-            node: BsddClass = idx.internalPointer()
-            code = node.Code
-            if code in seen_codes:
-                continue
-            seen_codes.add(code)
-            sel.append(node)
-
-        md = QMimeData()
-        md.setData(
-            JSON_MIME,
-            QByteArray(self._classes_to_json_bytes(sel)),
-        )
-        md.setData(CODES_MIME, QByteArray(json.dumps([c.Code for c in sel]).encode("utf-8")))
-        md.setText(json.dumps([c.Code for c in sel], ensure_ascii=False))
-        return md
+        classes = ClassTreeView.get_selected(self)
+        return ClassTreeView.generate_mime_data(classes)
 
     def canDropMimeData(self, data, action, row, column, parent: QModelIndex) -> bool:
         if parent.isValid() and parent.column() != 0:
@@ -211,72 +187,6 @@ class ClassTreeModel(ItemModel):
         elif action in (Qt.CopyAction, Qt.IgnoreAction):
             trigger.mime_copy_event(self.bsdd_data, data, parent)
         return True
-
-    def _is_descendant(self, maybe_ancestor: BsddClass, node: BsddClass) -> bool:
-        cur = node
-        while cur and cur.ParentClassCode:
-            if cur.ParentClassCode == maybe_ancestor.Code:
-                return True
-            cur = cl_utils.get_class_by_code(self.bsdd_dictionary, cur.ParentClassCode)
-        return False
-
-    def _collect_subtree(self, root: BsddClass) -> list[BsddClass]:
-        out, stack = [], [root]
-        seen_codes: set[str] = set()
-        while stack:
-            n = stack.pop()
-            if n.Code in seen_codes:
-                continue
-            seen_codes.add(n.Code)
-            out.append(n)
-            stack.extend(cl_utils.get_children(n))
-        return out
-
-    def _classes_to_json_bytes(
-        self, classes: list[BsddClass], *, subtree_codes: set[str] | None = None
-    ) -> bytes:
-        # flat list of class dicts (optionally entire subtrees of each selection)
-        export_list = []
-        roots = []
-        seen_class_code = set()
-        seen_property_code = set()
-        include_subtree_codes = (
-            subtree_codes if subtree_codes is not None else {c.Code for c in classes if c.Code}
-        )
-        dictionary_properties = list()
-
-        def add_property(p: BsddProperty):
-            if p.Code in seen_property_code:
-                return
-            dictionary_properties.append(p.model_dump(mode="json"))
-
-        def add_class(c: BsddClass):
-            if c.Code in seen_class_code:
-                return
-            seen_class_code.add(c.Code)
-            export_list.append(c.model_dump(mode="json"))
-            for cp in c.ClassProperties:
-                if not cp.PropertyCode:
-                    continue
-                internal_prop = prop_utils.get_internal_property(cp)
-                if not internal_prop:
-                    prop_utils.get_internal_property(cp)
-                add_property(internal_prop)
-
-        for c in classes:
-            roots.append(c.Code)
-            targets = self._collect_subtree(c) if c.Code in include_subtree_codes else [c]
-            for n in targets:
-                add_class(n)
-
-        payload = {
-            "kind": "BsddClassTransfer",
-            "version": 1,
-            "roots": roots,  # which items were dragged
-            "classes": export_list,  # flat list, parents by ParentClassCode
-            "properties": dictionary_properties,
-        }
-        return json.dumps(payload, ensure_ascii=False).encode("utf-8")
 
 
 class SortModel(QSortFilterProxyModel):

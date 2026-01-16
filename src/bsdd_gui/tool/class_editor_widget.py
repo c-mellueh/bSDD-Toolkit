@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
 class Signals(DialogSignals):
     edit_class_requested = Signal(BsddClass)
-    copy_class_requested = Signal(BsddClass)  # Class To Copy
     new_class_requested = Signal(BsddClass)  # Parent Class
     grouping_requested = Signal(list)
     new_class_created = Signal(
@@ -54,7 +53,6 @@ class ClassEditorWidget(DialogTool):
     @classmethod
     def connect_signals(cls):
         cls.signals.edit_class_requested.connect(trigger.create_dialog)
-        cls.signals.copy_class_requested.connect(trigger.copy_class)
         cls.signals.new_class_requested.connect(trigger.create_new_class)
         cls.signals.grouping_requested.connect(trigger.group_classes)
 
@@ -87,10 +85,6 @@ class ClassEditorWidget(DialogTool):
         cls.signals.edit_class_requested.emit(bsdd_class)
 
     @classmethod
-    def request_class_copy(cls, bsdd_class: BsddClass):
-        cls.signals.copy_class_requested.emit(bsdd_class)
-
-    @classmethod
     def request_new_class(cls, parent=None):
         cls.signals.new_class_requested.emit(parent)
 
@@ -113,10 +107,6 @@ class ClassEditorWidget(DialogTool):
         if not name.strip():
             return False
         return True
-
-    @classmethod
-    def copy_class(cls, bsdd_class: BsddClass):
-        return BsddClass(**bsdd_class.model_dump())
 
     @classmethod
     def sync_to_model(

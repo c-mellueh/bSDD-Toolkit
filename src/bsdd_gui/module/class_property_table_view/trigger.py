@@ -35,4 +35,14 @@ def view_created(view: ui.ClassPropertyTable):
     core.register_view(view, tool.ClassPropertyTableView)
     core.add_columns_to_view(view, tool.ClassPropertyTableView, tool.Project)
     core.add_context_menu_to_view(view, tool.ClassPropertyTableView)
-    core.connect_view(view, tool.ClassPropertyTableView)
+    core.connect_view(view, tool.ClassPropertyTableView, tool.Util)
+
+
+def copy_selected(view: ui.ClassPropertyTable):
+    core.copy_property_to_clipboard(view, tool.ClassPropertyTableView)
+
+
+def paste_clipboard(view: ui.ClassPropertyTable):
+    core.paste_property_from_clipboard(
+        view, tool.ClassPropertyTableView, tool.PropertyTableWidget, tool.Project, tool.Util
+    )

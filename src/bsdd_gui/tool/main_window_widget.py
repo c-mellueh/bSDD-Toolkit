@@ -21,7 +21,6 @@ class Signals(QObject):
     active_pset_changed = Signal(str)
     active_property_changed = Signal(BsddClassProperty)
     new_class_requested = Signal()
-    copy_active_class_requested = Signal()
     new_property_set_requested = Signal()
     new_property_requested = Signal()
     refresh_status_bar_requested = Signal()
@@ -241,3 +240,8 @@ class MainWindowWidget(ActionTool):
         else:
             # Ignore if not on Windows
             return False
+
+    def get_selected_classes(cls):
+        from bsdd_gui.tool import ClassTreeView
+
+        return ClassTreeView.get_selected(cls.get_class_view())

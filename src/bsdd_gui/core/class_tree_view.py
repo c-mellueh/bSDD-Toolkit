@@ -1,5 +1,5 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QTreeView
+from PySide6.QtWidgets import QTreeView, QApplication
 from PySide6.QtCore import QPoint, QCoreApplication, Qt, QModelIndex
 from typing import Type, TYPE_CHECKING
 import logging
@@ -7,12 +7,11 @@ import json
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 import qtawesome as qta
-from bsdd_gui.module.class_tree_view.constants import JSON_MIME, CODES_MIME
-from bsdd_json.models import BsddClass, BsddDictionary, BsddProperty
+from bsdd_json.models import BsddDictionary, BsddClass
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.class_tree_view import ui
+    from bsdd_gui.module.class_tree_view import ui, constants
     from bsdd_gui.module.class_tree_view import models
 
 
@@ -74,13 +73,24 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Copy"),
-        lambda: class_editor.request_class_copy(get_first_selection(view)),
+        lambda v=view: class_tree.request_copy_selection(v),
         True,
         True,
-        False,
+        True,
         icon=qta.icon("mdi6.content-copy"),
         shortcut="Ctrl+C",
     )
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Paste"),
+        lambda v=view: class_tree.request_paste(v),
+        False,
+        True,
+        True,
+        icon=qta.icon("mdi6.content-paste"),
+        shortcut="Ctrl+V",
+    )
+
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Delete"),
@@ -169,7 +179,12 @@ def connect_to_main_window(
     util.add_shortcut(
         "Ctrl+C",
         view,
-        lambda: main_window.signals.copy_active_class_requested.emit(),
+        lambda: class_tree.request_copy_selection(view),
+    )
+    util.add_shortcut(
+        "Ctrl+V",
+        view,
+        lambda v=view: class_tree.request_paste(v),
     )
 
     util.add_shortcut(
@@ -253,10 +268,6 @@ def group_selection(
     class_editor.request_class_grouping(bsdd_classes)
 
 
-def copy_selected_class(view: ui.ClassView):
-    pass  # TODO
-
-
 def search_class(
     view: ui.ClassView,
     search: Type[tool.SearchWidget],
@@ -289,7 +300,8 @@ def handle_mime_move(
     dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
     dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
 
-    codes = json.loads(bytes(data.data(CODES_MIME)).decode("utf-8"))
+    # codes = json.loads(bytes(data.data(CODES_MIME)).decode("utf-8"))
+    codes = class_tree.get_codes_from_data(data)
     if not codes:
         return False
     # one-at-a-time move (extend to multi later if needed)
@@ -317,45 +329,82 @@ def handle_mime_copy(
     dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
     dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
     payload = class_tree.get_payload_from_data(data)
-    if payload is None:
+
+    paste_class_payload_to_view(
+        payload, dest_parent_node, bsdd_dictionary, class_tree, property_table, util
+    )
+
+
+def copy_selected_classes_to_clipboard(
+    view: ui.ClassView, class_tree: Type[tool.ClassTreeView], project: Type[tool.Project]
+):
+    classes = class_tree.get_selected(view)
+    unexpanded = set()
+    for c in classes:
+        index = class_tree.get_index_from_bsdd_class(project.get(), c)
+        if not view.isExpanded(view.model().mapFromSource(index)):
+            unexpanded.add(c.Code)
+    if not classes:
         return
-    if payload.get("kind") != "BsddClassTransfer" or "classes" not in payload:
+    payload = class_tree.classes_to_payload(classes, unexpanded)
+    QApplication.clipboard().setText(json.dumps(payload, ensure_ascii=False))
+
+
+def paste_class_from_clipboard(
+    view: ui.ClassView,
+    class_tree: Type[tool.ClassTreeView],
+    property_table: Type[tool.PropertyTableWidget],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+):
+    clipboard_text = QApplication.clipboard().text()
+    try:
+        payload: constants.PAYLOAD = json.loads(clipboard_text)
+    except:
         return
 
+    selected_classes = class_tree.get_selected(view)
+    insert_parent = selected_classes[-1] if selected_classes else None
+
+    paste_class_payload_to_view(
+        payload, insert_parent, project.get(), class_tree, property_table, util
+    )
+
+
+def paste_class_payload_to_view(
+    payload: constants.PAYLOAD,
+    insert_parent: BsddClass,
+    bsdd_dictionary: BsddDictionary,
+    class_tree: Type[tool.ClassTreeView],
+    property_table: Type[tool.PropertyTableWidget],
+    util: Type[tool.Util],
+):
+
+    if not class_tree.is_payload_valid(payload):
+        return
     raw_classes = payload["classes"]
-    raw_properties = payload["properties"]
     root_codes = set(payload.get("roots", []))
 
-    # 1) build code -> raw map; compute depth to sort parents before children
-    class_code_dict = {
-        rc["Code"]: rc for rc in raw_classes if isinstance(rc, dict) and "Code" in rc
-    }
-
+    old2new = dict()
+    existing_codes = [c.Code for c in bsdd_dictionary.Classes]
+    class_code_dict = {rc["Code"]: rc for rc in raw_classes}
     ordered_class_codes = sorted(
         class_code_dict.keys(), key=lambda c, ccd=class_code_dict: class_tree.depth_of(c, ccd)
-    )  # parents first
+    )
 
-    # 2) conflict-safe code mapping
-    old2new = {}
-
-    # 3) create & insert classes (parents first), adjusting codes/parents
     for class_code in ordered_class_codes:
-        rc = dict(class_code_dict[class_code])  # copy
-        # new code (unique in target)
-        new_code = util.get_unique_name(rc["Code"], old2new)
-        old2new[rc["Code"]] = new_code
-        node = class_tree.create_class_from_mime(
-            rc, new_code, old2new, root_codes, dest_parent_node
+        bsdd_class = dict(class_code_dict[class_code])  # copy
+        code = bsdd_class.get("Code", "NewProperty")
+        code = util.get_unique_name(bsdd_class["Code"], existing_codes)
+        old2new[bsdd_class["Code"]] = code
+        new_class = class_tree.create_class_from_mime(
+            bsdd_class, code, old2new, root_codes, insert_parent
         )
-        if node is None:
+        if new_class is None:
             continue
-        # insert with proper signals (parent must exist now)
-        class_tree.add_class_to_dictionary(node, bsdd_dictionary)
+        class_tree.add_class_to_dictionary(new_class, bsdd_dictionary)
+        existing_codes.append(new_class.Code)
 
-    # 4) Insert Properties
-    #
-    # that don't exist so far
     new_properties = property_table.get_properties_from_mime_payload(payload, bsdd_dictionary)
     for p in new_properties:
         property_table.add_property_to_dictionary(p, bsdd_dictionary)
-    return True

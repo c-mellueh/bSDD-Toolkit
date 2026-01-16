@@ -4,11 +4,13 @@ from typing import Type, TYPE_CHECKING
 from PySide6.QtCore import QModelIndex, QCoreApplication, QPoint
 from bsdd_json.utils import property_utils as prop_utils
 import qtawesome as qta
+from bsdd_gui.module.util.constants import CLASS_PROP_CLIPBOARD_KIND
+import json
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.class_property_table_view import ui
-    from bsdd_json.models import BsddClass
+    from bsdd_gui.module.class_property_table_view import ui, models
+from bsdd_json import BsddClass, BsddClassProperty, BsddProperty
 
 
 def connect_signals(
@@ -77,6 +79,38 @@ def add_context_menu_to_view(
         icon=qta.icon("mdi6.rename"),
     )
 
+    property_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("PropertyTable", "New"),
+        lambda: property_table.request_new_property(),
+        False,
+        True,
+        True,
+        icon=qta.icon("mdi6.plus"),
+        shortcut="Ctrl+N",
+    )
+
+    property_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("ClassPropertyTable", "Copy"),
+        lambda: property_table.request_copy(view),
+        True,
+        True,
+        True,
+        icon=qta.icon("mdi6.content-copy"),
+        shortcut="Ctrl+C",
+    )
+    property_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("PropertyTable", "Paste"),
+        lambda: property_table.request_paste(view),
+        False,
+        True,
+        True,
+        icon=qta.icon("mdi6.content-paste"),
+        shortcut="Ctrl+V",
+    )
+
 
 def create_context_menu(
     view: ui.ClassPropertyTable, pos: QPoint, property_table: Type[tool.ClassPropertyTableView]
@@ -87,8 +121,27 @@ def create_context_menu(
     menu.exec(menu_pos)
 
 
-def connect_view(view: ui.ClassPropertyTable, property_table: Type[tool.ClassPropertyTableView]):
+def connect_view(
+    view: ui.ClassPropertyTable,
+    property_table: Type[tool.ClassPropertyTableView],
+    util: Type[tool.Util],
+):
     property_table.connect_view_signals(view)
+    util.add_shortcut(
+        "Ctrl+N",
+        view,
+        lambda: property_table.request_new_property(),
+    )
+    util.add_shortcut(
+        "Ctrl+C",
+        view,
+        lambda: property_table.request_copy(view),
+    )
+    util.add_shortcut(
+        "Ctrl+V",
+        view,
+        lambda: property_table.request_paste(view),
+    )
 
 
 def reset_views(property_table: Type[tool.ClassPropertyTableView], project: Type[tool.Project]):
@@ -138,3 +191,79 @@ def reset_models(
     main_window.set_active_property(None)
 
     property_table.reset_views()
+
+
+def copy_property_to_clipboard(
+    view: ui.ClassPropertyTable, class_property_table: Type[tool.ClassPropertyTableView]
+):
+    selected_properties: list[BsddClassProperty] = class_property_table.get_selected(view)
+    if not selected_properties:
+        return
+
+    seen_property_codes = list()
+    properties = []
+    class_properties = list()
+    for class_property in selected_properties:
+        internal_prop = prop_utils.get_internal_property(class_property=class_property)
+        if internal_prop:
+            if internal_prop.Code not in seen_property_codes:
+                properties.append(internal_prop.model_dump(mode="json"))
+                seen_property_codes.append(internal_prop.Code)
+        class_properties.append(class_property.model_dump(mode="json"))
+    if not properties:
+        return
+    payload = {
+        "kind": CLASS_PROP_CLIPBOARD_KIND,
+        "class_properties": class_properties,
+        "properties": properties,
+    }
+
+    QApplication.clipboard().setText(json.dumps(payload, ensure_ascii=False))
+
+
+def paste_property_from_clipboard(
+    view: ui.ClassPropertyTable,
+    class_property_table: Type[tool.ClassPropertyTableView],
+    property_table: Type[tool.PropertyTableWidget],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+):
+    bsdd_dictionary = project.get()
+    clipboard_text = QApplication.clipboard().text()
+    try:
+        payload = json.loads(clipboard_text)
+    except:
+        return
+
+    if not isinstance(payload, dict) or payload.get("kind") != CLASS_PROP_CLIPBOARD_KIND:
+        return
+
+    model: models.ClassPropertyTableModel = view.model().sourceModel()
+    bsdd_class_properties = payload.get("class_properties", [])
+    properties: list[BsddProperty] = payload.get("properties", [])
+
+    if not isinstance(bsdd_class_properties, list):
+        return
+
+    existing_codes = [cp.Code for cp in model.active_class.ClassProperties]
+    for bsdd_class_property in bsdd_class_properties:
+        if not isinstance(bsdd_class_property, dict):
+            continue
+
+        code = bsdd_class_property.get("Code", "New-Class-Property")
+        code = util.get_unique_name(code, existing_codes, True)
+        bsdd_class_property["Code"] = code
+        new_property = BsddClassProperty.model_validate(bsdd_class_property)
+        class_property_table.add_class_property(new_property, model.active_class)
+        existing_codes.append(code)
+
+    existing_property_codes = [p.Code for p in project.get().Properties]
+    for bsdd_property in properties:
+        if bsdd_property.get("Code") in existing_property_codes:
+            continue
+        try:
+            new_property = BsddProperty.model_validate(bsdd_property)
+            property_table.add_property_to_dictionary(new_property, bsdd_dictionary)
+            existing_property_codes.append(new_property.Code)
+        except:
+            pass

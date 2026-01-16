@@ -16,6 +16,9 @@ if TYPE_CHECKING:
 
 class Signals(ViewSignals):
     property_info_requested = Signal(BsddClassProperty)
+    paste_requested = Signal(ui.ClassPropertyTable)
+    copy_requested = Signal(ui.ClassPropertyTable)
+    new_property_requested = Signal()
 
 
 class ClassPropertyTableView(ItemViewTool):
@@ -83,6 +86,8 @@ class ClassPropertyTableView(ItemViewTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
+        cls.signals.copy_requested.connect(trigger.copy_selected)
+        cls.signals.paste_requested.connect(trigger.paste_clipboard)
 
     @classmethod
     def connect_view_signals(cls, view: ui.ClassPropertyTable):
@@ -128,3 +133,15 @@ class ClassPropertyTableView(ItemViewTool):
         if not bsdd_class_property:
             return
         cls.signals.property_info_requested.emit(bsdd_class_property)
+
+    @classmethod
+    def request_new_property(cls):
+        cls.signals.new_property_requested.emit()
+
+    @classmethod
+    def request_paste(cls, view: ui.ClassPropertyTable):
+        cls.signals.paste_requested.emit(view)
+
+    @classmethod
+    def request_copy(cls, view: ui.ClassPropertyTable):
+        cls.signals.copy_requested.emit(view)

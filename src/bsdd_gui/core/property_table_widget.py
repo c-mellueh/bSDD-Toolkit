@@ -1,13 +1,25 @@
 from __future__ import annotations
+import json
 from PySide6.QtCore import QCoreApplication, Qt, QPoint
-from PySide6.QtWidgets import QWidget, QTreeView
+from PySide6.QtWidgets import QWidget, QTreeView, QApplication
 from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.property_table_widget import views, ui, models
 from bsdd_json import BsddProperty, BsddClass, BsddClassProperty
 import qtawesome as qta
+from bsdd_gui.module.util.constants import PROP_CLIPBOARD_KIND
+from pydantic import ValidationError
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
+
+
+def connect_to_main_menu(
+    property_table: Type[tool.PropertyTableWidget],
+    main_window: Type[tool.MainWindowWidget],
+    util: Type[tool.Util],
+) -> None:
+    action = main_window.add_action(None, "Properties", lambda: property_table.request_widget())
+    property_table.set_action(main_window.get(), "open_window", action)
 
 
 def connect_signals(
@@ -126,13 +138,14 @@ def add_columns_to_view(
 
 
 def add_context_menu_to_view(
-    view: views.PropertyTable | views.ClassTable, property_table: Type[tool.PropertyTableWidget]
+    view: views.PropertyTable | views.ClassTable,
+    property_table: Type[tool.PropertyTableWidget],
 ):
 
     if isinstance(view, views.PropertyTable):
         property_table.add_context_menu_entry(
             view,
-            lambda: QCoreApplication.translate("PropertySet", "Delete"),
+            lambda: QCoreApplication.translate("PropertyTable", "Delete"),
             lambda: property_table.request_delete_selection(view),
             True,
             True,
@@ -142,7 +155,7 @@ def add_context_menu_to_view(
         )
         property_table.add_context_menu_entry(
             view,
-            lambda: QCoreApplication.translate("PropertySet", "Search"),
+            lambda: QCoreApplication.translate("PropertyTable", "Search"),
             lambda: property_table.signals.search_requested.emit(view),
             False,
             True,
@@ -152,7 +165,7 @@ def add_context_menu_to_view(
         )
         property_table.add_context_menu_entry(
             view,
-            lambda: QCoreApplication.translate("PropertySet", "New"),
+            lambda: QCoreApplication.translate("PropertyTable", "New"),
             lambda: property_table.request_new_property(),
             False,
             True,
@@ -160,10 +173,30 @@ def add_context_menu_to_view(
             icon=qta.icon("mdi6.plus"),
             shortcut="Ctrl+N",
         )
+        property_table.add_context_menu_entry(
+            view,
+            lambda: QCoreApplication.translate("PropertyTable", "Copy"),
+            lambda: property_table.request_property_copy(view),
+            True,
+            True,
+            True,
+            icon=qta.icon("mdi6.content-copy"),
+            shortcut="Ctrl+C",
+        )
+        property_table.add_context_menu_entry(
+            view,
+            lambda: QCoreApplication.translate("PropertyTable", "Paste"),
+            lambda: property_table.request_property_paste(view),
+            False,
+            True,
+            True,
+            icon=qta.icon("mdi6.content-paste"),
+            shortcut="Ctrl+V",
+        )
     else:
         property_table.add_context_menu_entry(
             view,
-            lambda: QCoreApplication.translate("PropertySet", "Delete Properties"),
+            lambda: QCoreApplication.translate("PropertyTable", "Delete Properties"),
             lambda: property_table.request_delete_selection(view),
             True,
             True,
@@ -176,6 +209,7 @@ def add_context_menu_to_view(
 def connect_view(
     view: views.PropertyTable | views.ClassTable,
     property_table: Type[tool.PropertyTableWidget],
+    project: Type[tool.Project],
     util: Type[tool.Util],
 ):
     property_table.connect_view_signals(view)
@@ -191,6 +225,17 @@ def connect_view(
             view,
             lambda: property_table.request_new_property(),
         )
+        util.add_shortcut(
+            "Ctrl+C",
+            view,
+            lambda: property_table.request_property_copy(view),
+        )
+        util.add_shortcut(
+            "Ctrl+V",
+            view,
+            lambda: property_table.request_property_paste(view),
+        )
+
     util.add_shortcut(
         "Del",
         view,
@@ -215,13 +260,6 @@ def remove_view(
     property_table.remove_model(view.model().sourceModel())
 
 
-def connect_to_main_menu(
-    property_table: Type[tool.PropertyTableWidget], main_window: Type[tool.MainWindowWidget]
-) -> None:
-    action = main_window.add_action(None, "Properties", lambda: property_table.request_widget())
-    property_table.set_action(main_window.get(), "open_window", action)
-
-
 def search_property(
     view: QTreeView,
     property_table: Type[tool.PropertyTableWidget],
@@ -234,3 +272,57 @@ def search_property(
         return
     # Select the found property in the view and scroll to it
     property_table.select_property(bsdd_property, view)
+
+
+def copy_property_to_clipboard(
+    view: views.PropertyTable, property_table: Type[tool.PropertyTableWidget]
+):
+
+    selected_properties: list[BsddProperty] = property_table.get_selected(view)
+    if not selected_properties:
+        return
+
+    properties = []
+    for bsdd_property in selected_properties:
+        properties = [bsdd_property.model_dump(mode="json")]
+    if not properties:
+        return
+    payload = {"kind": PROP_CLIPBOARD_KIND, "items": properties}
+    QApplication.clipboard().setText(json.dumps(payload, ensure_ascii=False))
+
+
+def paste_property_from_clipboard(
+    view: views.PropertyTable,
+    property_table: Type[tool.PropertyTableWidget],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+):
+    bsdd_dictionary = project.get()
+    clipboard_text = QApplication.clipboard().text()
+    try:
+        payload = json.loads(clipboard_text)
+    except:
+        return
+
+    if not isinstance(payload, dict) or payload.get("kind") != PROP_CLIPBOARD_KIND:
+        return
+
+    bsdd_properties = payload.get("items")
+    if not isinstance(bsdd_properties, list):
+        return
+
+    existing_codes = [p.Code for p in bsdd_dictionary.Properties]
+    for bsdd_property in bsdd_properties:
+        if not isinstance(bsdd_property, dict):
+            continue
+
+        code = bsdd_property.get("Code", "NewProperty")
+        code = util.get_unique_name(code, existing_codes, True)
+        bsdd_property["Code"] = code
+        try:
+            new_property = BsddProperty.model_validate(bsdd_property)
+            property_table.add_property_to_dictionary(new_property, bsdd_dictionary)
+            existing_codes.append(code)
+        except ValidationError:
+            continue
+    property_table.select_property(new_property, view)

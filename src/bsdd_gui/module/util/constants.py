@@ -1,1 +1,5 @@
 OPTION_SEPERATOR = " ;"
+PSET_CLIPBOARD_KIND = "BsddPropertySetTransfer"
+PROP_CLIPBOARD_KIND = "BsddPropertyTransfer"
+CLASS_CLIPBOARD_KIND = "BsddClassTransfer"
+CLASS_PROP_CLIPBOARD_KIND = "BsddClassPropertyTransfer"

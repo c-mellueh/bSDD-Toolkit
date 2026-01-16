@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_to_main_menu(tool.PropertyTableWidget, tool.MainWindowWidget)
+    core.connect_to_main_menu(tool.PropertyTableWidget, tool.MainWindowWidget, tool.Util)
     core.connect_signals(
         tool.PropertyTableWidget,
         tool.PropertyEditorWidget,
@@ -38,13 +38,13 @@ def widget_created(widget: ui.PropertyWidget):
     core.register_view(view, tool.PropertyTableWidget)
     core.add_columns_to_view(view, tool.PropertyTableWidget)
     core.add_context_menu_to_view(view, tool.PropertyTableWidget)
-    core.connect_view(view, tool.PropertyTableWidget, tool.Util)
+    core.connect_view(view, tool.PropertyTableWidget, tool.Project, tool.Util)
 
     view = widget.tv_classes
     core.register_view(view, tool.PropertyTableWidget)
     core.add_columns_to_view(view, tool.PropertyTableWidget)
     core.add_context_menu_to_view(view, tool.PropertyTableWidget)
-    core.connect_view(view, tool.PropertyTableWidget, tool.Util)
+    core.connect_view(view, tool.PropertyTableWidget, tool.Project, tool.Util)
 
     core.register_widget(widget, tool.PropertyTableWidget)
     core.connect_widget(widget, tool.PropertyTableWidget)
@@ -57,3 +57,11 @@ def search_requested(view: QTreeView):
 
 def context_menu_requested(view: views.PropertyTable | views.ClassTable, pos):
     core.create_context_menu(view, pos, tool.PropertyTableWidget)
+
+
+def copy_property_to_clipboard(view: views.PropertyTable):
+    core.copy_property_to_clipboard(view, tool.PropertyTableWidget)
+
+
+def paste_property_from_clipboard(view: views.PropertyTable):
+    core.paste_property_from_clipboard(view, tool.PropertyTableWidget, tool.Project, tool.Util)
