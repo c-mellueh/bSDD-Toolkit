@@ -76,10 +76,21 @@ def add_context_menu_to_view(
         lambda v=view: class_tree.request_copy_selection(v),
         True,
         True,
-        False,
+        True,
         icon=qta.icon("mdi6.content-copy"),
         shortcut="Ctrl+C",
     )
+    class_tree.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("Class", "Paste"),
+        lambda v=view: class_tree.request_paste(v),
+        False,
+        True,
+        True,
+        icon=qta.icon("mdi6.content-paste"),
+        shortcut="Ctrl+V",
+    )
+
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Delete"),
@@ -349,7 +360,7 @@ def paste_class_from_clipboard(
     clipboard_text = QApplication.clipboard().text()
     try:
         payload: constants.PAYLOAD = json.loads(clipboard_text)
-    except (TypeError, json.JSONDecodeError):
+    except:
         return
 
     selected_classes = class_tree.get_selected(view)
