@@ -25,6 +25,28 @@ class ClassView(TreeItemView):
         return super().model()
 
     def mimeData(self, indexes):
+        def _generate_subtree_codes():
+            # Subtrees are expanded Trees which also will be added as root
+            subtree_codes: set[str] = set()
+            seen_codes: set[str] = set()
+            classes = []
+            for proxy_idx in indexes:
+                if not proxy_idx.isValid() or proxy_idx.column() != 0:
+                    continue
+                src_idx = to_source(proxy_idx)
+                if not src_idx.isValid():
+                    continue
+                node = src_idx.internalPointer()
+                if node is None or node.Code in seen_codes:
+                    continue
+                seen_codes.add(node.Code)
+                classes.append(node)
+                if not self.isExpanded(proxy_idx):
+                    subtree_codes.add(node.Code)
+            return subtree_codes, classes
+
+        from bsdd_gui.tool import ClassTreeView
+
         # include subtree only when the node is collapsed
         proxy_model = self.model()
         if proxy_model is None:
@@ -36,34 +58,10 @@ class ClassView(TreeItemView):
             proxy_model.mapToSource if hasattr(proxy_model, "mapToSource") else (lambda i: i)
         )
 
-        classes = []
-        subtree_codes: set[str] = set()
-        seen_codes: set[str] = set()
-        for proxy_idx in indexes:
-            if not proxy_idx.isValid() or proxy_idx.column() != 0:
-                continue
-            src_idx = to_source(proxy_idx)
-            if not src_idx.isValid():
-                continue
-            node = src_idx.internalPointer()
-            if node is None or node.Code in seen_codes:
-                continue
-            seen_codes.add(node.Code)
-            classes.append(node)
-            if not self.isExpanded(proxy_idx):
-                subtree_codes.add(node.Code)
-
+        subtree_codes, classes = _generate_subtree_codes()
         if not classes:
             return super().mimeData(indexes)
-
-        md = QMimeData()
-        md.setData(
-            JSON_MIME,
-            QByteArray(source_model._classes_to_json_bytes(classes, subtree_codes=subtree_codes)),
-        )
-        md.setData(CODES_MIME, QByteArray(json.dumps([c.Code for c in classes]).encode("utf-8")))
-        md.setText(json.dumps([c.Code for c in classes], ensure_ascii=False))
-        return md
+        return ClassTreeView.generate_mime_data(classes, subtree_codes)
 
     def startDrag(self, supported_actions):
         indexes = self.selectedIndexes()

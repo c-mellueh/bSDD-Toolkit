@@ -3,7 +3,14 @@ from typing import TYPE_CHECKING, Type
 import ctypes
 import logging
 from types import ModuleType
-from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel, QModelIndex, QItemSelectionModel
+from PySide6.QtCore import (
+    QObject,
+    Signal,
+    QSortFilterProxyModel,
+    QModelIndex,
+    QMimeData,
+    QByteArray,
+)
 from PySide6.QtWidgets import QWidget, QAbstractItemView
 
 import bsdd_gui
@@ -13,6 +20,7 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.class_tree_view import ui, models, trigger, constants
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
+from bsdd_gui.module.util.constants import CLASS_CLIPBOARD_KIND
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_tree_view.prop import ClassTreeViewProperties
@@ -20,12 +28,13 @@ if TYPE_CHECKING:
 
 
 class Signals(ViewSignals):
-    copy_selection_requested = Signal(ui.ClassView)
     group_selection_requested = Signal(ui.ClassView)
     search_requested = Signal(ui.ClassView)
     expand_selection_requested = Signal(ui.ClassView)
     collapse_selection_requested = Signal(ui.ClassView)
     class_parent_changed = Signal(BsddClass)
+    copy_selection_requested = Signal(ui.ClassView)
+    paste_requested = Signal(ui.ClassView)
 
 
 class ClassTreeView(ItemViewTool):
@@ -50,11 +59,12 @@ class ClassTreeView(ItemViewTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.copy_selection_requested.connect(trigger.copy_selected_class)
         cls.signals.group_selection_requested.connect(trigger.group_selection)
         cls.signals.search_requested.connect(trigger.search_class)
         cls.signals.expand_selection_requested.connect(cls.expand_selection)
         cls.signals.collapse_selection_requested.connect(cls.collapse_selection)
+        cls.signals.copy_selection_requested.connect(trigger.copy_selected_classes_to_clipboard)
+        cls.signals.paste_requested.connect(trigger.paste_classes_from_clipboard)
 
     @classmethod
     def get_selected(cls, view: ui.ClassView) -> list[BsddClass]:
@@ -155,7 +165,7 @@ class ClassTreeView(ItemViewTool):
             cls.delete_class(node, bsdd_dictionary)
 
     @classmethod
-    def get_payload_from_data(cls, data):
+    def get_payload_from_data(cls, data) -> constants.PAYLOAD | None:
         payload = None
         for fmt in (constants.JSON_MIME, "application/json", "text/plain"):
             if data.hasFormat(fmt):
@@ -170,7 +180,28 @@ class ClassTreeView(ItemViewTool):
         return payload
 
     @classmethod
-    def depth_of(cls, code: str, class_code_dict) -> int:
+    def get_codes_from_data(cls, data):
+        payload = None
+        for fmt in constants.CODES_MIME:
+            if data.hasFormat(fmt):
+                try:
+                    b = bytes(data.data(fmt))
+                    payload = json.loads(b.decode("utf-8"))
+                    return payload
+                except Exception:
+                    pass
+        return payload
+
+    @classmethod
+    def is_payload_valid(cls, payload: constants.PAYLOAD):
+        if payload is None:
+            return False
+        if payload.get("kind") != CLASS_CLIPBOARD_KIND or "classes" not in payload:
+            return False
+        return True
+
+    @classmethod
+    def depth_of(cls, code: str, class_code_dict: dict[str, BsddClass]) -> int:
         d = 0
         seen = set()
         c = class_code_dict.get(code)
@@ -195,7 +226,7 @@ class ClassTreeView(ItemViewTool):
             rc["ParentClassCode"] = old2new[p]
         else:
             # imported root -> attach to dest_parent in this dictionary (or stay root)
-            if rc["Code"] in (old2new[c] for c in root_codes):
+            if rc["Code"] in (old2new.get(c) for c in root_codes):
                 rc["ParentClassCode"] = dest_parent.Code if dest_parent is not None else None
             else:
                 # parent outside import and not destination: make it root
@@ -203,7 +234,7 @@ class ClassTreeView(ItemViewTool):
 
         # build model instance
         try:
-            node = BsddClass.model_validate(rc)
+            node = BsddClass.model_validate(obj=rc)
         except Exception:
             # if invalid, skip this one (or log)
             node = None
@@ -218,3 +249,84 @@ class ClassTreeView(ItemViewTool):
     def collapse_selection(cls, tree: ui.ClassView):
         for index in tree.selectedIndexes():
             tree.collapse(index)
+
+    @classmethod
+    def classes_to_payload(
+        cls, classes: list[BsddClass], subtree_codes: set[str] | None = None
+    ) -> constants.PAYLOAD:
+        # flat list of class dicts (optionally entire subtrees of each selection)
+        def _collect_subtree(root: BsddClass) -> list[BsddClass]:
+            out, stack = [], [root]
+            seen_codes: set[str] = set()
+            while stack:
+                n = stack.pop()
+                if n.Code in seen_codes:
+                    continue
+                seen_codes.add(n.Code)
+                out.append(n)
+                stack.extend(cl_utils.get_children(n))
+            return out
+
+        def add_property(p: BsddProperty):
+            if p.Code in seen_property_code:
+                return
+            dictionary_properties.append(p.model_dump(mode="json"))
+
+        def add_class(c: BsddClass):
+            if c.Code in seen_class_code:
+                return
+            seen_class_code.add(c.Code)
+            export_list.append(c.model_dump(mode="json"))
+            for cp in c.ClassProperties:
+                if not cp.PropertyCode:
+                    continue
+                internal_prop = prop_utils.get_internal_property(cp)
+                if not internal_prop:
+                    prop_utils.get_internal_property(cp)
+                add_property(internal_prop)
+
+        export_list = []
+        roots = []
+        seen_class_code = set()
+        seen_property_code = set()
+        include_subtree_codes = (
+            subtree_codes if subtree_codes is not None else {c.Code for c in classes if c.Code}
+        )
+        dictionary_properties = list()
+
+        for c in classes:
+            roots.append(c.Code)
+            targets = _collect_subtree(c) if c.Code in include_subtree_codes else [c]
+            for n in targets:
+                add_class(n)
+
+        payload = {
+            "kind": CLASS_CLIPBOARD_KIND,
+            "version": 1,
+            "roots": roots,  # which items were dragged
+            "classes": export_list,  # flat list, parents by ParentClassCode
+            "properties": dictionary_properties,
+        }
+        return payload
+
+    @classmethod
+    def generate_mime_data(cls, classes: list[BsddClass], subtree_codes=None):
+        md = QMimeData()
+        payload = cls.classes_to_payload(classes, subtree_codes)
+        byte_payload = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        md.setData(
+            constants.JSON_MIME,
+            QByteArray(byte_payload),
+        )
+        class_codes_bytes = QByteArray(json.dumps([c.Code for c in classes]).encode("utf-8"))
+        md.setData(constants.CODES_MIME, class_codes_bytes)
+        md.setText(json.dumps([c.Code for c in classes], ensure_ascii=False))
+        return md
+
+    @classmethod
+    def request_copy_selection(cls, view: ui.ClassView):
+        cls.signals.copy_selection_requested.emit(view)
+
+    @classmethod
+    def request_paste(cls, view: ui.ClassView):
+        cls.signals.paste_requested.emit(view)

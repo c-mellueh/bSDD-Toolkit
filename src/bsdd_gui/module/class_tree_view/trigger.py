@@ -35,10 +35,6 @@ def class_view_created(view: ui.ClassView):
     core.connect_view(view, tool.ClassTreeView)
 
 
-def copy_selected_class(view: ui.ClassView):
-    core.copy_selected_class(view, tool.ClassTreeView, tool.ClassEditorWidget)
-
-
 def context_menu_requested(view: ui.ClassView, pos):
     core.create_context_menu(view, pos, tool.ClassTreeView)
 
@@ -63,3 +59,11 @@ def mime_copy_event(bsdd_dictionary: BsddDictionary, data, parent):
     core.handle_mime_copy(
         bsdd_dictionary, data, parent, tool.ClassTreeView, tool.Util, tool.PropertyTableWidget
     )
+
+
+def copy_selected_classes_to_clipboard(view: ui.ClassView):
+    core.copy_selected_classes_to_clipboard(view, tool.ClassTreeView)
+
+
+def paste_classes_from_clipboard(view:ui.ClassView):
+    core.paste_class_from_clipboard(view,tool.ClassTreeView, tool.PropertyTableWidget,tool.Project,tool.Util)

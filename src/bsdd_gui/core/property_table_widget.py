@@ -319,10 +319,10 @@ def paste_property_from_clipboard(
         code = bsdd_property.get("Code", "NewProperty")
         code = util.get_unique_name(code, existing_codes, True)
         bsdd_property["Code"] = code
-        existing_codes.append(code)
         try:
             new_property = BsddProperty.model_validate(bsdd_property)
             property_table.add_property_to_dictionary(new_property, bsdd_dictionary)
+            existing_codes.append(code)
         except ValidationError:
             continue
     property_table.select_property(new_property, view)
