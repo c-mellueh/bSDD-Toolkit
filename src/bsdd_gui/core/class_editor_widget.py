@@ -93,6 +93,7 @@ def register_fields(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorW
     class_editor.register_basic_field(widget, widget.de_version_date, "VersionDateUtc")
     class_editor.register_basic_field(widget, widget.sb_version_number, "VersionNumber")
     class_editor.register_basic_field(widget, widget.le_visual_rep, "VisualRepresentationUri")
+    class_editor.update_description_visiblility(widget)
 
 
 def register_validators(

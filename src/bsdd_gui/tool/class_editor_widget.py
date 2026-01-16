@@ -63,13 +63,25 @@ class ClassEditorWidget(DialogTool):
         super().connect_widget_signals(widget)
         cls.get_properties().old_name_value = widget.le_name.text()
         widget.le_name.textEdited.connect(lambda t, w=widget: cls.update_code(w, t))
-        
+        w = widget
+        w.cb_description.toggled.connect(lambda: cls.update_description_visiblility(w))
+
+    @classmethod
+    def update_description_visiblility(cls, widget: ui.ClassEditor):
+        if widget.cb_description.isChecked():
+            widget.te_description.setVisible(True)
+            widget.bsdd_data.Description = widget.te_description.toPlainText()
+        else:
+            widget.te_description.setVisible(False)
+            widget.bsdd_data.Description = None
+
     @classmethod
     def update_code(cls, widget: ui.ClassEditor, new_value: str):
         old_value = cls.get_properties().old_name_value
         if widget.le_code.text() == dict_utils.slugify(old_value):
             widget.le_code.setText(dict_utils.slugify(new_value))
         cls.get_properties().old_name_value = new_value
+
     @classmethod
     def request_class_editor(cls, bsdd_class: BsddClass):
         cls.signals.edit_class_requested.emit(bsdd_class)

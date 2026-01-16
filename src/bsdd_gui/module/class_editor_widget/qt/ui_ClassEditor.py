@@ -17,12 +17,13 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFormLayout, QGridLayout,
     QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QSizePolicy, QSpacerItem, QSpinBox, QTabWidget,
-    QTextEdit, QVBoxLayout, QWidget)
+    QSizePolicy, QSpacerItem, QTabWidget, QTextEdit,
+    QVBoxLayout, QWidget)
 
 from bsdd_gui.module.class_editor_widget.ui import IfcTagInput
 from bsdd_gui.module.relationship_editor_widget.ui import RelationshipWidget
-from bsdd_gui.presets.ui_presets import (ComboBoxWithToggleSwitch, DateTimeWithNow, TagInput, ToggleSwitch)
+from bsdd_gui.presets.ui_presets import (ComboBoxWithToggleSwitch, DateTimeWithNow, SpinBoxWithToggleSwitch, TagInput,
+    ToggleSwitch)
 
 class Ui_ClassEditor(object):
     def setupUi(self, ClassEditor):
@@ -216,7 +217,7 @@ class Ui_ClassEditor(object):
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lb_revision_number)
 
-        self.sb_revision_number = QSpinBox(self.gb_version_control)
+        self.sb_revision_number = SpinBoxWithToggleSwitch(self.gb_version_control)
         self.sb_revision_number.setObjectName(u"sb_revision_number")
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.sb_revision_number)
@@ -256,7 +257,7 @@ class Ui_ClassEditor(object):
 
         self.formLayout.setWidget(6, QFormLayout.ItemRole.LabelRole, self.lb_version_number)
 
-        self.sb_version_number = QSpinBox(self.gb_version_control)
+        self.sb_version_number = SpinBoxWithToggleSwitch(self.gb_version_control)
         self.sb_version_number.setObjectName(u"sb_version_number")
 
         self.formLayout.setWidget(6, QFormLayout.ItemRole.FieldRole, self.sb_version_number)

@@ -40,6 +40,8 @@ from PySide6.QtWidgets import (
     QTreeView,
     QLayout,
     QDateTimeEdit,
+    QSpinBox,
+    QDoubleSpinBox,
 )
 from PySide6.QtCore import (
     QObject,
@@ -419,6 +421,10 @@ class FieldTool(WidgetTool):
             c_field.dateTimeChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
         elif isinstance(c_field, QAbstractButton):
             c_field.toggled.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QSpinBox):
+            c_field.valueChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
+        elif isinstance(c_field, QDoubleSpinBox):
+            c_field.valueChanged.connect(lambda: cls.signals.field_changed.emit(w, r_field))
 
     @classmethod
     def add_validator(cls, widget, field, validator_function: callable, result_function: callable):
@@ -478,6 +484,10 @@ class FieldTool(WidgetTool):
             f.dateTimeChanged.connect(func)
         elif isinstance(f, QAbstractButton):
             f.toggled.connect(func)
+        elif isinstance(f, QSpinBox):
+            f.valueChanged.connect(func)
+        elif isinstance(f, QDoubleSpinBox):
+            f.valueChanged.connect(func)
         else:
             logging.info("ClassType not Found")
             return
@@ -512,6 +522,10 @@ class FieldTool(WidgetTool):
             value = field.dateTime().toPython()
         elif isinstance(field, QAbstractButton):
             value = field.isChecked()
+        elif isinstance(field, QSpinBox):
+            value = field.value()
+        elif isinstance(field, QDoubleSpinBox):
+            value = field.value()
         else:
             value = None
         return value
@@ -546,6 +560,10 @@ class FieldTool(WidgetTool):
                 field.setChecked(value or False)
             elif isinstance(field, TagInput):
                 field.setTags(value or [])
+            elif isinstance(field, QSpinBox):
+                field.setValue(value)
+            elif isinstance(field, QDoubleSpinBox):
+                field.setValue(value)
             elif isinstance(field, QDateTimeEdit):
                 if not value:
                     return

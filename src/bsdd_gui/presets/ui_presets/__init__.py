@@ -3,6 +3,7 @@ from .toggle_switch import (
     ItemWithToggleSwitch,
     ComboBoxWithToggleSwitch,
     LineEditWithToggleSwitch,
+    SpinBoxWithToggleSwitch,
 )
 from .label_tags_input import TagInput
 from .line_edit_with_button import LineEditWithButton
