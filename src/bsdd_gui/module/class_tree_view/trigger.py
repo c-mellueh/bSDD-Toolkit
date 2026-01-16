@@ -62,8 +62,10 @@ def mime_copy_event(bsdd_dictionary: BsddDictionary, data, parent):
 
 
 def copy_selected_classes_to_clipboard(view: ui.ClassView):
-    core.copy_selected_classes_to_clipboard(view, tool.ClassTreeView,tool.Project)
+    core.copy_selected_classes_to_clipboard(view, tool.ClassTreeView, tool.Project)
 
 
-def paste_classes_from_clipboard(view:ui.ClassView):
-    core.paste_class_from_clipboard(view,tool.ClassTreeView, tool.PropertyTableWidget,tool.Project,tool.Util)
+def paste_classes_from_clipboard(view: ui.ClassView):
+    core.paste_class_from_clipboard(
+        view, tool.ClassTreeView, tool.PropertyTableWidget, tool.Project, tool.Util
+    )

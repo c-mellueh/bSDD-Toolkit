@@ -243,4 +243,5 @@ class MainWindowWidget(ActionTool):
 
     def get_selected_classes(cls):
         from bsdd_gui.tool import ClassTreeView
+
         return ClassTreeView.get_selected(cls.get_class_view())
