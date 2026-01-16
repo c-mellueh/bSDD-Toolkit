@@ -271,6 +271,7 @@ class ClassTreeView(ItemViewTool):
             if p.Code in seen_property_code:
                 return
             dictionary_properties.append(p.model_dump(mode="json"))
+            seen_property_code.add(p.Code)
 
         def add_class(c: BsddClass):
             if c.Code in seen_class_code:
@@ -281,9 +282,8 @@ class ClassTreeView(ItemViewTool):
                 if not cp.PropertyCode:
                     continue
                 internal_prop = prop_utils.get_internal_property(cp)
-                if not internal_prop:
-                    prop_utils.get_internal_property(cp)
-                add_property(internal_prop)
+                if internal_prop:
+                    add_property(internal_prop)
 
         export_list = []
         roots = []

@@ -186,7 +186,7 @@ def add_context_menu_to_view(
         property_table.add_context_menu_entry(
             view,
             lambda: QCoreApplication.translate("PropertyTable", "Paste"),
-            lambda: property_table.request_paste(view),
+            lambda: property_table.request_property_paste(view),
             False,
             True,
             True,
@@ -301,7 +301,7 @@ def paste_property_from_clipboard(
     clipboard_text = QApplication.clipboard().text()
     try:
         payload = json.loads(clipboard_text)
-    except (TypeError, json.JSONDecodeError):
+    except:
         return
 
     if not isinstance(payload, dict) or payload.get("kind") != PROP_CLIPBOARD_KIND:
