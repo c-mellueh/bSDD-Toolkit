@@ -43,10 +43,6 @@ def widget_created(widget: ui.ClassEditor):
 ### Module Specific Triggers
 
 
-def copy_class(bsdd_class: BsddClass):
-    core.copy_class(bsdd_class, tool.ClassEditorWidget, tool.MainWindowWidget)
-
-
 def create_new_class(parent_class: BsddClass | None):
     core.create_new_class(parent_class, tool.ClassEditorWidget, tool.MainWindowWidget)
 
