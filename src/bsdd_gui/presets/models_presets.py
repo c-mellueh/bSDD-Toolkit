@@ -61,7 +61,7 @@ class ItemModel(QAbstractItemModel):
             setter_func(self, index, value)
             self.dataChanged.emit(index, index, [Qt.DisplayRole, Qt.EditRole])
             return True
-    
+
         if role == Qt.ItemDataRole.CheckStateRole:
             # CheckStateRole passes an enum/int; convert to bool for the setter.
             check_state = Qt.CheckState(value)

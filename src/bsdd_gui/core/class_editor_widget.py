@@ -69,8 +69,9 @@ def register_fields(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorW
     class_editor.setup_combo_box(widget, widget.cb_creator_iso, language_iso)
     class_editor.setup_combo_box(widget, widget.cb_document_ref, document_type)
 
-
-    class_editor.register_basic_field(widget, widget.ti_related_ifc_entity, "RelatedIfcEntityNamesList")
+    class_editor.register_basic_field(
+        widget, widget.ti_related_ifc_entity, "RelatedIfcEntityNamesList"
+    )
     class_editor.register_basic_field(widget, widget.ti_synonyms, "Synonyms")
     class_editor.register_basic_field(widget, widget.de_activation_time, "ActivationDateUtc")
     class_editor.register_basic_field(widget, widget.le_reference_code, "ReferenceCode")

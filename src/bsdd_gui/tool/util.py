@@ -475,4 +475,3 @@ class Util:
         cls.get_properties().waiting_thread = waiting_thread
         cls.get_properties().waiting_widget = waiting_widget
         return waiting_worker, waiting_thread, waiting_widget
-

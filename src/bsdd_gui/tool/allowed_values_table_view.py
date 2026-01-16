@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from types import ModuleType
 import logging
 from PySide6.QtCore import Qt, QModelIndex, QCoreApplication, Signal, QAbstractItemModel
-from PySide6.QtWidgets import QWidget,QAbstractItemDelegate,QLineEdit
+from PySide6.QtWidgets import QWidget, QAbstractItemDelegate, QLineEdit
 import bsdd_gui
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ class Signals(ViewSignals):
     items_pasted = Signal(QWidget)  # View
     value_changed = Signal(QModelIndex, str, str)  # Index, Old_Text, New_Text
     value_setted = Signal(QModelIndex, str)  # Index, New_Text
-    edit_closed = Signal(object,object)  # Index
+    edit_closed = Signal(object, object)  # Index
 
 
 class AllowedValuesTableView(ItemViewTool):
@@ -38,19 +38,20 @@ class AllowedValuesTableView(ItemViewTool):
         cls.signals.value_changed.connect(cls.update_code)
         cls.signals.value_setted.connect(cls.set_value)
         cls.signals.edit_closed.connect(cls.editor_closed)
+
     @classmethod
     def connect_view_signals(cls, view: ui.AllowedValuesTable):
         super().connect_view_signals(view)
-        
+
         view.editor_closed.connect(cls.signals.edit_closed.emit)
         delegate: ui.LiveEditDelegate = view.itemDelegateForColumn(0)
         delegate.text_edited.connect(cls.signals.value_changed.emit)
         delegate.text_set.connect(cls.signals.value_setted.emit)
 
     @classmethod
-    def editor_closed(cls,editor:QLineEdit,hints):
+    def editor_closed(cls, editor: QLineEdit, hints):
         if hints == QAbstractItemDelegate.EndEditHint.RevertModelCache:
-            bsdd_data:BsddAllowedValue = editor._bsdd_value
+            bsdd_data: BsddAllowedValue = editor._bsdd_value
             bsdd_data.Code = dict_utils.slugify(bsdd_data.Value)
 
     @classmethod

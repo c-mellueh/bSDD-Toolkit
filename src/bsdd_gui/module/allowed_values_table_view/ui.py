@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class AllowedValuesTable(TableItemView):
-    editor_closed = Signal(QLineEdit,object)
+    editor_closed = Signal(QLineEdit, object)
 
     def __init__(self, *args, bsdd_data=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -25,14 +25,15 @@ class AllowedValuesTable(TableItemView):
         return super().model()
 
     def closeEditor(self, editor, hint):
-        self.editor_closed.emit(editor,hint)
+        self.editor_closed.emit(editor, hint)
         return super().closeEditor(editor, hint)
+
 
 class LiveEditDelegate(QStyledItemDelegate):
 
     text_edited = Signal(QModelIndex, str, str)
     text_set = Signal(QModelIndex, str)
-    
+
     def createEditor(self, parent, option, index):
         source_index = self.parent().model().mapToSource(index)
         bsdd_value = source_index.internalPointer()

@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QComboBox,
     QLineEdit,
-    QSpinBox
+    QSpinBox,
 )
 from typing import Literal, overload
 
@@ -267,9 +267,9 @@ class ComboBoxWithToggleSwitch(ItemWithToggleSwitch):
     def item(self) -> QComboBox:
         return super().item
 
+
 class SpinBoxWithToggleSwitch(ItemWithToggleSwitch):
     def __init__(self, *args, is_enabled=False, **kwargs):
-
 
         spin_box = QSpinBox()
         super().__init__(

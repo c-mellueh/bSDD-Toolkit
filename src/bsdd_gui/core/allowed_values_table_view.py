@@ -47,7 +47,10 @@ def add_columns_to_view(
         prop
     )  # if the widget is enbedded in ui the value needs to be updated on setup
     allowed_values_table.add_column_to_table(
-        model, "Value", lambda av: av.Value, lambda model, index, value: allowed_values_table.set_value( index, value)
+        model,
+        "Value",
+        lambda av: av.Value,
+        lambda model, index, value: allowed_values_table.set_value(index, value),
     )
     allowed_values_table.add_column_to_table(
         model, "Code", lambda av: av.Code, allowed_values_table.set_code
@@ -83,7 +86,7 @@ def connect_view(
     allowed_values_table: Type[tool.AllowedValuesTableView],
     util: Type[tool.Util],
 ):
-    view.setItemDelegateForColumn(0,ui.LiveEditDelegate(parent=view))
+    view.setItemDelegateForColumn(0, ui.LiveEditDelegate(parent=view))
     allowed_values_table.connect_view_signals(view)
     util.add_shortcut(
         "Ctrl+V", view, lambda v=view: allowed_values_table.signals.items_pasted.emit(v)

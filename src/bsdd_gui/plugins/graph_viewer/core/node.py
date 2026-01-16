@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from bsdd_json import BsddClass, BsddProperty
     from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
-from bsdd_json import BsddClass,  BsddClassProperty
+from bsdd_json import BsddClass, BsddClassProperty
 
 
 def connect_signals(
