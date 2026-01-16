@@ -89,61 +89,52 @@ def register_fields(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     util: Type[tool.Util],
 ):
-    # Fill ComboBoxes
-    def setup_combo_box(cb_widget: ComboBoxWithToggleSwitch, values: list[str]):
-
-        cb_widget.item.addItems(values)
-        cb_widget.item.setEditable(True)
-        property_editor.add_validator(
-            widget,
-            cb_widget,
-            lambda v, w,: v in values or not cb_widget.is_active(),
-            lambda w, v: util.set_invalid(w, not v),
-        )
 
     language_iso = list(get_args(LANGUAGE_ISO_CODE))
     country_codes = list(get_args(COUNTRY_CODE))
     document_type = list(get_args(DOCUMENT_TYPE))
 
-    setup_combo_box(widget.cb_country_origin, country_codes)
-    setup_combo_box(widget.cb_creator_iso, language_iso)
-    setup_combo_box(widget.cb_document_ref, document_type)
+    property_editor.setup_combo_box(widget, widget.cb_country_origin, country_codes)
+    property_editor.setup_combo_box(widget, widget.cb_creator_iso, language_iso)
+    property_editor.setup_combo_box(widget, widget.cb_document_ref, document_type)
 
     property_editor.register_basic_field(widget, widget.le_code, "Code")
     property_editor.register_basic_field(widget, widget.le_name, "Name")
-    property_editor.register_basic_field(widget, widget.le_measurement, "MethodOfMeasurement")
-    property_editor.register_basic_field(widget, widget.le_example, "Example")
-    property_editor.register_basic_field(widget, widget.le_text_format, "TextFormat")
-    property_editor.register_basic_field(widget, widget.le_uid, "Uid")
-    property_editor.register_basic_field(widget, widget.le_visual_rep, "VisualRepresentationUri")
-
     property_editor.register_basic_field(widget, widget.te_definition, "Definition")
     property_editor.register_basic_field(widget, widget.te_description, "Description")
-
+    property_editor.register_basic_field(widget, widget.cb_datatype, "DataType")
     property_editor.register_basic_field(widget, widget.ti_units, "Units")
+    property_editor.register_basic_field(widget, widget.le_example, "Example")
+    property_editor.register_basic_field(widget, widget.de_activation_time, "ActivationDateUtc")
     property_editor.register_basic_field(
         widget, widget.ti_connect_properties, "ConnectedPropertyCodes"
     )
     property_editor.register_basic_field(widget, widget.ti_countries, "CountriesOfUse")
+    property_editor.register_basic_field(widget, widget.cb_country_origin, "CountryOfOrigin")
+    property_editor.register_basic_field(widget, widget.cb_creator_iso, "CreatorLanguageIsoCode")
+    property_editor.register_basic_field(widget, widget.de_deactivation_time, "DeActivationDateUtc")
+    property_editor.register_basic_field(
+        widget, widget.le_deprecation_explanation, "DeprecationExplanation"
+    )
+    property_editor.register_basic_field(widget, widget.le_dimension, "Dimension")
+    property_editor.register_basic_field(widget, widget.cb_document_ref, "DocumentReference")
+    property_editor.register_basic_field(widget, widget.le_measurement, "MethodOfMeasurement")
+    property_editor.register_basic_field(widget, widget.le_owned_uri, "OwnedUri")
+
+    property_editor.register_basic_field(widget, widget.cb_value_kind, "PropertyValueKind")
     property_editor.register_basic_field(
         widget, widget.ti_replacing_objects, "ReplacingObjectCodes"
     )
     property_editor.register_basic_field(widget, widget.ti_replaced_objects, "ReplacedObjectCodes")
-    property_editor.register_basic_field(widget, widget.ti_subdivision, "SubdivisionsOfUse")
-
-    property_editor.register_basic_field(widget, widget.cb_datatype, "DataType")
-    property_editor.register_basic_field(widget, widget.cb_value_kind, "PropertyValueKind")
-    property_editor.register_basic_field(widget, widget.cb_status, "Status")
-    property_editor.register_basic_field(widget, widget.cb_country_origin, "CountryOfOrigin")
-    property_editor.register_basic_field(widget, widget.cb_creator_iso, "CreatorLanguageIsoCode")
-    property_editor.register_basic_field(widget, widget.cb_document_ref, "DocumentReference")
-
-    property_editor.register_basic_field(widget, widget.de_activation_time, "ActivationDateUtc")
     property_editor.register_basic_field(widget, widget.de_revision_time, "RevisionDateUtc")
-    property_editor.register_basic_field(widget, widget.de_deactivation_time, "DeActivationDateUtc")
+    property_editor.register_basic_field(widget, widget.sb_revision_number, "RevisionNumber")
+    property_editor.register_basic_field(widget, widget.cb_status, "Status")
+    property_editor.register_basic_field(widget, widget.ti_subdivision, "SubdivisionsOfUse")
+    property_editor.register_basic_field(widget, widget.le_text_format, "TextFormat")
+    property_editor.register_basic_field(widget, widget.le_uid, "Uid")
     property_editor.register_basic_field(widget, widget.de_version_date, "VersionDateUtc")
-
     property_editor.register_basic_field(widget, widget.sb_version_number, "VersionNumber")
+    property_editor.register_basic_field(widget, widget.le_visual_rep, "VisualRepresentationUri")
 
     # Allowed Values Table
 

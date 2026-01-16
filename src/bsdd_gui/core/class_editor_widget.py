@@ -6,7 +6,8 @@ import logging
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
-
+from typing import get_args
+from bsdd_json.type_hints import COUNTRY_CODE, LANGUAGE_ISO_CODE, DOCUMENT_TYPE
 import json
 
 if TYPE_CHECKING:
@@ -60,19 +61,38 @@ def register_fields(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorW
         widget, widget.cb_class_type, lambda e, v: setattr(e, "ClassType", v)
     )
 
-    class_editor.register_field_getter(widget, widget.cb_status, lambda c: c.Status)
-    class_editor.register_field_setter(
-        widget, widget.cb_status, lambda e, v: setattr(e, "Status", v)
-    )
+    language_iso = list(get_args(LANGUAGE_ISO_CODE))
+    country_codes = list(get_args(COUNTRY_CODE))
+    document_type = list(get_args(DOCUMENT_TYPE))
 
-    class_editor.register_field_getter(
-        widget, widget.ti_related_ifc_entity, lambda c: c.RelatedIfcEntityNamesList
+    class_editor.setup_combo_box(widget, widget.cb_country_origin, country_codes)
+    class_editor.setup_combo_box(widget, widget.cb_creator_iso, language_iso)
+    class_editor.setup_combo_box(widget, widget.cb_document_ref, document_type)
+
+
+    class_editor.register_basic_field(widget, widget.ti_related_ifc_entity, "RelatedIfcEntityNamesList")
+    class_editor.register_basic_field(widget, widget.ti_synonyms, "Synonyms")
+    class_editor.register_basic_field(widget, widget.de_activation_time, "ActivationDateUtc")
+    class_editor.register_basic_field(widget, widget.le_reference_code, "ReferenceCode")
+    class_editor.register_basic_field(widget, widget.ti_countries, "CountriesOfUse")
+    class_editor.register_basic_field(widget, widget.cb_country_origin, "CountryOfOrigin")
+    class_editor.register_basic_field(widget, widget.cb_creator_iso, "CreatorLanguageIsoCode")
+    class_editor.register_basic_field(widget, widget.de_deactivation_time, "DeActivationDateUtc")
+    class_editor.register_basic_field(
+        widget, widget.le_deprecation_explanation, "DeprecationExplanation"
     )
-    class_editor.register_field_setter(
-        widget,
-        widget.ti_related_ifc_entity,
-        lambda e, v, w=widget: setattr(e, "RelatedIfcEntityNamesList", v),
-    )
+    class_editor.register_basic_field(widget, widget.cb_document_ref, "DocumentReference")
+    class_editor.register_basic_field(widget, widget.le_owned_uri, "OwnedUri")
+    class_editor.register_basic_field(widget, widget.ti_replacing_objects, "ReplacingObjectCodes")
+    class_editor.register_basic_field(widget, widget.ti_replaced_objects, "ReplacedObjectCodes")
+    class_editor.register_basic_field(widget, widget.de_revision_time, "RevisionDateUtc")
+    class_editor.register_basic_field(widget, widget.sb_revision_number, "RevisionNumber")
+    class_editor.register_basic_field(widget, widget.cb_status, "Status")
+    class_editor.register_basic_field(widget, widget.ti_subdivision, "SubdivisionsOfUse")
+    class_editor.register_basic_field(widget, widget.le_uid, "Uid")
+    class_editor.register_basic_field(widget, widget.de_version_date, "VersionDateUtc")
+    class_editor.register_basic_field(widget, widget.sb_version_number, "VersionNumber")
+    class_editor.register_basic_field(widget, widget.le_visual_rep, "VisualRepresentationUri")
 
 
 def register_validators(
@@ -130,7 +150,7 @@ def create_new_class(
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],
 ):
-    new_text = QCoreApplication.translate("ClassEditor","New")
+    new_text = QCoreApplication.translate("ClassEditor", "New")
     new_class = BsddClass(Code=new_text, Name=new_text, ClassType="Class")
     new_class.ParentClassCode = parent.Code if parent is not None else None
     dialog = class_editor.create_dialog(new_class, main_window.get())

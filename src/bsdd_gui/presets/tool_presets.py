@@ -66,6 +66,7 @@ from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSign
 from .models_presets import ItemModel
 import datetime
 import re
+from .ui_presets import ComboBoxWithToggleSwitch
 
 BsddDataType: TypeAlias = BsddClass | BsddProperty | BsddDictionary | BsddClassProperty
 
@@ -352,13 +353,15 @@ class FieldTool(WidgetTool):
         super().connect_internal_signals()
 
     @classmethod
-    def register_basic_field(cls, widget: FieldWidget, field: QWidget, variable_name: str):
+    def register_basic_field(cls, widget: FieldWidget, field: QWidget, variable_name: str,nosync = False):
         cls.register_field_getter(widget, field, lambda e, vn=variable_name: getattr(e, vn))
         cls.register_field_setter(
             widget,
             field,
             lambda e, v, vn=variable_name: setattr(e, vn, v if v is not None else None),
         )
+        if nosync:
+            return
         if hasattr(widget, "bsdd_data"):
             cls.sync_from_model(widget, widget.bsdd_data, explicit_field=field)
         else:
@@ -611,6 +614,18 @@ class FieldTool(WidgetTool):
                 is_valid = validator_function(value, widget)
                 result_function(f, is_valid)
 
+
+    @classmethod
+    def setup_combo_box(cls,widget,cb_widget: ComboBoxWithToggleSwitch, values: list[str]):
+        from bsdd_gui.tool.util import Util as util
+        cb_widget.item.addItems(values)
+        cb_widget.item.setEditable(True)
+        cls.add_validator(
+            widget,
+            cb_widget,
+            lambda v, w,: v in values or not cb_widget.is_active(),
+            lambda w, v: util.set_invalid(w, not v),
+        )
 
 class DialogTool(FieldTool):
     """Preset for dialog-based (non-live) editing.

@@ -25,6 +25,8 @@ from bsdd_gui import tool
 from bsdd_gui.module.util import ui
 from bsdd_gui.module.util.constants import OPTION_SEPERATOR
 from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
+from bsdd_gui.presets.ui_presets import ComboBoxWithToggleSwitch
+from bsdd_gui.presets.tool_presets import FieldTool
 
 
 if TYPE_CHECKING:
@@ -473,3 +475,4 @@ class Util:
         cls.get_properties().waiting_thread = waiting_thread
         cls.get_properties().waiting_widget = waiting_widget
         return waiting_worker, waiting_thread, waiting_widget
+
