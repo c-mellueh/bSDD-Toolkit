@@ -108,7 +108,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="IfcTagInput" name="ti_synonyms" native="true"/>
+           <widget class="TagInput" name="ti_synonyms" native="true"/>
           </item>
          </layout>
         </widget>

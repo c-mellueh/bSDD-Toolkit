@@ -308,12 +308,16 @@ class TagInput(QWidget):
     def tags(self) -> list[str]:
         return list(self._tags)
 
-    def setTags(self, tags: Iterable[str]) -> None:
+    def setTags(self, tags: list[str]) -> None:
         for t in list(self._tags):
-            self._remove_tag(t, emit_signal=False)
+            if t not in tags:
+                self._remove_tag(t, emit_signal=False)
+            else:
+                tags.remove(t)
         for t in tags:
             self._add_tag(str(t), emit_signal=False)
-        self.tagsChanged.emit(self.tags())
+        if tags:
+            self.tagsChanged.emit(self.tags())
 
     def clear(self) -> None:
         self.setTags([])
