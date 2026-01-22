@@ -29,7 +29,7 @@ def create_widget():
 
 def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
-    core.register_fields(widget, tool.IdsExporter, tool.Appdata, tool.Util)
+    core.register_fields(widget, tool.IdsExporter)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
     core.connect_widget(widget, tool.IdsExporter, tool.IdsClassView, tool.MainWindowWidget)
 

@@ -1,18 +1,12 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication, QModelIndex, QThread, QObject, Signal, Slot, Qt, QTimer
-from typing import TYPE_CHECKING, Type, Literal
-from bsdd_json.utils import property_utils as prop_utils
+from PySide6.QtCore import QCoreApplication, QModelIndex, QTimer
+from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.ids_exporter import constants
 import json
 import re
-from ifctester.facet import Property as PropertyFacet
-from ifctester.facet import Entity as EntityFacet
-from ifctester.facet import Classification as ClassificationFacet
-from ifctester.facet import Restriction
-from ifctester.ids import Specification
-from bsdd_gui.resources import icons
 import qtawesome as qta
 from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
+import logging
 
 import datetime
 
@@ -92,21 +86,43 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
 def register_fields(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    appdata: Type[tool.Appdata],
-    util: Type[tool.Util],
 ):
-    def _getter(name, data_type: Literal["string", "list", "bool"] = "string"):
-        if data_type == "string":
-            return appdata.get_string_setting("ids", name)
-        elif data_type == "list":
-            return appdata.get_list_setting("ids", name)
-        elif data_type == "bool":
-            return appdata.get_bool_setting("ids", name)
 
-    def _setter(name, value):
-        appdata.set_setting("ids", name, value)
+    widget_tool.register_appdata_field(widget, widget.cb_clsf, "ids", "classif", "bool")
+    widget_tool.register_appdata_field(widget, widget.cb_type_objects, "ids", "type_obj", "bool")
+    widget_tool.register_appdata_field(widget, widget.cb_inh, "ids", "inherit", "bool")
+    widget_tool.register_appdata_field(widget, widget.le_title, "ids", "title", "string")
+    widget_tool.register_appdata_field(widget, widget.le_desc, "ids", "desc", "string")
+    widget_tool.register_appdata_field(widget, widget.le_author, "ids", "author", "string")
+    widget_tool.register_appdata_field(widget, widget.le_miles, "ids", "milestone", "string")
+    widget_tool.register_appdata_field(widget, widget.le_purpose, "ids", "purpose", "string")
+    widget_tool.register_appdata_field(widget, widget.le_version, "ids", "version", "string")
+    widget_tool.register_appdata_field(widget, widget.le_copyr, "ids", "copyright", "string")
+    widget_tool.register_appdata_field(widget, widget.ti_ifc_vers, "ids", "ifc", "list")
+    widget_tool.register_appdata_field(widget, widget.dt_date, "ids", "date", "string")
+    widget_tool.register_appdata_field(widget, widget.cb_datatype, "ids", "datatype", "string")
 
-    def _is_not_empty(value, widget):
+    widget_tool.register_appdata_field(
+        widget, widget.cb_string, "ids", "string", "string", "IFCTEXT"
+    )
+    widget_tool.register_appdata_field(
+        widget, widget.cb_boolean, "ids", "le_boolean", "string", "IFCBOOLEAN"
+    )
+    widget_tool.register_appdata_field(
+        widget, widget.cb_integer, "ids", "integer", "string", "IFCINTEGER"
+    )
+    widget_tool.register_appdata_field(widget, widget.cb_real, "ids", "real", "string", "IFCREAL")
+    widget_tool.register_appdata_field(
+        widget, widget.cb_character, "ids", "character", "string", "IFCLABEL"
+    )
+    widget_tool.register_appdata_field(
+        widget, widget.cb_time, "ids", "time", "string", "IFCDATETIME"
+    )
+    widget_tool.sync_from_model(widget, widget.bsdd_data)
+
+
+def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
+    def _is_not_empty(value, _):
         if value is None:
             return False
         if isinstance(value, datetime.datetime):
@@ -115,97 +131,21 @@ def register_fields(
             return bool(value)
         return bool(value.strip())
 
-    def _check_mail(value, widet):
-        if not _is_not_empty(value, widet):
+    def _check_mail(value, widget):
+        if not _is_not_empty(value, widget):
             return False
         return bool(re.match(r"[^@]+@[^\.]+\..+", value))
 
-    # Check for Classification
-    widget_tool.register_field_getter(widget, widget.cb_clsf, lambda _: _getter("classif", "bool"))
-    widget_tool.register_field_setter(widget, widget.cb_clsf, lambda _, v: _setter("classif", v))
-    widget_tool.register_field_listener(widget, widget.cb_clsf)
-
-    # Check IfcTypeObjects
-    widget_tool.register_field_getter(
-        widget, widget.cb_type_objects, lambda _: _getter("type_obj", "bool")
-    )
-    widget_tool.register_field_setter(
-        widget, widget.cb_type_objects, lambda _, v: _setter("type_obj", v)
-    )
-    widget_tool.register_field_listener(widget, widget.cb_type_objects)
-
-    # Inherit to Subclasses
-    widget_tool.register_field_getter(widget, widget.cb_inh, lambda _: _getter("inherit", "bool"))
-    widget_tool.register_field_setter(widget, widget.cb_inh, lambda _, v: _setter("inherit", v))
-    widget_tool.register_field_listener(widget, widget.cb_inh)
-
-    # Title
-    widget_tool.register_field_getter(widget, widget.le_title, lambda _: _getter("title"))
-    widget_tool.register_field_setter(widget, widget.le_title, lambda _, v: _setter("title", v))
-    widget_tool.register_field_listener(widget, widget.le_title)
     widget_tool.add_validator(widget, widget.le_title, _is_not_empty, util.set_valid)
-
-    # Description
-    widget_tool.register_field_getter(widget, widget.le_desc, lambda _: _getter("desc"))
-    widget_tool.register_field_setter(widget, widget.le_desc, lambda _, v: _setter("desc", v))
-    widget_tool.register_field_listener(widget, widget.le_desc)
     widget_tool.add_validator(widget, widget.le_desc, _is_not_empty, util.set_valid)
-
-    # Author
-    widget_tool.register_field_getter(widget, widget.le_author, lambda _: _getter("author"))
-    widget_tool.register_field_setter(widget, widget.le_author, lambda _, v: _setter("author", v))
-    widget_tool.register_field_listener(widget, widget.le_author)
     widget_tool.add_validator(widget, widget.le_author, _check_mail, util.set_valid)
-
-    # Milestone
-    widget_tool.register_field_getter(widget, widget.le_miles, lambda _: _getter("milestone"))
-    widget_tool.register_field_setter(widget, widget.le_miles, lambda _, v: _setter("milestone", v))
-    widget_tool.register_field_listener(widget, widget.le_miles)
     widget_tool.add_validator(widget, widget.le_miles, _is_not_empty, util.set_valid)
-
-    # Purpose
-    widget_tool.register_field_getter(widget, widget.le_purpose, lambda _: _getter("purpose"))
-    widget_tool.register_field_setter(widget, widget.le_purpose, lambda _, v: _setter("purpose", v))
-    widget_tool.register_field_listener(widget, widget.le_purpose)
     widget_tool.add_validator(widget, widget.le_purpose, _is_not_empty, util.set_valid)
-
-    # Version
-    widget_tool.register_field_getter(widget, widget.le_version, lambda _: _getter("version"))
-    widget_tool.register_field_setter(widget, widget.le_version, lambda _, v: _setter("version", v))
-    widget_tool.register_field_listener(widget, widget.le_version)
     widget_tool.add_validator(widget, widget.le_version, _is_not_empty, util.set_valid)
-
-    # Copyright
-    widget_tool.register_field_getter(widget, widget.le_copyr, lambda _: _getter("copyright"))
-    widget_tool.register_field_setter(widget, widget.le_copyr, lambda _, v: _setter("copyright", v))
-    widget_tool.register_field_listener(widget, widget.le_copyr)
     widget_tool.add_validator(widget, widget.le_copyr, _is_not_empty, util.set_valid)
-
-    # Ifc-Version
-    widget_tool.register_field_getter(widget, widget.ti_ifc_vers, lambda _: _getter("ifc", "list"))
-    widget_tool.register_field_setter(widget, widget.ti_ifc_vers, lambda _, v: _setter("ifc", v))
-    widget_tool.register_field_listener(widget, widget.ti_ifc_vers)
     widget_tool.add_validator(widget, widget.ti_ifc_vers, _is_not_empty, util.set_valid)
-
-    # Date
-    widget_tool.register_field_getter(widget, widget.dt_date, lambda _: _getter("date"))
-    widget_tool.register_field_setter(widget, widget.dt_date, lambda _, v: _setter("date", v))
-    widget_tool.register_field_listener(widget, widget.dt_date)
     widget_tool.add_validator(widget, widget.dt_date, _is_not_empty, util.set_valid)
-
-    # Datatype
-    widget_tool.register_field_getter(widget, widget.cb_datatype, lambda _: _getter("datatype"))
-    widget_tool.register_field_setter(
-        widget, widget.cb_datatype, lambda _, v: _setter("datatype", v)
-    )
-    widget_tool.register_field_listener(widget, widget.cb_datatype)
     widget_tool.add_validator(widget, widget.cb_datatype, _is_not_empty, util.set_valid)
-
-    widget_tool.sync_from_model(widget, widget.bsdd_data)
-
-
-def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
-    pass
 
 
 def connect_widget(
@@ -390,13 +330,13 @@ def export_ids(
     waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
     waiting_widget.set_title("Load Data")
 
-    setup_worker, setup_thread = widget_tool.create_export_setup_thread(
+    setup_worker, setup_thread = widget_tool.create_setup_thread(
         widget, class_settings, property_settings, base_settings, metadata_settings
     )
 
     def _start_specification(payload: PayLoadDict):
         waiting_widget.set_title("Build IDS")
-
+        logging.info("Create Specification")
         create_worker, creator_thread, creator_dialog = widget_tool.create_build_thread(
             payload, waiting_widget
         )
@@ -411,6 +351,9 @@ def export_ids(
         QTimer.singleShot(0, widget, lambda: _start_specification(payload))
 
     def _export(ids: Ids, out_path: str):
+        logging.info("Creation Done!")
+        logging.info("Start Export!")
+
         write_worker, write_thread = widget_tool.create_write_thread(ids, out_path)
         waiting_widget.set_title("Write IDS")
         write_thread.finished.connect(
@@ -421,6 +364,7 @@ def export_ids(
                 parent=widget,
             )
         )
+        logging.info("Export Done!")
         write_thread.finished.connect(lambda: stop_waiting_widget(waiting_worker))
         write_thread.start()
 

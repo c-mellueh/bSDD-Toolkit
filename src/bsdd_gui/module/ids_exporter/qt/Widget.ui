@@ -25,179 +25,42 @@
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
      </property>
+     <property name="handleWidth">
+      <number>6</number>
+     </property>
      <widget class="ClassView" name="tv_classes"/>
      <widget class="PropertyView" name="tv_properties"/>
      <widget class="QWidget" name="widget" native="true">
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
        <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
         <number>0</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
-        <widget class="QFrame" name="main_settings">
-         <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="1" column="1">
-           <widget class="ToggleSwitch" name="cb_inh">
-            <property name="layoutDirection">
-             <enum>Qt::LayoutDirection::LeftToRight</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>**Settings**</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::TextFormat::MarkdownText</enum>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="ToggleSwitch" name="cb_clsf">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::LayoutDirection::LeftToRight</enum>
-            </property>
-            <property name="text">
-             <string>CheckBox</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QWidget" name="widget_prop" native="true">
-            <layout class="QGridLayout" name="gridLayout_3">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="cb_prop"/>
-             </item>
-             <item row="0" column="0">
-              <widget class="QComboBox" name="cb_pset">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="sizeAdjustPolicy">
-                <enum>QComboBox::SizeAdjustPolicy::AdjustToMinimumContentsLengthWithIcon</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QComboBox" name="cb_datatype">
-               <item>
-                <property name="text">
-                 <string>IfcLabel</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>IfcText</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>Datatype:</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_classification">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Check for Classification</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Inherit Checkstates</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Check IfcTypeObjects</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="ToggleSwitch" name="cb_type_objects">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QScrollArea" name="scrollArea">
-         <property name="autoFillBackground">
-          <bool>true</bool>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
-         </property>
-         <property name="lineWidth">
-          <number>0</number>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-         </property>
+        <widget class="QScrollArea" name="scrollArea_2">
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
+         <widget class="QWidget" name="scrollAreaWidgetContents_3">
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>406</width>
-            <height>591</height>
+            <y>-109</y>
+            <width>450</width>
+            <height>880</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="spacing">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -212,6 +75,140 @@
             <number>0</number>
            </property>
            <item>
+            <widget class="QFrame" name="main_settings">
+             <property name="frameShape">
+              <enum>QFrame::Shape::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Shadow::Raised</enum>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="3" column="1">
+               <widget class="ToggleSwitch" name="cb_clsf">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LayoutDirection::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>CheckBox</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0" colspan="2">
+               <widget class="QWidget" name="widget_prop" native="true">
+                <layout class="QGridLayout" name="gridLayout_3">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="cb_prop"/>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QComboBox" name="cb_pset">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QComboBox::SizeAdjustPolicy::AdjustToMinimumContentsLengthWithIcon</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QComboBox" name="cb_datatype">
+                   <item>
+                    <property name="text">
+                     <string>IfcLabel</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>IfcText</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>Datatype:</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_classification">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Check for Classification</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_15">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Check IfcTypeObjects</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="ToggleSwitch" name="cb_inh">
+                <property name="layoutDirection">
+                 <enum>Qt::LayoutDirection::LeftToRight</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Inherit Checkstates</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="ToggleSwitch" name="cb_type_objects">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>**Settings**</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::TextFormat::MarkdownText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QFrame" name="ids_settings">
              <property name="autoFillBackground">
               <bool>false</bool>
@@ -223,13 +220,13 @@
               <enum>QFrame::Shadow::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="5" column="0">
-               <widget class="QLineEdit" name="le_desc"/>
+              <item row="15" column="0">
+               <widget class="QLineEdit" name="le_version"/>
               </item>
-              <item row="14" column="0">
-               <widget class="QLabel" name="label_10">
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_6">
                 <property name="text">
-                 <string>Version</string>
+                 <string>Author</string>
                 </property>
                </widget>
               </item>
@@ -240,13 +237,43 @@
                 </property>
                </widget>
               </item>
-              <item row="11" column="0">
-               <widget class="DateTimeWithNow" name="dt_date" native="true"/>
-              </item>
-              <item row="6" column="0">
-               <widget class="QLabel" name="label_6">
+              <item row="18" column="0">
+               <widget class="QLabel" name="label_12">
                 <property name="text">
-                 <string>Author</string>
+                 <string>IFC-Versions</string>
+                </property>
+               </widget>
+              </item>
+              <item row="16" column="0">
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>Copyright</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLineEdit" name="le_desc"/>
+              </item>
+              <item row="17" column="0">
+               <widget class="QLineEdit" name="le_copyr"/>
+              </item>
+              <item row="12" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Purpose</string>
+                </property>
+               </widget>
+              </item>
+              <item row="19" column="0">
+               <widget class="TagInput_IfcVersion" name="ti_ifc_vers" native="true"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLineEdit" name="le_title"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Title</string>
                 </property>
                </widget>
               </item>
@@ -263,48 +290,8 @@
                 </property>
                </spacer>
               </item>
-              <item row="8" column="0">
-               <widget class="QLabel" name="label_7">
-                <property name="text">
-                 <string>Milestone</string>
-                </property>
-               </widget>
-              </item>
-              <item row="16" column="0">
-               <widget class="QLabel" name="label_11">
-                <property name="text">
-                 <string>Copyright</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_4">
-                <property name="text">
-                 <string>Title</string>
-                </property>
-               </widget>
-              </item>
               <item row="7" column="0">
                <widget class="QLineEdit" name="le_author"/>
-              </item>
-              <item row="12" column="0">
-               <widget class="QLabel" name="label_9">
-                <property name="text">
-                 <string>Purpose</string>
-                </property>
-               </widget>
-              </item>
-              <item row="19" column="0">
-               <widget class="TagInput_IfcVersion" name="ti_ifc_vers" native="true"/>
-              </item>
-              <item row="17" column="0">
-               <widget class="QLineEdit" name="le_copyr"/>
-              </item>
-              <item row="9" column="0">
-               <widget class="QLineEdit" name="le_miles"/>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLineEdit" name="le_title"/>
               </item>
               <item row="4" column="0">
                <widget class="QLabel" name="label_5">
@@ -313,16 +300,26 @@
                 </property>
                </widget>
               </item>
+              <item row="9" column="0">
+               <widget class="QLineEdit" name="le_miles"/>
+              </item>
               <item row="13" column="0">
                <widget class="QLineEdit" name="le_purpose"/>
               </item>
-              <item row="15" column="0">
-               <widget class="QLineEdit" name="le_version"/>
+              <item row="11" column="0">
+               <widget class="DateTimeWithNow" name="dt_date" native="true"/>
               </item>
-              <item row="18" column="0">
-               <widget class="QLabel" name="label_12">
+              <item row="14" column="0">
+               <widget class="QLabel" name="label_10">
                 <property name="text">
-                 <string>IFC-Versions</string>
+                 <string>Version</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Milestone</string>
                 </property>
                </widget>
               </item>
@@ -337,6 +334,137 @@
                 <property name="alignment">
                  <set>Qt::AlignmentFlag::AlignCenter</set>
                 </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame">
+             <property name="frameShape">
+              <enum>QFrame::Shape::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Shadow::Raised</enum>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_17">
+                <property name="text">
+                 <string>String</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>**Datatype Mapping**</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::TextFormat::MarkdownText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_18">
+                <property name="text">
+                 <string>Boolean</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_20">
+                <property name="text">
+                 <string>Real</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_21">
+                <property name="text">
+                 <string>Character</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_19">
+                <property name="text">
+                 <string>Integer</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_22">
+                <property name="text">
+                 <string>Time</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="cb_string">
+                <item>
+                 <property name="text">
+                  <string>IFCTEXT</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>IFCLABEL</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="cb_boolean">
+                <item>
+                 <property name="text">
+                  <string>IFCBOOLEAN</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="cb_integer">
+                <item>
+                 <property name="text">
+                  <string>IFCINTEGER</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QComboBox" name="cb_real">
+                <item>
+                 <property name="text">
+                  <string>IFCREAL</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QComboBox" name="cb_character">
+                <item>
+                 <property name="text">
+                  <string>IFCTEXT</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>IFCLABEL</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QComboBox" name="cb_time">
+                <item>
+                 <property name="text">
+                  <string>IFCDATETIME</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>

@@ -354,3 +354,17 @@ def build_dummy_class(class_uri: str) -> BsddClass:
         Name=class_uri,
         OwnedUri=class_uri,
     )
+
+
+def get_class_property_by_name(
+    bsdd_class: BsddClass, name: str, pset: str = None, bsdd_dict: BsddDictionary = None
+):
+    from . import property_utils as prop_utils
+
+    bsdd_dict = bsdd_class.parent() if not bsdd_dict else bsdd_dict
+    for cp in bsdd_class.ClassProperties:
+        property_name = prop_utils.get_name(cp, bsdd_dict)
+        if property_name == name:
+            if not pset or pset == cp.PropertySet:
+                return cp
+    return cp

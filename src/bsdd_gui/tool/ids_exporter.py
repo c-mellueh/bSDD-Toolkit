@@ -44,6 +44,15 @@ class SettingsDict(TypedDict):
     ids_metadata: MetadataDict
 
 
+class DatatypeMappingDict(TypedDict):
+    string: Literal["IFCLABEL", "IFCTEXT"]
+    boolean: Literal["IFCBOOLEAN"]
+    integer: Literal["IFCINTERGER"]
+    real: Literal["IFCREAL"]
+    character: Literal["IFCLABEL", "IFCTEXT"]
+    time: Literal["IFCDATETIME"]
+
+
 class BasicSettingsDict(TypedDict):
     inherit: bool
     classification: bool
@@ -51,6 +60,7 @@ class BasicSettingsDict(TypedDict):
     main_pset: str
     main_property: str
     datatype: Literal["IfcLabel", "IfcText"]
+    datatype_mapping: DatatypeMappingDict
 
 
 class PayLoadDict(TypedDict):
@@ -163,15 +173,20 @@ class IdsExporter(ActionTool, FieldTool):
     # Copyright (c) 2024 BIM-Tools
     # Licensed under the MIT License
     @classmethod
-    def get_data_type(cls, dataType, propertyUri):
+    def get_data_type(cls, dataType: str, propertyUri: str, datatype_mapping: DatatypeMappingDict):
         if propertyUri in constants.PROPERTY_DATATYPE_MAPPING:
             return constants.PROPERTY_DATATYPE_MAPPING[propertyUri]
-        return constants.DATATYPE_MAPPING.get(dataType, "IFCLABEL")
+        return datatype_mapping.get(dataType, "IFCTEXT")
 
     # Copyright (c) 2024 BIM-Tools
     # Licensed under the MIT License
     @classmethod
-    def add_property_facet(cls, bsdd_property: BsddClassProperty, bsdd_dictionary):
+    def add_property_facet(
+        cls,
+        bsdd_property: BsddClassProperty,
+        bsdd_dictionary,
+        datatype_mapping: DatatypeMappingDict,
+    ):
 
         value = None
         pattern = bsdd_property.Pattern
@@ -186,15 +201,16 @@ class IdsExporter(ActionTool, FieldTool):
             )
         elif predefined_value:
             value = predefined_value
-
+        cardinality = "required" if bsdd_property.IsRequired else "optional" 
         property_facet = PropertyFacet(
             bsdd_property.PropertySet,
             prop_utils.get_name(bsdd_property, bsdd_dictionary),
             value,
             cls.get_data_type(
-                prop_utils.get_data_type(bsdd_property), bsdd_property.PropertyUri
+                prop_utils.get_data_type(bsdd_property), bsdd_property.PropertyUri, datatype_mapping
             ).upper(),
             bsdd_property.PropertyUri,
+            cardinality=cardinality 
         )
         return property_facet
 
@@ -341,7 +357,19 @@ class IdsExporter(ActionTool, FieldTool):
         widget.cb_prop.addItems(sorted(prop_names, key=prop_names.get, reverse=True))
 
     @classmethod
+    def get_datatype_mapping(cls, widget: ui.IdsWidget) -> DatatypeMappingDict:
+        return {
+            "boolean": widget.cb_boolean.currentText(),
+            "string": widget.cb_string.currentText(),
+            "integer": widget.cb_integer.currentText(),
+            "real": widget.cb_real.currentText(),
+            "character": widget.cb_character.currentText(),
+            "time": widget.cb_time.currentText(),
+        }
+
+    @classmethod
     def get_settings(cls, widget: ui.IdsWidget) -> BasicSettingsDict:
+
         settings_dict = {
             "inherit": widget.cb_inh.isChecked(),
             "classification": widget.cb_clsf.isChecked(),
@@ -349,6 +377,7 @@ class IdsExporter(ActionTool, FieldTool):
             "main_pset": widget.cb_pset.currentText(),
             "main_property": widget.cb_prop.currentText(),
             "datatype": widget.cb_datatype.currentText(),
+            "datatype_mapping": cls.get_datatype_mapping(widget),
         }
         return settings_dict
 
@@ -386,7 +415,7 @@ class IdsExporter(ActionTool, FieldTool):
         widget.ti_ifc_vers.setTags(ifc_versions)
 
     @classmethod
-    def set_settings(cls, widget: ui.IdsWidget, settings_dict: dict):
+    def set_settings(cls, widget: ui.IdsWidget, settings_dict: BasicSettingsDict):
         inherit = settings_dict.get("inherit")
         classification = settings_dict.get("classification")
         pset = settings_dict.get("main_pset")
@@ -401,6 +430,17 @@ class IdsExporter(ActionTool, FieldTool):
         if prop is not None:
             widget.cb_prop.setCurrentText(prop)
 
+        cls.set_datatype_mapping(widget, settings_dict.get("datatype_mapping", {}))
+
+    @classmethod
+    def set_datatype_mapping(cls, widget: ui.IdsWidget, settings: DatatypeMappingDict):
+        widget.cb_boolean.setCurrentText(settings.get("boolean", "IFCBOOLEAN"))
+        widget.cb_string.setCurrentText(settings.get("string", "IFCTEXT"))
+        widget.cb_integer.setCurrentText(settings.get("integer", "IFCINTEGER"))
+        widget.cb_real.setCurrentText(settings.get("real", "IFCREAL"))
+        widget.cb_character.setCurrentText(settings.get("character", "IFCTEXT"))
+        widget.cb_time.setCurrentText(settings.get("time", "IFCDATETIME"))
+
     @classmethod
     def build_classification_facet(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
 
@@ -412,14 +452,121 @@ class IdsExporter(ActionTool, FieldTool):
         )
 
     @classmethod
-    def build_main_property_facet(cls, bsdd_class: BsddClass, base_settings: BasicSettingsDict):
-        return PropertyFacet(
-            base_settings.get("main_pset"),
-            base_settings.get("main_property"),
-            bsdd_class.Code,
-            base_settings.get("datatype"),
-            cardinality="optional",
+    def get_identifiers_by_class(
+        cls, bsdd_class: BsddClass, main_prop: str, main_pset: str, bsdd_dict: BsddDictionary
+    ):
+
+        class_property = class_utils.get_class_property_by_name(
+            bsdd_class, main_prop, main_pset, bsdd_dict
         )
+        count = len(class_property.AllowedValues or []) if class_property else 0
+        if count < 0:
+            value = [bsdd_class.Code]
+        elif count == 1:
+            value = [class_property.AllowedValues[0].Value]
+        else:
+            value = [v.Value for v in class_property.AllowedValues]
+
+        return value
+
+    @classmethod
+    def _run_setup(
+        cls,
+        widget: ui.IdsWidget,
+        class_settings: dict[str, bool],
+        property_settings: PsetDict,
+        base_settings: BasicSettingsDict,
+        metadata_settings: MetadataDict,
+    ) -> PayLoadDict:
+        out_path = widget.fw_output.get_path()
+        template_path = cls.get_template()
+        ifc_version = metadata_settings.get("ifc_versions", ["IFC4X3_ADD2"])
+        bsdd_dict = widget.bsdd_data
+        ids = ifctester.ids.open(template_path)
+        base_spec = ids.specifications[0]
+        if base_settings.get("classification", False):
+            ids.specifications = list()
+        else:
+            mp = base_settings.get("main_property", "")
+            mps = base_settings.get("main_pset", "")
+            base_requirement: PropertyFacet = base_spec.requirements[0]
+            base_requirement.propertySet = mps
+            base_requirement.baseName = mp
+            base_restriction = base_requirement.value
+
+            identifiers = set()
+            for bsdd_class in bsdd_dict.Classes:
+
+                for identifier in cls.get_identifiers_by_class(bsdd_class, mp, mps, bsdd_dict):
+                    identifiers.add(identifier)
+
+            base_restriction.options = {"enumeration": sorted(identifiers)}
+            base_requirement.dataType = base_settings.get("datatype")
+            base_spec.ifcVersion = ifc_version
+
+        cls.fill_ids_by_metadata(ids, metadata_settings)
+        if base_settings["inherit"]:
+            cs = cls.build_inherited_checkstate_dict(bsdd_dict.Classes, class_settings)
+        else:
+            cs = class_settings
+
+        sorted_classes = sorted(bsdd_dict.Classes, key=lambda x: x.Code)
+        payload: PayLoadDict = {
+            "ids": ids,
+            "sorted_classes": sorted_classes,
+            "base_settings": base_settings,
+            "class_settings": cs,
+            "property_settings": property_settings,
+            "bsdd_dict": bsdd_dict,
+            "ifc_version": ifc_version,
+            "out_path": out_path,
+        }
+        return payload
+
+    @classmethod
+    def create_setup_thread(
+        cls,
+        widget: ui.IdsWidget,
+        class_settings: dict[str, bool],
+        property_settings: PsetDict,
+        base_settings: BasicSettingsDict,
+        metadata_settings: MetadataDict,
+    ):
+        class _SetupWorker(QObject):
+            finished = Signal(object)
+            error = Signal(object)
+
+            def __init__(self):
+                super().__init__()
+
+            def run(self):
+                try:
+                    payload = cls._run_setup(
+                        widget,
+                        class_settings,
+                        property_settings,
+                        base_settings,
+                        metadata_settings,
+                    )
+                    self.finished.emit(payload)
+
+                except Exception as exc:  # pragma: no cover - pass through
+                    self.error.emit(exc)
+
+        setup_worker = _SetupWorker()
+        cls.get_properties().setup_worker = setup_worker
+        setup_thread = QThread()
+
+        cls.get_properties().setup_thread = setup_thread
+
+        setup_worker.moveToThread(setup_thread)
+        setup_worker.finished.connect(setup_thread.quit)
+        setup_worker.finished.connect(setup_worker.deleteLater)
+        setup_worker.error.connect(setup_thread.quit)
+        setup_worker.error.connect(setup_worker.deleteLater)
+        setup_thread.finished.connect(setup_thread.deleteLater)
+        setup_thread.started.connect(setup_worker.run, Qt.ConnectionType.QueuedConnection)
+        return setup_worker, setup_thread
 
     @classmethod
     def create_build_thread(
@@ -428,10 +575,27 @@ class IdsExporter(ActionTool, FieldTool):
         parent: QWidget,
     ):
         """
-        [Unverified] Wraps the outer loop in a worker thread with progress embedded in the UI.
+        Wraps the outer loop in a worker thread with progress embedded in the UI.
         """
 
+        def _build_main_property_facet(
+            bsdd_class: BsddClass, base_settings: BasicSettingsDict, bsdd_dict: BsddDictionary
+        ):
+            main_prop = base_settings.get("main_property")
+            main_pset = base_settings.get("main_pset")
+            value = cls.get_identifiers_by_class(bsdd_class, main_prop, main_pset, bsdd_dict)
+            if len(value) == 1:
+                value = value[0]
+            return PropertyFacet(
+                main_pset,
+                main_prop,
+                value,
+                base_settings.get("datatype"),
+                cardinality="optional",
+            )
+
         def _process_bsdd_class(bsdd_class: BsddClass, idx: int):
+            logging.info(f"Process {bsdd_class.Name} [{bsdd_class.Code}]")
             if not class_settings.get(bsdd_class.Code, True):
                 return
 
@@ -444,7 +608,9 @@ class IdsExporter(ActionTool, FieldTool):
             if base_settings.get("classification", False):
                 applicability_facet = cls.build_classification_facet(bsdd_class, bsdd_dict)
             else:
-                applicability_facet = cls.build_main_property_facet(bsdd_class, base_settings)
+                applicability_facet = _build_main_property_facet(
+                    bsdd_class, base_settings, bsdd_dict
+                )
             spec.applicability.append(applicability_facet)
             for class_prop in bsdd_class.ClassProperties:
                 if not cls.is_class_prop_active(
@@ -452,7 +618,9 @@ class IdsExporter(ActionTool, FieldTool):
                 ):
                     continue
 
-                facet = cls.add_property_facet(class_prop, bsdd_dict)
+                facet = cls.add_property_facet(
+                    class_prop, bsdd_dict, base_settings["datatype_mapping"]
+                )
                 if facet:
                     spec.requirements.append(facet)
 
@@ -499,78 +667,6 @@ class IdsExporter(ActionTool, FieldTool):
         ids.info["purpose"] = metadata.get("purpose", ids.info.get("purpose"))
         ids.info["version"] = metadata.get("version", ids.info.get("version"))
         ids.info["copyright"] = metadata.get("copyright", ids.info.get("copyright"))
-
-    @classmethod
-    def create_export_setup_thread(
-        cls,
-        widget: ui.IdsWidget,
-        class_settings: dict[str, bool],
-        property_settings: PsetDict,
-        base_settings: BasicSettingsDict,
-        metadata_settings: MetadataDict,
-    ):
-        class _SetupWorker(QObject):
-            finished = Signal(object)
-            error = Signal(object)
-
-            def __init__(self):
-                super().__init__()
-
-            def run(self):
-                try:
-                    out_path = widget.fw_output.get_path()
-                    template_path = cls.get_template()
-                    ifc_version = metadata_settings.get("ifc_versions", ["IFC4X3_ADD2"])
-                    bsdd_dict = widget.bsdd_data
-                    ids = ifctester.ids.open(template_path)
-                    base_spec = ids.specifications[0]
-                    if base_settings.get("classification", False):
-                        ids.specifications = list()
-                    else:
-                        base_requirement: PropertyFacet = base_spec.requirements[0]
-                        base_requirement.propertySet = base_settings.get("main_pset", "")
-                        base_requirement.baseName = base_settings.get("main_property", "")
-                        base_restriction = base_requirement.value
-                        base_restriction.options = {
-                            "enumeration": [c.Code for c in bsdd_dict.Classes]
-                        }
-                        base_spec.ifcVersion = ifc_version
-
-                    cls.fill_ids_by_metadata(ids, metadata_settings)
-                    if base_settings["inherit"]:
-                        cs = cls.build_inherited_checkstate_dict(bsdd_dict.Classes, class_settings)
-                    else:
-                        cs = class_settings
-
-                    sorted_classes = sorted(bsdd_dict.Classes, key=lambda x: x.Code)
-                    payload: PayLoadDict = {
-                        "ids": ids,
-                        "sorted_classes": sorted_classes,
-                        "base_settings": base_settings,
-                        "class_settings": cs,
-                        "property_settings": property_settings,
-                        "bsdd_dict": bsdd_dict,
-                        "ifc_version": ifc_version,
-                        "out_path": out_path,
-                    }
-                    self.finished.emit(payload)
-                except Exception as exc:  # pragma: no cover - pass through
-                    self.error.emit(exc)
-
-        setup_worker = _SetupWorker()
-        cls.get_properties().setup_worker = setup_worker
-        setup_thread = QThread()
-
-        cls.get_properties().setup_thread = setup_thread
-
-        setup_worker.moveToThread(setup_thread)
-        setup_worker.finished.connect(setup_thread.quit)
-        setup_worker.finished.connect(setup_worker.deleteLater)
-        setup_worker.error.connect(setup_thread.quit)
-        setup_worker.error.connect(setup_worker.deleteLater)
-        setup_thread.finished.connect(setup_thread.deleteLater)
-        setup_thread.started.connect(setup_worker.run, Qt.ConnectionType.QueuedConnection)
-        return setup_worker, setup_thread
 
     @classmethod
     def create_write_thread(cls, ids, out_path):

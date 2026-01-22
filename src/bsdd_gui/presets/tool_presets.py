@@ -355,6 +355,44 @@ class FieldTool(WidgetTool):
         super().connect_internal_signals()
 
     @classmethod
+    def register_appdata_field(
+        cls,
+        widget: FieldWidget,
+        field: QWidget,
+        section: str,
+        option: str,
+        datatype: Literal["string", "list", "bool"] = "string",
+        default = None,
+        nosync=False,
+    ):
+        from bsdd_gui.tool import Appdata
+
+        def _getter():
+            if datatype == "string":
+                return Appdata.get_string_setting(section, option,default)
+            elif datatype == "list":
+                return Appdata.get_list_setting(section, option,default)
+            elif datatype == "bool":
+                return Appdata.get_bool_setting(section, option,default)
+
+        def _setter(value):
+            Appdata.set_setting(section, option, value)
+
+        cls.register_field_getter(widget, field, getter_func=lambda _: _getter())
+        cls.register_field_setter(
+            widget,
+            field,
+            lambda e, v,: _setter(v),
+        )
+        if nosync:
+            return
+        if hasattr(widget, "bsdd_data"):
+            cls.sync_from_model(widget, widget.bsdd_data, explicit_field=field)
+        else:
+            logging.info(f"Attribute 'bsdd_data' not set for {widget}")
+        cls.register_field_listener(widget, field)
+
+    @classmethod
     def register_basic_field(
         cls, widget: FieldWidget, field: QWidget, variable_name: str, nosync=False
     ):
