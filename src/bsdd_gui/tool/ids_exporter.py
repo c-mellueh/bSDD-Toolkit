@@ -201,7 +201,7 @@ class IdsExporter(ActionTool, FieldTool):
             )
         elif predefined_value:
             value = predefined_value
-
+        cardinality = "required" if bsdd_property.IsRequired else "optional" 
         property_facet = PropertyFacet(
             bsdd_property.PropertySet,
             prop_utils.get_name(bsdd_property, bsdd_dictionary),
@@ -210,6 +210,7 @@ class IdsExporter(ActionTool, FieldTool):
                 prop_utils.get_data_type(bsdd_property), bsdd_property.PropertyUri, datatype_mapping
             ).upper(),
             bsdd_property.PropertyUri,
+            cardinality=cardinality 
         )
         return property_facet
 
