@@ -362,18 +362,18 @@ class FieldTool(WidgetTool):
         section: str,
         option: str,
         datatype: Literal["string", "list", "bool"] = "string",
-        default = None,
+        default=None,
         nosync=False,
     ):
         from bsdd_gui.tool import Appdata
 
         def _getter():
             if datatype == "string":
-                return Appdata.get_string_setting(section, option,default)
+                return Appdata.get_string_setting(section, option, default)
             elif datatype == "list":
-                return Appdata.get_list_setting(section, option,default)
+                return Appdata.get_list_setting(section, option, default)
             elif datatype == "bool":
-                return Appdata.get_bool_setting(section, option,default)
+                return Appdata.get_bool_setting(section, option, default)
 
         def _setter(value):
             Appdata.set_setting(section, option, value)
