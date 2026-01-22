@@ -6,7 +6,7 @@ from PySide6.QtCore import QObject, QThread, QTimer, Signal, Slot, Qt
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QWidget
 from bsdd_gui.resources.icons import get_icon
-
+import logging
 
 class _Spinner(QWidget):
     """
@@ -133,4 +133,6 @@ def stop_waiting_widget(worker: WaitingWorker):
     """
     Convenience to terminate the waiting widget created via start_waiting_widget.
     """
+    logging.info("Stop Waiting Worker!")
     worker.stop()
+    logging.info("Stop Done!")

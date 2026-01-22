@@ -1,18 +1,12 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication, QModelIndex, QThread, QObject, Signal, Slot, Qt, QTimer
-from typing import TYPE_CHECKING, Type, Literal
-from bsdd_json.utils import property_utils as prop_utils
+from PySide6.QtCore import QCoreApplication, QModelIndex, QTimer
+from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.ids_exporter import constants
 import json
 import re
-from ifctester.facet import Property as PropertyFacet
-from ifctester.facet import Entity as EntityFacet
-from ifctester.facet import Classification as ClassificationFacet
-from ifctester.facet import Restriction
-from ifctester.ids import Specification
-from bsdd_gui.resources import icons
 import qtawesome as qta
 from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
+import logging
 
 import datetime
 
@@ -108,12 +102,22 @@ def register_fields(
     widget_tool.register_appdata_field(widget, widget.dt_date, "ids", "date", "string")
     widget_tool.register_appdata_field(widget, widget.cb_datatype, "ids", "datatype", "string")
 
-    widget_tool.register_appdata_field(widget, widget.le_string, "ids", "string", "string","IFCTEXT")
-    widget_tool.register_appdata_field(widget, widget.le_boolean, "ids", "le_boolean", "string","IFCBOOLEAN")
-    widget_tool.register_appdata_field(widget, widget.le_integer, "ids", "integer", "string","IFCINTEGER")
-    widget_tool.register_appdata_field(widget, widget.le_real, "ids", "real", "string","IFCREAL")
-    widget_tool.register_appdata_field(widget, widget.le_character, "ids", "character", "string","IFCLABEL")
-    widget_tool.register_appdata_field(widget, widget.le_time, "ids", "time", "string","IFCDATETIME")
+    widget_tool.register_appdata_field(
+        widget, widget.cb_string, "ids", "string", "string", "IFCTEXT"
+    )
+    widget_tool.register_appdata_field(
+        widget, widget.cb_boolean, "ids", "le_boolean", "string", "IFCBOOLEAN"
+    )
+    widget_tool.register_appdata_field(
+        widget, widget.cb_integer, "ids", "integer", "string", "IFCINTEGER"
+    )
+    widget_tool.register_appdata_field(widget, widget.cb_real, "ids", "real", "string", "IFCREAL")
+    widget_tool.register_appdata_field(
+        widget, widget.cb_character, "ids", "character", "string", "IFCLABEL"
+    )
+    widget_tool.register_appdata_field(
+        widget, widget.cb_time, "ids", "time", "string", "IFCDATETIME"
+    )
     widget_tool.sync_from_model(widget, widget.bsdd_data)
 
 
@@ -326,13 +330,13 @@ def export_ids(
     waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
     waiting_widget.set_title("Load Data")
 
-    setup_worker, setup_thread = widget_tool.create_export_setup_thread(
+    setup_worker, setup_thread = widget_tool.create_setup_thread(
         widget, class_settings, property_settings, base_settings, metadata_settings
     )
 
     def _start_specification(payload: PayLoadDict):
         waiting_widget.set_title("Build IDS")
-
+        logging.info("Create Specification")
         create_worker, creator_thread, creator_dialog = widget_tool.create_build_thread(
             payload, waiting_widget
         )
@@ -347,6 +351,9 @@ def export_ids(
         QTimer.singleShot(0, widget, lambda: _start_specification(payload))
 
     def _export(ids: Ids, out_path: str):
+        logging.info("Creation Done!")
+        logging.info("Start Export!")
+
         write_worker, write_thread = widget_tool.create_write_thread(ids, out_path)
         waiting_widget.set_title("Write IDS")
         write_thread.finished.connect(
@@ -357,6 +364,7 @@ def export_ids(
                 parent=widget,
             )
         )
+        logging.info("Export Done!")
         write_thread.finished.connect(lambda: stop_waiting_widget(waiting_worker))
         write_thread.start()
 

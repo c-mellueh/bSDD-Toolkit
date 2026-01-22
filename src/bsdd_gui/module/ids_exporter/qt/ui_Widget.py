@@ -55,7 +55,7 @@ class Ui_Form(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollAreaWidgetContents_3 = QWidget()
         self.scrollAreaWidgetContents_3.setObjectName(u"scrollAreaWidgetContents_3")
-        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 471, 856))
+        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, -109, 450, 880))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_3)
         self.verticalLayout_3.setSpacing(6)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -288,45 +288,53 @@ class Ui_Form(object):
 
         self.gridLayout_5.addWidget(self.label_21, 5, 0, 1, 1)
 
-        self.le_time = QLineEdit(self.frame)
-        self.le_time.setObjectName(u"le_time")
-
-        self.gridLayout_5.addWidget(self.le_time, 6, 1, 1, 1)
-
         self.label_19 = QLabel(self.frame)
         self.label_19.setObjectName(u"label_19")
 
         self.gridLayout_5.addWidget(self.label_19, 3, 0, 1, 1)
 
-        self.le_integer = QLineEdit(self.frame)
-        self.le_integer.setObjectName(u"le_integer")
-
-        self.gridLayout_5.addWidget(self.le_integer, 3, 1, 1, 1)
-
-        self.le_boolean = QLineEdit(self.frame)
-        self.le_boolean.setObjectName(u"le_boolean")
-
-        self.gridLayout_5.addWidget(self.le_boolean, 2, 1, 1, 1)
-
-        self.le_string = QLineEdit(self.frame)
-        self.le_string.setObjectName(u"le_string")
-
-        self.gridLayout_5.addWidget(self.le_string, 1, 1, 1, 1)
-
-        self.le_real = QLineEdit(self.frame)
-        self.le_real.setObjectName(u"le_real")
-
-        self.gridLayout_5.addWidget(self.le_real, 4, 1, 1, 1)
-
-        self.le_character = QLineEdit(self.frame)
-        self.le_character.setObjectName(u"le_character")
-
-        self.gridLayout_5.addWidget(self.le_character, 5, 1, 1, 1)
-
         self.label_22 = QLabel(self.frame)
         self.label_22.setObjectName(u"label_22")
 
         self.gridLayout_5.addWidget(self.label_22, 6, 0, 1, 1)
+
+        self.cb_string = QComboBox(self.frame)
+        self.cb_string.addItem("")
+        self.cb_string.addItem("")
+        self.cb_string.setObjectName(u"cb_string")
+
+        self.gridLayout_5.addWidget(self.cb_string, 1, 1, 1, 1)
+
+        self.cb_boolean = QComboBox(self.frame)
+        self.cb_boolean.addItem("")
+        self.cb_boolean.setObjectName(u"cb_boolean")
+
+        self.gridLayout_5.addWidget(self.cb_boolean, 2, 1, 1, 1)
+
+        self.cb_integer = QComboBox(self.frame)
+        self.cb_integer.addItem("")
+        self.cb_integer.setObjectName(u"cb_integer")
+
+        self.gridLayout_5.addWidget(self.cb_integer, 3, 1, 1, 1)
+
+        self.cb_real = QComboBox(self.frame)
+        self.cb_real.addItem("")
+        self.cb_real.setObjectName(u"cb_real")
+
+        self.gridLayout_5.addWidget(self.cb_real, 4, 1, 1, 1)
+
+        self.cb_character = QComboBox(self.frame)
+        self.cb_character.addItem("")
+        self.cb_character.addItem("")
+        self.cb_character.setObjectName(u"cb_character")
+
+        self.gridLayout_5.addWidget(self.cb_character, 5, 1, 1, 1)
+
+        self.cb_time = QComboBox(self.frame)
+        self.cb_time.addItem("")
+        self.cb_time.setObjectName(u"cb_time")
+
+        self.gridLayout_5.addWidget(self.cb_time, 6, 1, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.frame)
@@ -441,14 +449,22 @@ class Ui_Form(object):
         self.label_18.setText(QCoreApplication.translate("Form", u"Boolean", None))
         self.label_20.setText(QCoreApplication.translate("Form", u"Real", None))
         self.label_21.setText(QCoreApplication.translate("Form", u"Character", None))
-        self.le_time.setText(QCoreApplication.translate("Form", u"IfcDateTime", None))
         self.label_19.setText(QCoreApplication.translate("Form", u"Integer", None))
-        self.le_integer.setText(QCoreApplication.translate("Form", u"IfcInteger", None))
-        self.le_boolean.setText(QCoreApplication.translate("Form", u"IfcBoolean", None))
-        self.le_string.setText(QCoreApplication.translate("Form", u"IfcText", None))
-        self.le_real.setText(QCoreApplication.translate("Form", u"IfcReal", None))
-        self.le_character.setText(QCoreApplication.translate("Form", u"IfcLabel", None))
         self.label_22.setText(QCoreApplication.translate("Form", u"Time", None))
+        self.cb_string.setItemText(0, QCoreApplication.translate("Form", u"IFCTEXT", None))
+        self.cb_string.setItemText(1, QCoreApplication.translate("Form", u"IFCLABEL", None))
+
+        self.cb_boolean.setItemText(0, QCoreApplication.translate("Form", u"IFCBOOLEAN", None))
+
+        self.cb_integer.setItemText(0, QCoreApplication.translate("Form", u"IFCINTEGER", None))
+
+        self.cb_real.setItemText(0, QCoreApplication.translate("Form", u"IFCREAL", None))
+
+        self.cb_character.setItemText(0, QCoreApplication.translate("Form", u"IFCTEXT", None))
+        self.cb_character.setItemText(1, QCoreApplication.translate("Form", u"IFCLABEL", None))
+
+        self.cb_time.setItemText(0, QCoreApplication.translate("Form", u"IFCDATETIME", None))
+
 #if QT_CONFIG(tooltip)
         self.pb_import.setToolTip(QCoreApplication.translate("Form", u"Import", None))
 #endif // QT_CONFIG(tooltip)
