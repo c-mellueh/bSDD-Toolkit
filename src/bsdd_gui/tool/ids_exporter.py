@@ -412,11 +412,22 @@ class IdsExporter(ActionTool, FieldTool):
         )
 
     @classmethod
-    def build_main_property_facet(cls, bsdd_class: BsddClass, base_settings: BasicSettingsDict):
+    def build_main_property_facet(cls, bsdd_class: BsddClass, base_settings: BasicSettingsDict,bsdd_dict:BsddDictionary):
+        main_prop = base_settings.get("main_property")
+        main_pset = base_settings.get("main_pset")
+        class_property = class_utils.get_class_property_by_name(bsdd_class, main_prop,main_pset,bsdd_dict)
+        count = len(class_property.AllowedValues or []) if class_property else 0
+        if count < 0:
+            value = bsdd_class.Code
+        elif count == 1:
+            value = class_property.AllowedValues[0].Value
+        else:
+            value = [v.Value for v in class_property.AllowedValues]
+
         return PropertyFacet(
-            base_settings.get("main_pset"),
-            base_settings.get("main_property"),
-            bsdd_class.Code,
+            main_pset,
+            main_prop,
+            value,
             base_settings.get("datatype"),
             cardinality="optional",
         )
@@ -444,7 +455,7 @@ class IdsExporter(ActionTool, FieldTool):
             if base_settings.get("classification", False):
                 applicability_facet = cls.build_classification_facet(bsdd_class, bsdd_dict)
             else:
-                applicability_facet = cls.build_main_property_facet(bsdd_class, base_settings)
+                applicability_facet = cls.build_main_property_facet(bsdd_class, base_settings,bsdd_dict)
             spec.applicability.append(applicability_facet)
             for class_prop in bsdd_class.ClassProperties:
                 if not cls.is_class_prop_active(
