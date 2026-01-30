@@ -18,7 +18,10 @@ class ClassView(TreeItemView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        trigger.class_view_created(self)
+        self.get_trigger().class_view_created(self)
+
+    def get_trigger(self):
+        return trigger
 
     # typing
     def model(self) -> SortModel:

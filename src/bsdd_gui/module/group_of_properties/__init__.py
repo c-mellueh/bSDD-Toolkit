@@ -4,7 +4,7 @@ from . import ui, prop, trigger
 
 def register():
     bsdd_gui.GroupOfPropertiesProperties = prop.GroupOfPropertiesProperties()
-
+    bsdd_gui.GopClassViewProperties = prop.GopClassViewProperties()
 def retranslate_ui():
     trigger.retranslate_ui()
 
