@@ -60,7 +60,7 @@ class ClassTreeView(ItemViewTool):
     def connect_internal_signals(cls):
         super().connect_internal_signals()
         cls.signals.group_selection_requested.connect(
-            lambda v: cls._get_trigger().group_selection(v, cls)
+            lambda v: trigger.group_selection(v, cls)
         )
         cls.signals.search_requested.connect(lambda v: trigger.search_class(v, cls))
         cls.signals.expand_selection_requested.connect(cls.expand_selection)

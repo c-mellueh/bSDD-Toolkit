@@ -216,14 +216,13 @@ def delete_selection(
 
 def group_selection(
     view: ui.ClassView,
-    class_tree: Type[tool.ClassTreeView],
+    class_tree: Type[tool.ClassTreeView | tool.GopClassView],
     class_editor: Type[tool.ClassEditorWidget],
 ):
     bsdd_classes = class_tree.get_selected(view)
     if not bsdd_classes:
         return
-    allowed_class_types = "Class|Material|AlternativeUse"
-    class_editor.request_class_grouping(allowed_class_types, bsdd_classes)
+    class_editor.request_class_grouping(class_tree, bsdd_classes)
 
 
 def search_class(

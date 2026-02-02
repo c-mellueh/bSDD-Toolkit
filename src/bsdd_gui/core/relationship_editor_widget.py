@@ -5,6 +5,7 @@ from bsdd_json import BsddProperty, BsddClass, BsddClassRelation, BsddPropertyRe
 from PySide6.QtWidgets import QWidget, QTableView
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.relationship_editor_widget import ui, constants
+import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -186,6 +187,8 @@ def add_context_menu_to_view(
         True,
         True,
         True,
+        qta.icon("mdi.delete"),
+        "Del",
     )
 
 

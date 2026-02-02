@@ -21,7 +21,7 @@ class Signals(DialogSignals):
     new_class_requested = Signal(
         str, BsddClass
     )  # Classtype (Class|Material|GroupOfProperties|AlternativeUse),Parent
-    grouping_requested = Signal(str, list)  # allowed_class_types,list of classes
+    grouping_requested = Signal(object, list)  # ClassTreeTool,list of classes
     new_class_created = Signal(
         BsddClass
     )  # the class is not added to the Dictionary So far, this gets handled by ClassTree
@@ -93,10 +93,10 @@ class ClassEditorWidget(DialogTool):
         cls.signals.new_class_requested.emit(class_type, parent)
 
     @classmethod
-    def request_class_grouping(cls, allowed_class_types, bsdd_classes: list[BsddClass]):
+    def request_class_grouping(cls, class_tree_tool, bsdd_classes: list[BsddClass]):
         """allowed_class_types is one or multiple of Class|Material|GroupOfProperties|AlternativeUse joined with '|'"""
 
-        cls.signals.grouping_requested.emit(allowed_class_types, bsdd_classes)
+        cls.signals.grouping_requested.emit(class_tree_tool, bsdd_classes)
 
     @classmethod
     def is_code_valid(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):

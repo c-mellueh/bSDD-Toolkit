@@ -129,7 +129,8 @@ def connect_to_main_window(
     )
 
 
-def edit_class(allowed_class_types,
+def edit_class(
+    allowed_class_types,
     bsdd_class: BsddClass,
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],
@@ -137,7 +138,7 @@ def edit_class(allowed_class_types,
     dialog = class_editor.create_dialog(bsdd_class, main_window.get())
     text = QCoreApplication.translate("ClassEditor", "Edit Class")
     dialog.setWindowTitle(text)
-    class_editor.apply_allowed_class_types(allowed_class_types,dialog._widget)
+    class_editor.apply_allowed_class_types(allowed_class_types, dialog._widget)
     if dialog.exec():
         class_editor.sync_to_model(dialog._widget, bsdd_class)
         class_editor.signals.dialog_accepted.emit(dialog)
@@ -171,14 +172,14 @@ def create_new_class(
 
 
 def group_classes(
-    allowed_class_types: str,
     bsdd_classes: list[BsddClass],
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
-    class_tree: Type[tool.ClassTreeView],
+    class_tree: Type[tool.ClassTreeView | tool.GopClassView],
 ):
-    new_class = BsddClass(Code="GroupCode", Name="GroupName", ClassType="Class")
+
+    new_class = BsddClass(Code="NewGroup", Name="NewGroup", ClassType="Class")
     parent = cl_utils.shared_parent(bsdd_classes, dictionary=project.get(), mode="lowest")
     parent_code = None if parent is None else parent.Code
     new_class.ParentClassCode = parent_code
@@ -186,7 +187,8 @@ def group_classes(
     widget = dialog._widget
     text = QCoreApplication.translate("ClassEditor", "Group Classes")
     dialog.setWindowTitle(text)
-    class_editor.apply_allowed_class_types(allowed_class_types, widget)
+    act = "|".join(class_tree.get_allowed_class_types())
+    class_editor.apply_allowed_class_types(act, widget)
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
         class_editor.signals.new_class_created.emit(new_class)

@@ -217,25 +217,6 @@ def connect_to_main_window(
 
     pset_view = main_window.get_pset_view()
     main_window.signals.active_class_changed.connect(reset_pset)
-    util.add_shortcut(
-        "Ctrl+C",
-        pset_view,
-        lambda: copy_property_sets_to_clipboard(pset_view, property_set_table, main_window),
-    )
-    util.add_shortcut(
-        "Ctrl+V",
-        pset_view,
-        lambda: paste_property_sets_from_clipboard(
-            pset_view, property_set_table, property_table, main_window, util
-        ),
-    )
-
-    util.add_shortcut(
-        "Del",
-        pset_view,
-        lambda: property_set_table.signals.delete_selection_requested.emit(pset_view),
-    )
-
     property_set_table.signals.selection_changed.connect(
         lambda v, n: (main_window.set_active_pset(n) if v == main_window.get_pset_view() else None)
     )
