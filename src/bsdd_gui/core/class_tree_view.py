@@ -276,8 +276,8 @@ def search_class(
     class_tree: Type[tool.ClassTreeView],
     project: Type[tool.Project],
 ):
-
-    cl = search.search_class(project.get().Classes)
+    classes = [c for c in project.get().Classes if c.ClassType in class_tree.get_allowed_class_types()]
+    cl = search.search_class(classes)
     if not cl:
         return
     class_tree.select_and_expand(cl, view)

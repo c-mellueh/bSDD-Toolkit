@@ -28,7 +28,7 @@ def create_widget(data: object, parent):
 
 def widget_created(widget):
     core.register_widget(widget, tool.GroupOfProperties)
-    core.connect_widget(widget, tool.GroupOfProperties,tool.ClassEditorWidget)
+    core.connect_widget(widget, tool.GroupOfProperties,tool.GopClassView,tool.ClassEditorWidget)
 
 #CLassTreeView
 

@@ -41,12 +41,21 @@ def retranslate_ui(
     action.setText(QCoreApplication.translate("GroupsOfProperties", "Groups of Properties"))
 
 
-def connect_signals(widget_tool: Type[tool.GroupOfProperties], gop_view: Type[tool.GopClassView],class_editor:Type[tool.ClassEditorWidget],project:Type[tool.Project]):
+def connect_signals(
+    widget_tool: Type[tool.GroupOfProperties],
+    class_view: Type[tool.GopClassView],
+    class_editor: Type[tool.ClassEditorWidget],
+    project: Type[tool.Project],
+):
     widget_tool.connect_internal_signals()
-    gop_view.connect_internal_signals()
+    class_view.connect_internal_signals()
+
     class_editor.signals.new_class_created.connect(
-        lambda c: gop_view.add_class_to_dictionary(c, project.get())
+        lambda c: class_view.add_class_to_dictionary(c, project.get())
     )
+    class_view.signals.item_removed.connect(project.signals.class_removed.emit)
+    class_view.signals.item_added.connect(project.signals.class_added.emit)
+
 
 def create_widget(data, parent, widget_tool: Type[tool.GroupOfProperties]):
     widget_tool.show_widget(data, parent)
@@ -59,6 +68,7 @@ def register_widget(widget: ui.GopWidget, widget_tool: Type[tool.GroupOfProperti
 def connect_widget(
     widget: ui.GopWidget,
     widget_tool: Type[tool.GroupOfProperties],
+    class_view: Type[tool.GopClassView],
     class_editor: Type[tool.ClassEditorWidget],
 ):
     widget_tool.connect_widget_signals(widget)
@@ -72,6 +82,7 @@ def connect_widget(
         class_editor.signals.edit_class_requested.emit(class_types, bsdd_class)
 
     view = widget.treeView
+    widget.tb_search.clicked.connect(lambda _,v=view: class_view.request_search(v))
     view.doubleClicked.connect(emit_class_info_requested)
 
 

@@ -18,15 +18,12 @@ if TYPE_CHECKING:
 class WidgetSignals(FieldSignals):
     widget_requested = Signal(object,QWidget) #bSDDDictionary, Window
     new_class_requested = Signal(str)
-
 class GroupOfProperties(FieldTool,ActionTool):
     signals = WidgetSignals()
 
     @classmethod
     def get_properties(cls) -> GroupOfPropertiesProperties:
         return bsdd_gui.GroupOfPropertiesProperties
-
-
 
     @classmethod
     def connect_internal_signals(cls):
