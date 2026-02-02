@@ -9,6 +9,7 @@ from bsdd_json.type_hints import COUNTRY_CODE, LANGUAGE_ISO_CODE, DOCUMENT_TYPE
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.class_editor_widget import ui
+    from bsdd_gui.module.class_editor_widget.constants import CLASS_TYPES
 
 
 def connect_signals(class_editor: Type[tool.ClassEditorWidget], project: Type[tool.Project]):
@@ -19,21 +20,6 @@ def connect_signals(class_editor: Type[tool.ClassEditorWidget], project: Type[to
 
 def retranslate_ui(class_editor: Type[tool.ClassEditorWidget]):
     pass  # TODO
-
-
-def create_dialog(
-    bsdd_class: BsddClass,
-    class_editor: Type[tool.ClassEditorWidget],
-    main_window: Type[tool.MainWindowWidget],
-):
-    dialog = class_editor.create_dialog(bsdd_class, main_window.get())
-    text = QCoreApplication.translate("ClassEditor", "Edit Class")
-    dialog.setWindowTitle(text)
-    if dialog.exec():
-        class_editor.sync_to_model(dialog._widget, bsdd_class)
-        class_editor.signals.dialog_accepted.emit(dialog)
-    else:
-        class_editor.signals.dialog_declined.emit(dialog)
 
 
 def register_widget(widget: ui.ClassEditor, class_editor: Type[tool.ClassEditorWidget]):
@@ -130,28 +116,52 @@ def connect_to_main_window(
         bsdd_class = index.internalPointer()
         if not bsdd_class:
             return
-        class_editor.signals.edit_class_requested.emit(bsdd_class)
+        class_types = "Class|Material|AlternativeUse"
+        class_editor.signals.edit_class_requested.emit(class_types, bsdd_class)
 
     view = main_window.get_class_view()
     view.doubleClicked.connect(emit_class_info_requested)
 
     main_window.signals.new_class_requested.connect(
-        lambda: class_editor.request_new_class(cl_utils.get_parent(main_window.get_active_class()))
+        lambda class_type: class_editor.request_new_class(
+            class_type, cl_utils.get_parent(main_window.get_active_class())
+        )
     )
 
 
+def edit_class(allowed_class_types,
+    bsdd_class: BsddClass,
+    class_editor: Type[tool.ClassEditorWidget],
+    main_window: Type[tool.MainWindowWidget],
+):
+    dialog = class_editor.create_dialog(bsdd_class, main_window.get())
+    text = QCoreApplication.translate("ClassEditor", "Edit Class")
+    dialog.setWindowTitle(text)
+    class_editor.apply_allowed_class_types(allowed_class_types,dialog._widget)
+    if dialog.exec():
+        class_editor.sync_to_model(dialog._widget, bsdd_class)
+        class_editor.signals.dialog_accepted.emit(dialog)
+    else:
+        class_editor.signals.dialog_declined.emit(dialog)
+
+
 def create_new_class(
+    allowed_class_types: CLASS_TYPES,
     parent: BsddClass | None,
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],
 ):
+    allowed_class_types = allowed_class_types.split("|")
+    class_type = "Class" if "Class" in allowed_class_types else allowed_class_types[0]
     new_text = QCoreApplication.translate("ClassEditor", "New")
-    new_class = BsddClass(Code=new_text, Name=new_text, ClassType="Class")
+    new_class = BsddClass(Code=new_text, Name=new_text, ClassType=class_type)
     new_class.ParentClassCode = parent.Code if parent is not None else None
     dialog = class_editor.create_dialog(new_class, main_window.get())
-    widget = dialog._widget
+    widget: ui.ClassEditor = dialog._widget
     text = QCoreApplication.translate("ClassEditor", "Create New Class")
     dialog.setWindowTitle(text)
+    class_editor.apply_allowed_class_types(allowed_class_types, widget)
+
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
         class_editor.signals.new_class_created.emit(new_class)
@@ -163,6 +173,7 @@ def create_new_class(
 
 
 def group_classes(
+    allowed_class_types: str,
     bsdd_classes: list[BsddClass],
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],
@@ -177,6 +188,7 @@ def group_classes(
     widget = dialog._widget
     text = QCoreApplication.translate("ClassEditor", "Group Classes")
     dialog.setWindowTitle(text)
+    class_editor.apply_allowed_class_types(allowed_class_types, widget)
     if dialog.exec():
         class_editor.sync_to_model(widget, new_class)
         class_editor.signals.new_class_created.emit(new_class)

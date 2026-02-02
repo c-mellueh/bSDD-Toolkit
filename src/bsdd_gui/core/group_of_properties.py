@@ -166,11 +166,10 @@ def add_context_menu_to_view(view: views.ClassView, class_tree: Type[tool.GopCla
         icon=qta.icon("mdi6.refresh"),
         shortcut="Ctrl+R",
     )
-
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Edit"),
-        lambda: class_editor.request_class_editor(get_first_selection(view)),
+        lambda: class_editor.request_class_editor("GroupOfProperties",get_first_selection(view)),
         True,
         True,
         False,

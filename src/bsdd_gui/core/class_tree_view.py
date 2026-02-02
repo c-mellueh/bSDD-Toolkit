@@ -154,10 +154,11 @@ def add_context_menu_to_view(
         shortcut="Ctrl+R",
     )
 
+    class_types = "Class|Material|AlternativeUse"
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Edit"),
-        lambda: class_editor.request_class_editor(get_first_selection(view)),
+        lambda: class_editor.request_class_editor(class_types, get_first_selection(view)),
         True,
         True,
         False,
@@ -222,7 +223,7 @@ def connect_to_main_window(
     util.add_shortcut(
         "Ctrl+N",
         view,
-        lambda: main_window.signals.new_class_requested.emit(),
+        lambda: main_window.signals.new_class_requested.emit("Class|Material|AlternativeUse"),
     )
 
     class_tree.signals.selection_changed.connect(
@@ -265,7 +266,8 @@ def group_selection(
     bsdd_classes = class_tree.get_selected(view)
     if not bsdd_classes:
         return
-    class_editor.request_class_grouping(bsdd_classes)
+    allowed_class_types = "Class|Material|AlternativeUse"
+    class_editor.request_class_grouping(allowed_class_types, bsdd_classes)
 
 
 def search_class(
