@@ -68,7 +68,7 @@ class ClassTreeView(ItemViewTool):
         cls.signals.copy_selection_requested.connect(
             lambda v: trigger.copy_selected_classes_to_clipboard(v, cls)
         )
-        cls.signals.paste_requested.connect(trigger.paste_classes_from_clipboard)
+        cls.signals.paste_requested.connect(lambda view:trigger.paste_classes_from_clipboard(view,cls))
 
     @classmethod
     def get_allowed_class_types(cls) -> list[str]:
@@ -142,7 +142,8 @@ class ClassTreeView(ItemViewTool):
         new_parent_index = (
             QModelIndex() if new_parent is None else model._index_for_class(new_parent)
         )
-
+        if bsdd_class.ClassType not in cls.get_allowed_class_types():
+            return
         # current position of the node among its siblings
         siblings_src = (
             cl_utils.get_root_classes(model.bsdd_dictionary)

@@ -73,7 +73,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Copy"),
-        lambda v=view: class_tree.request_copy_selection(v),
+        lambda *_,v=view: class_tree.request_copy_selection(v),
         True,
         True,
         True,
@@ -83,7 +83,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Paste"),
-        lambda v=view: class_tree.request_paste(v),
+        lambda *_,v=view: class_tree.request_paste(v),
         False,
         True,
         True,

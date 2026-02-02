@@ -91,6 +91,7 @@ def connect_widget(
 
 def register_view(view: views.ClassView, gop_view: Type[tool.GopClassView]):
     gop_view.register_view(view)
+    view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
     view.setSelectionBehavior(QTreeView.SelectRows)
     view.setSelectionMode(QTreeView.ExtendedSelection)
     view.setAlternatingRowColors(True)
@@ -130,7 +131,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Copy"),
-        lambda v=view: class_tree.request_copy_selection(v),
+        lambda *_,v=view: class_tree.request_copy_selection(v),
         True,
         True,
         True,
@@ -140,7 +141,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Paste"),
-        lambda v=view: class_tree.request_paste(v),
+        lambda *_,v=view: class_tree.request_paste(v),
         False,
         True,
         True,

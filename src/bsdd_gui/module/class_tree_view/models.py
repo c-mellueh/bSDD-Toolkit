@@ -25,16 +25,17 @@ class ClassTreeModel(ItemModel):
             tl = tool.ClassTreeView
         super().__init__(tl, bsdd_dictionary, *args, **kwargs)
         self.bsdd_data: BsddDictionary
+        self.tool: tool.ClassTreeView | tool.GopClassView
 
     @property
     def bsdd_dictionary(self):
         return self.bsdd_data
 
     def _get_root_classes(self):
-        rc =  cl_utils.get_root_classes(self.bsdd_dictionary)
+        rc = cl_utils.get_root_classes(self.bsdd_dictionary)
         return [c for c in rc if c.ClassType != "GroupOfProperties"]
 
-    def _get_children(self,bsdd_class:BsddClass):
+    def _get_children(self, bsdd_class: BsddClass):
         children = cl_utils.get_children(bsdd_class)
         return [c for c in children if c.ClassType != "GroupOfProperties"]
 
@@ -87,9 +88,7 @@ class ClassTreeModel(ItemModel):
         if gp_code:
             gp_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, gp_code)
             siblings = (
-                self._get_children(gp_cls)
-                if gp_cls is not None
-                else self._get_root_classes()
+                self._get_children(gp_cls) if gp_cls is not None else self._get_root_classes()
             )
         else:
             siblings = self._get_root_classes()
@@ -178,11 +177,20 @@ class ClassTreeModel(ItemModel):
             return False
         if action not in (Qt.MoveAction, Qt.CopyAction):
             return False
+
+
         if (
             data.hasFormat(JSON_MIME)
             or data.hasFormat("application/json")
             or data.hasFormat(CODES_MIME)
         ):
+            codes = self.tool.get_codes_from_data(data)
+            if not codes:
+                return False
+            
+            bsdd_class = cl_utils.get_class_by_code(self.bsdd_dictionary,codes[0])
+            if not bsdd_class.ClassType in self.tool.get_allowed_class_types():
+                return False
             return True
         return False
 
@@ -190,9 +198,9 @@ class ClassTreeModel(ItemModel):
         dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
         dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
         if action == Qt.MoveAction and data.hasFormat(CODES_MIME):
-            trigger.mime_move_event(self.bsdd_data, data, row, parent,self.tool)
+            trigger.mime_move_event(self.bsdd_data, data, row, parent, self.tool)
         elif action in (Qt.CopyAction, Qt.IgnoreAction):
-            trigger.mime_copy_event(self.bsdd_data, data, parent,self.tool)
+            trigger.mime_copy_event(self.bsdd_data, data, parent, self.tool)
         return True
 
 
