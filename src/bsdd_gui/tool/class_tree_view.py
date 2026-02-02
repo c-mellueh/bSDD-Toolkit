@@ -59,11 +59,11 @@ class ClassTreeView(ItemViewTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.group_selection_requested.connect(trigger.group_selection)
-        cls.signals.search_requested.connect(trigger.search_class)
+        cls.signals.group_selection_requested.connect(lambda v:trigger.group_selection(v,cls))
+        cls.signals.search_requested.connect(lambda v: trigger.search_class(v,cls))
         cls.signals.expand_selection_requested.connect(cls.expand_selection)
         cls.signals.collapse_selection_requested.connect(cls.collapse_selection)
-        cls.signals.copy_selection_requested.connect(trigger.copy_selected_classes_to_clipboard)
+        cls.signals.copy_selection_requested.connect(lambda v:trigger.copy_selected_classes_to_clipboard(v,cls))
         cls.signals.paste_requested.connect(trigger.paste_classes_from_clipboard)
 
     @classmethod
@@ -96,7 +96,7 @@ class ClassTreeView(ItemViewTool):
 
     @classmethod
     def delete_selection(cls, view: ui.ClassView):
-        trigger.delete_selection(view)  # can't be handled here because popup is required
+        trigger.delete_selection(view,cls)  # can't be handled here because popup is required
 
     @classmethod
     def delete_class(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
@@ -182,7 +182,7 @@ class ClassTreeView(ItemViewTool):
     @classmethod
     def get_codes_from_data(cls, data):
         payload = None
-        for fmt in constants.CODES_MIME:
+        for fmt in [constants.CODES_MIME]:
             if data.hasFormat(fmt):
                 try:
                     b = bytes(data.data(fmt))

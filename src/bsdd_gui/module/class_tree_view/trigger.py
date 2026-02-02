@@ -39,33 +39,45 @@ def context_menu_requested(view: ui.ClassView, pos):
     core.create_context_menu(view, pos, tool.ClassTreeView)
 
 
-def delete_selection(view: ui.ClassView):
-    core.delete_selection(view, tool.ClassTreeView, tool.Popups, tool.Project)
+def delete_selection(view: ui.ClassView,view_tool: tool.ClassTreeView | tool.GopClassView):
+    core.delete_selection(view, view_tool, tool.Popups, tool.Project)
 
 
-def group_selection(view: ui.ClassView):
-    core.group_selection(view, tool.ClassTreeView, tool.ClassEditorWidget)
+def group_selection(view: ui.ClassView,view_tool: tool.ClassTreeView | tool.GopClassView):
+    core.group_selection(view, view_tool, tool.ClassEditorWidget)
 
 
-def search_class(view: ui.ClassView):
-    core.search_class(view, tool.SearchWidget, tool.ClassTreeView, tool.Project)
+def search_class(view: ui.ClassView, view_tool: tool.ClassTreeView | tool.GopClassView):
+    core.search_class(view, tool.SearchWidget, view_tool, tool.Project)
 
 
-def mime_move_event(bsdd_dictionary: BsddDictionary, data, row, parent):
-    core.handle_mime_move(bsdd_dictionary, data, row, parent, tool.ClassTreeView)
+def mime_move_event(
+    bsdd_dictionary: BsddDictionary,
+    data,
+    row,
+    parent,
+    view_tool: tool.ClassTreeView | tool.GopClassView,
+):
+    core.handle_mime_move(bsdd_dictionary, data, row, parent, view_tool)
 
 
-def mime_copy_event(bsdd_dictionary: BsddDictionary, data, parent):
+def mime_copy_event(
+    bsdd_dictionary: BsddDictionary, data, parent, view_tool: tool.ClassTreeView | tool.GopClassView
+):
     core.handle_mime_copy(
-        bsdd_dictionary, data, parent, tool.ClassTreeView, tool.Util, tool.PropertyTableWidget
+        bsdd_dictionary, data, parent, view_tool, tool.Util, tool.PropertyTableWidget
     )
 
 
-def copy_selected_classes_to_clipboard(view: ui.ClassView):
-    core.copy_selected_classes_to_clipboard(view, tool.ClassTreeView, tool.Project)
+def copy_selected_classes_to_clipboard(
+    view: ui.ClassView, view_tool: tool.ClassTreeView | tool.GopClassView
+):
+    core.copy_selected_classes_to_clipboard(view, view_tool, tool.Project)
 
 
-def paste_classes_from_clipboard(view: ui.ClassView):
+def paste_classes_from_clipboard(
+    view: ui.ClassView, view_tool: tool.ClassTreeView | tool.GopClassView
+):
     core.paste_class_from_clipboard(
-        view, tool.ClassTreeView, tool.PropertyTableWidget, tool.Project, tool.Util
+        view, view_tool, tool.PropertyTableWidget, tool.Project, tool.Util
     )
