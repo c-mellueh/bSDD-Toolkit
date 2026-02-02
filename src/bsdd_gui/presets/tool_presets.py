@@ -945,6 +945,9 @@ class ItemViewTool(BaseTool):
 
         props = cls.get_properties()
         props.context_menu_list[view].append(entry)
+        if shortcut:
+            from bsdd_gui.tool import Util
+            Util.add_shortcut(shortcut,view,action_func)
         return entry
 
     @classmethod

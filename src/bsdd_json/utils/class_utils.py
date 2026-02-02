@@ -153,10 +153,11 @@ def get_dictionary_from_class(bsdd_class: BsddClass):
     return bsdd_class.parent()
 
 
-def get_parent(bsdd_class: BsddClass) -> BsddClass | None:
+def get_parent(bsdd_class: BsddClass,bsdd_dictionary:BsddDictionary =None) -> BsddClass | None:
     if bsdd_class is None:
         return None
-    bsdd_dictionary = get_dictionary_from_class(bsdd_class)
+    if not bsdd_dictionary:
+        bsdd_dictionary = get_dictionary_from_class(bsdd_class)
     if bsdd_class.ParentClassCode is None:
         return None
     return get_class_by_code(bsdd_dictionary, bsdd_class.ParentClassCode)

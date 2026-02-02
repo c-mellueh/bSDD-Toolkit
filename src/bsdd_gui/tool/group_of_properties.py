@@ -31,8 +31,6 @@ class GroupOfProperties(FieldTool,ActionTool):
     
     @classmethod
     def connect_widget_signals(cls, widget:ui.GopWidget):
-
-        widget.tb_new.clicked.connect(lambda *_:cls.signals.new_class_requested.emit("GroupOfProperties"))
         super().connect_widget_signals(widget)
     
     @classmethod
@@ -45,7 +43,7 @@ class GroupOfProperties(FieldTool,ActionTool):
 
 
 class ClassViewSignals(CTS):
-    pass
+    new_class_requested = Signal(str,views.ClassView)
 
 class GopClassView(CTV):
     signals = ClassViewSignals()
@@ -66,9 +64,10 @@ class GopClassView(CTV):
         return models.SortModel
     
     @classmethod
-    def delete_selection(view):
-        return super().delete_selection()
-
-    @classmethod
     def get_allowed_class_types(cls):
         return ["GroupOfProperties"]
+    
+    @classmethod
+    def request_new_class(cls,view:views.ClassView):
+        text = "|".join(cls.get_allowed_class_types())
+        cls.signals.new_class_requested.emit(text,view)

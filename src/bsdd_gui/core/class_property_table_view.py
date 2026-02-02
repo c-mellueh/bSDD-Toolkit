@@ -111,7 +111,6 @@ def add_context_menu_to_view(
         shortcut="Ctrl+V",
     )
 
-
 def create_context_menu(
     view: ui.ClassPropertyTable, pos: QPoint, property_table: Type[tool.ClassPropertyTableView]
 ):
@@ -127,21 +126,6 @@ def connect_view(
     util: Type[tool.Util],
 ):
     property_table.connect_view_signals(view)
-    util.add_shortcut(
-        "Ctrl+N",
-        view,
-        lambda: property_table.request_new_property(),
-    )
-    util.add_shortcut(
-        "Ctrl+C",
-        view,
-        lambda: property_table.request_copy(view),
-    )
-    util.add_shortcut(
-        "Ctrl+V",
-        view,
-        lambda: property_table.request_paste(view),
-    )
 
 
 def reset_views(property_table: Type[tool.ClassPropertyTableView], project: Type[tool.Project]):

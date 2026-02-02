@@ -22,16 +22,10 @@ def connect_to_main_window(
 
     action = main_window.add_action(
         None,
-        "GRoups of Properties",
+        "Groups of Properties",
         lambda: group_of_properties.request_widget(project.get(), main_window.get()),
     )
     group_of_properties.set_action(main_window.get(), "open_window", action)
-
-    group_of_properties.signals.new_class_requested.connect(
-        lambda class_type: class_editor.request_new_class(
-            class_type, cl_utils.get_parent(main_window.get_active_class())
-        )
-    )
 
 
 def retranslate_ui(
@@ -47,6 +41,11 @@ def connect_signals(
     class_editor: Type[tool.ClassEditorWidget],
     project: Type[tool.Project],
 ):
+    def handle_new_request(act, view: views.ClassView):
+        active = class_view.get_selected(view)
+        active = cl_utils.get_parent(active[0], project.get()) if active else None
+        class_editor.request_new_class(act, active)
+
     widget_tool.connect_internal_signals()
     class_view.connect_internal_signals()
 
@@ -55,11 +54,13 @@ def connect_signals(
     )
     class_view.signals.item_removed.connect(project.signals.class_removed.emit)
     class_view.signals.item_added.connect(project.signals.class_added.emit)
+    class_view.signals.new_class_requested.connect(handle_new_request)
 
 
 def create_widget(data, parent, widget_tool: Type[tool.GroupOfProperties]):
-    widget_tool.show_widget(data, parent)
-
+    widget:ui.GopWidget = widget_tool.show_widget(data, parent)
+    widget.tb_search.setIcon(qta.icon("mdi.magnify"))
+    widget.tb_new.setIcon(qta.icon("mdi.plus"))
 
 def register_widget(widget: ui.GopWidget, widget_tool: Type[tool.GroupOfProperties]):
     widget_tool.register_widget(widget)
@@ -72,6 +73,7 @@ def connect_widget(
     class_editor: Type[tool.ClassEditorWidget],
 ):
     widget_tool.connect_widget_signals(widget)
+    widget.tb_new.clicked.connect(lambda *_, w=widget: class_view.request_new_class(w.treeView))
 
     def emit_class_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)
@@ -82,7 +84,7 @@ def connect_widget(
         class_editor.signals.edit_class_requested.emit(class_types, bsdd_class)
 
     view = widget.treeView
-    widget.tb_search.clicked.connect(lambda _,v=view: class_view.request_search(v))
+    widget.tb_search.clicked.connect(lambda _, v=view: class_view.request_search(v))
     view.doubleClicked.connect(emit_class_info_requested)
 
 
@@ -130,8 +132,18 @@ def add_context_menu_to_view(
     class_tree.clear_context_menu_list(view)
     class_tree.add_context_menu_entry(
         view,
+        lambda: QCoreApplication.translate("Class", "New"),
+        lambda *_, v=view: class_tree.request_new_class(v),
+        False,
+        True,
+        True,
+        icon=qta.icon("mdi6.plus"),
+        shortcut="Ctrl+N",
+    )
+    class_tree.add_context_menu_entry(
+        view,
         lambda: QCoreApplication.translate("Class", "Copy"),
-        lambda *_,v=view: class_tree.request_copy_selection(v),
+        lambda *_, v=view: class_tree.request_copy_selection(v),
         True,
         True,
         True,
@@ -141,7 +153,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Paste"),
-        lambda *_,v=view: class_tree.request_paste(v),
+        lambda *_, v=view: class_tree.request_paste(v),
         False,
         True,
         True,

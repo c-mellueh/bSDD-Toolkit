@@ -73,7 +73,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Copy"),
-        lambda *_,v=view: class_tree.request_copy_selection(v),
+        lambda *_, v=view: class_tree.request_copy_selection(v),
         True,
         True,
         True,
@@ -83,7 +83,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Paste"),
-        lambda *_,v=view: class_tree.request_paste(v),
+        lambda *_, v=view: class_tree.request_paste(v),
         False,
         True,
         True,
@@ -176,50 +176,6 @@ def connect_to_main_window(
     util: Type[tool.Util],
 ):
     view = main_window.get_class_view()
-
-    util.add_shortcut(
-        "Ctrl+C",
-        view,
-        lambda: class_tree.request_copy_selection(view),
-    )
-    util.add_shortcut(
-        "Ctrl+V",
-        view,
-        lambda v=view: class_tree.request_paste(v),
-    )
-
-    util.add_shortcut(
-        "Del",
-        view,
-        lambda: class_tree.signals.delete_selection_requested.emit(view),
-    )
-
-    util.add_shortcut(
-        "Ctrl+E",
-        view,
-        lambda: class_tree.signals.expand_selection_requested.emit(view),
-    )
-    util.add_shortcut(
-        "Ctrl+Alt+E",
-        view,
-        lambda: class_tree.signals.collapse_selection_requested.emit(view),
-    )
-
-    util.add_shortcut(
-        "Ctrl+G",
-        view,
-        lambda: class_tree.signals.group_selection_requested.emit(view),
-    )
-    util.add_shortcut(
-        "Ctrl+F",
-        view,
-        lambda: class_tree.signals.search_requested.emit(view),
-    )
-    util.add_shortcut(
-        "Ctrl+R",
-        view,
-        lambda: class_tree.signals.model_refresh_requested.emit(),
-    )
     util.add_shortcut(
         "Ctrl+N",
         view,
@@ -276,7 +232,9 @@ def search_class(
     class_tree: Type[tool.ClassTreeView],
     project: Type[tool.Project],
 ):
-    classes = [c for c in project.get().Classes if c.ClassType in class_tree.get_allowed_class_types()]
+    classes = [
+        c for c in project.get().Classes if c.ClassType in class_tree.get_allowed_class_types()
+    ]
     cl = search.search_class(classes)
     if not cl:
         return
