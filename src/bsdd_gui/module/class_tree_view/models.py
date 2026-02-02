@@ -31,11 +31,11 @@ class ClassTreeModel(ItemModel):
         return self.bsdd_data
 
     def _get_root_classes(self):
-        rc =  self._get_root_classes()
+        rc =  cl_utils.get_root_classes(self.bsdd_dictionary)
         return [c for c in rc if c.ClassType != "GroupOfProperties"]
 
     def _get_children(self,bsdd_class:BsddClass):
-        children = self._get_children(bsdd_class)
+        children = cl_utils.get_children(bsdd_class)
         return [c for c in children if c.ClassType != "GroupOfProperties"]
 
     def hasChildren(self, parent=QModelIndex()):
