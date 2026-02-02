@@ -151,10 +151,8 @@ def create_new_class(
     class_editor: Type[tool.ClassEditorWidget],
     main_window: Type[tool.MainWindowWidget],
 ):
-    allowed_class_types = allowed_class_types.split("|")
-    class_type = "Class" if "Class" in allowed_class_types else allowed_class_types[0]
     new_text = QCoreApplication.translate("ClassEditor", "New")
-    new_class = BsddClass(Code=new_text, Name=new_text, ClassType=class_type)
+    new_class = BsddClass(Code=new_text, Name=new_text)
     new_class.ParentClassCode = parent.Code if parent is not None else None
     dialog = class_editor.create_dialog(new_class, main_window.get())
     widget: ui.ClassEditor = dialog._widget

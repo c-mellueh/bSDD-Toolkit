@@ -59,12 +59,20 @@ class ClassTreeView(ItemViewTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.group_selection_requested.connect(lambda v:cls._get_trigger().group_selection(v,cls))
-        cls.signals.search_requested.connect(lambda v: trigger.search_class(v,cls))
+        cls.signals.group_selection_requested.connect(
+            lambda v: cls._get_trigger().group_selection(v, cls)
+        )
+        cls.signals.search_requested.connect(lambda v: trigger.search_class(v, cls))
         cls.signals.expand_selection_requested.connect(cls.expand_selection)
         cls.signals.collapse_selection_requested.connect(cls.collapse_selection)
-        cls.signals.copy_selection_requested.connect(lambda v:trigger.copy_selected_classes_to_clipboard(v,cls))
+        cls.signals.copy_selection_requested.connect(
+            lambda v: trigger.copy_selected_classes_to_clipboard(v, cls)
+        )
         cls.signals.paste_requested.connect(trigger.paste_classes_from_clipboard)
+
+    @classmethod
+    def get_allowed_class_types(cls) -> list[str]:
+        return ["Class", "Material", "AlternativeUse"]
 
     @classmethod
     def get_selected(cls, view: ui.ClassView) -> list[BsddClass]:
@@ -84,19 +92,25 @@ class ClassTreeView(ItemViewTool):
         if not model:
             logging.info(f"no Model found")
             return
+        
+        #Skips Class if the Tree is not dhe right one
+        if new_class.ClassType not in cls.get_allowed_class_types():
+            return
         parent_index = model._get_current_parent_index(new_class)
 
         insert_row = model.rowCount(parent_index)  # current child count
         model.beginInsertRows(parent_index, insert_row, insert_row)
         # mutate your data
-        model.bsdd_dictionary.Classes.append(new_class)
-        new_class._set_parent(model.bsdd_dictionary)
+        if cl_utils.get_class_by_code(bsdd_dictionary,new_class.Code) is None:
+            model.bsdd_dictionary.Classes.append(new_class)
+            new_class._set_parent(model.bsdd_dictionary)
+            cls.signals.item_added.emit(new_class)
+
         model.endInsertRows()
-        cls.signals.item_added.emit(new_class)
 
     @classmethod
     def delete_selection(cls, view: ui.ClassView):
-        trigger.delete_selection(view,cls)  # can't be handled here because popup is required
+        trigger.delete_selection(view, cls)  # can't be handled here because popup is required
 
     @classmethod
     def delete_class(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):

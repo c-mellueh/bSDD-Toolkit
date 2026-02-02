@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_to_main_window(tool.GroupOfProperties, tool.MainWindowWidget, tool.Project)
-    core.connect_signals(tool.GroupOfProperties,tool.GopClassView)
+    core.connect_to_main_window(tool.GroupOfProperties, tool.MainWindowWidget, tool.Project,tool.ClassEditorWidget)
+    core.connect_signals(tool.GroupOfProperties,tool.GopClassView,tool.ClassEditorWidget,tool.Project)
 
 
 def retranslate_ui():
@@ -28,7 +28,7 @@ def create_widget(data: object, parent):
 
 def widget_created(widget):
     core.register_widget(widget, tool.GroupOfProperties)
-    core.connect_widget(widget, tool.GroupOfProperties)
+    core.connect_widget(widget, tool.GroupOfProperties,tool.ClassEditorWidget)
 
 #CLassTreeView
 

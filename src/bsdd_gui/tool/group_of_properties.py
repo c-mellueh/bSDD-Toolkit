@@ -5,8 +5,7 @@ import logging
 
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import FieldTool,ActionTool,ItemViewTool,FieldSignals,ViewSignals
-from bsdd_gui.module.group_of_properties.ui import GopWidget
-from bsdd_gui.module.group_of_properties import trigger,models,views
+from bsdd_gui.module.group_of_properties import trigger,models,views,ui
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal
 from .class_tree_view import ClassTreeView as CTV
@@ -18,7 +17,7 @@ if TYPE_CHECKING:
 
 class WidgetSignals(FieldSignals):
     widget_requested = Signal(object,QWidget) #bSDDDictionary, Window
-
+    new_class_requested = Signal(str)
 
 class GroupOfProperties(FieldTool,ActionTool):
     signals = WidgetSignals()
@@ -27,13 +26,17 @@ class GroupOfProperties(FieldTool,ActionTool):
     def get_properties(cls) -> GroupOfPropertiesProperties:
         return bsdd_gui.GroupOfPropertiesProperties
 
+
+
     @classmethod
     def connect_internal_signals(cls):
         return super().connect_internal_signals()
     
     @classmethod
-    def connect_widget_signals(cls, widget):
-        return super().connect_widget_signals(widget)
+    def connect_widget_signals(cls, widget:ui.GopWidget):
+
+        widget.tb_new.clicked.connect(lambda *_:cls.signals.new_class_requested.emit("GroupOfProperties"))
+        super().connect_widget_signals(widget)
     
     @classmethod
     def _get_trigger(cls):
@@ -41,7 +44,7 @@ class GroupOfProperties(FieldTool,ActionTool):
 
     @classmethod
     def _get_widget_class(cls):
-        return GopWidget
+        return ui.GopWidget
 
 
 class ClassViewSignals(CTS):
@@ -68,3 +71,7 @@ class GopClassView(CTV):
     @classmethod
     def delete_selection(view):
         return super().delete_selection()
+
+    @classmethod
+    def get_allowed_class_types(cls):
+        return ["GroupOfProperties"]
