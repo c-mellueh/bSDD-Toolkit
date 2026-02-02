@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHeaderView, QLabel,
-    QSizePolicy, QSplitter, QTableView, QToolButton,
-    QVBoxLayout, QWidget)
+    QPushButton, QSizePolicy, QSplitter, QTableView,
+    QToolButton, QVBoxLayout, QWidget)
 
 from bsdd_gui.module.group_of_properties.views import GroupOfPropertiesView
 
@@ -43,18 +43,23 @@ class Ui_Form(object):
 
         self.lb_class = QLabel(self.gridLayoutWidget_2)
         self.lb_class.setObjectName(u"lb_class")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.lb_class.sizePolicy().hasHeightForWidth())
+        self.lb_class.setSizePolicy(sizePolicy)
 
         self.gridLayout_2.addWidget(self.lb_class, 0, 1, 1, 1)
-
-        self.tb_new = QToolButton(self.gridLayoutWidget_2)
-        self.tb_new.setObjectName(u"tb_new")
-
-        self.gridLayout_2.addWidget(self.tb_new, 0, 2, 1, 1)
 
         self.treeView = GroupOfPropertiesView(self.gridLayoutWidget_2)
         self.treeView.setObjectName(u"treeView")
 
         self.gridLayout_2.addWidget(self.treeView, 1, 0, 1, 3)
+
+        self.pb_new_class = QPushButton(self.gridLayoutWidget_2)
+        self.pb_new_class.setObjectName(u"pb_new_class")
+
+        self.gridLayout_2.addWidget(self.pb_new_class, 0, 2, 1, 1)
 
         self.splitter.addWidget(self.gridLayoutWidget_2)
         self.gridLayoutWidget = QWidget(self.splitter)
@@ -62,10 +67,22 @@ class Ui_Form(object):
         self.gridLayout = QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.label = QLabel(self.gridLayoutWidget)
+        self.label.setObjectName(u"label")
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+
         self.tableView = QTableView(self.gridLayoutWidget)
         self.tableView.setObjectName(u"tableView")
 
-        self.gridLayout.addWidget(self.tableView, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.tableView, 1, 0, 1, 2)
+
+        self.pb_new_prop = QPushButton(self.gridLayoutWidget)
+        self.pb_new_prop.setObjectName(u"pb_new_prop")
+
+        self.gridLayout.addWidget(self.pb_new_prop, 0, 1, 1, 1)
 
         self.splitter.addWidget(self.gridLayoutWidget)
 
@@ -81,6 +98,8 @@ class Ui_Form(object):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.tb_search.setText(QCoreApplication.translate("Form", u"...", None))
         self.lb_class.setText(QCoreApplication.translate("Form", u"Group of Properties:", None))
-        self.tb_new.setText(QCoreApplication.translate("Form", u"New", None))
+        self.pb_new_class.setText(QCoreApplication.translate("Form", u"New", None))
+        self.label.setText(QCoreApplication.translate("Form", u"Property:", None))
+        self.pb_new_prop.setText(QCoreApplication.translate("Form", u"New", None))
     # retranslateUi
 

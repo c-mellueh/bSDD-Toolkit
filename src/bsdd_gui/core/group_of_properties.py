@@ -58,9 +58,11 @@ def connect_signals(
 
 
 def create_widget(data, parent, widget_tool: Type[tool.GroupOfProperties]):
-    widget:ui.GopWidget = widget_tool.show_widget(data, parent)
+    widget: ui.GopWidget = widget_tool.show_widget(data, parent)
     widget.tb_search.setIcon(qta.icon("mdi.magnify"))
-    widget.tb_new.setIcon(qta.icon("mdi.plus"))
+    widget.pb_new_class.setIcon(qta.icon("mdi.plus"))
+    widget.pb_new_prop.setIcon(qta.icon("mdi.plus"))
+
 
 def register_widget(widget: ui.GopWidget, widget_tool: Type[tool.GroupOfProperties]):
     widget_tool.register_widget(widget)
@@ -73,7 +75,9 @@ def connect_widget(
     class_editor: Type[tool.ClassEditorWidget],
 ):
     widget_tool.connect_widget_signals(widget)
-    widget.tb_new.clicked.connect(lambda *_, w=widget: class_view.request_new_class(w.treeView))
+    widget.pb_new_class.clicked.connect(
+        lambda *_, w=widget: class_view.request_new_class(w.treeView)
+    )
 
     def emit_class_info_requested(index: QModelIndex):
         index = view.model().mapToSource(index)

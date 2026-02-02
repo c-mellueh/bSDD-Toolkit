@@ -30,27 +30,53 @@
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="lb_class">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Group of Properties:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QToolButton" name="tb_new">
-         <property name="text">
-          <string>New</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" colspan="3">
         <widget class="GroupOfPropertiesView" name="treeView"/>
        </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="pb_new_class">
+         <property name="text">
+          <string>New</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="gridLayoutWidget">
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Property:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
         <widget class="QTableView" name="tableView"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="pb_new_prop">
+         <property name="text">
+          <string>New</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
