@@ -53,6 +53,7 @@ class Ui_Form(object):
 
         self.tv_class = GopClassView(self.glw_class)
         self.tv_class.setObjectName(u"tv_class")
+        self.tv_class.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
         self.gl_class.addWidget(self.tv_class, 1, 0, 1, 3)
 
@@ -76,6 +77,7 @@ class Ui_Form(object):
 
         self.tv_properties = GopPropertyView(self.glw_property)
         self.tv_properties.setObjectName(u"tv_properties")
+        self.tv_properties.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
         self.gl_property.addWidget(self.tv_properties, 1, 0, 1, 2)
 

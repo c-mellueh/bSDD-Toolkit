@@ -122,7 +122,6 @@ def connect_widget(
 
 def register_class_view(view: views.GopPropertyView, gop_view: Type[tool.GopClassView]):
     gop_view.register_view(view)
-    view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
     view.setSelectionBehavior(QTreeView.SelectRows)
     view.setSelectionMode(QTreeView.ExtendedSelection)
     view.setAlternatingRowColors(True)

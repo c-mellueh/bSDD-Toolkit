@@ -54,7 +54,11 @@ def class_view_created(view: GopClassView):
 
 
 def context_menu_requested(view: GopClassView, pos: QPoint):
-    core.create_context_menu(view, pos, tool.GopClassView)
+    from .views import GopClassView, GopPropertyView
+    if isinstance(view,GopClassView):
+        core.create_context_menu(view, pos, tool.GopClassView)
+    else:
+        core.create_context_menu(view, pos, tool.GopPropertyView)
 
 
 ### PropertyTable View
