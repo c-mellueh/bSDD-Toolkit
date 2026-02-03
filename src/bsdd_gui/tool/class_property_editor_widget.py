@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 class Signals(DialogSignals):
     paste_clipboard = Signal(ui.ClassPropertyEditor)
     property_reference_changed = Signal(BsddClassProperty)
-    new_class_property_created = Signal(BsddClassProperty)
+    new_class_property_created = Signal(BsddClassProperty,BsddClassProperty)
 
     new_value_requested = Signal(object)
     create_new_class_property_requested = Signal()

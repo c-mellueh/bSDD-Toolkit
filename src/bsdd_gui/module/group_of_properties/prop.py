@@ -8,7 +8,7 @@ class GroupOfPropertiesProperties(ActionsProperties, FieldProperties):
     def __init__(self):
         super().__init__()
         self.active_class = None
-
+        self.active_class_property = None
 
 class GopClassViewProperties(ClassTreeViewProperties):
     def __init__(self):

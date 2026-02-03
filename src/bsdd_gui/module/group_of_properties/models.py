@@ -8,10 +8,10 @@ from bsdd_json.utils import class_utils as cl_utils
 
 
 class ClassTreeModel(CTM):
-    def __init__(self, tl=None, bsdd_dictionary=None, *args, **kwargs):
+    def __init__(self, tl=None, bsdd_data=None, *args, **kwargs):
         from bsdd_gui.tool import GopClassView
 
-        super().__init__(bsdd_dictionary, GopClassView, *args, **kwargs)
+        super().__init__(GopClassView, bsdd_data, *args, **kwargs)
 
     def _get_root_classes(self):
         rc = cl_utils.get_root_classes(self.bsdd_dictionary)
@@ -27,10 +27,23 @@ class ClassSortModel(CSM):
 
 
 class PropertyTableModel(PTM):
-    def __init__(self, tl=None, bsdd_dictionary=None, *args, **kwargs):
+    def __init__(self, tl=None, bsdd_data=None, *args, **kwargs):
         from bsdd_gui.tool import GopPropertyView
 
-        super().__init__(GopPropertyView, bsdd_dictionary, *args, **kwargs)
+        super().__init__(GopPropertyView, bsdd_data, *args, **kwargs)
+
+    @property
+    def active_class(self):
+        from bsdd_gui.tool import GroupOfProperties
+
+        return GroupOfProperties.get_active_class()
+
+    @property
+    def active_pset(self):
+        from bsdd_gui.tool import GroupOfProperties
+
+        active_class = GroupOfProperties.get_active_class()
+        return active_class.Name
 
 
 class PropertySortModel(PSM):

@@ -21,6 +21,7 @@ def connect():
         tool.GopClassView,
         tool.GopPropertyView,
         tool.ClassEditorWidget,
+        tool.ClassPropertyEditorWidget,
         tool.Project,
     )
 
@@ -39,7 +40,7 @@ def create_widget(data: object, parent):
 
 def widget_created(widget):
     core.register_widget(widget, tool.GroupOfProperties)
-    core.connect_widget(widget, tool.GroupOfProperties, tool.GopClassView, tool.ClassEditorWidget)
+    core.connect_widget(widget, tool.GroupOfProperties, tool.GopClassView,tool.GopPropertyView, tool.ClassEditorWidget)
 
 
 # CLassTreeView

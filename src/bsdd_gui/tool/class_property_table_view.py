@@ -145,3 +145,27 @@ class ClassPropertyTableView(ItemViewTool):
     @classmethod
     def request_copy(cls, view: ui.ClassPropertyTable):
         cls.signals.copy_requested.emit(view)
+
+    @classmethod
+    def reset_property(
+        cls,
+        new_pset_name: str,
+        property_view: ui.ClassPropertyTable,
+        active_class: BsddClass,
+        active_property: BsddClassProperty,
+    ):
+        """
+        if the class changes this function checks if the new class has a propertySet with the same name as the old class and selects it
+        """
+        active_prop = active_property
+        if active_prop is None:
+            return
+        active_class = active_class
+        property_list = cls.filter_properties_by_pset(active_class, new_pset_name)
+        code_dict = {p.Code: p for p in property_list}
+        if active_prop.Code in code_dict:
+            new_property = code_dict[active_prop.Code]
+            row_index = cls.get_row_of_property(property_view, new_property)
+        else:
+            row_index = 0
+        cls.select_row(property_view, row_index or 0)

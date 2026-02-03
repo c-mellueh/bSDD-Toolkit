@@ -38,11 +38,12 @@ def retranslate_ui(
 def connect_signals(
     widget_tool: Type[tool.GroupOfProperties],
     class_view: Type[tool.GopClassView],
-    property_view:Type[tool.GopPropertyView],
+    property_view: Type[tool.GopPropertyView],
     class_editor: Type[tool.ClassEditorWidget],
+    class_property_editor: Type[tool.ClassPropertyEditorWidget],
     project: Type[tool.Project],
 ):
-    def handle_new_request(act, view:views.GopClassView):
+    def handle_new_request(act, view: views.GopClassView):
         active = class_view.get_selected(view)
         active = cl_utils.get_parent(active[0], project.get()) if active else None
         class_editor.request_new_class(act, active)
@@ -57,6 +58,11 @@ def connect_signals(
     class_view.signals.item_removed.connect(project.signals.class_removed.emit)
     class_view.signals.item_added.connect(project.signals.class_added.emit)
     class_view.signals.new_class_requested.connect(handle_new_request)
+    class_property_editor.signals.new_class_property_created.connect(
+        lambda p, c: property_view.add_class_property(p, c)
+    )
+    property_view.signals.item_added.connect(project.signals.class_property_added.emit)
+    property_view.signals.item_removed.connect(project.signals.class_property_removed.emit)
 
 
 def create_widget(data, parent, widget_tool: Type[tool.GroupOfProperties]):
@@ -73,29 +79,43 @@ def register_widget(widget: ui.GopWidget, widget_tool: Type[tool.GroupOfProperti
 def connect_widget(
     widget: ui.GopWidget,
     widget_tool: Type[tool.GroupOfProperties],
-    class_view: Type[tool.GopClassView],
+    gop_class_view: Type[tool.GopClassView],
+    gop_prop_view: Type[tool.GopPropertyView],
     class_editor: Type[tool.ClassEditorWidget],
 ):
     widget_tool.connect_widget_signals(widget)
     widget.pb_new_class.clicked.connect(
-        lambda *_, w=widget: class_view.request_new_class(w.tv_class)
+        lambda *_, w=widget: gop_class_view.request_new_class(w.tv_class)
     )
 
     def emit_class_info_requested(index: QModelIndex):
-        index = view.model().mapToSource(index)
+        index = class_view.model().mapToSource(index)
         bsdd_class = index.internalPointer()
         if not bsdd_class:
             return
         class_types = "GroupOfProperties"
         class_editor.signals.edit_class_requested.emit(class_types, bsdd_class)
 
-    view = widget.tv_class
-    widget.tb_search.clicked.connect(lambda _, v=view: class_view.request_search(v))
-    view.doubleClicked.connect(emit_class_info_requested)
-    class_view.signals.selection_changed.connect(
-        lambda v, c, w=widget: widget_tool.update_class_selection(v, w, c)
+    class_view = widget.tv_class
+    widget.tb_search.clicked.connect(lambda _, v=class_view: gop_class_view.request_search(v))
+    class_view.doubleClicked.connect(emit_class_info_requested)
+    gop_class_view.signals.selection_changed.connect(
+        lambda v, c, w=widget: widget_tool.set_active_class(v, w, c)
     )
-    widget_tool.update_class_selection(widget.tv_class, widget, None)
+    widget_tool.set_active_class(widget.tv_class, widget, None)
+    prop_view = widget.tv_properties
+    gop_prop_view.signals.selection_changed.connect(
+        lambda v, n: (widget_tool.set_active_property(n) if v == prop_view else None)
+    )
+    widget_tool.signals.active_class_changed.connect(lambda c: gop_prop_view.reset_view(prop_view))
+    widget_tool.signals.active_class_changed.connect(
+        lambda c: gop_prop_view.reset_property(
+            c.Name,
+            prop_view,
+            c,
+            widget_tool.get_active_property(),
+        )
+    )
 
 
 ### Item View
@@ -114,15 +134,16 @@ def register_class_view(view: views.GopPropertyView, gop_view: Type[tool.GopClas
     view.setDragDropMode(QTreeView.DragDropMode.DragDrop)  # internal DnD
     logging.info(f"register View {type(view).__name__} done!")
 
-def register_property_view(view:views.GopPropertyView,gop_view:Type[tool.GopPropertyView]):
-    gop_view.register_view(view)
 
+def register_property_view(view: views.GopPropertyView, gop_view: Type[tool.GopPropertyView]):
+    gop_view.register_view(view)
 
 
 def connect_class_view(view: views.GopPropertyView, gop_view: Type[tool.GopClassView]):
     gop_view.connect_view_signals(view)
 
-def connect_property_view(view:views.GopPropertyView,gop_view:Type[tool.GopPropertyView]):
+
+def connect_property_view(view: views.GopPropertyView, gop_view: Type[tool.GopPropertyView]):
     gop_view.connect_view_signals(view)
 
 
@@ -135,14 +156,16 @@ def add_columns_to_class_view(
     view.setModel(sort_model)
 
 
-def create_context_menu(view:views.GopClassView, pos, gop_view: Type[tool.GopClassView|tool.GopPropertyView]):
+def create_context_menu(
+    view: views.GopClassView, pos, gop_view: Type[tool.GopClassView | tool.GopPropertyView]
+):
     bsdd_allowed_values = gop_view.get_selected(view)
     menu = gop_view.create_context_menu(view, bsdd_allowed_values)
     menu_pos = view.viewport().mapToGlobal(pos)
     menu.exec(menu_pos)
 
 
-def remove_view(view:views.GopClassView, pos, gop_view: Type[tool.GopClassView]):
+def remove_view(view: views.GopClassView, pos, gop_view: Type[tool.GopClassView]):
     gop_view.remove_model(view.model().sourceModel())
 
 

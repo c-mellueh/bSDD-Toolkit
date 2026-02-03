@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 
-from bsdd_json import BsddClass
+from bsdd_json import BsddClass, BsddClassProperty
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import (
     FieldTool,
@@ -30,7 +30,8 @@ if TYPE_CHECKING:
 class WidgetSignals(FieldSignals):
     widget_requested = Signal(object, QWidget)  # bSDDDictionary, Window
     new_class_requested = Signal(str)
-
+    active_class_changed = Signal(BsddClass)
+    active_property_changed = Signal(BsddClassProperty)
 
 class GroupOfProperties(FieldTool, ActionTool):
     signals = WidgetSignals()
@@ -56,19 +57,27 @@ class GroupOfProperties(FieldTool, ActionTool):
         return ui.GopWidget
 
     @classmethod
-    def update_class_selection(
-        cls, view: views.ClassView, widget: ui.GopWidget, bsdd_class: BsddClass
-    ):
+    def set_active_class(cls, view: views.ClassView, widget: ui.GopWidget, bsdd_class: BsddClass):
         if widget.tv_class != view:
             return
         text = QCoreApplication.translate("GroupOfProperties", "Group of properties: {}")
         widget.lb_class.setText(text.format(bsdd_class.Name if bsdd_class else ""))
         widget.glw_property.setEnabled(bsdd_class is not None)
         cls.get_properties().active_class = bsdd_class
+        cls.signals.active_class_changed.emit(bsdd_class)
 
     @classmethod
     def get_active_class(cls) -> BsddClass:
         return cls.get_properties().active_class
+
+    @classmethod
+    def set_active_property(cls, value: BsddClassProperty):
+        cls.get_properties().active_class_property = value
+        cls.signals.active_property_changed.emit(value)
+
+    @classmethod
+    def get_active_property(cls) -> BsddClassProperty:
+        return cls.get_properties().active_class_property
 
 
 class ClassViewSignals(CTS):
