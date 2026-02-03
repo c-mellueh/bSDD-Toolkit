@@ -56,7 +56,7 @@
      <widget class="QWidget" name="glw_property">
       <layout class="QGridLayout" name="gl_property">
        <item row="0" column="0">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="lb_prop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>1</horstretch>

@@ -100,24 +100,21 @@ def connect_widget(
     widget.tb_search.clicked.connect(lambda _, v=class_view: gop_class_view.request_search(v))
     class_view.doubleClicked.connect(emit_class_info_requested)
     gop_class_view.signals.selection_changed.connect(
-        lambda v, c, w=widget: widget_tool.set_active_class(v, w, c)
+        lambda v, c, w=widget: widget_tool.set_active_class(c)
     )
-    widget_tool.set_active_class(widget.tv_class, widget, None)
+
     prop_view = widget.tv_properties
+
     gop_prop_view.signals.selection_changed.connect(
         lambda v, n: (widget_tool.set_active_property(n) if v == prop_view else None)
     )
+
     widget_tool.signals.active_class_changed.connect(lambda c: gop_prop_view.reset_view(prop_view))
-    widget_tool.signals.active_class_changed.connect(
-        lambda c: gop_prop_view.reset_property(
-            widget_tool.generate_pset_name(c),
-            prop_view,
-            c,
-            widget_tool.get_active_property(),
-        )
-    )
+    widget_tool.signals.active_class_changed.connect(widget_tool.reset_property)
     widget.pb_new_prop.clicked.connect(lambda: gop_prop_view.request_new_property())
     gop_prop_view.set_allowed_class_types(gop_class_view.get_allowed_class_types())
+    
+    widget_tool.set_active_class(None)
 
 
 ### Item View

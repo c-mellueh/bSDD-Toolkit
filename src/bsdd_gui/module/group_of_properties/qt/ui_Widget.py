@@ -67,12 +67,12 @@ class Ui_Form(object):
         self.gl_property = QGridLayout(self.glw_property)
         self.gl_property.setObjectName(u"gl_property")
         self.gl_property.setContentsMargins(0, 0, 0, 0)
-        self.label = QLabel(self.glw_property)
-        self.label.setObjectName(u"label")
-        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-        self.label.setSizePolicy(sizePolicy)
+        self.lb_prop = QLabel(self.glw_property)
+        self.lb_prop.setObjectName(u"lb_prop")
+        sizePolicy.setHeightForWidth(self.lb_prop.sizePolicy().hasHeightForWidth())
+        self.lb_prop.setSizePolicy(sizePolicy)
 
-        self.gl_property.addWidget(self.label, 0, 0, 1, 1)
+        self.gl_property.addWidget(self.lb_prop, 0, 0, 1, 1)
 
         self.tv_properties = GopPropertyView(self.glw_property)
         self.tv_properties.setObjectName(u"tv_properties")
@@ -99,7 +99,7 @@ class Ui_Form(object):
         self.tb_search.setText(QCoreApplication.translate("Form", u"...", None))
         self.lb_class.setText(QCoreApplication.translate("Form", u"Group of Properties:", None))
         self.pb_new_class.setText(QCoreApplication.translate("Form", u"New", None))
-        self.label.setText(QCoreApplication.translate("Form", u"Property:", None))
+        self.lb_prop.setText(QCoreApplication.translate("Form", u"Property:", None))
         self.pb_new_prop.setText(QCoreApplication.translate("Form", u"New", None))
     # retranslateUi
 

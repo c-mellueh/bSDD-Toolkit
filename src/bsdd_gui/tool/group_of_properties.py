@@ -43,7 +43,10 @@ class GroupOfProperties(FieldTool, ActionTool):
 
     @classmethod
     def connect_internal_signals(cls):
-        return super().connect_internal_signals()
+        super().connect_internal_signals()
+        cls.signals.active_class_changed.connect(lambda *_: cls.update_class_label())
+        cls.signals.active_class_changed.connect(lambda *_: cls.update_property_enabled_state())
+        cls.signals.active_property_changed.connect(lambda *_: cls.update_property_label())
 
     @classmethod
     def connect_widget_signals(cls, widget: ui.GopWidget):
@@ -58,12 +61,7 @@ class GroupOfProperties(FieldTool, ActionTool):
         return ui.GopWidget
 
     @classmethod
-    def set_active_class(cls, view: views.ClassView, widget: ui.GopWidget, bsdd_class: BsddClass):
-        if widget.tv_class != view:
-            return
-        text = QCoreApplication.translate("GroupOfProperties", "Group of properties: {}")
-        widget.lb_class.setText(text.format(bsdd_class.Name if bsdd_class else ""))
-        widget.glw_property.setEnabled(bsdd_class is not None)
+    def set_active_class(cls, bsdd_class: BsddClass):
         cls.get_properties().active_class = bsdd_class
         cls.signals.active_class_changed.emit(bsdd_class)
 
@@ -77,12 +75,70 @@ class GroupOfProperties(FieldTool, ActionTool):
         cls.signals.active_property_changed.emit(value)
 
     @classmethod
+    def update_property_enabled_state(cls):
+        widget = cls.get_widget()
+        if not widget:
+            return
+        widget.glw_property.setEnabled(cls.get_active_class() is not None)
+
+    @classmethod
+    def update_class_label(cls):
+        widget = cls.get_widget()
+        widget.lb_class
+        active_class = cls.get_active_class()
+        text = QCoreApplication.translate("GroupOfProperties", "Group of properties: {}")
+        text = text.format(active_class.Name if active_class else "")
+        widget.lb_class.setText(text)
+
+    @classmethod
+    def update_property_label(cls):
+        widget = cls.get_widget()
+        widget.lb_class
+        active_property = cls.get_active_property()
+        text = QCoreApplication.translate("GroupOfProperties", "Property: {}")
+        text = text.format(active_property.Code if active_property else "")
+        widget.lb_prop.setText(text)
+
+    @classmethod
     def get_active_property(cls) -> BsddClassProperty:
         return cls.get_properties().active_class_property
 
     @classmethod
     def generate_pset_name(cls, bsdd_class: BsddClass):
+        if bsdd_class is None:
+            return ""
         return bsdd_class.Name
+
+    @classmethod
+    def get_widget(cls, data=None) -> ui.GopWidget:
+        widgets = cls.get_properties().widgets
+        if not widgets:
+            return None
+        return widgets[-1]
+
+    @classmethod
+    def reset_property(cls, active_class: BsddClass):
+        """
+        if the class changes this function checks if the new class has a propertySet with the same name as the old class and selects it
+        """
+
+        active_prop = cls.get_active_property()
+
+        if active_prop is None:
+            return
+        view = cls.get_widget().tv_properties
+        active_class = active_class
+        code_dict = {p.Code: p for p in active_class.ClassProperties}
+        if active_prop.Code in code_dict:
+            new_property = code_dict[active_prop.Code]
+            row_index = GopPropertyView.get_row_of_property(view, new_property)
+            cls.set_active_property(new_property)
+
+        else:
+            row_index = 0
+            cls.set_active_property(None)
+
+        GopPropertyView.select_row(view, row_index or 0)
 
 
 class ClassViewSignals(CTS):
