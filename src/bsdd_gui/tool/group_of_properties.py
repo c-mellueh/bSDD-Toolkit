@@ -33,6 +33,7 @@ class WidgetSignals(FieldSignals):
     active_class_changed = Signal(BsddClass)
     active_property_changed = Signal(BsddClassProperty)
 
+
 class GroupOfProperties(FieldTool, ActionTool):
     signals = WidgetSignals()
 
@@ -78,6 +79,10 @@ class GroupOfProperties(FieldTool, ActionTool):
     @classmethod
     def get_active_property(cls) -> BsddClassProperty:
         return cls.get_properties().active_class_property
+
+    @classmethod
+    def generate_pset_name(cls, bsdd_class: BsddClass):
+        return bsdd_class.Name
 
 
 class ClassViewSignals(CTS):
@@ -135,3 +140,11 @@ class GopPropertyView(PTW):
     @classmethod
     def _get_proxy_model_class(cls):
         return models.PropertySortModel
+
+    @classmethod
+    def request_new_property(cls):
+        from bsdd_gui import tool
+
+        bsdd_class = tool.GroupOfProperties.get_active_class()
+        property_set = tool.GroupOfProperties.generate_pset_name(bsdd_class)
+        cls.signals.new_property_requested.emit(bsdd_class, property_set)

@@ -22,7 +22,7 @@ class Signals(QObject):
     active_property_changed = Signal(BsddClassProperty)
     new_class_requested = Signal(str) #Type: Class|Material|GroupOfProperties|AlternativeUse
     new_property_set_requested = Signal()
-    new_property_requested = Signal()
+    new_property_requested = Signal(BsddClass,str)
     refresh_status_bar_requested = Signal()
     toggle_console_requested = Signal()
 

@@ -15,7 +15,7 @@ def connect():
         tool.ClassPropertyEditorWidget,
         tool.Project,
     )
-    core.connect_to_main_window(tool.ClassPropertyTableView, tool.MainWindowWidget)
+    core.connect_to_main_window(tool.ClassPropertyTableView, tool.MainWindowWidget,tool.ClassTreeView)
 
 
 def retranslate_ui():

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import logging
 
 import bsdd_gui
-from bsdd_json import BsddClassProperty, BsddDictionary, BsddProperty
+from bsdd_json import BsddClassProperty, BsddDictionary, BsddProperty,BsddClass
 from bsdd_gui.module.class_property_editor_widget import ui, views
 from PySide6.QtWidgets import QLayout, QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
@@ -35,7 +35,7 @@ class Signals(DialogSignals):
     new_class_property_created = Signal(BsddClassProperty,BsddClassProperty)
 
     new_value_requested = Signal(object)
-    create_new_class_property_requested = Signal()
+    create_new_class_property_requested = Signal(BsddClass,str)
     edit_bsdd_property_requested = Signal(
         BsddProperty, QWidget
     )  # BsddProperty not BsddClassProperty,parentWidget

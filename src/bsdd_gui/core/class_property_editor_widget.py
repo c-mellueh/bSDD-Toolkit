@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from bsdd_json import BsddClassProperty
+from bsdd_json import BsddClassProperty, BsddClass
 from bsdd_gui.module.class_property_editor_widget.constants import (
     SEPERATOR_SECTION,
     SEPERATOR,
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 def connect_signals(
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
     property_table: Type[tool.ClassPropertyTableView],
+    gop_property_table: Type[tool.GopPropertyView],
     main_window: Type[tool.MainWindowWidget],
     property_editor: Type[tool.PropertyEditorWidget],
     project: Type[tool.Project],
@@ -32,6 +33,11 @@ def connect_signals(
     property_table.signals.new_property_requested.connect(
         class_property_editor.signals.create_new_class_property_requested.emit
     )
+
+    gop_property_table.signals.new_property_requested.connect(
+        class_property_editor.signals.create_new_class_property_requested.emit
+    )
+
     property_editor.signals.field_changed.connect(class_property_editor.handle_field_changed)
     property_editor.signals.new_property_created.connect(
         lambda _: class_property_editor.validate_widgets()
@@ -135,13 +141,14 @@ def update_property_specific_fields(
 
 
 def create_dialog(
+    bsdd_class: BsddClass,
+    property_set: str,
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
     main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
     property_set_table: Type[tool.PropertySetTableView],
 ):
-    bsdd_class = main_window.get_active_class()
-    property_set = main_window.get_active_pset()
+
     if bsdd_class is None or property_set is None:
         return
 
@@ -159,7 +166,9 @@ def create_dialog(
     if dialog.exec():
         class_property_editor.sync_to_model(dialog._widget, bsdd_class_property)
         # add ClassProperty to Class
-        class_property_editor.signals.new_class_property_created.emit(bsdd_class_property,bsdd_class)
+        class_property_editor.signals.new_class_property_created.emit(
+            bsdd_class_property, bsdd_class
+        )
         # bsdd_class_property.parent().ClassProperties.append(bsdd_class_property)
 
         if pset_was_temporary:

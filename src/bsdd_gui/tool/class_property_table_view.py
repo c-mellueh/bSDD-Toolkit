@@ -12,13 +12,14 @@ from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_property_table_view.prop import ClassPropertyTableViewProperties
+    from bsdd_json.type_hints import CLASS_TYPE
 
 
 class Signals(ViewSignals):
     property_info_requested = Signal(BsddClassProperty)
     paste_requested = Signal(ui.ClassPropertyTable)
     copy_requested = Signal(ui.ClassPropertyTable)
-    new_property_requested = Signal()
+    new_property_requested = Signal(BsddClass, str)
 
 
 class ClassPropertyTableView(ItemViewTool):
@@ -45,9 +46,17 @@ class ClassPropertyTableView(ItemViewTool):
         return [model for model in cls.get_models() if model.active_class == bsdd_class]
 
     @classmethod
+    def set_allowed_class_types(cls, allowed_class_types: list[CLASS_TYPE]):
+        cls.get_properties().allowed_class_types = allowed_class_types
+
+    @classmethod
     def add_class_property(cls, class_property: BsddClassProperty, bsdd_class: BsddClass):
+        if bsdd_class.ClassType not in cls.get_properties().allowed_class_types:
+            return
+
         if class_property in bsdd_class.ClassProperties:
             return
+
         affected_models = cls.get_models_by_class(bsdd_class)
         for model in affected_models:
             row = model.rowCount()
@@ -136,7 +145,11 @@ class ClassPropertyTableView(ItemViewTool):
 
     @classmethod
     def request_new_property(cls):
-        cls.signals.new_property_requested.emit()
+        from bsdd_gui import tool
+
+        bsdd_class = tool.MainWindowWidget.get_active_class()
+        property_set = tool.MainWindowWidget.get_active_pset()
+        cls.signals.new_property_requested.emit(bsdd_class, property_set)
 
     @classmethod
     def request_paste(cls, view: ui.ClassPropertyTable):

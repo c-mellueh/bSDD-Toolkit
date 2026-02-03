@@ -134,7 +134,9 @@ def reset_views(property_table: Type[tool.ClassPropertyTableView], project: Type
 
 
 def connect_to_main_window(
-    property_table: Type[tool.ClassPropertyTableView], main_window: Type[tool.MainWindowWidget]
+    property_table: Type[tool.ClassPropertyTableView],
+    main_window: Type[tool.MainWindowWidget],
+    class_tree_view: Type[tool.ClassTreeView],
 ):
 
     view = main_window.get_property_view()
@@ -151,6 +153,7 @@ def connect_to_main_window(
             main_window.get_active_property(),
         )
     )
+    property_table.set_allowed_class_types(class_tree_view.get_allowed_class_types())
 
 
 def reset_models(

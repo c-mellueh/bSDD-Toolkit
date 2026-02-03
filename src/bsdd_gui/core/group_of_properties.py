@@ -110,12 +110,14 @@ def connect_widget(
     widget_tool.signals.active_class_changed.connect(lambda c: gop_prop_view.reset_view(prop_view))
     widget_tool.signals.active_class_changed.connect(
         lambda c: gop_prop_view.reset_property(
-            c.Name,
+            widget_tool.generate_pset_name(c),
             prop_view,
             c,
             widget_tool.get_active_property(),
         )
     )
+    widget.pb_new_prop.clicked.connect(lambda: gop_prop_view.request_new_property())
+    gop_prop_view.set_allowed_class_types(gop_class_view.get_allowed_class_types())
 
 
 ### Item View

@@ -47,9 +47,15 @@ def connect_main_window(
     )
     signals = main_window.signals
     ui = main_window.get()
-    ui.button_classes_add.clicked.connect(lambda *_:signals.new_class_requested.emit("Class|Material|AlternativeUse"))
+    ui.button_classes_add.clicked.connect(
+        lambda *_: signals.new_class_requested.emit("Class|Material|AlternativeUse")
+    )
     ui.button_Pset_add.clicked.connect(signals.new_property_set_requested.emit)
-    ui.button_property_add.clicked.connect(signals.new_property_requested.emit)
+    ui.button_property_add.clicked.connect(
+        lambda: signals.new_property_requested.emit(
+            main_window.get_active_class(), main_window.get_active_pset()
+        )
+    )
 
     ui.button_search.clicked.connect(
         lambda _: class_tree.request_search(main_window.get_class_view())
