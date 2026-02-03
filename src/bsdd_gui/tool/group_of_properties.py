@@ -16,11 +16,14 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal, QCoreApplication
 from .class_tree_view import ClassTreeView as CTV
 from .class_tree_view import Signals as CTS
+from .property_table_widget import PropertyTableWidget as PTW
+from .property_table_widget import Signals as PTS
 
 if TYPE_CHECKING:
     from bsdd_gui.module.group_of_properties.prop import (
         GroupOfPropertiesProperties,
         GopClassViewProperties,
+        GopPropertyViewProperties,
     )
 
 
@@ -61,11 +64,13 @@ class GroupOfProperties(FieldTool, ActionTool):
         text = QCoreApplication.translate("GroupOfProperties", "Group of properties: {}")
         widget.lb_class.setText(text.format(bsdd_class.Name if bsdd_class else ""))
         widget.glw_property.setEnabled(bsdd_class is not None)
-        cls.get_properties().active_class= bsdd_class
+        cls.get_properties().active_class = bsdd_class
 
     @classmethod
     def get_active_class(cls) -> BsddClass:
         return cls.get_properties().active_class
+
+
 class ClassViewSignals(CTS):
     new_class_requested = Signal(str, views.ClassView)
 
@@ -97,3 +102,27 @@ class GopClassView(CTV):
     def request_new_class(cls, view: views.ClassView):
         text = "|".join(cls.get_allowed_class_types())
         cls.signals.new_class_requested.emit(text, view)
+
+
+class PropertyViewSignals(PTS):
+    pass
+
+
+class GopPropertyView(PTW):
+    signals = PropertyViewSignals()
+
+    @classmethod
+    def get_properties(cls) -> GopPropertyViewProperties:
+        return bsdd_gui.GopPropertyViewProperties
+
+    @classmethod
+    def _get_model_class(cls):
+        return models.ClassTreeModel
+
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
+
+    @classmethod
+    def _get_proxy_model_class(cls):
+        return models.SortModel

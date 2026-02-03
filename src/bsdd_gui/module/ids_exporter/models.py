@@ -1,6 +1,6 @@
 from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
 from bsdd_gui.presets.models_presets import ItemModel
-from bsdd_gui.module.class_tree_view.models import SortModel as SM
+from bsdd_gui.module.class_tree_view.models import SortModel as CSM
 from bsdd_gui import tool
 from PySide6.QtCore import QModelIndex, Qt
 from bsdd_json import BsddClass, BsddClassProperty
@@ -220,5 +220,5 @@ class PropertyTreeModel(ItemModel):
                 stack.append(child_row_index)
 
 
-class SortModel(SM):
+class SortModel(CSM):
     pass

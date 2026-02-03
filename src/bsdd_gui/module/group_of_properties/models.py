@@ -1,5 +1,8 @@
 from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
-from bsdd_gui.module.class_tree_view.models import SortModel as SM
+from bsdd_gui.module.class_tree_view.models import SortModel as CSM
+from bsdd_gui.module.property_table_widget.models import PropertyTableModel as PTM
+from bsdd_gui.module.property_table_widget.models import SortModel as PSM
+
 from bsdd_json import BsddClass
 from bsdd_json.utils import class_utils as cl_utils
 
@@ -19,5 +22,13 @@ class ClassTreeModel(CTM):
         return [c for c in children if c.ClassType == "GroupOfProperties"]
 
 
-class SortModel(SM):
+class SortModel(CSM):
     pass
+
+
+class PropertyTableModel(PTM):
+    def __init__(self, bsdd_dictionary, tl=None, *args, **kwargs):
+        from bsdd_gui.tool import GopPropertyView
+
+        super().__init__(bsdd_dictionary, GopPropertyView, *args, **kwargs)
+
