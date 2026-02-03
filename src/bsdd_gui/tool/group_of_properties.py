@@ -1,24 +1,35 @@
-
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 
+from bsdd_json import BsddClass
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import FieldTool,ActionTool,ItemViewTool,FieldSignals,ViewSignals
-from bsdd_gui.module.group_of_properties import trigger,models,views,ui
+from bsdd_gui.presets.tool_presets import (
+    FieldTool,
+    ActionTool,
+    ItemViewTool,
+    FieldSignals,
+    ViewSignals,
+)
+from bsdd_gui.module.group_of_properties import trigger, models, views, ui
 from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QCoreApplication
 from .class_tree_view import ClassTreeView as CTV
 from .class_tree_view import Signals as CTS
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.group_of_properties.prop import GroupOfPropertiesProperties,GopClassViewProperties
+    from bsdd_gui.module.group_of_properties.prop import (
+        GroupOfPropertiesProperties,
+        GopClassViewProperties,
+    )
 
 
 class WidgetSignals(FieldSignals):
-    widget_requested = Signal(object,QWidget) #bSDDDictionary, Window
+    widget_requested = Signal(object, QWidget)  # bSDDDictionary, Window
     new_class_requested = Signal(str)
-class GroupOfProperties(FieldTool,ActionTool):
+
+
+class GroupOfProperties(FieldTool, ActionTool):
     signals = WidgetSignals()
 
     @classmethod
@@ -28,11 +39,11 @@ class GroupOfProperties(FieldTool,ActionTool):
     @classmethod
     def connect_internal_signals(cls):
         return super().connect_internal_signals()
-    
+
     @classmethod
-    def connect_widget_signals(cls, widget:ui.GopWidget):
+    def connect_widget_signals(cls, widget: ui.GopWidget):
         super().connect_widget_signals(widget)
-    
+
     @classmethod
     def _get_trigger(cls):
         return trigger
@@ -41,33 +52,48 @@ class GroupOfProperties(FieldTool,ActionTool):
     def _get_widget_class(cls):
         return ui.GopWidget
 
+    @classmethod
+    def update_class_selection(
+        cls, view: views.ClassView, widget: ui.GopWidget, bsdd_class: BsddClass
+    ):
+        if widget.tv_class != view:
+            return
+        text = QCoreApplication.translate("GroupOfProperties", "Group of properties: {}")
+        widget.lb_class.setText(text.format(bsdd_class.Name if bsdd_class else ""))
+        widget.glw_property.setEnabled(bsdd_class is not None)
+        cls.get_properties().active_class= bsdd_class
 
+    @classmethod
+    def get_active_class(cls) -> BsddClass:
+        return cls.get_properties().active_class
 class ClassViewSignals(CTS):
-    new_class_requested = Signal(str,views.ClassView)
+    new_class_requested = Signal(str, views.ClassView)
+
 
 class GopClassView(CTV):
     signals = ClassViewSignals()
+
     @classmethod
     def get_properties(cls) -> GopClassViewProperties:
-        return bsdd_gui.GopClassViewProperties  
-    
+        return bsdd_gui.GopClassViewProperties
+
     @classmethod
     def _get_model_class(cls):
-        return  models.ClassTreeModel
-    
+        return models.ClassTreeModel
+
     @classmethod
     def _get_trigger(cls):
         return trigger
-    
+
     @classmethod
     def _get_proxy_model_class(cls):
         return models.SortModel
-    
+
     @classmethod
     def get_allowed_class_types(cls):
         return ["GroupOfProperties"]
-    
+
     @classmethod
-    def request_new_class(cls,view:views.ClassView):
+    def request_new_class(cls, view: views.ClassView):
         text = "|".join(cls.get_allowed_class_types())
-        cls.signals.new_class_requested.emit(text,view)
+        cls.signals.new_class_requested.emit(text, view)

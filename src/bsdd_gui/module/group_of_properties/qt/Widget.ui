@@ -19,8 +19,8 @@
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
      </property>
-     <widget class="QWidget" name="gridLayoutWidget_2">
-      <layout class="QGridLayout" name="gridLayout_2">
+     <widget class="QWidget" name="glw_class">
+      <layout class="QGridLayout" name="gl_class">
        <item row="0" column="0">
         <widget class="QToolButton" name="tb_search">
          <property name="text">
@@ -42,7 +42,7 @@
         </widget>
        </item>
        <item row="1" column="0" colspan="3">
-        <widget class="GroupOfPropertiesView" name="treeView"/>
+        <widget class="GroupOfPropertiesView" name="tv_class"/>
        </item>
        <item row="0" column="2">
         <widget class="QPushButton" name="pb_new_class">
@@ -53,8 +53,8 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="gridLayoutWidget">
-      <layout class="QGridLayout" name="gridLayout">
+     <widget class="QWidget" name="glw_property">
+      <layout class="QGridLayout" name="gl_property">
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="sizePolicy">

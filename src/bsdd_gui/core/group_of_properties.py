@@ -76,7 +76,7 @@ def connect_widget(
 ):
     widget_tool.connect_widget_signals(widget)
     widget.pb_new_class.clicked.connect(
-        lambda *_, w=widget: class_view.request_new_class(w.treeView)
+        lambda *_, w=widget: class_view.request_new_class(w.tv_class)
     )
 
     def emit_class_info_requested(index: QModelIndex):
@@ -87,10 +87,13 @@ def connect_widget(
         class_types = "GroupOfProperties"
         class_editor.signals.edit_class_requested.emit(class_types, bsdd_class)
 
-    view = widget.treeView
+    view = widget.tv_class
     widget.tb_search.clicked.connect(lambda _, v=view: class_view.request_search(v))
     view.doubleClicked.connect(emit_class_info_requested)
-
+    class_view.signals.selection_changed.connect(
+        lambda v, c, w=widget: widget_tool.update_class_selection(v, w, c)
+    )
+    widget_tool.update_class_selection(widget.tv_class,widget,None)
 
 ### Item View
 
