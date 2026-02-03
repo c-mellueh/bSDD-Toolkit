@@ -89,11 +89,11 @@ class ClassTreeModel(CTM):
 
 
 class PropertyTreeModel(ItemModel):
-    def __init__(self, data, *args, **kwargs):
+    def __init__(self, tl = None,bsdd_data = None, *args, **kwargs):
         """
         self.bsdd_data is the active bsdd_class
         """
-        super().__init__(tool.IdsPropertyView, data, *args, **kwargs)
+        super().__init__(tool.IdsPropertyView, bsdd_data, *args, **kwargs)
         self.bsdd_data: BsddClass = None
 
     def hasChildren(self, parent=QModelIndex()):

@@ -20,10 +20,10 @@ from .constants import JSON_MIME, CODES_MIME
 
 class ClassTreeModel(ItemModel):
 
-    def __init__(self, bsdd_dictionary: BsddDictionary, tl=None, *args, **kwargs):
+    def __init__(self, tl=None,bsdd_data: BsddDictionary = None,  *args, **kwargs):
         if tl is None:
             tl = tool.ClassTreeView
-        super().__init__(tl, bsdd_dictionary, *args, **kwargs)
+        super().__init__(tl, bsdd_data, *args, **kwargs)
         self.bsdd_data: BsddDictionary
         self.tool: tool.ClassTreeView | tool.GopClassView
 

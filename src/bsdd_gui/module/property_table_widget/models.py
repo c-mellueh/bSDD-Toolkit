@@ -24,12 +24,12 @@ import json
 
 class PropertyTableModel(ItemModel):
 
-    def __init__(self, tl, data, *args, **kwargs):
+    def __init__(self, tl = None, bsdd_data=None, *args, **kwargs):
 
         if not tl:
             tl = tool.PropertyTableWidget
 
-        super().__init__(tl, data, *args, **kwargs)
+        super().__init__(tl, bsdd_data, *args, **kwargs)
 
     @property
     def bsdd_dictionary(self):
@@ -162,7 +162,7 @@ class PropertyTableModel(ItemModel):
 
 class ClassTableModel(ItemModel):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, tl = None, bsdd_data = None,*args, **kwargs):
         super().__init__(tool.PropertyTableWidget, None, *args, **kwargs)
         self._data = None
 
