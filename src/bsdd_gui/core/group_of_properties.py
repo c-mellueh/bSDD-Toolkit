@@ -38,16 +38,18 @@ def retranslate_ui(
 def connect_signals(
     widget_tool: Type[tool.GroupOfProperties],
     class_view: Type[tool.GopClassView],
+    property_view:Type[tool.GopPropertyView],
     class_editor: Type[tool.ClassEditorWidget],
     project: Type[tool.Project],
 ):
-    def handle_new_request(act, view: views.ClassView):
+    def handle_new_request(act, view:views.GopClassView):
         active = class_view.get_selected(view)
         active = cl_utils.get_parent(active[0], project.get()) if active else None
         class_editor.request_new_class(act, active)
 
     widget_tool.connect_internal_signals()
     class_view.connect_internal_signals()
+    property_view.connect_internal_signals()
 
     class_editor.signals.new_class_created.connect(
         lambda c: class_view.add_class_to_dictionary(c, project.get())
@@ -93,12 +95,13 @@ def connect_widget(
     class_view.signals.selection_changed.connect(
         lambda v, c, w=widget: widget_tool.update_class_selection(v, w, c)
     )
-    widget_tool.update_class_selection(widget.tv_class,widget,None)
+    widget_tool.update_class_selection(widget.tv_class, widget, None)
+
 
 ### Item View
 
 
-def register_view(view: views.ClassView, gop_view: Type[tool.GopClassView]):
+def register_class_view(view: views.GopPropertyView, gop_view: Type[tool.GopClassView]):
     gop_view.register_view(view)
     view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
     view.setSelectionBehavior(QTreeView.SelectRows)
@@ -111,13 +114,20 @@ def register_view(view: views.ClassView, gop_view: Type[tool.GopClassView]):
     view.setDragDropMode(QTreeView.DragDropMode.DragDrop)  # internal DnD
     logging.info(f"register View {type(view).__name__} done!")
 
+def register_property_view(view:views.GopPropertyView,gop_view:Type[tool.GopPropertyView]):
+    gop_view.register_view(view)
 
-def connect_view(view: views.ClassView, gop_view: Type[tool.GopClassView]):
+
+
+def connect_class_view(view: views.GopPropertyView, gop_view: Type[tool.GopClassView]):
+    gop_view.connect_view_signals(view)
+
+def connect_property_view(view:views.GopPropertyView,gop_view:Type[tool.GopPropertyView]):
     gop_view.connect_view_signals(view)
 
 
-def add_columns_to_view(
-    view: views.ClassView, gop_view: Type[tool.GopClassView], project: Type[tool.Project]
+def add_columns_to_class_view(
+    view: views.GopPropertyView, gop_view: Type[tool.GopClassView], project: Type[tool.Project]
 ):
     sort_model, model = gop_view.create_model(project.get())
     gop_view.add_column_to_table(model, "Name", lambda av: av.Name)
@@ -125,130 +135,14 @@ def add_columns_to_view(
     view.setModel(sort_model)
 
 
-def add_context_menu_to_view(
-    view: views.ClassView,
-    class_tree: Type[tool.GopClassView],
-    class_editor: Type[tool.ClassEditorWidget],
-):
-    class_tree.clear_context_menu_list(view)
-
-    def get_first_selection(v: ui.ClassView):
-        bsdd_classes = class_tree.get_selected(v)
-        return bsdd_classes[0] if bsdd_classes else None
-
-    class_tree.clear_context_menu_list(view)
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "New"),
-        lambda *_, v=view: class_tree.request_new_class(v),
-        False,
-        True,
-        True,
-        icon=qta.icon("mdi6.plus"),
-        shortcut="Ctrl+N",
-    )
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Copy"),
-        lambda *_, v=view: class_tree.request_copy_selection(v),
-        True,
-        True,
-        True,
-        icon=qta.icon("mdi6.content-copy"),
-        shortcut="Ctrl+C",
-    )
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Paste"),
-        lambda *_, v=view: class_tree.request_paste(v),
-        False,
-        True,
-        True,
-        icon=qta.icon("mdi6.content-paste"),
-        shortcut="Ctrl+V",
-    )
-
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Delete"),
-        lambda: class_tree.signals.delete_selection_requested.emit(view),
-        True,
-        True,
-        True,
-        icon=qta.icon("mdi6.delete"),
-        shortcut="Del",
-    )
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Extend Selection"),
-        lambda: class_tree.signals.expand_selection_requested.emit(view),
-        True,
-        True,
-        True,
-        icon=qta.icon("mdi6.arrow-expand"),
-        shortcut="Ctrl+E",
-    )
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Collapse Selection"),
-        lambda: class_tree.signals.collapse_selection_requested.emit(view),
-        True,
-        True,
-        True,
-        icon=qta.icon("mdi6.arrow-collapse"),
-        shortcut="Ctrl+Alt+E",
-    )
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Group"),
-        lambda: class_tree.signals.group_selection_requested.emit(view),
-        True,
-        True,
-        True,
-        icon=qta.icon("mdi6.group"),
-        shortcut="Ctrl+G",
-    )
-
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Search"),
-        lambda: class_tree.signals.search_requested.emit(view),
-        False,
-        True,
-        True,
-        icon=qta.icon("mdi6.magnify"),
-        shortcut="Ctrl+F",
-    )
-
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Reset View"),
-        lambda: class_tree.signals.model_refresh_requested.emit(),
-        False,
-        True,
-        True,
-        icon=qta.icon("mdi6.refresh"),
-        shortcut="Ctrl+R",
-    )
-    class_tree.add_context_menu_entry(
-        view,
-        lambda: QCoreApplication.translate("Class", "Edit"),
-        lambda: class_editor.request_class_editor("GroupOfProperties", get_first_selection(view)),
-        True,
-        True,
-        False,
-        icon=qta.icon("mdi6.rename"),
-    )
-
-
-def create_context_menu(view: views.ClassView, pos, gop_view: Type[tool.GopClassView]):
+def create_context_menu(view:views.GopClassView, pos, gop_view: Type[tool.GopClassView|tool.GopPropertyView]):
     bsdd_allowed_values = gop_view.get_selected(view)
     menu = gop_view.create_context_menu(view, bsdd_allowed_values)
     menu_pos = view.viewport().mapToGlobal(pos)
     menu.exec(menu_pos)
 
 
-def remove_view(view: views.ClassView, pos, gop_view: Type[tool.GopClassView]):
+def remove_view(view:views.GopClassView, pos, gop_view: Type[tool.GopClassView]):
     gop_view.remove_model(view.model().sourceModel())
 
 

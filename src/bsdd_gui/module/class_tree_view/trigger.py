@@ -30,7 +30,7 @@ def close_event(event):
 
 def class_view_created(view: ui.ClassView):
     core.register_view(view, tool.ClassTreeView)
-    core.add_columns_to_view(view, tool.ClassTreeView, tool.Project, tool.Util)
+    core.add_columns_to_view(view, tool.ClassTreeView)
     core.add_context_menu_to_view(view, tool.ClassTreeView, tool.ClassEditorWidget)
     core.connect_view(view, tool.ClassTreeView)
 

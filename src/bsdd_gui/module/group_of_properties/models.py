@@ -1,14 +1,14 @@
 from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
 from bsdd_gui.module.class_tree_view.models import SortModel as CSM
-from bsdd_gui.module.property_table_widget.models import PropertyTableModel as PTM
-from bsdd_gui.module.property_table_widget.models import SortModel as PSM
+from bsdd_gui.module.class_property_table_view.models import ClassPropertyTableModel as PTM
+from bsdd_gui.module.class_property_table_view.models import SortModel as PSM
 
 from bsdd_json import BsddClass
 from bsdd_json.utils import class_utils as cl_utils
 
 
 class ClassTreeModel(CTM):
-    def __init__(self, bsdd_dictionary, tl=None, *args, **kwargs):
+    def __init__(self, tl=None, bsdd_dictionary=None, *args, **kwargs):
         from bsdd_gui.tool import GopClassView
 
         super().__init__(bsdd_dictionary, GopClassView, *args, **kwargs)
@@ -22,13 +22,16 @@ class ClassTreeModel(CTM):
         return [c for c in children if c.ClassType == "GroupOfProperties"]
 
 
-class SortModel(CSM):
+class ClassSortModel(CSM):
     pass
 
 
 class PropertyTableModel(PTM):
-    def __init__(self, bsdd_dictionary, tl=None, *args, **kwargs):
+    def __init__(self, tl=None, bsdd_dictionary=None, *args, **kwargs):
         from bsdd_gui.tool import GopPropertyView
 
-        super().__init__(bsdd_dictionary, GopPropertyView, *args, **kwargs)
+        super().__init__(GopPropertyView, bsdd_dictionary, *args, **kwargs)
 
+
+class PropertySortModel(PSM):
+    pass

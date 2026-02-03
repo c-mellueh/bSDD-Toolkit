@@ -16,8 +16,8 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal, QCoreApplication
 from .class_tree_view import ClassTreeView as CTV
 from .class_tree_view import Signals as CTS
-from .property_table_widget import PropertyTableWidget as PTW
-from .property_table_widget import Signals as PTS
+from .class_property_table_view import ClassPropertyTableView as PTW
+from .class_property_table_view import Signals as PTS
 
 if TYPE_CHECKING:
     from bsdd_gui.module.group_of_properties.prop import (
@@ -92,7 +92,7 @@ class GopClassView(CTV):
 
     @classmethod
     def _get_proxy_model_class(cls):
-        return models.SortModel
+        return models.ClassSortModel
 
     @classmethod
     def get_allowed_class_types(cls):
@@ -117,7 +117,7 @@ class GopPropertyView(PTW):
 
     @classmethod
     def _get_model_class(cls):
-        return models.ClassTreeModel
+        return models.PropertyTableModel
 
     @classmethod
     def _get_trigger(cls):
@@ -125,4 +125,4 @@ class GopPropertyView(PTW):
 
     @classmethod
     def _get_proxy_model_class(cls):
-        return models.SortModel
+        return models.PropertySortModel

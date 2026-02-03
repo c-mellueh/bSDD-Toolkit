@@ -14,7 +14,13 @@ if TYPE_CHECKING:
 class ClassPropertyTable(TableItemView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        trigger.view_created(self)
+        self.run_created()
 
     def model(self) -> models.SortModel:
         return super().model()
+
+    def run_created(self):
+        self.get_trigger().view_created(self)
+
+    def get_trigger(self):
+        return trigger

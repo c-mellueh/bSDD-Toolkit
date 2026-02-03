@@ -49,8 +49,6 @@ def register_view(view: ui.ClassView, class_tree: Type[tool.ClassTreeView]):
 def add_columns_to_view(
     view: ui.ClassView,
     class_tree: Type[tool.ClassTreeView],
-    project: Type[tool.Project],
-    util: Type[tool.Util],
 ):
     proxy_model, model = class_tree.create_model(None)
     class_tree.add_column_to_table(model, "Name", lambda a: a.Name)
@@ -154,7 +152,7 @@ def add_context_menu_to_view(
         shortcut="Ctrl+R",
     )
 
-    class_types = "Class|Material|AlternativeUse"
+    class_types = "|".join(class_tree.get_allowed_class_types())
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Edit"),

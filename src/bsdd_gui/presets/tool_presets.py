@@ -845,7 +845,7 @@ class ItemViewTool(BaseTool):
 
     @classmethod
     def create_model(cls, data: object) -> tuple[QSortFilterProxyModel, ItemModel]:
-        model = cls._get_model_class()(data)
+        model = cls._get_model_class()(bsdd_data=data, tl=cls)
         cls.get_properties().models.add(model)
         proxy_model = cls._get_proxy_model_class()()
         proxy_model.setSourceModel(model)
@@ -947,7 +947,8 @@ class ItemViewTool(BaseTool):
         props.context_menu_list[view].append(entry)
         if shortcut:
             from bsdd_gui.tool import Util
-            Util.add_shortcut(shortcut,view,action_func)
+
+            Util.add_shortcut(shortcut, view, action_func)
         return entry
 
     @classmethod

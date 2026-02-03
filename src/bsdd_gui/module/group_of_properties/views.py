@@ -5,11 +5,15 @@ from . import trigger
 
 
 class GopClassView(ClassView):
-    def get_trigger(self):
-        return trigger
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def run_created(self):
+        self.get_trigger().class_view_created(self)
+
+    def get_trigger(self):
+        return trigger
 
 
 class GopPropertyView(ClassPropertyTable):
@@ -18,3 +22,9 @@ class GopPropertyView(ClassPropertyTable):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def run_created(self):
+        self.get_trigger().property_view_created(self)
+
+    def get_trigger(self):
+        return trigger
