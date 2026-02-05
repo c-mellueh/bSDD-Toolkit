@@ -9,9 +9,10 @@ from PySide6.QtCore import (
 )
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_json.models import BsddDictionary, BsddClass, BsddClassProperty
+from bsdd_json.utils import property_utils
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
+import qtawesome as qta
 
 
 class ClassPropertyTableModel(ItemModel):
@@ -64,6 +65,16 @@ class ClassPropertyTableModel(ItemModel):
 
     def setData(self, index, value, /, role=...):
         return False
+
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        if role != Qt.ItemDataRole.DecorationRole:
+            return super().data(index, role)
+        if index.column() != 0:
+            return QModelIndex()
+        class_property = index.internalPointer()
+        if property_utils.is_class_property_linked(class_property, self.bsdd_dictionary):
+            return qta.icon("mdi.link-variant")
+        return QModelIndex()
 
 
 # typing

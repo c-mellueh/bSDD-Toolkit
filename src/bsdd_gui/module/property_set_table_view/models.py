@@ -8,13 +8,14 @@ from PySide6.QtCore import (
     QSortFilterProxyModel,
 )
 from typing import Type
-
+from bsdd_json.utils import class_utils
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_json.models import BsddDictionary, BsddClass
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
 import qtawesome as qta
+
 
 class PsetTableModel(ItemModel):
 
@@ -56,12 +57,11 @@ class PsetTableModel(ItemModel):
 
         if index.column() != 0:
             return QModelIndex()
-        bsdd_class = self.active_class
-        related_psets = self.tool.get_related_psets(bsdd_class,self.bsdd_data)
-        if index.data(Qt.ItemDataRole.DisplayRole) in [c.Name for c in related_psets]:
+        if class_utils.is_pset_linked(self.active_class, index.internalPointer(), self.bsdd_data):
             return qta.icon("mdi.link-variant")
         else:
             return QModelIndex()
+
 
 # typing
 class SortModel(QSortFilterProxyModel):

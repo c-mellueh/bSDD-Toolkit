@@ -188,7 +188,9 @@ class PropertySetTableView(ItemViewTool):
         pset_class = pset_classes[0]
 
         for cp in pset_class.ClassProperties:
-            bsdd_class.ClassProperties.append(cp.model_copy(deep=True))
+            new_cp = cp.model_copy(deep=True)
+            bsdd_class.ClassProperties.append(new_cp)
+            new_cp._set_parent(bsdd_class)
 
         if len(pset_class.ClassProperties) == 0:
             cls.add_temporary_pset(bsdd_class,pset_name)

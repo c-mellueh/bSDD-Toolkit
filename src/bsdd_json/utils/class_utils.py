@@ -153,7 +153,9 @@ def get_dictionary_from_class(bsdd_class: BsddClass):
     return bsdd_class.parent()
 
 
-def get_parent(bsdd_class: BsddClass,bsdd_dictionary:BsddDictionary =None) -> BsddClass | None:
+def get_parent(
+    bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary = None
+) -> BsddClass | None:
     if bsdd_class is None:
         return None
     if not bsdd_dictionary:
@@ -369,3 +371,27 @@ def get_class_property_by_name(
             if not pset or pset == cp.PropertySet:
                 return cp
     return cp
+
+
+def is_pset_linked(
+    bsdd_class: BsddClass, pset_name: str, bsdd_dictionary: BsddDictionary
+):
+    related_psets = get_related_psets(bsdd_class, bsdd_dictionary)
+    return pset_name in [c.Name for c in related_psets]
+
+
+def get_related_psets(
+    bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary
+) -> list[BsddClass]:
+    related_psets = list()
+
+    for cr in bsdd_class.ClassRelations:
+        if cr.RelationType != "HasReference":
+            continue
+        uri = cr.RelatedClassUri
+        related_class = get_class_by_uri(bsdd_dictionary, uri)
+        if not related_class:
+            continue
+        if related_class.ClassType == "GroupOfProperties":
+            related_psets.append(related_class)
+    return related_psets
