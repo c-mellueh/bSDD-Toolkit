@@ -224,21 +224,37 @@ def connect_to_main_window(
     main_window.signals.new_property_set_requested.connect(
         lambda: property_set_table.request_new_property_set(main_window.get_active_class())
     )
+    property_set_table.set_combobox(main_window.get().cb_pset_name)
 
 
 def create_new_property_set(
     bsdd_class: BsddClass,
     property_set_table: Type[tool.PropertySetTableView],
     util: Type[tool.Util],
+    project: Type[tool.Project],
 ):
     if not bsdd_class:
         return
+
+    pset_name = property_set_table.get_name_from_combobox()
+    is_predefined = property_set_table.is_pset_predefined(pset_name, project.get())
+    is_existing = property_set_table.is_pset_existing(pset_name, bsdd_class)
     existings_psets = property_set_table.get_pset_names_with_temporary(bsdd_class)
-    new_name = util.get_unique_name(
-        QCoreApplication.translate("PropertySetTable", "New PropertySet"), existings_psets
-    )
-    property_set_table.add_temporary_pset(bsdd_class, new_name)
-    property_set_table.signals.property_set_added.emit(new_name)
+
+    if is_predefined:
+        # if connected Pset is allready existing add the pset under a new name and dont connect it
+        if is_existing:
+            while is_existing and is_predefined:
+                pset_name = util.get_unique_name(pset_name, existings_psets)
+                is_predefined = property_set_table.is_pset_predefined(pset_name, project.get())
+                is_existing = False
+            property_set_table.add_temporary_pset(bsdd_class, pset_name)
+        else:
+            property_set_table.create_connected_pset(pset_name, bsdd_class, project.get())
+    else:
+        pset_name = util.get_unique_name(pset_name, existings_psets)
+        property_set_table.add_temporary_pset(bsdd_class, pset_name)
+    property_set_table.signals.property_set_added.emit(pset_name)
 
 
 def add_context_menu_to_view(
