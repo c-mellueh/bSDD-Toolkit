@@ -61,6 +61,7 @@ def add_columns_to_view(
 
     bsdd_dictionary = project.get()
     proxy_model, model = property_set_table.create_model(bsdd_dictionary)
+    model.dataChanged.connect(property_set_table.signals.data_changed.emit)
     view.setModel(proxy_model)
     property_set_table.add_column_to_table(model, "Name", lambda a: a, rename_pset)
 
@@ -237,7 +238,7 @@ def create_new_property_set(
         QCoreApplication.translate("PropertySetTable", "New PropertySet"), existings_psets
     )
     property_set_table.add_temporary_pset(bsdd_class, new_name)
-    property_set_table.signals.model_refresh_requested.emit()
+    property_set_table.signals.property_set_added.emit(new_name)
 
 
 def add_context_menu_to_view(

@@ -5,6 +5,7 @@ from typing import Type, TYPE_CHECKING
 import bsdd_gui
 import logging
 import qtawesome as qta
+from bsdd_json.utils import class_utils, property_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -35,9 +36,13 @@ def create_main_window(application: QApplication, main_window: Type[tool.MainWin
 def connect_main_window(
     main_window: Type[tool.MainWindowWidget],
     class_tree: Type[tool.ClassTreeView],
-    util: Type[tool.Util],
-    project: Type[tool.Project],
+    pset_table: Type[tool.PropertySetTableView],
 ):
+
+    def handle_pset_data_change(topleft, bottomright, roles):
+        if Qt.EditRole in roles:
+            main_window.request_pset_combobox_update()
+
     main_window.signals.active_class_changed.connect(
         lambda c: main_window.set_class_text(c.Name if c is not None else "")
     )
@@ -60,6 +65,8 @@ def connect_main_window(
     ui.button_search.clicked.connect(
         lambda _: class_tree.request_search(main_window.get_class_view())
     )
+    pset_table.signals.property_set_added.connect(main_window.request_pset_combobox_update)
+    pset_table.signals.data_changed.connect(handle_pset_data_change)
     main_window.connect_internal_signals()
 
 
@@ -123,3 +130,23 @@ def close_event(
             logging.info(f"File was saved before closing to: '{file_path}'")
     file_lock.unlock_file()
     event.accept()
+
+
+def update_pset_combobox(
+    main_window: Type[tool.MainWindowWidget],
+    project: Type[tool.Project],
+    pset_table: Type[tool.PropertySetTableView],
+):
+    combobox = main_window.get().cb_pset_name
+    combobox.clear()
+    bsdd_dictionary = project.get()
+    group_of_properties = [c for c in bsdd_dictionary.Classes if c.ClassType == "GroupOfProperties"]
+    active_class = main_window.get_active_class()
+    if not active_class:
+        return
+    existing_psets = set(pset_table.get_pset_names_with_temporary(active_class))
+    available_psets = {c.Name for c in group_of_properties}
+    new_psets = available_psets.difference(existing_psets)
+    allowed = [QCoreApplication.translate("PropertySets", "New PropertySet")] + sorted(new_psets)
+    combobox.addItems(allowed)
+    combobox.setCurrentIndex(0)

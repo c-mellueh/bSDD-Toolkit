@@ -19,8 +19,8 @@ class Signals(ViewSignals):
     delete_selection_requested = Signal(ui.PsetTableView)
     property_set_deleted = Signal(BsddClass, str)
     rename_selection_requested = Signal(ui.PsetTableView)
-
-
+    property_set_added = Signal(str)
+    data_changed = Signal(QModelIndex,QModelIndex,list)
 class PropertySetTableView(ItemViewTool):
     signals = Signals()
 
@@ -51,6 +51,8 @@ class PropertySetTableView(ItemViewTool):
         cls.signals.rename_selection_requested.connect(
             lambda view: view.edit([i for i in view.selectedIndexes() if i.column() == 0][0])
         )
+        cls.signals.property_set_added.connect(lambda _:cls.signals.model_refresh_requested.emit())
+
 
     @classmethod
     def connect_view_signals(cls, view: ui.PsetTableView):
@@ -59,7 +61,7 @@ class PropertySetTableView(ItemViewTool):
     @classmethod
     def create_model(
         cls, bsdd_dictionary: BsddDictionary
-    ) -> tuple[models.SortModel | models.ItemModel]:
+    ) -> tuple[models.SortModel , models.ItemModel]:
         return super().create_model(bsdd_dictionary)
 
     @classmethod

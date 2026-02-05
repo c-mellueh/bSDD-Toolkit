@@ -20,11 +20,12 @@ class Signals(QObject):
     active_class_changed = Signal(BsddClass)
     active_pset_changed = Signal(str)
     active_property_changed = Signal(BsddClassProperty)
-    new_class_requested = Signal(str) #Type: Class|Material|GroupOfProperties|AlternativeUse
+    new_class_requested = Signal(str)  # Type: Class|Material|GroupOfProperties|AlternativeUse
     new_property_set_requested = Signal()
-    new_property_requested = Signal(BsddClass,str)
+    new_property_requested = Signal(BsddClass, str)
     refresh_status_bar_requested = Signal()
     toggle_console_requested = Signal()
+    update_pset_combobox_requested = Signal()
 
 
 class MainWindowWidget(ActionTool):
@@ -38,6 +39,8 @@ class MainWindowWidget(ActionTool):
     def connect_internal_signals(cls):
         cls.signals.refresh_status_bar_requested.connect(trigger.refresh_status_bar)
         cls.signals.toggle_console_requested.connect(trigger.toggle_console)
+        cls.signals.active_class_changed.connect(cls.request_pset_combobox_update)
+        cls.signals.update_pset_combobox_requested.connect(trigger.update_pset_combobox)
 
     @classmethod
     def create(cls, application: QApplication) -> ui.MainWindow:
@@ -241,7 +244,6 @@ class MainWindowWidget(ActionTool):
             # Ignore if not on Windows
             return False
 
-    def get_selected_classes(cls):
-        from bsdd_gui.tool import ClassTreeView
-
-        return ClassTreeView.get_selected(cls.get_class_view())
+    @classmethod
+    def request_pset_combobox_update(cls):
+        cls.signals.update_pset_combobox_requested.emit()
