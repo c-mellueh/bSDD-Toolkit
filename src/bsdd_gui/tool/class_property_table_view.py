@@ -95,8 +95,9 @@ class ClassPropertyTableView(ItemViewTool):
     @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
-        cls.signals.copy_requested.connect(trigger.copy_selected)
-        cls.signals.paste_requested.connect(trigger.paste_clipboard)
+        
+        cls.signals.copy_requested.connect(lambda view:cls._get_trigger().copy_selected(view,cls))
+        cls.signals.paste_requested.connect(lambda view:cls._get_trigger().paste_clipboard(view,cls))
 
     @classmethod
     def connect_view_signals(cls, view: ui.ClassPropertyTable):

@@ -5,7 +5,7 @@ from bsdd_gui.core import group_of_properties as core
 from bsdd_gui.core import class_property_table_view as ptv_core
 from bsdd_gui.core import class_tree_view as ctv_core
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING,Type
 
 if TYPE_CHECKING:
     from .views import GopClassView, GopPropertyView
@@ -69,3 +69,16 @@ def property_view_created(view: GopPropertyView):
     ptv_core.add_columns_to_view(view, tool.GopPropertyView, tool.Project)
     ptv_core.add_context_menu_to_view(view, tool.GopPropertyView)
     core.connect_property_view(view, tool.GopPropertyView)
+
+def copy_selected(
+    view: GopPropertyView, view_tool: Type[ tool.GopPropertyView]
+):
+    ptv_core.copy_property_to_clipboard(view, view_tool)
+
+
+def paste_clipboard(
+    view: GopPropertyView, view_tool: Type[tool.GopPropertyView]
+):
+    core.paste_property_from_clipboard(
+        view, view_tool, tool.PropertyTableWidget, tool.Project, tool.Util,tool.GroupOfProperties
+    )

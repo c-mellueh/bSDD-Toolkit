@@ -202,9 +202,11 @@ def paste_property_from_clipboard(
     property_table: Type[tool.PropertyTableWidget],
     project: Type[tool.Project],
     util: Type[tool.Util],
+    main_window: Type[tool.MainWindowWidget],
 ):
     bsdd_dictionary = project.get()
     clipboard_text = QApplication.clipboard().text()
+
     try:
         payload = json.loads(clipboard_text)
     except:
@@ -213,6 +215,7 @@ def paste_property_from_clipboard(
     if not isinstance(payload, dict) or payload.get("kind") != CLASS_PROP_CLIPBOARD_KIND:
         return
 
+    pset_name = main_window.get_active_pset()
     model: models.ClassPropertyTableModel = view.model().sourceModel()
     bsdd_class_properties = payload.get("class_properties", [])
     properties: list[BsddProperty] = payload.get("properties", [])
@@ -229,6 +232,7 @@ def paste_property_from_clipboard(
         code = util.get_unique_name(code, existing_codes, True)
         bsdd_class_property["Code"] = code
         new_property = BsddClassProperty.model_validate(bsdd_class_property)
+        new_property.PropertySet = pset_name
         class_property_table.add_class_property(new_property, model.active_class)
         existing_codes.append(code)
 

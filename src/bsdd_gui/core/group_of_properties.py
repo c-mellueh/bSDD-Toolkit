@@ -2,14 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QCoreApplication, Qt, QModelIndex
-from PySide6.QtWidgets import QTreeView
+from PySide6.QtWidgets import QTreeView, QApplication
+from bsdd_gui.module.util.constants import CLASS_PROP_CLIPBOARD_KIND
 import logging
 import qtawesome as qta
 from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json import BsddClassProperty, BsddProperty
+import json
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.group_of_properties import ui, views
+    from bsdd_gui.module.group_of_properties import ui, views, models
 
 
 def connect_to_main_window(
@@ -113,7 +116,7 @@ def connect_widget(
     widget_tool.signals.active_class_changed.connect(widget_tool.reset_property)
     widget.pb_new_prop.clicked.connect(lambda: gop_prop_view.request_new_property())
     gop_prop_view.set_allowed_class_types(gop_class_view.get_allowed_class_types())
-    
+
     widget_tool.set_active_class(None)
 
 
@@ -176,3 +179,54 @@ def reset_models(
         model.bsdd_data = project.get()
     main_window.set_active_class(None)
     class_tree.reset_views()
+
+
+def paste_property_from_clipboard(
+    view: views.GopPropertyView,
+    gop_property_view: Type[tool.GopPropertyView],
+    property_table: Type[tool.PropertyTableWidget],
+    project: Type[tool.Project],
+    util: Type[tool.Util],
+    group_of_properties: Type[tool.GroupOfProperties],
+):
+    bsdd_dictionary = project.get()
+    clipboard_text = QApplication.clipboard().text()
+    try:
+        payload = json.loads(clipboard_text)
+    except:
+        return
+
+    if not isinstance(payload, dict) or payload.get("kind") != CLASS_PROP_CLIPBOARD_KIND:
+        return
+
+    model: models.PropertyTableModel = view.model().sourceModel()
+    bsdd_class_properties = payload.get("class_properties", [])
+    properties: list[BsddProperty] = payload.get("properties", [])
+
+    if not isinstance(bsdd_class_properties, list):
+        return
+
+    pset_name = group_of_properties.generate_pset_name(group_of_properties.get_active_class())
+    existing_codes = [cp.Code for cp in model.active_class.ClassProperties]
+    for bsdd_class_property in bsdd_class_properties:
+        if not isinstance(bsdd_class_property, dict):
+            continue
+
+        code = bsdd_class_property.get("Code", "New-Class-Property")
+        code = util.get_unique_name(code, existing_codes, True)
+        bsdd_class_property["Code"] = code
+        new_property = BsddClassProperty.model_validate(bsdd_class_property)
+        new_property.PropertySet = pset_name
+        gop_property_view.add_class_property(new_property, model.active_class)
+        existing_codes.append(code)
+
+    existing_property_codes = [p.Code for p in project.get().Properties]
+    for bsdd_property in properties:
+        if bsdd_property.get("Code") in existing_property_codes:
+            continue
+        try:
+            new_property = BsddProperty.model_validate(bsdd_property)
+            property_table.add_property_to_dictionary(new_property, bsdd_dictionary)
+            existing_property_codes.append(new_property.Code)
+        except:
+            pass
