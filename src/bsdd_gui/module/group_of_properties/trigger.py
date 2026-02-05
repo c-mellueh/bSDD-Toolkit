@@ -5,11 +5,12 @@ from bsdd_gui.core import group_of_properties as core
 from bsdd_gui.core import class_property_table_view as ptv_core
 from bsdd_gui.core import class_tree_view as ctv_core
 
-from typing import TYPE_CHECKING,Type
+from typing import TYPE_CHECKING, Type
 
 if TYPE_CHECKING:
     from .views import GopClassView, GopPropertyView
     from PySide6.QtCore import QPoint
+    from bsdd_json import BsddClassProperty
 
 
 def connect():
@@ -40,7 +41,13 @@ def create_widget(data: object, parent):
 
 def widget_created(widget):
     core.register_widget(widget, tool.GroupOfProperties)
-    core.connect_widget(widget, tool.GroupOfProperties, tool.GopClassView,tool.GopPropertyView, tool.ClassEditorWidget)
+    core.connect_widget(
+        widget,
+        tool.GroupOfProperties,
+        tool.GopClassView,
+        tool.GopPropertyView,
+        tool.ClassEditorWidget,
+    )
 
 
 # CLassTreeView
@@ -55,7 +62,8 @@ def class_view_created(view: GopClassView):
 
 def context_menu_requested(view: GopClassView, pos: QPoint):
     from .views import GopClassView, GopPropertyView
-    if isinstance(view,GopClassView):
+
+    if isinstance(view, GopClassView):
         core.create_context_menu(view, pos, tool.GopClassView)
     else:
         core.create_context_menu(view, pos, tool.GopPropertyView)
@@ -70,15 +78,32 @@ def property_view_created(view: GopPropertyView):
     ptv_core.add_context_menu_to_view(view, tool.GopPropertyView)
     core.connect_property_view(view, tool.GopPropertyView)
 
-def copy_selected(
-    view: GopPropertyView, view_tool: Type[ tool.GopPropertyView]
-):
+
+def copy_selected(view: GopPropertyView, view_tool: Type[tool.GopPropertyView]):
     ptv_core.copy_property_to_clipboard(view, view_tool)
 
 
-def paste_clipboard(
-    view: GopPropertyView, view_tool: Type[tool.GopPropertyView]
-):
+def paste_clipboard(view: GopPropertyView, view_tool: Type[tool.GopPropertyView]):
     core.paste_property_from_clipboard(
-        view, view_tool, tool.PropertyTableWidget, tool.Project, tool.Util,tool.GroupOfProperties
+        view, view_tool, tool.PropertyTableWidget, tool.Project, tool.Util, tool.GroupOfProperties
+    )
+
+
+def add_class_property_to_linked(bsdd_class_property: BsddClassProperty):
+    core.add_class_property_to_linked(
+        bsdd_class_property,
+        tool.Project,
+        tool.GroupOfProperties,
+        tool.PropertySetTableView,
+        tool.ClassPropertyTableView,
+    )
+
+
+def remove_class_property_from_linked(bsdd_class_property: BsddClassProperty):
+    core.remove_class_property_from_linked(
+        bsdd_class_property,
+        tool.Project,
+        tool.GroupOfProperties,
+        tool.PropertySetTableView,
+        tool.ClassPropertyTableView,
     )

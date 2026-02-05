@@ -230,3 +230,46 @@ def paste_property_from_clipboard(
             existing_property_codes.append(new_property.Code)
         except:
             pass
+
+
+def add_class_property_to_linked(
+    class_property: BsddClassProperty,
+    project: Type[tool.Project],
+    group_of_properties: Type[tool.GroupOfProperties],
+    pset_table: Type[tool.PropertySetTableView],
+    class_properties: Type[tool.ClassPropertyTableView],
+):
+    bsdd_class = class_property.parent()
+
+    related_classes = group_of_properties.get_related_classes(bsdd_class, project.get())
+    for related_class in related_classes:
+        is_temp = bsdd_class.Name in pset_table.get_temporary_psets(related_class)
+        if class_property.Code in [cp.Code for cp in related_class.ClassProperties] and not is_temp:
+            continue
+        new_property = class_property.model_copy(deep=True)
+        new_property._set_parent(bsdd_class)
+        class_properties.add_class_property(new_property, related_class)
+        if is_temp:
+            pset_table.remove_temporary_pset(related_class, bsdd_class.Name)
+
+
+def remove_class_property_from_linked(
+    class_property: BsddClassProperty,
+    project: Type[tool.Project],
+    group_of_properties: Type[tool.GroupOfProperties],
+    pset_table: Type[tool.PropertySetTableView],
+    class_properties: Type[tool.ClassPropertyTableView],
+):
+    bsdd_class = class_property.parent()
+
+    related_classes = group_of_properties.get_related_classes(bsdd_class, project.get())
+    for related_class in related_classes:
+        cp = {cp.Code: cp for cp in related_class.ClassProperties}.get(class_property.Code)
+        if not cp:
+            continue
+        class_properties.remove_property(related_class, cp)
+        remaining = [cp for cp in related_class.ClassProperties if cp.PropertySet == bsdd_class.Name]
+        if not remaining:
+            if bsdd_class.Name in pset_table.get_temporary_psets(related_class):
+                continue
+            pset_table.add_temporary_pset(related_class,bsdd_class.Name)

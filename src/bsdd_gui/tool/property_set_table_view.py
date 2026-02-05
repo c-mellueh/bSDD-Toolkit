@@ -81,6 +81,12 @@ class PropertySetTableView(ItemViewTool):
         cls.signals.new_property_set_requested.emit(bsdd_class)
 
     @classmethod
+    def get_temporary_psets(cls, bsdd_class: BsddClass):
+        if bsdd_class.Code in cls.get_properties().temporary_pset:
+            return cls.get_properties().temporary_pset[bsdd_class.Code]
+        return []
+
+    @classmethod
     def get_pset_names_with_temporary(cls, bsdd_class: BsddClass) -> list[str]:
         bsdd_properties = list()
         if bsdd_class is None:
@@ -89,10 +95,8 @@ class PropertySetTableView(ItemViewTool):
             if cp.PropertySet not in bsdd_properties:
                 bsdd_properties.append(cp.PropertySet)
 
-        if bsdd_class.Code in cls.get_properties().temporary_pset:
-            for property_set in cls.get_properties().temporary_pset[bsdd_class.Code]:
-                bsdd_properties.append(property_set)
-        return bsdd_properties
+        temporary_psets = cls.get_temporary_psets(bsdd_class)
+        return bsdd_properties + temporary_psets
 
     @classmethod
     def select_row(cls, view: ui.PsetTableView, row_index: int):
@@ -184,7 +188,7 @@ class PropertySetTableView(ItemViewTool):
             return
         if len(pset_classes) > 1:
             logging.warning(f"Multiple Pset Classes found! for {pset_name}")
-            #TODO: Add a Picker or disalow multiple Psets with the same name
+            # TODO: Add a Picker or disalow multiple Psets with the same name
         pset_class = pset_classes[0]
 
         for cp in pset_class.ClassProperties:
@@ -193,7 +197,7 @@ class PropertySetTableView(ItemViewTool):
             new_cp._set_parent(bsdd_class)
 
         if len(pset_class.ClassProperties) == 0:
-            cls.add_temporary_pset(bsdd_class,pset_name)
+            cls.add_temporary_pset(bsdd_class, pset_name)
         cls.add_pset_relation(bsdd_class, pset_class, bsdd_dictionary)
 
     @classmethod

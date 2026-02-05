@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import logging
 
-from bsdd_json import BsddClass, BsddClassProperty
+from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import (
     FieldTool,
@@ -11,6 +11,7 @@ from bsdd_gui.presets.tool_presets import (
     FieldSignals,
     ViewSignals,
 )
+from bsdd_json.utils import class_utils
 from bsdd_gui.module.group_of_properties import trigger, models, views, ui
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal, QCoreApplication
@@ -140,6 +141,20 @@ class GroupOfProperties(FieldTool, ActionTool):
 
         GopPropertyView.select_row(view, row_index or 0)
 
+    @classmethod
+    def get_related_classes(
+        cls, group_of_properties: BsddClass, bsdd_dictionary: BsddDictionary
+    ) -> list[BsddClass]:
+        uri = class_utils.build_bsdd_uri(group_of_properties, bsdd_dictionary)
+        classes = list()
+        for bsdd_class in bsdd_dictionary.Classes:
+            for relation in bsdd_class.ClassRelations:
+                if relation.RelationType != "HasReference":
+                    continue
+                if relation.RelatedClassUri == uri:
+                    classes.append(bsdd_class)
+        return classes
+
 
 class ClassViewSignals(CTS):
     new_class_requested = Signal(str, views.ClassView)
@@ -184,6 +199,12 @@ class GopPropertyView(PTW):
     @classmethod
     def get_properties(cls) -> GopPropertyViewProperties:
         return bsdd_gui.GopPropertyViewProperties
+
+    @classmethod
+    def connect_internal_signals(cls):
+        super().connect_internal_signals()
+        cls.signals.item_added.connect(trigger.add_class_property_to_linked)
+        cls.signals.item_removed.connect(trigger.remove_class_property_from_linked)
 
     @classmethod
     def _get_model_class(cls):
