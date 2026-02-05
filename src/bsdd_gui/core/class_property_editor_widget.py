@@ -31,7 +31,6 @@ def connect_signals(
         lambda d: class_property_editor.signals.widget_requested.emit(d, main_window.get())
     )
 
-
     main_window.signals.new_property_requested.connect(
         class_property_editor.signals.create_new_class_property_requested.emit
     )

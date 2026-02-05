@@ -89,7 +89,7 @@ class ClassTreeModel(CTM):
 
 
 class PropertyTreeModel(ItemModel):
-    def __init__(self, tl = None,bsdd_data = None, *args, **kwargs):
+    def __init__(self, tl=None, bsdd_data=None, *args, **kwargs):
         """
         self.bsdd_data is the active bsdd_class
         """

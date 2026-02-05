@@ -30,5 +30,6 @@ def toggle_console():
     core.toggle_console(tool.MainWindowWidget)
     core.retranslate_ui(tool.MainWindowWidget)
 
+
 def update_pset_combobox():
-    core.update_pset_combobox(tool.MainWindowWidget,tool.Project,tool.PropertySetTableView)
+    core.update_pset_combobox(tool.MainWindowWidget, tool.Project, tool.PropertySetTableView)

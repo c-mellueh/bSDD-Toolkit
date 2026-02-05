@@ -81,7 +81,7 @@ def add_context_menu_to_view(
         True,
         True,
         qta.icon("mdi.delete"),
-        "Del"
+        "Del",
     )
     allowed_values_table.add_context_menu_entry(
         view,
@@ -91,7 +91,7 @@ def add_context_menu_to_view(
         True,
         True,
         qta.icon("mdi.content-paste"),
-        "Ctrl+V"
+        "Ctrl+V",
     )
 
 
@@ -102,7 +102,6 @@ def connect_view(
 ):
     view.setItemDelegateForColumn(0, ui.LiveEditDelegate(parent=view))
     allowed_values_table.connect_view_signals(view)
-
 
 
 def create_context_menu(

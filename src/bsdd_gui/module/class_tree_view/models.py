@@ -20,7 +20,7 @@ from .constants import JSON_MIME, CODES_MIME
 
 class ClassTreeModel(ItemModel):
 
-    def __init__(self, tl=None,bsdd_data: BsddDictionary = None,  *args, **kwargs):
+    def __init__(self, tl=None, bsdd_data: BsddDictionary = None, *args, **kwargs):
         if tl is None:
             tl = tool.ClassTreeView
         super().__init__(tl, bsdd_data, *args, **kwargs)
@@ -178,7 +178,6 @@ class ClassTreeModel(ItemModel):
         if action not in (Qt.MoveAction, Qt.CopyAction):
             return False
 
-
         if (
             data.hasFormat(JSON_MIME)
             or data.hasFormat("application/json")
@@ -187,8 +186,8 @@ class ClassTreeModel(ItemModel):
             codes = self.tool.get_codes_from_data(data)
             if not codes:
                 return False
-            
-            bsdd_class = cl_utils.get_class_by_code(self.bsdd_dictionary,codes[0])
+
+            bsdd_class = cl_utils.get_class_by_code(self.bsdd_dictionary, codes[0])
             if not bsdd_class.ClassType in self.tool.get_allowed_class_types():
                 return False
             return True

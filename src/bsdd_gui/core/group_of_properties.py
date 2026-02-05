@@ -268,8 +268,10 @@ def remove_class_property_from_linked(
         if not cp:
             continue
         class_properties.remove_property(related_class, cp)
-        remaining = [cp for cp in related_class.ClassProperties if cp.PropertySet == bsdd_class.Name]
+        remaining = [
+            cp for cp in related_class.ClassProperties if cp.PropertySet == bsdd_class.Name
+        ]
         if not remaining:
             if bsdd_class.Name in pset_table.get_temporary_psets(related_class):
                 continue
-            pset_table.add_temporary_pset(related_class,bsdd_class.Name)
+            pset_table.add_temporary_pset(related_class, bsdd_class.Name)

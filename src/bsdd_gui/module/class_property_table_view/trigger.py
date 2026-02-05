@@ -39,15 +39,11 @@ def view_created(view: ui.ClassPropertyTable):
     core.connect_view(view, tool.ClassPropertyTableView, tool.Util)
 
 
-def copy_selected(
-    view: ui.ClassPropertyTable, view_tool: Type[tool.ClassPropertyTableView]
-):
+def copy_selected(view: ui.ClassPropertyTable, view_tool: Type[tool.ClassPropertyTableView]):
     core.copy_property_to_clipboard(view, view_tool)
 
 
-def paste_clipboard(
-    view: ui.ClassPropertyTable, view_tool: Type[tool.ClassPropertyTableView]
-):
+def paste_clipboard(view: ui.ClassPropertyTable, view_tool: Type[tool.ClassPropertyTableView]):
     core.paste_property_from_clipboard(
-        view, view_tool, tool.PropertyTableWidget, tool.Project, tool.Util,tool.MainWindowWidget
+        view, view_tool, tool.PropertyTableWidget, tool.Project, tool.Util, tool.MainWindowWidget
     )

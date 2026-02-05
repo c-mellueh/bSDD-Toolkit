@@ -3,7 +3,7 @@ import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import class_editor_widget as core
 from bsdd_json import BsddClass
-from typing import TYPE_CHECKING,Type
+from typing import TYPE_CHECKING, Type
 import logging
 
 if TYPE_CHECKING:
@@ -47,11 +47,9 @@ def create_new_class(class_type: CLASS_TYPES, parent_class: BsddClass | None):
     core.create_new_class(class_type, parent_class, tool.ClassEditorWidget, tool.MainWindowWidget)
 
 
-def group_classes(class_tree_tool:Type[tool.ClassTreeView|tool.GopClassView], bsdd_classes: list[BsddClass]):
+def group_classes(
+    class_tree_tool: Type[tool.ClassTreeView | tool.GopClassView], bsdd_classes: list[BsddClass]
+):
     core.group_classes(
-        bsdd_classes,
-        tool.ClassEditorWidget,
-        tool.MainWindowWidget,
-        tool.Project,
-        class_tree_tool
+        bsdd_classes, tool.ClassEditorWidget, tool.MainWindowWidget, tool.Project, class_tree_tool
     )

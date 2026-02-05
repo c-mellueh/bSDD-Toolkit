@@ -39,11 +39,11 @@ def context_menu_requested(view: ui.ClassView, pos):
     core.create_context_menu(view, pos, tool.ClassTreeView)
 
 
-def delete_selection(view: ui.ClassView,view_tool: tool.ClassTreeView | tool.GopClassView):
+def delete_selection(view: ui.ClassView, view_tool: tool.ClassTreeView | tool.GopClassView):
     core.delete_selection(view, view_tool, tool.Popups, tool.Project)
 
 
-def group_selection(view: ui.ClassView,view_tool: tool.ClassTreeView | tool.GopClassView):
+def group_selection(view: ui.ClassView, view_tool: tool.ClassTreeView | tool.GopClassView):
     core.group_selection(view, view_tool, tool.ClassEditorWidget)
 
 
