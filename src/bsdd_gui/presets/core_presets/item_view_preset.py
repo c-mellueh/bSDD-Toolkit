@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Type
 from bsdd_json import BsddClassProperty, BsddProperty
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
-
+import qtawesome as qta
 if TYPE_CHECKING:
     from bsdd_gui.presets import tool_presets as tool
     from bsdd_gui.presets.ui_presets import ItemViewType
@@ -51,6 +51,8 @@ def add_context_menu_to_view(view: ItemViewType, item_view_handler: Type[tool.It
         True,
         True,
         True,
+        qta.icon("mdi.delete"),
+        "Del"
     )
 
 

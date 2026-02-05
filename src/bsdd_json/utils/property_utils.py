@@ -369,3 +369,29 @@ def build_dummy_property(uri: str) -> BsddProperty:
     code = get_code_by_uri(uri)
     dummy_property = BsddProperty(Code=code, Name=uri, OwnedUri=uri)
     return dummy_property
+
+
+def is_class_property_linked(
+    class_property: BsddClassProperty, bsdd_dictionary: BsddDictionary
+):
+    from . import class_utils
+
+    def get_parent_class():
+        for c in bsdd_dictionary.Classes:
+            for cp in c.ClassProperties:
+                if cp == class_property:
+                    return c
+
+    bsdd_class = class_property.parent()
+    if not bsdd_class:
+        bsdd_class == get_parent_class()
+    if not bsdd_class:
+        return False
+    related_psets = class_utils.get_related_psets(bsdd_class, bsdd_dictionary)
+    related_pset = {c.Name: c for c in related_psets}.get(class_property.PropertySet)
+    if not related_pset:
+        return False
+    if class_property.Code in [cp.Code for cp in related_pset.ClassProperties]:
+        return True
+    else:
+        return False

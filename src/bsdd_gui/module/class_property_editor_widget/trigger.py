@@ -3,7 +3,7 @@ import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import class_property_editor_widget as core
 from typing import TYPE_CHECKING
-from bsdd_json import BsddClassProperty
+from bsdd_json import BsddClassProperty,BsddClass
 from PySide6.QtGui import QKeySequence
 from .constants import SEPERATOR_SECTION, SEPERATOR_STATUS
 from . import ui, views
@@ -15,6 +15,7 @@ def connect():
     core.connect_signals(
         tool.ClassPropertyEditorWidget,
         tool.ClassPropertyTableView,
+        tool.GopPropertyView,
         tool.MainWindowWidget,
         tool.PropertyEditorWidget,
         tool.Project,
@@ -37,9 +38,9 @@ def create_widget(som_property: BsddClassProperty):
     )
 
 
-def create_dialog():
+def create_dialog(bsdd_class:BsddClass,property_set:str):
     # new Property Dialog
-    core.create_dialog(
+    core.create_dialog(bsdd_class,property_set,
         tool.ClassPropertyEditorWidget,
         tool.MainWindowWidget,
         tool.Project,

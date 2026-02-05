@@ -4,9 +4,12 @@ import logging
 from types import ModuleType
 import bsdd_gui
 from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
+from PySide6.QtWidgets import QComboBox
 from bsdd_gui.module.property_set_table_view import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals, ItemViewTool
-from bsdd_json.models import BsddDictionary, BsddClass
+from bsdd_json.models import BsddDictionary, BsddClass, BsddClassRelation
+from bsdd_json.utils import class_utils
+import copy as cp
 
 if TYPE_CHECKING:
     from bsdd_gui.module.property_set_table_view.prop import (
@@ -19,6 +22,8 @@ class Signals(ViewSignals):
     delete_selection_requested = Signal(ui.PsetTableView)
     property_set_deleted = Signal(BsddClass, str)
     rename_selection_requested = Signal(ui.PsetTableView)
+    property_set_added = Signal(str)
+    data_changed = Signal(QModelIndex, QModelIndex, list)
 
 
 class PropertySetTableView(ItemViewTool):
@@ -51,6 +56,7 @@ class PropertySetTableView(ItemViewTool):
         cls.signals.rename_selection_requested.connect(
             lambda view: view.edit([i for i in view.selectedIndexes() if i.column() == 0][0])
         )
+        cls.signals.property_set_added.connect(lambda _: cls.signals.model_refresh_requested.emit())
 
     @classmethod
     def connect_view_signals(cls, view: ui.PsetTableView):
@@ -59,7 +65,7 @@ class PropertySetTableView(ItemViewTool):
     @classmethod
     def create_model(
         cls, bsdd_dictionary: BsddDictionary
-    ) -> tuple[models.SortModel | models.ItemModel]:
+    ) -> tuple[models.SortModel, models.ItemModel]:
         return super().create_model(bsdd_dictionary)
 
     @classmethod
@@ -75,6 +81,12 @@ class PropertySetTableView(ItemViewTool):
         cls.signals.new_property_set_requested.emit(bsdd_class)
 
     @classmethod
+    def get_temporary_psets(cls, bsdd_class: BsddClass):
+        if bsdd_class.Code in cls.get_properties().temporary_pset:
+            return cls.get_properties().temporary_pset[bsdd_class.Code]
+        return []
+
+    @classmethod
     def get_pset_names_with_temporary(cls, bsdd_class: BsddClass) -> list[str]:
         bsdd_properties = list()
         if bsdd_class is None:
@@ -83,10 +95,8 @@ class PropertySetTableView(ItemViewTool):
             if cp.PropertySet not in bsdd_properties:
                 bsdd_properties.append(cp.PropertySet)
 
-        if bsdd_class.Code in cls.get_properties().temporary_pset:
-            for property_set in cls.get_properties().temporary_pset[bsdd_class.Code]:
-                bsdd_properties.append(property_set)
-        return bsdd_properties
+        temporary_psets = cls.get_temporary_psets(bsdd_class)
+        return bsdd_properties + temporary_psets
 
     @classmethod
     def select_row(cls, view: ui.PsetTableView, row_index: int):
@@ -146,3 +156,73 @@ class PropertySetTableView(ItemViewTool):
         for class_property in bsdd_class.ClassProperties:
             if class_property.PropertySet == old_name:
                 class_property.PropertySet = new_name
+
+    @classmethod
+    def set_combobox(cls, value: QComboBox):
+        cls.get_properties().combo_box = value
+
+    @classmethod
+    def get_combobox(cls) -> QComboBox:
+        return cls.get_properties().combo_box
+
+    @classmethod
+    def get_name_from_combobox(cls):
+        return cls.get_combobox().currentText()
+
+    @classmethod
+    def is_pset_predefined(cls, pset_name: str, bsdd_dictionary: BsddDictionary):
+        return pset_name in [
+            c.Name for c in bsdd_dictionary.Classes if c.ClassType == "GroupOfProperties"
+        ]
+
+    @classmethod
+    def is_pset_existing(cls, pset_name, bsdd_class: BsddClass):
+        return pset_name in cls.get_pset_names_with_temporary(bsdd_class)
+
+    @classmethod
+    def create_connected_pset(
+        cls, pset_name: str, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary
+    ):
+        pset_classes = [c for c in bsdd_dictionary.Classes if c.Name == pset_name]
+        if not pset_classes:
+            return
+        if len(pset_classes) > 1:
+            logging.warning(f"Multiple Pset Classes found! for {pset_name}")
+            # TODO: Add a Picker or disalow multiple Psets with the same name
+        pset_class = pset_classes[0]
+
+        for cp in pset_class.ClassProperties:
+            new_cp = cp.model_copy(deep=True)
+            bsdd_class.ClassProperties.append(new_cp)
+            new_cp._set_parent(bsdd_class)
+
+        if len(pset_class.ClassProperties) == 0:
+            cls.add_temporary_pset(bsdd_class, pset_name)
+        cls.add_pset_relation(bsdd_class, pset_class, bsdd_dictionary)
+
+    @classmethod
+    def add_pset_relation(
+        cls, bsdd_class: BsddClass, pset_class: BsddClass, bsdd_dictionary: BsddDictionary
+    ):
+        uri = class_utils.build_bsdd_uri(pset_class, bsdd_dictionary)
+        relation = BsddClassRelation(
+            RelationType="HasReference", RelatedClassUri=uri, RelatedClassName=pset_class.Name
+        )
+        bsdd_class.ClassRelations.append(relation)
+
+    @classmethod
+    def get_related_psets(
+        cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary
+    ) -> list[BsddClass]:
+        related_psets = list()
+
+        for cr in bsdd_class.ClassRelations:
+            if cr.RelationType != "HasReference":
+                continue
+            uri = cr.RelatedClassUri
+            related_class = class_utils.get_class_by_uri(bsdd_dictionary, uri)
+            if not related_class:
+                continue
+            if related_class.ClassType == "GroupOfProperties":
+                related_psets.append(related_class)
+        return related_psets

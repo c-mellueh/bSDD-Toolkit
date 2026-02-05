@@ -2,7 +2,7 @@ from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import class_property_table_view as core
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 from PySide6.QtCore import QPoint
 
 if TYPE_CHECKING:
@@ -13,10 +13,11 @@ def connect():
     core.connect_signals(
         tool.ClassPropertyTableView,
         tool.ClassPropertyEditorWidget,
-        tool.MainWindowWidget,
         tool.Project,
     )
-    core.connect_to_main_window(tool.ClassPropertyTableView, tool.MainWindowWidget)
+    core.connect_to_main_window(
+        tool.ClassPropertyTableView, tool.MainWindowWidget, tool.ClassTreeView
+    )
 
 
 def retranslate_ui():
@@ -38,11 +39,15 @@ def view_created(view: ui.ClassPropertyTable):
     core.connect_view(view, tool.ClassPropertyTableView, tool.Util)
 
 
-def copy_selected(view: ui.ClassPropertyTable):
-    core.copy_property_to_clipboard(view, tool.ClassPropertyTableView)
+def copy_selected(
+    view: ui.ClassPropertyTable, view_tool: Type[tool.ClassPropertyTableView]
+):
+    core.copy_property_to_clipboard(view, view_tool)
 
 
-def paste_clipboard(view: ui.ClassPropertyTable):
+def paste_clipboard(
+    view: ui.ClassPropertyTable, view_tool: Type[tool.ClassPropertyTableView]
+):
     core.paste_property_from_clipboard(
-        view, tool.ClassPropertyTableView, tool.PropertyTableWidget, tool.Project, tool.Util
+        view, view_tool, tool.PropertyTableWidget, tool.Project, tool.Util,tool.MainWindowWidget
     )

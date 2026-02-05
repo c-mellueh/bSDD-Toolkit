@@ -7,7 +7,7 @@ TOOGLE_CONSOLE_ACTION = "toggle_console"
 
 
 def connect():
-    core.connect_main_window(tool.MainWindowWidget, tool.ClassTreeView, tool.Util, tool.Project)
+    core.connect_main_window(tool.MainWindowWidget, tool.ClassTreeView, tool.PropertySetTableView)
 
 
 def on_new_project():
@@ -29,3 +29,6 @@ def refresh_status_bar():
 def toggle_console():
     core.toggle_console(tool.MainWindowWidget)
     core.retranslate_ui(tool.MainWindowWidget)
+
+def update_pset_combobox():
+    core.update_pset_combobox(tool.MainWindowWidget,tool.Project,tool.PropertySetTableView)

@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 
 class ItemModel(QAbstractItemModel):
 
-    def __init__(self, tool: ItemViewTool, bsdd_data: object, *args, **kwargs):
-        self.tool = tool
+    def __init__(self, tl: ItemViewTool, bsdd_data: object, *args, **kwargs):
+        self.tool = tl
         self.bsdd_data = bsdd_data
         super().__init__(*args, **kwargs)
 

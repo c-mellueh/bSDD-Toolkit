@@ -49,8 +49,6 @@ def register_view(view: ui.ClassView, class_tree: Type[tool.ClassTreeView]):
 def add_columns_to_view(
     view: ui.ClassView,
     class_tree: Type[tool.ClassTreeView],
-    project: Type[tool.Project],
-    util: Type[tool.Util],
 ):
     proxy_model, model = class_tree.create_model(None)
     class_tree.add_column_to_table(model, "Name", lambda a: a.Name)
@@ -73,7 +71,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Copy"),
-        lambda v=view: class_tree.request_copy_selection(v),
+        lambda *_, v=view: class_tree.request_copy_selection(v),
         True,
         True,
         True,
@@ -83,7 +81,7 @@ def add_context_menu_to_view(
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Paste"),
-        lambda v=view: class_tree.request_paste(v),
+        lambda *_, v=view: class_tree.request_paste(v),
         False,
         True,
         True,
@@ -154,10 +152,11 @@ def add_context_menu_to_view(
         shortcut="Ctrl+R",
     )
 
+    class_types = "|".join(class_tree.get_allowed_class_types())
     class_tree.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("Class", "Edit"),
-        lambda: class_editor.request_class_editor(get_first_selection(view)),
+        lambda: class_editor.request_class_editor(class_types, get_first_selection(view)),
         True,
         True,
         False,
@@ -175,54 +174,10 @@ def connect_to_main_window(
     util: Type[tool.Util],
 ):
     view = main_window.get_class_view()
-
-    util.add_shortcut(
-        "Ctrl+C",
-        view,
-        lambda: class_tree.request_copy_selection(view),
-    )
-    util.add_shortcut(
-        "Ctrl+V",
-        view,
-        lambda v=view: class_tree.request_paste(v),
-    )
-
-    util.add_shortcut(
-        "Del",
-        view,
-        lambda: class_tree.signals.delete_selection_requested.emit(view),
-    )
-
-    util.add_shortcut(
-        "Ctrl+E",
-        view,
-        lambda: class_tree.signals.expand_selection_requested.emit(view),
-    )
-    util.add_shortcut(
-        "Ctrl+Alt+E",
-        view,
-        lambda: class_tree.signals.collapse_selection_requested.emit(view),
-    )
-
-    util.add_shortcut(
-        "Ctrl+G",
-        view,
-        lambda: class_tree.signals.group_selection_requested.emit(view),
-    )
-    util.add_shortcut(
-        "Ctrl+F",
-        view,
-        lambda: class_tree.signals.search_requested.emit(view),
-    )
-    util.add_shortcut(
-        "Ctrl+R",
-        view,
-        lambda: class_tree.signals.model_refresh_requested.emit(),
-    )
     util.add_shortcut(
         "Ctrl+N",
         view,
-        lambda: main_window.signals.new_class_requested.emit(),
+        lambda: main_window.signals.new_class_requested.emit("Class|Material|AlternativeUse"),
     )
 
     class_tree.signals.selection_changed.connect(
@@ -259,13 +214,13 @@ def delete_selection(
 
 def group_selection(
     view: ui.ClassView,
-    class_tree: Type[tool.ClassTreeView],
+    class_tree: Type[tool.ClassTreeView | tool.GopClassView],
     class_editor: Type[tool.ClassEditorWidget],
 ):
     bsdd_classes = class_tree.get_selected(view)
     if not bsdd_classes:
         return
-    class_editor.request_class_grouping(bsdd_classes)
+    class_editor.request_class_grouping(class_tree, bsdd_classes)
 
 
 def search_class(
@@ -274,8 +229,10 @@ def search_class(
     class_tree: Type[tool.ClassTreeView],
     project: Type[tool.Project],
 ):
-
-    cl = search.search_class(project.get().Classes)
+    classes = [
+        c for c in project.get().Classes if c.ClassType in class_tree.get_allowed_class_types()
+    ]
+    cl = search.search_class(classes)
     if not cl:
         return
     class_tree.select_and_expand(cl, view)

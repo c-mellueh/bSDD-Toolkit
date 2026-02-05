@@ -81,6 +81,17 @@ def add_context_menu_to_view(
         True,
         True,
         qta.icon("mdi.delete"),
+        "Del"
+    )
+    allowed_values_table.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("AllowedValuesTable", "Paste"),
+        lambda v=view: allowed_values_table.signals.items_pasted.emit(v),
+        False,
+        True,
+        True,
+        qta.icon("mdi.content-paste"),
+        "Ctrl+V"
     )
 
 
@@ -91,9 +102,7 @@ def connect_view(
 ):
     view.setItemDelegateForColumn(0, ui.LiveEditDelegate(parent=view))
     allowed_values_table.connect_view_signals(view)
-    util.add_shortcut(
-        "Ctrl+V", view, lambda v=view: allowed_values_table.signals.items_pasted.emit(v)
-    )
+
 
 
 def create_context_menu(

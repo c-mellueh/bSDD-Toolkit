@@ -16,12 +16,11 @@ from bsdd_json import BsddClass, BsddClassProperty, BsddProperty
 def connect_signals(
     class_property_table: Type[tool.ClassPropertyTableView],
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
-    main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ):
     class_property_table.connect_internal_signals()
     class_property_editor.signals.new_class_property_created.connect(
-        lambda p: class_property_table.add_class_property(p, main_window.get_active_class())
+        lambda p, c: class_property_table.add_class_property(p, c)
     )
     class_property_table.signals.item_added.connect(project.signals.class_property_added.emit)
     class_property_table.signals.item_removed.connect(project.signals.class_property_removed.emit)
@@ -127,21 +126,6 @@ def connect_view(
     util: Type[tool.Util],
 ):
     property_table.connect_view_signals(view)
-    util.add_shortcut(
-        "Ctrl+N",
-        view,
-        lambda: property_table.request_new_property(),
-    )
-    util.add_shortcut(
-        "Ctrl+C",
-        view,
-        lambda: property_table.request_copy(view),
-    )
-    util.add_shortcut(
-        "Ctrl+V",
-        view,
-        lambda: property_table.request_paste(view),
-    )
 
 
 def reset_views(property_table: Type[tool.ClassPropertyTableView], project: Type[tool.Project]):
@@ -150,35 +134,26 @@ def reset_views(property_table: Type[tool.ClassPropertyTableView], project: Type
 
 
 def connect_to_main_window(
-    property_table: Type[tool.ClassPropertyTableView], main_window: Type[tool.MainWindowWidget]
+    property_table: Type[tool.ClassPropertyTableView],
+    main_window: Type[tool.MainWindowWidget],
+    class_tree_view: Type[tool.ClassTreeView],
 ):
 
-    def reset_property(new_pset_name: str):
-        """
-        if the class changes this function checks if the new class has a propertySet with the same name as the old class and selects it
-        """
-        active_prop = main_window.get_active_property()
-        if active_prop is None:
-            return
-        active_class = main_window.get_active_class()
-        property_list = property_table.filter_properties_by_pset(active_class, new_pset_name)
-        code_dict = {p.Code: p for p in property_list}
-        if active_prop.Code in code_dict:
-            new_property = code_dict[active_prop.Code]
-            row_index = property_table.get_row_of_property(property_view, new_property)
-        else:
-            row_index = 0
-        property_table.select_row(property_view, row_index or 0)
-
-    property_view = main_window.get_property_view()
+    view = main_window.get_property_view()
 
     property_table.signals.selection_changed.connect(
-        lambda v, n: (main_window.set_active_property(n) if v == property_view else None)
+        lambda v, n: (main_window.set_active_property(n) if v == view else None)
     )
+    main_window.signals.active_pset_changed.connect(lambda c: property_table.reset_view(view))
     main_window.signals.active_pset_changed.connect(
-        lambda c: property_table.reset_view(property_view)
+        lambda n: property_table.reset_property(
+            n,
+            view,
+            main_window.get_active_class(),
+            main_window.get_active_property(),
+        )
     )
-    main_window.signals.active_pset_changed.connect(reset_property)
+    property_table.set_allowed_class_types(class_tree_view.get_allowed_class_types())
 
 
 def reset_models(
@@ -227,9 +202,11 @@ def paste_property_from_clipboard(
     property_table: Type[tool.PropertyTableWidget],
     project: Type[tool.Project],
     util: Type[tool.Util],
+    main_window: Type[tool.MainWindowWidget],
 ):
     bsdd_dictionary = project.get()
     clipboard_text = QApplication.clipboard().text()
+
     try:
         payload = json.loads(clipboard_text)
     except:
@@ -238,6 +215,7 @@ def paste_property_from_clipboard(
     if not isinstance(payload, dict) or payload.get("kind") != CLASS_PROP_CLIPBOARD_KIND:
         return
 
+    pset_name = main_window.get_active_pset()
     model: models.ClassPropertyTableModel = view.model().sourceModel()
     bsdd_class_properties = payload.get("class_properties", [])
     properties: list[BsddProperty] = payload.get("properties", [])
@@ -254,6 +232,7 @@ def paste_property_from_clipboard(
         code = util.get_unique_name(code, existing_codes, True)
         bsdd_class_property["Code"] = code
         new_property = BsddClassProperty.model_validate(bsdd_class_property)
+        new_property.PropertySet = pset_name
         class_property_table.add_class_property(new_property, model.active_class)
         existing_codes.append(code)
 

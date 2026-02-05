@@ -214,34 +214,6 @@ def connect_view(
 ):
     property_table.connect_view_signals(view)
 
-    if isinstance(view, views.PropertyTable):
-        util.add_shortcut(
-            "Ctrl+F",
-            view,
-            lambda: property_table.signals.search_requested.emit(view),
-        )
-        util.add_shortcut(
-            "Ctrl+N",
-            view,
-            lambda: property_table.request_new_property(),
-        )
-        util.add_shortcut(
-            "Ctrl+C",
-            view,
-            lambda: property_table.request_property_copy(view),
-        )
-        util.add_shortcut(
-            "Ctrl+V",
-            view,
-            lambda: property_table.request_property_paste(view),
-        )
-
-    util.add_shortcut(
-        "Del",
-        view,
-        lambda: property_table.request_delete_selection(view),
-    )
-
 
 def create_context_menu(
     view: views.PropertyTable | views.ClassTable,

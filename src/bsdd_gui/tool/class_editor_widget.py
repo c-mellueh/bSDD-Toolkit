@@ -15,9 +15,13 @@ if TYPE_CHECKING:
 
 
 class Signals(DialogSignals):
-    edit_class_requested = Signal(BsddClass)
-    new_class_requested = Signal(BsddClass)  # Parent Class
-    grouping_requested = Signal(list)
+    edit_class_requested = Signal(
+        str, BsddClass
+    )  # Classtype (Class|Material|GroupOfProperties|AlternativeUse),Class
+    new_class_requested = Signal(
+        str, BsddClass
+    )  # Classtype (Class|Material|GroupOfProperties|AlternativeUse),Parent
+    grouping_requested = Signal(object, list)  # ClassTreeTool,list of classes
     new_class_created = Signal(
         BsddClass
     )  # the class is not added to the Dictionary So far, this gets handled by ClassTree
@@ -81,16 +85,18 @@ class ClassEditorWidget(DialogTool):
         cls.get_properties().old_name_value = new_value
 
     @classmethod
-    def request_class_editor(cls, bsdd_class: BsddClass):
-        cls.signals.edit_class_requested.emit(bsdd_class)
+    def request_class_editor(cls, allowed_class_types: str, bsdd_class: BsddClass):
+        cls.signals.edit_class_requested.emit(allowed_class_types, bsdd_class)
 
     @classmethod
-    def request_new_class(cls, parent=None):
-        cls.signals.new_class_requested.emit(parent)
+    def request_new_class(cls, class_type, parent=None):
+        cls.signals.new_class_requested.emit(class_type, parent)
 
     @classmethod
-    def request_class_grouping(cls, bsdd_classes: list[BsddClass]):
-        cls.signals.grouping_requested.emit(bsdd_classes)
+    def request_class_grouping(cls, class_tree_tool, bsdd_classes: list[BsddClass]):
+        """allowed_class_types is one or multiple of Class|Material|GroupOfProperties|AlternativeUse joined with '|'"""
+
+        cls.signals.grouping_requested.emit(class_tree_tool, bsdd_classes)
 
     @classmethod
     def is_code_valid(cls, code: str, widget: ui.ClassEditor, bsdd_dict: BsddDictionary):
@@ -122,3 +128,17 @@ class ClassEditorWidget(DialogTool):
             cls.signals.related_ifc_added.emit(element, ifc_code)
         for ifc_code in removed_ifc:
             cls.signals.related_ifc_removed.emit(element, ifc_code)
+
+    @classmethod
+    def apply_allowed_class_types(cls, allowed_class_types: str, widget: ui.ClassEditor):
+        """
+        allowed_class_types is one or multiple of Class|Material|GroupOfProperties|AlternativeUse joined with "|"
+        """
+        allowed_class_types = allowed_class_types.split("|")
+
+        widget.cb_class_type.clear()
+        widget.cb_class_type.addItems(allowed_class_types)
+        class_type = widget.bsdd_data.ClassType
+        if not class_type in allowed_class_types:
+            class_type = "Class" if "Class" in allowed_class_types else allowed_class_types[0]
+        widget.cb_class_type.setCurrentText(class_type)

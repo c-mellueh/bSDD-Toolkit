@@ -20,15 +20,24 @@ from .constants import JSON_MIME, CODES_MIME
 
 class ClassTreeModel(ItemModel):
 
-    def __init__(self, bsdd_dictionary: BsddDictionary, tl=None, *args, **kwargs):
+    def __init__(self, tl=None,bsdd_data: BsddDictionary = None,  *args, **kwargs):
         if tl is None:
             tl = tool.ClassTreeView
-        super().__init__(tl, bsdd_dictionary, *args, **kwargs)
+        super().__init__(tl, bsdd_data, *args, **kwargs)
         self.bsdd_data: BsddDictionary
+        self.tool: tool.ClassTreeView | tool.GopClassView
 
     @property
     def bsdd_dictionary(self):
         return self.bsdd_data
+
+    def _get_root_classes(self):
+        rc = cl_utils.get_root_classes(self.bsdd_dictionary)
+        return [c for c in rc if c.ClassType != "GroupOfProperties"]
+
+    def _get_children(self, bsdd_class: BsddClass):
+        children = cl_utils.get_children(bsdd_class)
+        return [c for c in children if c.ClassType != "GroupOfProperties"]
 
     def hasChildren(self, parent=QModelIndex()):
         if parent.isValid() and parent.column() != 0:
@@ -39,10 +48,10 @@ class ClassTreeModel(ItemModel):
         if parent.isValid() and parent.column() != 0:
             return 0
         if not parent.isValid():
-            return len(cl_utils.get_root_classes(self.bsdd_dictionary))
+            return len(self._get_root_classes())
         else:
             bsdd_class: BsddClass = parent.internalPointer()
-            return len(cl_utils.get_children(bsdd_class))
+            return len(self._get_children(bsdd_class))
 
     def index(self, row: int, column: int, parent=QModelIndex()):
         # Für Eltern in Spalte != 0 KEINE Kinder liefern
@@ -50,14 +59,14 @@ class ClassTreeModel(ItemModel):
             return QModelIndex()
 
         if not parent.isValid():
-            roots = cl_utils.get_root_classes(self.bsdd_dictionary)
+            roots = self._get_root_classes()
             if 0 <= row < len(roots):
                 return self.createIndex(row, column, roots[row])
             return QModelIndex()
 
         parent = parent.siblingAtColumn(0)  # optional, schadet nicht
         parent_class: BsddClass = parent.internalPointer()
-        children = cl_utils.get_children(parent_class)
+        children = self._get_children(parent_class)
         if 0 <= row < len(children):
             return self.createIndex(row, column, children[row])
         return QModelIndex()
@@ -79,12 +88,10 @@ class ClassTreeModel(ItemModel):
         if gp_code:
             gp_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, gp_code)
             siblings = (
-                cl_utils.get_children(gp_cls)
-                if gp_cls is not None
-                else cl_utils.get_root_classes(self.bsdd_dictionary)
+                self._get_children(gp_cls) if gp_cls is not None else self._get_root_classes()
             )
         else:
-            siblings = cl_utils.get_root_classes(self.bsdd_dictionary)
+            siblings = self._get_root_classes()
 
         try:
             row = siblings.index(parent_cls)
@@ -113,10 +120,10 @@ class ClassTreeModel(ItemModel):
             parent_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, c.ParentClassCode)
             if parent_cls is not None:
                 parent_index = self._index_for_class(parent_cls)
-                siblings = cl_utils.get_children(parent_cls)
+                siblings = self._get_children(parent_cls)
                 return parent_index, siblings
         # Root-Fall
-        return QModelIndex(), cl_utils.get_root_classes(self.bsdd_dictionary)
+        return QModelIndex(), self._get_root_classes()
 
     def _index_for_class(self, cls: BsddClass) -> QModelIndex:
         """Return the QModelIndex for an existing class object."""
@@ -126,12 +133,12 @@ class ClassTreeModel(ItemModel):
             parent_cls = cl_utils.get_class_by_code(self.bsdd_dictionary, parent_code)
             gp_idx = self._index_for_class(parent_cls)  # recurse to get parent's parent index
             # children of the parent
-            children = cl_utils.get_children(parent_cls)
+            children = self._get_children(parent_cls)
             row = children.index(cls)
             return self.index(row, 0, gp_idx)
         else:
             # root class
-            roots = cl_utils.get_root_classes(self.bsdd_dictionary)
+            roots = self._get_root_classes()
             if cls in roots:
                 row = roots.index(cls)
             else:
@@ -170,22 +177,30 @@ class ClassTreeModel(ItemModel):
             return False
         if action not in (Qt.MoveAction, Qt.CopyAction):
             return False
+
+
         if (
             data.hasFormat(JSON_MIME)
             or data.hasFormat("application/json")
             or data.hasFormat(CODES_MIME)
         ):
+            codes = self.tool.get_codes_from_data(data)
+            if not codes:
+                return False
+            
+            bsdd_class = cl_utils.get_class_by_code(self.bsdd_dictionary,codes[0])
+            if not bsdd_class.ClassType in self.tool.get_allowed_class_types():
+                return False
             return True
         return False
 
     def dropMimeData(self, data, action, row, column, parent: QModelIndex) -> bool:
         dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
         dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
-
         if action == Qt.MoveAction and data.hasFormat(CODES_MIME):
-            trigger.mime_move_event(self.bsdd_data, data, row, parent)
+            trigger.mime_move_event(self.bsdd_data, data, row, parent, self.tool)
         elif action in (Qt.CopyAction, Qt.IgnoreAction):
-            trigger.mime_copy_event(self.bsdd_data, data, parent)
+            trigger.mime_copy_event(self.bsdd_data, data, parent, self.tool)
         return True
 
 
