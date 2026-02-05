@@ -173,7 +173,7 @@ class PropertySetTableView(ItemViewTool):
 
     @classmethod
     def is_pset_existing(cls, pset_name, bsdd_class: BsddClass):
-        pset_name in cls.get_pset_names_with_temporary(bsdd_class)
+        return pset_name in cls.get_pset_names_with_temporary(bsdd_class)
 
     @classmethod
     def create_connected_pset(
@@ -190,6 +190,8 @@ class PropertySetTableView(ItemViewTool):
         for cp in pset_class.ClassProperties:
             bsdd_class.ClassProperties.append(cp.model_copy(deep=True))
 
+        if len(pset_class.ClassProperties) == 0:
+            cls.add_temporary_pset(bsdd_class,pset_name)
         cls.add_pset_relation(bsdd_class, pset_class, bsdd_dictionary)
 
     @classmethod

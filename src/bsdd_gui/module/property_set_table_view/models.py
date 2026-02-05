@@ -7,18 +7,21 @@ from PySide6.QtCore import (
     QModelIndex,
     QSortFilterProxyModel,
 )
+from typing import Type
+
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_json.models import BsddDictionary, BsddClass
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
-
+import qtawesome as qta
 
 class PsetTableModel(ItemModel):
 
-    def __init__(self, tl = None, bsdd_data: BsddDictionary = None, *args, **kwargs):
+    def __init__(self, tl=None, bsdd_data: BsddDictionary = None, *args, **kwargs):
         super().__init__(tool.PropertySetTableView, bsdd_data, *args, **kwargs)
         self.bsdd_data: BsddDictionary
+        self.tool: Type[tool.PropertySetTableView]
 
     @property
     def active_class(self):
@@ -48,9 +51,17 @@ class PsetTableModel(ItemModel):
     #     return super().setData(index,value,role)
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
-        test = 0
-        return super().data(index, role)
+        if role != Qt.ItemDataRole.DecorationRole:
+            return super().data(index, role)
 
+        if index.column() != 0:
+            return QModelIndex()
+        bsdd_class = self.active_class
+        related_psets = self.tool.get_related_psets(bsdd_class,self.bsdd_data)
+        if index.data(Qt.ItemDataRole.DisplayRole) in [c.Name for c in related_psets]:
+            return qta.icon("mdi.link-variant")
+        else:
+            return QModelIndex()
 
 # typing
 class SortModel(QSortFilterProxyModel):
