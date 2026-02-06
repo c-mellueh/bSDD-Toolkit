@@ -144,7 +144,7 @@ def connect_widget(
 ### Item View
 
 
-def register_class_view(view: views.GopPropertyView, gop_view: Type[tool.GopClassView]):
+def register_class_view(view: views.GopClassView, gop_view: Type[tool.GopClassView]):
     gop_view.register_view(view)
     view.setSelectionBehavior(QTreeView.SelectRows)
     view.setSelectionMode(QTreeView.ExtendedSelection)
@@ -152,7 +152,7 @@ def register_class_view(view: views.GopPropertyView, gop_view: Type[tool.GopClas
     view.setDragEnabled(True)
     view.setAcceptDrops(True)
     view.setDropIndicatorShown(True)
-    view.setDefaultDropAction(Qt.MoveAction)
+    view.setDefaultDropAction(Qt.DropAction.MoveAction)
     view.setDragDropMode(QTreeView.DragDropMode.DragDrop)  # internal DnD
     logging.info(f"register View {type(view).__name__} done!")
 

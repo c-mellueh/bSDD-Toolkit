@@ -8,8 +8,8 @@ from bsdd_json.utils import property_utils as prop_utils
 
 
 class ClassTreeModel(CTM):
-    def __init__(self, data, *args, **kwargs):
-        super().__init__(data, tool.IdsClassView, *args, **kwargs)
+    def __init__(self,tl=None ,bsdd_data=None, *args, **kwargs):
+        super().__init__(tool.IdsClassView, bsdd_data, *args, **kwargs)
         self.is_check_inerheritance_enabled = False
 
     def set_checkstate_inheritance(self, value: bool) -> None:

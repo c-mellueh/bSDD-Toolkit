@@ -234,8 +234,14 @@
           <property name="contextMenuPolicy">
            <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
           </property>
+          <property name="acceptDrops">
+           <bool>true</bool>
+          </property>
           <property name="editTriggers">
            <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::SelectedClicked</set>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::DragDropMode::DragDrop</enum>
           </property>
           <property name="selectionMode">
            <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>

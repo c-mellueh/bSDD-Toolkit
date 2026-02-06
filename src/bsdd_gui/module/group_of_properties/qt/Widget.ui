@@ -46,6 +46,18 @@
          <property name="contextMenuPolicy">
           <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
          </property>
+         <property name="dragEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropOverwriteMode">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::DragDropMode::DragDrop</enum>
+         </property>
+         <property name="defaultDropAction">
+          <enum>Qt::DropAction::MoveAction</enum>
+         </property>
         </widget>
        </item>
        <item row="0" column="2">

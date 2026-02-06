@@ -1,12 +1,13 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QTreeView, QTreeWidget, QWidget
+from PySide6.QtWidgets import QTreeView, QTreeWidget
 from PySide6.QtCore import (
-    QAbstractListModel,
     Qt,
     QCoreApplication,
     QModelIndex,
     QSortFilterProxyModel,
 )
+from PySide6.QtGui import QDragEnterEvent,QDragMoveEvent
+
 from typing import Type
 from bsdd_json.utils import class_utils
 from bsdd_gui.resources.icons import get_icon
@@ -61,6 +62,31 @@ class PsetTableModel(ItemModel):
             return qta.icon("mdi.link-variant")
         else:
             return QModelIndex()
+
+    def canDropMimeData(self, mimeData, action, row, column, parent):
+        # Nur bestimmte MIME-Typen erlauben
+        if mimeData.hasFormat("application/x-my-custom-type"):
+            return True
+
+        # z.B. Text explizit verbieten
+        if mimeData.hasText():
+            return False
+
+        return False
+
+    def dragEnterEvent(self, e: QDragEnterEvent):
+        if e.source() is None:  # different process
+            e.setDropAction(Qt.CopyAction)
+            e.accept()
+        else:
+            super().dragEnterEvent(e)
+
+    def dragMoveEvent(self, e: QDragMoveEvent):
+        if e.source() is None:
+            e.setDropAction(Qt.CopyAction)
+            e.accept()
+        else:
+            super().dragMoveEvent(e)
 
 
 # typing
