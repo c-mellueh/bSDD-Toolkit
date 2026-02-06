@@ -202,6 +202,34 @@ def reset_models(
     class_tree.reset_views()
 
 
+def add_context_menu_to_class_view(
+    view: views.GopClassView,
+    class_view: Type[tool.GopClassView],
+    project: Type[tool.Project],
+    class_property_view: Type[tool.ClassPropertyTableView],
+    pset_table_view:Type[tool.PropertySetTableView]
+):
+
+    def delete_synced_psets():
+        for bsdd_class in class_view.get_selected(view):
+            for relating_class in cl_utils.get_relating_pset_classes(bsdd_class, project.get()):
+                for cp in relating_class.ClassProperties:
+                    if cp.PropertySet != bsdd_class.Name:
+                        continue
+                    class_property_view.remove_property(relating_class, cp)
+                
+        pset_table_view.request_model_refresh()
+    class_view.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("ClassView", "Delete Synced PropertySets"),
+        lambda: delete_synced_psets(),
+        True,
+        True,
+        True,
+        icon=qta.icon("mdi6.delete-variant"),
+    )
+
+
 def paste_property_from_clipboard(
     view: views.GopPropertyView,
     gop_property_view: Type[tool.GopPropertyView],

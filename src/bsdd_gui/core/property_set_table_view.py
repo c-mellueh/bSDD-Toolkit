@@ -350,7 +350,6 @@ def delete_selection(
     property_table.signals.model_refresh_requested.emit()
     property_set_table.signals.model_refresh_requested.emit()
 
-
 def reset_models(
     property_table: Type[tool.PropertySetTableView],
     project: Type[tool.Project],

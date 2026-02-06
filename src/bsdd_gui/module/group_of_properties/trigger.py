@@ -57,6 +57,14 @@ def class_view_created(view: GopClassView):
     core.register_class_view(view, tool.GopClassView)
     core.add_columns_to_class_view(view, tool.GopClassView, tool.Project)
     ctv_core.add_context_menu_to_view(view, tool.GopClassView, tool.ClassEditorWidget)
+    core.add_context_menu_to_class_view(
+        view,
+        tool.GopClassView,
+        tool.Project,
+        tool.ClassPropertyTableView,
+        tool.PropertySetTableView,
+    )
+
     core.connect_class_view(view, tool.GopClassView)
 
 
@@ -76,7 +84,7 @@ def property_view_created(view: GopPropertyView):
     core.register_property_view(view, tool.GopPropertyView)
     ptv_core.add_columns_to_view(view, tool.GopPropertyView, tool.Project)
     ptv_core.add_context_menu_to_view(view, tool.GopPropertyView)
-    core.add_context_menu_to_prop_view(view,tool.GopPropertyView,tool.Project)
+    core.add_context_menu_to_prop_view(view, tool.GopPropertyView, tool.Project)
     core.connect_property_view(view, tool.GopPropertyView)
 
 

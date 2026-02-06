@@ -226,3 +226,4 @@ class PropertySetTableView(ItemViewTool):
             if related_class.ClassType == "GroupOfProperties":
                 related_psets.append(related_class)
         return related_psets
+

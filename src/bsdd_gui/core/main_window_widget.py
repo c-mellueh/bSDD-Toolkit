@@ -67,6 +67,8 @@ def connect_main_window(
     )
     pset_table.signals.property_set_added.connect(main_window.request_pset_combobox_update)
     pset_table.signals.data_changed.connect(handle_pset_data_change)
+    pset_table.signals.model_refresh_requested.connect(main_window.request_pset_combobox_update)
+
     main_window.connect_internal_signals()
 
 

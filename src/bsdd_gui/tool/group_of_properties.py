@@ -199,6 +199,9 @@ class GopClassView(CTV):
         cls.signals.new_class_requested.emit(text, view)
 
 
+
+
+
 class PropertyViewSignals(PTS):
     pass
 

@@ -1106,3 +1106,7 @@ class ItemViewTool(BaseTool):
     @classmethod
     def request_delete_selection(cls, view):
         cls.signals.delete_selection_requested.emit(view)
+
+    @classmethod
+    def request_model_refresh(cls):
+        cls.signals.model_refresh_requested.emit()
