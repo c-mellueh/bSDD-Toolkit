@@ -85,9 +85,9 @@ def connect_signals(
 
     class_property_editor.signals.field_changed.connect(handle_value_change)
     class_property_editor.signals.code_changed.connect(
-        lambda cp,oc,nc: widget_tool.update_code_of_relating_classes(cp,nc, project.get())
+        lambda cp, oc, nc: widget_tool.update_code_of_relating_classes(cp, nc, project.get())
     )
-    
+
 
 def create_widget(data, parent, widget_tool: Type[tool.GroupOfProperties]):
     widget: ui.GopWidget = widget_tool.show_widget(data, parent)
@@ -296,3 +296,19 @@ def remove_class_property_from_linked(
             if bsdd_class.Name in pset_table.get_temporary_psets(related_class):
                 continue
             pset_table.add_temporary_pset(related_class, bsdd_class.Name)
+
+
+def add_context_menu_to_prop_view(
+    view: views.GopPropertyView,
+    property_view: Type[tool.GopPropertyView],
+    project: Type[tool.Project],
+):
+    property_view.add_context_menu_entry(
+        view,
+        lambda: QCoreApplication.translate("PropertyTable", "Sync Allowed Values"),
+        lambda: property_view.sync_allowed_values(view, project.get()),
+        True,
+        True,
+        True,
+        icon=qta.icon("mdi6.sync"),
+    )

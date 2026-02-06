@@ -76,6 +76,7 @@ def property_view_created(view: GopPropertyView):
     core.register_property_view(view, tool.GopPropertyView)
     ptv_core.add_columns_to_view(view, tool.GopPropertyView, tool.Project)
     ptv_core.add_context_menu_to_view(view, tool.GopPropertyView)
+    core.add_context_menu_to_prop_view(view,tool.GopPropertyView,tool.Project)
     core.connect_property_view(view, tool.GopPropertyView)
 
 

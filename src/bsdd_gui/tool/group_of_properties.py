@@ -158,7 +158,7 @@ class GroupOfProperties(FieldTool, ActionTool):
 
     @classmethod
     def update_code_of_relating_classes(
-        cls, gop_property:BsddClassProperty, new_code: str, bsdd_dictionary: BsddDictionary
+        cls, gop_property: BsddClassProperty, new_code: str, bsdd_dictionary: BsddDictionary
     ):
         relating_properties = prop_utils.get_relating_properties(gop_property, bsdd_dictionary)
         for prop in relating_properties:
@@ -234,3 +234,14 @@ class GopPropertyView(PTW):
         bsdd_class = tool.GroupOfProperties.get_active_class()
         property_set = tool.GroupOfProperties.generate_pset_name(bsdd_class)
         cls.signals.new_property_requested.emit(bsdd_class, property_set)
+
+    @classmethod
+    def sync_allowed_values(cls, view: views.GopPropertyView, bsdd_dictionary: BsddDictionary):
+        for bsdd_property in cls.get_selected(view):
+            bsdd_property: BsddClassProperty
+            bsdd_class = bsdd_property.parent()
+            if not bsdd_class or bsdd_class.ClassType != "GroupOfProperties":
+                return
+            relating_properties = prop_utils.get_relating_properties(bsdd_property, bsdd_dictionary)
+            for rp in relating_properties:
+                rp.AllowedValues = [av.model_copy(deep=True) for av in bsdd_property.AllowedValues]
