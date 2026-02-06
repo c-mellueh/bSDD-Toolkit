@@ -90,12 +90,20 @@ def node_double_clicked(
     property_table: Type[tool.PropertyTableWidget],
     class_tree: Type[tool.ClassTreeView],
     main_window: Type[tool.MainWindowWidget],
+    group_of_properties: Type[tool.GroupOfProperties],
+    gop_class: Type[tool.GopClassView],
+    project:Type[tool.Project]
 ):
     if node.node_type == constants.CLASS_NODE_TYPE:
         bsdd_class: BsddClass = node.bsdd_data
         class_tree.select_and_expand(bsdd_class, main_window.get_class_view())
         main_window.get().raise_()
         main_window.get().activateWindow()
+    elif node.node_type == constants.GOP_NODE_TYPE:
+        bsdd_class: BsddClass = node.bsdd_data
+        group_of_properties.request_widget(project.get(), main_window.get())
+        widget = group_of_properties.get_widget().tv_class
+        gop_class.select_and_expand(bsdd_class,widget)
 
     elif node.node_type == constants.PROPERTY_NODE_TYPE:
         bsdd_property: BsddProperty = node.bsdd_data

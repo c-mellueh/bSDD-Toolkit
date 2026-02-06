@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
 # Node Types
 PROPERTY_NODE_TYPE = "Property"
 CLASS_NODE_TYPE = "Class"
+GOP_NODE_TYPE = "GroupOfProperties"
 EXTERNAL_PROPERTY_NODE_TYPE = "ExternalProperty"
 EXTERNAL_CLASS_NODE_TYPE = "ExternalClass"
 IFC_NODE_TYPE = "IfcReference"
@@ -40,6 +41,7 @@ GENERIC_NODE_TYPE = "generic"
 ALLOWED_NODE_TYPES = [
     EXTERNAL_PROPERTY_NODE_TYPE,
     PROPERTY_NODE_TYPE,
+    GOP_NODE_TYPE,
     CLASS_NODE_TYPE,
     EXTERNAL_CLASS_NODE_TYPE,
     IFC_NODE_TYPE,
@@ -49,6 +51,7 @@ ALLOWED_NODE_TYPES_TYPING = Literal[
     "Property",
     "ExternalProperty",
     "Class",
+    "GroupOfProperties",
     "ExternalClass",
     "IfcReference",
 ]
@@ -60,6 +63,7 @@ NODE_TYPE_LABEL_MAP: dict[str, str] = {
     EXTERNAL_PROPERTY_NODE_TYPE: "External Property",
     IFC_NODE_TYPE: "IfcReference",
     GENERIC_NODE_TYPE: "Generic",
+    GOP_NODE_TYPE: "Group of Properties",
 }
 
 
@@ -72,6 +76,7 @@ NODE_COLOR_MAP: dict[str, QColor] = {
     PROPERTY_NODE_TYPE: QColor(60, 120, 220),  # blue
     EXTERNAL_PROPERTY_NODE_TYPE: QColor(60, 180, 220),  # light blue
     GENERIC_NODE_TYPE: NODE_COLOR_DEFAULT,
+    GOP_NODE_TYPE: QColor(220, 180, 220),
 }
 SHAPE_STYPE_ELLIPSE = "ellipse"
 SHAPE_STYLE_RECT = "rect"
@@ -85,6 +90,7 @@ ALLOWED_NODE_SHAPES_TYPING = Literal[
 
 NODE_SHAPE_MAP: dict[str, str] = {
     CLASS_NODE_TYPE: SHAPE_STYLE_RECT,
+    GOP_NODE_TYPE: SHAPE_STYLE_RECT,
     EXTERNAL_CLASS_NODE_TYPE: SHAPE_STYLE_RECT,
     IFC_NODE_TYPE: SHAPE_STYLE_RECT,
     PROPERTY_NODE_TYPE: SHAPE_STYLE_ROUNDED_RECT,

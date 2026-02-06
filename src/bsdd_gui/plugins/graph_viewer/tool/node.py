@@ -85,6 +85,8 @@ class Node(PluginTool):
                 node_type = constants.IFC_NODE_TYPE
             elif is_external:
                 node_type = constants.EXTERNAL_CLASS_NODE_TYPE
+            elif bsdd_data.ClassType == "GroupOfProperties":
+                node_type = constants.GOP_NODE_TYPE
             else:
                 node_type = constants.CLASS_NODE_TYPE
         else:
@@ -198,14 +200,14 @@ class Node(PluginTool):
 
     @classmethod
     def get_class_nodes(cls) -> list[ui.Node]:
-        return [n for n in cls.get_nodes() if n.node_type == constants.CLASS_NODE_TYPE]
+        return [n for n in cls.get_nodes() if n.node_type in [constants.CLASS_NODE_TYPE,constants.GOP_NODE_TYPE]]
 
     @classmethod
     def get_internal_nodes(cls, bsdd_dictionary: BsddDictionary):
         return {
             cl_utils.build_bsdd_uri(n.bsdd_data, bsdd_dictionary): n
             for n in cls.get_nodes()
-            if n.node_type == constants.CLASS_NODE_TYPE
+            if n.node_type in [constants.CLASS_NODE_TYPE,constants.GOP_NODE_TYPE]
         }
 
     @classmethod
@@ -227,6 +229,8 @@ class Node(PluginTool):
                 uri = node.bsdd_data.OwnedUri
             elif node.node_type == constants.IFC_NODE_TYPE:
                 uri = node.bsdd_data.OwnedUri
+            elif node.node_type == constants.GOP_NODE_TYPE:
+                uri = cl_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
             else:
                 logging.warning(f"Unknown node type for uri extraction: {node.node_type}")
                 continue
@@ -338,7 +342,7 @@ class Node(PluginTool):
             x, y = float(pos[0]), float(pos[1])
             bsdd_obj = None
             if bsdd_dictionary is not None:
-                if ntype == constants.CLASS_NODE_TYPE:
+                if ntype in [constants.CLASS_NODE_TYPE,constants.GOP_NODE_TYPE]:
                     bsdd_obj = cl_utils.get_class_by_code(bsdd_dictionary, code)
                 elif ntype == constants.PROPERTY_NODE_TYPE:
                     bsdd_obj = prop_utils.get_property_by_code(code, bsdd_dictionary)

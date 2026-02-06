@@ -21,7 +21,9 @@ def load_property(
     result = _load_property_json(uri, include_classes, language_code, client)
     if result is None:
         return
-    return BsddProperty.model_validate(result)
+    prop =  BsddProperty.model_validate(result)
+    prop.OwnedUri = uri
+    return prop
 
 
 def _load_property_json(

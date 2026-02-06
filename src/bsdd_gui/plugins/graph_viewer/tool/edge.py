@@ -321,7 +321,7 @@ class Edge(PluginTool):
     ):
         bsdd_class = (
             start_node.bsdd_data
-            if start_node.node_type == node_constants.CLASS_NODE_TYPE
+            if start_node.node_type in [node_constants.CLASS_NODE_TYPE,node_constants.GOP_NODE_TYPE]
             else end_node.bsdd_data
         )
         bsdd_property = (
@@ -439,7 +439,10 @@ class Edge(PluginTool):
     ) -> list[ui.Edge]:
         new_edges = list()
         for start_node in nodes:
-            if start_node.node_type != node_constants.CLASS_NODE_TYPE:
+            if start_node.node_type not in [
+                node_constants.CLASS_NODE_TYPE,
+                node_constants.GOP_NODE_TYPE,
+            ]:
                 continue
             start_class = start_node.bsdd_data
             parent_class = cl_utils.get_class_by_code(bsdd_dictionary, start_class.ParentClassCode)
@@ -479,7 +482,7 @@ class Edge(PluginTool):
 
         new_edges = list()
         for start_node in nodes:
-            if start_node.node_type != node_constants.CLASS_NODE_TYPE:
+            if start_node.node_type not in  [node_constants.CLASS_NODE_TYPE,node_constants.GOP_NODE_TYPE]:
                 continue
             start_class = start_node.bsdd_data
             for cp in start_class.ClassProperties:
@@ -537,7 +540,7 @@ class Edge(PluginTool):
         new_edges = list()
         relation_type = constants.IFC_REFERENCE_REL
         for start_node in nodes:
-            if start_node.node_type != node_constants.CLASS_NODE_TYPE or start_node.is_external:
+            if start_node.node_type not in [node_constants.CLASS_NODE_TYPE,node_constants.GOP_NODE_TYPE] or start_node.is_external:
                 continue
             start_class = start_node.bsdd_data
             for ifc_name in start_class.RelatedIfcEntityNamesList or []:
@@ -566,7 +569,7 @@ class Edge(PluginTool):
                 node_constants.IFC_NODE_TYPE,
             ]:
                 uri = node.bsdd_data.OwnedUri
-            elif node.node_type == node_constants.CLASS_NODE_TYPE:
+            elif node.node_type in [node_constants.CLASS_NODE_TYPE, node_constants.GOP_NODE_TYPE]:
                 uri = cl_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
             elif node.node_type == node_constants.PROPERTY_NODE_TYPE:
                 uri = prop_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
