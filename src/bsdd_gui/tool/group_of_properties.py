@@ -129,7 +129,8 @@ class GroupOfProperties(FieldTool, ActionTool):
         if active_prop is None:
             return
         view = cls.get_widget().tv_properties
-        active_class = active_class
+        if not active_class:
+            return
         code_dict = {p.Code: p for p in active_class.ClassProperties}
         if active_prop.Code in code_dict:
             new_property = code_dict[active_prop.Code]
