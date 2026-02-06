@@ -37,7 +37,7 @@ def retranslate_ui(
     text = QCoreApplication.translate("DictionaryEditor", "Dictionary Data")
     action.setText(text)
     title = util.get_window_title(
-        QCoreApplication.translate("DictionaryEditor", " bSDD-Dictionary")
+        QCoreApplication.translate("DictionaryEditor", "bSDD-Dictionary")
     )
     for widget in dictionary_editor.get_widgets():
         widget.setWindowTitle(title)
