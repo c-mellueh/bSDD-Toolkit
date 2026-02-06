@@ -81,9 +81,19 @@ def register_fields(
     class_property_editor: Type[tool.ClassPropertyEditorWidget],
     project: Type[tool.Project],
 ):
-    class_property_editor.register_basic_field(widget, widget.le_code, "Code")
     class_property_editor.register_basic_field(widget, widget.te_description, "Description")
     class_property_editor.register_basic_field(widget, widget.cb_is_required, "IsRequired")
+
+    class_property_editor.register_field_getter(
+        widget, widget.le_code, lambda e: getattr(e, "Code")
+    )
+    class_property_editor.register_field_setter(
+        widget,
+        widget.le_code,
+        lambda e, v, p=project: class_property_editor.set_code(e, v),
+    )
+    class_property_editor.sync_from_model(widget, widget.bsdd_data, explicit_field=widget.le_code)
+    class_property_editor.register_field_listener(widget, widget.le_code)
 
     ### Property Reference Field
     class_property_editor.register_field_getter(

@@ -383,7 +383,10 @@ def is_pset_linked(
 def get_related_psets(
     bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary
 ) -> list[BsddClass]:
-    related_psets = list()
+    """
+    get Psets of a normal BsddClass that are Referencing a BsddClass of Type GroupOfProperties
+    """
+    related_psets: list[BsddClass] = list()
 
     for cr in bsdd_class.ClassRelations:
         if cr.RelationType != "HasReference":
@@ -394,4 +397,17 @@ def get_related_psets(
             continue
         if related_class.ClassType == "GroupOfProperties":
             related_psets.append(related_class)
-    return related_psets
+    return list({c.Code: c for c in related_psets}.values())
+
+
+def get_relating_pset_classes(
+    group_of_properties: BsddClass, bsdd_dictionary: BsddDictionary
+) -> list[BsddClass]:
+    uri = build_bsdd_uri(group_of_properties, bsdd_dictionary)
+    relating_classes: list[BsddClass] = list()
+    for bsdd_class in bsdd_dictionary.Classes:
+        for cr in bsdd_class.ClassRelations:
+            if cr.RelationType == "HasReference" and cr.RelatedClassUri == uri:
+                relating_classes.append(bsdd_class)
+
+    return list({c.Code: c for c in relating_classes}.values())

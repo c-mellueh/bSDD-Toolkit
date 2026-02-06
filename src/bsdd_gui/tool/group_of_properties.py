@@ -12,6 +12,7 @@ from bsdd_gui.presets.tool_presets import (
     ViewSignals,
 )
 from bsdd_json.utils import class_utils
+from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.group_of_properties import trigger, models, views, ui
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal, QCoreApplication
@@ -154,6 +155,14 @@ class GroupOfProperties(FieldTool, ActionTool):
                 if relation.RelatedClassUri == uri:
                     classes.append(bsdd_class)
         return classes
+
+    @classmethod
+    def update_code_of_relating_classes(
+        cls, gop_property:BsddClassProperty, new_code: str, bsdd_dictionary: BsddDictionary
+    ):
+        relating_properties = prop_utils.get_relating_properties(gop_property, bsdd_dictionary)
+        for prop in relating_properties:
+            prop.Code = new_code
 
 
 class ClassViewSignals(CTS):

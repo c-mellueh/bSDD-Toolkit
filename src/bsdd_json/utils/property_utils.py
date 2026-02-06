@@ -371,11 +371,9 @@ def build_dummy_property(uri: str) -> BsddProperty:
     return dummy_property
 
 
-def is_class_property_linked(
+def find_parent_class(
     class_property: BsddClassProperty, bsdd_dictionary: BsddDictionary
 ):
-    from . import class_utils
-
     def get_parent_class():
         for c in bsdd_dictionary.Classes:
             for cp in c.ClassProperties:
@@ -386,7 +384,21 @@ def is_class_property_linked(
     if not bsdd_class:
         bsdd_class == get_parent_class()
     if not bsdd_class:
+        return None
+    return bsdd_class
+
+
+def is_class_property_linked(
+    class_property: BsddClassProperty, bsdd_dictionary: BsddDictionary
+):
+    from . import class_utils
+
+    bsdd_class = class_property.parent()
+    if not bsdd_class:
+        bsdd_class = find_parent_class(class_property, bsdd_dictionary)
+    if not bsdd_class:
         return False
+
     related_psets = class_utils.get_related_psets(bsdd_class, bsdd_dictionary)
     related_pset = {c.Name: c for c in related_psets}.get(class_property.PropertySet)
     if not related_pset:
@@ -395,3 +407,30 @@ def is_class_property_linked(
         return True
     else:
         return False
+
+
+def get_relating_properties(
+    class_property: BsddClassProperty, bsdd_dictionary: BsddDictionary
+) -> list[BsddClassProperty]:
+    """
+    Get all Class Properties that are relating to the Class Property of a GroupOfProperties
+    """
+    from . import class_utils
+
+    bsdd_class = class_property.parent()
+
+    if not bsdd_class:
+        bsdd_class = find_parent_class(class_property, bsdd_dictionary)
+    if not bsdd_class:
+        return []
+    if bsdd_class.ClassType != "GroupOfProperties":
+        return []
+
+    relatinge_properties: list[BsddClassProperty] = list()
+    for relating_class in class_utils.get_relating_pset_classes(
+        bsdd_class, bsdd_dictionary
+    ):
+        for bsdd_property in relating_class.ClassProperties:
+            if bsdd_property.Code == class_property.Code:
+                relatinge_properties.append(bsdd_property)
+    return relatinge_properties

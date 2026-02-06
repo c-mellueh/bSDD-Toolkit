@@ -41,6 +41,7 @@ class Signals(DialogSignals):
     )  # BsddProperty not BsddClassProperty,parentWidget
     create_bsdd_property_requested = Signal(object)  # BsddProperty not BsddClassProperty
     property_specific_redraw_requested = Signal(ui.ClassPropertyEditor)
+    code_changed = Signal(BsddClassProperty, str, str)  # ClassProperty old_value, new_value
 
 
 class ClassPropertyEditorWidget(DialogTool):
@@ -97,6 +98,12 @@ class ClassPropertyEditorWidget(DialogTool):
         widget.pb_new_value.clicked.connect(
             lambda _, w=widget: cls.signals.new_value_requested.emit(w)
         )
+
+    @classmethod
+    def set_code(cls, class_property: BsddClassProperty, new_value: str):
+        old_value = class_property.Code
+        cls.signals.code_changed.emit(class_property, old_value, new_value)
+        class_property.Code = new_value
 
     @classmethod
     def create_dialog(

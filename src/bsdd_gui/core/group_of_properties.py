@@ -7,12 +7,15 @@ from bsdd_gui.module.util.constants import CLASS_PROP_CLIPBOARD_KIND
 import logging
 import qtawesome as qta
 from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import property_utils as prop_utils
+
 from bsdd_json import BsddClassProperty, BsddProperty
 import json
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.group_of_properties import ui, views, models
+    from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 
 
 def connect_to_main_window(
@@ -67,6 +70,24 @@ def connect_signals(
     property_view.signals.item_added.connect(project.signals.class_property_added.emit)
     property_view.signals.item_removed.connect(project.signals.class_property_removed.emit)
 
+    def handle_value_change(widget: ClassPropertyEditor, field_widget):
+        element: BsddClassProperty = widget.bsdd_data
+        if not element:
+            return
+        bsdd_class = element.parent()
+        if not bsdd_class or bsdd_class.ClassType != "GroupOfProperties":
+            return
+        if field_widget == widget.le_code:
+            return
+        relating_properties = prop_utils.get_relating_properties(element, project.get())
+        for rp in relating_properties:
+            class_property_editor.sync_to_model(widget, rp, field_widget)
+
+    class_property_editor.signals.field_changed.connect(handle_value_change)
+    class_property_editor.signals.code_changed.connect(
+        lambda cp,oc,nc: widget_tool.update_code_of_relating_classes(cp,nc, project.get())
+    )
+    
 
 def create_widget(data, parent, widget_tool: Type[tool.GroupOfProperties]):
     widget: ui.GopWidget = widget_tool.show_widget(data, parent)
