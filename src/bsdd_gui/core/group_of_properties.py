@@ -290,7 +290,7 @@ def add_class_property_to_linked(
 ):
     bsdd_class = class_property.parent()
 
-    related_classes = group_of_properties.get_related_classes(bsdd_class, project.get())
+    related_classes = cl_utils.get_relating_pset_classes(bsdd_class, project.get())
     for related_class in related_classes:
         is_temp = bsdd_class.Name in pset_table.get_temporary_psets(related_class)
         if class_property.Code in [cp.Code for cp in related_class.ClassProperties] and not is_temp:
@@ -311,7 +311,7 @@ def remove_class_property_from_linked(
 ):
     bsdd_class = class_property.parent()
 
-    related_classes = group_of_properties.get_related_classes(bsdd_class, project.get())
+    related_classes = cl_utils.get_relating_pset_classes(bsdd_class, project.get())
     for related_class in related_classes:
         cp = {cp.Code: cp for cp in related_class.ClassProperties}.get(class_property.Code)
         if not cp:

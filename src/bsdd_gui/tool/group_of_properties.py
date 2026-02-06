@@ -144,20 +144,6 @@ class GroupOfProperties(FieldTool, ActionTool):
         GopPropertyView.select_row(view, row_index or 0)
 
     @classmethod
-    def get_related_classes(
-        cls, group_of_properties: BsddClass, bsdd_dictionary: BsddDictionary
-    ) -> list[BsddClass]:
-        uri = class_utils.build_bsdd_uri(group_of_properties, bsdd_dictionary)
-        classes = list()
-        for bsdd_class in bsdd_dictionary.Classes:
-            for relation in bsdd_class.ClassRelations:
-                if relation.RelationType != "HasReference":
-                    continue
-                if relation.RelatedClassUri == uri:
-                    classes.append(bsdd_class)
-        return classes
-
-    @classmethod
     def update_code_of_relating_classes(
         cls, gop_property: BsddClassProperty, new_code: str, bsdd_dictionary: BsddDictionary
     ):

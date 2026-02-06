@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Type
 import logging
 from types import ModuleType
 import bsdd_gui
-from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
+from PySide6.QtCore import QModelIndex, QObject, Signal, Qt, QCoreApplication
 from PySide6.QtWidgets import QComboBox
 from bsdd_gui.module.property_set_table_view import ui, models, trigger
 from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals, ItemViewTool
@@ -190,13 +190,25 @@ class PropertySetTableView(ItemViewTool):
             logging.warning(f"Multiple Pset Classes found! for {pset_name}")
             # TODO: Add a Picker or disalow multiple Psets with the same name
         pset_class = pset_classes[0]
+        existing_codes = {cp.Code: cp for cp in bsdd_class.ClassProperties}
+        warning_text = QCoreApplication.translate(
+            "PropertySet",
+            "There exists allready a ClassProperty with the Code '{}' in the PropertySet '{}'",
+        )
 
         for cp in pset_class.ClassProperties:
+            if cp.Code in existing_codes:
+                logging.warning(
+                    warning_text.format(cp.Code, existing_codes.get(cp.Code).PropertySet)
+                )
+                continue
             new_cp = cp.model_copy(deep=True)
+
             bsdd_class.ClassProperties.append(new_cp)
             new_cp._set_parent(bsdd_class)
+            existing_codes[new_cp.Code] = new_cp
 
-        if len(pset_class.ClassProperties) == 0:
+        if len([cp for cp in bsdd_class.ClassProperties if cp.PropertySet == pset_name]) == 0:
             cls.add_temporary_pset(bsdd_class, pset_name)
         cls.add_pset_relation(bsdd_class, pset_class, bsdd_dictionary)
 
@@ -226,4 +238,3 @@ class PropertySetTableView(ItemViewTool):
             if related_class.ClassType == "GroupOfProperties":
                 related_psets.append(related_class)
         return related_psets
-
