@@ -1763,7 +1763,14 @@ Beispiel: „IsExternal“</translation>
                                                                 or want to have the QUDT units
                                                                 in the API output, please let us
                                                                 know.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Einheiten stellen eine Skala dar,
+                mit der ein Wert gemessen werden kann (ISO 80000 oder ISO 4217,
+                oder ISO 8601). Liste von Werten.
+                Siehe Referenzliste (JSON) units.
+                Wir arbeiten an der Unterstützung des QUDT-Vokabulars.
+                Wenn Sie mit QUDT-Einheiten importieren möchten
+                oder die QUDT-Einheiten in der API-Ausgabe benötigen, lassen Sie es uns
+                wissen.</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="169"/>
@@ -1782,7 +1789,11 @@ Beispiel: „IsExternal“</translation>
                                                                         assembling properties),
                                                                         ComplexList (list of
                                                                         complex values).</source>
-        <translation type="unfinished"></translation>
+        <translation>Muss eine der folgenden Optionen sein:
+                Einzelwert (ein Wert; Standard), Bereich (zwei Werte), Liste (mehrere Werte),
+                Komplex (weder Einzelwert/Bereich/Liste, z. B. ein Objekt wie IfcActor
+                oder eine Aggregation verbundener Merkmale – siehe „assembling properties“),
+                Komplexliste (Liste komplexer Werte).</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="272"/>
@@ -1791,27 +1802,31 @@ Beispiel: „IsExternal“</translation>
                                                                 Example:
                                                                 &quot;abc-00123-01&quot; or
                                                                 &quot;SpecialWidth&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eindeutige Kennung des
+                Merkmals innerhalb der Bibliothek.
+                Beispiel:
+                &quot;abc-00123-01&quot; oder
+                &quot;SpecialWidth&quot;.</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="405"/>
         <source>Relations &amp; + Version</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Relationen &amp; + Versionen</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="445"/>
         <source>Version Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Versions Kontrolle</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="471"/>
         <source>Revision Number:</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisionsnummer:</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="537"/>
         <source>DeprecationExplanation</source>
-        <translation type="unfinished"></translation>
+        <translation>Begründung der Deaktivierung</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="551"/>
@@ -1821,7 +1836,7 @@ Beispiel: „IsExternal“</translation>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="557"/>
         <source>Identification</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifikation</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="563"/>
@@ -1836,24 +1851,24 @@ Beispiel: „IsExternal“</translation>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="686"/>
         <source>Dimension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dimensionen:</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="696"/>
         <source>Language</source>
-        <translation type="unfinished">Sprache</translation>
+        <translation>Sprache</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="702"/>
         <source>List of country ISO codes this Property is being
                                             used.</source>
-        <translation type="unfinished"></translation>
+        <translation>List der Länder als ISO Code in denen das Merkmal genutzt wird.</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="716"/>
         <source>ISO Country Code of the country of origin of this
                                             Property</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO-Ländercode des Herkunftslands dieses Merkmals</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="451"/>
@@ -2003,20 +2018,22 @@ Beispiel: „IsExternal“</translation>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="576"/>
         <source>OwnedUri:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="586"/>
         <source> List of codes of one or more connected properties.
                                             Can also be full URI instead of code, in case it is a
                                             property of another dictionary.</source>
-        <translation type="unfinished"></translation>
+        <translation> Liste der Codes eines oder mehrerer verbundener Merkmale.
+Kann auch eine vollständige URI statt eines Codes sein, falls es sich um
+ein Merkmal einer anderen Bibliothek handelt.</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="601"/>
         <source>Reference to document with the full or official
                                             definition of the Property</source>
-        <translation type="unfinished"></translation>
+        <translation>Referenz zu dem Dokumen, welches die vollständige oder offizielle Definition des Merkmals beinhaltet</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="615"/>
@@ -2028,7 +2045,7 @@ Beispiel: „IsExternal“</translation>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="629"/>
         <source>List of geographical regions of use Example:
                                             &quot;US-MT&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste der Regiionen, welche das Merkmal verwenden (z.B. &quot;de-DE&quot;)</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="643"/>
@@ -2036,13 +2053,16 @@ Beispiel: „IsExternal“</translation>
                                             The encoding is set according to &quot;Name of encoding
                                             standard&quot; of IANA, RFC 2978, Example:
                                             &quot;(UTF-8,32)&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Paar für den Texttyp (Kodierung, Zeichenanzahl)
+                Die Kodierung wird gemäß &quot;Name of encoding standard&quot; der IANA, RFC 2978,
+                festgelegt.
+                Beispiel: &quot;(UTF-8,32)&quot;</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="659"/>
         <source>Unique identification (ID), in case the URI is not
                                             enough.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eindeutige Kennung (ID), falls die URI nicht ausreicht.</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="673"/>
@@ -2125,12 +2145,12 @@ Beispiel: „IsExternal“</translation>
     <message>
         <location filename="../../core/relationship_editor_widget.py" line="271"/>
         <source>Unknown URI</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannte URI</translation>
     </message>
     <message>
         <location filename="../../core/relationship_editor_widget.py" line="272"/>
         <source>The specified URI &apos;{}&apos; is not recognized in the current dictionary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die spezifizierte URI &apos;{}&apos; existiert nicht in dieser Bibliothek.</translation>
     </message>
 </context>
 <context>
@@ -2159,18 +2179,18 @@ Beispiel: „IsExternal“</translation>
         <location filename="../../tool/search_widget.py" line="126"/>
         <location filename="../../tool/search_widget.py" line="132"/>
         <source>Code</source>
-        <translation type="unfinished">Code</translation>
+        <translation>Code</translation>
     </message>
     <message>
         <location filename="../../tool/search_widget.py" line="127"/>
         <location filename="../../tool/search_widget.py" line="133"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../../tool/search_widget.py" line="128"/>
         <source>Classtyp</source>
-        <translation type="unfinished"></translation>
+        <translation>Klassentyp</translation>
     </message>
     <message>
         <location filename="../../tool/search_widget.py" line="150"/>
@@ -2235,7 +2255,7 @@ Beispiel: „IsExternal“</translation>
     <message>
         <location filename="../../module/settings_widget/qt/Widget.ui" line="134"/>
         <source>OpenAI</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenAI</translation>
     </message>
     <message>
         <location filename="../../module/settings_widget/qt/Widget.ui" line="158"/>
@@ -2296,12 +2316,12 @@ Beispiel: „IsExternal“</translation>
     <message>
         <location filename="../../plugins/graph_viewer/module/settings/qt/Widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../../plugins/graph_viewer/module/settings/qt/Widget.ui" line="41"/>
         <source>Show/Hide Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Einblenden/Ausblenden der Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -2309,7 +2329,7 @@ Beispiel: „IsExternal“</translation>
     <message>
         <location filename="../../core/shell_widget.py" line="26"/>
         <source>Show Shell</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Entwicklungsumgebung</translation>
     </message>
 </context>
 <context>

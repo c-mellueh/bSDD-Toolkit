@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>750</height>
+    <height>755</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,16 +88,16 @@
              <widget class="QLabel" name="lb_unit">
               <property name="toolTip">
                <string>The units represent a scale
-                                                                that enables a value to be
-                                                                measured (ISO 80000 or ISO 4217,
-                                                                or ISO 8601). List of values.
-                                                                See reference list (JSON) units.
-                                                                We are working on supporting the
-                                                                QUDT vocabulary. If you would
-                                                                like to import using QUDT units
-                                                                or want to have the QUDT units
-                                                                in the API output, please let us
-                                                                know.</string>
+that enables a value to be
+measured (ISO 80000 or ISO 4217,
+or ISO 8601). List of values.
+See reference list (JSON) units.
+We are working on supporting the
+QUDT vocabulary. If you would
+like to import using QUDT units
+or want to have the QUDT units
+in the API output, please let us
+know.</string>
               </property>
               <property name="text">
                <string>Units:</string>
@@ -167,19 +167,19 @@
                <widget class="QLabel" name="lb_value_kind">
                 <property name="toolTip">
                  <string>Must be one of:
-                                                                        Single (one value; this
-                                                                        is the default), Range
-                                                                        (two values), List
-                                                                        (multiple values),
-                                                                        Complex (neither
-                                                                        single/range/list, for
-                                                                        example an object like
-                                                                        IfcActor or an
-                                                                        aggregation of connected
-                                                                        properties - see
-                                                                        assembling properties),
-                                                                        ComplexList (list of
-                                                                        complex values).</string>
+Single (one value; this
+is the default), Range
+(two values), List
+(multiple values),
+Complex (neither
+single/range/list, for
+example an object like
+IfcActor or an
+aggregation of connected
+properties - see
+assembling properties),
+ComplexList (list of
+complex values).</string>
                 </property>
                 <property name="text">
                  <string>Property Value Kind:</string>
@@ -196,19 +196,19 @@
                 </property>
                 <property name="toolTip">
                  <string>Must be one of:
-                                                                        Single (one value; this
-                                                                        is the default), Range
-                                                                        (two values), List
-                                                                        (multiple values),
-                                                                        Complex (neither
-                                                                        single/range/list, for
-                                                                        example an object like
-                                                                        IfcActor or an
-                                                                        aggregation of connected
-                                                                        properties - see
-                                                                        assembling properties),
-                                                                        ComplexList (list of
-                                                                        complex values).</string>
+Single (one value; this
+is the default), Range
+(two values), List
+(multiple values),
+Complex (neither
+single/range/list, for
+example an object like
+IfcActor or an
+aggregation of connected
+properties - see
+assembling properties),
+ComplexList (list of
+complex values).</string>
                 </property>
                 <item>
                  <property name="text">
