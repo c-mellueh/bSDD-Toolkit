@@ -178,8 +178,7 @@ pip install -U pip
 pip install .
 pip install pyinstaller
 
-# run the build from src/ so relative paths in the spec resolve
-cd src
+# run the build
 pyinstaller main.spec -y
 ```
 
