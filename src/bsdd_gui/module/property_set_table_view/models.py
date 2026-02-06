@@ -6,7 +6,6 @@ from PySide6.QtCore import (
     QModelIndex,
     QSortFilterProxyModel,
 )
-from PySide6.QtGui import QDragEnterEvent,QDragMoveEvent
 
 from typing import Type
 from bsdd_json.utils import class_utils
@@ -16,6 +15,10 @@ from bsdd_json.models import BsddDictionary, BsddClass
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
 import qtawesome as qta
+from bsdd_gui.module.class_tree_view.constants import (
+    JSON_MIME as CLASS_JSON_MIME,
+    CODES_MIME as CLASS_CODES_MIME,
+)
 
 
 class PsetTableModel(ItemModel):
@@ -63,30 +66,93 @@ class PsetTableModel(ItemModel):
         else:
             return QModelIndex()
 
-    def canDropMimeData(self, mimeData, action, row, column, parent):
-        # Nur bestimmte MIME-Typen erlauben
-        if mimeData.hasFormat("application/x-my-custom-type"):
-            return True
+    def flags(self, index: QModelIndex):
+        base = super().flags(index)
+        if not index.isValid():
+            return base | Qt.ItemIsDropEnabled
+        return base | Qt.ItemIsEditable | Qt.ItemIsDropEnabled
 
-        # z.B. Text explizit verbieten
-        if mimeData.hasText():
+    def supportedDropActions(self):
+        return Qt.CopyAction | Qt.MoveAction
+
+    def mimeTypes(self):
+        return [CLASS_JSON_MIME, CLASS_CODES_MIME, "application/json", "text/plain"]
+
+    def _get_payload_from_data(self, data):
+        from bsdd_gui.tool import ClassTreeView
+
+        return ClassTreeView.get_payload_from_data(data)
+
+    def _get_codes_from_data(self, data):
+        from bsdd_gui.tool import ClassTreeView
+
+        codes = ClassTreeView.get_codes_from_data(data)
+        if codes:
+            return codes
+        payload = self._get_payload_from_data(data)
+        if isinstance(payload, dict):
+            roots = payload.get("roots")
+            if isinstance(roots, list):
+                return [c for c in roots if isinstance(c, str)]
+            classes = payload.get("classes")
+            if isinstance(classes, list):
+                return [
+                    c.get("Code")
+                    for c in classes
+                    if isinstance(c, dict) and isinstance(c.get("Code"), str)
+                ]
+        return None
+
+    def canDropMimeData(self, data, action, row, column, parent):
+        if action not in (Qt.CopyAction, Qt.MoveAction, Qt.IgnoreAction):
+            return False
+        if not self.active_class:
             return False
 
+        if not (
+            data.hasFormat(CLASS_JSON_MIME)
+            or data.hasFormat(CLASS_CODES_MIME)
+            or data.hasFormat("application/json")
+            or data.hasFormat("text/plain")
+        ):
+            return False
+
+        codes = self._get_codes_from_data(data)
+        if not codes:
+            return False
+
+        for code in codes:
+            bsdd_class = class_utils.get_class_by_code(self.bsdd_data, code)
+            if bsdd_class and bsdd_class.ClassType == "GroupOfProperties":
+                return True
         return False
 
-    def dragEnterEvent(self, e: QDragEnterEvent):
-        if e.source() is None:  # different process
-            e.setDropAction(Qt.CopyAction)
-            e.accept()
-        else:
-            super().dragEnterEvent(e)
+    def dropMimeData(self, data, action, row, column, parent):
+        if not self.active_class:
+            return False
+        codes = self._get_codes_from_data(data)
+        if not codes:
+            return False
 
-    def dragMoveEvent(self, e: QDragMoveEvent):
-        if e.source() is None:
-            e.setDropAction(Qt.CopyAction)
-            e.accept()
-        else:
-            super().dragMoveEvent(e)
+        related = tool.PropertySetTableView.get_related_psets(
+            self.active_class, self.bsdd_data
+        )
+        related_names = {c.Name for c in related}
+        added = False
+        for code in codes:
+            bsdd_class = class_utils.get_class_by_code(self.bsdd_data, code)
+            if not bsdd_class or bsdd_class.ClassType != "GroupOfProperties":
+                continue
+            if bsdd_class.Name in related_names:
+                continue
+            tool.PropertySetTableView.create_connected_pset(
+                bsdd_class.Name, self.active_class, self.bsdd_data
+            )
+            added = True
+
+        if added:
+            tool.PropertySetTableView.signals.model_refresh_requested.emit()
+        return added
 
 
 # typing

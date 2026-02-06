@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 import qtawesome as qta
 from bsdd_gui.module.property_set_table_view import ui
-from PySide6.QtCore import QCoreApplication, QPoint, QModelIndex
-from PySide6.QtWidgets import QApplication, QListView
+from PySide6.QtCore import QCoreApplication, QPoint, QModelIndex, Qt
+from PySide6.QtWidgets import QApplication, QListView, QAbstractItemView
 from pydantic import ValidationError
 from bsdd_json.models import BsddClass, BsddClassProperty
 from bsdd_json.utils import build_unique_code
@@ -29,6 +29,10 @@ def register_view(view: ui.PsetTableView, property_set_table: Type[tool.Property
     property_set_table.register_view(view)
     view.setSelectionBehavior(QListView.SelectionBehavior.SelectRows)
     view.setSelectionMode(QListView.SelectionMode.SingleSelection)
+    view.setAcceptDrops(True)
+    view.setDropIndicatorShown(True)
+    view.setDragDropMode(QAbstractItemView.DragDropMode.DropOnly)
+    view.setDefaultDropAction(Qt.DropAction.CopyAction)
     # view.setAlternatingRowColors(True) #Colors the Row in the AccentColor...
 
 
