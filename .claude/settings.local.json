@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(c:/Users/melluehc/GitRepos/bsdd-creator/.venv/Scripts/python.exe -c \"import pytest; import pytestqt; print\\(''ok''\\)\")",
-      "Bash(.venv/Scripts/python.exe -m pytest tests/test_class_tree_view.py -v)"
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_class_tree_view.py -v)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/ -v)"
     ]
   }
 }
