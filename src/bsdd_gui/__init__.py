@@ -4,14 +4,10 @@ __version__ = "0.2.7.3"  # needs to be on top of bsdd_gui import statements else
 
 import logging
 from typing import TYPE_CHECKING
-import bsdd_gui
-from bsdd_gui import core, tool
-from bsdd_gui.resources.icons import get_icon
 import importlib
 import pkgutil
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.main_window_widget.ui import MainWindow
     from types import ModuleType
 
 

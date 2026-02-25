@@ -31,12 +31,14 @@ class TestAddPageToToolbox:
         assert "page_general" in SettingsWidget.get_page_dict()
 
     def test_widget_function_stored_under_page_name(self):
-        wf = lambda: None
+        def wf():
+            return None
         SettingsWidget.add_page_to_toolbox(wf, "page_general", lambda: None)
         assert wf in SettingsWidget.get_page_dict()["page_general"]
 
     def test_accept_function_is_stored(self):
-        af = lambda: None
+        def af():
+            return None
         SettingsWidget.add_page_to_toolbox(lambda: None, "page_general", af)
         assert af in SettingsWidget.get_accept_functions()
 
