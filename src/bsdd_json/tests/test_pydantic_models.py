@@ -25,57 +25,7 @@ from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
 from bsdd_json.utils import property_utils as prop_utils
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-def make_dictionary(**kwargs) -> BsddDictionary:
-    defaults = dict(
-        OrganizationCode="TST",
-        DictionaryCode="TEST",
-        DictionaryVersion="1.0",
-        LanguageIsoCode="en-GB",
-        LanguageOnly=False,
-        UseOwnUri=False,
-    )
-    defaults.update(kwargs)
-    return BsddDictionary(**defaults)
-
-
-def make_class(code: str, name: str, **kwargs) -> BsddClass:
-    return BsddClass(Code=code, Name=name, **kwargs)
-
-
-def make_property(code: str, name: str, **kwargs) -> BsddProperty:
-    return BsddProperty(Code=code, Name=name, **kwargs)
-
-
-@pytest.fixture()
-def populated_dictionary() -> BsddDictionary:
-    """Dictionary with a small class/property tree for navigation tests.
-
-    ROOT
-    ├── CHILD1
-    │   └── GRANDCHILD
-    └── CHILD2
-    """
-    root = make_class("ROOT", "Root")
-    child1 = make_class("CHILD1", "Child 1", ParentClassCode="ROOT")
-    child2 = make_class("CHILD2", "Child 2", ParentClassCode="ROOT")
-    grandchild = make_class("GRANDCHILD", "Grandchild", ParentClassCode="CHILD1")
-    prop1 = make_property("PROP1", "Property 1")
-    prop2 = make_property("PROP2", "Property 2")
-    return BsddDictionary(
-        OrganizationCode="TST",
-        DictionaryCode="TEST",
-        DictionaryVersion="1.0",
-        LanguageIsoCode="en-GB",
-        LanguageOnly=False,
-        UseOwnUri=False,
-        Classes=[root, child1, child2, grandchild],
-        Properties=[prop1, prop2],
-    )
+from .helpers import make_class, make_dictionary, make_property
 
 
 # ===========================================================================
