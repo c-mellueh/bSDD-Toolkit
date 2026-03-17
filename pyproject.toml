@@ -1,0 +1,7 @@
+[tool.uv.workspace]
+members = ["src/bsdd*"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0",
+]
