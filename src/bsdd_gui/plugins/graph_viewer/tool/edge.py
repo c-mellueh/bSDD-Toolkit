@@ -905,3 +905,18 @@ class Edge(PluginTool):
         except Exception:
             pass
         return glow_pen
+
+    @classmethod
+    def get_visible_edges(cls,visible_nodes:list[Node]):
+        edges = list()
+        edge_filter = cls.get_filters()
+        for e in cls.get_edges():
+            if not edge_filter.get(e.edge_type,True):
+                continue
+            if e.start_node not in visible_nodes:
+                continue
+            if e.end_node not in visible_nodes:
+                continue
+            edges.append(e)
+        return edges
+

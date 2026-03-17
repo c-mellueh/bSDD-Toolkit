@@ -369,3 +369,9 @@ class Node(PluginTool):
         for node in cls.get_nodes():
             if node.is_external and node.bsdd_data.Code == ifc_code:
                 return node
+
+    @classmethod
+    def get_visible_nodes(cls) -> list[Node]:
+        nodes = cls.get_nodes()
+        node_filters = cls.get_filters()
+        return [n for n in nodes if node_filters.get(n.node_type, True)]

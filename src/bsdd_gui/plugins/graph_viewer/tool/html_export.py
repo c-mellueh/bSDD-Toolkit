@@ -3,16 +3,19 @@ from typing import TYPE_CHECKING
 import html
 import math
 import logging
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QCoreApplication
 import bsdd_gui
-from bsdd_gui.plugins.graph_viewer.module.html_export import constants, trigger, ui
+from bsdd_gui.plugins.graph_viewer.module.html_export import constants, trigger
 from bsdd_gui.presets.tool_presets import PluginTool, PluginSignals
+from bsdd_gui.plugins.graph_viewer.module.edge import constants as ec
+from bsdd_gui.plugins.graph_viewer.module.node import constants as nc
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.html_export.prop import HTMLExportProperties
     from bsdd_json import BsddDictionary
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
     from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
+    from bsdd_gui.plugins.graph_viewer.tool import Window as WindowTool
 
 class Signals(PluginSignals):
     export_requested = Signal()
@@ -33,17 +36,16 @@ class HTMLExport(PluginTool):
     @classmethod
     def request_export(cls):
         cls.signals.export_requested.emit()
-    
 
     @classmethod
-    def _qcolor_to_css(cls,color) -> str:
+    def _qcolor_to_css(cls, color) -> str:
         r, g, b, a = color.red(), color.green(), color.blue(), color.alpha()
         if a >= 254:
             return f"rgb({r},{g},{b})"
         return f"rgba({r},{g},{b},{a / 255:.2f})"
 
     @classmethod
-    def _dash_array(cls,pen_style) -> str:
+    def _dash_array(cls, pen_style) -> str:
         from PySide6.QtCore import Qt
 
         if pen_style == Qt.PenStyle.DotLine:
@@ -56,14 +58,19 @@ class HTMLExport(PluginTool):
             return "10,5,3,5,3,5"
         return ""
 
-
     # ---------------------------------------------------------------------------
     # Geometry helpers – mirror of tool/edge.py anchor calculations
     # ---------------------------------------------------------------------------
     @classmethod
-    def _straight_anchor(cls,
-        cx: float, cy: float, w: float, h: float, node_shape: str,
-        toward_x: float, toward_y: float,
+    def _straight_anchor(
+        cls,
+        cx: float,
+        cy: float,
+        w: float,
+        h: float,
+        node_shape: str,
+        toward_x: float,
+        toward_y: float,
     ) -> tuple[float, float]:
         """Replicate Edge._calculate_anchor_on_node (straight mode).
 
@@ -88,9 +95,15 @@ class HTMLExport(PluginTool):
         return cx + nx * t, cy + ny * t
 
     @classmethod
-    def _ortho_anchor(cls,
-        cx: float, cy: float, w: float, h: float,
-        toward_x: float, toward_y: float, hor_mode: bool,
+    def _ortho_anchor(
+        cls,
+        cx: float,
+        cy: float,
+        w: float,
+        h: float,
+        toward_x: float,
+        toward_y: float,
+        hor_mode: bool,
     ) -> tuple[float, float]:
         """Replicate Edge._ortho_start.
 
@@ -106,9 +119,12 @@ class HTMLExport(PluginTool):
             return cx, cy + dh
 
     @classmethod
-    def _ortho_waypoints(cls,
-        psx: float, psy: float,
-        pex: float, pey: float,
+    def _ortho_waypoints(
+        cls,
+        psx: float,
+        psy: float,
+        pex: float,
+        pey: float,
         hor_mode: bool,
         arrow_length: float,
     ) -> list[tuple[float, float]]:
@@ -131,9 +147,12 @@ class HTMLExport(PluginTool):
         return [(psx, psy), p1, p2, (pex, pey)]
 
     @classmethod
-    def _edge_path_points(cls,
-        sn: Node, en: Node,
-        offset_x: float, offset_y: float,
+    def _edge_path_points(
+        cls,
+        sn: Node,
+        en: Node,
+        offset_x: float,
+        offset_y: float,
         orthogonal: bool,
         arrow_length: float,
     ) -> list[tuple[float, float]] | None:
@@ -157,12 +176,11 @@ class HTMLExport(PluginTool):
         pex, pey = cls._ortho_anchor(ecx, ecy, en._w, en._h, scx, scy, hor_mode)
         return cls._ortho_waypoints(psx, psy, pex, pey, hor_mode, arrow_length)
 
-
     # ---------------------------------------------------------------------------
     # Node helpers
     # ---------------------------------------------------------------------------
     @classmethod
-    def _node_url(cls,node: Node, bsdd_dictionary: BsddDictionary | None) -> str | None:
+    def _node_url(cls, node: Node, bsdd_dictionary: BsddDictionary | None) -> str | None:
         from bsdd_gui.plugins.graph_viewer.module.node import constants as nc
         from bsdd_json.utils import class_utils as cl_utils
         from bsdd_json.utils import property_utils as prop_utils
@@ -181,7 +199,7 @@ class HTMLExport(PluginTool):
         return None
 
     @classmethod
-    def _node_shape_element(cls,node: Node, cx: float, cy: float) -> str:
+    def _node_shape_element(cls, node: Node, cx: float, cy: float) -> str:
         from bsdd_gui.plugins.graph_viewer.module.node import constants as nc
 
         w = max(node._w, 30.0)
@@ -208,44 +226,13 @@ class HTMLExport(PluginTool):
             f'stroke="{stroke}" stroke-width="1.2"/>'
         )
 
-
-    # ---------------------------------------------------------------------------
-    # Main entry point
-    # ---------------------------------------------------------------------------
     @classmethod
-    def generate_html(cls,
-        nodes: list[Node],
-        edges: list[Edge],
-        bsdd_dictionary: BsddDictionary | None,
-        edge_filters: dict[str, bool],
-        node_filters: dict[str, bool],
-        orthogonal: bool = False,
-        arrow_length: float = 12.0,
-    ) -> str:
-        from bsdd_gui.plugins.graph_viewer.module.edge import constants as ec
-        from bsdd_gui.plugins.graph_viewer.module.node import constants as nc
-
-        visible_nodes = [n for n in nodes if node_filters.get(n.node_type, True)]
-        visible_edges = [
-            e
-            for e in edges
-            if edge_filters.get(e.edge_type, True)
-            and node_filters.get(e.start_node.node_type, True)
-            and node_filters.get(e.end_node.node_type, True)
-        ]
-
-        if not visible_nodes:
-            return (
-                "<!DOCTYPE html><html><body>"
-                "<p style='color:#ccc;background:#141520;padding:16px'>"
-                "No visible nodes to export.</p></body></html>"
-            )
-
+    def compute_bounding_box(cls, nodes: list[Node]):
         # Compute bounding box
-        xs = [n.pos().x() for n in visible_nodes]
-        ys = [n.pos().y() for n in visible_nodes]
-        half_ws = [max(n._w, 30.0) / 2 for n in visible_nodes]
-        half_hs = [max(n._h, 16.0) / 2 for n in visible_nodes]
+        xs = [n.pos().x() for n in nodes]
+        ys = [n.pos().y() for n in nodes]
+        half_ws = [max(n._w, 30.0) / 2 for n in nodes]
+        half_hs = [max(n._h, 16.0) / 2 for n in nodes]
         min_x = min(x - hw for x, hw in zip(xs, half_ws)) - constants.PADDING
         max_x = max(x + hw for x, hw in zip(xs, half_ws)) + constants.PADDING
         min_y = min(y - hh for y, hh in zip(ys, half_hs)) - constants.PADDING
@@ -256,10 +243,14 @@ class HTMLExport(PluginTool):
         offset_x = -min_x
         offset_y = -min_y
 
+        return svg_w, svg_h, offset_x, offset_y
+
+    @classmethod
+    def generate_arrowhead_defs(cls, edges: list[Edge]):
         # Arrow marker definitions — one per edge type that appears in the graph.
         # Using markerUnits="userSpaceOnUse" keeps the arrowhead a fixed pixel size
         # regardless of stroke width.
-        used_edge_types = {e.edge_type for e in visible_edges}
+        used_edge_types = {e.edge_type for e in edges}
         marker_ids: dict[str, str] = {}
         defs_parts: list[str] = []
         for etype in used_edge_types:
@@ -275,10 +266,18 @@ class HTMLExport(PluginTool):
                 f'<path d="M0,0 L10,5 L0,10 Z" fill="{fill}"/>'
                 f"</marker>"
             )
+        return marker_ids, defs_parts
+
+    @classmethod
+    def generate_edge_parts(
+        cls, edges: list[Edge], offset_x, offset_y, orthogonal, arrow_length, marker_ids
+    ) -> list[str]:
+
+        marker_ids, defs_parts = cls.generate_arrowhead_defs(edges)
 
         # Edge elements
         edge_parts: list[str] = []
-        for edge in visible_edges:
+        for edge in edges:
             pts = cls._edge_path_points(
                 edge.start_node, edge.end_node, offset_x, offset_y, orthogonal, arrow_length
             )
@@ -303,12 +302,18 @@ class HTMLExport(PluginTool):
 
             edge_parts.append(
                 f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{width}"'
-                f'{dash_attr}{marker_attr}/>'
+                f"{dash_attr}{marker_attr}/>"
             )
+        return defs_parts, edge_parts
+
+    @classmethod
+    def generate_node_parts(
+        cls, nodes: list[Node], offset_x: float, offset_y: float, bsdd_dictionary: BsddDictionary
+    ) -> list[str]:
 
         # Node elements
         node_parts: list[str] = []
-        for node in visible_nodes:
+        for node in nodes:
             cx = node.pos().x() + offset_x
             cy = node.pos().y() + offset_y
             shape_el = cls._node_shape_element(node, cx, cy)
@@ -326,10 +331,13 @@ class HTMLExport(PluginTool):
                     f'xlink:href="{html.escape(url)}" style="cursor:pointer">{inner}</a>'
                 )
             node_parts.append(inner)
+        return node_parts
 
+    @classmethod
+    def generate_node_legend(cls, nodes: list[Node]) -> str:
         # Legend — node types
         node_legend_html = ""
-        seen_node_types = {n.node_type for n in visible_nodes}
+        seen_node_types = {n.node_type for n in nodes}
         for ntype in nc.ALLOWED_NODE_TYPES:
             if ntype not in seen_node_types:
                 continue
@@ -354,14 +362,14 @@ class HTMLExport(PluginTool):
                     f'<rect x="1" y="1" width="34" height="14" fill="{fill}" '
                     f'stroke="{constants.NODE_BORDER}" stroke-width="1"/></svg>'
                 )
-            node_legend_html += (
-                f'<div class="legend-row">{icon}'
-                f'<span>{label_text}</span></div>'
-            )
+            node_legend_html += f'<div class="legend-row">{icon}<span>{label_text}</span></div>'
+        return node_legend_html
 
+    @classmethod
+    def generate_edge_legend(cls, edges: list[Edge]) -> str:
         # Legend — edge types
         edge_legend_html = ""
-        seen_edge_types = {e.edge_type for e in visible_edges}
+        seen_edge_types = {e.edge_type for e in edges}
         for etype in ec.ALLOWED_EDGE_TYPES:
             if etype not in seen_edge_types:
                 continue
@@ -375,11 +383,11 @@ class HTMLExport(PluginTool):
                 f'<line x1="2" y1="8" x2="34" y2="8" stroke="{color}" '
                 f'stroke-width="2"{dash_attr}/></svg>'
             )
-            edge_legend_html += (
-                f'<div class="legend-row">{icon}'
-                f'<span>{label_text}</span></div>'
-            )
+            edge_legend_html += f'<div class="legend-row">{icon}<span>{label_text}</span></div>'
+        return edge_legend_html
 
+    @classmethod
+    def generate_title(cls, bsdd_dictionary: BsddDictionary) -> tuple[str, str]:
         dict_title = ""
         if bsdd_dictionary:
             dict_title = html.escape(
@@ -388,6 +396,24 @@ class HTMLExport(PluginTool):
             )
         page_title = f"bSDD Graph – {dict_title}" if dict_title else "bSDD Graph"
         heading_suffix = f" – {dict_title}" if dict_title else ""
+        return page_title, heading_suffix
+
+    # ---------------------------------------------------------------------------
+    # Main entry point
+    # ---------------------------------------------------------------------------
+    @classmethod
+    def generate_html(
+        cls,
+        page_title: str,
+        heading_suffix: str,
+        svg_w: float,
+        svg_h: float,
+        defs_parts: str,
+        edge_parts: str,
+        node_parts: str,
+        node_legend_html: str,
+        edge_legend_html: str,
+    ) -> str:
 
         defs_block = f"<defs>{''.join(defs_parts)}</defs>" if defs_parts else ""
         bg_rect = f'<rect width="{svg_w:.0f}" height="{svg_h:.0f}" fill="{constants.SCENE_BG}"/>'
@@ -469,3 +495,21 @@ class HTMLExport(PluginTool):
     </div>
     </body>
     </html>"""
+
+    @classmethod
+    def write_html(cls, html_content: str, path:str, window:WindowTool):
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(html_content)
+                text = QCoreApplication.translate("GraphViewer", "HTML exported: ") + str(path)
+                window.set_status(text)
+
+        except Exception as e:
+            logging.exception("Failed to export HTML: %s", e)
+    
+    @classmethod
+    def generate_empty_html(cls):
+            return """<!DOCTYPE html><html><body>
+            <p style='color:#ccc;background:#141520;padding:16px'>
+            No visible nodes to export.</p></body></html>"""
+        
