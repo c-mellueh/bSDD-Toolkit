@@ -1,6 +1,9 @@
 [tool.uv.workspace]
 members = ["src/bsdd*"]
 
+[tool.uv.sources]
+bsdd_json = { workspace = true }
+
 [tool.uv]
 dev-dependencies = [
     "pytest>=8.0",
