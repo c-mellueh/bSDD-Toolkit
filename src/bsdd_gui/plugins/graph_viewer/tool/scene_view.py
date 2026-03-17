@@ -338,6 +338,7 @@ class SceneView(PluginTool):
         button_widget = ui.ButtonWidget()
         button_widget.bt_clear.setIcon(qta.icon("mdi6.cancel"))
         button_widget.bt_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
+        button_widget.bt_export_html.setIcon(qta.icon("mdi6.web"))
         button_widget.bt_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
         button_widget.bt_load.setIcon(qta.icon("mdi6.tray-full"))
         button_widget.bt_center.setIcon(qta.icon("mdi6.arrow-collapse-all"))

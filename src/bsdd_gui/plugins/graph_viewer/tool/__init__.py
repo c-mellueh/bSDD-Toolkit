@@ -6,3 +6,4 @@ from .settings import Settings
 from .physics import Physics
 from .input_bar import InputBar
 from .buchheim import Buchheim
+from .html_export import HTMLExport
