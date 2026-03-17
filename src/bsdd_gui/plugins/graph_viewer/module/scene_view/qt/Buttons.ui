@@ -70,6 +70,13 @@
      </property>
     </widget>
    </item>
+   <item row="4" column="1">
+    <widget class="QPushButton" name="bt_export_html">
+     <property name="text">
+      <string>Export HTML</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

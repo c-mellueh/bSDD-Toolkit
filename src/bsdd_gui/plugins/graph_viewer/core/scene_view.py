@@ -7,7 +7,6 @@ import json
 import logging
 import qtawesome as qta
 from bsdd_gui.plugins.graph_viewer.module.scene_view import constants
-from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import dictionary_utils as dict_utils
@@ -16,10 +15,7 @@ from bsdd_json import BsddClass, BsddProperty
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.plugins.graph_viewer import tool as gv_tool
-    from bsdd_gui.plugins.graph_viewer.module.scene_view import ui
     from bsdd_gui.plugins.graph_viewer.module.window import ui as ui_window
-    from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
-    from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
 
 def connect_signals(
@@ -27,11 +23,12 @@ def connect_signals(
     scene_view: Type[gv_tool.SceneView],
     settings: Type[gv_tool.Settings],
     physics: Type[gv_tool.Physics],
+    html_export:type[gv_tool.HTMLExport]
 ):
     window.signals.widget_created.connect(lambda w: handle_widget_creation(w, scene_view))
     window.signals.delete_selection_requested.connect(scene_view.request_delete_selection)
     scene_view.connect_internal_signals()
-    settings.signals.widget_created.connect(lambda sw: add_settings(scene_view, settings))
+    settings.signals.widget_created.connect(lambda sw: add_settings(scene_view, settings,html_export))
     physics.signals.is_running_changed.connect(scene_view.request_retranslate)
 
 
@@ -40,10 +37,12 @@ def disconnect_signals(scene_view: Type[gv_tool.SceneView]):
     scene_view.disconnect_external_signals()
 
 
-def add_settings(scene_view: Type[gv_tool.SceneView], settings: Type[gv_tool.Settings]):
+def add_settings(scene_view: Type[gv_tool.SceneView], settings: Type[gv_tool.Settings],html_export:Type[gv_tool.HTMLExport]):
     widget = scene_view.create_button_widget()
     scene_view.connect_button_settings()
     settings.add_content_widget(widget)
+    button_widget = scene_view.get_buttons_widget()
+    button_widget.bt_export_html.clicked.connect(html_export.request_export)
 
 
 def retranslate_ui(scene_view: Type[gv_tool.SceneView], phyiscs: Type[gv_tool.Physics]):
