@@ -270,7 +270,7 @@ class HTMLExport(PluginTool):
 
     @classmethod
     def generate_edge_parts(
-        cls, edges: list[Edge], offset_x, offset_y, orthogonal, arrow_length, marker_ids
+        cls, edges: list[Edge], offset_x, offset_y, orthogonal, arrow_length
     ) -> list[str]:
 
         marker_ids, defs_parts = cls.generate_arrowhead_defs(edges)
