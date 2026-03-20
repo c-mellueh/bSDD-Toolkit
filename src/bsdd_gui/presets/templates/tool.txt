@@ -5,22 +5,22 @@ import logging
 from PySide6.QtCore import Signal
 
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import ActionTool,WidgetTool,WidgetSignals
+from bsdd_gui.presets.tool_presets import ActionTool,FieldTool,FieldSignals
 from bsdd_gui.module.{{ name }} import ui
 
 if TYPE_CHECKING:
     from bsdd_gui.module.{{ name }}.prop import {{ prop_name }}
 
-clas Signals(WidgetSignals):
+class Signals(FieldSignals):
     pass
 
-class {{ tool_name }}:
+class {{ tool_name }}(ActionTool,FieldTool):
     @classmethod
     def get_properties(cls) -> {{ prop_name }}:
         return bsdd_gui.{{ prop_name }}
 
     @classmethod
-    def _get_widget_class(cls) -> Type[ui.{{ widget_name }}]:
+    def _get_widget_class(cls) -> type[ui.{{ widget_name }}]:
         return ui.{{ widget_name }}
 
     @classmethod

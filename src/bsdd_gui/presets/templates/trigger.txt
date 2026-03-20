@@ -26,7 +26,7 @@ def create_widget(data: object, parent: ui.{{ widget_name }}):
 #    core.create_dialog(data, parent, tool.{{ tool_name }})
 
 
-def widget_created(widget: ui{{ widget_name }}):
+def widget_created(widget: ui.{{ widget_name }}):
     core.register_widget(widget, tool.{{ tool_name }})
     core.register_fields(widget, tool.{{ tool_name }})
     core.register_validators(widget, tool.{{ tool_name }}, tool.Util)

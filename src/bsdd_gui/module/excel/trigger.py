@@ -4,12 +4,31 @@ from bsdd_gui import tool
 from bsdd_gui.core import excel as core
 from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from . import ui
+
 
 def connect():
-    pass
+    core.connect_signals(tool.Excel)
+
 
 def retranslate_ui():
-    pass
+    core.retranslate_ui(tool.Excel)
 
 def on_new_project():
     pass
+
+def create_widget(data: object, parent: ui.Widget):
+    core.create_widget(data, parent, tool.Excel)
+
+
+#def create_dialog(data: object, parent: ui.Widget):
+#    core.create_dialog(data, parent, tool.Excel)
+
+
+def widget_created(widget: ui.Widget):
+    core.register_widget(widget, tool.Excel)
+    core.register_fields(widget, tool.Excel)
+    core.register_validators(widget, tool.Excel, tool.Util)
+    core.connect_widget(widget, tool.Excel)
+

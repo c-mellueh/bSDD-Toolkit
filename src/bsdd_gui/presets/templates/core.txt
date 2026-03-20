@@ -14,11 +14,11 @@ def connect_signals({{ name }}: Type[tool.{{ tool_name }}]):
     {{ name }}.connect_internal_signals()
 
 
-def retranslate_ui({{ name }}: Type[{{ tool_name }}]):
+def retranslate_ui({{ name }}: Type[tool.{{ tool_name }}]):
     pass
 
 
-def create_widget(data, parent, {{ name }}: Type[{{ tool_name }}]):
+def create_widget(data, parent, {{ name }}: Type[tool.{{ tool_name }}]):
     {{ name }}.show_widget(data, parent)
 
 
@@ -33,15 +33,15 @@ def create_dialog(data: object, parent, {{ name }}: Type[tool.{{ tool_name }}]):
         {{ name }}.signals.dialog_declined.emit(dialog)
 
 
-def register_widget(widget: ui.{{ widget_name }}, {{ name }}: Type[{{ tool_name }}]):
+def register_widget(widget: ui.{{ widget_name }}, {{ name }}: Type[tool.{{ tool_name }}]):
     {{ name }}.register_widget(widget)
 
 
-def register_fields(widget: ui.{{ widget_name }}, {{ name }}: Type[{{ tool_name }}]):
+def register_fields(widget: ui.{{ widget_name }}, {{ name }}: Type[tool.{{ tool_name }}]):
     {{ name }}.register_basic_field(widget, widget.le_name, "Name")
 
 
-def register_validators(widget:ui.{{ widget_name }}, {{ name }}: Type[{{ tool_name }}], util: Type[tool.Util]):
+def register_validators(widget:ui.{{ widget_name }}, {{ name }}: Type[tool.{{ tool_name }}], util: Type[tool.Util]):
     {{ name }}.add_validator(
         widget,
         widget.le_code,
@@ -50,6 +50,6 @@ def register_validators(widget:ui.{{ widget_name }}, {{ name }}: Type[{{ tool_na
     )
 
 
-def connect_widget(widget: ui.{{ widget_name }}, {{ name }}: Type[{{ tool_name }}]):
+def connect_widget(widget: ui.{{ widget_name }}, {{ name }}: Type[tool.{{ tool_name }}]):
     {{ name }}.connect_widget_signals(widget)
 
