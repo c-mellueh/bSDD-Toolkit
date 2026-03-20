@@ -6,7 +6,7 @@ from PySide6.QtCore import Signal
 
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool,FieldTool,FieldSignals
-from bsdd_gui.module.excel import ui
+from bsdd_gui.module.excel import ui,trigger
 
 if TYPE_CHECKING:
     from bsdd_gui.module.excel.prop import ExcelProperties
@@ -22,6 +22,9 @@ class Excel(ActionTool,FieldTool):
     @classmethod
     def _get_widget_class(cls) -> type[ui.Widget]:
         return ui.Widget
+    @classmethod
+    def _get_trigger(cls):
+        return trigger
 
     @classmethod
     def create_widget(cls, *args, **kwargs) -> ui.Widget:

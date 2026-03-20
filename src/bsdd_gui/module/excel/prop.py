@@ -1,7 +1,7 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import ActionsProperties,WidgetProperties
+from bsdd_gui.presets.prop_presets import ActionsProperties,FieldProperties
 
-class ExcelProperties(ActionsProperties,WidgetProperties):
+class ExcelProperties(ActionsProperties,FieldProperties):
     def __init__(self):
         super().__init__()
 

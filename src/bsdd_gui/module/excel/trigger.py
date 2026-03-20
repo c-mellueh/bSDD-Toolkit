@@ -9,11 +9,12 @@ if TYPE_CHECKING:
 
 
 def connect():
+    core.connect_to_main_window(tool.Excel,tool.MainWindowWidget,tool.Project)
     core.connect_signals(tool.Excel)
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.Excel)
+    core.retranslate_ui(tool.Excel,tool.MainWindowWidget)
 
 def on_new_project():
     pass
