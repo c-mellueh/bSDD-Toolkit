@@ -92,7 +92,7 @@ def create_core(name: str):
         f.write(
             f"""from __future__ import annotations
 
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from bsdd_gui import tool
 """

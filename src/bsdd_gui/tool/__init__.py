@@ -25,3 +25,4 @@ from .file_lock import FileLock
 from .ai_helper import AiHelper, AiClassDescription, AiPropertyDescription
 from .download import Download
 from .group_of_properties import GroupOfProperties, GopClassView, GopPropertyView
+from .excel import Excel
