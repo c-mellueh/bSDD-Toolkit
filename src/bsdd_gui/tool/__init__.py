@@ -20,10 +20,10 @@ from .property_editor_widget import PropertyEditorWidget
 from .property_table_widget import PropertyTableWidget
 from .search_widget import SearchWidget
 from .relationship_editor_widget import RelationshipEditorWidget
-from .ids_exporter import IdsExporter, IdsClassView, IdsPropertyView
+from .ids_exporter import IdsExporter
 from .file_lock import FileLock
 from .ai_helper import AiHelper, AiClassDescription, AiPropertyDescription
 from .download import Download
 from .group_of_properties import GroupOfProperties, GopClassView, GopPropertyView
 from .excel import Excel
-from .property_picker import PropertyPicker
+from .property_picker import PropertyPicker, IdsClassView, IdsPropertyView

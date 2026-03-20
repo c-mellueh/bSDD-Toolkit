@@ -19,14 +19,3 @@ class IdsExporterProperties(ActionsProperties, DialogProperties):
         self.write_thread = None
         self.type_classes = get_ifc_type_classes()
 
-
-class IdsClassViewProperties(ViewProperties):
-    def __init__(self):
-        super().__init__()
-        self.checkstate_dict = {}
-
-
-class IdsPropertyViewProperties(ViewProperties):
-    def __init__(self):
-        super().__init__()
-        self.checkstate_dict = {}

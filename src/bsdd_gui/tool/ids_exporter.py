@@ -8,23 +8,19 @@ from ifctester.facet import Entity as EntityFacet
 
 from ifctester.facet import Restriction
 from ifctester.ids import Specification, Ids
-from bsdd_gui.presets.signal_presets import FieldSignals, ViewSignals
-from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, ItemViewTool
+from bsdd_gui.presets.signal_presets import FieldSignals
+from bsdd_gui.presets.tool_presets import ActionTool, FieldTool
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils
-from bsdd_gui.module.ids_exporter import ui, models, model_views, constants
-from operator import itemgetter
+from bsdd_gui.module.ids_exporter import ui, constants
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QDate, Signal, Qt, QObject, QThread
 import datetime
 from ifctester.facet import Classification as ClassificationFacet
-from ifctester.facet import Property as PropertyFacet
 
 if TYPE_CHECKING:
     from bsdd_gui.module.ids_exporter.prop import (
-        IdsExporterProperties,
-        IdsClassViewProperties,
-        IdsPropertyViewProperties,
+        IdsExporterProperties
     )
 from bsdd_gui.module.ids_exporter import trigger
 import ifctester
@@ -699,150 +695,5 @@ class IdsExporter(ActionTool, FieldTool):
         return write_worker, write_thread
 
 
-class ClassSignals(ViewSignals):
-    pass
 
 
-class IdsClassView(ItemViewTool):
-    signals = ClassSignals()
-
-    @classmethod
-    def get_properties(cls) -> IdsClassViewProperties:
-        return bsdd_gui.IdsClassViewProperties  #
-
-    @classmethod
-    def _get_model_class(cls):
-        return models.ClassTreeModel
-
-    @classmethod
-    def _get_trigger(cls):
-        return trigger
-
-    @classmethod
-    def _get_proxy_model_class(cls):
-        return models.SortModel
-
-    @classmethod
-    def connect_settings_signals(cls, widget: ui.IdsWidget, view: model_views.ClassView):
-        class_model = view.model().sourceModel()
-        widget.cb_inh.toggled.connect(
-            lambda checked: class_model.set_checkstate_inheritance(checked)
-        )
-
-        return super().connect_view_signals(view)
-
-    @classmethod
-    def get_checkstate(cls, bsdd_class: BsddClass):
-        return cls.get_properties().checkstate_dict.get(bsdd_class.Code, True)
-
-    @classmethod
-    def set_checkstate(cls, bsdd_class: BsddClass, state: bool):
-        cls.get_properties().checkstate_dict[bsdd_class.Code] = state
-
-    @classmethod
-    def get_check_dict(cls):
-        return cls.get_properties().checkstate_dict
-
-    @classmethod
-    def set_check_dict(cls, check_dict, treev_view: model_views.ClassView):
-        model: models.ClassTreeModel = treev_view.model().sourceModel()
-        model.beginResetModel()
-        cls.get_properties().checkstate_dict = check_dict
-        model.endResetModel()
-
-
-class PropertySignals(ViewSignals):
-    pass
-
-
-class IdsPropertyView(ItemViewTool):
-    signals = PropertySignals()
-
-    @classmethod
-    def get_properties(cls) -> IdsPropertyViewProperties:
-        return bsdd_gui.IdsPropertyViewProperties
-
-    @classmethod
-    def _get_model_class(cls):
-        return models.PropertyTreeModel
-
-    @classmethod
-    def _get_trigger(cls):
-        return trigger
-
-    @classmethod
-    def _get_proxy_model_class(cls):
-        return models.SortModel
-
-    @classmethod
-    def _get_name(cls, bsdd_property: BsddClassProperty | str):
-        if isinstance(bsdd_property, str):
-            return bsdd_property
-        return prop_utils.get_name(bsdd_property)
-
-    @classmethod
-    def _get_code(cls, bsdd_property: BsddClassProperty | str):
-        if isinstance(bsdd_property, str):
-            return ""
-        return bsdd_property.Code
-
-    @classmethod
-    def get_checkstate(
-        cls, model: models.PropertyTreeModel, bsdd_class_property: BsddClassProperty | str
-    ):
-        pset_name = (
-            bsdd_class_property
-            if isinstance(bsdd_class_property, str)
-            else bsdd_class_property.PropertySet
-        )
-        property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
-        bsdd_class_code = model.bsdd_data.Code
-        checkstate_dict: PsetDict = cls.get_properties().checkstate_dict
-        class_dict = checkstate_dict.get(bsdd_class_code, None)
-        if not class_dict:
-            return True
-        pset_dict = class_dict.get(pset_name)
-        if not pset_dict:
-            return True
-        if property_code is None:  # propertySet
-            return pset_dict.get("checked", True)
-        else:
-            return pset_dict["properties"].get(property_code, True)
-
-    @classmethod
-    def set_checkstate(
-        cls,
-        model: models.PropertyTreeModel,
-        bsdd_class: BsddClass,
-        bsdd_class_property: BsddClassProperty | str,
-        state: bool,
-    ):
-        if not model.bsdd_data:
-            return
-
-        pset_name = (
-            bsdd_class_property
-            if isinstance(bsdd_class_property, str)
-            else bsdd_class_property.PropertySet
-        )
-        property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
-        if bsdd_class.Code not in cls.get_properties().checkstate_dict:
-            cls.get_properties().checkstate_dict[bsdd_class.Code] = dict()
-        checkstate_dict = cls.get_properties().checkstate_dict[bsdd_class.Code]
-        if not pset_name in checkstate_dict:
-            checkstate_dict[pset_name] = {"checked": True, "properties": dict()}
-        if not property_code:
-            checkstate_dict[pset_name]["checked"] = state
-        else:
-            checkstate_dict[pset_name]["properties"][property_code] = state
-
-    @classmethod
-    def get_check_dict(cls):
-        return cls.get_properties().checkstate_dict
-
-    @classmethod
-    def set_check_dict(cls, check_dict, tree_view: model_views.PropertyView):
-        model: models.ClassTreeModel = tree_view.model().sourceModel()
-        model.beginResetModel()
-        cls.get_properties().checkstate_dict = check_dict
-        model.endResetModel()
