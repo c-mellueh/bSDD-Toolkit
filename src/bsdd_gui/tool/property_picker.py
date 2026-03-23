@@ -87,6 +87,8 @@ class IdsClassView(ItemViewTool):
 
     @classmethod
     def set_checkstate(cls, bsdd_class: BsddClass, state: bool,view:model_views.ClassView):
+        if  view not in cls.get_properties().checkstate_dict:
+            cls.get_properties().checkstate_dict[view] = {}
         cls.get_properties().checkstate_dict[view][bsdd_class.Code] = state
 
     @classmethod
@@ -105,6 +107,12 @@ class IdsClassView(ItemViewTool):
         class_model:models.ClassTreeModel = view.model().sourceModel()
         class_model.set_checkstate_inheritance(state)
 
+
+    @classmethod
+    def get_property_view(cls,class_view:model_views.ClassView) -> model_views.PropertyView:
+        widget:ui.Widget = class_view.parent().parent()
+        return widget.tv_properties
+    
 class PropertySignals(ViewSignals):
     pass
 
@@ -142,8 +150,9 @@ class IdsPropertyView(ItemViewTool):
 
     @classmethod
     def get_checkstate(
-        cls, model: models.PropertyTreeModel, bsdd_class_property: BsddClassProperty | str
+        cls, view: model_views.PropertyView, bsdd_class_property: BsddClassProperty | str
     ):
+        model:models.PropertyTreeModel = view.model().sourceModel()
         pset_name = (
             bsdd_class_property
             if isinstance(bsdd_class_property, str)
@@ -151,7 +160,7 @@ class IdsPropertyView(ItemViewTool):
         )
         property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
         bsdd_class_code = model.bsdd_data.Code
-        checkstate_dict: PsetDict = cls.get_properties().checkstate_dict
+        checkstate_dict: PsetDict = cls.get_check_dict(view)
         class_dict = checkstate_dict.get(bsdd_class_code, None)
         if not class_dict:
             return True
@@ -166,12 +175,14 @@ class IdsPropertyView(ItemViewTool):
     @classmethod
     def set_checkstate(
         cls,
-        model: models.PropertyTreeModel,
-        bsdd_class: BsddClass,
+        view: model_views.PropertyView,
         bsdd_class_property: BsddClassProperty | str,
         state: bool,
+        
     ):
-        if not model.bsdd_data:
+        model:models.PropertyTreeModel = view.model().sourceModel()
+        bsdd_class = model.bsdd_data
+        if not bsdd_class:
             return
 
         pset_name = (
@@ -180,9 +191,13 @@ class IdsPropertyView(ItemViewTool):
             else bsdd_class_property.PropertySet
         )
         property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
-        if bsdd_class.Code not in cls.get_properties().checkstate_dict:
-            cls.get_properties().checkstate_dict[bsdd_class.Code] = dict()
-        checkstate_dict = cls.get_properties().checkstate_dict[bsdd_class.Code]
+        if view not in cls.get_properties().checkstate_dict:
+            cls.get_properties().checkstate_dict[view] = {}
+        
+        if bsdd_class.Code not in cls.get_properties().checkstate_dict[view]:
+            cls.get_properties().checkstate_dict[view][bsdd_class.Code] = dict()
+        
+        checkstate_dict = cls.get_properties().checkstate_dict[view][bsdd_class.Code]
         if pset_name not in checkstate_dict:
             checkstate_dict[pset_name] = {"checked": True, "properties": dict()}
         if not property_code:
@@ -191,12 +206,17 @@ class IdsPropertyView(ItemViewTool):
             checkstate_dict[pset_name]["properties"][property_code] = state
 
     @classmethod
-    def get_check_dict(cls):
-        return cls.get_properties().checkstate_dict
+    def get_check_dict(cls,view:model_views.PropertyView) -> dict:
+        return cls.get_properties().checkstate_dict.get(view,{})
 
     @classmethod
     def set_check_dict(cls, check_dict, tree_view: model_views.PropertyView):
         model: models.ClassTreeModel = tree_view.model().sourceModel()
         model.beginResetModel()
-        cls.get_properties().checkstate_dict = check_dict
+        cls.get_properties().checkstate_dict[tree_view] = check_dict
         model.endResetModel()
+
+@classmethod
+def get_class_view(cls,property_view:model_views.PropertyView) -> model_views.ClassView:
+    widget:ui.Widget = property_view.parent().parent()
+    return widget.tv_classes

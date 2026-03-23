@@ -506,7 +506,7 @@ class IdsExporter(ActionTool, FieldTool):
         else:
             cs = class_settings
 
-        sorted_classes = sorted(bsdd_dict.Classes, key=lambda x: x.Code)
+        sorted_classes = sorted([c for c in bsdd_dict.Classes if c.ClassType == "Class"],key=lambda x: x.Code)
         payload: PayLoadDict = {
             "ids": ids,
             "sorted_classes": sorted_classes,
@@ -582,6 +582,9 @@ class IdsExporter(ActionTool, FieldTool):
             value = cls.get_identifiers_by_class(bsdd_class, main_prop, main_pset, bsdd_dict)
             if len(value) == 1:
                 value = value[0]
+            print(value)
+            if not value:
+                print(bsdd_class.Name)
             return PropertyFacet(
                 main_pset,
                 main_prop,
@@ -665,7 +668,7 @@ class IdsExporter(ActionTool, FieldTool):
         ids.info["copyright"] = metadata.get("copyright", ids.info.get("copyright"))
 
     @classmethod
-    def create_write_thread(cls, ids, out_path):
+    def create_write_thread(cls, ids:Ids, out_path:str):
         class _SetupWorker(QObject):
             finished = Signal()
             error = Signal(object)

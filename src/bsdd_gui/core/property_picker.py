@@ -68,14 +68,14 @@ def add_columns_to_property_view(
     data = project.get()
     proxy_model, model = ids_property.create_model(data)
 
-    def set_checkstate(model: CTM, index: QModelIndex, value: bool):
+    def set_checkstate(model: CTM, index: QModelIndex, value: bool,v:model_views.PropertyView):
         bsdd_property = index.internalPointer()
-        ids_property.set_checkstate(model, model.bsdd_data, bsdd_property, value)
+        ids_property.set_checkstate(v,  bsdd_property, value)
 
     ids_property.add_column_to_table(model, "Name", ids_property._get_name)
     ids_property.add_column_to_table(model, "Code", ids_property._get_code)
     ids_property.add_column_to_table(
-        model, "Export", lambda cp: ids_property.get_checkstate(model, cp), set_checkstate
+        model, "Export", lambda cp,v=view: ids_property.get_checkstate(v, cp),lambda *args,v=view: set_checkstate(*args,v)
     )
 
     view.setModel(proxy_model)
@@ -95,8 +95,7 @@ def connect_property_view(
         class_view: model_views.ClassView,
         data: BsddClass,
     ):
-        widget: ui.Widget = class_view.window()
-        property_view = widget.tv_properties
+        property_view = ids_class.get_property_view(class_view)
         proxy_model: models.SortModel = property_view.model()
         model = proxy_model.sourceModel()
         model.beginResetModel()
@@ -105,3 +104,7 @@ def connect_property_view(
 
     ids_class.signals.selection_changed.connect(update_property_view)
     ids_property.connect_view_signals(view)
+
+
+def create_widget(args,property_picker:type[tool.PropertyPicker]):
+    property_picker.create_widget(*args)
