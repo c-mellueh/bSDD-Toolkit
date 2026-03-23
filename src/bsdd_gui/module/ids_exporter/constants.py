@@ -1,6 +1,6 @@
 SETTINGS_FILETYPE = "Settings (*.json);;all (*.*)"
 IDS_FILETYPE = "IDS (*.ids);;XML(*.xml);;all (*.*)"
-IDS_APPDATA = "ids_settings"
+APPDATA_OPTION = "ids_settings"
 
 DATATYPE_MAPPING = {
     "String": "IfcLabel",

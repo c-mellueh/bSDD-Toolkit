@@ -33,3 +33,11 @@ def widget_created(widget: ui.Widget):
     core.register_validators(widget, tool.Excel, tool.Util)
     core.connect_widget(widget, tool.Excel)
 
+def import_settings(widget:ui.Widget):
+    core.import_settings(widget,tool.Excel,tool.PPClassView,tool.PPPropertyView,tool.Appdata,tool.Popups)
+
+
+def export_settings(widget: ui.Widget):
+    core.export_settings(
+        widget, tool.Excel, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
+    )

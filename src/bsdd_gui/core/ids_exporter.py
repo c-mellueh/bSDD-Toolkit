@@ -187,11 +187,11 @@ def export_settings(
 
     # Set Path
     text = QCoreApplication.translate("IDSExport", "Export IDS settings")
-    old_path = appdata.get_path(constants.IDS_APPDATA)
+    old_path = appdata.get_path(constants.APPDATA_OPTION)
     new_path = popups.get_save_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
     if not new_path:
         return
-    appdata.set_path(constants.IDS_APPDATA, new_path)
+    appdata.set_path(constants.APPDATA_OPTION, new_path)
 
     # Write Json
     with open(new_path, "w") as file:
@@ -207,12 +207,12 @@ def import_settings(
     popups: Type[tool.Popups],
 ):
     # Handle Path
-    old_path = appdata.get_path(constants.IDS_APPDATA)
+    old_path = appdata.get_path(constants.APPDATA_OPTION)
     text = QCoreApplication.translate("IDSExport", "Import IDS settings")
     new_path = popups.get_open_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
     if not new_path:
         return
-    appdata.set_path(constants.IDS_APPDATA, new_path)
+    appdata.set_path(constants.APPDATA_OPTION, new_path)
 
     # Read Settings
     with open(new_path, "r") as file:
