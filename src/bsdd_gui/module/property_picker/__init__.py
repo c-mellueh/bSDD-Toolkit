@@ -4,8 +4,8 @@ from . import ui, prop, trigger
 
 def register():
     bsdd_gui.PropertyPickerProperties = prop.PropertyPickerProperties()
-    bsdd_gui.IdsClassViewProperties = prop.IdsClassViewProperties()
-    bsdd_gui.IdsPropertyViewProperties = prop.IdsPropertyViewProperties()
+    bsdd_gui.PPClassViewProperties = prop.PPClassViewProperties()
+    bsdd_gui.PPPropertyViewProperties = prop.PPPropertyViewProperties()
 
 def retranslate_ui():
     trigger.retranslate_ui()

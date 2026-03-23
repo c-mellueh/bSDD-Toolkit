@@ -31,18 +31,18 @@ def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
     core.register_fields(widget, tool.IdsExporter)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
-    core.connect_widget(widget, tool.IdsExporter, tool.IdsClassView, tool.MainWindowWidget)
+    core.connect_widget(widget, tool.IdsExporter, tool.PPClassView, tool.MainWindowWidget)
 
 
 def import_settings(widget: IdsWidget):
     core.import_settings(
-        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Appdata, tool.Popups
+        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
     )
 
 
 def export_settings(widget: IdsWidget):
     core.export_settings(
-        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Appdata, tool.Popups
+        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
     )
 
 
@@ -54,5 +54,5 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
 
 def export_ids(widget: IdsWidget):
     core.export_ids(
-        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Popups, tool.Util
+        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Popups, tool.Util
     )

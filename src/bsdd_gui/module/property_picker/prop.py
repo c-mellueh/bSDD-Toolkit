@@ -7,13 +7,13 @@ class PropertyPickerProperties(ActionsProperties,WidgetProperties):
 
 
 
-class IdsClassViewProperties(ViewProperties):
+class PPClassViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()
         self.checkstate_dict = {}
 
 
-class IdsPropertyViewProperties(ViewProperties):
+class PPPropertyViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()
         self.checkstate_dict = {}

@@ -140,7 +140,7 @@ def register_validators(widget:ui.IdsWidget, widget_tool: Type[tool.IdsExporter]
 def connect_widget(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    ids_class: Type[tool.IdsClassView],
+    pp_class_view: Type[tool.PPClassView],
     main_window: Type[tool.MainWindowWidget],
 ):
     widget.cb_prop.hide()
@@ -157,7 +157,7 @@ def connect_widget(
     worker.finished.connect(lambda: widget_tool.fill_pset_combobox(widget))
     widget_tool.connect_widget_signals(widget)
     class_view = widget.property_picker.tv_classes
-    widget.cb_inh.toggled.connect(lambda cs: ids_class.request_set_inheritance(cs,class_view))
+    widget.cb_inh.toggled.connect(lambda cs: pp_class_view.request_set_inheritance(cs,class_view))
 
 
 
@@ -166,16 +166,16 @@ def connect_widget(
 def export_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    class_view: Type[tool.IdsClassView],
-    property_view: Type[tool.IdsPropertyView],
+    pp_class_view: Type[tool.PPClassView],
+    pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
     # Create Dict
     class_tree = widget.property_picker.tv_classes
     property_tree = widget.property_picker.tv_properties
-    class_dict: dict[str, bool] = class_view.get_check_dict(class_tree)
-    property_dict: PsetDict = property_view.get_check_dict(property_tree)
+    class_dict: dict[str, bool] = pp_class_view.get_check_dict(class_tree)
+    property_dict: PsetDict = pp_property_view.get_check_dict(property_tree)
     settings_dict: BasicSettingsDict = widget_tool.get_settings(widget)
     ids_metadata: MetadataDict = widget_tool.get_ids_metadata(widget)
     full_dict: SettingsDict = {
@@ -201,8 +201,8 @@ def export_settings(
 def import_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    class_view: Type[tool.IdsClassView],
-    property_view: Type[tool.IdsPropertyView],
+    pp_class_view: Type[tool.PPClassView],
+    pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
@@ -225,8 +225,8 @@ def import_settings(
     # Fill Fields and Checkstates
     class_tree = widget.property_picker.tv_classes
     property_tree = widget.property_picker.tv_properties
-    class_view.set_check_dict(class_dict, class_tree)
-    property_view.set_check_dict(property_dict, property_tree)
+    pp_class_view.set_check_dict(class_dict, class_tree)
+    pp_property_view.set_check_dict(property_dict, property_tree)
     widget_tool.set_settings(widget, settings_dict)
     widget_tool.set_ids_metadata(widget, ids_metadata)
     pass
@@ -235,8 +235,8 @@ def import_settings(
 def export_ids(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    class_view: Type[tool.IdsClassView],
-    property_view: Type[tool.IdsPropertyView],
+    pp_class_view: Type[tool.PPClassView],
+    pp_property_view: Type[tool.PPPropertyView],
     popups: Type[tool.Popups],
     util: Type[tool.Util],
 ):
@@ -244,8 +244,8 @@ def export_ids(
     widget_tool.sync_to_model(widget, widget.bsdd_data)
     class_tree = widget.property_picker.tv_classes
     property_tree = widget.property_picker.tv_properties
-    class_settings = class_view.get_check_dict(class_tree)
-    property_settings = property_view.get_check_dict(property_tree)
+    class_settings = pp_class_view.get_check_dict(class_tree)
+    property_settings = pp_property_view.get_check_dict(property_tree)
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 

@@ -11,7 +11,7 @@ from bsdd_gui.presets.tool_presets import ActionTool,WidgetTool,WidgetSignals,It
 from bsdd_gui.module.property_picker import ui,trigger,model_views,models
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_picker.prop import PropertyPickerProperties,IdsClassViewProperties,IdsPropertyViewProperties
+    from bsdd_gui.module.property_picker.prop import PropertyPickerProperties,PPClassViewProperties,PPPropertyViewProperties
 
 
 class PsetDict(TypedDict):
@@ -53,12 +53,12 @@ class ClassSignals(ViewSignals):
     set_inheritance_requested = Signal(bool,model_views.ClassView)
 
 
-class IdsClassView(ItemViewTool):
+class PPClassView(ItemViewTool):
     signals = ClassSignals()
 
     @classmethod
-    def get_properties(cls) -> IdsClassViewProperties:
-        return bsdd_gui.IdsClassViewProperties  #
+    def get_properties(cls) -> PPClassViewProperties:
+        return bsdd_gui.PPClassViewProperties  #
 
     @classmethod
     def _get_model_class(cls):
@@ -117,12 +117,12 @@ class PropertySignals(ViewSignals):
     pass
 
 
-class IdsPropertyView(ItemViewTool):
+class PPPropertyView(ItemViewTool):
     signals = PropertySignals()
 
     @classmethod
-    def get_properties(cls) -> IdsPropertyViewProperties:
-        return bsdd_gui.IdsPropertyViewProperties
+    def get_properties(cls) -> PPPropertyViewProperties:
+        return bsdd_gui.PPPropertyViewProperties
 
     @classmethod
     def _get_model_class(cls):
