@@ -82,22 +82,22 @@ class IdsClassView(ItemViewTool):
         return super().connect_internal_signals()
 
     @classmethod
-    def get_checkstate(cls, bsdd_class: BsddClass):
-        return cls.get_properties().checkstate_dict.get(bsdd_class.Code, True)
+    def get_checkstate(cls, bsdd_class: BsddClass,view:model_views.ClassView):
+        return cls.get_check_dict(view).get(bsdd_class.Code,True)
 
     @classmethod
-    def set_checkstate(cls, bsdd_class: BsddClass, state: bool):
-        cls.get_properties().checkstate_dict[bsdd_class.Code] = state
+    def set_checkstate(cls, bsdd_class: BsddClass, state: bool,view:model_views.ClassView):
+        cls.get_properties().checkstate_dict[view][bsdd_class.Code] = state
 
     @classmethod
-    def get_check_dict(cls):
-        return cls.get_properties().checkstate_dict
+    def get_check_dict(cls,view:model_views.ClassView):
+        return cls.get_properties().checkstate_dict.get(view,{})
 
     @classmethod
-    def set_check_dict(cls, check_dict, treev_view: model_views.ClassView):
-        model: models.ClassTreeModel = treev_view.model().sourceModel()
+    def set_check_dict(cls, check_dict, tree_view: model_views.ClassView):
+        model: models.ClassTreeModel = tree_view.model().sourceModel()
         model.beginResetModel()
-        cls.get_properties().checkstate_dict = check_dict
+        cls.get_properties().checkstate_dict[tree_view] = check_dict
         model.endResetModel()
 
     @classmethod

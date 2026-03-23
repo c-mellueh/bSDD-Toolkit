@@ -110,7 +110,7 @@ def register_fields(
     widget_tool.sync_from_model(widget, widget.bsdd_data)
 
 
-def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
+def register_validators(widget:ui.IdsWidget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
     def _is_not_empty(value, _):
         if value is None:
             return False
@@ -172,8 +172,10 @@ def export_settings(
     popups: Type[tool.Popups],
 ):
     # Create Dict
-    class_dict: dict[str, bool] = class_view.get_check_dict()
-    property_dict: PsetDict = property_view.get_check_dict()
+    class_tree = widget.property_picker.tv_classes
+    property_tree = widget.property_picker.tv_properties
+    class_dict: dict[str, bool] = class_view.get_check_dict(class_tree)
+    property_dict: PsetDict = property_view.get_check_dict(property_tree)
     settings_dict: BasicSettingsDict = widget_tool.get_settings(widget)
     ids_metadata: MetadataDict = widget_tool.get_ids_metadata(widget)
     full_dict: SettingsDict = {
@@ -221,8 +223,10 @@ def import_settings(
     ids_metadata = full_dict.get("ids_metadata", {})
 
     # Fill Fields and Checkstates
-    class_view.set_check_dict(class_dict, widget.tv_classes)
-    property_view.set_check_dict(property_dict, widget.tv_properties)
+    class_tree = widget.property_picker.tv_classes
+    property_tree = widget.property_picker.tv_properties
+    class_view.set_check_dict(class_dict, class_tree)
+    property_view.set_check_dict(property_dict, property_tree)
     widget_tool.set_settings(widget, settings_dict)
     widget_tool.set_ids_metadata(widget, ids_metadata)
     pass

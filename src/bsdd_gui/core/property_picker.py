@@ -49,13 +49,13 @@ def add_columns_to_class_view(
 ):
     def set_checkstate(model: CTM, index: QModelIndex, value: bool):
         bsdd_class = index.internalPointer()
-        ids_class.set_checkstate(bsdd_class, value)
+        ids_class.set_checkstate(bsdd_class, value,view)
 
     data = project.get()
     proxy_model, model = ids_class.create_model(data)
     ids_class.add_column_to_table(model, "Name", lambda a: a.Name)
     ids_class.add_column_to_table(model, "Code", lambda a: a.Code)
-    ids_class.add_column_to_table(model, "Export", ids_class.get_checkstate, set_checkstate)
+    ids_class.add_column_to_table(model, "Export", lambda c,v=view:ids_class.get_checkstate(c,v), set_checkstate)
     view.setModel(proxy_model)
 
 
