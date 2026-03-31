@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.excel import ui
     from bsdd_gui.tool.property_picker import PsetDict
     from bsdd_gui.tool.excel import SettingsDict
-
+    from bsdd_json import BsddClass
 def connect_to_main_window(
     excel: Type[tool.Excel],
     main_window: Type[tool.MainWindowWidget],
@@ -162,53 +162,20 @@ def export_excel(    widget: ui.Widget,
     bsdd_classes = [c for c in bsdd_dict.Classes if  c.ClassType == "Class" and class_settings.get(c.Code,True)]
     root_classes = [c for c in bsdd_classes if not c.ParentClassCode ]
     psets = [c for c in bsdd_dict.Classes if  c.ClassType == "GroupOfProperties"]
-    COLUMN_COUNT = 6
-    MAX_ENTRIES = 8
+
 
     workbook = openpyxl.Workbook()
-    overview_workbook = workbook.active
-    overview_workbook.title = QCoreApplication.translate("Excel","Overview")
-    overview_row = 2
-    overview_workbook.cell(1,1,"Code")
-    overview_workbook.cell(1,2,"Name")
-    overview_workbook.cell(1,3,"Definition")
+    overview_sheet = workbook.active
 
+    filtered_classes:list[BsddClass] = list()
 
     for bsdd_class in root_classes:
-        overview_workbook.cell(overview_row,1,bsdd_class.Code)
-        overview_workbook.cell(overview_row,2,bsdd_class.Name)
-        overview_workbook.cell(overview_row,3,bsdd_class.Definition)
-        overview_row+=1
-        property_dict = property_settings.get(bsdd_class.Code,{})
-        overview_workbook = workbook.create_sheet(bsdd_class.Name)
-        row, column = 1,1
-        max_row = 0
-        max_row = excel.draw_class(bsdd_class,row,column,overview_workbook,property_dict,bsdd_dict)
-        items_in_row = 1
-        column +=COLUMN_COUNT
-        for child in excel.get_all_children(bsdd_class,bsdd_dict):
-            if not class_settings.get(child.Code,True):
-                continue
+        created_classes =excel.create_class_sheet(bsdd_class,bsdd_dict,workbook,class_settings,property_settings)
+        filtered_classes.extend(created_classes)
 
+    excel.create_overview_sheet(filtered_classes,overview_sheet)
 
-            overview_workbook.cell(overview_row,1,bsdd_class.Code)
-            overview_workbook.cell(overview_row,2,bsdd_class.Name)
-            overview_workbook.cell(overview_row,3,bsdd_class.Definition)
-            overview_row+=1
-
-            property_dict = property_settings.get(child.Code,{})
-
-            bottom_row = excel.draw_class(child,row,column,overview_workbook,property_dict,bsdd_dict)
-            column +=COLUMN_COUNT
-            max_row = bottom_row if bottom_row > max_row else max_row
-            items_in_row +=1
-
-            if items_in_row > MAX_ENTRIES:
-                column = 1
-                row = max_row+2
-                items_in_row = 0
-
-
+    
     workbook.save(r"C:\Users\melluehc\Desktop\TestExcel\test.xlsx")
 
 

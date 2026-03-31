@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, TypedDict
 import logging
 from PySide6.QtCore import Signal, QCoreApplication
 from openpyxl import styles
+from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from bsdd_json.utils import class_utils, property_utils, dictionary_utils
 from openpyxl.utils import get_column_letter
@@ -10,11 +11,10 @@ from openpyxl.utils import get_column_letter
 from bsdd_json import BsddClass, BsddDictionary, BsddClassProperty
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, FieldSignals
-from bsdd_gui.module.excel import ui, trigger
+from bsdd_gui.module.excel import ui, trigger,constants
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
-TABLE_STYLE = "TableStyleLight1"
-OPTIONAL_FONT = styles.Font(color="4e6ec0")
+
 
 
 class PsetDict(TypedDict):
@@ -220,11 +220,11 @@ class Excel(ActionTool, FieldTool):
     def create_table(
         cls, row_range: tuple[int, int], column_range: tuple[int, int], sheet: Worksheet, name
     ):
-        name = dictionary_utils.slugify(name)
+        name = dictionary_utils.slugify(name,delimiter="_")
         table_range = f"{sheet.cell(row_range[0], column_range[0]).coordinate}:{sheet.cell(row_range[1], column_range[1]).coordinate}"
         table = Table(displayName=name, ref=table_range)
         style = TableStyleInfo(
-            name=TABLE_STYLE,
+            name=constants.TABLE_STYLE,
             showFirstColumn=False,
             showLastColumn=False,
             showRowStripes=True,
@@ -233,3 +233,44 @@ class Excel(ActionTool, FieldTool):
         table.tableStyleInfo = style
         sheet.add_table(table)
         # cls.autoadjust_column_widths(sheet, 5)
+
+    @classmethod
+    def create_class_sheet(cls,root_class:BsddClass,bsdd_dict:BsddDictionary,workbook:Workbook,class_settings:dict,property_settings:dict):
+        classes = [root_class]
+        property_dict = property_settings.get(root_class.Code,{})
+        class_sheet = workbook.create_sheet(root_class.Name)
+        row, column = 1,1
+        max_row = 0
+        max_row = cls.draw_class(root_class,row,column,class_sheet,property_dict,bsdd_dict)
+        items_in_row = 1
+        column +=constants.COLUMN_COUNT
+
+        for child in cls.get_all_children(root_class,bsdd_dict):
+            if not class_settings.get(child.Code,True):
+                continue
+
+            classes.append(child)
+            property_dict = property_settings.get(child.Code,{})
+
+            bottom_row = cls.draw_class(child,row,column,class_sheet,property_dict,bsdd_dict)
+            column +=constants.COLUMN_COUNT
+            max_row = bottom_row if bottom_row > max_row else max_row
+            items_in_row +=1
+
+            if items_in_row > constants.MAX_ENTRIES:
+                column = 1
+                row = max_row+2
+                items_in_row = 0
+        return classes
+    
+    @classmethod
+    def create_overview_sheet(cls,classes:list[BsddClass],sheet:Worksheet):
+        sheet.title = QCoreApplication.translate("Excel","Overview")
+        sheet.cell(1,1,"Code")
+        sheet.cell(1,2,"Name")
+        sheet.cell(1,3,"Definition")
+        for row,bsdd_class in enumerate(classes,start=2):
+            sheet.cell(row,1,bsdd_class.Code)
+            sheet.cell(row,2,bsdd_class.Name)
+            sheet.cell(row,3,bsdd_class.Definition)
+        cls.create_table((1,row),(1,3),sheet,sheet.title)
