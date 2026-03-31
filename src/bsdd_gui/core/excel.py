@@ -4,6 +4,9 @@ from typing import TYPE_CHECKING, Type
 import qtawesome as qta
 from bsdd_gui.module.excel import constants
 import json
+import openpyxl
+from bsdd_json.utils import class_utils
+
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.excel import ui
@@ -95,7 +98,7 @@ def export_settings(
     }
 
     # Set Path
-    text = QCoreApplication.translate("IDSExport", "Export IDS settings")
+    text = QCoreApplication.translate("Excel", "Export Excel settings")
     old_path = appdata.get_path(constants.APPDATA_OPTION)
     new_path = popups.get_save_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
     if not new_path:
@@ -109,7 +112,7 @@ def export_settings(
 
 def import_settings(
     widget: ui.Widget,
-    widget_tool: Type[tool.IdsExporter],
+    widget_tool: Type[tool.Excel],
     pp_class_view: Type[tool.PPClassView],
     pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
@@ -117,7 +120,7 @@ def import_settings(
 ):
     # Handle Path
     old_path = appdata.get_path(constants.APPDATA_OPTION)
-    text = QCoreApplication.translate("IDSExport", "Import IDS settings")
+    text = QCoreApplication.translate("Excel", "Import Excel settings")
     new_path = popups.get_open_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
     if not new_path:
         return
@@ -129,7 +132,6 @@ def import_settings(
     class_dict = full_dict.get("class_settings", {})
     property_dict = full_dict.get("property_settings", {})
     settings_dict = full_dict.get("settings", {})
-    ids_metadata = full_dict.get("ids_metadata", {})
 
     # Fill Fields and Checkstates
     class_tree = widget.property_picker.tv_classes
@@ -137,13 +139,76 @@ def import_settings(
     pp_class_view.set_check_dict(class_dict, class_tree)
     pp_property_view.set_check_dict(property_dict, property_tree)
     widget_tool.set_settings(widget, settings_dict)
-    widget_tool.set_ids_metadata(widget, ids_metadata)
     pass
 
 def export_excel(    widget: ui.Widget,
-    widget_tool: Type[tool.IdsExporter],
+    excel: Type[tool.Excel],
     pp_class_view: Type[tool.PPClassView],
     pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
-    popups: Type[tool.Popups]):
-    pass
+    popups: Type[tool.Popups],
+    util:Type[tool.Util],
+    project:type[tool.Project]):
+    
+    excel.sync_to_model(widget, widget.bsdd_data)
+    class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
+    property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
+    base_settings = excel.get_settings(widget)
+    title = QCoreApplication.translate("Excel", "Export Excel")
+    
+    # waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
+    bsdd_dict = project.get()
+
+    bsdd_classes = [c for c in bsdd_dict.Classes if  c.ClassType == "Class" and class_settings.get(c.Code,True)]
+    root_classes = [c for c in bsdd_classes if not c.ParentClassCode ]
+    psets = [c for c in bsdd_dict.Classes if  c.ClassType == "GroupOfProperties"]
+    COLUMN_COUNT = 6
+    MAX_ENTRIES = 8
+
+    workbook = openpyxl.Workbook()
+    overview_workbook = workbook.active
+    overview_workbook.title = QCoreApplication.translate("Excel","Overview")
+    overview_row = 2
+    overview_workbook.cell(1,1,"Code")
+    overview_workbook.cell(1,2,"Name")
+    overview_workbook.cell(1,3,"Definition")
+
+
+    for bsdd_class in root_classes:
+        overview_workbook.cell(overview_row,1,bsdd_class.Code)
+        overview_workbook.cell(overview_row,2,bsdd_class.Name)
+        overview_workbook.cell(overview_row,3,bsdd_class.Definition)
+        overview_row+=1
+        property_dict = property_settings.get(bsdd_class.Code,{})
+        overview_workbook = workbook.create_sheet(bsdd_class.Name)
+        row, column = 1,1
+        max_row = 0
+        max_row = excel.draw_class(bsdd_class,row,column,overview_workbook,property_dict,bsdd_dict)
+        items_in_row = 1
+        column +=COLUMN_COUNT
+        for child in excel.get_all_children(bsdd_class,bsdd_dict):
+            if not class_settings.get(child.Code,True):
+                continue
+
+
+            overview_workbook.cell(overview_row,1,bsdd_class.Code)
+            overview_workbook.cell(overview_row,2,bsdd_class.Name)
+            overview_workbook.cell(overview_row,3,bsdd_class.Definition)
+            overview_row+=1
+
+            property_dict = property_settings.get(child.Code,{})
+
+            bottom_row = excel.draw_class(child,row,column,overview_workbook,property_dict,bsdd_dict)
+            column +=COLUMN_COUNT
+            max_row = bottom_row if bottom_row > max_row else max_row
+            items_in_row +=1
+
+            if items_in_row > MAX_ENTRIES:
+                column = 1
+                row = max_row+2
+                items_in_row = 0
+
+
+    workbook.save(r"C:\Users\melluehc\Desktop\TestExcel\test.xlsx")
+
+

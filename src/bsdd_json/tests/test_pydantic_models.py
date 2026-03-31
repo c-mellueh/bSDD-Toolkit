@@ -933,11 +933,11 @@ class TestPropertyUtilsAccessors:
 
     def test_get_datatype_returns_type_string(self):
         cp, d = self._make_dict_with_prop(DataType="String")
-        assert prop_utils.get_datatype(cp, d) == "String"
+        assert prop_utils.get_data_type(cp, d) == "String"
 
     def test_get_datatype_defaults_to_string_when_none(self):
         cp, d = self._make_dict_with_prop()  # DataType not set
-        assert prop_utils.get_datatype(cp, d) == "String"
+        assert prop_utils.get_data_type(cp, d) == "String"
 
     def test_get_units_returns_units(self):
         cp, d = self._make_dict_with_prop(Units=["m"])

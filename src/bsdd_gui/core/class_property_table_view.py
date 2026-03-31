@@ -46,7 +46,7 @@ def add_columns_to_view(
     )
     property_table.add_column_to_table(model, "Code", lambda a: a.Code)
     property_table.add_column_to_table(
-        model, "Datatype", lambda p: prop_utils.get_datatype(p, project.get())
+        model, "Datatype", lambda p: prop_utils.get_data_type(p, project.get())
     )
     property_table.add_column_to_table(model, "Unit", prop_utils.get_units)
     property_table.add_column_to_table(model, "Values", property_table.get_allowed_values)

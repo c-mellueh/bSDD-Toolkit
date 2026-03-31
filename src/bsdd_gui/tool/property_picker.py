@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class PsetDict(TypedDict):
     checked: bool
-    proeprties: dict[str, bool]
+    properties: dict[str, bool]
 
 class Signals(WidgetSignals):
     pass
@@ -206,7 +206,7 @@ class PPPropertyView(ItemViewTool):
             checkstate_dict[pset_name]["properties"][property_code] = state
 
     @classmethod
-    def get_check_dict(cls,view:model_views.PropertyView) -> dict:
+    def get_check_dict(cls,view:model_views.PropertyView) -> dict[str,PsetDict]:
         return cls.get_properties().checkstate_dict.get(view,{})
 
     @classmethod

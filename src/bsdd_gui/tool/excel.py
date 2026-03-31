@@ -1,16 +1,25 @@
-
 from __future__ import annotations
-from typing import TYPE_CHECKING,TypedDict
+from typing import TYPE_CHECKING, TypedDict
 import logging
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QCoreApplication
+from openpyxl import styles
+from openpyxl.worksheet.worksheet import Worksheet
+from bsdd_json.utils import class_utils, property_utils, dictionary_utils
+from openpyxl.utils import get_column_letter
 
+from bsdd_json import BsddClass, BsddDictionary, BsddClassProperty
 import bsdd_gui
-from bsdd_gui.presets.tool_presets import ActionTool,FieldTool,FieldSignals
-from bsdd_gui.module.excel import ui,trigger
+from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, FieldSignals
+from bsdd_gui.module.excel import ui, trigger
+from openpyxl.worksheet.table import Table, TableStyleInfo
+
+TABLE_STYLE = "TableStyleLight1"
+OPTIONAL_FONT = styles.Font(color="4e6ec0")
+
 
 class PsetDict(TypedDict):
     checked: bool
-    proeprties: dict[str, bool]
+    properties: dict[str, bool]
 
 
 class BasicSettingsDict(TypedDict):
@@ -19,6 +28,7 @@ class BasicSettingsDict(TypedDict):
     type_objects: bool
     main_pset: str
     main_property: str
+
 
 class SettingsDict(TypedDict):
     class_settings: dict[str, bool]
@@ -29,10 +39,12 @@ class SettingsDict(TypedDict):
 if TYPE_CHECKING:
     from bsdd_gui.module.excel.prop import ExcelProperties
 
+
 class Signals(FieldSignals):
     pass
 
-class Excel(ActionTool,FieldTool):
+
+class Excel(ActionTool, FieldTool):
     @classmethod
     def get_properties(cls) -> ExcelProperties:
         return bsdd_gui.ExcelProperties
@@ -40,6 +52,7 @@ class Excel(ActionTool,FieldTool):
     @classmethod
     def _get_widget_class(cls) -> type[ui.Widget]:
         return ui.Widget
+
     @classmethod
     def _get_trigger(cls):
         return trigger
@@ -62,6 +75,84 @@ class Excel(ActionTool,FieldTool):
         super().connect_widget_signals(widget)
 
     @classmethod
+    def draw_class(
+        cls,
+        bsdd_class: BsddClass,
+        start_row: int,
+        start_column: int,
+        sheet: Worksheet,
+        property_filter: dict[str,PsetDict],
+        bsdd_dictionary: BsddDictionary,
+    ):
+        sheet.cell(start_row, start_column, QCoreApplication.translate("Excel", "Name"))
+        sheet.cell(start_row, start_column + 1, bsdd_class.Name)
+        sheet.cell(start_row, start_column + 2, QCoreApplication.translate("Excel", "Parent Code"))
+        sheet.cell(start_row, start_column + 3, bsdd_class.ParentClassCode or "")
+
+        sheet.cell(start_row + 1, start_column, QCoreApplication.translate("Excel", "Identifier"))
+        sheet.cell(start_row + 1, start_column + 1, bsdd_class.Code)
+
+        sheet.cell(start_row + 2, start_column, QCoreApplication.translate("Excel", "Definition"))
+        sheet.cell(start_row + 2, start_column + 1, bsdd_class.Definition)
+        sheet.cell(start_row + 2, start_column + 5, " ")
+
+        sheet.cell(start_row + 3, start_column, QCoreApplication.translate("Excel", "Property"))
+        sheet.cell(
+            start_row + 3, start_column + 1, QCoreApplication.translate("Excel", "PropertySet")
+        )
+        sheet.cell(
+            start_row + 3, start_column + 2, QCoreApplication.translate("Excel", "Definition")
+        )
+        sheet.cell(start_row + 3, start_column + 3, QCoreApplication.translate("Excel", "Datatype"))
+        sheet.cell(start_row + 3, start_column + 4, QCoreApplication.translate("Excel", "Values"))
+
+        cls.draw_border(sheet, (start_row, start_row + 2), (start_column, start_column + 4))
+        cls.fill_grey(sheet, (start_row, start_row + 2), (start_column, start_column + 4))
+
+        start_row += 3
+        row = 0
+
+        def is_active(bsdd_property:BsddClassProperty):
+            pset_data = property_filter.get(bsdd_property.PropertySet)
+            if not pset_data:
+                return True
+            if not pset_data.get("checked",True):
+                return False
+            return pset_data.get("properties",{}).get(bsdd_property.Code,True)
+
+        bsdd_properties = sorted([p for p in bsdd_class.ClassProperties if is_active(p)],key=lambda p:p.PropertySet)
+
+        for row, bsdd_property in enumerate(bsdd_properties, start=1):
+            name = property_utils.get_name(bsdd_property, bsdd_dictionary)
+            definition = property_utils.get_definition(bsdd_property, bsdd_dictionary)
+            data_type = property_utils.get_data_type(bsdd_property) or "IFCLABEL"
+            values = [v.Code for v in property_utils.get_values(bsdd_property)]
+
+            sheet.cell(start_row + row, start_column, name)
+            sheet.cell(start_row + row, start_column + 1, bsdd_property.PropertySet)
+            sheet.cell(start_row + row, start_column + 2, definition)
+            sheet.cell(start_row + row, start_column + 3, data_type)
+            sheet.cell(start_row + row, start_column + 4, "; ".join(values))
+            sheet.cell(start_row + row, start_column + 5, " ")
+
+        cls.create_table(
+            (start_row, start_row + row), (start_column, start_column + 4), sheet, bsdd_class.Name
+        )
+        return start_row + row
+
+    @classmethod
+    def get_all_children(
+        cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary
+    ) -> list[BsddClass]:
+        result = []
+        queue = class_utils.get_children(bsdd_class, bsdd_dictionary)
+        while queue:
+            child = queue.pop(0)
+            result.append(child)
+            queue.extend(class_utils.get_children(child, bsdd_dictionary))
+        return result
+
+    @classmethod
     def get_settings(cls, widget: ui.Widget) -> BasicSettingsDict:
 
         settings_dict = {
@@ -74,3 +165,71 @@ class Excel(ActionTool,FieldTool):
             # "datatype_mapping": cls.get_datatype_mapping(widget),
         }
         return settings_dict
+
+    @classmethod
+    def set_settings(cls, widget: ui.Widget, settings_dict: BasicSettingsDict):
+        pass
+
+
+    @classmethod
+    def draw_border(
+        cls, sheet: Worksheet, row_range: tuple[int, int], column_range: tuple[int, int]
+    ):
+        for row in range(row_range[0], row_range[1] + 1):
+            for column in range(column_range[0], column_range[1] + 1):
+                left_side = styles.Side(border_style="none", color="FF000000")
+                right_side = styles.Side(border_style="none", color="FF000000")
+                top_side = styles.Side(border_style="none", color="FF000000")
+                bottom_side = styles.Side(border_style="none", color="FF000000")
+                if column == column_range[0]:
+                    left_side = styles.Side(border_style="thick", color="FF000000")
+
+                if column == column_range[1]:
+                    right_side = styles.Side(border_style="thick", color="FF000000")
+
+                if row == row_range[0]:
+                    top_side = styles.Side(border_style="thick", color="FF000000")
+                if row == row_range[1]:
+                    bottom_side = styles.Side(border_style="thick", color="FF000000")
+                sheet.cell(row, column).border = styles.Border(
+                    left=left_side, right=right_side, top=top_side, bottom=bottom_side
+                )
+
+    @classmethod
+    def fill_grey(cls, sheet: Worksheet, row_range: tuple[int, int], column_range: tuple[int, int]):
+        fill = styles.PatternFill(fill_type="solid", start_color="d9d9d9")
+        for row in range(row_range[0], row_range[1] + 1):
+            for column in range(column_range[0], column_range[1] + 1):
+                sheet.cell(row, column).fill = fill
+
+    @classmethod
+    def autoadjust_column_widths(cls, sheet: Worksheet, extra_width=0) -> None:
+        for i in range(len(list(sheet.columns))):
+            column_letter = get_column_letter(i + 1)
+            column = sheet[column_letter]
+            width = (
+                max(
+                    [len(cell.value) for cell in column if cell.value is not None],
+                    default=2,
+                )
+                + extra_width
+            )
+            sheet.column_dimensions[column_letter].width = width
+
+    @classmethod
+    def create_table(
+        cls, row_range: tuple[int, int], column_range: tuple[int, int], sheet: Worksheet, name
+    ):
+        name = dictionary_utils.slugify(name)
+        table_range = f"{sheet.cell(row_range[0], column_range[0]).coordinate}:{sheet.cell(row_range[1], column_range[1]).coordinate}"
+        table = Table(displayName=name, ref=table_range)
+        style = TableStyleInfo(
+            name=TABLE_STYLE,
+            showFirstColumn=False,
+            showLastColumn=False,
+            showRowStripes=True,
+            showColumnStripes=False,
+        )
+        table.tableStyleInfo = style
+        sheet.add_table(table)
+        # cls.autoadjust_column_widths(sheet, 5)

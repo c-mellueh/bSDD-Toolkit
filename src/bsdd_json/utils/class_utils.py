@@ -124,6 +124,12 @@ class Cache:
     def flush_data(cls):
         cls.data = dict()
 
+def get_root_parent(bsdd_class:BsddClass,bsdd_dictionary:BsddDictionary):
+    parent = bsdd_class
+    while parent:
+        last_parent = parent
+        parent = get_parent(parent,bsdd_dictionary)
+    return last_parent
 
 def get_root_classes(bsdd_dictionary: BsddDictionary):
     if bsdd_dictionary is None:
@@ -131,8 +137,9 @@ def get_root_classes(bsdd_dictionary: BsddDictionary):
     return [c for c in bsdd_dictionary.Classes if not c.ParentClassCode]
 
 
-def get_children(bsdd_class: BsddClass):
-    bsdd_dictionary = get_dictionary_from_class(bsdd_class)
+def get_children(bsdd_class: BsddClass,bsdd_dictionary:BsddDictionary =None):
+    if not bsdd_dictionary:
+        bsdd_dictionary = get_dictionary_from_class(bsdd_class)
     if bsdd_dictionary is None:
         return []
     code = bsdd_class.Code

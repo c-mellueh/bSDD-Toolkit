@@ -30,7 +30,7 @@ from bsdd_gui.presets.ui_presets import run_iterable_with_progress
 
 class PsetDict(TypedDict):
     checked: bool
-    proeprties: dict[str, bool]
+    properties: dict[str, bool]
 
 
 class SettingsDict(TypedDict):

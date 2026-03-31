@@ -242,10 +242,8 @@ def export_ids(
 ):
 
     widget_tool.sync_to_model(widget, widget.bsdd_data)
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    class_settings = pp_class_view.get_check_dict(class_tree)
-    property_settings = pp_property_view.get_check_dict(property_tree)
+    class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
+    property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 
