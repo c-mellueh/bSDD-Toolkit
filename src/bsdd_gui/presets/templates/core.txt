@@ -1,0 +1,55 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Type
+from bsdd_json import BsddClassProperty, BsddProperty
+from PySide6.QtCore import QCoreApplication, QPoint
+from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
+
+if TYPE_CHECKING:
+    from bsdd_gui import tool
+    from bsdd_gui.module.{{ name }} import ui
+
+
+def connect_signals({{ name }}: Type[tool.{{ tool_name }}]):
+    {{ name }}.connect_internal_signals()
+
+
+def retranslate_ui({{ name }}: Type[tool.{{ tool_name }}]):
+    pass
+
+
+def create_widget(data, parent, {{ name }}: Type[tool.{{ tool_name }}]):
+    {{ name }}.show_widget(data, parent)
+
+
+def create_dialog(data: object, parent, {{ name }}: Type[tool.{{ tool_name }}]):
+    dialog = {{ name }}.create_dialog(data, parent)
+    text = QCoreApplication.translate("Preset", "Example Title")
+    dialog.setWindowTitle(text)
+    if dialog.exec():
+        {{ name }}.sync_to_model(dialog._widget, data)
+        {{ name }}.signals.dialog_accepted.emit(dialog)
+    else:
+        {{ name }}.signals.dialog_declined.emit(dialog)
+
+
+def register_widget(widget: ui.{{ widget_name }}, {{ name }}: Type[tool.{{ tool_name }}]):
+    {{ name }}.register_widget(widget)
+
+
+def register_fields(widget: ui.{{ widget_name }}, {{ name }}: Type[tool.{{ tool_name }}]):
+    {{ name }}.register_basic_field(widget, widget.le_name, "Name")
+
+
+def register_validators(widget:ui.{{ widget_name }}, {{ name }}: Type[tool.{{ tool_name }}], util: Type[tool.Util]):
+    {{ name }}.add_validator(
+        widget,
+        widget.le_code,
+        lambda v, w,: {{ name }}.is_code_valid(v, w),
+        lambda w, v: util.set_invalid(w, not v),
+    )
+
+
+def connect_widget(widget: ui.{{ widget_name }}, {{ name }}: Type[tool.{{ tool_name }}]):
+    {{ name }}.connect_widget_signals(widget)
+

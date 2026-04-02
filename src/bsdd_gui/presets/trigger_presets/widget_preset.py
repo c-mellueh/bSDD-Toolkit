@@ -1,12 +1,8 @@
 # This File can be copied and modified to fit your Module
-# It contains the minimum amount of triggers needed to make an ItemView Work
+# It contains the minimum amount of triggers needed to make an Widget Work
 
 from __future__ import annotations
-import bsdd_gui
 from typing import TYPE_CHECKING
-from bsdd_gui.presets.ui_presets import ItemViewType
-from PySide6.QtCore import QPoint
-
 from bsdd_gui.presets.core_presets import widget_preset as core  # <- modify to fit your need
 from bsdd_gui.presets import tool_presets as tool  # <- modify to fit your need
 from bsdd_gui.presets.ui_presets import FieldWidget

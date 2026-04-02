@@ -5,16 +5,13 @@ from bsdd_gui.module.ids_exporter import constants
 import json
 import re
 import qtawesome as qta
-from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
+from bsdd_gui.presets.ui_presets.waiting import stop_waiting_widget
 import logging
 
 import datetime
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.ids_exporter import ui, model_views, models
-    from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
-    from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
     from bsdd_gui.tool.ids_exporter import (
         BasicSettingsDict,
         MetadataDict,
@@ -22,6 +19,7 @@ if TYPE_CHECKING:
         SettingsDict,
         PayLoadDict,
     )
+    from bsdd_gui.module.ids_exporter import ui
     from ifctester.ids import Ids
 
 
@@ -43,14 +41,8 @@ def retranslate_ui(ids_exporter: Type[tool.IdsExporter], main_window: Type[tool.
     action.setText(QCoreApplication.translate("IDSExport", "IDS Exporter"))
 
 
-def connect_signals(
-    widget_tool: Type[tool.IdsExporter],
-    ids_class: Type[tool.IdsClassView],
-    ids_property: Type[tool.IdsPropertyView],
-):
+def connect_signals(widget_tool: Type[tool.IdsExporter]):
     widget_tool.connect_internal_signals()
-    ids_class.connect_internal_signals()
-    ids_property.connect_internal_signals()
 
 
 def create_widget(
@@ -61,10 +53,7 @@ def create_widget(
     widget: ui.IdsWidget = widget_tool.show_widget(project.get(), main_window.get())
     text = QCoreApplication.translate("IdsExport", "IDS Exporter")
     widget.setWindowTitle(text)
-    model: models.ClassTreeModel = widget.tv_classes.model().sourceModel()
-    model.beginResetModel()
-    model.bsdd_data = project.get()
-    model.endResetModel()
+
 
 
 def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
@@ -121,7 +110,7 @@ def register_fields(
     widget_tool.sync_from_model(widget, widget.bsdd_data)
 
 
-def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
+def register_validators(widget:ui.IdsWidget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
     def _is_not_empty(value, _):
         if value is None:
             return False
@@ -151,7 +140,7 @@ def register_validators(widget, widget_tool: Type[tool.IdsExporter], util: Type[
 def connect_widget(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    ids_class: Type[tool.IdsClassView],
+    pp_class_view: Type[tool.PPClassView],
     main_window: Type[tool.MainWindowWidget],
 ):
     widget.cb_prop.hide()
@@ -167,94 +156,26 @@ def connect_widget(
     thread.finished.connect(lambda: setattr(widget, "_count_dialog", None))
     worker.finished.connect(lambda: widget_tool.fill_pset_combobox(widget))
     widget_tool.connect_widget_signals(widget)
-    class_view = widget.tv_classes
-    ids_class.connect_settings_signals(widget, class_view)
+    class_view = widget.property_picker.tv_classes
+    widget.cb_inh.toggled.connect(lambda cs: pp_class_view.request_set_inheritance(cs,class_view))
 
 
-def register_class_view(view: model_views.ClassView, ids_class_view: Type[tool.IdsClassView]):
-    ids_class_view.register_view(view)
 
-
-def register_property_view(
-    view: model_views.PropertyView, ids_property_view: Type[tool.IdsPropertyView]
-):
-    ids_property_view.register_view(view)
-
-
-def add_columns_to_class_view(
-    view: model_views.ClassView, ids_class: Type[tool.IdsClassView], project: Type[tool.Project]
-):
-    def set_checkstate(model: CTM, index: QModelIndex, value: bool):
-        bsdd_class = index.internalPointer()
-        ids_class.set_checkstate(bsdd_class, value)
-
-    data = project.get()
-    proxy_model, model = ids_class.create_model(data)
-    ids_class.add_column_to_table(model, "Name", lambda a: a.Name)
-    ids_class.add_column_to_table(model, "Code", lambda a: a.Code)
-    ids_class.add_column_to_table(model, "Export", ids_class.get_checkstate, set_checkstate)
-    view.setModel(proxy_model)
-
-
-def add_columns_to_property_view(
-    view: model_views.PropertyView,
-    ids_property: Type[tool.IdsPropertyView],
-    project: Type[tool.Project],
-):
-
-    data = project.get()
-    proxy_model, model = ids_property.create_model(data)
-
-    def set_checkstate(model: CTM, index: QModelIndex, value: bool):
-        bsdd_property = index.internalPointer()
-        ids_property.set_checkstate(model, model.bsdd_data, bsdd_property, value)
-
-    ids_property.add_column_to_table(model, "Name", ids_property._get_name)
-    ids_property.add_column_to_table(model, "Code", ids_property._get_code)
-    ids_property.add_column_to_table(
-        model, "Export", lambda cp: ids_property.get_checkstate(model, cp), set_checkstate
-    )
-
-    view.setModel(proxy_model)
-
-
-def connect_class_view(view: model_views.ClassView, ids_class: Type[tool.IdsClassView]):
-    ids_class.connect_view_signals(view)
-
-
-def connect_property_view(
-    view: model_views.PropertyView,
-    ids_property: Type[tool.IdsPropertyView],
-    ids_class: Type[tool.IdsClassView],
-):
-
-    def update_property_view(
-        class_view: model_views.ClassView,
-        data: BsddClass,
-    ):
-        widget: ui.IdsWidget = class_view.window()
-        property_view = widget.tv_properties
-        proxy_model: models.SortModel = property_view.model()
-        model = proxy_model.sourceModel()
-        model.beginResetModel()
-        model.bsdd_data = data
-        model.endResetModel()
-
-    ids_class.signals.selection_changed.connect(update_property_view)
-    ids_property.connect_view_signals(view)
 
 
 def export_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    class_view: Type[tool.IdsClassView],
-    property_view: Type[tool.IdsPropertyView],
+    pp_class_view: Type[tool.PPClassView],
+    pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
     # Create Dict
-    class_dict: dict[str, bool] = class_view.get_check_dict()
-    property_dict: PsetDict = property_view.get_check_dict()
+    class_tree = widget.property_picker.tv_classes
+    property_tree = widget.property_picker.tv_properties
+    class_dict: dict[str, bool] = pp_class_view.get_check_dict(class_tree)
+    property_dict: PsetDict = pp_property_view.get_check_dict(property_tree)
     settings_dict: BasicSettingsDict = widget_tool.get_settings(widget)
     ids_metadata: MetadataDict = widget_tool.get_ids_metadata(widget)
     full_dict: SettingsDict = {
@@ -266,11 +187,11 @@ def export_settings(
 
     # Set Path
     text = QCoreApplication.translate("IDSExport", "Export IDS settings")
-    old_path = appdata.get_path(constants.IDS_APPDATA)
+    old_path = appdata.get_path(constants.APPDATA_OPTION)
     new_path = popups.get_save_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
     if not new_path:
         return
-    appdata.set_path(constants.IDS_APPDATA, new_path)
+    appdata.set_path(constants.APPDATA_OPTION, new_path)
 
     # Write Json
     with open(new_path, "w") as file:
@@ -280,18 +201,18 @@ def export_settings(
 def import_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    class_view: Type[tool.IdsClassView],
-    property_view: Type[tool.IdsPropertyView],
+    pp_class_view: Type[tool.PPClassView],
+    pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
     # Handle Path
-    old_path = appdata.get_path(constants.IDS_APPDATA)
+    old_path = appdata.get_path(constants.APPDATA_OPTION)
     text = QCoreApplication.translate("IDSExport", "Import IDS settings")
     new_path = popups.get_open_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
     if not new_path:
         return
-    appdata.set_path(constants.IDS_APPDATA, new_path)
+    appdata.set_path(constants.APPDATA_OPTION, new_path)
 
     # Read Settings
     with open(new_path, "r") as file:
@@ -302,8 +223,10 @@ def import_settings(
     ids_metadata = full_dict.get("ids_metadata", {})
 
     # Fill Fields and Checkstates
-    class_view.set_check_dict(class_dict, widget.tv_classes)
-    property_view.set_check_dict(property_dict, widget.tv_properties)
+    class_tree = widget.property_picker.tv_classes
+    property_tree = widget.property_picker.tv_properties
+    pp_class_view.set_check_dict(class_dict, class_tree)
+    pp_property_view.set_check_dict(property_dict, property_tree)
     widget_tool.set_settings(widget, settings_dict)
     widget_tool.set_ids_metadata(widget, ids_metadata)
     pass
@@ -312,16 +235,15 @@ def import_settings(
 def export_ids(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    class_view: Type[tool.IdsClassView],
-    property_view: Type[tool.IdsPropertyView],
+    pp_class_view: Type[tool.PPClassView],
+    pp_property_view: Type[tool.PPPropertyView],
     popups: Type[tool.Popups],
     util: Type[tool.Util],
 ):
 
     widget_tool.sync_to_model(widget, widget.bsdd_data)
-
-    class_settings = class_view.get_check_dict()
-    property_settings = property_view.get_check_dict()
+    class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
+    property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 

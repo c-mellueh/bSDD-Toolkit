@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 def connect():
     core.connect_to_main_window(tool.IdsExporter, tool.MainWindowWidget, tool.Project)
-    core.connect_signals(tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView)
+    core.connect_signals(tool.IdsExporter)
 
 
 def retranslate_ui():
@@ -31,33 +31,19 @@ def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
     core.register_fields(widget, tool.IdsExporter)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
-    core.connect_widget(widget, tool.IdsExporter, tool.IdsClassView, tool.MainWindowWidget)
+    core.connect_widget(widget, tool.IdsExporter, tool.PPClassView, tool.MainWindowWidget)
 
 
 def import_settings(widget: IdsWidget):
     core.import_settings(
-        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Appdata, tool.Popups
+        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
     )
 
 
 def export_settings(widget: IdsWidget):
     core.export_settings(
-        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Appdata, tool.Popups
+        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
     )
-
-
-def class_view_created(view: model_views.ClassView):
-    core.register_class_view(view, tool.IdsClassView)
-    core.add_columns_to_class_view(view, tool.IdsClassView, tool.Project)
-    # core.add_context_menu_to_view(view, tool.IdsClassView, tool.ClassEditorWidget)
-    core.connect_class_view(view, tool.IdsClassView)
-
-
-def property_view_created(view: model_views.PropertyView):
-    core.register_property_view(view, tool.IdsPropertyView)
-    core.add_columns_to_property_view(view, tool.IdsPropertyView, tool.Project)
-    # core.add_context_menu_to_view(view, tool.IdsClassView, tool.ClassEditorWidget)
-    core.connect_property_view(view, tool.IdsPropertyView, tool.IdsClassView)
 
 
 def context_menu_requested(view: model_views.ClassView, pos: QPoint):
@@ -68,5 +54,5 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
 
 def export_ids(widget: IdsWidget):
     core.export_ids(
-        widget, tool.IdsExporter, tool.IdsClassView, tool.IdsPropertyView, tool.Popups, tool.Util
+        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Popups, tool.Util
     )

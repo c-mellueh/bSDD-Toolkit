@@ -3,12 +3,12 @@ from . import ui, prop, trigger
 
 
 def register():
-    bsdd_gui.IdsExporterProperties = prop.IdsExporterProperties()
-
+    bsdd_gui.PropertyPickerProperties = prop.PropertyPickerProperties()
+    bsdd_gui.PPClassViewProperties = prop.PPClassViewProperties()
+    bsdd_gui.PPPropertyViewProperties = prop.PPPropertyViewProperties()
 
 def retranslate_ui():
     trigger.retranslate_ui()
-
 
 def load_ui_triggers():
     trigger.connect()
@@ -16,3 +16,4 @@ def load_ui_triggers():
 
 def on_new_project():
     trigger.on_new_project()
+
