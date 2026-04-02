@@ -1,12 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
 import logging
-from PySide6.QtCore import Signal, QCoreApplication
+from PySide6.QtCore import Signal, QCoreApplication,QObject,QThread,Qt
 from openpyxl import styles
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from bsdd_json.utils import class_utils, property_utils, dictionary_utils
 from openpyxl.utils import get_column_letter
+import openpyxl
 
 from bsdd_json import BsddClass, BsddDictionary, BsddClassProperty
 import bsdd_gui
@@ -269,8 +270,60 @@ class Excel(ActionTool, FieldTool):
         sheet.cell(1,1,"Code")
         sheet.cell(1,2,"Name")
         sheet.cell(1,3,"Definition")
+        row = 2
         for row,bsdd_class in enumerate(classes,start=2):
             sheet.cell(row,1,bsdd_class.Code)
             sheet.cell(row,2,bsdd_class.Name)
             sheet.cell(row,3,bsdd_class.Definition)
         cls.create_table((1,row),(1,3),sheet,sheet.title)
+
+    @classmethod
+    def create_build_thread(
+        cls,
+        bsdd_dict: BsddDictionary,
+        class_settings: dict[str, bool],
+        property_settings: PsetDict,
+        out_path:str
+    ):
+        class _BuildWorker(QObject):
+            finished = Signal(object)
+            error = Signal(object)
+
+            def __init__(self):
+                super().__init__()
+
+            def run(self):
+                try:
+                    bsdd_classes = [c for c in bsdd_dict.Classes if  c.ClassType == "Class" and class_settings.get(c.Code,True)]
+                    root_classes = [c for c in bsdd_classes if not c.ParentClassCode ]
+                    workbook = openpyxl.Workbook()
+                    overview_sheet = workbook.active
+
+                    filtered_classes:list[BsddClass] = list()
+
+                    for bsdd_class in root_classes:
+                        created_classes =cls.create_class_sheet(bsdd_class,bsdd_dict,workbook,class_settings,property_settings)
+                        filtered_classes.extend(created_classes)
+
+                    cls.create_overview_sheet(filtered_classes,overview_sheet)
+                    workbook.save(out_path)
+
+                    self.finished.emit(filtered_classes)
+
+                except Exception as exc:  # pragma: no cover - pass through
+                    self.error.emit(exc)
+
+        build_worker = _BuildWorker()
+        cls.get_properties().build_worker = build_worker
+        build_thread = QThread()
+
+        cls.get_properties().build_thread = build_thread
+
+        build_worker.moveToThread(build_thread)
+        build_worker.finished.connect(build_thread.quit)
+        build_worker.finished.connect(build_worker.deleteLater)
+        build_worker.error.connect(build_thread.quit)
+        build_worker.error.connect(build_worker.deleteLater)
+        build_thread.finished.connect(build_thread.deleteLater)
+        build_thread.started.connect(build_worker.run, Qt.ConnectionType.QueuedConnection)
+        return build_worker, build_thread

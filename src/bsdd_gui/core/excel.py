@@ -1,11 +1,12 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication,QTimer
 from typing import TYPE_CHECKING, Type
 import qtawesome as qta
 from bsdd_gui.module.excel import constants
 import json
-import openpyxl
 from bsdd_json.utils import class_utils
+from bsdd_gui.presets.ui_presets.waiting import stop_waiting_widget
+
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -151,31 +152,32 @@ def export_excel(    widget: ui.Widget,
     project:type[tool.Project]):
     
     excel.sync_to_model(widget, widget.bsdd_data)
+    title = QCoreApplication.translate("Excel", "Export Excel")
+    waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
+    waiting_widget.set_title("Load Data")
+
     class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
     property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
     base_settings = excel.get_settings(widget)
-    title = QCoreApplication.translate("Excel", "Export Excel")
-    
-    # waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
     bsdd_dict = project.get()
+    out_path = widget.fw_output.get_path()
 
-    bsdd_classes = [c for c in bsdd_dict.Classes if  c.ClassType == "Class" and class_settings.get(c.Code,True)]
-    root_classes = [c for c in bsdd_classes if not c.ParentClassCode ]
-    psets = [c for c in bsdd_dict.Classes if  c.ClassType == "GroupOfProperties"]
+    def export_done(classes:list[BsddClass]):
+        stop_waiting_widget(waiting_worker)
+        title = QCoreApplication.translate("Excel","Export Done!")
+        text_title = QCoreApplication.translate("Excel","Excel Export Done!")
+        text = QCoreApplication.translate("Excel","{} classes exported!").format(len(classes))
+        QTimer.singleShot(0, widget,  lambda: popups.create_info_popup(text,title,text_title,parent=widget))
+        
+    
 
+    build_worker, build_thread = excel.create_build_thread(bsdd_dict,class_settings,property_settings,out_path)
 
-    workbook = openpyxl.Workbook()
-    overview_sheet = workbook.active
+    build_worker.finished.connect(export_done )
+    build_worker.error.connect(lambda: stop_waiting_widget(waiting_worker))
 
-    filtered_classes:list[BsddClass] = list()
-
-    for bsdd_class in root_classes:
-        created_classes =excel.create_class_sheet(bsdd_class,bsdd_dict,workbook,class_settings,property_settings)
-        filtered_classes.extend(created_classes)
-
-    excel.create_overview_sheet(filtered_classes,overview_sheet)
+    build_thread.start()
 
     
-    workbook.save(r"C:\Users\melluehc\Desktop\TestExcel\test.xlsx")
 
 
