@@ -48,8 +48,8 @@ def export_settings(widget: ui.Widget):
     )
 
 
-def export_ids(widget: ui.Widget):
-    core.export_excel(
+def export(widget: ui.Widget):
+    core.export(
         widget,
         tool.Excel,
         tool.PPClassView,

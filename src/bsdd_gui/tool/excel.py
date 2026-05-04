@@ -46,6 +46,7 @@ class Signals(FieldSignals):
 
 
 class Excel(ActionTool, FieldTool):
+    signals = Signals()
     @classmethod
     def get_properties(cls) -> ExcelProperties:
         return bsdd_gui.ExcelProperties
@@ -72,7 +73,7 @@ class Excel(ActionTool, FieldTool):
     def connect_widget_signals(cls, widget: ui.Widget):
         widget.pb_import.clicked.connect(lambda: trigger.import_settings(widget))
         widget.pb_export.clicked.connect(lambda: trigger.export_settings(widget))
-        widget.pb_create.clicked.connect(lambda _, w=widget: trigger.export_ids(w))
+        widget.pb_create.clicked.connect(lambda _, w=widget: trigger.export(w))
         super().connect_widget_signals(widget)
 
     @classmethod

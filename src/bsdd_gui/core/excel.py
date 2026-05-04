@@ -14,13 +14,13 @@ if TYPE_CHECKING:
     from bsdd_gui.tool.property_picker import PsetDict
     from bsdd_gui.tool.excel import SettingsDict
     from bsdd_json import BsddClass
+
 def connect_to_main_window(
     excel: Type[tool.Excel],
     main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ):
-    # Action uses the WidgetTool request to allow trigger routing
-
+    # Action uses the WidgetTool request to allow trigger routing 
     action = main_window.add_action(
         "menuFile",
         "Export Excel",
@@ -142,7 +142,7 @@ def import_settings(
     widget_tool.set_settings(widget, settings_dict)
     pass
 
-def export_excel(    widget: ui.Widget,
+def export(    widget: ui.Widget,
     excel: Type[tool.Excel],
     pp_class_view: Type[tool.PPClassView],
     pp_property_view: Type[tool.PPPropertyView],
