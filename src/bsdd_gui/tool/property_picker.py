@@ -5,8 +5,9 @@ import logging
 from PySide6.QtCore import Signal
 
 import bsdd_gui
-from bsdd_json import BsddClass,BsddClassProperty
+from bsdd_json import BsddClass,BsddClassProperty,BsddDictionary
 from bsdd_json.utils import property_utils as prop_utils
+from bsdd_json.utils import class_utils
 from bsdd_gui.presets.tool_presets import ActionTool,WidgetTool,WidgetSignals,ItemViewTool,ViewSignals
 from bsdd_gui.module.property_picker import ui,trigger,model_views,models
 
@@ -94,6 +95,23 @@ class PPClassView(ItemViewTool):
     @classmethod
     def get_check_dict(cls,view:model_views.ClassView):
         return cls.get_properties().checkstate_dict.get(view,{})
+    
+    @classmethod
+    def build_full_check_dict(cls, view: model_views.ClassView, bsdd_dictionary: BsddDictionary):
+        partial = cls.get_check_dict(view)
+        full = {}
+
+        def walk(node: BsddClass, inherited: bool):
+            state = partial.get(node.Code, inherited)
+            full[node.Code] = state
+            for child in class_utils.get_children(node, bsdd_dictionary):
+                walk(child, state)
+
+        for root in class_utils.get_root_classes(bsdd_dictionary):
+            walk(root, True)
+
+        return full
+
 
     @classmethod
     def set_check_dict(cls, check_dict, tree_view: model_views.ClassView):
@@ -208,6 +226,23 @@ class PPPropertyView(ItemViewTool):
     @classmethod
     def get_check_dict(cls,view:model_views.PropertyView) -> dict[str,PsetDict]:
         return cls.get_properties().checkstate_dict.get(view,{})
+
+    @classmethod
+    def build_full_check_dict(cls, view: model_views.PropertyView, bsdd_dictionary: BsddDictionary):
+        partial = cls.get_check_dict(view)
+        full = {}
+
+        for node in bsdd_dictionary.Classes:
+            class_partial = partial.get(node.Code, {})
+            psets = {}
+            for cp in node.ClassProperties:
+                pset_partial = class_partial.get(cp.PropertySet, {"checked": True, "properties": {}})
+                entry = psets.setdefault(cp.PropertySet, {"checked": pset_partial["checked"], "properties": {}})
+                entry["properties"][cp.Code] = pset_partial["properties"].get(cp.Code, True)
+            full[node.Code] = psets
+
+        return full
+
 
     @classmethod
     def set_check_dict(cls, check_dict, tree_view: model_views.PropertyView):

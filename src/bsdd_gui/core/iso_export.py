@@ -150,17 +150,17 @@ def export(    widget: ui.Widget,
     waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
     waiting_widget.set_title("Load Data")
 
-    class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
-    property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
-    base_settings = iso_export.get_settings(widget)
     bsdd_dict = project.get()
+    class_settings = pp_class_view.build_full_check_dict(widget.property_picker.tv_classes,bsdd_dict)
+    property_settings = pp_property_view.build_full_check_dict(widget.property_picker.tv_properties,bsdd_dict)
+    base_settings = iso_export.get_settings(widget)
     out_path = widget.fw_output.get_path()
 
-    def export_done(classes:list[BsddClass]):
+    def export_done(class_count:int):
         stop_waiting_widget(waiting_worker)
         title = QCoreApplication.translate("IsoExport","Export Done!")
         text_title = QCoreApplication.translate("IsoExport","ISO23386 Export Done!")
-        text = QCoreApplication.translate("IsoExport","{} classes exported!").format(len(classes))
+        text = QCoreApplication.translate("IsoExport","{} classes exported!").format(class_count)
         QTimer.singleShot(0, widget,  lambda: popups.create_info_popup(text,title,text_title,parent=widget))
         
     

@@ -393,7 +393,7 @@ def get_related_psets(
     """
     get Psets of a normal BsddClass that are Referencing a BsddClass of Type GroupOfProperties
     """
-    related_psets: list[BsddClass] = list()
+    related_psets: list[BsddClass] = []
 
     for cr in bsdd_class.ClassRelations:
         if cr.RelationType != "HasReference":
@@ -406,6 +406,9 @@ def get_related_psets(
             related_psets.append(related_class)
     return list({c.Code: c for c in related_psets}.values())
 
+def get_related_pset(bsdd_class:BsddClass,bsdd_dictionary:BsddDictionary,pset_name:str) -> BsddClass|None:
+    psets = get_related_psets(bsdd_class,bsdd_dictionary)
+    return {p.Name:p for p in psets}.get(pset_name)
 
 def get_relating_pset_classes(
     group_of_properties: BsddClass, bsdd_dictionary: BsddDictionary
