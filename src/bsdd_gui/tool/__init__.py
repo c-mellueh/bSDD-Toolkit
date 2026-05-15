@@ -28,3 +28,4 @@ from .group_of_properties import GroupOfProperties, GopClassView, GopPropertyVie
 from .excel import Excel
 from .property_picker import PropertyPicker, PPClassView, PPPropertyView
 from .iso_export import IsoExport
+from .loin import Loin

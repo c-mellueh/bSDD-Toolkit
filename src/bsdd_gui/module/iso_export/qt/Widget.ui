@@ -20,6 +20,27 @@
    <item row="5" column="0">
     <layout class="QHBoxLayout" name="button_layout">
      <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Format:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cb_format">
+       <item>
+        <property name="text">
+         <string comment="iso_23386">ISO 23386 XML</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string comment="loin">ISO 7817-3 XML (LOIN)</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>

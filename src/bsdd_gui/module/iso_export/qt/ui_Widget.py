@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QLabel, QPushButton, QScrollArea, QSizePolicy,
-    QSpacerItem, QSplitter, QToolButton, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
+    QHBoxLayout, QLabel, QPushButton, QScrollArea,
+    QSizePolicy, QSpacerItem, QSplitter, QToolButton,
+    QVBoxLayout, QWidget)
 
 from bsdd_gui.module.property_picker.ui import Widget
 from bsdd_gui.presets.ui_presets import FileSelector
@@ -37,6 +37,18 @@ class Ui_Form(object):
 
         self.button_layout = QHBoxLayout()
         self.button_layout.setObjectName(u"button_layout")
+        self.label = QLabel(Form)
+        self.label.setObjectName(u"label")
+
+        self.button_layout.addWidget(self.label)
+
+        self.cb_format = QComboBox(Form)
+        self.cb_format.addItem("")
+        self.cb_format.addItem("")
+        self.cb_format.setObjectName(u"cb_format")
+
+        self.button_layout.addWidget(self.cb_format)
+
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.button_layout.addItem(self.horizontalSpacer_2)
@@ -147,6 +159,10 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
+        self.label.setText(QCoreApplication.translate("Form", u"Format:", None))
+        self.cb_format.setItemText(0, QCoreApplication.translate("Form", u"ISO 23386 XML", u"iso_23386"))
+        self.cb_format.setItemText(1, QCoreApplication.translate("Form", u"ISO 7817-3 XML (LOIN)", u"loin"))
+
         self.pb_create.setText(QCoreApplication.translate("Form", u"Create", None))
         self.label_3.setText(QCoreApplication.translate("Form", u"Export:", None))
         self.label_13.setText(QCoreApplication.translate("Form", u"**Settings**", None))

@@ -92,6 +92,26 @@ class IsoExport(ActionTool, FieldTool):
         widget.pb_create.clicked.connect(lambda _, w=widget: trigger.export(w))
         super().connect_widget_signals(widget)
 
+    # ------------------------------------------------------------------ format
+
+    @classmethod
+    def get_export_format(cls, widget: ui.Widget) -> str:
+        """Return the currently-selected output format constant."""
+        combo = getattr(widget, "cb_format", None)
+        if combo is None:
+            return constants.FORMAT_ISO_23386
+        return combo.currentData() or constants.FORMAT_ISO_23386
+
+    @classmethod
+    def set_export_format(cls, widget: ui.Widget, value: str) -> None:
+        combo = getattr(widget, "cb_format", None)
+        if combo is None:
+            return
+        for i in range(combo.count()):
+            if combo.itemData(i) == value:
+                combo.setCurrentIndex(i)
+                return
+
 
     @classmethod
     def get_settings(cls, widget: ui.Widget) -> BasicSettingsDict:
@@ -333,3 +353,36 @@ class IsoExport(ActionTool, FieldTool):
         build_thread.finished.connect(build_thread.deleteLater)
         build_thread.started.connect(build_worker.run, Qt.ConnectionType.QueuedConnection)
         return build_worker, build_thread
+
+    # ------------------------------------------------------------------ LOIN export
+
+    @classmethod
+    def create_loin_build_thread(cls, out_path: str):
+        """Build a background thread that writes the in-memory LOIN to *out_path*."""
+
+        class _LoinWorker(QObject):
+            finished = Signal(object)
+            error = Signal(object)
+
+            def run(self):
+                try:
+                    from bsdd_gui.tool.loin import Loin
+
+                    count = Loin.export_to_xml(out_path)
+                    self.finished.emit(count)
+                except Exception as exc:  # pragma: no cover - pass through
+                    self.error.emit(exc)
+
+        worker = _LoinWorker()
+        thread = QThread()
+        cls.get_properties().build_worker = worker
+        cls.get_properties().build_thread = thread
+
+        worker.moveToThread(thread)
+        worker.finished.connect(thread.quit)
+        worker.finished.connect(worker.deleteLater)
+        worker.error.connect(thread.quit)
+        worker.error.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.started.connect(worker.run, Qt.ConnectionType.QueuedConnection)
+        return worker, thread

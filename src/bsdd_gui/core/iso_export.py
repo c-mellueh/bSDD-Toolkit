@@ -58,6 +58,47 @@ def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport]):
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
+    widget.pb_import.clicked.connect(lambda _=False, w=widget: _import_loin(w, iso_export))
+    widget.pb_export.clicked.connect(lambda _=False, w=widget: _export_loin(w, iso_export))
+
+
+def _import_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport]) -> None:
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+    from bsdd_gui.tool.loin import Loin
+
+    title = QCoreApplication.translate("IsoExport", "Import LOIN XML")
+    path, _ = QFileDialog.getOpenFileName(
+        widget.window(), title, "", constants.LOIN_FILETYPE
+    )
+    if not path:
+        return
+    try:
+        Loin.import_from_xml(path)
+    except Exception as exc:
+        QMessageBox.critical(widget.window(), title, str(exc))
+
+
+def _export_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport]) -> None:
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+    from bsdd_gui.tool.loin import Loin
+
+    title = QCoreApplication.translate("IsoExport", "Export LOIN XML")
+    path, _ = QFileDialog.getSaveFileName(
+        widget.window(), title, "", constants.LOIN_FILETYPE
+    )
+    if not path:
+        return
+    try:
+        count = Loin.export_to_xml(path)
+        QMessageBox.information(
+            widget.window(),
+            title,
+            QCoreApplication.translate("IsoExport", "{} specification(s) exported.").format(count),
+        )
+    except Exception as exc:
+        QMessageBox.warning(widget.window(), title, str(exc))
 
 
 def register_fields(widget: ui.Widget, iso_export: Type[tool.IsoExport]):
@@ -144,7 +185,34 @@ def export(    widget: ui.Widget,
     popups: Type[tool.Popups],
     util:Type[tool.Util],
     project:type[tool.Project]):
-    
+
+    fmt = iso_export.get_export_format(widget)
+    out_path = widget.fw_output.get_path()
+
+    if fmt == constants.FORMAT_LOIN:
+        iso_export.sync_to_model(widget, widget.bsdd_data)
+        title = QCoreApplication.translate("IsoExport", "Export ISO 7817-3 (LOIN)")
+        waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
+        waiting_widget.set_title("Serialise LOIN")
+
+        def loin_done(count: int):
+            stop_waiting_widget(waiting_worker)
+            t = QCoreApplication.translate("IsoExport", "Export Done!")
+            text_title = QCoreApplication.translate(
+                "IsoExport", "ISO 7817-3 LOIN Export Done!"
+            )
+            text = QCoreApplication.translate(
+                "IsoExport", "{} specification(s) exported!"
+            ).format(count)
+            QTimer.singleShot(0, widget, lambda: popups.create_info_popup(text, t, text_title, parent=widget))
+
+        worker, thread = iso_export.create_loin_build_thread(out_path)
+        worker.finished.connect(loin_done)
+        worker.error.connect(lambda: stop_waiting_widget(waiting_worker))
+        thread.start()
+        return
+
+    # Default / ISO 23386 path (existing behaviour).
     iso_export.sync_to_model(widget, widget.bsdd_data)
     title = QCoreApplication.translate("IsoExport", "Export ISO23386")
     waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
@@ -154,16 +222,13 @@ def export(    widget: ui.Widget,
     class_settings = pp_class_view.build_full_check_dict(widget.property_picker.tv_classes,bsdd_dict)
     property_settings = pp_property_view.build_full_check_dict(widget.property_picker.tv_properties,bsdd_dict)
     base_settings = iso_export.get_settings(widget)
-    out_path = widget.fw_output.get_path()
 
     def export_done(class_count:int):
         stop_waiting_widget(waiting_worker)
-        title = QCoreApplication.translate("IsoExport","Export Done!")
+        t = QCoreApplication.translate("IsoExport","Export Done!")
         text_title = QCoreApplication.translate("IsoExport","ISO23386 Export Done!")
         text = QCoreApplication.translate("IsoExport","{} classes exported!").format(class_count)
-        QTimer.singleShot(0, widget,  lambda: popups.create_info_popup(text,title,text_title,parent=widget))
-        
-    
+        QTimer.singleShot(0, widget,  lambda: popups.create_info_popup(text,t,text_title,parent=widget))
 
     build_worker, build_thread = iso_export.create_build_thread(bsdd_dict,class_settings,property_settings,out_path)
 

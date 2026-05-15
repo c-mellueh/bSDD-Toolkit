@@ -1,42 +1,114 @@
+"""UC/MS overlay for the property picker, backed by the Loin tool.
+
+This module exposes:
+
+* :class:`UcMsColumnProxy` — wraps a source model and appends one checkable
+  column per (Purpose × Milestone) pair. Check state is *not* stored in the
+  proxy; every read/write delegates to :class:`bsdd_gui.tool.Loin`.
+* :class:`TwoRowHeaderView` — paints UC (top row) and MS (bottom row) headers
+  derived from the Loin tool.
+* :class:`FilterTableWindow` — a stand-alone editor for the UC/MS grid plus
+  the global Providing/Receiving actor pair.
+* :func:`get_filter_window` — singleton accessor used by the property picker.
+"""
+
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QIdentityProxyModel, QModelIndex, QPersistentModelIndex, QRect, QTimer
-from PySide6.QtGui import QPainter, QFont
+from typing import TYPE_CHECKING, Optional
+from uuid import UUID
+
+from PySide6.QtCore import (
+    QIdentityProxyModel,
+    QModelIndex,
+    QPersistentModelIndex,
+    QRect,
+    Qt,
+    QTimer,
+)
+from PySide6.QtGui import QFont, QPainter
 from PySide6.QtWidgets import (
-    QHeaderView, QInputDialog, QMenu, QSizePolicy,
-    QTableWidget, QTableWidgetItem, QTreeView, QVBoxLayout, QWidget,
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QInputDialog,
+    QLabel,
+    QLineEdit,
+    QMenu,
+    QSizePolicy,
+    QTableWidget,
+    QTableWidgetItem,
+    QTreeView,
+    QVBoxLayout,
+    QWidget,
 )
 
-USE_CASES: list[str] = ["UC 1", "UC 2", "UC 3"]
-MILESTONES: list[str] = ["MS 1", "MS 2", "MS 3", "MS 4"]
+from bsdd_gui import tool
+from bsdd_json import BsddClass, BsddClassProperty
+
+if TYPE_CHECKING:
+    pass
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _current_purposes() -> list:
+    return tool.Loin.get_purposes()
+
+
+def _current_milestones() -> list:
+    return tool.Loin.get_milestones()
+
+
+def _column_to_pm(column: int, prefix_cols: int) -> Optional[tuple[UUID, UUID]]:
+    """Return the (purpose_guid, milestone_guid) for a proxy column index."""
+    if column < prefix_cols:
+        return None
+    purposes = _current_purposes()
+    milestones = _current_milestones()
+    if not purposes or not milestones:
+        return None
+    rel = column - prefix_cols
+    num_ms = len(milestones)
+    purpose_idx, milestone_idx = divmod(rel, num_ms)
+    if purpose_idx >= len(purposes) or milestone_idx >= num_ms:
+        return None
+    return purposes[purpose_idx].guid, milestones[milestone_idx].guid
 
 
 # ---------------------------------------------------------------------------
 # Column proxy — adds UC × MS checkbox columns to any tree model
 # ---------------------------------------------------------------------------
 
-class UcMsColumnProxy(QIdentityProxyModel):
-    """Wraps a source model and appends len(uc)*len(ms) checkable columns after prefix_cols.
 
-    Every proxy index — prefix columns included — stores a QPersistentModelIndex pointing
-    to (row, 0) in the source model as its internalPointer.  mapToSource always rebuilds
-    the source index via sourceModel().index(), never via createIndex(), so it is safe
-    when the source is a QSortFilterProxyModel.
+class UcMsColumnProxy(QIdentityProxyModel):
+    """Wraps a source model and appends `len(uc) * len(ms)` checkable columns.
+
+    State storage is delegated to the Loin tool — the proxy is now purely a
+    view layer with no hidden booleans.
     """
 
-    def __init__(
-        self,
-        use_cases: list[str],
-        milestones: list[str],
-        prefix_cols: int = 2,
-        parent=None,
-    ):
+    def __init__(self, prefix_cols: int = 2, parent=None):
         super().__init__(parent)
-        self._uc = use_cases
-        self._ms = milestones
         self._prefix_cols = prefix_cols
         self._pmi_alive: set[QPersistentModelIndex] = set()
-        self._checked: dict[tuple[QPersistentModelIndex, int], Qt.CheckState] = {}
+
+        # Rebuild whenever the Loin model membership/structure changes.
+        signals = tool.Loin.get_signals()
+        signals.spec_membership_changed.connect(self._reset_view)
+        signals.purposes_changed.connect(self._reset_view)
+        signals.milestones_changed.connect(self._reset_view)
+        signals.loin_reset.connect(self._reset_view)
+
+    # ------------------------------------------------------------------ basics
+
+    def _reset_view(self) -> None:
+        self.beginResetModel()
+        self._pmi_alive.clear()
+        self.endResetModel()
 
     def setSourceModel(self, model) -> None:
         super().setSourceModel(model)
@@ -45,21 +117,20 @@ class UcMsColumnProxy(QIdentityProxyModel):
 
     def _on_source_reset(self) -> None:
         self._pmi_alive.clear()
-        self._checked.clear()
 
     def _intern(self, src_row0: QModelIndex) -> QPersistentModelIndex:
         pmi = QPersistentModelIndex(src_row0)
         self._pmi_alive.add(pmi)
         return pmi
 
-    # --- column count ---
+    # ------------------------------------------------------------------ column count
 
     def columnCount(self, _parent=QModelIndex()) -> int:
         if self.sourceModel() is None:
             return 0
-        return self._prefix_cols + len(self._uc) * len(self._ms)
+        return self._prefix_cols + len(_current_purposes()) * len(_current_milestones())
 
-    # --- index / parent ---
+    # ------------------------------------------------------------------ index/parent
 
     def index(self, row: int, column: int, parent=QModelIndex()) -> QModelIndex:
         if not self.hasIndex(row, column, parent):
@@ -71,7 +142,7 @@ class UcMsColumnProxy(QIdentityProxyModel):
             return QModelIndex()
         return self.createIndex(row, column, self._intern(src_row0))
 
-    # --- source mapping ---
+    # ------------------------------------------------------------------ source mapping
 
     def mapToSource(self, proxy_index: QModelIndex) -> QModelIndex:
         if not proxy_index.isValid():
@@ -91,71 +162,147 @@ class UcMsColumnProxy(QIdentityProxyModel):
         sm = self.sourceModel()
         src_parent = sm.parent(source_index)
         src_row0 = sm.index(source_index.row(), 0, src_parent)
-        return self.createIndex(source_index.row(), source_index.column(), self._intern(src_row0))
+        return self.createIndex(
+            source_index.row(), source_index.column(), self._intern(src_row0)
+        )
 
-    # --- data / flags ---
+    # ------------------------------------------------------------------ row payload
+
+    def _row_payload(self, index: QModelIndex):
+        """Return the underlying bSDD object/string for the row of *index*."""
+        src = self.mapToSource(index)
+        if not src.isValid():
+            return None
+        return src.internalPointer()
+
+    # ------------------------------------------------------------------ data/flags
 
     def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
         col = index.column()
         if col >= self._prefix_cols:
             if role == Qt.ItemDataRole.CheckStateRole:
-                pmi = index.internalPointer()
-                if isinstance(pmi, QPersistentModelIndex):
-                    return self._checked.get((pmi, col), Qt.CheckState.Unchecked)
+                return self._check_state(index)
             return None
         return super().data(index, role)
 
     def setData(self, index: QModelIndex, value, role=Qt.ItemDataRole.EditRole) -> bool:
         col = index.column()
         if col >= self._prefix_cols and role == Qt.ItemDataRole.CheckStateRole:
-            pmi = index.internalPointer()
-            if isinstance(pmi, QPersistentModelIndex):
-                self._checked[(pmi, col)] = value
-                self.dataChanged.emit(index, index, [role])
-                return True
+            pm = _column_to_pm(col, self._prefix_cols)
+            if pm is None:
+                return False
+            payload = self._row_payload(index)
+            included = Qt.CheckState(value) == Qt.CheckState.Checked
+            if isinstance(payload, BsddClass):
+                tool.Loin.set_class_included(payload, pm[0], pm[1], included)
+            elif isinstance(payload, BsddClassProperty):
+                # The property view nests properties under a pset string; the
+                # underlying class is held on the source model.
+                bsdd_class = self._owning_class_for_property_view(index)
+                if bsdd_class is None:
+                    return False
+                tool.Loin.set_property_included(
+                    bsdd_class, payload, pm[0], pm[1], included
+                )
+            else:
+                return False
+            self.dataChanged.emit(index, index, [role])
+            return True
         return super().setData(index, value, role)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         col = index.column()
         if col >= self._prefix_cols:
-            return (Qt.ItemFlag.ItemIsEnabled
-                    | Qt.ItemFlag.ItemIsSelectable
-                    | Qt.ItemFlag.ItemIsUserCheckable)
+            payload = self._row_payload(index)
+            if not isinstance(payload, (BsddClass, BsddClassProperty)):
+                # Pset header rows in the property view are non-interactive.
+                return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
+            return (
+                Qt.ItemFlag.ItemIsEnabled
+                | Qt.ItemFlag.ItemIsSelectable
+                | Qt.ItemFlag.ItemIsUserCheckable
+            )
         src = self.mapToSource(index)
         if not src.isValid():
             return Qt.ItemFlag.NoItemFlags
         return self.sourceModel().flags(src)
+
+    # ------------------------------------------------------------------ state lookups
+
+    def _check_state(self, index: QModelIndex) -> Qt.CheckState:
+        pm = _column_to_pm(index.column(), self._prefix_cols)
+        if pm is None:
+            return Qt.CheckState.Unchecked
+        payload = self._row_payload(index)
+        if isinstance(payload, BsddClass):
+            return (
+                Qt.CheckState.Checked
+                if tool.Loin.is_class_included(payload, pm[0], pm[1])
+                else Qt.CheckState.Unchecked
+            )
+        if isinstance(payload, BsddClassProperty):
+            bsdd_class = self._owning_class_for_property_view(index)
+            if bsdd_class is None:
+                return Qt.CheckState.Unchecked
+            return (
+                Qt.CheckState.Checked
+                if tool.Loin.is_property_included(bsdd_class, payload, pm[0], pm[1])
+                else Qt.CheckState.Unchecked
+            )
+        return Qt.CheckState.Unchecked
+
+    def _owning_class_for_property_view(self, index: QModelIndex) -> Optional[BsddClass]:
+        """For the property view, return the bSDD class the model is bound to."""
+        sm = self.sourceModel()
+        # PropertyTreeModel stores it in .bsdd_data.
+        bsdd_data = getattr(sm, "bsdd_data", None)
+        if isinstance(bsdd_data, BsddClass):
+            return bsdd_data
+        # Some wrapped source models expose .sourceModel() (QSortFilterProxyModel).
+        inner = getattr(sm, "sourceModel", None)
+        if callable(inner):
+            inner_model = inner()
+            return getattr(inner_model, "bsdd_data", None)
+        return None
 
 
 # ---------------------------------------------------------------------------
 # Two-row header
 # ---------------------------------------------------------------------------
 
+
 class TwoRowHeaderView(QHeaderView):
     TOP_H = 24
     _PADDING = 16
 
-    def __init__(
-        self,
-        orientation,
-        use_cases: list[str],
-        milestones: list[str],
-        prefix_cols: int = 2,
-        parent=None,
-    ):
+    def __init__(self, orientation, prefix_cols: int = 2, parent=None):
         super().__init__(orientation, parent)
-        self._uc = use_cases
-        self._ms = milestones
         self._prefix_cols = prefix_cols
         self.setDefaultSectionSize(70)
         self.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         self.sectionResized.connect(lambda *_: self.viewport().update())
 
+        signals = tool.Loin.get_signals()
+        signals.purposes_changed.connect(self._on_loin_changed)
+        signals.milestones_changed.connect(self._on_loin_changed)
+        signals.loin_reset.connect(self._on_loin_changed)
+
+    def _on_loin_changed(self) -> None:
+        self.updateGeometry()
+        self.viewport().update()
+
     def _bot_height(self) -> int:
         fm = self.fontMetrics()
-        if not self._ms:
+        milestones = _current_milestones()
+        if not milestones:
             return self._PADDING
-        return max(fm.horizontalAdvance(ms) for ms in self._ms) + self._PADDING
+        return (
+            max(
+                fm.horizontalAdvance(tool.Loin.milestone_display_name(m))
+                for m in milestones
+            )
+            + self._PADDING
+        )
 
     def sizeHint(self):
         hint = super().sizeHint()
@@ -163,7 +310,7 @@ class TwoRowHeaderView(QHeaderView):
         return hint
 
     def paintSection(self, *_) -> None:
-        pass  # all drawing happens in paintEvent
+        pass
 
     def paintEvent(self, *_) -> None:
         painter = QPainter(self.viewport())
@@ -188,16 +335,20 @@ class TwoRowHeaderView(QHeaderView):
             self._draw_cell(painter, x, 0, w, total_h, str(label), bold)
             x += w
 
-        num_ms = len(self._ms)
-        for ui, uc_name in enumerate(self._uc):
-            first_col = self._prefix_cols + ui * num_ms
+        purposes = _current_purposes()
+        milestones = _current_milestones()
+        num_ms = len(milestones)
+        for ui_idx, purpose in enumerate(purposes):
+            first_col = self._prefix_cols + ui_idx * num_ms
             x_uc = sum(self.sectionSize(c) for c in range(first_col)) - self.offset()
             w_uc = sum(self.sectionSize(first_col + m) for m in range(num_ms))
+            uc_name = tool.Loin.purpose_display_name(purpose)
             self._draw_cell(painter, x_uc, 0, w_uc, self.TOP_H, uc_name, bold)
 
             x_ms = x_uc
-            for mi, ms_name in enumerate(self._ms):
+            for mi, milestone in enumerate(milestones):
                 w_ms = self.sectionSize(first_col + mi)
+                ms_name = tool.Loin.milestone_display_name(milestone)
                 self._draw_cell(painter, x_ms, self.TOP_H, w_ms, bot_h, ms_name, rotated=True)
                 x_ms += w_ms
 
@@ -234,30 +385,41 @@ class TwoRowHeaderView(QHeaderView):
 
 
 # ---------------------------------------------------------------------------
-# Filter table window
+# Filter table window — UC/MS editor + global actors
 # ---------------------------------------------------------------------------
 
-class FilterTableWindow(QWidget):
-    """Standalone window that controls UC/MS column visibility in registered tree views."""
 
-    def __init__(
-        self,
-        use_cases: list[str],
-        milestones: list[str],
-        prefix_cols: int = 2,
-        parent=None,
-    ):
+class FilterTableWindow(QWidget):
+    """Editor for the UC/MS grid plus the global Providing/Receiving actors.
+
+    Add/remove/rename actions mutate the Loin tool directly; the registered
+    tree views refresh themselves via the Loin signals.
+    """
+
+    def __init__(self, prefix_cols: int = 2, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Edit Use Cases / Milestones")
         self.setWindowFlags(Qt.WindowType.Window)
-        self._uc = use_cases
-        self._ms = milestones
         self._prefix_cols = prefix_cols
         self._views: list[QTreeView] = []
         self._filter_table: QTableWidget | None = None
 
         layout = QVBoxLayout(self)
-        layout.addWidget(self._build_table())
+        self._table_holder = QWidget(self)
+        self._table_layout = QVBoxLayout(self._table_holder)
+        self._table_layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self._table_holder)
+        layout.addWidget(self._build_actors_panel())
+
+        self._rebuild_table()
+
+        signals = tool.Loin.get_signals()
+        signals.purposes_changed.connect(self._rebuild_table)
+        signals.milestones_changed.connect(self._rebuild_table)
+        signals.loin_reset.connect(self._rebuild_table)
+        signals.actors_changed.connect(self._refresh_actor_fields)
+
+    # ------------------------------------------------------------------ register
 
     def register_view(self, view: QTreeView) -> None:
         if view not in self._views:
@@ -266,147 +428,213 @@ class FilterTableWindow(QWidget):
     def unregister_view(self, view: QTreeView) -> None:
         self._views = [v for v in self._views if v is not view]
 
-    # --- table construction ---
+    # ------------------------------------------------------------------ table
 
     def _build_table(self) -> QTableWidget:
-        table = QTableWidget(len(self._uc), len(self._ms))
-        table.setVerticalHeaderLabels(self._uc)
-        table.setHorizontalHeaderLabels(self._ms)
+        purposes = _current_purposes()
+        milestones = _current_milestones()
+        table = QTableWidget(len(purposes), len(milestones))
+        table.setVerticalHeaderLabels(
+            [tool.Loin.purpose_display_name(p) for p in purposes]
+        )
+        table.setHorizontalHeaderLabels(
+            [tool.Loin.milestone_display_name(m) for m in milestones]
+        )
         table.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
 
-        for ui in range(len(self._uc)):
-            for mi in range(len(self._ms)):
+        for ui_idx in range(len(purposes)):
+            for mi in range(len(milestones)):
                 item = QTableWidgetItem()
                 item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 item.setCheckState(Qt.CheckState.Checked)
-                table.setItem(ui, mi, item)
+                table.setItem(ui_idx, mi, item)
 
         table.resizeColumnsToContents()
         table.resizeRowsToContents()
         table.setFixedHeight(
             table.horizontalHeader().height()
-            + sum(table.rowHeight(r) for r in range(len(self._uc)))
+            + sum(table.rowHeight(r) for r in range(max(len(purposes), 1)))
             + 4
         )
         table.itemChanged.connect(self._on_filter_changed)
 
         vh = table.verticalHeader()
-        vh.setSectionsMovable(True)
         vh.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         vh.customContextMenuRequested.connect(self._uc_context_menu)
-        vh.sectionMoved.connect(self._on_uc_moved)
 
         hh = table.horizontalHeader()
-        hh.setSectionsMovable(True)
         hh.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         hh.customContextMenuRequested.connect(self._ms_context_menu)
-        hh.sectionMoved.connect(self._on_ms_moved)
 
         self._filter_table = table
         return table
 
     def _rebuild_table(self) -> None:
-        layout = self.layout()
-        old = layout.itemAt(0).widget()
-        layout.removeWidget(old)
-        old.deleteLater()
-        layout.addWidget(self._build_table())
+        # Clear the holder.
+        while self._table_layout.count():
+            item = self._table_layout.takeAt(0)
+            w = item.widget()
+            if w is not None:
+                w.deleteLater()
+        self._table_layout.addWidget(self._build_table())
         self._sync_all_views()
 
-    # --- filter changed ---
-
     def _on_filter_changed(self, item: QTableWidgetItem) -> None:
-        col = self._prefix_cols + item.row() * len(self._ms) + item.column()
+        purposes = _current_purposes()
+        milestones = _current_milestones()
+        if not purposes or not milestones:
+            return
+        col = self._prefix_cols + item.row() * len(milestones) + item.column()
         hidden = item.checkState() != Qt.CheckState.Checked
         for view in self._views:
             view.setColumnHidden(col, hidden)
             view.header().viewport().update()
 
     def _sync_all_views(self) -> None:
-        end = self._prefix_cols + len(self._uc) * len(self._ms)
+        purposes = _current_purposes()
+        milestones = _current_milestones()
+        end = self._prefix_cols + len(purposes) * len(milestones)
         for view in self._views:
             for col in range(self._prefix_cols, end):
                 view.setColumnHidden(col, False)
             view.header().viewport().update()
 
-    def _refresh_headers(self) -> None:
-        for view in self._views:
-            view.header().updateGeometry()
-            view.header().viewport().update()
-
-    # --- drag-to-reorder ---
-
-    def _on_uc_moved(self, *_) -> None:
-        vh = self._filter_table.verticalHeader()
-        new_order = [self._uc[vh.logicalIndex(i)] for i in range(len(self._uc))]
-        QTimer.singleShot(0, lambda: self._apply_uc_reorder(new_order))
-
-    def _on_ms_moved(self, *_) -> None:
-        hh = self._filter_table.horizontalHeader()
-        new_order = [self._ms[hh.logicalIndex(i)] for i in range(len(self._ms))]
-        QTimer.singleShot(0, lambda: self._apply_ms_reorder(new_order))
-
-    def _apply_uc_reorder(self, new_order: list[str]) -> None:
-        self._uc[:] = new_order
-        self._rebuild_table()
-        self._refresh_headers()
-
-    def _apply_ms_reorder(self, new_order: list[str]) -> None:
-        self._ms[:] = new_order
-        self._rebuild_table()
-        self._refresh_headers()
-
-    # --- context menus ---
-
-    def _uc_context_menu(self, pos) -> None:
-        idx = self._filter_table.verticalHeader().logicalIndexAt(pos)
-        menu = QMenu(self)
-        menu.addAction("Add Use Case above", lambda: self._add_uc(idx))
-        menu.addAction("Add Use Case below", lambda: self._add_uc(idx + 1))
-        if len(self._uc) > 1:
-            menu.addSeparator()
-            menu.addAction(f"Remove '{self._uc[idx]}'", lambda: self._remove_uc(idx))
-        menu.exec(self._filter_table.verticalHeader().mapToGlobal(pos))
-
-    def _ms_context_menu(self, pos) -> None:
-        idx = self._filter_table.horizontalHeader().logicalIndexAt(pos)
-        menu = QMenu(self)
-        menu.addAction("Add Milestone before", lambda: self._add_ms(idx))
-        menu.addAction("Add Milestone after", lambda: self._add_ms(idx + 1))
-        if len(self._ms) > 1:
-            menu.addSeparator()
-            menu.addAction(f"Remove '{self._ms[idx]}'", lambda: self._remove_ms(idx))
-        menu.exec(self._filter_table.horizontalHeader().mapToGlobal(pos))
+    # ------------------------------------------------------------------ context menus
 
     def _ask_name(self, prompt: str) -> str | None:
         name, ok = QInputDialog.getText(self, "Name", prompt)
         return name.strip() if ok and name.strip() else None
 
-    def _add_uc(self, idx: int) -> None:
+    def _uc_context_menu(self, pos) -> None:
+        idx = self._filter_table.verticalHeader().logicalIndexAt(pos)
+        purposes = _current_purposes()
+        menu = QMenu(self)
+        menu.addAction("Add Use Case", lambda: self._add_uc())
+        if 0 <= idx < len(purposes):
+            label = tool.Loin.purpose_display_name(purposes[idx])
+            menu.addSeparator()
+            menu.addAction(f"Rename '{label}'", lambda: self._rename_uc(purposes[idx].guid))
+            menu.addAction(f"Remove '{label}'", lambda: self._remove_uc(purposes[idx].guid))
+        menu.exec(self._filter_table.verticalHeader().mapToGlobal(pos))
+
+    def _ms_context_menu(self, pos) -> None:
+        idx = self._filter_table.horizontalHeader().logicalIndexAt(pos)
+        milestones = _current_milestones()
+        menu = QMenu(self)
+        menu.addAction("Add Milestone", lambda: self._add_ms())
+        if 0 <= idx < len(milestones):
+            label = tool.Loin.milestone_display_name(milestones[idx])
+            menu.addSeparator()
+            menu.addAction(
+                f"Rename '{label}'",
+                lambda: self._rename_ms(milestones[idx].guid),
+            )
+            menu.addAction(
+                f"Remove '{label}'",
+                lambda: self._remove_ms(milestones[idx].guid),
+            )
+        menu.exec(self._filter_table.horizontalHeader().mapToGlobal(pos))
+
+    def _add_uc(self) -> None:
         name = self._ask_name("Use case name:")
-        if not name:
-            return
-        self._uc.insert(idx, name)
-        self._rebuild_table()
-        self._refresh_headers()
+        if name:
+            tool.Loin.add_purpose(name)
 
-    def _remove_uc(self, idx: int) -> None:
-        self._uc.pop(idx)
-        self._rebuild_table()
-        self._refresh_headers()
-
-    def _add_ms(self, idx: int) -> None:
+    def _add_ms(self) -> None:
         name = self._ask_name("Milestone name:")
-        if not name:
-            return
-        self._ms.insert(idx, name)
-        self._rebuild_table()
-        self._refresh_headers()
+        if name:
+            tool.Loin.add_milestone(name)
 
-    def _remove_ms(self, idx: int) -> None:
-        self._ms.pop(idx)
-        self._rebuild_table()
-        self._refresh_headers()
+    def _remove_uc(self, guid: UUID) -> None:
+        tool.Loin.remove_purpose(guid)
+
+    def _remove_ms(self, guid: UUID) -> None:
+        tool.Loin.remove_milestone(guid)
+
+    def _rename_uc(self, guid: UUID) -> None:
+        new = self._ask_name("Use case name:")
+        if new:
+            tool.Loin.rename_purpose(guid, new)
+
+    def _rename_ms(self, guid: UUID) -> None:
+        new = self._ask_name("Milestone name:")
+        if new:
+            tool.Loin.rename_milestone(guid, new)
+
+    # ------------------------------------------------------------------ actors panel
+
+    def _build_actors_panel(self) -> QGroupBox:
+        box = QGroupBox("Actors (Providing / Receiving)", self)
+        outer = QVBoxLayout(box)
+
+        self._le_prov_role = QLineEdit(box)
+        self._le_prov_aff = QLineEdit(box)
+        self._le_prov_email = QLineEdit(box)
+        self._le_recv_role = QLineEdit(box)
+        self._le_recv_aff = QLineEdit(box)
+        self._le_recv_email = QLineEdit(box)
+
+        for w in (self._le_prov_role, self._le_recv_role):
+            w.setPlaceholderText("Role (required)")
+        for w in (self._le_prov_aff, self._le_recv_aff):
+            w.setPlaceholderText("Affiliation")
+        for w in (self._le_prov_email, self._le_recv_email):
+            w.setPlaceholderText("Email")
+
+        rows = QHBoxLayout()
+        for label, role, aff, email in (
+            ("Providing", self._le_prov_role, self._le_prov_aff, self._le_prov_email),
+            ("Receiving", self._le_recv_role, self._le_recv_aff, self._le_recv_email),
+        ):
+            col = QFormLayout()
+            col.addRow(QLabel(f"<b>{label}</b>"))
+            col.addRow("Role", role)
+            col.addRow("Affiliation", aff)
+            col.addRow("Email", email)
+            wrapper = QWidget(box)
+            wrapper.setLayout(col)
+            rows.addWidget(wrapper)
+        outer.addLayout(rows)
+
+        for w in (
+            self._le_prov_role,
+            self._le_prov_aff,
+            self._le_prov_email,
+            self._le_recv_role,
+            self._le_recv_aff,
+            self._le_recv_email,
+        ):
+            w.editingFinished.connect(self._apply_actor_fields)
+
+        return box
+
+    def _refresh_actor_fields(self) -> None:
+        prov = tool.Loin.get_providing_actor()
+        recv = tool.Loin.get_receiving_actor()
+        if prov is not None:
+            self._le_prov_role.setText(prov.role.text if prov.role else "")
+            self._le_prov_aff.setText(prov.affiliation or "")
+            self._le_prov_email.setText(prov.email_address or "")
+        if recv is not None:
+            self._le_recv_role.setText(recv.role.text if recv.role else "")
+            self._le_recv_aff.setText(recv.affiliation or "")
+            self._le_recv_email.setText(recv.email_address or "")
+
+    def _apply_actor_fields(self) -> None:
+        prov_role = self._le_prov_role.text().strip()
+        recv_role = self._le_recv_role.text().strip()
+        if prov_role:
+            tool.Loin.set_providing_actor(
+                role=prov_role,
+                affiliation=self._le_prov_aff.text().strip() or None,
+                email_address=self._le_prov_email.text().strip() or None,
+            )
+        if recv_role:
+            tool.Loin.set_receiving_actor(
+                role=recv_role,
+                affiliation=self._le_recv_aff.text().strip() or None,
+                email_address=self._le_recv_email.text().strip() or None,
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -419,5 +647,14 @@ _window: FilterTableWindow | None = None
 def get_filter_window() -> FilterTableWindow:
     global _window
     if _window is None:
-        _window = FilterTableWindow(USE_CASES, MILESTONES, prefix_cols=2)
+        _window = FilterTableWindow(prefix_cols=2)
     return _window
+
+
+def reset_filter_window() -> None:
+    """Reset the cached singleton (used when the LOIN model is wiped)."""
+    global _window
+    if _window is not None:
+        _window.close()
+        _window.deleteLater()
+        _window = None
