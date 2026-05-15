@@ -43,3 +43,7 @@ def property_view_created(view: model_views.PropertyView):
     core.register_property_view(view, tool.PPPropertyView)
     core.add_columns_to_property_view(view, tool.PPPropertyView, tool.Project)
     core.connect_property_view(view, tool.PPPropertyView, tool.PPClassView)
+
+
+def context_menu_requested(*_):
+    pass

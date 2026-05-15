@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from PySide6.QtCore import QModelIndex
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_picker import ui,models,model_views
-    from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
     from bsdd_json import BsddClass
 
 
@@ -45,15 +43,8 @@ def register_property_view(
 def add_columns_to_class_view(
     view: model_views.ClassView, class_view: type[tool.PPClassView], project: type[tool.Project]
 ):
-    def set_checkstate(model: CTM, index: QModelIndex, value: bool):
-        bsdd_class = index.internalPointer()
-        class_view.set_checkstate(bsdd_class, value,view)
-
     data = project.get()
-    proxy_model, model = class_view.create_model(data)
-    class_view.add_column_to_table(model, "Name", lambda a: a.Name)
-    class_view.add_column_to_table(model, "Code", lambda a: a.Code)
-    class_view.add_column_to_table(model, "Export", lambda c,v=view:class_view.get_checkstate(c,v), set_checkstate)
+    proxy_model, _ = class_view.create_model(data)
     view.setModel(proxy_model)
 
 
@@ -62,20 +53,8 @@ def add_columns_to_property_view(
     property_view: type[tool.PPPropertyView],
     project: type[tool.Project],
 ):
-
     data = project.get()
     proxy_model, model = property_view.create_model(data)
-
-    def set_checkstate(model: CTM, index: QModelIndex, value: bool,v:model_views.PropertyView):
-        bsdd_property = index.internalPointer()
-        property_view.set_checkstate(v,  bsdd_property, value)
-
-    property_view.add_column_to_table(model, "Name", property_view._get_name)
-    property_view.add_column_to_table(model, "Code", property_view._get_code)
-    property_view.add_column_to_table(
-        model, "Export", lambda cp,v=view: property_view.get_checkstate(v, cp),lambda *args,v=view: set_checkstate(*args,v)
-    )
-
     view.setModel(proxy_model)
 
 
