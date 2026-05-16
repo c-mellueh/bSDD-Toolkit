@@ -129,18 +129,17 @@ class PropertyPicker(ActionTool, WidgetTool):
         props.specs = {}
 
         # Seed the base UC/MS pair (signals are emitted in bulk below).
-        props.purposes.append(
-            LoinPurpose(
-                guid=uuid4(),
-                names=[DtMultiLangText(language="en", text=constants.DEFAULT_PURPOSE_NAME)],
-            )
+        default_purpose = LoinPurpose(
+            guid=uuid4(),
+            names=[DtMultiLangText(language="en", text=constants.DEFAULT_PURPOSE_NAME)],
         )
-        props.milestones.append(
-            LoinInformationDeliveryMilestone(
-                guid=uuid4(),
-                names=[DtMultiLangText(language="en", text=constants.DEFAULT_MILESTONE_NAME)],
-            )
+        default_milestone = LoinInformationDeliveryMilestone(
+            guid=uuid4(),
+            names=[DtMultiLangText(language="en", text=constants.DEFAULT_MILESTONE_NAME)],
         )
+        props.purposes.append(default_purpose)
+        props.milestones.append(default_milestone)
+        cls.get_or_create_spec(default_purpose.guid, default_milestone.guid)
 
         cls.get_signals().loin_reset.emit()
         cls.get_signals().purposes_changed.emit()
@@ -159,6 +158,8 @@ class PropertyPicker(ActionTool, WidgetTool):
             names=[DtMultiLangText(language=language, text=name)],
         )
         cls.get_properties().purposes.append(purpose)
+        for milestone in cls.get_properties().milestones:
+            cls.get_or_create_spec(purpose.guid, milestone.guid)
         cls.get_signals().purposes_changed.emit()
         return purpose
 
@@ -208,6 +209,8 @@ class PropertyPicker(ActionTool, WidgetTool):
             names=[DtMultiLangText(language=language, text=name)],
         )
         cls.get_properties().milestones.append(milestone)
+        for purpose in cls.get_properties().purposes:
+            cls.get_or_create_spec(purpose.guid, milestone.guid)
         cls.get_signals().milestones_changed.emit()
         return milestone
 
