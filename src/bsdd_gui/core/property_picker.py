@@ -112,6 +112,15 @@ def reset(property_picker:type[tool.PropertyPicker]):
     property_picker.reset()
 
 
+def apply_checkstate_to_children(
+    bsdd_class: "BsddClass",
+    purpose_guid,
+    milestone_guid,
+    property_picker: Type[tool.PropertyPicker],
+) -> None:
+    property_picker.apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid)
+
+
 def remove_class(
     bsdd_class: "BsddClass",
     property_picker: Type[tool.PropertyPicker],

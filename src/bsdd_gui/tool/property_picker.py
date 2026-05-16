@@ -386,6 +386,27 @@ class PropertyPicker(ActionTool, WidgetTool):
         return bsdd_class.Code in cls.get_properties().added_classes
 
     @classmethod
+    def apply_checkstate_to_children(
+        cls,
+        bsdd_class: BsddClass,
+        purpose_guid: UUID,
+        milestone_guid: UUID,
+    ) -> None:
+        """Propagate bsdd_class's check state for a UC×MS to all its descendants."""
+        included = cls.is_class_included(bsdd_class, purpose_guid, milestone_guid)
+        props = cls.get_properties()
+
+        def walk(parent: BsddClass) -> None:
+            for child in class_utils.get_children(parent):
+                if child.Code not in props.added_classes:
+                    continue
+                cls.set_class_included(child, purpose_guid, milestone_guid, included)
+                walk(child)
+
+        walk(bsdd_class)
+        cls.get_signals().added_classes_changed.emit()
+
+    @classmethod
     def remove_class(cls, bsdd_class: BsddClass) -> None:
         """Remove a class from the property picker and all specs it belongs to."""
         props = cls.get_properties()

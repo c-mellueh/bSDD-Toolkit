@@ -58,3 +58,7 @@ def classes_dropped(codes: list[str]) -> None:
 def class_removed(bsdd_class) -> None:
     core.remove_class(bsdd_class, tool.PropertyPicker)
 
+
+def apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid) -> None:
+    core.apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid, tool.PropertyPicker)
+
