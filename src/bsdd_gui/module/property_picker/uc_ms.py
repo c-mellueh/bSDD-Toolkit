@@ -28,6 +28,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtGui import QFont, QPainter
 from PySide6.QtWidgets import (
+    QApplication,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -37,6 +38,9 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMenu,
     QSizePolicy,
+    QStyle,
+    QStyledItemDelegate,
+    QStyleOptionButton,
     QTableWidget,
     QTableWidgetItem,
     QTreeView,
@@ -92,6 +96,50 @@ def _column_to_guids(column: int, prefix_cols: int) -> Optional[tuple[UUID, UUID
 
 
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Centered-checkbox delegate for UC × MS columns
+# ---------------------------------------------------------------------------
+
+
+class _CenteredCheckDelegate(QStyledItemDelegate):
+    """Draws the checkbox centred in its cell for columns that carry CheckStateRole."""
+
+    def paint(self, painter, option, index) -> None:
+        check = index.data(Qt.ItemDataRole.CheckStateRole)
+        if check is None:
+            super().paint(painter, option, index)
+            return
+        opts = QStyleOptionButton()
+        opts.state = QStyle.StateFlag.State_Enabled
+        if check == Qt.CheckState.Checked:
+            opts.state |= QStyle.StateFlag.State_On
+        elif check == Qt.CheckState.PartiallyChecked:
+            opts.state |= QStyle.StateFlag.State_NoChange
+        else:
+            opts.state |= QStyle.StateFlag.State_Off
+        indicator_size = QApplication.style().subElementRect(
+            QStyle.SubElement.SE_CheckBoxIndicator, opts
+        ).size()
+        x = option.rect.x() + (option.rect.width() - indicator_size.width()) // 2
+        y = option.rect.y() + (option.rect.height() - indicator_size.height()) // 2
+        opts.rect = QRect(x, y, indicator_size.width(), indicator_size.height())
+        QApplication.style().drawControl(QStyle.ControlElement.CE_CheckBox, opts, painter)
+
+    def editorEvent(self, event, model, option, index) -> bool:
+        if index.data(Qt.ItemDataRole.CheckStateRole) is None:
+            return super().editorEvent(event, model, option, index)
+        if event.type() == QEvent.Type.MouseButtonRelease:
+            current = index.data(Qt.ItemDataRole.CheckStateRole)
+            new_state = (
+                Qt.CheckState.Unchecked
+                if current == Qt.CheckState.Checked
+                else Qt.CheckState.Checked
+            )
+            model.setData(index, new_state, Qt.ItemDataRole.CheckStateRole)
+            return True
+        return False
+
+
 # Column proxy — adds UC × MS checkbox columns to any tree model
 # ---------------------------------------------------------------------------
 
@@ -120,6 +168,7 @@ class ClassModel(QAbstractItemModel):
     def register_view(self, view: QTreeView) -> None:
         if view not in self._tracked_views:
             self._tracked_views.append(view)
+            view.setItemDelegate(_CenteredCheckDelegate(view))
 
     # ------------------------------------------------------------------ basics
 
