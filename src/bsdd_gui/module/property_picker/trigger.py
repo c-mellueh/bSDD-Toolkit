@@ -62,3 +62,8 @@ def class_removed(bsdd_class) -> None:
 def apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid) -> None:
     core.apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid, tool.PropertyPicker)
 
+def import_xml(widget: ui.Widget) -> None:
+    core.import_from_xml(widget, tool.PropertyPicker, tool.Project, tool.Appdata, tool.Popups)
+
+def export_xml(widget: ui.Widget) -> None:
+    core.export_to_xml(widget,tool.PropertyPicker, tool.Appdata, tool.Popups)

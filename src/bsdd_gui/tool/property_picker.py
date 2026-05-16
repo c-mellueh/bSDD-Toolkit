@@ -689,8 +689,12 @@ class PropertyPicker(ActionTool, WidgetTool):
         return len(loin.specifications)
 
     @classmethod
-    def request_xml_import(cls, in_path: str):
-        trigger.import_xml(in_path)
+    def request_xml_import(cls, widget: ui.Widget) :
+        trigger.import_xml(widget)
+
+    @classmethod
+    def request_xml_export(cls, widget: ui.Widget) :
+        trigger.export_xml(widget)
 
     @classmethod
     def _adopt_loin(cls, loin: LoinLevelOfInformationNeed, bsdd_dictionary: BsddDictionary) -> None:

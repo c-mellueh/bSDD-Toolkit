@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-
+from PySide6.QtCore import QCoreApplication
+from bsdd_gui.module.property_picker import constants
+from bsdd_gui.module.iso_export import constants as iso_constants
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_picker import ui,models,model_views
@@ -94,14 +96,29 @@ def create_widget(args,property_picker:type[tool.PropertyPicker]):
 
 
 
-def export_to_xml(property_picker: Type["tool.PropertyPicker"], out_path: str) -> int:
+def export_to_xml(widget:ui.Widget,property_picker: Type["tool.PropertyPicker"],appdata:Type[tool.Appdata],popups:Type[tool.Popups]) -> int:
     """Write the current LOIN to *out_path* (ISO 7817-3 XML). Returns spec count."""
-    return property_picker.export_to_xml(out_path)
+    text = QCoreApplication.translate("IDSExport", "Export IDS settings")
+    old_path = appdata.get_path(constants.APPDATA_OPTION)
+    new_path = popups.get_save_path(iso_constants.LOIN_FILETYPE, widget.window(), old_path, text)
+    if not new_path:
+        return
+    appdata.set_path(constants.APPDATA_OPTION, new_path)
+    
+    return property_picker.export_to_xml(new_path)
 
 
-def import_from_xml(in_path: str,property_picker: Type["tool.PropertyPicker"],project:Type[tool.Project]) -> None:
+def import_from_xml(widget:ui.Widget,property_picker: Type["tool.PropertyPicker"],project:Type[tool.Project],appdata:Type[tool.Appdata],popups:Type[tool.Popups]) -> None:
     """Replace the current LOIN with the contents of *in_path*."""
-    with open(in_path, "rb") as f:
+    
+    text = QCoreApplication.translate("IDSExport", "Export IDS settings")
+    old_path = appdata.get_path(constants.APPDATA_OPTION)
+    new_path = popups.get_open_path(iso_constants.LOIN_FILETYPE, widget.window(), old_path, text)
+    if not new_path:
+        return
+    appdata.set_path(constants.APPDATA_OPTION, new_path)
+    
+    with open(new_path, "rb") as f:
         xml_bytes = f.read()
     from bsdd_gui.module.iso_export.datamodel import LoinLevelOfInformationNeed
 

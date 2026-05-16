@@ -58,43 +58,8 @@ def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],property
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
-    widget.pb_import.clicked.connect(lambda _=False, w=widget: _import_loin(w, iso_export,property_picker))
-    widget.pb_export.clicked.connect(lambda _=False, w=widget: _export_loin(w, iso_export,property_picker))
-
-
-def _import_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport],property_picker:Type[tool.PropertyPicker]) -> None:
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-
-    title = QCoreApplication.translate("IsoExport", "Import LOIN XML")
-    path, _ = QFileDialog.getOpenFileName(
-        widget.window(), title, "", constants.LOIN_FILETYPE
-    )
-    if not path:
-        return
-    try:
-        property_picker.request_xml_import(path)
-    except Exception as exc:
-        QMessageBox.critical(widget.window(), title, str(exc))
-
-
-def _export_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport],property_picker:Type[tool.PropertyPicker]) -> None:
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-
-    title = QCoreApplication.translate("IsoExport", "Export LOIN XML")
-    path, _ = QFileDialog.getSaveFileName(
-        widget.window(), title, "", constants.LOIN_FILETYPE
-    )
-    if not path:
-        return
-    try:
-        count = property_picker.export_to_xml(path)
-        QMessageBox.information(
-            widget.window(),
-            title,
-            QCoreApplication.translate("IsoExport", "{} specification(s) exported.").format(count),
-        )
-    except Exception as exc:
-        QMessageBox.warning(widget.window(), title, str(exc))
+    widget.pb_import.clicked.connect(lambda _=False, w=widget: property_picker.request_xml_import(w))
+    widget.pb_export.clicked.connect(lambda _=False, w=widget: property_picker.request_xml_export(w))
 
 
 def register_fields(widget: ui.Widget, iso_export: Type[tool.IsoExport]):
