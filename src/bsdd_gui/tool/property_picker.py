@@ -384,6 +384,27 @@ class PropertyPicker(ActionTool, WidgetTool):
         return bsdd_class.Code in cls.get_properties().added_classes
 
     @classmethod
+    def add_classes(cls, codes: list[str], bsdd_dictionary: BsddDictionary) -> None:
+        """Add classes and their ancestors to added_classes, then refresh the view."""
+        props = cls.get_properties()
+        existing = {c.Code: c for c in bsdd_dictionary.Classes}
+        to_add: set[str] = set()
+        for code in codes:
+            if code not in existing:
+                continue
+            to_add.add(code)
+            parent = existing.get(existing[code].ParentClassCode)
+            while parent:
+                if parent.Code in to_add or parent.Code in props.added_classes:
+                    break
+                to_add.add(parent.Code)
+                parent = existing.get(parent.ParentClassCode)
+        if not to_add:
+            return
+        props.added_classes.update(to_add)
+        cls.get_signals().spec_membership_changed.emit()
+
+    @classmethod
     def set_class_included(
         cls,
         bsdd_class: "BsddClass",

@@ -95,7 +95,7 @@ def _column_to_guids(column: int, prefix_cols: int) -> Optional[tuple[UUID, UUID
 # ---------------------------------------------------------------------------
 
 
-class UcMsColumnProxy(QAbstractItemModel):
+class ClassModel(QAbstractItemModel):
     """Wraps a source model and appends `len(uc) * len(ms)` checkable columns.
 
     State storage is delegated to the Loin tool — the proxy is now purely a

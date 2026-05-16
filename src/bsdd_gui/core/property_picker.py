@@ -46,9 +46,9 @@ def add_columns_to_class_view(
 ):
     #data = project.get()
     #proxy_model, _ = class_view.create_model(data)
-    from bsdd_gui.module.property_picker.uc_ms import UcMsColumnProxy
+    from bsdd_gui.module.property_picker.uc_ms import ClassModel
     
-    view.setModel(UcMsColumnProxy())
+    view.setModel(ClassModel())
 
 
 def add_columns_to_property_view(
@@ -58,9 +58,9 @@ def add_columns_to_property_view(
 ):
     # data = project.get()
     # proxy_model, model = property_view.create_model(data)
-    from bsdd_gui.module.property_picker.uc_ms import UcMsColumnProxy
+    from bsdd_gui.module.property_picker.uc_ms import ClassModel
     
-    view.setModel(UcMsColumnProxy())
+    view.setModel(ClassModel())
 
 
 def connect_class_view(tree_view: model_views.ClassView, class_view: type[tool.PPClassView]):
@@ -110,3 +110,11 @@ def import_from_xml(in_path: str,property_picker: Type["tool.PropertyPicker"],pr
 
 def reset(property_picker:type[tool.PropertyPicker]):
     property_picker.reset()
+
+
+def add_classes_from_drop(
+    codes: list[str],
+    property_picker: Type[tool.PropertyPicker],
+    project: Type[tool.Project],
+) -> None:
+    property_picker.add_classes(codes, project.get())

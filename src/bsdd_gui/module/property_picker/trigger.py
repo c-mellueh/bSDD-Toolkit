@@ -50,3 +50,7 @@ def property_view_created(view: model_views.PropertyView):
 def context_menu_requested(*_):
     pass
 
+
+def classes_dropped(codes: list[str]) -> None:
+    core.add_classes_from_drop(codes, tool.PropertyPicker, tool.Project)
+
