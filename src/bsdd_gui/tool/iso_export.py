@@ -112,17 +112,6 @@ class IsoExport(ActionTool, FieldTool):
 
 
     @classmethod
-    def get_settings(cls, widget: ui.Widget) -> BasicSettingsDict:
-
-        settings_dict = {
-        }
-        return settings_dict
-
-    @classmethod
-    def set_settings(cls, widget: ui.Widget, settings_dict: BasicSettingsDict):
-        pass
-
-    @classmethod
     def create_class(cls,bsdd_class: BsddClass,mode: constants.MODE):
         if bsdd_class.ReferenceCode:
             guid = bsdd_class.Uid

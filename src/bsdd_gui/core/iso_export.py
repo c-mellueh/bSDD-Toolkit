@@ -114,7 +114,6 @@ def export( widget: ui.Widget,
     bsdd_dict = project.get()
     class_settings = pp_class_view.build_full_check_dict(widget.property_picker.tv_classes,bsdd_dict)
     property_settings = pp_property_view.build_full_check_dict(widget.property_picker.tv_properties,bsdd_dict)
-    base_settings = iso_export.get_settings(widget)
 
     def export_done(class_count:int):
         stop_waiting_widget(waiting_worker)
