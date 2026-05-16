@@ -4,7 +4,7 @@ This module exposes:
 
 * :class:`UcMsColumnProxy` — wraps a source model and appends one checkable
   column per (Purpose × Milestone) pair. Check state is *not* stored in the
-  proxy; every read/write delegates to :class:`bsdd_gui.tool.Loin`.
+  proxy; every read/write delegates to :class:`bsdd_gui.tool.PropertyPicker`.
 * :class:`TwoRowHeaderView` — paints UC (top row) and MS (bottom row) headers
   derived from the Loin tool.
 * :class:`FilterTableWindow` — a stand-alone editor for the UC/MS grid plus
@@ -57,19 +57,19 @@ if TYPE_CHECKING:
 
 def _get_root_classes():
     rc = class_utils.get_root_classes(tool.Project.get())
-    return [c for c in rc if c.ClassType != "GroupOfProperties" and tool.Loin.is_class_added(c)]
+    return [c for c in rc if c.ClassType != "GroupOfProperties" and tool.PropertyPicker.is_class_added(c)]
 
 def _get_children(bsdd_class: BsddClass):
     children = class_utils.get_children(bsdd_class)
-    return [c for c in children if c.ClassType != "GroupOfProperties" and tool.Loin.is_class_added(c)]
+    return [c for c in children if c.ClassType != "GroupOfProperties" and tool.PropertyPicker.is_class_added(c)]
 
 
 def _current_purposes() -> list:
-    return tool.Loin.get_purposes()
+    return tool.PropertyPicker.get_purposes()
 
 
 def _current_milestones() -> list:
-    return tool.Loin.get_milestones()
+    return tool.PropertyPicker.get_milestones()
 
 
 
@@ -107,7 +107,7 @@ class UcMsColumnProxy(QAbstractItemModel):
         self._prefix_cols = prefix_cols
 
         # Rebuild whenever the Loin model membership/structure changes.
-        signals = tool.Loin.get_signals()
+        signals = tool.PropertyPicker.get_signals()
         signals.spec_membership_changed.connect(self._reset_view)
         signals.purposes_changed.connect(self._reset_view)
         signals.milestones_changed.connect(self._reset_view)
@@ -214,14 +214,14 @@ class UcMsColumnProxy(QAbstractItemModel):
             payload = index.internalPointer()
             included = Qt.CheckState(value) == Qt.CheckState.Checked
             if isinstance(payload, BsddClass):
-                tool.Loin.set_class_included(payload, pm[0], pm[1], included)
+                tool.PropertyPicker.set_class_included(payload, pm[0], pm[1], included)
             elif isinstance(payload, BsddClassProperty):
                 # The property view nests properties under a pset string; the
                 # underlying class is held on the source model.
                 bsdd_class = self._owning_class_for_property_view(index)
                 if bsdd_class is None:
                     return False
-                tool.Loin.set_property_included(
+                tool.PropertyPicker.set_property_included(
                     bsdd_class, payload, pm[0], pm[1], included
                 )
             else:
@@ -259,7 +259,7 @@ class UcMsColumnProxy(QAbstractItemModel):
         if isinstance(payload, BsddClass):
             return (
                 Qt.CheckState.Checked
-                if tool.Loin.is_class_included(payload, pm[0], pm[1])
+                if tool.PropertyPicker.is_class_included(payload, pm[0], pm[1])
                 else Qt.CheckState.Unchecked
             )
         if isinstance(payload, BsddClassProperty):
@@ -268,7 +268,7 @@ class UcMsColumnProxy(QAbstractItemModel):
                 return Qt.CheckState.Unchecked
             return (
                 Qt.CheckState.Checked
-                if tool.Loin.is_property_included(bsdd_class, payload, pm[0], pm[1])
+                if tool.PropertyPicker.is_property_included(bsdd_class, payload, pm[0], pm[1])
                 else Qt.CheckState.Unchecked
             )
         return Qt.CheckState.Unchecked
@@ -304,7 +304,7 @@ class TwoRowHeaderView(QHeaderView):
         self.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         self.sectionResized.connect(lambda *_: self.viewport().update())
 
-        signals = tool.Loin.get_signals()
+        signals = tool.PropertyPicker.get_signals()
         signals.purposes_changed.connect(self._on_loin_changed)
         signals.milestones_changed.connect(self._on_loin_changed)
         signals.loin_reset.connect(self._on_loin_changed)
@@ -320,7 +320,7 @@ class TwoRowHeaderView(QHeaderView):
             return self._PADDING
         return (
             max(
-                fm.horizontalAdvance(tool.Loin.milestone_display_name(m))
+                fm.horizontalAdvance(tool.PropertyPicker.milestone_display_name(m))
                 for m in milestones
             )
             + self._PADDING
@@ -364,13 +364,13 @@ class TwoRowHeaderView(QHeaderView):
             first_col = self._prefix_cols + ui_idx * num_ms
             x_uc = sum(self.sectionSize(c) for c in range(first_col)) - self.offset()
             w_uc = sum(self.sectionSize(first_col + m) for m in range(num_ms))
-            uc_name = tool.Loin.purpose_display_name(purpose)
+            uc_name = tool.PropertyPicker.purpose_display_name(purpose)
             self._draw_cell(painter, x_uc, 0, w_uc, self.TOP_H, uc_name, bold)
 
             x_ms = x_uc
             for mi, milestone in enumerate(milestones):
                 w_ms = self.sectionSize(first_col + mi)
-                ms_name = tool.Loin.milestone_display_name(milestone)
+                ms_name = tool.PropertyPicker.milestone_display_name(milestone)
                 self._draw_cell(painter, x_ms, self.TOP_H, w_ms, bot_h, ms_name, rotated=True)
                 x_ms += w_ms
 
@@ -435,7 +435,7 @@ class FilterTableWindow(QWidget):
 
         self._rebuild_table()
 
-        signals = tool.Loin.get_signals()
+        signals = tool.PropertyPicker.get_signals()
         signals.purposes_changed.connect(self._rebuild_table)
         signals.milestones_changed.connect(self._rebuild_table)
         signals.loin_reset.connect(self._rebuild_table)
@@ -457,10 +457,10 @@ class FilterTableWindow(QWidget):
         milestones = _current_milestones()
         table = QTableWidget(len(purposes), len(milestones))
         table.setVerticalHeaderLabels(
-            [tool.Loin.purpose_display_name(p) for p in purposes]
+            [tool.PropertyPicker.purpose_display_name(p) for p in purposes]
         )
         table.setHorizontalHeaderLabels(
-            [tool.Loin.milestone_display_name(m) for m in milestones]
+            [tool.PropertyPicker.milestone_display_name(m) for m in milestones]
         )
         table.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
 
@@ -533,7 +533,7 @@ class FilterTableWindow(QWidget):
         menu = QMenu(self)
         menu.addAction("Add Use Case", lambda: self._add_uc())
         if 0 <= idx < len(purposes):
-            label = tool.Loin.purpose_display_name(purposes[idx])
+            label = tool.PropertyPicker.purpose_display_name(purposes[idx])
             menu.addSeparator()
             menu.addAction(f"Rename '{label}'", lambda: self._rename_uc(purposes[idx].guid))
             menu.addAction(f"Remove '{label}'", lambda: self._remove_uc(purposes[idx].guid))
@@ -545,7 +545,7 @@ class FilterTableWindow(QWidget):
         menu = QMenu(self)
         menu.addAction("Add Milestone", lambda: self._add_ms())
         if 0 <= idx < len(milestones):
-            label = tool.Loin.milestone_display_name(milestones[idx])
+            label = tool.PropertyPicker.milestone_display_name(milestones[idx])
             menu.addSeparator()
             menu.addAction(
                 f"Rename '{label}'",
@@ -560,28 +560,28 @@ class FilterTableWindow(QWidget):
     def _add_uc(self) -> None:
         name = self._ask_name("Use case name:")
         if name:
-            tool.Loin.add_purpose(name)
+            tool.PropertyPicker.add_purpose(name)
 
     def _add_ms(self) -> None:
         name = self._ask_name("Milestone name:")
         if name:
-            tool.Loin.add_milestone(name)
+            tool.PropertyPicker.add_milestone(name)
 
     def _remove_uc(self, guid: UUID) -> None:
-        tool.Loin.remove_purpose(guid)
+        tool.PropertyPicker.remove_purpose(guid)
 
     def _remove_ms(self, guid: UUID) -> None:
-        tool.Loin.remove_milestone(guid)
+        tool.PropertyPicker.remove_milestone(guid)
 
     def _rename_uc(self, guid: UUID) -> None:
         new = self._ask_name("Use case name:")
         if new:
-            tool.Loin.rename_purpose(guid, new)
+            tool.PropertyPicker.rename_purpose(guid, new)
 
     def _rename_ms(self, guid: UUID) -> None:
         new = self._ask_name("Milestone name:")
         if new:
-            tool.Loin.rename_milestone(guid, new)
+            tool.PropertyPicker.rename_milestone(guid, new)
 
     # ------------------------------------------------------------------ actors panel
 
@@ -631,8 +631,8 @@ class FilterTableWindow(QWidget):
         return box
 
     def _refresh_actor_fields(self) -> None:
-        prov = tool.Loin.get_providing_actor()
-        recv = tool.Loin.get_receiving_actor()
+        prov = tool.PropertyPicker.get_providing_actor()
+        recv = tool.PropertyPicker.get_receiving_actor()
         if prov is not None:
             self._le_prov_role.setText(prov.role.text if prov.role else "")
             self._le_prov_aff.setText(prov.affiliation or "")
@@ -646,13 +646,13 @@ class FilterTableWindow(QWidget):
         prov_role = self._le_prov_role.text().strip()
         recv_role = self._le_recv_role.text().strip()
         if prov_role:
-            tool.Loin.set_providing_actor(
+            tool.PropertyPicker.set_providing_actor(
                 role=prov_role,
                 affiliation=self._le_prov_aff.text().strip() or None,
                 email_address=self._le_prov_email.text().strip() or None,
             )
         if recv_role:
-            tool.Loin.set_receiving_actor(
+            tool.PropertyPicker.set_receiving_actor(
                 role=recv_role,
                 affiliation=self._le_recv_aff.text().strip() or None,
                 email_address=self._le_recv_email.text().strip() or None,

@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from bsdd_json import BsddClass
 
 
+
 def connect_signals(property_picker: Type[tool.PropertyPicker],class_view:type[tool.PPClassView],property_view:type[tool.PPPropertyView]):
     property_picker.connect_internal_signals()
     class_view.connect_internal_signals()
@@ -89,3 +90,23 @@ def connect_property_view(
 
 def create_widget(args,property_picker:type[tool.PropertyPicker]):
     property_picker.create_widget(*args)
+
+
+
+
+def export_to_xml(property_picker: Type["tool.PropertyPicker"], out_path: str) -> int:
+    """Write the current LOIN to *out_path* (ISO 7817-3 XML). Returns spec count."""
+    return property_picker.export_to_xml(out_path)
+
+
+def import_from_xml(in_path: str,property_picker: Type["tool.PropertyPicker"],project:Type[tool.Project]) -> None:
+    """Replace the current LOIN with the contents of *in_path*."""
+    with open(in_path, "rb") as f:
+        xml_bytes = f.read()
+    from bsdd_gui.module.iso_export.datamodel import LoinLevelOfInformationNeed
+
+    new_loin = LoinLevelOfInformationNeed.from_xml(xml_bytes)
+    property_picker._adopt_loin(new_loin,project.get())
+
+def reset(property_picker:type[tool.PropertyPicker]):
+    property_picker.reset()

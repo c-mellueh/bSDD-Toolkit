@@ -17,6 +17,8 @@ def retranslate_ui():
 
 
 def on_new_project():
+    core.reset(tool.PropertyPicker)
+
     pass
 
 
@@ -47,3 +49,4 @@ def property_view_created(view: model_views.PropertyView):
 
 def context_menu_requested(*_):
     pass
+

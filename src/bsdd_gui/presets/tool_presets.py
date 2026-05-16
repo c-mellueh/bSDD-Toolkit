@@ -64,7 +64,7 @@ from bsdd_gui.presets.ui_presets import (
 )
 from bsdd_json import *
 import logging
-from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals, PluginSignals
+from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals, PluginSignals, BaseSignals
 from .models_presets import ItemModel
 import datetime
 import re
@@ -85,6 +85,7 @@ if TYPE_CHECKING:
 
 
 class BaseTool(ABC):
+    signals = BaseSignals()
     """Abstract base for all tool presets.
 
     Subclasses provide a typed Properties object via get_properties(), and
@@ -95,6 +96,8 @@ class BaseTool(ABC):
     @abstractmethod
     def get_properties(cls) -> object:
         return None
+
+
 
     @classmethod
     @abstractmethod
@@ -109,6 +112,10 @@ class BaseTool(ABC):
     @classmethod
     def request_retranslate(cls):
         cls._get_trigger().retranslate_ui()
+
+    @classmethod
+    def get_signals(cls) -> BaseSignals:
+        return cls.signals
 
 
 class PluginTool(BaseTool):

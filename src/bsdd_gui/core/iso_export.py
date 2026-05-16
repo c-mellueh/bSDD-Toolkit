@@ -48,7 +48,7 @@ def create_widget(data, parent, iso_export: Type[tool.IsoExport]):
     iso_export.show_widget(data, parent)
 
 
-def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],loin:Type[tool.Loin]):
+def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],property_picker:Type[tool.PropertyPicker]):
     iso_export.register_widget(widget)
     widget.fw_output.file_format = constants.ISO_FILETYPE
     widget.fw_output.section = "paths"
@@ -58,11 +58,11 @@ def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],loin:Typ
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
-    widget.pb_import.clicked.connect(lambda _=False, w=widget: _import_loin(w, iso_export,loin))
-    widget.pb_export.clicked.connect(lambda _=False, w=widget: _export_loin(w, iso_export))
+    widget.pb_import.clicked.connect(lambda _=False, w=widget: _import_loin(w, iso_export,property_picker))
+    widget.pb_export.clicked.connect(lambda _=False, w=widget: _export_loin(w, iso_export,property_picker))
 
 
-def _import_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport],loin:Type[tool.Loin]) -> None:
+def _import_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport],property_picker:Type[tool.PropertyPicker]) -> None:
     from PySide6.QtWidgets import QFileDialog, QMessageBox
 
     title = QCoreApplication.translate("IsoExport", "Import LOIN XML")
@@ -72,15 +72,13 @@ def _import_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport],loin:Type[t
     if not path:
         return
     try:
-        loin.request_xml_import(path)
+        property_picker.request_xml_import(path)
     except Exception as exc:
         QMessageBox.critical(widget.window(), title, str(exc))
 
 
-def _export_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport]) -> None:
+def _export_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport],property_picker:Type[tool.PropertyPicker]) -> None:
     from PySide6.QtWidgets import QFileDialog, QMessageBox
-
-    from bsdd_gui.tool.loin import Loin
 
     title = QCoreApplication.translate("IsoExport", "Export LOIN XML")
     path, _ = QFileDialog.getSaveFileName(
@@ -89,7 +87,7 @@ def _export_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport]) -> None:
     if not path:
         return
     try:
-        count = Loin.export_to_xml(path)
+        count = property_picker.export_to_xml(path)
         QMessageBox.information(
             widget.window(),
             title,
