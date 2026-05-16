@@ -112,6 +112,13 @@ def reset(property_picker:type[tool.PropertyPicker]):
     property_picker.reset()
 
 
+def remove_class(
+    bsdd_class: "BsddClass",
+    property_picker: Type[tool.PropertyPicker],
+) -> None:
+    property_picker.remove_class(bsdd_class)
+
+
 def add_classes_from_drop(
     codes: list[str],
     property_picker: Type[tool.PropertyPicker],

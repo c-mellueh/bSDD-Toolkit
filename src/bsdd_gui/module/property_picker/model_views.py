@@ -38,7 +38,32 @@ class ClassView(_UcMsViewMixin):
         super().__init__(*args, **kwargs)
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(False)
+        self.customContextMenuRequested.connect(self._show_context_menu)
         trigger.class_view_created(self)
+
+    def keyPressEvent(self, event) -> None:
+        if event.key() == Qt.Key.Key_Delete:
+            nodes = [
+                idx.internalPointer()
+                for idx in self.selectedIndexes()
+                if idx.column() == 0 and idx.internalPointer() is not None
+            ]
+            for node in nodes:
+                trigger.class_removed(node)
+            return
+        super().keyPressEvent(event)
+
+    def _show_context_menu(self, pos) -> None:
+        index = self.indexAt(pos)
+        if not index.isValid():
+            return
+        node = index.internalPointer()
+        if node is None:
+            return
+        menu = QMenu(self)
+        name = getattr(node, "Name", None) or getattr(node, "Code", None) or "Class"
+        menu.addAction(f"Remove '{name}'", lambda: trigger.class_removed(node))
+        menu.exec(self.viewport().mapToGlobal(pos))
 
     def _accepted_mime(self, data) -> bool:
         return data.hasFormat(CODES_MIME) or data.hasFormat(JSON_MIME)

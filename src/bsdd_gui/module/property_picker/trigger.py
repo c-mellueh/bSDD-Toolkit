@@ -54,3 +54,7 @@ def context_menu_requested(*_):
 def classes_dropped(codes: list[str]) -> None:
     core.add_classes_from_drop(codes, tool.PropertyPicker, tool.Project)
 
+
+def class_removed(bsdd_class) -> None:
+    core.remove_class(bsdd_class, tool.PropertyPicker)
+

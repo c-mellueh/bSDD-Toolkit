@@ -386,6 +386,20 @@ class PropertyPicker(ActionTool, WidgetTool):
         return bsdd_class.Code in cls.get_properties().added_classes
 
     @classmethod
+    def remove_class(cls, bsdd_class: BsddClass) -> None:
+        """Remove a class from the property picker and all specs it belongs to."""
+        props = cls.get_properties()
+        code = bsdd_class.Code
+        props.added_classes.discard(code)
+        for key in list(props.specs.keys()):
+            props.classes_in_spec.get(key, set()).discard(code)
+            props.properties_in_spec.get(key, {}).pop(code, None)
+            spec = props.specs.get(key)
+            if spec is not None:
+                cls._remove_class_from_spec(spec, bsdd_class)
+        cls.get_signals().added_classes_changed.emit()
+
+    @classmethod
     def add_classes(cls, codes: list[str], bsdd_dictionary: BsddDictionary) -> None:
         """Add classes and their ancestors to added_classes, then refresh the view."""
         props = cls.get_properties()
