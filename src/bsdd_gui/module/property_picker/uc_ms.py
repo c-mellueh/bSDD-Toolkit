@@ -105,19 +105,66 @@ class ClassModel(QAbstractItemModel):
     def __init__(self, prefix_cols: int = 2, parent=None):
         super().__init__(parent)
         self._prefix_cols = prefix_cols
+        self._tracked_views: list[QTreeView] = []
 
-        # Rebuild whenever the Loin model membership/structure changes.
+        # loin_reset wipes everything — full model reset is correct there.
+        # All other structural signals preserve expansion state so the tree
+        # does not collapse when adding/removing purposes, milestones or classes.
         signals = tool.PropertyPicker.get_signals()
-        signals.spec_membership_changed.connect(self._reset_view)
-        signals.purposes_changed.connect(self._reset_view)
-        signals.milestones_changed.connect(self._reset_view)
+        signals.added_classes_changed.connect(self._reset_preserving_expansion)
+        signals.purposes_changed.connect(self._reset_preserving_expansion)
+        signals.milestones_changed.connect(self._reset_preserving_expansion)
         signals.loin_reset.connect(self._reset_view)
+
+    def register_view(self, view: QTreeView) -> None:
+        if view not in self._tracked_views:
+            self._tracked_views.append(view)
 
     # ------------------------------------------------------------------ basics
 
     def _reset_view(self) -> None:
         self.beginResetModel()
         self.endResetModel()
+
+    def _collect_expanded(self, view: QTreeView) -> set[str]:
+        expanded: set[str] = set()
+
+        def walk(parent_idx: QModelIndex) -> None:
+            for row in range(self.rowCount(parent_idx)):
+                idx = self.index(row, 0, parent_idx)
+                if not idx.isValid():
+                    continue
+                if view.isExpanded(idx):
+                    node = idx.internalPointer()
+                    if node is not None and hasattr(node, "Code"):
+                        expanded.add(node.Code)
+                    walk(idx)
+
+        walk(QModelIndex())
+        return expanded
+
+    def _apply_expanded(self, view: QTreeView, expanded: set[str]) -> None:
+        if not expanded:
+            return
+
+        def walk(parent_idx: QModelIndex) -> None:
+            for row in range(self.rowCount(parent_idx)):
+                idx = self.index(row, 0, parent_idx)
+                if not idx.isValid():
+                    continue
+                node = idx.internalPointer()
+                if node is not None and hasattr(node, "Code") and node.Code in expanded:
+                    view.setExpanded(idx, True)
+                    walk(idx)
+
+        walk(QModelIndex())
+
+    def _reset_preserving_expansion(self) -> None:
+        snapshots = [(v, self._collect_expanded(v)) for v in self._tracked_views]
+        self.beginResetModel()
+        self.endResetModel()
+        for view, expanded in snapshots:
+            self._apply_expanded(view, expanded)
 
     def setSourceModel(self, model) -> None:
         super().setSourceModel(model)

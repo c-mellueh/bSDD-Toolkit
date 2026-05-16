@@ -25,6 +25,8 @@ class _UcMsViewMixin(QTreeView):
             proxy = ClassModel(prefix_cols=2)
             proxy.setSourceModel(model)
             model = proxy
+        if isinstance(model, ClassModel):
+            model.register_view(self)
         super().setModel(model)
 
     def _show_uc_ms_menu(self, pos) -> None:

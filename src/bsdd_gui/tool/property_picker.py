@@ -55,6 +55,8 @@ class Signals(WidgetSignals):
     milestones_changed = Signal()
     actors_changed = Signal()
     spec_membership_changed = Signal()
+    # Emitted when added_classes grows/shrinks (rows change in ClassModel).
+    added_classes_changed = Signal()
     # Coarse signal: anything about the LOIN tree changed (used to reset views)
     loin_reset = Signal()
 
@@ -402,7 +404,7 @@ class PropertyPicker(ActionTool, WidgetTool):
         if not to_add:
             return
         props.added_classes.update(to_add)
-        cls.get_signals().spec_membership_changed.emit()
+        cls.get_signals().added_classes_changed.emit()
 
     @classmethod
     def set_class_included(
