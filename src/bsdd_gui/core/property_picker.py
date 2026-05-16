@@ -35,34 +35,16 @@ def connect_widget(widget: ui.Widget, property_picker: Type[tool.PropertyPicker]
 
 def register_class_view(view: model_views.ClassView, class_view: type[tool.PPClassView]):
     class_view.register_view(view)
-
+    from bsdd_gui.module.property_picker.uc_ms import ClassModel
+    view.setModel(ClassModel())
 
 def register_property_view(
     view: model_views.PropertyView, property_view: type[tool.PPPropertyView]
 ):
     property_view.register_view(view)
+    from bsdd_gui.module.property_picker.uc_ms import PropertyModel
+    view.setModel(PropertyModel())
 
-
-def add_columns_to_class_view(
-    view: model_views.ClassView, class_view: type[tool.PPClassView], project: type[tool.Project]
-):
-    #data = project.get()
-    #proxy_model, _ = class_view.create_model(data)
-    from bsdd_gui.module.property_picker.uc_ms import ClassModel
-    
-    view.setModel(ClassModel())
-
-
-def add_columns_to_property_view(
-    view: model_views.PropertyView,
-    property_view: type[tool.PPPropertyView],
-    project: type[tool.Project],
-):
-    # data = project.get()
-    # proxy_model, model = property_view.create_model(data)
-    from bsdd_gui.module.property_picker.uc_ms import ClassModel
-    
-    view.setModel(ClassModel())
 
 
 def connect_class_view(tree_view: model_views.ClassView, class_view: type[tool.PPClassView]):

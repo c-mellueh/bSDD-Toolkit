@@ -64,9 +64,15 @@ class Signals(WidgetSignals):
 class PropertyPicker(ActionTool, WidgetTool):
     signals = Signals()
 
+
+
     @classmethod
     def get_properties(cls) -> PropertyPickerProperties:
         return bsdd_gui.PropertyPickerProperties
+
+    @classmethod
+    def get_signals(cls) -> Signals:
+        return super().get_signals()
 
     @classmethod
     def _get_widget_class(cls) -> type[ui.Widget]:

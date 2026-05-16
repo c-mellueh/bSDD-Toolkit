@@ -399,6 +399,7 @@ class ClassModel(QAbstractItemModel):
 # ---------------------------------------------------------------------------
 
 
+
 class TwoRowHeaderView(QHeaderView):
     TOP_H = 24
     _PADDING = 16
