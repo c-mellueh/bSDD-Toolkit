@@ -384,6 +384,15 @@ class ClassModel(QAbstractItemModel):
             return getattr(inner_model, "bsdd_data", None)
         return None
 
+    def headerData(self, section, orientation, /, role = ...):
+        if orientation == Qt.Orientation.Vertical:
+            return None
+        if section >= self._prefix_cols:
+            return None
+        if role == Qt.ItemDataRole.DisplayRole:
+            return ["Name", "Code"][section]
+        return None
+
 
 # ---------------------------------------------------------------------------
 # Two-row header
