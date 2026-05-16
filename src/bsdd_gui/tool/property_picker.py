@@ -131,6 +131,15 @@ class PPClassView(ItemViewTool):
         widget:ui.Widget = class_view.parent().parent().parent()
         return widget.tv_properties
     
+
+    @classmethod
+    def on_current_changed(cls, view, curr, prev):
+        proxy_model = view.model()
+        if not curr.isValid():
+            return
+        index =curr
+        cls.signals.selection_changed.emit(view, index.internalPointer())
+
 class PropertySignals(ViewSignals):
     pass
 

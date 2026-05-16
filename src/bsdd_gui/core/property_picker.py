@@ -19,7 +19,7 @@ def retranslate_ui(property_picker: Type[tool.PropertyPicker]):
 
 def register_widget(widget: ui.Widget, property_picker: Type[tool.PropertyPicker],project:type[tool.Project]):
     property_picker.register_widget(widget)
-    model: models.ClassTreeModel = widget.tv_classes.model().sourceModel()
+    model: models.ClassTreeModel = widget.tv_classes.model()
     model.beginResetModel()
     model.bsdd_data = project.get()
     model.endResetModel()
@@ -43,9 +43,11 @@ def register_property_view(
 def add_columns_to_class_view(
     view: model_views.ClassView, class_view: type[tool.PPClassView], project: type[tool.Project]
 ):
-    data = project.get()
-    proxy_model, _ = class_view.create_model(data)
-    view.setModel(proxy_model)
+    #data = project.get()
+    #proxy_model, _ = class_view.create_model(data)
+    from bsdd_gui.module.property_picker.uc_ms import UcMsColumnProxy
+    
+    view.setModel(UcMsColumnProxy())
 
 
 def add_columns_to_property_view(
@@ -53,9 +55,11 @@ def add_columns_to_property_view(
     property_view: type[tool.PPPropertyView],
     project: type[tool.Project],
 ):
-    data = project.get()
-    proxy_model, model = property_view.create_model(data)
-    view.setModel(proxy_model)
+    # data = project.get()
+    # proxy_model, model = property_view.create_model(data)
+    from bsdd_gui.module.property_picker.uc_ms import UcMsColumnProxy
+    
+    view.setModel(UcMsColumnProxy())
 
 
 def connect_class_view(tree_view: model_views.ClassView, class_view: type[tool.PPClassView]):
@@ -74,7 +78,7 @@ def connect_property_view(
     ):
         property_tree_ivew = class_view.get_property_view(class_tree_view)
         proxy_model: models.SortModel = property_tree_ivew.model()
-        model = proxy_model.sourceModel()
+        model = proxy_model
         model.beginResetModel()
         model.bsdd_data = data
         model.endResetModel()

@@ -42,6 +42,7 @@ class Ui_Form(object):
         self.spl_horizontal.addWidget(self.spl_vertical)
         self.tv_properties = PropertyView(self.spl_horizontal)
         self.tv_properties.setObjectName(u"tv_properties")
+        self.tv_properties.setEnabled(False)
         self.spl_horizontal.addWidget(self.tv_properties)
 
         self.gridLayout.addWidget(self.spl_horizontal, 0, 0, 1, 1)

@@ -30,9 +30,11 @@ from bsdd_gui.module.iso_export.datamodel import (
     LoinSpecificationPerObjectType,
 )
 
+from bsdd_gui.module.loin import trigger
+from bsdd_json.utils import class_utils
 if TYPE_CHECKING:
     from bsdd_gui.module.loin.prop import LoinProperties
-    from bsdd_json import BsddClass, BsddClassProperty
+    from bsdd_json import BsddClass, BsddClassProperty,BsddDictionary
 
 
 def _now() -> datetime:
@@ -93,6 +95,7 @@ class Loin:
         props.providing_actor = None
         props.receiving_actor = None
         props.classes_in_spec = {}
+        props.added_classes = set()
         props.properties_in_spec = {}
         props.specs = {}
 
@@ -365,6 +368,11 @@ class Loin:
         )
 
     @classmethod
+    def is_class_added(cls,bsdd_class:BsddClass)-> bool:
+        return bsdd_class.Code in cls.get_properties().added_classes
+
+
+    @classmethod
     def set_class_included(
         cls,
         bsdd_class: "BsddClass",
@@ -375,9 +383,13 @@ class Loin:
         props = cls.get_properties()
         key = (purpose_guid, milestone_guid)
         bucket = props.classes_in_spec.setdefault(key, set())
+
         if included:
+
             if bsdd_class.Code in bucket:
                 return
+            if bsdd_class.Code not in cls.get_properties().added_classes:
+                cls.get_properties().added_classes.add(bsdd_class.Code)
             bucket.add(bsdd_class.Code)
             spec = cls.get_or_create_spec(purpose_guid, milestone_guid)
             cls._add_class_to_spec(spec, bsdd_class)
@@ -619,14 +631,12 @@ class Loin:
         return len(loin.specifications)
 
     @classmethod
-    def import_from_xml(cls, in_path: str) -> None:
-        with open(in_path, "rb") as f:
-            xml_bytes = f.read()
-        loin = LoinLevelOfInformationNeed.from_xml(xml_bytes)
-        cls._adopt_loin(loin)
+    def request_xml_import(cls,in_path:str):
+        trigger.import_xml(in_path)
+
 
     @classmethod
-    def _adopt_loin(cls, loin: LoinLevelOfInformationNeed) -> None:
+    def _adopt_loin(cls, loin: LoinLevelOfInformationNeed,bsdd_dictionary:BsddDictionary) -> None:
         """Replace state from a freshly parsed LoinLevelOfInformationNeed.
 
         Membership caches and the global actor pair are rebuilt from the spec
@@ -639,11 +649,13 @@ class Loin:
         props.providing_actor = None
         props.receiving_actor = None
         props.classes_in_spec = {}
+        props.added_classes = set()
         props.properties_in_spec = {}
         props.specs = {}
 
         seen_purposes: dict[UUID, LoinPurpose] = {}
         seen_milestones: dict[UUID, LoinInformationDeliveryMilestone] = {}
+        existing_classes = {c.Code:c for c in  bsdd_dictionary.Classes}
 
         for spec in loin.specifications:
             purpose = spec.prerequisites.purpose
@@ -683,6 +695,24 @@ class Loin:
                             if uri is None:
                                 continue
                             prop_buckets.setdefault(code, set()).add((pset, uri))
+            
+
+            added_classes = set(class_codes)
+            #also add the Parent classes so they also get shown
+            for c in list(added_classes):
+                bsdd_class = existing_classes.get(c)
+                if not bsdd_class:
+                    continue
+                
+                parent = existing_classes.get(bsdd_class.ParentClassCode)
+                while parent:
+                    if parent.Code in added_classes:
+                        parent = None
+                    else:
+                        added_classes.add(parent.Code)
+                        parent = existing_classes.get(parent.ParentClassCode)
+                    
+            cls.get_properties().added_classes.update(added_classes)
             props.classes_in_spec[key] = class_codes
             props.properties_in_spec[key] = prop_buckets
 

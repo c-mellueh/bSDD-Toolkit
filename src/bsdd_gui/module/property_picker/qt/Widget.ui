@@ -26,7 +26,11 @@
       <widget class="ClassView" name="tv_classes"/>
       <widget class="QTableView" name="tv_pset"/>
      </widget>
-     <widget class="PropertyView" name="tv_properties"/>
+     <widget class="PropertyView" name="tv_properties">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>

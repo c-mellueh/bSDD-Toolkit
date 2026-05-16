@@ -14,3 +14,6 @@ def retranslate_ui():
 
 def on_new_project():
     core.reset(tool.Loin)
+
+def import_xml(path):
+    core.import_from_xml(path,tool.Loin,tool.Project)

@@ -67,3 +67,4 @@ class LoinProperties:
 
         # The signal hub (QObject so we can emit Qt signals).
         self.signals = LoinSignals()
+        self.added_classes:set[ClassCode] = set()

@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Optional
 from uuid import UUID
 
 from PySide6.QtCore import (
-    QIdentityProxyModel,
+    QAbstractItemModel,
     QModelIndex,
     QPersistentModelIndex,
     QRect,
@@ -45,7 +45,7 @@ from PySide6.QtWidgets import (
 
 from bsdd_gui import tool
 from bsdd_json import BsddClass, BsddClassProperty
-
+from bsdd_json.utils import class_utils
 if TYPE_CHECKING:
     pass
 
@@ -53,6 +53,15 @@ if TYPE_CHECKING:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def _get_root_classes():
+    rc = class_utils.get_root_classes(tool.Project.get())
+    return [c for c in rc if c.ClassType != "GroupOfProperties" and tool.Loin.is_class_added(c)]
+
+def _get_children(bsdd_class: BsddClass):
+    children = class_utils.get_children(bsdd_class)
+    return [c for c in children if c.ClassType != "GroupOfProperties" and tool.Loin.is_class_added(c)]
 
 
 def _current_purposes() -> list:
@@ -63,7 +72,9 @@ def _current_milestones() -> list:
     return tool.Loin.get_milestones()
 
 
-def _column_to_pm(column: int, prefix_cols: int) -> Optional[tuple[UUID, UUID]]:
+
+
+def _column_to_guids(column: int, prefix_cols: int) -> Optional[tuple[UUID, UUID]]:
     """Return the (purpose_guid, milestone_guid) for a proxy column index."""
     if column < prefix_cols:
         return None
@@ -84,7 +95,7 @@ def _column_to_pm(column: int, prefix_cols: int) -> Optional[tuple[UUID, UUID]]:
 # ---------------------------------------------------------------------------
 
 
-class UcMsColumnProxy(QIdentityProxyModel):
+class UcMsColumnProxy(QAbstractItemModel):
     """Wraps a source model and appends `len(uc) * len(ms)` checkable columns.
 
     State storage is delegated to the Loin tool — the proxy is now purely a
@@ -94,7 +105,6 @@ class UcMsColumnProxy(QIdentityProxyModel):
     def __init__(self, prefix_cols: int = 2, parent=None):
         super().__init__(parent)
         self._prefix_cols = prefix_cols
-        self._pmi_alive: set[QPersistentModelIndex] = set()
 
         # Rebuild whenever the Loin model membership/structure changes.
         signals = tool.Loin.get_signals()
@@ -107,7 +117,6 @@ class UcMsColumnProxy(QIdentityProxyModel):
 
     def _reset_view(self) -> None:
         self.beginResetModel()
-        self._pmi_alive.clear()
         self.endResetModel()
 
     def setSourceModel(self, model) -> None:
@@ -115,83 +124,94 @@ class UcMsColumnProxy(QIdentityProxyModel):
         if model:
             model.modelReset.connect(self._on_source_reset)
 
-    def _on_source_reset(self) -> None:
-        self._pmi_alive.clear()
-
-    def _intern(self, src_row0: QModelIndex) -> QPersistentModelIndex:
-        pmi = QPersistentModelIndex(src_row0)
-        self._pmi_alive.add(pmi)
-        return pmi
-
     # ------------------------------------------------------------------ column count
 
-    def columnCount(self, _parent=QModelIndex()) -> int:
-        if self.sourceModel() is None:
+    def rowCount(self, /, parent = QModelIndex()):
+        if parent.isValid() and parent.column() != 0:
             return 0
+        if not parent.isValid():
+            return len(_get_root_classes())
+        parent_class: BsddClass = parent.internalPointer()
+        return len(_get_children(parent_class))
+
+    def columnCount(self, _parent=QModelIndex()) -> int:
         return self._prefix_cols + len(_current_purposes()) * len(_current_milestones())
+
+    def parent(self,index:QModelIndex) -> QModelIndex:
+        if not index.isValid():
+            return QModelIndex()
+
+        node: BsddClass = index.internalPointer()
+        if not node.ParentClassCode:
+            return QModelIndex()  # root hat keinen Parent
+
+        parent_cls = class_utils.get_class_by_code(tool.Project.get(), node.ParentClassCode)
+        if parent_cls is None:
+            return QModelIndex()
+
+        # Geschwister des Elterns ermitteln – exakt wie in index():
+        gp_code = parent_cls.ParentClassCode
+        if gp_code:
+            gp_cls = class_utils.get_class_by_code(tool.Project.get(), gp_code)
+            siblings = (
+                _get_children(gp_cls) if gp_cls is not None else _get_root_classes()
+            )
+        else:
+            siblings = _get_root_classes()
+
+        try:
+            row = siblings.index(parent_cls)
+        except ValueError:
+            return QModelIndex()
+
+        return self.createIndex(row, 0, parent_cls)
 
     # ------------------------------------------------------------------ index/parent
 
     def index(self, row: int, column: int, parent=QModelIndex()) -> QModelIndex:
-        if not self.hasIndex(row, column, parent):
+        if parent.isValid() and parent.column() != 0:
             return QModelIndex()
-        sm = self.sourceModel()
-        src_parent = self.mapToSource(parent)
-        src_row0 = sm.index(row, 0, src_parent)
-        if not src_row0.isValid():
-            return QModelIndex()
-        return self.createIndex(row, column, self._intern(src_row0))
 
-    # ------------------------------------------------------------------ source mapping
-
-    def mapToSource(self, proxy_index: QModelIndex) -> QModelIndex:
-        if not proxy_index.isValid():
+        if not parent.isValid():
+            roots = _get_root_classes()
+            if 0 <= row < len(roots):
+                return self.createIndex(row, column, roots[row])
             return QModelIndex()
-        pmi = proxy_index.internalPointer()
-        if not isinstance(pmi, QPersistentModelIndex) or not pmi.isValid():
-            return QModelIndex()
-        sm = self.sourceModel()
-        src_row0 = QModelIndex(pmi)
-        src_parent = sm.parent(src_row0)
-        col = proxy_index.column() if proxy_index.column() < self._prefix_cols else 0
-        return sm.index(src_row0.row(), col, src_parent)
+        parent = parent.siblingAtColumn(0)  # optional, schadet nicht
+        parent_class: BsddClass = parent.internalPointer()
+        children = _get_children(parent_class)
+        if 0 <= row < len(children):
+            return self.createIndex(row, column, children[row])
+        return QModelIndex()
 
-    def mapFromSource(self, source_index: QModelIndex) -> QModelIndex:
-        if not source_index.isValid():
-            return QModelIndex()
-        sm = self.sourceModel()
-        src_parent = sm.parent(source_index)
-        src_row0 = sm.index(source_index.row(), 0, src_parent)
-        return self.createIndex(
-            source_index.row(), source_index.column(), self._intern(src_row0)
-        )
-
-    # ------------------------------------------------------------------ row payload
 
     def _row_payload(self, index: QModelIndex):
-        """Return the underlying bSDD object/string for the row of *index*."""
-        src = self.mapToSource(index)
-        if not src.isValid():
-            return None
-        return src.internalPointer()
+        return index.internalPointer()
 
     # ------------------------------------------------------------------ data/flags
 
     def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
         col = index.column()
-        if col >= self._prefix_cols:
-            if role == Qt.ItemDataRole.CheckStateRole:
+        if role == Qt.ItemDataRole.CheckStateRole:
+            if col < self._prefix_cols:
+                return None
+            else:
                 return self._check_state(index)
-            return None
-        return super().data(index, role)
+
+        if role == Qt.ItemDataRole.DisplayRole or role == Qt.ItemDataRole.EditRole:
+            if index.column() == 0:
+                return index.internalPointer().Name
+            if index.column() == 1:
+                return index.internalPointer().Code
+        return None
 
     def setData(self, index: QModelIndex, value, role=Qt.ItemDataRole.EditRole) -> bool:
         col = index.column()
         if col >= self._prefix_cols and role == Qt.ItemDataRole.CheckStateRole:
-            pm = _column_to_pm(col, self._prefix_cols)
+            pm = _column_to_guids(col, self._prefix_cols)
             if pm is None:
                 return False
-            payload = self._row_payload(index)
+            payload = index.internalPointer()
             included = Qt.CheckState(value) == Qt.CheckState.Checked
             if isinstance(payload, BsddClass):
                 tool.Loin.set_class_included(payload, pm[0], pm[1], included)
@@ -213,7 +233,7 @@ class UcMsColumnProxy(QIdentityProxyModel):
     def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         col = index.column()
         if col >= self._prefix_cols:
-            payload = self._row_payload(index)
+            payload = index.internalPointer()
             if not isinstance(payload, (BsddClass, BsddClassProperty)):
                 # Pset header rows in the property view are non-interactive.
                 return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
@@ -222,18 +242,20 @@ class UcMsColumnProxy(QIdentityProxyModel):
                 | Qt.ItemFlag.ItemIsSelectable
                 | Qt.ItemFlag.ItemIsUserCheckable
             )
-        src = self.mapToSource(index)
-        if not src.isValid():
-            return Qt.ItemFlag.NoItemFlags
-        return self.sourceModel().flags(src)
+        else:
+            return         (
+                Qt.ItemFlag.ItemIsEnabled
+                | Qt.ItemFlag.ItemIsSelectable
+            )
+
 
     # ------------------------------------------------------------------ state lookups
 
     def _check_state(self, index: QModelIndex) -> Qt.CheckState:
-        pm = _column_to_pm(index.column(), self._prefix_cols)
+        pm = _column_to_guids(index.column(), self._prefix_cols)
         if pm is None:
             return Qt.CheckState.Unchecked
-        payload = self._row_payload(index)
+        payload = index.internalPointer()
         if isinstance(payload, BsddClass):
             return (
                 Qt.CheckState.Checked

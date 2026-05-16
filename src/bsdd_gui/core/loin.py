@@ -14,7 +14,7 @@ if TYPE_CHECKING:
         LoinSpecification,
     )
 
-
+from bsdd_gui.module.iso_export.datamodel import LoinLevelOfInformationNeed
 # ---------------------------------------------------------------------------
 # Lifecycle
 # ---------------------------------------------------------------------------
@@ -156,6 +156,9 @@ def export_to_xml(loin: Type["tool.Loin"], out_path: str) -> int:
     return loin.export_to_xml(out_path)
 
 
-def import_from_xml(loin: Type["tool.Loin"], in_path: str) -> None:
+def import_from_xml(in_path: str,loin: Type["tool.Loin"],project:Type[tool.Project]) -> None:
     """Replace the current LOIN with the contents of *in_path*."""
-    loin.import_from_xml(in_path)
+    with open(in_path, "rb") as f:
+        xml_bytes = f.read()
+    new_loin = LoinLevelOfInformationNeed.from_xml(xml_bytes)
+    loin._adopt_loin(new_loin,project.get())

@@ -48,7 +48,7 @@ def create_widget(data, parent, iso_export: Type[tool.IsoExport]):
     iso_export.show_widget(data, parent)
 
 
-def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport]):
+def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],loin:Type[tool.Loin]):
     iso_export.register_widget(widget)
     widget.fw_output.file_format = constants.ISO_FILETYPE
     widget.fw_output.section = "paths"
@@ -58,14 +58,12 @@ def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport]):
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
-    widget.pb_import.clicked.connect(lambda _=False, w=widget: _import_loin(w, iso_export))
+    widget.pb_import.clicked.connect(lambda _=False, w=widget: _import_loin(w, iso_export,loin))
     widget.pb_export.clicked.connect(lambda _=False, w=widget: _export_loin(w, iso_export))
 
 
-def _import_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport]) -> None:
+def _import_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport],loin:Type[tool.Loin]) -> None:
     from PySide6.QtWidgets import QFileDialog, QMessageBox
-
-    from bsdd_gui.tool.loin import Loin
 
     title = QCoreApplication.translate("IsoExport", "Import LOIN XML")
     path, _ = QFileDialog.getOpenFileName(
@@ -74,7 +72,7 @@ def _import_loin(widget: ui.Widget, iso_export: Type[tool.IsoExport]) -> None:
     if not path:
         return
     try:
-        Loin.import_from_xml(path)
+        loin.request_xml_import(path)
     except Exception as exc:
         QMessageBox.critical(widget.window(), title, str(exc))
 
@@ -155,6 +153,7 @@ def import_settings(
     popups: Type[tool.Popups],
 ):
     # Handle Path
+    return
     old_path = appdata.get_path(constants.APPDATA_OPTION)
     text = QCoreApplication.translate("IsoExport", "Import ISO23386 settings")
     new_path = popups.get_open_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
