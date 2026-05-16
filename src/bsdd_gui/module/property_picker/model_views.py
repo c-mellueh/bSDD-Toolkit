@@ -17,7 +17,6 @@ class _UcMsViewMixin(QTreeView):
         header = TwoRowHeaderView(Qt.Orientation.Horizontal)
         self.setHeader(header)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.customContextMenuRequested.connect(self._show_uc_ms_menu)
         get_filter_window().register_view(self)
 
     def setModel(self, model) -> None:
@@ -29,16 +28,9 @@ class _UcMsViewMixin(QTreeView):
             model.register_view(self)
         super().setModel(model)
 
-    def _show_uc_ms_menu(self, pos) -> None:
-        menu = QMenu(self)
-        menu.addAction("Edit Use Cases / Milestones", self._open_filter_window)
-        menu.exec(self.viewport().mapToGlobal(pos))
 
-    def _open_filter_window(self) -> None:
-        win = get_filter_window()
-        win.show()
-        win.raise_()
-        win.activateWindow()
+
+
 
 
 class ClassView(_UcMsViewMixin):

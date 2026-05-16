@@ -19,6 +19,7 @@ from uuid import UUID
 
 from PySide6.QtCore import (
     QAbstractItemModel,
+    QEvent,
     QModelIndex,
     QPersistentModelIndex,
     QRect,
@@ -350,12 +351,141 @@ class TwoRowHeaderView(QHeaderView):
         self.setDefaultSectionSize(70)
         self.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         self.sectionResized.connect(lambda *_: self.viewport().update())
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self._show_uc_ms_menu)
+        self._hover_row: str | None = None  # "uc", "ms", or None
+        self.viewport().setMouseTracking(True)
+        self.viewport().installEventFilter(self)
 
         signals = tool.PropertyPicker.get_signals()
         signals.purposes_changed.connect(self._on_loin_changed)
         signals.milestones_changed.connect(self._on_loin_changed)
         signals.loin_reset.connect(self._on_loin_changed)
 
+    def eventFilter(self, obj, event) -> bool:
+        if obj is self.viewport():
+            t = event.type()
+            if t == QEvent.Type.MouseMove:
+                if self.logicalIndexAt(event.pos()) < 0:
+                    row = "uc" if event.pos().y() < self.TOP_H else "ms"
+                else:
+                    row = None
+                if row != self._hover_row:
+                    self._hover_row = row
+                    self.viewport().update()
+            elif t == QEvent.Type.Leave:
+                if self._hover_row is not None:
+                    self._hover_row = None
+                    self.viewport().update()
+        return False
+
+    def mousePressEvent(self, event) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            col = self.logicalIndexAt(event.pos())
+            if col < 0:
+                if event.pos().y() < self.TOP_H:
+                    self._add_uc()
+                else:
+                    self._add_ms()
+                return
+        super().mousePressEvent(event)
+
+    def _show_uc_ms_menu(self, pos) -> None:
+        col = self.logicalIndexAt(pos)
+        in_uc_row = pos.y() < self.TOP_H
+        purposes = _current_purposes()
+        milestones = _current_milestones()
+        menu = QMenu(self)
+
+        if col >= self._prefix_cols and purposes and milestones:
+            guids = _column_to_guids(col, self._prefix_cols)
+            if guids:
+                p_guid, m_guid = guids
+                purpose = next((p for p in purposes if p.guid == p_guid), None)
+                milestone = next((m for m in milestones if m.guid == m_guid), None)
+
+                if purpose and milestone:
+                    p_name = tool.PropertyPicker.purpose_display_name(purpose)
+                    m_name = tool.PropertyPicker.milestone_display_name(milestone)
+                    p_idx = purposes.index(purpose)
+                    m_idx = milestones.index(milestone)
+                    view = self.parentWidget()
+
+                    if in_uc_row:
+                        menu.addAction(f"Rename '{p_name}'…", lambda g=p_guid: self._rename_uc(g))
+                        menu.addAction(f"Remove '{p_name}'", lambda g=p_guid: self._remove_uc(g))
+                        menu.addSeparator()
+                        for mi, ms in enumerate(milestones):
+                            ms_name = tool.PropertyPicker.milestone_display_name(ms)
+                            ms_col = self._prefix_cols + p_idx * len(milestones) + mi
+                            visible = view is None or not view.isColumnHidden(ms_col)
+                            act = menu.addAction(f"'{ms_name}'")
+                            act.setCheckable(True)
+                            act.setChecked(visible)
+                            act.triggered.connect(
+                                lambda _=None, pg=p_guid, mg=ms.guid:
+                                    get_filter_window().toggle_combination(pg, mg)
+                            )
+                    else:
+                        menu.addAction(f"Rename '{m_name}'…", lambda g=m_guid: self._rename_ms(g))
+                        menu.addAction(f"Remove '{m_name}'", lambda g=m_guid: self._remove_ms(g))
+                        menu.addSeparator()
+                        for pi, pu in enumerate(purposes):
+                            pu_name = tool.PropertyPicker.purpose_display_name(pu)
+                            pu_col = self._prefix_cols + pi * len(milestones) + m_idx
+                            visible = view is None or not view.isColumnHidden(pu_col)
+                            act = menu.addAction(f"'{pu_name}'")
+                            act.setCheckable(True)
+                            act.setChecked(visible)
+                            act.triggered.connect(
+                                lambda _=None, pg=pu.guid, mg=m_guid:
+                                    get_filter_window().toggle_combination(pg, mg)
+                            )
+
+                    menu.addSeparator()
+
+        menu.addAction("Add Use Case…", self._add_uc)
+        menu.addAction("Add Milestone…", self._add_ms)
+        menu.addSeparator()
+        menu.addAction("Edit Use Cases / Milestones", self._open_filter_window)
+        menu.exec(self.viewport().mapToGlobal(pos))
+
+    def _open_filter_window(self) -> None:
+        win = get_filter_window()
+        win.show()
+        win.raise_()
+        win.activateWindow()
+
+    def _ask_name(self, prompt: str) -> str | None:
+        name, ok = QInputDialog.getText(self, "Name", prompt)
+        return name.strip() if ok and name.strip() else None
+
+    def _add_uc(self) -> None:
+        name = self._ask_name("Use case name:")
+        if name:
+            tool.PropertyPicker.add_purpose(name)
+
+    def _add_ms(self) -> None:
+        name = self._ask_name("Milestone name:")
+        if name:
+            tool.PropertyPicker.add_milestone(name)
+
+    def _rename_uc(self, guid: UUID) -> None:
+        new = self._ask_name("Use case name:")
+        if new:
+            tool.PropertyPicker.rename_purpose(guid, new)
+
+    def _rename_ms(self, guid: UUID) -> None:
+        new = self._ask_name("Milestone name:")
+        if new:
+            tool.PropertyPicker.rename_milestone(guid, new)
+
+    def _remove_uc(self, guid: UUID) -> None:
+        tool.PropertyPicker.remove_purpose(guid)
+
+    def _remove_ms(self, guid: UUID) -> None:
+        tool.PropertyPicker.remove_milestone(guid)
+        
     def _on_loin_changed(self) -> None:
         self.updateGeometry()
         self.viewport().update()
@@ -420,6 +550,26 @@ class TwoRowHeaderView(QHeaderView):
                 ms_name = tool.PropertyPicker.milestone_display_name(milestone)
                 self._draw_cell(painter, x_ms, self.TOP_H, w_ms, bot_h, ms_name, rotated=True)
                 x_ms += w_ms
+
+        # Hover hint in the empty space beyond the last section
+        if self._hover_row is not None:
+            total_cols = self._prefix_cols + len(purposes) * len(milestones)
+            hint_x = sum(self.sectionSize(c) for c in range(total_cols)) - self.offset()
+            hint_w = self.viewport().width() - hint_x
+            if hint_w > 20:
+                highlight = self.palette().highlight().color()
+                bg = self.palette().highlight().color()
+                bg.setAlpha(30)
+                if self._hover_row == "uc":
+                    rect = QRect(hint_x, 0, hint_w, self.TOP_H)
+                    label = "+ New UC"
+                else:
+                    rect = QRect(hint_x, self.TOP_H, hint_w, bot_h)
+                    label = "+ New MS"
+                painter.fillRect(rect, bg)
+                painter.setPen(highlight)
+                painter.drawRect(rect.adjusted(0, 0, -1, -1))
+                painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, label)
 
         painter.restore()
 
@@ -496,6 +646,25 @@ class FilterTableWindow(QWidget):
 
     def unregister_view(self, view: QTreeView) -> None:
         self._views = [v for v in self._views if v is not view]
+
+    def toggle_combination(self, purpose_guid: UUID, milestone_guid: UUID) -> None:
+        """Toggle visibility of the given purpose × milestone column on all views."""
+        purposes = _current_purposes()
+        milestones = _current_milestones()
+        p_idx = next((i for i, p in enumerate(purposes) if p.guid == purpose_guid), None)
+        m_idx = next((i for i, m in enumerate(milestones) if m.guid == milestone_guid), None)
+        if p_idx is None or m_idx is None or self._filter_table is None:
+            return
+        item = self._filter_table.item(p_idx, m_idx)
+        if item is None:
+            return
+        new_state = (
+            Qt.CheckState.Unchecked
+            if item.checkState() == Qt.CheckState.Checked
+            else Qt.CheckState.Checked
+        )
+        item.setCheckState(new_state)
+        # _on_filter_changed fires via itemChanged and updates all views
 
     # ------------------------------------------------------------------ table
 
