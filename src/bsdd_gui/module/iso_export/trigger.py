@@ -24,22 +24,11 @@ def create_widget(data: object, parent: ui.Widget):
 
 
 def widget_created(widget: ui.Widget):
-    core.register_widget(widget, tool.IsoExport,tool.PropertyPicker)
+    core.register_widget(widget, tool.IsoExport,tool)
     core.register_fields(widget, tool.IsoExport)
     core.register_validators(widget, tool.IsoExport, tool.Util)
-    core.connect_widget(widget, tool.IsoExport)
+    core.connect_widget(widget, tool.IsoExport,tool.PropertyPicker)
 
-
-def import_settings(widget: ui.Widget):
-    core.import_settings(
-        widget, tool.IsoExport, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
-    )
-
-
-def export_settings(widget: ui.Widget):
-    core.export_settings(
-        widget, tool.IsoExport, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
-    )
 
 
 def export(widget: ui.Widget):
