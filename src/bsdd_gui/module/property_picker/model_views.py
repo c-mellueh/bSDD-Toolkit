@@ -10,6 +10,23 @@ from .uc_ms import TwoRowHeaderView, ClassModel, get_filter_window, _current_pur
 from bsdd_gui.module.class_tree_view.constants import CODES_MIME, JSON_MIME
 
 
+class _ContextMenu(QMenu):
+    """QMenu that lets a submenu-parent action also respond to a direct click.
+
+    Set ``action._direct_callback = callable`` on an action that has a submenu;
+    clicking that action calls the callback instead of the default submenu toggle.
+    Hovering still auto-expands the submenu as usual.
+    """
+
+    def mouseReleaseEvent(self, event):
+        action = self.activeAction()
+        if action is not None and getattr(action, "_direct_callback", None) is not None:
+            self.hide()
+            action._direct_callback()
+            return
+        super().mouseReleaseEvent(event)
+
+
 class _UcMsViewMixin(QTreeView):
     """Adds the two-row UC/MS header and the 'Edit Use Cases / Milestones' context menu."""
 
@@ -61,30 +78,14 @@ class ClassView(_UcMsViewMixin):
         node = index.internalPointer()
         if node is None:
             return
-        menu = QMenu(self)
+        menu = _ContextMenu(self)
         name = getattr(node, "Name", None) or getattr(node, "Code", None) or "Class"
         menu.addAction(f"Remove '{name}'", lambda: trigger.class_removed(node))
 
         purposes = _current_purposes()
         milestones = _current_milestones()
         if purposes and milestones:
-            # If the click landed on a specific UC×MS column, offer a fast-path direct action.
-            model = self.model()
-            prefix_cols = getattr(model, "_prefix_cols", 2)
-            clicked_guids = _column_to_guids(index.column(), prefix_cols)
-            if clicked_guids is not None:
-                p_guid, m_guid = clicked_guids
-                purpose = next((p for p in purposes if p.guid == p_guid), None)
-                milestone = next((m for m in milestones if m.guid == m_guid), None)
-                if purpose and milestone:
-                    p_name = tool.PropertyPicker.purpose_display_name(purpose)
-                    m_name = tool.PropertyPicker.milestone_display_name(milestone)
-                    direct = menu.addAction(f"Apply '{p_name} × {m_name}' to children")
-                    direct.triggered.connect(
-                        lambda _checked, n=node, pg=p_guid, mg=m_guid: trigger.apply_checkstate_to_children(n, pg, mg)
-                    )
-
-            submenu = menu.addMenu("Apply to children")
+            submenu = QMenu("Apply to children", menu)
             for purpose in purposes:
                 for milestone in milestones:
                     p_name = tool.PropertyPicker.purpose_display_name(purpose)
@@ -98,6 +99,17 @@ class ClassView(_UcMsViewMixin):
                     action.triggered.connect(
                         lambda _checked, n=node, pg=p_guid, mg=m_guid: trigger.apply_checkstate_to_children(n, pg, mg)
                     )
+
+            apply_action = menu.addMenu(submenu)
+
+            model = self.model()
+            prefix_cols = getattr(model, "_prefix_cols", 2)
+            clicked_guids = _column_to_guids(index.column(), prefix_cols)
+            if clicked_guids is not None:
+                p_guid, m_guid = clicked_guids
+                apply_action._direct_callback = (
+                    lambda n=node, pg=p_guid, mg=m_guid: trigger.apply_checkstate_to_children(n, pg, mg)
+                )
 
         menu.exec(self.viewport().mapToGlobal(pos))
 
