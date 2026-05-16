@@ -28,7 +28,7 @@
      </widget>
      <widget class="PropertyView" name="tv_properties">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
     </widget>

@@ -38,11 +38,13 @@ class _UcMsViewMixin(QTreeView):
         get_filter_window().register_view(self)
 
     def setModel(self, model) -> None:
-        if model is not None and not isinstance(model, ClassModel):
+        # Models that manage their own UC×MS columns expose register_view().
+        # Anything else gets wrapped in ClassModel so it gains those columns.
+        if model is not None and not hasattr(model, "register_view"):
             proxy = ClassModel(prefix_cols=2)
             proxy.setSourceModel(model)
             model = proxy
-        if isinstance(model, ClassModel):
+        if model is not None and hasattr(model, "register_view"):
             model.register_view(self)
         super().setModel(model)
 

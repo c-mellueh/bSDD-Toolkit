@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -42,7 +42,7 @@ class Ui_Form(object):
         self.spl_horizontal.addWidget(self.spl_vertical)
         self.tv_properties = PropertyView(self.spl_horizontal)
         self.tv_properties.setObjectName(u"tv_properties")
-        self.tv_properties.setEnabled(False)
+        self.tv_properties.setEnabled(True)
         self.spl_horizontal.addWidget(self.tv_properties)
 
         self.gridLayout.addWidget(self.spl_horizontal, 0, 0, 1, 1)

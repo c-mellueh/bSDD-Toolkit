@@ -51,6 +51,7 @@ from PySide6.QtWidgets import (
 from bsdd_gui import tool
 from bsdd_json import BsddClass, BsddClassProperty
 from bsdd_json.utils import class_utils
+from bsdd_json.utils import property_utils as prop_utils
 if TYPE_CHECKING:
     pass
 
@@ -392,6 +393,221 @@ class ClassModel(QAbstractItemModel):
         if role == Qt.ItemDataRole.DisplayRole:
             return ["Name", "Code"][section]
         return None
+
+
+# ---------------------------------------------------------------------------
+# Property tree model — psets as roots, BsddClassProperty as children
+# ---------------------------------------------------------------------------
+
+
+class PropertyModel(QAbstractItemModel):
+    """Two-level tree for the PropertyView.
+
+    Root rows  : PropertySet names (``str``).
+    Child rows : ``BsddClassProperty`` objects within that pset.
+    Columns 0  : display name (property name or pset name).
+    Column  1  : data type (property rows only).
+    Columns ≥2 : UC×MS check states via ``tool.PropertyPicker``.
+    """
+
+    _prefix_cols: int = 2
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.bsdd_data: Optional[BsddClass] = None
+        self._tracked_views: list[QTreeView] = []
+
+        signals = tool.PropertyPicker.get_signals()
+        signals.purposes_changed.connect(self._reset_view)
+        signals.milestones_changed.connect(self._reset_view)
+        signals.loin_reset.connect(self._reset_view)
+        signals.spec_membership_changed.connect(self._emit_check_data_changed)
+
+    def register_view(self, view: QTreeView) -> None:
+        if view not in self._tracked_views:
+            self._tracked_views.append(view)
+            view.setItemDelegate(_CenteredCheckDelegate(view))
+
+    # ------------------------------------------------------------------ helpers
+
+    def _reset_view(self) -> None:
+        self.beginResetModel()
+        self.endResetModel()
+
+    def _pset_names(self) -> list[str]:
+        if self.bsdd_data is None:
+            return []
+        return tool.PropertySetTableView.get_pset_names_with_temporary(self.bsdd_data)
+
+    def _props_for_pset(self, pset_name: str) -> list[BsddClassProperty]:
+        if self.bsdd_data is None:
+            return []
+        return prop_utils.get_class_properties_by_pset_name(self.bsdd_data, pset_name)
+
+    def _emit_check_data_changed(self) -> None:
+        """Re-render all UC×MS cells without a full model reset."""
+        if self.bsdd_data is None:
+            return
+        psets = self._pset_names()
+        if not psets:
+            return
+        n_cols = self.columnCount()
+        roles = [Qt.ItemDataRole.CheckStateRole]
+        # Root (pset) rows
+        self.dataChanged.emit(
+            self.index(0, self._prefix_cols),
+            self.index(len(psets) - 1, n_cols - 1),
+            roles,
+        )
+        # Child (property) rows
+        for row, pset in enumerate(psets):
+            parent_idx = self.index(row, 0)
+            props = self._props_for_pset(pset)
+            if props:
+                self.dataChanged.emit(
+                    self.index(0, self._prefix_cols, parent_idx),
+                    self.index(len(props) - 1, n_cols - 1, parent_idx),
+                    roles,
+                )
+
+    # ------------------------------------------------------------------ QAbstractItemModel
+
+    def rowCount(self, parent=QModelIndex()) -> int:
+        if parent.isValid() and parent.column() != 0:
+            return 0
+        if not parent.isValid():
+            return len(self._pset_names())
+        ptr = parent.internalPointer()
+        if isinstance(ptr, str):
+            return len(self._props_for_pset(ptr))
+        return 0
+
+    def columnCount(self, _parent=QModelIndex()) -> int:
+        return self._prefix_cols + len(_current_purposes()) * len(_current_milestones())
+
+    def index(self, row: int, column: int, parent=QModelIndex()) -> QModelIndex:
+        if parent.isValid() and parent.column() != 0:
+            return QModelIndex()
+        if not parent.isValid():
+            psets = self._pset_names()
+            if 0 <= row < len(psets):
+                return self.createIndex(row, column, psets[row])
+            return QModelIndex()
+        ptr = parent.internalPointer()
+        if isinstance(ptr, str):
+            props = self._props_for_pset(ptr)
+            if 0 <= row < len(props):
+                return self.createIndex(row, column, props[row])
+        return QModelIndex()
+
+    def parent(self, index: QModelIndex) -> QModelIndex:
+        if not index.isValid():
+            return QModelIndex()
+        ptr = index.internalPointer()
+        if isinstance(ptr, str):
+            return QModelIndex()
+        pset_name = getattr(ptr, "PropertySet", None)
+        if pset_name is None:
+            return QModelIndex()
+        psets = self._pset_names()
+        if pset_name in psets:
+            return self.createIndex(psets.index(pset_name), 0, pset_name)
+        return QModelIndex()
+
+    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
+        base = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
+        if index.column() >= self._prefix_cols and self.bsdd_data is not None:
+            base |= Qt.ItemFlag.ItemIsUserCheckable
+        return base
+
+    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
+        if not index.isValid():
+            return None
+        col = index.column()
+        ptr = index.internalPointer()
+
+        if role == Qt.ItemDataRole.CheckStateRole:
+            if col < self._prefix_cols:
+                return None
+            return self._check_state(index)
+
+        if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
+            if isinstance(ptr, str):
+                return ptr if col == 0 else None
+            if isinstance(ptr, BsddClassProperty):
+                if col == 0:
+                    return prop_utils.get_name(ptr) or ptr.Code
+                if col == 1:
+                    return prop_utils.get_data_type(ptr)
+        return None
+
+    def setData(self, index: QModelIndex, value, role=Qt.ItemDataRole.EditRole) -> bool:
+        if role != Qt.ItemDataRole.CheckStateRole:
+            return False
+        col = index.column()
+        if col < self._prefix_cols:
+            return False
+        pm = _column_to_guids(col, self._prefix_cols)
+        if pm is None or self.bsdd_data is None:
+            return False
+        ptr = index.internalPointer()
+        included = Qt.CheckState(value) == Qt.CheckState.Checked
+
+        if isinstance(ptr, str):
+            for prop in self._props_for_pset(ptr):
+                tool.PropertyPicker.set_property_included(
+                    self.bsdd_data, prop, pm[0], pm[1], included
+                )
+            return True
+        if isinstance(ptr, BsddClassProperty):
+            tool.PropertyPicker.set_property_included(
+                self.bsdd_data, ptr, pm[0], pm[1], included
+            )
+            return True
+        return False
+
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+        if orientation == Qt.Orientation.Vertical:
+            return None
+        if section >= self._prefix_cols:
+            return None
+        if role == Qt.ItemDataRole.DisplayRole:
+            return ["Name", "Data Type"][section]
+        return None
+
+    def mapToSource(self, index: QModelIndex) -> QModelIndex:
+        """Pass-through so callers that assume a proxy model still work."""
+        return index
+
+    # ------------------------------------------------------------------ check state
+
+    def _check_state(self, index: QModelIndex) -> Qt.CheckState:
+        pm = _column_to_guids(index.column(), self._prefix_cols)
+        if pm is None or self.bsdd_data is None:
+            return Qt.CheckState.Unchecked
+        ptr = index.internalPointer()
+
+        if isinstance(ptr, BsddClassProperty):
+            included = tool.PropertyPicker.is_property_included(
+                self.bsdd_data, ptr, pm[0], pm[1]
+            )
+            return Qt.CheckState.Checked if included else Qt.CheckState.Unchecked
+
+        if isinstance(ptr, str):
+            props = self._props_for_pset(ptr)
+            if not props:
+                return Qt.CheckState.Unchecked
+            states = [
+                tool.PropertyPicker.is_property_included(self.bsdd_data, p, pm[0], pm[1])
+                for p in props
+            ]
+            if all(states):
+                return Qt.CheckState.Checked
+            if any(states):
+                return Qt.CheckState.PartiallyChecked
+            return Qt.CheckState.Unchecked
+
+        return Qt.CheckState.Unchecked
 
 
 # ---------------------------------------------------------------------------
