@@ -1,7 +1,7 @@
 import json
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
+from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QPainter
 from PySide6.QtWidgets import QMenu, QTreeView
 
 from . import trigger
@@ -79,6 +79,21 @@ class ClassView(_UcMsViewMixin):
             event.acceptProposedAction()
         else:
             event.ignore()
+
+    def paintEvent(self, event) -> None:
+        super().paintEvent(event)
+        model = self.model()
+        if model is not None and model.rowCount() > 0:
+            return
+        painter = QPainter(self.viewport())
+        painter.save()
+        painter.setPen(self.palette().placeholderText().color())
+        painter.drawText(
+            self.viewport().rect(),
+            Qt.AlignmentFlag.AlignCenter,
+            "Drag & drop classes here",
+        )
+        painter.restore()
 
 
 class PropertyView(_UcMsViewMixin):
