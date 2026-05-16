@@ -661,18 +661,20 @@ class PropertyPicker(ActionTool, WidgetTool):
 
     @classmethod
     def _property_ref(cls, bsdd_property: "BsddClassProperty") -> DtRef:
-        """Build a DtRef for a bSDD property — prefer URI, fall back to UID."""
-        uri = getattr(bsdd_property, "PropertyUri", None) or getattr(bsdd_property, "Uri", None)
-        guid_value: Optional[UUID] = None
-        raw_guid = getattr(bsdd_property, "Uid", None)
-        if isinstance(raw_guid, UUID):
-            guid_value = raw_guid
-        elif isinstance(raw_guid, str):
-            try:
-                guid_value = UUID(raw_guid)
-            except ValueError:
-                guid_value = None
-        return DtRef(reference_uri=uri, guid=guid_value)
+        """Build a DtRef for a bSDD property.
+
+        Prefers an explicit PropertyUri. For internally-referenced properties
+        (PropertyCode only) builds the canonical bSDD URI via build_bsdd_uri.
+        """
+        uri = bsdd_property.PropertyUri or bsdd_property.OwnedUri
+
+        if not uri:
+            inner = prop_utils.get_internal_property(bsdd_property)
+            dictionary = prop_utils.get_dictionary_from_property(bsdd_property)
+            if inner is not None and dictionary is not None:
+                uri = prop_utils.build_bsdd_uri(inner, dictionary)
+
+        return DtRef(reference_uri=uri)
 
     # ------------------------------------------------------------------ XML I/O
 
@@ -701,6 +703,30 @@ class PropertyPicker(ActionTool, WidgetTool):
     @classmethod
     def request_xml_export(cls, widget: ui.Widget) :
         trigger.export_xml(widget)
+
+    @classmethod
+    def _resolve_property_uri_to_code(
+        cls,
+        bsdd_class: "BsddClass",
+        pset: str,
+        uri: str,
+        bsdd_dictionary: "BsddDictionary",
+    ) -> Optional[str]:
+        """Return the BsddClassProperty.Code whose URI matches *uri*.
+
+        Uses get_property_by_uri so version segments in the URI are ignored.
+        """
+        bsdd_prop = prop_utils.get_property_by_uri(uri, bsdd_dictionary)
+        if bsdd_prop is None:
+            return None
+        for cp in bsdd_class.ClassProperties:
+            if cp.PropertySet != pset:
+                continue
+            if cp.PropertyCode == bsdd_prop.Code:
+                return cp.Code
+            if cp.PropertyUri and cp.PropertyUri == uri:
+                return cp.Code
+        return None
 
     @classmethod
     def _adopt_loin(cls, loin: LoinLevelOfInformationNeed, bsdd_dictionary: BsddDictionary) -> None:
@@ -758,11 +784,16 @@ class PropertyPicker(ActionTool, WidgetTool):
                             g.__dict__["_pset"] = pset
                         if not pset:
                             continue
+                        bsdd_class = existing_classes.get(code)
                         for ref in g.has_property_refs:
                             uri = ref.reference_uri or (str(ref.guid) if ref.guid else None)
                             if uri is None:
                                 continue
-                            prop_buckets.setdefault(code, set()).add((pset, uri))
+                            prop_code = cls._resolve_property_uri_to_code(
+                                bsdd_class, pset, uri, bsdd_dictionary
+                            ) if bsdd_class else None
+                            if prop_code:
+                                prop_buckets.setdefault(code, set()).add((pset, prop_code))
 
             added_classes = set(class_codes)
             # also add the Parent classes so they also get shown
