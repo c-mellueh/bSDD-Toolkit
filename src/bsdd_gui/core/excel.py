@@ -86,29 +86,7 @@ def export_settings(
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
-    # Create Dict
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    class_dict: dict[str, bool] = pp_class_view.get_check_dict(class_tree)
-    property_dict: PsetDict = pp_property_view.get_check_dict(property_tree)
-    settings_dict: SettingsDict = widget_tool.get_settings(widget)
-    full_dict: SettingsDict = {
-        "class_settings": class_dict,
-        "property_settings": property_dict,
-        "settings": settings_dict,
-    }
-
-    # Set Path
-    text = QCoreApplication.translate("Excel", "Export Excel settings")
-    old_path = appdata.get_path(constants.APPDATA_OPTION)
-    new_path = popups.get_save_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
-    if not new_path:
-        return
-    appdata.set_path(constants.APPDATA_OPTION, new_path)
-
-    # Write Json
-    with open(new_path, "w") as file:
-        json.dump(full_dict, file)
+    return
 
 
 def import_settings(
@@ -119,28 +97,7 @@ def import_settings(
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
-    # Handle Path
-    old_path = appdata.get_path(constants.APPDATA_OPTION)
-    text = QCoreApplication.translate("Excel", "Import Excel settings")
-    new_path = popups.get_open_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
-    if not new_path:
-        return
-    appdata.set_path(constants.APPDATA_OPTION, new_path)
-
-    # Read Settings
-    with open(new_path, "r") as file:
-        full_dict: SettingsDict = json.load(file)
-    class_dict = full_dict.get("class_settings", {})
-    property_dict = full_dict.get("property_settings", {})
-    settings_dict = full_dict.get("settings", {})
-
-    # Fill Fields and Checkstates
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    pp_class_view.set_check_dict(class_dict, class_tree)
-    pp_property_view.set_check_dict(property_dict, property_tree)
-    widget_tool.set_settings(widget, settings_dict)
-    pass
+    return
 
 def export(    widget: ui.Widget,
     excel: Type[tool.Excel],
@@ -156,7 +113,7 @@ def export(    widget: ui.Widget,
     waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
     waiting_widget.set_title("Load Data")
 
-    class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
+    class_settings = pp_class_view.get_checked_classes(widget.property_picker.tv_classes)
     property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
     base_settings = excel.get_settings(widget)
     bsdd_dict = project.get()

@@ -77,7 +77,8 @@ def export( widget: ui.Widget,
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
     util:Type[tool.Util],
-    project:type[tool.Project]):
+    project:type[tool.Project],
+    property_picker:type[tool.PropertyPicker],):
 
     fmt = iso_export.get_export_format(widget)
     out_path = widget.fw_output.get_path()
@@ -112,8 +113,9 @@ def export( widget: ui.Widget,
     waiting_widget.set_title("Load Data")
 
     bsdd_dict = project.get()
-    class_settings = pp_class_view.build_full_check_dict(widget.property_picker.tv_classes,bsdd_dict)
-    property_settings = pp_property_view.build_full_check_dict(widget.property_picker.tv_properties,bsdd_dict)
+    specs = list(property_picker.get_properties().specs.values())
+    checked_classes = property_picker.get_checked_classes(specs, bsdd_dict)
+    checked_properties = property_picker.build_property_check_dict(specs, bsdd_dict)
 
     def export_done(class_count:int):
         stop_waiting_widget(waiting_worker)
@@ -122,7 +124,7 @@ def export( widget: ui.Widget,
         text = QCoreApplication.translate("IsoExport","{} classes exported!").format(class_count)
         QTimer.singleShot(0, widget,  lambda: popups.create_info_popup(text,t,text_title,parent=widget))
 
-    build_worker, build_thread = iso_export.create_build_thread(bsdd_dict,class_settings,property_settings,out_path)
+    build_worker, build_thread = iso_export.create_build_thread(bsdd_dict,checked_classes,checked_properties,out_path)
 
     build_worker.finished.connect(export_done )
     build_worker.error.connect(lambda: stop_waiting_widget(waiting_worker))

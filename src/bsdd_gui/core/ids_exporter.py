@@ -174,7 +174,7 @@ def export_settings(
     # Create Dict
     class_tree = widget.property_picker.tv_classes
     property_tree = widget.property_picker.tv_properties
-    class_dict: dict[str, bool] = pp_class_view.get_check_dict(class_tree)
+    class_dict: dict[str, bool] = pp_class_view.get_checked_classes(class_tree)
     property_dict: PsetDict = pp_property_view.get_check_dict(property_tree)
     settings_dict: BasicSettingsDict = widget_tool.get_settings(widget)
     ids_metadata: MetadataDict = widget_tool.get_ids_metadata(widget)
@@ -242,7 +242,7 @@ def export_ids(
 ):
 
     widget_tool.sync_to_model(widget, widget.bsdd_data)
-    class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
+    checked_classes = pp_class_view.get_checked_classes(widget.property_picker.tv_classes)
     property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
@@ -253,7 +253,7 @@ def export_ids(
     waiting_widget.set_title("Load Data")
 
     setup_worker, setup_thread = widget_tool.create_setup_thread(
-        widget, class_settings, property_settings, base_settings, metadata_settings
+        widget, checked_classes, property_settings, base_settings, metadata_settings
     )
 
     def _start_specification(payload: PayLoadDict):

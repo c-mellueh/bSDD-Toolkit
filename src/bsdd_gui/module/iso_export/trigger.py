@@ -40,5 +40,6 @@ def export(widget: ui.Widget):
         tool.Appdata,
         tool.Popups,
         tool.Util,
-        tool.Project
+        tool.Project,
+        tool.PropertyPicker
     )

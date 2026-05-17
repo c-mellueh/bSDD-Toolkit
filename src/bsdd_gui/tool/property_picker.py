@@ -38,7 +38,11 @@ if TYPE_CHECKING:
         PropertyPickerProperties,
         PPClassViewProperties,
         PPPropertyViewProperties,
+        ClassCode,
+        PropertyCode,
     )
+
+
 
 
 def _now() -> datetime:
@@ -113,6 +117,66 @@ class PropertyPicker(ActionTool, WidgetTool):
     @classmethod
     def has_specs(cls) -> bool:
         return bool(cls.get_properties().specs)
+
+    @classmethod
+    def get_checked_classes(
+        cls,
+        active_specifications: list[LoinSpecification],bsdd_dictionary: BsddDictionary
+    ) -> list[BsddClass]:
+        """Return BsddClass objects included in at least one of the given specs."""
+        props = cls.get_properties()
+
+        if bsdd_dictionary is None:
+            return []
+        existing = {c.Code: c for c in bsdd_dictionary.Classes}
+        checked_codes: set[str] = set()
+        for spec in active_specifications:
+            key = cls._get_spec_key(spec)
+            checked_codes.update(props.classes_in_spec.get(key, set()))
+        return [existing[code] for code in checked_codes if code in existing]
+
+    @classmethod
+    def _get_spec_key(cls,spec: LoinSpecification) -> tuple[UUID, UUID]:
+        return spec.prerequisites.purpose.guid, spec.prerequisites.information_delivery_milestone.guid
+
+    @classmethod
+    def build_property_check_dict(
+        cls,
+        active_specifications: list[LoinSpecification],
+        bsdd_dictionary: BsddDictionary,
+    ) -> dict[str, dict[str, PsetDict]]:
+        """Return property check state for every class/pset/property.
+
+        A pset or property entry is ``True`` when it is included in at least
+        one of *active_specifications*.
+        """
+
+        if bsdd_dictionary is None:
+            return {}
+
+        result: dict[str, dict[str, PsetDict]] = {}
+
+        for bsdd_class in bsdd_dictionary.Classes:
+            if not cls.is_class_added(bsdd_class):
+                continue
+            psets: dict[str, PsetDict] = {}
+            for cp in bsdd_class.ClassProperties:
+                pset_name = cp.PropertySet or ""
+                prop_checked = False
+                for spec in active_specifications:
+                    p_guid, m_guid = cls._get_spec_key(spec)
+                    if cls.is_property_included(bsdd_class, cp, p_guid, m_guid):
+                        prop_checked = True
+    
+                entry = psets.setdefault(pset_name, {"checked": False, "properties": {}})
+                entry["properties"][cp.Code] = prop_checked
+                if prop_checked:
+                    entry["checked"] = True
+
+            if psets:
+                result[bsdd_class.Code] = psets
+
+        return result
 
     @classmethod
     def reset(cls) -> None:
@@ -689,7 +753,7 @@ class PropertyPicker(ActionTool, WidgetTool):
         xml_bytes = loin.to_xml(
             encoding="UTF-8",
             xml_declaration=True,
-            exclude_none=True,
+            exclude_none=False,
             exclude_unset=True,
         )
         with open(out_path, "wb") as f:
@@ -760,7 +824,7 @@ class PropertyPicker(ActionTool, WidgetTool):
             if props.receiving_actor is None:
                 props.receiving_actor = spec.prerequisites.receiving_actor
 
-            key = (purpose.guid, milestone.guid)
+            key = cls._get_spec_key(spec)
             props.specs[key] = spec
             class_codes: set[str] = set()
             prop_buckets: dict[str, set[tuple[str, str]]] = {}
@@ -856,23 +920,10 @@ class PPClassView(ItemViewTool):
         cls.signals.set_inheritance_requested.connect(cls.set_checkstate_inheritance)
         return super().connect_internal_signals()
 
-    @classmethod
-    def get_checkstate(cls, bsdd_class: BsddClass, view: model_views.ClassView):
-        return cls.get_check_dict(view).get(bsdd_class.Code, True)
-
-    @classmethod
-    def set_checkstate(cls, bsdd_class: BsddClass, state: bool, view: model_views.ClassView):
-        if view not in cls.get_properties().checkstate_dict:
-            cls.get_properties().checkstate_dict[view] = {}
-        cls.get_properties().checkstate_dict[view][bsdd_class.Code] = state
-
-    @classmethod
-    def get_check_dict(cls, view: model_views.ClassView):
-        return cls.get_properties().checkstate_dict.get(view, {})
 
     @classmethod
     def build_full_check_dict(cls, view: model_views.ClassView, bsdd_dictionary: BsddDictionary):
-        partial = cls.get_check_dict(view)
+        partial = cls.get_checked_classes(view)
         full = {}
 
         def walk(node: BsddClass, inherited: bool):
@@ -886,12 +937,6 @@ class PPClassView(ItemViewTool):
 
         return full
 
-    @classmethod
-    def set_check_dict(cls, check_dict, tree_view: model_views.ClassView):
-        model: models.ClassTreeModel = tree_view.model().sourceModel()
-        model.beginResetModel()
-        cls.get_properties().checkstate_dict[tree_view] = check_dict
-        model.endResetModel()
 
     @classmethod
     def set_checkstate_inheritance(cls, state: bool, view: model_views.ClassView):
@@ -947,95 +992,9 @@ class PPPropertyView(ItemViewTool):
             return ""
         return bsdd_property.Code
 
-    @classmethod
-    def get_checkstate(
-        cls, view: model_views.PropertyView, bsdd_class_property: BsddClassProperty | str
-    ):
-        model: models.PropertyTreeModel = view.model().sourceModel()
-        pset_name = (
-            bsdd_class_property
-            if isinstance(bsdd_class_property, str)
-            else bsdd_class_property.PropertySet
-        )
-        property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
-        bsdd_class_code = model.bsdd_data.Code
-        checkstate_dict: PsetDict = cls.get_check_dict(view)
-        class_dict = checkstate_dict.get(bsdd_class_code, None)
-        if not class_dict:
-            return True
-        pset_dict = class_dict.get(pset_name)
-        if not pset_dict:
-            return True
-        if property_code is None:  # propertySet
-            return pset_dict.get("checked", True)
-        else:
-            return pset_dict["properties"].get(property_code, True)
 
     @classmethod
-    def set_checkstate(
-        cls,
-        view: model_views.PropertyView,
-        bsdd_class_property: BsddClassProperty | str,
-        state: bool,
-    ):
-        model: models.PropertyTreeModel = view.model().sourceModel()
-        bsdd_class = model.bsdd_data
-        if not bsdd_class:
-            return
-
-        pset_name = (
-            bsdd_class_property
-            if isinstance(bsdd_class_property, str)
-            else bsdd_class_property.PropertySet
-        )
-        property_code = None if isinstance(bsdd_class_property, str) else bsdd_class_property.Code
-        if view not in cls.get_properties().checkstate_dict:
-            cls.get_properties().checkstate_dict[view] = {}
-
-        if bsdd_class.Code not in cls.get_properties().checkstate_dict[view]:
-            cls.get_properties().checkstate_dict[view][bsdd_class.Code] = dict()
-
-        checkstate_dict = cls.get_properties().checkstate_dict[view][bsdd_class.Code]
-        if pset_name not in checkstate_dict:
-            checkstate_dict[pset_name] = {"checked": True, "properties": dict()}
-        if not property_code:
-            checkstate_dict[pset_name]["checked"] = state
-        else:
-            checkstate_dict[pset_name]["properties"][property_code] = state
-
-    @classmethod
-    def get_check_dict(cls, view: model_views.PropertyView) -> dict[str, PsetDict]:
-        return cls.get_properties().checkstate_dict.get(view, {})
-
-    @classmethod
-    def build_full_check_dict(cls, view: model_views.PropertyView, bsdd_dictionary: BsddDictionary):
-        partial = cls.get_check_dict(view)
-        full = {}
-
-        for node in bsdd_dictionary.Classes:
-            class_partial = partial.get(node.Code, {})
-            psets = {}
-            for cp in node.ClassProperties:
-                pset_partial = class_partial.get(
-                    cp.PropertySet, {"checked": True, "properties": {}}
-                )
-                entry = psets.setdefault(
-                    cp.PropertySet, {"checked": pset_partial["checked"], "properties": {}}
-                )
-                entry["properties"][cp.Code] = pset_partial["properties"].get(cp.Code, True)
-            full[node.Code] = psets
-
-        return full
-
-    @classmethod
-    def set_check_dict(cls, check_dict, tree_view: model_views.PropertyView):
-        model: models.ClassTreeModel = tree_view.model().sourceModel()
-        model.beginResetModel()
-        cls.get_properties().checkstate_dict[tree_view] = check_dict
-        model.endResetModel()
+    def get_check_dict(cls, view: model_views.PropertyView) -> dict[ClassCode, PsetDict]:
+        return None
 
 
-@classmethod
-def get_class_view(cls, property_view: model_views.PropertyView) -> model_views.ClassView:
-    widget: ui.Widget = property_view.parent().parent()
-    return widget.tv_classes

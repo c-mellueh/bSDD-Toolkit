@@ -237,7 +237,7 @@ class Excel(ActionTool, FieldTool):
         # cls.autoadjust_column_widths(sheet, 5)
 
     @classmethod
-    def create_class_sheet(cls,root_class:BsddClass,bsdd_dict:BsddDictionary,workbook:Workbook,class_settings:dict,property_settings:dict):
+    def create_class_sheet(cls,root_class:BsddClass,bsdd_dict:BsddDictionary,workbook:Workbook,checked_classes:list[BsddClass],property_settings:dict):
         classes = [root_class]
         property_dict = property_settings.get(root_class.Code,{})
         class_sheet = workbook.create_sheet(root_class.Name)
@@ -248,7 +248,7 @@ class Excel(ActionTool, FieldTool):
         column +=constants.COLUMN_COUNT
 
         for child in cls.get_all_children(root_class,bsdd_dict):
-            if not class_settings.get(child.Code,True):
+            if not child in checked_classes:
                 continue
 
             classes.append(child)
@@ -282,8 +282,8 @@ class Excel(ActionTool, FieldTool):
     def create_build_thread(
         cls,
         bsdd_dict: BsddDictionary,
-        class_settings: dict[str, bool],
-        property_settings: PsetDict,
+        checked_classes: dict[str, bool],
+        checked_properties: PsetDict,
         out_path:str
     ):
         class _BuildWorker(QObject):
@@ -295,7 +295,7 @@ class Excel(ActionTool, FieldTool):
 
             def run(self):
                 try:
-                    bsdd_classes = [c for c in bsdd_dict.Classes if  c.ClassType == "Class" and class_settings.get(c.Code,True)]
+                    bsdd_classes = [c for c in checked_classes if  c.ClassType == "Class"]
                     root_classes = [c for c in bsdd_classes if not c.ParentClassCode ]
                     workbook = openpyxl.Workbook()
                     overview_sheet = workbook.active
@@ -303,7 +303,7 @@ class Excel(ActionTool, FieldTool):
                     filtered_classes:list[BsddClass] = list()
 
                     for bsdd_class in root_classes:
-                        created_classes =cls.create_class_sheet(bsdd_class,bsdd_dict,workbook,class_settings,property_settings)
+                        created_classes =cls.create_class_sheet(bsdd_class,bsdd_dict,workbook,checked_classes,checked_properties)
                         filtered_classes.extend(created_classes)
 
                     cls.create_overview_sheet(filtered_classes,overview_sheet)

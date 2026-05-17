@@ -132,11 +132,11 @@ class IdsExporter(ActionTool, FieldTool):
 
     @classmethod
     def build_inherited_checkstate_dict(
-        cls, bsdd_classes: list[BsddClass], old_checkstate_dict: dict[str, bool]
+        cls, bsdd_classes: list[BsddClass], checked_classes: list[BsddClass]
     ):
         def _iter_classes(child_classes: list[BsddClass], parent_checkstate: bool):
             for child in child_classes:
-                checkstate = old_checkstate_dict.get(child.Code, True) and parent_checkstate
+                checkstate = child in checked_classes and parent_checkstate
                 new_checkstate_dict[child.Code] = checkstate
                 _iter_classes(class_utils.get_children(child), checkstate)
 
@@ -469,7 +469,7 @@ class IdsExporter(ActionTool, FieldTool):
     def _run_setup(
         cls,
         widget: ui.IdsWidget,
-        class_settings: dict[str, bool],
+        checked_classes: list[BsddClass],
         property_settings: PsetDict,
         base_settings: BasicSettingsDict,
         metadata_settings: MetadataDict,
@@ -502,9 +502,9 @@ class IdsExporter(ActionTool, FieldTool):
 
         cls.fill_ids_by_metadata(ids, metadata_settings)
         if base_settings["inherit"]:
-            cs = cls.build_inherited_checkstate_dict(bsdd_dict.Classes, class_settings)
+            cs = cls.build_inherited_checkstate_dict(bsdd_dict.Classes, checked_classes)
         else:
-            cs = class_settings
+            cs = {c.Code: True for c in checked_classes}
 
         sorted_classes = sorted([c for c in bsdd_dict.Classes if c.ClassType == "Class"],key=lambda x: x.Code)
         payload: PayLoadDict = {
@@ -523,7 +523,7 @@ class IdsExporter(ActionTool, FieldTool):
     def create_setup_thread(
         cls,
         widget: ui.IdsWidget,
-        class_settings: dict[str, bool],
+        checked_classes: list[BsddClass],
         property_settings: PsetDict,
         base_settings: BasicSettingsDict,
         metadata_settings: MetadataDict,
@@ -539,7 +539,7 @@ class IdsExporter(ActionTool, FieldTool):
                 try:
                     payload = cls._run_setup(
                         widget,
-                        class_settings,
+                        checked_classes,
                         property_settings,
                         base_settings,
                         metadata_settings,

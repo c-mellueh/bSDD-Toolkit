@@ -13,8 +13,9 @@ if TYPE_CHECKING:
     )
 
 ClassCode = str
+PropertyCode = str
 # (pset_name, property_code) — None means "the property set as a whole" (not used yet)
-PropertyKey = Tuple[str, str]
+PropertyKey = Tuple[str, PropertyCode]
 SpecKey = Tuple[UUID, UUID]
 
 
@@ -60,10 +61,8 @@ class PropertyPickerProperties(ActionsProperties,WidgetProperties):
 class PPClassViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()
-        self.checkstate_dict = {}
 
 
 class PPPropertyViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()
-        self.checkstate_dict = {}

@@ -27,9 +27,8 @@ from bsdd_gui.module.iso_export.datamodel import (
     Container
 )
 
-class GroupPropertyDict(TypedDict):
-    pset:BsddClass
-    property_codes:set[str]
+
+
 class PsetDict(TypedDict):
     checked: bool
     properties: dict[str, bool]
@@ -50,8 +49,7 @@ class SettingsDict(TypedDict):
 
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.iso_export.prop import IsoExportProperties
-
+    from bsdd_gui.module.iso_export.prop import IsoExportProperties,PropertyGroupDict,GroupPropertyDict
 
 class Signals(FieldSignals):
     pass
@@ -195,14 +193,14 @@ class IsoExport(ActionTool, FieldTool):
         return bsdd_property, prop
 
     @classmethod
-    def build_group_of_properties(cls,group_properties_dict:GroupPropertyDict,project:BsddDictionary):
+    def build_group_of_properties(cls,group_properties_dict:PropertyGroupDict,project:BsddDictionary):
 
-        for pset_code,pset_dict in group_properties_dict.items():
-            pset:BsddClass = pset_dict["pset"]
-            allowed_properties:list[BsddClassProperty] = [cp for cp in pset.ClassProperties if cp.Code in pset_dict["property_codes"]]
+        for pset_code,property_group_dict in group_properties_dict.items():
+            pset= property_group_dict["pset"]
+            allowed_properties:list[BsddClassProperty] = [cp for cp in pset.ClassProperties if cp.Code in property_group_dict["property_codes"]]
             
             guid, xml_class = cls.create_class(pset,"name property set")
-            cls.get_properties().property_groups[pset.Code] = {"guid": guid, "xml_pset": xml_class, "properties": {}}
+            cls.get_properties().property_groups[pset.Code] = {"guid": guid, "xml_pset": xml_class, "properties": {},"bsdd_class": pset}
             for pset_property in allowed_properties:
                 bsdd_property, xml_property = cls.create_property(pset_property, guid,project)
                 if bsdd_property.Code not in cls.get_properties().bsdd_properties:
@@ -210,25 +208,15 @@ class IsoExport(ActionTool, FieldTool):
                 cls.get_properties().property_groups[pset.Code]["properties"][bsdd_property.Code] = xml_property
 
     @classmethod
-    def build_xml_properties(cls,project:BsddDictionary,class_settings:dict,property_settings:dict):
-        for bsdd_class in project.Classes:
+    def build_xml_properties(cls,project:BsddDictionary,checked_classes:list[BsddClass],checked_properties:dict):
+        for bsdd_class in checked_classes:
             if bsdd_class.ClassType != "Class":
                 continue
-            if not class_settings.get(bsdd_class.Code,True):
-                continue
-            parent_class = class_utils.get_parent(bsdd_class,project)
-            if parent_class:
-                parent_prop_codes = [cl_prop.PropertyCode for cl_prop in parent_class.ClassProperties]
-            else:
-                parent_prop_codes = []
-
             guid, xml_class = cls.create_class(bsdd_class,"class")
-            cls.get_properties().property_groups[bsdd_class.Code] = {"guid": guid, "xml_pset": xml_class, "properties": {}}
+            cls.get_properties().property_groups[bsdd_class.Code] = {"guid": guid, "xml_pset": xml_class, "properties": {}, "bsdd_class": bsdd_class}
             for class_property in bsdd_class.ClassProperties:
-                is_active = property_settings.get(bsdd_class.Code,{}).get(class_property.PropertySet,{}).get(class_property.Code,True)
+                is_active = checked_properties.get(bsdd_class.Code,{}).get(class_property.PropertySet,{}).get(class_property.Code,True)
                 if not is_active:
-                    continue
-                if class_property.PropertyCode in parent_prop_codes:
                     continue
                 bsdd_property = property_utils.get_property_by_class_property(class_property,project)
                 xml_property = cls.get_properties().bsdd_properties.get(bsdd_property.Code)
@@ -240,56 +228,92 @@ class IsoExport(ActionTool, FieldTool):
                     xml_property.groupOfProperties.append(guid)
 
     @classmethod
-    def find_group_properties(cls,project:BsddDictionary,class_settings,property_settings) -> GroupPropertyDict:
-        property_sets:GroupPropertyDict = {} #Code:{pset:BsddClass,property_codes:{}}
-        for bsdd_class in project.Classes:
-            if not class_settings.get(bsdd_class.Code,True):
+    def remove_inherited_properties(cls,bsdd_properties:dict,property_groups:dict[str,GroupPropertyDict]):
+        for bsdd_property, xml_property in bsdd_properties.items():
+            if len(xml_property.groupOfProperties) <= 1:
                 continue
+            parent_groups = xml_property.groupOfProperties.copy()
+            for group_guid in parent_groups:
+                xml_property_group = property_groups.get(group_guid)
+                if xml_property_group is None:
+                    continue
+                for other_group_guid in parent_groups:
+                    if group_guid == other_group_guid:
+                        continue
+                    other_xml_group = property_groups.get(other_group_guid)
+                    if other_xml_group is None:
+                        continue
+                    if bsdd_property.Code in group["properties"] and bsdd_property.Code in other_group["properties"]:
+                        if group["properties"][bsdd_property.Code].dateOfCreation < other_group["properties"][bsdd_property.Code].dateOfCreation:
+                            xml_property.groupOfProperties.remove(other_group_guid)
+                        else:
+                            xml_property.groupOfProperties.remove(group_guid)
 
-            linked_psets:dict[str,BsddClass] = dict()
+    @classmethod
+    def find_checked_property_sets(cls,project:BsddDictionary,checked_classes:list[BsddClass],checked_properties:dict[str, dict[str, PsetDict]]) -> GroupPropertyDict:
+        """Return all predefined property sets that are linked to checked classes, along with the checked properties in those sets."""
+        property_sets:GroupPropertyDict = {} #{Code:{pset:BsddClass,property_codes:{}}
+        
+        class_utils
+
+        
+        for bsdd_class in project.Classes:
+            if bsdd_class not in checked_classes:
+                continue
+            related_psets = {p.Code:p for p in class_utils.get_related_psets(bsdd_class,project)}
             for bsdd_property in bsdd_class.ClassProperties:
-                pset = bsdd_property.PropertySet
-                if class_utils.is_pset_linked(bsdd_class,pset,project):
-                    if pset not in linked_psets:
-                        linked_psets[pset] = class_utils.get_related_pset(bsdd_class,project,pset)
-                else:
+                pset_name = bsdd_property.PropertySet
+                linked_pset = related_psets.get(pset_name)
+                if not linked_pset:
                     continue
                 
-                linked_pset = linked_psets[pset]
-                if bsdd_class.Code not in property_settings:
-                    property_sets[pset] = {"pset":linked_pset,"property_codes":{cp.Code for cp in linked_pset.ClassProperties}}
+                
+                if bsdd_class.Code not in checked_properties:
+                    property_sets[pset_name] = {"pset":linked_pset,"property_codes":{cp.Code for cp in linked_pset.ClassProperties}}
                     continue
 
-                pset_data = property_settings.get(bsdd_class.Code,{}).get(pset,{})
+                pset_data = checked_properties.get(bsdd_class.Code,{}).get(pset_name,{})
                 if not pset_data.get("checked",True):
                     continue
-                if  pset not in property_sets:
-                    property_sets[pset] = {"pset":linked_pset,"property_codes":set()}
+                if  pset_name not in property_sets:
+                    property_sets[pset_name] = {"pset":linked_pset,"property_codes":set()}
                 for cp in linked_pset.ClassProperties:
                     if pset_data.get("properties",{}).get(cp.Code,True):
-                        property_sets[pset]["property_codes"].add(cp.Code)
-
+                        property_sets[pset_name]["property_codes"].add(cp.Code)
         return property_sets
 
     @classmethod
-    def build_parent_class_codes(cls,project,pg,class_settings):
+    def build_parent_class_codes(cls,project:BsddDictionary,pg:dict,checked_classes:list[BsddClass]):
         for bsdd_class in project.Classes:
-            if not class_settings.get(bsdd_class.Code,True):
+            if bsdd_class not in checked_classes:
                 continue
             if not bsdd_class.ParentClassCode:
                 continue
-            if not class_settings.get(bsdd_class.ParentClassCode,True):
+            parent = class_utils.get_parent(bsdd_class,project)
+            if parent is None or parent not in checked_classes:
                 continue
             xml_class:PropertyGroup = pg.get(bsdd_class.Code,{}).get("xml_pset")
             parent_xml_pset:PropertyGroup = pg.get(bsdd_class.ParentClassCode,{}).get("xml_pset")
             xml_class.parentGroupOfProperties = parent_xml_pset.guid
 
     @classmethod
+    def reset_data(cls):
+        cls.get_properties().property_groups = {}
+        cls.get_properties().bsdd_properties = {}
+
+    @classmethod
+    def _run_export(cls):
+        cls.reset_data()
+        checked_property_sets = cls.find_checked_property_sets()
+        cls.build_group_of_properties(checked_property_sets,project)
+
+
+    @classmethod
     def create_build_thread(
         cls,
         project: BsddDictionary,
-        class_settings: dict[str, bool],
-        property_settings: PsetDict,
+        checked_classes: dict[str, bool],
+        checked_properties: PsetDict,
         out_path:str
     ):
         class _BuildWorker(QObject):
@@ -303,15 +327,16 @@ class IsoExport(ActionTool, FieldTool):
                 try:
                     cls.get_properties().property_groups = {}
                     cls.get_properties().bsdd_properties:dict[BsddProperty,Property] = {}
-                    gpd = cls.find_group_properties(project,class_settings,property_settings)
-                    cls.build_group_of_properties(gpd,project)
-                    cls.build_xml_properties(project,class_settings,property_settings)
+                    checked_property_sets = cls.find_checked_property_sets(project,checked_classes,checked_properties)
+                    cls.build_group_of_properties(checked_property_sets,project)
+                    cls.build_xml_properties(project,checked_classes,checked_properties)
                     
                     pg  = cls.get_properties().property_groups
                     bp = cls.get_properties().bsdd_properties
                     v1 = [x["xml_pset"] for x in pg.values()]
                     v2 = list(bp.values())
-                    cls.build_parent_class_codes(project,pg,class_settings)
+                    cls.build_parent_class_codes(project,pg,checked_classes)
+                    cls.remove_inherited_properties(bg,pg)
                     container = Container(propertyGroup=v1,property_=v2)
                     xml_bytes = container.to_xml(
                         encoding="UTF-8",
