@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>709</width>
-    <height>486</height>
+    <width>798</width>
+    <height>481</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,13 +23,48 @@
       <property name="orientation">
        <enum>Qt::Orientation::Vertical</enum>
       </property>
-      <widget class="ClassView" name="tv_classes"/>
-      <widget class="QTableView" name="tv_pset"/>
+      <widget class="QWidget" name="verticalLayoutWidget_2">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="lb_classes">
+          <property name="text">
+           <string>Classes</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="ClassView" name="tv_classes"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="verticalLayoutWidget">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="lb_predefined_properties">
+          <property name="text">
+           <string>Predefined Properties</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="PsetView" name="tv_pset"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
-     <widget class="PropertyView" name="tv_properties">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
+     <widget class="QWidget" name="verticalLayoutWidget_3">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Class Properties</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="PropertyView" name="tv_properties"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -43,6 +78,11 @@
   </customwidget>
   <customwidget>
    <class>PropertyView</class>
+   <extends>QTreeView</extends>
+   <header>bsdd_gui.module.property_picker.model_views</header>
+  </customwidget>
+  <customwidget>
+   <class>PsetView</class>
    <extends>QTreeView</extends>
    <header>bsdd_gui.module.property_picker.model_views</header>
   </customwidget>

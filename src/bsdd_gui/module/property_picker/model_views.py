@@ -2,7 +2,7 @@ import json
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QPainter
-from PySide6.QtWidgets import QMenu, QTreeView
+from PySide6.QtWidgets import QAbstractItemView, QMenu, QTreeView
 
 from bsdd_gui import tool
 from . import trigger
@@ -62,6 +62,7 @@ class ClassView(_UcMsViewMixin):
         super().__init__(*args, **kwargs)
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(False)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.customContextMenuRequested.connect(self._show_context_menu)
         trigger.class_view_created(self)
 
@@ -84,9 +85,23 @@ class ClassView(_UcMsViewMixin):
         node = index.internalPointer()
         if node is None:
             return
+
+        # Collect every selected class (column 0 only, deduplicated).
+        selected_nodes = [
+            idx.internalPointer()
+            for idx in self.selectedIndexes()
+            if idx.column() == 0 and idx.internalPointer() is not None
+        ]
+        # Always include the right-clicked node even if it wasn't in the selection.
+        if node not in selected_nodes:
+            selected_nodes = [node]
+
         menu = _ContextMenu(self)
-        name = getattr(node, "Name", None) or getattr(node, "Code", None) or "Class"
-        menu.addAction(f"Remove '{name}'", lambda: trigger.class_removed(node))
+        if len(selected_nodes) > 1:
+            menu.addAction(f"Remove {len(selected_nodes)} classes", lambda nodes=selected_nodes: [trigger.class_removed(n) for n in nodes])
+        else:
+            name = getattr(node, "Name", None) or getattr(node, "Code", None) or "Class"
+            menu.addAction(f"Remove '{name}'", lambda: trigger.class_removed(node))
 
         purposes = _current_purposes()
         milestones = _current_milestones()

@@ -993,7 +993,7 @@ class PPClassView(ItemViewTool):
 
     @classmethod
     def get_property_view(cls, class_view: model_views.ClassView) -> model_views.PropertyView:
-        widget: ui.Widget = class_view.parent().parent().parent()
+        widget: ui.Widget = class_view.parent().parent().parent().parent()
         return widget.tv_properties
 
     @classmethod
