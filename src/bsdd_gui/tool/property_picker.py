@@ -473,24 +473,39 @@ class PropertyPicker(ActionTool, WidgetTool):
             for child in class_utils.get_children(parent):
                 if child.Code not in props.added_classes:
                     continue
-                cls.set_class_included(child, purpose_guid, milestone_guid, included)
+                cls._set_class_included_silent(child, purpose_guid, milestone_guid, included)
                 walk(child)
 
         walk(bsdd_class)
+        cls.get_signals().spec_membership_changed.emit()
         cls.get_signals().added_classes_changed.emit()
 
     @classmethod
     def remove_class(cls, bsdd_class: BsddClass) -> None:
-        """Remove a class from the property picker and all specs it belongs to."""
+        """Remove a class and all its descendants from the property picker."""
         props = cls.get_properties()
-        code = bsdd_class.Code
-        props.added_classes.discard(code)
-        for key in list(props.specs.keys()):
-            props.classes_in_spec.get(key, set()).discard(code)
-            props.properties_in_spec.get(key, {}).pop(code, None)
-            spec = props.specs.get(key)
-            if spec is not None:
-                cls._remove_class_from_spec(spec, bsdd_class)
+
+        # Collect the class plus every descendant that is currently added.
+        to_remove: list[BsddClass] = []
+
+        def _collect(parent: BsddClass) -> None:
+            to_remove.append(parent)
+            for child in class_utils.get_children(parent):
+                if child.Code in props.added_classes:
+                    _collect(child)
+
+        _collect(bsdd_class)
+
+        for bc in to_remove:
+            code = bc.Code
+            props.added_classes.discard(code)
+            for key in list(props.specs.keys()):
+                props.classes_in_spec.get(key, set()).discard(code)
+                props.properties_in_spec.get(key, {}).pop(code, None)
+                spec = props.specs.get(key)
+                if spec is not None:
+                    cls._remove_class_from_spec(spec, bc)
+
         cls.get_signals().added_classes_changed.emit()
 
     @classmethod
@@ -522,28 +537,7 @@ class PropertyPicker(ActionTool, WidgetTool):
         milestone_guid: UUID,
         included: bool,
     ) -> None:
-        props = cls.get_properties()
-        key = (purpose_guid, milestone_guid)
-        bucket = props.classes_in_spec.setdefault(key, set())
-
-        if included:
-
-            if bsdd_class.Code in bucket:
-                return
-            if bsdd_class.Code not in cls.get_properties().added_classes:
-                cls.get_properties().added_classes.add(bsdd_class.Code)
-            bucket.add(bsdd_class.Code)
-            spec = cls.get_or_create_spec(purpose_guid, milestone_guid)
-            cls._add_class_to_spec(spec, bsdd_class)
-        else:
-            if bsdd_class.Code not in bucket:
-                return
-            bucket.discard(bsdd_class.Code)
-            # Also clear any properties the class had under this spec.
-            props.properties_in_spec.get(key, {}).pop(bsdd_class.Code, None)
-            spec = props.specs.get(key)
-            if spec is not None:
-                cls._remove_class_from_spec(spec, bsdd_class)
+        cls._set_class_included_silent(bsdd_class, purpose_guid, milestone_guid, included)
         cls.get_signals().spec_membership_changed.emit()
 
     @classmethod
@@ -569,14 +563,55 @@ class PropertyPicker(ActionTool, WidgetTool):
         milestone_guid: UUID,
         included: bool,
     ) -> None:
+        cls._set_property_included_silent(bsdd_class, bsdd_property, purpose_guid, milestone_guid, included)
+        cls.get_signals().spec_membership_changed.emit()
+
+    @classmethod
+    def _set_class_included_silent(
+        cls,
+        bsdd_class: "BsddClass",
+        purpose_guid: UUID,
+        milestone_guid: UUID,
+        included: bool,
+    ) -> None:
+        """Like set_class_included but without emitting spec_membership_changed."""
+        props = cls.get_properties()
+        key = (purpose_guid, milestone_guid)
+        bucket = props.classes_in_spec.setdefault(key, set())
+        if included:
+            if bsdd_class.Code in bucket:
+                return
+            if bsdd_class.Code not in props.added_classes:
+                props.added_classes.add(bsdd_class.Code)
+            bucket.add(bsdd_class.Code)
+            spec = cls.get_or_create_spec(purpose_guid, milestone_guid)
+            cls._add_class_to_spec(spec, bsdd_class)
+        else:
+            if bsdd_class.Code not in bucket:
+                return
+            bucket.discard(bsdd_class.Code)
+            props.properties_in_spec.get(key, {}).pop(bsdd_class.Code, None)
+            spec = props.specs.get(key)
+            if spec is not None:
+                cls._remove_class_from_spec(spec, bsdd_class)
+
+    @classmethod
+    def _set_property_included_silent(
+        cls,
+        bsdd_class: "BsddClass",
+        bsdd_property: "BsddClassProperty",
+        purpose_guid: UUID,
+        milestone_guid: UUID,
+        included: bool,
+    ) -> None:
+        """Like set_property_included but without emitting spec_membership_changed."""
         props = cls.get_properties()
         key = (purpose_guid, milestone_guid)
         per_class = props.properties_in_spec.setdefault(key, {})
         bucket = per_class.setdefault(bsdd_class.Code, set())
         prop_key = (bsdd_property.PropertySet, bsdd_property.Code)
         if included:
-            # Auto-check the class first.
-            cls.set_class_included(bsdd_class, purpose_guid, milestone_guid, True)
+            cls._set_class_included_silent(bsdd_class, purpose_guid, milestone_guid, True)
             if prop_key in bucket:
                 return
             bucket.add(prop_key)
@@ -593,6 +628,19 @@ class PropertyPicker(ActionTool, WidgetTool):
                 spec_per_obj = cls._find_spec_per_object_type(spec, bsdd_class)
                 if spec_per_obj is not None:
                     cls._remove_property_from_spec_per_obj(spec_per_obj, bsdd_property)
+
+    @classmethod
+    def set_pset_included(
+        cls,
+        pset_classes: "list[tuple[BsddClass, list[BsddClassProperty]]]",
+        purpose_guid: UUID,
+        milestone_guid: UUID,
+        included: bool,
+    ) -> None:
+        """Set all properties of a pset across multiple classes, emitting the signal once."""
+        for bsdd_class, props in pset_classes:
+            for cp in props:
+                cls._set_property_included_silent(bsdd_class, cp, purpose_guid, milestone_guid, included)
         cls.get_signals().spec_membership_changed.emit()
 
     # ----------------------------------------- LoinSpecificationPerObjectType helpers

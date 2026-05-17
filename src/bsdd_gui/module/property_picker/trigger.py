@@ -45,6 +45,10 @@ def property_view_created(view: model_views.PropertyView):
     core.connect_property_view(view, tool.PPPropertyView, tool.PPClassView)
 
 
+def pset_view_created(view: model_views.PsetView):
+    core.register_pset_view(view)
+
+
 def context_menu_requested(*_):
     pass
 

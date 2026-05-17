@@ -46,6 +46,11 @@ def register_property_view(
     view.setModel(PropertyModel())
 
 
+def register_pset_view(view: model_views.PsetView):
+    from bsdd_gui.module.property_picker.uc_ms import PsetModel
+    view.setModel(PsetModel())
+
+
 
 def connect_class_view(tree_view: model_views.ClassView, class_view: type[tool.PPClassView]):
     class_view.connect_view_signals(tree_view)

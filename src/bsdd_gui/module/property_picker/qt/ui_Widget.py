@@ -16,9 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHeaderView, QSizePolicy,
-    QSplitter, QTableView, QWidget)
+    QSplitter, QWidget)
 
-from bsdd_gui.module.property_picker.model_views import (ClassView, PropertyView)
+from bsdd_gui.module.property_picker.model_views import (ClassView, PropertyView, PsetView)
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -36,7 +36,7 @@ class Ui_Form(object):
         self.tv_classes = ClassView(self.spl_vertical)
         self.tv_classes.setObjectName(u"tv_classes")
         self.spl_vertical.addWidget(self.tv_classes)
-        self.tv_pset = QTableView(self.spl_vertical)
+        self.tv_pset = PsetView(self.spl_vertical)
         self.tv_pset.setObjectName(u"tv_pset")
         self.spl_vertical.addWidget(self.tv_pset)
         self.spl_horizontal.addWidget(self.spl_vertical)

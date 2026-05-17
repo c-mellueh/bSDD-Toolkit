@@ -46,6 +46,10 @@ class _UcMsViewMixin(QTreeView):
             model = proxy
         if model is not None and hasattr(model, "register_view"):
             model.register_view(self)
+        # Keep a strong Python reference so PySide6 can't GC the model wrapper
+        # while C++ still holds a raw pointer — without this, signal connections
+        # on the model are silently dropped after garbage collection.
+        self._uc_ms_model = model
         super().setModel(model)
 
 
@@ -175,3 +179,9 @@ class PropertyView(_UcMsViewMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         trigger.property_view_created(self)
+
+
+class PsetView(_UcMsViewMixin):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        trigger.pset_view_created(self)
