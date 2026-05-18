@@ -125,7 +125,7 @@ class IdsExporter(ActionTool, FieldTool):
 
         var = "ids_template"
         path = tool.Appdata.get_path(var)
-        if not path:
+        if not path or not os.path.exists(path):
             path = os.path.join(DATA_PATH, "template.ids")
         tool.Appdata.set_path(var, path)
         return path
@@ -474,15 +474,28 @@ class IdsExporter(ActionTool, FieldTool):
         base_settings: BasicSettingsDict,
         metadata_settings: MetadataDict,
     ) -> PayLoadDict:
+        
         out_path = widget.fw_output.get_path()
+        logging.debug(f"Output path: {out_path}")
         template_path = cls.get_template()
+        logging.debug(f"Template path: {template_path}")
+
         ifc_version = metadata_settings.get("ifc_versions", ["IFC4X3_ADD2"])
         bsdd_dict = widget.bsdd_data
+        logging.debug("load Template")
         ids = ifctester.ids.open(template_path)
+        logging.debug(f"Template IDS loaded with {len(ids.specifications)} specifications")
+
         base_spec = ids.specifications[0]
+        logging.debug(f"Base specification: {base_spec}")
+
         if base_settings.get("classification", False):
+            logging.debug("Use Classification: True")
+
             ids.specifications = list()
         else:
+            logging.debug("Use Classification: False")
+
             mp = base_settings.get("main_property", "")
             mps = base_settings.get("main_pset", "")
             base_requirement: PropertyFacet = base_spec.requirements[0]
@@ -499,6 +512,8 @@ class IdsExporter(ActionTool, FieldTool):
             base_restriction.options = {"enumeration": sorted(identifiers)}
             base_requirement.dataType = base_settings.get("datatype")
             base_spec.ifcVersion = ifc_version
+
+        logging.debug("Basic Classification created")
 
         cls.fill_ids_by_metadata(ids, metadata_settings)
         if base_settings["inherit"]:
@@ -517,6 +532,8 @@ class IdsExporter(ActionTool, FieldTool):
             "ifc_version": ifc_version,
             "out_path": out_path,
         }
+        logging.debug("Payload created")
+
         return payload
 
     @classmethod
@@ -537,6 +554,7 @@ class IdsExporter(ActionTool, FieldTool):
 
             def run(self):
                 try:
+                    logging.info("Start setup thread!")
                     payload = cls._run_setup(
                         widget,
                         checked_classes,
@@ -544,6 +562,7 @@ class IdsExporter(ActionTool, FieldTool):
                         base_settings,
                         metadata_settings,
                     )
+                    logging.info("Finished setup thread!")
                     self.finished.emit(payload)
 
                 except Exception as exc:  # pragma: no cover - pass through
@@ -658,6 +677,7 @@ class IdsExporter(ActionTool, FieldTool):
 
     @classmethod
     def fill_ids_by_metadata(cls, ids, metadata: MetadataDict):
+        logging.debug("Fill IDS metadata")
 
         ids.info["title"] = metadata.get("title", ids.info.get("title"))
         ids.info["description"] = metadata.get("description", ids.info.get("description"))

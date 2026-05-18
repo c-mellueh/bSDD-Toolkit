@@ -235,15 +235,16 @@ def import_settings(
 def export_ids(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    pp_class_view: Type[tool.PPClassView],
-    pp_property_view: Type[tool.PPPropertyView],
     popups: Type[tool.Popups],
     util: Type[tool.Util],
+    project: Type[tool.Project],
+    property_picker: Type[tool.PropertyPicker],
 ):
-
     widget_tool.sync_to_model(widget, widget.bsdd_data)
-    checked_classes = pp_class_view.get_checked_classes(widget.property_picker.tv_classes)
-    property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
+    bsdd_dict = project.get()
+    specs = list(property_picker.get_properties().specs.values())
+    checked_classes = property_picker.get_checked_classes(specs, bsdd_dict)
+    property_settings = property_picker.get_checked_properties(specs, bsdd_dict)
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 
@@ -265,8 +266,10 @@ def export_ids(
         creator_thread.finished.connect(lambda: _export(payload["ids"], payload["out_path"]))
         creator_thread.start()
 
-    def _setup_failed(_exc: Exception):
+    def _show_error(exc: Exception):
         stop_waiting_widget(waiting_worker)
+        t = QCoreApplication.translate("IDSExport", "Export Error")
+        popups.create_info_popup(str(exc), t, t, parent=widget)
 
     def _dispatch_specification(payload: PayLoadDict):
         # queue execution on the main thread (mw affinity)
@@ -278,7 +281,7 @@ def export_ids(
 
         write_worker, write_thread = widget_tool.create_write_thread(ids, out_path)
         waiting_widget.set_title("Write IDS")
-        write_thread.finished.connect(
+        write_worker.finished.connect(
             lambda: popups.create_info_popup(
                 f"{len(ids.specifications)} Specifications created.",
                 "IDS Export Done!",
@@ -286,10 +289,11 @@ def export_ids(
                 parent=widget,
             )
         )
+        write_worker.finished.connect(lambda: stop_waiting_widget(waiting_worker))
+        write_worker.error.connect(_show_error)
         logging.info("Export Done!")
-        write_thread.finished.connect(lambda: stop_waiting_widget(waiting_worker))
         write_thread.start()
 
     setup_worker.finished.connect(_dispatch_specification)
-    setup_worker.error.connect(_setup_failed)
+    setup_worker.error.connect(_show_error)
     setup_thread.start()
