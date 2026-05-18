@@ -11,7 +11,7 @@ from bsdd_gui.presets.ui_presets.waiting import stop_waiting_widget
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.excel import ui
-    from bsdd_gui.tool.property_picker import PsetDict
+    from bsdd_gui.tool.loin import PsetDict
     from bsdd_gui.tool.excel import SettingsDict
     from bsdd_json import BsddClass
 
@@ -105,7 +105,7 @@ def export(    widget: ui.Widget,
     popups: Type[tool.Popups],
     util:Type[tool.Util],
     project:type[tool.Project],
-    property_picker:Type[tool.PropertyPicker],):
+    loin:Type[tool.Loin],):
     
     excel.sync_to_model(widget, widget.bsdd_data)
     title = QCoreApplication.translate("Excel", "Export Excel")
@@ -113,11 +113,11 @@ def export(    widget: ui.Widget,
     waiting_widget.set_title("Load Data")
     bsdd_dict = project.get()
 
-    specs = property_picker.select_specs_dialog(widget)
+    specs = loin.select_specs_dialog(widget)
     if not specs:
         return
-    checked_classes = property_picker.get_checked_classes(specs,bsdd_dict)
-    checked_properties = property_picker.get_checked_properties(specs,bsdd_dict)
+    checked_classes = loin.get_checked_classes(specs,bsdd_dict)
+    checked_properties = loin.get_checked_properties(specs,bsdd_dict)
     base_settings = excel.get_settings(widget)
     out_path = widget.fw_output.get_path()
 

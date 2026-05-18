@@ -25,7 +25,7 @@ from bsdd_gui.presets.tool_presets import (
     ItemViewTool,
     ViewSignals,
 )
-from bsdd_gui.module.property_picker import ui, trigger, model_views, models, constants
+from bsdd_gui.module.loin import ui, trigger, model_views, models, constants
 from bsdd_gui.module.iso_export.datamodel import (
     DtMultiLangText,
     DtRef,
@@ -43,8 +43,8 @@ from bsdd_gui.module.iso_export.datamodel import (
 )
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.property_picker.prop import (
-        PropertyPickerProperties,
+    from bsdd_gui.module.loin.prop import (
+        LoinProperties,
         PPClassViewProperties,
         PPPropertyViewProperties,
         ClassCode,
@@ -74,14 +74,14 @@ class Signals(WidgetSignals):
     loin_reset = Signal()
 
 
-class PropertyPicker(ActionTool, WidgetTool):
+class Loin(ActionTool, WidgetTool):
     signals = Signals()
 
 
 
     @classmethod
-    def get_properties(cls) -> PropertyPickerProperties:
-        return bsdd_gui.PropertyPickerProperties
+    def get_properties(cls) -> LoinProperties:
+        return bsdd_gui.LoinProperties
 
     @classmethod
     def get_signals(cls) -> Signals:

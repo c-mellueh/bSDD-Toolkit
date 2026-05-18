@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QToolButton, QVBoxLayout, QWidget)
 
 from bsdd_gui.module.ids_exporter.model_views import TagInput_IfcVersion
-from bsdd_gui.module.property_picker.ui import Widget
+from bsdd_gui.module.loin.ui import Widget
 from bsdd_gui.presets.ui_presets import (DateTimeWithNow, FileSelector, ToggleSwitch)
 
 class Ui_Form(object):
@@ -64,14 +64,14 @@ class Ui_Form(object):
         self.splitter.setSizePolicy(sizePolicy)
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(6)
-        self.property_picker = Widget(self.splitter)
-        self.property_picker.setObjectName(u"property_picker")
+        self.loin = Widget(self.splitter)
+        self.loin.setObjectName(u"loin")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.property_picker.sizePolicy().hasHeightForWidth())
-        self.property_picker.setSizePolicy(sizePolicy1)
-        self.splitter.addWidget(self.property_picker)
+        sizePolicy1.setHeightForWidth(self.loin.sizePolicy().hasHeightForWidth())
+        self.loin.setSizePolicy(sizePolicy1)
+        self.splitter.addWidget(self.loin)
         self.settings_widget = QWidget(self.splitter)
         self.settings_widget.setObjectName(u"settings_widget")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)

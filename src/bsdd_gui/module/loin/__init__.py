@@ -3,7 +3,7 @@ from . import ui, prop, trigger
 
 
 def register():
-    bsdd_gui.PropertyPickerProperties = prop.PropertyPickerProperties()
+    bsdd_gui.LoinProperties = prop.LoinProperties()
     bsdd_gui.PPClassViewProperties = prop.PPClassViewProperties()
     bsdd_gui.PPPropertyViewProperties = prop.PPPropertyViewProperties()
 

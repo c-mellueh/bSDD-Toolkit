@@ -43,7 +43,7 @@ def create_widget(data, parent, iso_export: Type[tool.IsoExport]):
     iso_export.show_widget(data, parent)
 
 
-def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],property_picker:Type[tool.PropertyPicker]):
+def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],loin:Type[tool.Loin]):
     iso_export.register_widget(widget)
     widget.fw_output.file_format = constants.ISO_FILETYPE
     widget.fw_output.section = "paths"
@@ -64,7 +64,7 @@ def register_validators(widget: ui.Widget, iso_epxort: Type[tool.IsoExport], uti
 
 
 
-def connect_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],property_picker:Type[tool.PropertyPicker]):
+def connect_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],loin:Type[tool.Loin]):
     iso_export.connect_widget_signals(widget)
 
 
@@ -76,7 +76,7 @@ def export( widget: ui.Widget,
     popups: Type[tool.Popups],
     util:Type[tool.Util],
     project:type[tool.Project],
-    property_picker:type[tool.PropertyPicker],):
+    loin:type[tool.Loin],):
 
     fmt = iso_export.get_export_format(widget)
     out_path = widget.fw_output.get_path()
@@ -111,12 +111,12 @@ def export( widget: ui.Widget,
     waiting_widget.set_title("Load Data")
 
     bsdd_dict = project.get()
-    specs = property_picker.select_specs_dialog(parent=widget)
+    specs = loin.select_specs_dialog(parent=widget)
     if specs is None:
         return
-    checked_classes = property_picker.get_checked_classes(specs, bsdd_dict)
-    checked_properties = property_picker.get_checked_properties(specs, bsdd_dict)
-    checked_predefined_porperties = property_picker.get_checked_predefined_properties(specs, bsdd_dict)
+    checked_classes = loin.get_checked_classes(specs, bsdd_dict)
+    checked_properties = loin.get_checked_properties(specs, bsdd_dict)
+    checked_predefined_porperties = loin.get_checked_predefined_properties(specs, bsdd_dict)
 
     def export_done(class_count:int):
         stop_waiting_widget(waiting_worker)

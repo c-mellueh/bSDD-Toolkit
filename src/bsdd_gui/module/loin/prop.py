@@ -28,7 +28,7 @@ SpecKey = Tuple[UUID, UUID]
 # by (purpose_guid, milestone_guid) gives us that.
 
 
-class PropertyPickerProperties(ActionsProperties,WidgetProperties):
+class LoinProperties(ActionsProperties,WidgetProperties):
     def __init__(self):
         super().__init__()
         # The in-memory LOIN document. Created fresh per project.

@@ -31,7 +31,7 @@ def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
     core.register_fields(widget, tool.IdsExporter)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
-    core.connect_widget(widget, tool.IdsExporter, tool.PPClassView, tool.PropertyPicker)
+    core.connect_widget(widget, tool.IdsExporter, tool.PPClassView, tool.Loin)
 
 
 def import_settings(widget: IdsWidget):
@@ -54,5 +54,5 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
 
 def export_ids(widget: IdsWidget):
     core.export_ids(
-        widget, tool.IdsExporter, tool.Popups, tool.Util, tool.Project, tool.PropertyPicker
+        widget, tool.IdsExporter, tool.Popups, tool.Util, tool.Project, tool.Loin
     )

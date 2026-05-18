@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
     QHeaderView, QLabel, QSizePolicy, QSpacerItem,
     QSplitter, QToolButton, QVBoxLayout, QWidget)
 
-from bsdd_gui.module.property_picker.model_views import (ClassView, PropertyView, PsetView)
+from bsdd_gui.module.loin.model_views import (ClassView, PropertyView, PsetView)
 
 class Ui_Form(object):
     def setupUi(self, Form):

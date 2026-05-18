@@ -139,7 +139,7 @@ def connect_widget(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
     pp_class_view: Type[tool.PPClassView],
-    property_picker: Type[tool.PropertyPicker],
+    loin: Type[tool.Loin],
 ):
     widget.cb_prop.hide()
     widget.cb_pset.hide()
@@ -154,7 +154,7 @@ def connect_widget(
     thread.finished.connect(lambda: setattr(widget, "_count_dialog", None))
     worker.finished.connect(lambda: widget_tool.fill_pset_combobox(widget))
     widget_tool.connect_widget_signals(widget)
-    class_view = widget.property_picker.tv_classes
+    class_view = widget.loin.tv_classes
     widget.cb_inh.toggled.connect(lambda cs: pp_class_view.request_set_inheritance(cs,class_view))
 
 
@@ -218,15 +218,15 @@ def export_ids(
     popups: Type[tool.Popups],
     util: Type[tool.Util],
     project: Type[tool.Project],
-    property_picker: Type[tool.PropertyPicker],
+    loin: Type[tool.Loin],
 ):
     widget_tool.sync_to_model(widget, widget.bsdd_data)
-    specs = property_picker.select_specs_dialog(parent=widget)
+    specs = loin.select_specs_dialog(parent=widget)
     if specs is None:
         return
     bsdd_dict = project.get()
-    checked_classes = property_picker.get_checked_classes(specs, bsdd_dict)
-    property_settings = property_picker.get_checked_properties(specs, bsdd_dict)
+    checked_classes = loin.get_checked_classes(specs, bsdd_dict)
+    property_settings = loin.get_checked_properties(specs, bsdd_dict)
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 

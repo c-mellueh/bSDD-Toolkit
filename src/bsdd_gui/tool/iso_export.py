@@ -366,9 +366,9 @@ class IsoExport(ActionTool, FieldTool):
 
             def run(self):
                 try:
-                    from bsdd_gui.tool.property_picker import PropertyPicker
+                    from bsdd_gui.tool.loin import Loin
 
-                    count = PropertyPicker.export_to_xml(out_path)
+                    count = Loin.export_to_xml(out_path)
                     self.finished.emit(count)
                 except Exception as exc:  # pragma: no cover - pass through
                     self.error.emit(exc)

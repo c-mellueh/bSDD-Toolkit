@@ -1,7 +1,7 @@
 from __future__ import annotations
 import bsdd_gui
 from bsdd_gui import tool
-from bsdd_gui.core import property_picker as core
+from bsdd_gui.core import loin as core
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -9,30 +9,30 @@ if TYPE_CHECKING:
 
 
 def connect():
-    core.connect_signals(tool.PropertyPicker, tool.PPClassView, tool.PPPropertyView)
+    core.connect_signals(tool.Loin, tool.PPClassView, tool.PPPropertyView)
 
 
 def retranslate_ui():
-    core.retranslate_ui(tool.PropertyPicker)
+    core.retranslate_ui(tool.Loin)
 
 
 def on_new_project():
-    core.reset(tool.PropertyPicker)
+    core.reset(tool.Loin)
 
     pass
 
 
 def create_widget(*args, **kwargs):
-    core.create_widget(args, tool.PropertyPicker)
+    core.create_widget(args, tool.Loin)
 
 
 def widget_created(widget: ui.Widget):
     core.register_widget(
         widget,
-        tool.PropertyPicker,
+        tool.Loin,
         tool.Project
     )
-    core.connect_widget(widget, tool.PropertyPicker, tool.PPClassView, tool.PPPropertyView)
+    core.connect_widget(widget, tool.Loin, tool.PPClassView, tool.PPPropertyView)
 
 
 def class_view_created(view: model_views.ClassView):
@@ -54,18 +54,18 @@ def context_menu_requested(*_):
 
 
 def classes_dropped(codes: list[str]) -> None:
-    core.add_classes_from_drop(codes, tool.PropertyPicker, tool.Project)
+    core.add_classes_from_drop(codes, tool.Loin, tool.Project)
 
 
 def class_removed(bsdd_class) -> None:
-    core.remove_class(bsdd_class, tool.PropertyPicker)
+    core.remove_class(bsdd_class, tool.Loin)
 
 
 def apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid) -> None:
-    core.apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid, tool.PropertyPicker)
+    core.apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid, tool.Loin)
 
 def import_xml(widget: ui.Widget) -> None:
-    core.import_from_xml(widget, tool.PropertyPicker, tool.Project, tool.Appdata, tool.Popups)
+    core.import_from_xml(widget, tool.Loin, tool.Project, tool.Appdata, tool.Popups)
 
 def export_xml(widget: ui.Widget) -> None:
-    core.export_to_xml(widget,tool.PropertyPicker, tool.Appdata, tool.Popups)
+    core.export_to_xml(widget,tool.Loin, tool.Appdata, tool.Popups)

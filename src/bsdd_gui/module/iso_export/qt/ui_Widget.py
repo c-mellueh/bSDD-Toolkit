@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QSizePolicy, QSpacerItem, QSplitter, QToolButton,
     QVBoxLayout, QWidget)
 
-from bsdd_gui.module.property_picker.ui import Widget
+from bsdd_gui.module.loin.ui import Widget
 from bsdd_gui.presets.ui_presets import FileSelector
 
 class Ui_Form(object):
@@ -43,8 +43,8 @@ class Ui_Form(object):
         self.button_layout.addWidget(self.label)
 
         self.cb_format = QComboBox(Form)
-        self.cb_format.addItem("", u"iso_23386")
-        self.cb_format.addItem("", u"loin")
+        self.cb_format.addItem("")
+        self.cb_format.addItem("")
         self.cb_format.setObjectName(u"cb_format")
 
         self.button_layout.addWidget(self.cb_format)
@@ -75,9 +75,9 @@ class Ui_Form(object):
         self.splitter.setSizePolicy(sizePolicy)
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(6)
-        self.property_picker = Widget(self.splitter)
-        self.property_picker.setObjectName(u"property_picker")
-        self.splitter.addWidget(self.property_picker)
+        self.loin = Widget(self.splitter)
+        self.loin.setObjectName(u"loin")
+        self.splitter.addWidget(self.loin)
         self.settings_widget = QWidget(self.splitter)
         self.settings_widget.setObjectName(u"settings_widget")
         self.verticalLayout = QVBoxLayout(self.settings_widget)

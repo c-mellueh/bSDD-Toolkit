@@ -109,9 +109,9 @@ class ClassView(_UcMsViewMixin):
             submenu = QMenu("Apply to children", menu)
             for purpose in purposes:
                 for milestone in milestones:
-                    p_name = tool.PropertyPicker.purpose_display_name(purpose)
-                    m_name = tool.PropertyPicker.milestone_display_name(milestone)
-                    included = tool.PropertyPicker.is_class_included(node, purpose.guid, milestone.guid)
+                    p_name = tool.Loin.purpose_display_name(purpose)
+                    m_name = tool.Loin.milestone_display_name(milestone)
+                    included = tool.Loin.is_class_included(node, purpose.guid, milestone.guid)
                     action = submenu.addAction(f"{p_name} × {m_name}")
                     action.setCheckable(True)
                     action.setChecked(included)

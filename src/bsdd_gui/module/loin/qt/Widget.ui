@@ -188,17 +188,17 @@
   <customwidget>
    <class>ClassView</class>
    <extends>QTreeView</extends>
-   <header>bsdd_gui.module.property_picker.model_views</header>
+   <header>bsdd_gui.module.loin.model_views</header>
   </customwidget>
   <customwidget>
    <class>PropertyView</class>
    <extends>QTreeView</extends>
-   <header>bsdd_gui.module.property_picker.model_views</header>
+   <header>bsdd_gui.module.loin.model_views</header>
   </customwidget>
   <customwidget>
    <class>PsetView</class>
    <extends>QTreeView</extends>
-   <header>bsdd_gui.module.property_picker.model_views</header>
+   <header>bsdd_gui.module.loin.model_views</header>
   </customwidget>
  </customwidgets>
  <resources/>
