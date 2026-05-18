@@ -5,7 +5,6 @@ from typing import Type, TYPE_CHECKING
 import bsdd_gui
 import logging
 import qtawesome as qta
-from bsdd_json.utils import class_utils, property_utils
 
 if TYPE_CHECKING:
     from bsdd_gui import tool

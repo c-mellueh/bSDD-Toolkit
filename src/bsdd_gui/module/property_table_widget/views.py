@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtGui import QDropEvent
-from PySide6.QtWidgets import QTableView
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QDragEnterEvent
-from . import trigger
 from bsdd_gui.presets.ui_presets import TableItemView
 
 if TYPE_CHECKING:

@@ -94,7 +94,7 @@ class Appdata:
         path = config.get(PATHS_SECTION, option)
         if not path:
             return []
-        if not OPTION_SEPERATOR in path:
+        if OPTION_SEPERATOR not in path:
             return [path]
         cleaned = []
         for p in path.split(OPTION_SEPERATOR):

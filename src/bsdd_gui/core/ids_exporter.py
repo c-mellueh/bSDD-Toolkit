@@ -1,5 +1,5 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication, QModelIndex, QTimer
+from PySide6.QtCore import QCoreApplication, QTimer
 from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.ids_exporter import constants
 import json
@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from bsdd_gui.tool.ids_exporter import (
         BasicSettingsDict,
         MetadataDict,
-        PsetDict,
         SettingsDict,
         PayLoadDict,
     )

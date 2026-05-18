@@ -3,7 +3,7 @@ from bsdd_gui.presets.prop_presets import WidgetProperties, ActionsProperties
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ui import Shell
+    pass
 
 
 class ShellWidgetProperties(WidgetProperties, ActionsProperties):

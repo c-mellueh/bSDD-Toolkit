@@ -5,7 +5,6 @@ Tests cover the pure helpers that do not require a live Qt dialog.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_gui.tool import SearchWidget
 
 

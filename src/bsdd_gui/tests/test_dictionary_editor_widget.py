@@ -7,7 +7,6 @@ acceptable for all other validators.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_gui.tool import DictionaryEditorWidget
 
 

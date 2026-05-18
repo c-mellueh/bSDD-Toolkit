@@ -2,10 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ui import SearchDialog
-from dataclasses import dataclass
+    pass
 
-from PySide6.QtWidgets import QDialog
 
 from bsdd_gui.presets.prop_presets import WidgetProperties
 

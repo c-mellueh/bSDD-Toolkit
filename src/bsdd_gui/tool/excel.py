@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
-import logging
 from PySide6.QtCore import Signal, QCoreApplication,QObject,QThread,Qt
 from openpyxl import styles
 from openpyxl import Workbook

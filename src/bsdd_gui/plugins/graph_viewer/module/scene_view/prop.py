@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
     from PySide6.QtWidgets import QLabel
     from PySide6.QtCore import QPoint
     from . import ui

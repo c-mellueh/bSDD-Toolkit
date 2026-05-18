@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 from types import ModuleType
 from bsdd import Client
-from bsdd_json import BsddDictionary, BsddClass, BsddProperty
+from bsdd_json import BsddDictionary
 import logging
 from bsdd_gui.presets.tool_presets import FieldTool, ActionTool
 from bsdd_gui.presets.tool_presets import FieldSignals
@@ -121,7 +121,7 @@ class Download(FieldTool, ActionTool):
         def _on_worker_finished():
             prop = cls.get_properties()
             setattr(prop, result_save_place, worker.result)
-            label.setText(f"Import done!")
+            label.setText("Import done!")
             cls.get_properties().done_count += 1
             if cls.get_properties().done_count == 2:
                 _handle_finish()

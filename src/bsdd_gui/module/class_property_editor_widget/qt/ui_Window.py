@@ -10,43 +10,15 @@
 
 from PySide6.QtCore import (
     QCoreApplication,
-    QDate,
-    QDateTime,
-    QLocale,
     QMetaObject,
-    QObject,
-    QPoint,
-    QRect,
     QSize,
-    QTime,
-    QUrl,
     Qt,
 )
-from PySide6.QtGui import (
-    QBrush,
-    QColor,
-    QConicalGradient,
-    QCursor,
-    QFont,
-    QFontDatabase,
-    QGradient,
-    QIcon,
-    QImage,
-    QKeySequence,
-    QLinearGradient,
-    QPainter,
-    QPalette,
-    QPixmap,
-    QRadialGradient,
-    QTransform,
-)
 from PySide6.QtWidgets import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QFormLayout,
     QHBoxLayout,
-    QHeaderView,
     QLabel,
     QLineEdit,
     QPushButton,
@@ -54,7 +26,6 @@ from PySide6.QtWidgets import (
     QSplitter,
     QTextEdit,
     QVBoxLayout,
-    QWidget,
 )
 
 from bsdd_gui.module.allowed_values_table_view.ui import AllowedValuesTable

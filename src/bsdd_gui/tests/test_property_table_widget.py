@@ -5,7 +5,6 @@ Covers get_properties_from_mime_payload which is pure Python.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_json.models import BsddDictionary, BsddProperty
 
 from bsdd_gui.tool import PropertyTableWidget

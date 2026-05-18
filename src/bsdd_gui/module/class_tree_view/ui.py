@@ -1,14 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QTreeView, QTreeWidget, QWidget
-from PySide6.QtCore import Qt, QByteArray, QMimeData
-from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDrag
-from bsdd_gui.resources.icons import get_icon
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QDragEnterEvent, QDrag
 from . import trigger
-from .constants import JSON_MIME, CODES_MIME
 
 from bsdd_gui.presets.ui_presets import TreeItemView
-import json
 
 if TYPE_CHECKING:
     from .models import SortModel

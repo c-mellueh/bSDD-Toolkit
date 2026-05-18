@@ -3,16 +3,12 @@ from PySide6.QtCore import QCoreApplication,QTimer
 from typing import TYPE_CHECKING, Type
 import qtawesome as qta
 from bsdd_gui.module.excel import constants
-import json
-from bsdd_json.utils import class_utils
 from bsdd_gui.presets.ui_presets.waiting import stop_waiting_widget
 
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.excel import ui
-    from bsdd_gui.tool.loin import PsetDict
-    from bsdd_gui.tool.excel import SettingsDict
     from bsdd_json import BsddClass
 
 def connect_to_main_window(

@@ -1,9 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Iterable
-import logging
-from PySide6.QtCore import Signal, QCoreApplication
-from PySide6.QtGui import QPalette
-from PySide6.QtWidgets import QWidget, QLineEdit, QLabel, QComboBox, QTextEdit, QDialogButtonBox
+from typing import TYPE_CHECKING
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import QWidget
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import DialogSignals, DialogTool
 from bsdd_json import BsddClass, BsddDictionary
@@ -139,6 +137,6 @@ class ClassEditorWidget(DialogTool):
         widget.cb_class_type.clear()
         widget.cb_class_type.addItems(allowed_class_types)
         class_type = widget.bsdd_data.ClassType
-        if not class_type in allowed_class_types:
+        if class_type not in allowed_class_types:
             class_type = "Class" if "Class" in allowed_class_types else allowed_class_types[0]
         widget.cb_class_type.setCurrentText(class_type)

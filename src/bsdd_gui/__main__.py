@@ -15,7 +15,7 @@ if sys.platform.startswith("linux"):
 if TYPE_CHECKING:
     from os import PathLike
 
-from bsdd_gui import core, tool
+from bsdd_gui import tool
 import bsdd_gui.core.main_window_widget
 import importlib
 from bsdd_gui.module.project.constants import OPEN_PATH

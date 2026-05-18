@@ -1,5 +1,4 @@
-"""
-Tests for the bsdd_json module.
+"""Tests for the bsdd_json module.
 
 Covers models, class_utils, property_utils, and dictionary_utils.
 These tests are pure-Python and do not require network access.
@@ -26,7 +25,6 @@ from bsdd_json.utils import dictionary_utils as dict_utils
 from bsdd_json.utils import property_utils as prop_utils
 
 from .helpers import make_class, make_dictionary, make_property
-
 
 # ===========================================================================
 # 1. build_unique_code

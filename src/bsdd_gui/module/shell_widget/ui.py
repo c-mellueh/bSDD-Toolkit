@@ -2,8 +2,6 @@ from pyqtconsole.console import PythonConsole
 
 from bsdd_gui import tool
 from bsdd_gui.resources.icons import get_icon
-from . import trigger
-from bsdd_gui.presets.ui_presets import BaseWindow
 from PySide6.QtCore import Signal, Qt
 
 

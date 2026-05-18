@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from types import ModuleType
-import logging
-from PySide6.QtCore import Qt, QModelIndex, QCoreApplication, Signal, QAbstractItemModel
+from PySide6.QtCore import Qt, QModelIndex, QCoreApplication, Signal
 from PySide6.QtWidgets import QWidget, QAbstractItemDelegate, QLineEdit
 import bsdd_gui
 

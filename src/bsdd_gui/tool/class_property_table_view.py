@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type
-import logging
 
-from PySide6.QtCore import QModelIndex, QObject, Signal, Qt
+from PySide6.QtCore import QModelIndex, Signal
 
 import bsdd_gui
 from bsdd_json.models import BsddClassProperty, BsddClass

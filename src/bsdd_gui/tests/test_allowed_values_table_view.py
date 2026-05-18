@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
 from bsdd_json.models import BsddAllowedValue
 from bsdd_json.utils import dictionary_utils as dict_utils
 

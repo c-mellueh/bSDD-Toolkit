@@ -8,10 +8,9 @@ import argparse
 from pathlib import Path
 import json
 import openpyxl
-from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
+from bsdd_json import BsddClass, BsddDictionary
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils as class_utils
-from bsdd_json.utils import property_utils as prop_utils
 
 
 def find_property(bsdd_class: BsddClass, property_name: str):

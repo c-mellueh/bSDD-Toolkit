@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 def filesector_clicked(widget: ui.FileSelector, util: Type[tool.Util]):
-    logging.debug(f"filerequest clicked")
+    logging.debug("filerequest clicked")
     paths = util.request_path(widget)
     if not paths:
         return

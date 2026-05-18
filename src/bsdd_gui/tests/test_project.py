@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
 from bsdd_json.models import BsddDictionary
 
 from bsdd_gui.tool import Project

@@ -3,13 +3,12 @@ from typing import TYPE_CHECKING, Type
 import logging
 from types import ModuleType
 import bsdd_gui
-from PySide6.QtCore import QModelIndex, QObject, Signal, Qt, QCoreApplication
+from PySide6.QtCore import QModelIndex, Signal, Qt, QCoreApplication
 from PySide6.QtWidgets import QComboBox
 from bsdd_gui.module.property_set_table_view import ui, models, trigger
-from bsdd_gui.presets.tool_presets import ItemViewTool, ViewSignals, ItemViewTool
+from bsdd_gui.presets.tool_presets import ViewSignals, ItemViewTool
 from bsdd_json.models import BsddDictionary, BsddClass, BsddClassRelation
 from bsdd_json.utils import class_utils
-import copy as cp
 
 if TYPE_CHECKING:
     from bsdd_gui.module.property_set_table_view.prop import (
@@ -118,14 +117,14 @@ class PropertySetTableView(ItemViewTool):
     @classmethod
     def add_temporary_pset(cls, bsdd_class: BsddClass, name: str):
         class_code = bsdd_class.Code
-        if not class_code in cls.get_properties().temporary_pset:
+        if class_code not in cls.get_properties().temporary_pset:
             cls.get_properties().temporary_pset[class_code] = list()
         cls.get_properties().temporary_pset[class_code].append(name)
 
     @classmethod
     def remove_temporary_pset(cls, bsdd_class: BsddClass, name: str):
         class_code = bsdd_class.Code
-        if not class_code in cls.get_properties().temporary_pset:
+        if class_code not in cls.get_properties().temporary_pset:
             cls.get_properties().temporary_pset[class_code] = list()
         if name in cls.get_properties().temporary_pset[class_code]:
             cls.get_properties().temporary_pset[class_code].remove(name)
@@ -142,7 +141,7 @@ class PropertySetTableView(ItemViewTool):
         class_code = bsdd_class.Code
         if class_code not in cls.get_properties().temporary_pset:
             return
-        if not old_name in cls.get_properties().temporary_pset[class_code]:
+        if old_name not in cls.get_properties().temporary_pset[class_code]:
             return
         index = cls.get_properties().temporary_pset[class_code].index(old_name)
         cls.get_properties().temporary_pset[class_code][index] = new_name

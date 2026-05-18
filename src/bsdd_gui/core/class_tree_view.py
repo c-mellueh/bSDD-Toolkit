@@ -5,7 +5,6 @@ from typing import Type, TYPE_CHECKING
 import logging
 import json
 from bsdd_json.utils import class_utils as cl_utils
-from bsdd_json.utils import property_utils as prop_utils
 import qtawesome as qta
 from bsdd_json.models import BsddDictionary, BsddClass
 

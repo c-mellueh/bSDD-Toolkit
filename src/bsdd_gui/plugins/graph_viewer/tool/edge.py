@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type, Callable
+from typing import TYPE_CHECKING, Type
 import logging
 from bsdd_json import BsddDictionary
 import bsdd_gui
@@ -10,11 +10,10 @@ from bsdd_json import (
     BsddClass,
     BsddProperty,
     BsddClassProperty,
-    BsddDictionary,
     BsddClassRelation,
     BsddPropertyRelation,
 )
-from PySide6.QtCore import Signal, Qt, QPointF, QObject, QCoreApplication
+from PySide6.QtCore import Signal, Qt, QPointF, QCoreApplication
 from PySide6.QtGui import QColor, QPen, QPainterPath, QPolygonF, QBrush
 from PySide6.QtWidgets import QGraphicsPathItem, QHBoxLayout, QLabel, QGraphicsItem
 from bsdd_gui.plugins.graph_viewer.module.edge import ui, trigger, constants
@@ -80,7 +79,7 @@ class Edge(PluginTool):
         only_visual=False,
         allow_parent_deletion=False,
     ):
-        if not edge in cls.get_edges():
+        if edge not in cls.get_edges():
             return
 
         start_node, end_node = edge.start_node, edge.end_node
@@ -425,7 +424,7 @@ class Edge(PluginTool):
         for edge in cls.get_edges():
             info = cls._info(edge.start_node, edge.end_node, bsdd_dictionary)
             if info in relations_dict[edge.edge_type]:
-                logging.info(f"Relationship duplicate found")
+                logging.info("Relationship duplicate found")
             relations_dict[edge.edge_type][info] = edge
         return relations_dict
 

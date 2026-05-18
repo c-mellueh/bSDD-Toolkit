@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from typing import TypedDict
 
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QApplication, QMenu, QLabel
+from PySide6.QtWidgets import QApplication, QLabel
 from bsdd_gui.presets.prop_presets import ActionsProperties
 
 if TYPE_CHECKING:

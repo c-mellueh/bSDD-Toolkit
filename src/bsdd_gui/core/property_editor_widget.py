@@ -1,5 +1,5 @@
 from __future__ import annotations
-from bsdd_json import BsddClassProperty, BsddProperty
+from bsdd_json import BsddClassProperty
 from typing import TYPE_CHECKING, Type
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QCoreApplication
@@ -10,7 +10,6 @@ from bsdd_json.type_hints import COUNTRY_CODE, LANGUAGE_ISO_CODE, DOCUMENT_TYPE
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_editor_widget import ui
-    from bsdd_gui.presets.ui_presets import ComboBoxWithToggleSwitch
 
 
 def connect_signals(

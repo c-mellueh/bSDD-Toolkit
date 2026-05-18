@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
-import logging
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QDialog,
@@ -48,7 +47,6 @@ if TYPE_CHECKING:
         PPClassViewProperties,
         PPPropertyViewProperties,
         ClassCode,
-        PropertyCode,
     )
 
 from bsdd_gui import tool

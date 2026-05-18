@@ -6,7 +6,6 @@ IDS file access.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_json.models import BsddClass, BsddClassProperty, BsddDictionary
 
 from bsdd_gui.tool import IdsExporter

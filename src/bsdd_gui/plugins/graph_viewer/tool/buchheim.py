@@ -1,12 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import logging
 
 from bsdd_gui.presets.tool_presets import PluginTool, PluginSignals
 import bsdd_gui
-from bsdd_gui.plugins.graph_viewer.module.buchheim import ui, trigger, constants
+from bsdd_gui.plugins.graph_viewer.module.buchheim import trigger, constants
 from PySide6.QtWidgets import QWidget, QMessageBox
-from PySide6.QtCore import QCoreApplication, QPointF, Signal, QObject
+from PySide6.QtCore import QCoreApplication, QPointF, Signal
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.buchheim.prop import GraphViewerBuchheimProperties

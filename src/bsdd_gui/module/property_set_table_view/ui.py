@@ -3,8 +3,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .models import SortModel
-from PySide6.QtCore import QModelIndex, Qt, Signal
-from PySide6.QtWidgets import QStyledItemDelegate, QTableView, QWidget, QListView
 from . import trigger
 from bsdd_gui.presets.ui_presets import TableItemView
 

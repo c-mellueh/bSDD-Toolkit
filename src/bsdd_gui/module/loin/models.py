@@ -1,4 +1,3 @@
-from bsdd_gui.module.class_tree_view.models import ClassTreeModel as CTM
 from bsdd_gui.presets.models_presets import ItemModel
 from bsdd_gui.module.class_tree_view.models import SortModel as CSM
 from bsdd_gui import tool

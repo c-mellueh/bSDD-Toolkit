@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict, Literal
 import logging
-from bsdd_json import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
+from bsdd_json import BsddDictionary, BsddClass, BsddClassProperty
 import bsdd_gui
 from ifctester.facet import Property as PropertyFacet
 from ifctester.facet import Entity as EntityFacet

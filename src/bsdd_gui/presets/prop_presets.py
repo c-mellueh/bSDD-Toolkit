@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QAbstractItemView, QWidget
 from PySide6.QtCore import QAbstractItemModel
 from PySide6.QtGui import QAction, QIcon
-from typing import TypedDict, Callable, TypeAlias
+from typing import TypedDict, Callable
 from bsdd_gui.presets.ui_presets import ItemViewType, FieldWidget
 from .models_presets import ItemModel
 from dataclasses import dataclass

@@ -2,7 +2,6 @@ from __future__ import annotations
 from PySide6.QtCore import Property, QEasingCurve, QPropertyAnimation, QRectF, QSize, Qt, QMargins
 from PySide6.QtGui import QColor, QPainter, QPen, QPalette
 from PySide6.QtWidgets import (
-    QApplication,
     QAbstractButton,
     QWidget,
     QHBoxLayout,
@@ -10,7 +9,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QSpinBox,
 )
-from typing import Literal, overload
+from typing import Literal
 
 
 class ToggleSwitch(QAbstractButton):

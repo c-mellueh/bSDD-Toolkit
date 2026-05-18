@@ -1,6 +1,5 @@
 from __future__ import annotations
 from PySide6.QtCore import QPoint
-from bsdd_json import BsddDictionary
 from bsdd_gui import tool
 from bsdd_gui.core import ids_exporter as core
 from typing import TYPE_CHECKING

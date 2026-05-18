@@ -6,7 +6,6 @@ that requires a live bSDD server is out of scope.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_gui.tool import Download
 
 

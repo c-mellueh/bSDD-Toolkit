@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import logging
 
 import bsdd_gui
 from bsdd_gui.module.shell_widget import ui, trigger

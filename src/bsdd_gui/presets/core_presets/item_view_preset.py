@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-from bsdd_json import BsddClassProperty, BsddProperty
 from PySide6.QtCore import QCoreApplication, QPoint
-from bsdd_gui.module.class_property_editor_widget.ui import ClassPropertyEditor
 import qtawesome as qta
 
 if TYPE_CHECKING:

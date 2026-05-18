@@ -1,12 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import logging
 import bsdd_gui.plugins.graph_viewer.tool as gv_tool
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 
 from bsdd_json import BsddClass, BsddDictionary, BsddProperty
-from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint, QObject, QPointF, QRectF
+from PySide6.QtCore import QCoreApplication, Qt, Signal, QPoint, QPointF, QRectF
 from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QLabel, QGraphicsItem
 
@@ -20,7 +19,6 @@ import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.scene_view.prop import GraphViewerSceneViewProperties
-    from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
     from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
     from bsdd_gui.plugins.graph_viewer.module.node.ui import Node
 
@@ -286,7 +284,7 @@ class SceneView(PluginTool):
     @classmethod
     def read_classes_to_add(cls, payload: dict, bsdd_dictionary: BsddDictionary):
         classes_to_add = list()
-        if not "classes" in payload:
+        if "classes" not in payload:
             return []
         for rc in payload["classes"]:
             code = rc.get("Code", None)
@@ -301,7 +299,7 @@ class SceneView(PluginTool):
     @classmethod
     def read_properties_to_add(cls, payload: dict, bsdd_dictionary: BsddDictionary):
         properties_to_add = list()
-        if not "properties" in payload:
+        if "properties" not in payload:
             return []
         for rp in payload["properties"]:
             code = rp.get("Code")

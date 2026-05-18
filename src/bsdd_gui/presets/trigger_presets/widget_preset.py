@@ -8,7 +8,7 @@ from bsdd_gui.presets import tool_presets as tool  # <- modify to fit your need
 from bsdd_gui.presets.ui_presets import FieldWidget
 
 if TYPE_CHECKING:
-    from . import ui
+    pass
 
 ### Basic Triggers
 

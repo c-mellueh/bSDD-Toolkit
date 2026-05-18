@@ -1,5 +1,5 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import ActionsProperties, DialogProperties, ViewProperties
+from bsdd_gui.presets.prop_presets import ActionsProperties, DialogProperties
 from bsdd_gui.resources.data import get_ifc_type_classes
 
 

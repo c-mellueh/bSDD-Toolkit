@@ -1,6 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
-import logging
+from typing import TYPE_CHECKING
 import os
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool

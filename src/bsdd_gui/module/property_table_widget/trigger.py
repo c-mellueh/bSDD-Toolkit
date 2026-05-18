@@ -1,5 +1,4 @@
 from __future__ import annotations
-import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import property_table_widget as core
 from typing import TYPE_CHECKING

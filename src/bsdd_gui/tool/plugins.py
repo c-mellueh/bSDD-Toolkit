@@ -61,14 +61,14 @@ class Plugins:
     @classmethod
     def get_friendly_name(cls, name: str):
         module = importlib.import_module(f"bsdd_gui.plugins.{name}")
-        if not "friendly_name" in dir(module):
+        if "friendly_name" not in dir(module):
             return name
         return getattr(module, "friendly_name")
 
     @classmethod
     def get_description(cls, name: str):
         module = importlib.import_module(f"bsdd_gui.plugins.{name}")
-        if not "description" in dir(module):
+        if "description" not in dir(module):
             return ""
         return getattr(module, "description")
 
@@ -85,7 +85,7 @@ class Plugins:
     @classmethod
     def activate_plugin(cls, plugin_name: str):
         module = importlib.import_module(f"bsdd_gui.plugins.{plugin_name}")
-        if not "activate" in dir(module):
+        if "activate" not in dir(module):
             return None
         module.activate()
         cls.set_plugin_active(plugin_name, True)
@@ -93,7 +93,7 @@ class Plugins:
     @classmethod
     def deactivate_plugin(cls, plugin_name: str):
         module = importlib.import_module(f"bsdd_gui.plugins.{plugin_name}")
-        if not "deactivate" in dir(module):
+        if "deactivate" not in dir(module):
             return None
         module.deactivate()
         cls.set_plugin_active(plugin_name, False)
@@ -103,6 +103,6 @@ class Plugins:
         if not cls.is_plugin_active(plugin_name):
             return
         module = importlib.import_module(f"bsdd_gui.plugins.{plugin_name}")
-        if not "on_new_project" in dir(module):
+        if "on_new_project" not in dir(module):
             return None
         module.on_new_project()

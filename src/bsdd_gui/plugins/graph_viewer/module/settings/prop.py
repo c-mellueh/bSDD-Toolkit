@@ -3,7 +3,7 @@ from bsdd_gui.presets.prop_presets import WidgetProperties, PluginProperties
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from . import ui
+    pass
 
 
 class GraphViewerSettingsProperties(PluginProperties, WidgetProperties):

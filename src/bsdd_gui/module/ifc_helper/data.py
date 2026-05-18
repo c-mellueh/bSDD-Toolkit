@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import bsdd
 
 if TYPE_CHECKING:
-    from bsdd_json.models import BsddClassProperty
+    pass
 from .constants import IFC_URI
 from requests.exceptions import ReadTimeout
 from bsdd_gui.resources.data import get_ifc_classes as ifc_backup
@@ -24,7 +24,7 @@ class IfcHelperData:
     def get_classes(cls):
         cls.data["ifc_classes"] = ifc_backup()
         return  cls.data["ifc_classes"]
-        if not "ifc_classes" in cls.data:
+        if "ifc_classes" not in cls.data:
             try:
                 c = bsdd.Client()
                 c1 = c.get_classes(IFC_URI, use_nested_classes=False, limit=1000)["classes"]

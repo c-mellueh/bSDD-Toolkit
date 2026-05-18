@@ -1,7 +1,5 @@
 from bsdd_gui import tool
 from bsdd_gui.core import main_window_widget as core
-from PySide6.QtCore import QModelIndex
-from PySide6.QtGui import QDropEvent
 
 TOOGLE_CONSOLE_ACTION = "toggle_console"
 

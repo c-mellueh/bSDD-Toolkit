@@ -1,7 +1,7 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QApplication, QTableView
+from PySide6.QtWidgets import QApplication
 from typing import Type, TYPE_CHECKING
-from PySide6.QtCore import QModelIndex, QCoreApplication, QPoint
+from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_json.utils import property_utils as prop_utils
 import qtawesome as qta
 from bsdd_gui.module.util.constants import CLASS_PROP_CLIPBOARD_KIND
@@ -10,7 +10,7 @@ import json
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.class_property_table_view import ui, models
-from bsdd_json import BsddClass, BsddClassProperty, BsddProperty
+from bsdd_json import BsddClassProperty, BsddProperty
 
 
 def connect_signals(

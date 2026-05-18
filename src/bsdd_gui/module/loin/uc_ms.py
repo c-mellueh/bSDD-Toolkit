@@ -21,10 +21,8 @@ from PySide6.QtCore import (
     QAbstractItemModel,
     QEvent,
     QModelIndex,
-    QPersistentModelIndex,
     QRect,
     Qt,
-    QTimer,
 )
 from PySide6.QtGui import QFont, QPainter
 from PySide6.QtWidgets import (

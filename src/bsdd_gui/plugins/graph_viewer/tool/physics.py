@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import logging
-from PySide6.QtCore import QObject, QTimer, Signal
+from PySide6.QtCore import QTimer, Signal
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.physics import data, trigger, ui
 from bsdd_gui.presets.tool_presets import PluginTool, PluginSignals

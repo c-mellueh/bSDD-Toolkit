@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
 from bsdd_json.models import BsddClass, BsddDictionary
 
 from bsdd_gui.tool import ClassEditorWidget

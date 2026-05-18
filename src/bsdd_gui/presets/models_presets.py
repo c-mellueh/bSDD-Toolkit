@@ -1,14 +1,9 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QTreeView, QTreeWidget, QWidget
 from PySide6.QtCore import (
     QAbstractItemModel,
     Qt,
-    QCoreApplication,
     QModelIndex,
-    QSortFilterProxyModel,
 )
-from bsdd_json.models import BsddDictionary, BsddClass, BsddClassProperty
-from bsdd_gui import tool
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

@@ -9,7 +9,6 @@ from __future__ import annotations
 import logging
 import os
 
-import pytest
 from bsdd_gui.tool.logging import CustomFormatter
 
 

@@ -1,17 +1,10 @@
 import bsdd
-import bsdd_json
-from bsdd_json.utils import dictionary_utils as dict_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils as class_utils
 from pathlib import Path
 import argparse
 from bsdd_json import (
-    BsddClass,
     BsddDictionary,
-    BsddClassProperty,
-    BsddProperty,
-    BsddClassRelation,
-    BsddPropertyRelation,
 )
 import tqdm
 

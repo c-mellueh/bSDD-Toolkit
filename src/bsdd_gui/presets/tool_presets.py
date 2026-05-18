@@ -25,7 +25,7 @@ Notes
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Callable, TYPE_CHECKING, Any, Iterable, Type, TypeAlias
+from typing import Callable, TYPE_CHECKING, Iterable, Type, TypeAlias
 from types import ModuleType
 from PySide6.QtWidgets import (
     QWidget,
@@ -44,7 +44,6 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox,
 )
 from PySide6.QtCore import (
-    QObject,
     Signal,
     QDateTime,
     Qt,
@@ -55,7 +54,6 @@ from PySide6.QtCore import (
 from PySide6.QtGui import QAction, QIcon
 from bsdd_gui.presets.ui_presets import (
     TagInput,
-    DateTimeWithNow,
     FieldWidget,
     TreeItemView,
     BaseDialog,
@@ -173,7 +171,7 @@ class ActionTool(BaseTool):
         """
         save all actions so that the translation functions work
         """
-        if not widget in cls.get_properties().actions:
+        if widget not in cls.get_properties().actions:
             cls.get_properties().actions[widget] = dict()
         cls.get_properties().actions[widget][name] = action
 
@@ -219,7 +217,7 @@ class WidgetTool(BaseTool):
     @classmethod
     @abstractmethod
     def _get_widget_class(cls) -> Type[FieldWidget]:
-        logging.error(f"This function needs to be subclassed")
+        logging.error("This function needs to be subclassed")
         return None
 
     @classmethod
@@ -254,7 +252,7 @@ class WidgetTool(BaseTool):
     @classmethod
     def unregister_widget(cls, widget: FieldWidget):
         logging.info(f"Unregister {widget}")
-        if not widget in cls.get_properties().widgets:
+        if widget not in cls.get_properties().widgets:
             return False
         cls.get_properties().widgets.remove(widget)
         return True
@@ -326,7 +324,7 @@ class FieldTool(WidgetTool):
     def get_widget(cls, data: object) -> ItemViewType:
         widgets = [widget for widget in cls.get_widgets() if widget.bsdd_data == data]
         if len(widgets) > 1:
-            logging.warning(f"Multiple Widgets found for the same data")
+            logging.warning("Multiple Widgets found for the same data")
         elif not widgets:
             return None
         return widgets[0]
@@ -427,7 +425,7 @@ class FieldTool(WidgetTool):
             getter_func (callable): function(element)
         """
 
-        if not widget in cls.get_properties().field_getter:
+        if widget not in cls.get_properties().field_getter:
             cls.get_properties().field_getter[widget] = dict()
         cls.get_properties().field_getter[widget][field] = getter_func
 
@@ -436,7 +434,7 @@ class FieldTool(WidgetTool):
         """
         the setter func gets called with func(data,value)
         """
-        if not widget in cls.get_properties().field_setter:
+        if widget not in cls.get_properties().field_setter:
             cls.get_properties().field_setter[widget] = dict()
         cls.get_properties().field_setter[widget][field] = setter_func
 
@@ -502,9 +500,9 @@ class FieldTool(WidgetTool):
             >>> MyForm.add_validator(form, line_edit, is_not_empty, highlight_invalid)
         """
 
-        if not widget in cls.get_properties().validator_functions:
+        if widget not in cls.get_properties().validator_functions:
             cls.get_properties().validator_functions[widget] = dict()
-        if not field in cls.get_properties().validator_functions[widget]:
+        if field not in cls.get_properties().validator_functions[widget]:
             cls.get_properties().validator_functions[widget][field] = list()
         cls.get_properties().validator_functions[widget][field].append(
             (validator_function, result_function)
@@ -582,7 +580,7 @@ class FieldTool(WidgetTool):
         """
         get values from the model and set them to the fields
         """
-        if not widget in cls.get_properties().field_getter:
+        if widget not in cls.get_properties().field_getter:
             return
         for field, getter_func in cls.get_properties().field_getter[widget].items():
             if explicit_field is not None and explicit_field != field:
@@ -729,7 +727,7 @@ class DialogTool(FieldTool):
     @classmethod
     @abstractmethod
     def _get_dialog_class(cls) -> Type[BaseDialog]:
-        logging.error(f"This function needs to be subclassed")
+        logging.error("This function needs to be subclassed")
         return BaseDialog
 
     @classmethod
@@ -887,7 +885,7 @@ class ItemViewTool(BaseTool):
     @classmethod
     def unregister_view(cls, view: ItemViewType):
         logging.info(f"Unregister View: {view}")
-        if not view in cls.get_properties().views:
+        if view not in cls.get_properties().views:
             return
         cls.get_properties().views.remove(view)
         cls.get_properties().context_menu_list.pop(view)
@@ -1007,7 +1005,7 @@ class ItemViewTool(BaseTool):
         set_function: function(model,index,new_value)
         :return:
         """
-        if not model in cls.get_properties().columns:
+        if model not in cls.get_properties().columns:
             cls.get_properties().columns[model] = list()
         cls.get_properties().columns[model].append((name, get_function, set_function))
 

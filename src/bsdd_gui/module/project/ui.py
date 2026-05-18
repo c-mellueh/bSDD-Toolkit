@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QVBoxLayout
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout
 from PySide6.QtCore import Qt, QCoreApplication
 from bsdd_gui.resources.icons import get_icon
 

@@ -1,22 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type
-import ctypes
 import logging
-from types import ModuleType
 from PySide6.QtCore import (
-    QObject,
     Signal,
-    QSortFilterProxyModel,
     QModelIndex,
     QMimeData,
     QByteArray,
 )
-from PySide6.QtWidgets import QWidget, QAbstractItemView
 
 import bsdd_gui
 import json
 from bsdd_json.type_hints import CLASS_TYPE
-from bsdd_json.models import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
+from bsdd_json.models import BsddDictionary, BsddClass, BsddProperty
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.class_tree_view import ui, models, trigger, constants
@@ -91,7 +86,7 @@ class ClassTreeView(ItemViewTool):
     def add_class_to_dictionary(cls, new_class: BsddClass, bsdd_dictionary: BsddDictionary):
         model: models.ClassTreeModel = cls.get_model(bsdd_dictionary)
         if not model:
-            logging.info(f"no Model found")
+            logging.info("no Model found")
             return
 
         # Skips Class if the Tree is not dhe right one

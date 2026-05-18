@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
-from PySide6.QtCore import QCoreApplication, Qt, QObject, Signal
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
+from PySide6.QtCore import QCoreApplication, Qt, Signal
+from PySide6.QtWidgets import QTableWidgetItem
 
 import bsdd_gui
 from bsdd_gui import __version__ as version
 from bsdd_gui import tool
-from bsdd_gui.module import search_widget
 from bsdd_gui.module.project.constants import CLASS_REFERENCE
 from bsdd_gui.module.search_widget import trigger, constants
 
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
 from bsdd_gui.module.search_widget import ui
 from thefuzz import fuzz
 from bsdd_gui.presets.tool_presets import WidgetTool, WidgetSignals
-from bsdd_json import BsddClass, BsddClassProperty, BsddProperty
+from bsdd_json import BsddClass, BsddProperty
 
 
 class Signals(WidgetSignals):

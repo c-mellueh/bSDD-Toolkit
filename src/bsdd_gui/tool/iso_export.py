@@ -1,27 +1,18 @@
 from __future__ import annotations
-from tokenize import group
 from typing import TYPE_CHECKING, TypedDict
-import logging
-from PySide6.QtCore import Signal, QCoreApplication,QObject,QThread,Qt
-from openpyxl import styles
-from openpyxl import Workbook
-from openpyxl.worksheet.worksheet import Worksheet
-from bsdd_json.utils import class_utils, property_utils, dictionary_utils
-from openpyxl.utils import get_column_letter
-import openpyxl
+from PySide6.QtCore import Signal, QObject,QThread,Qt
+from bsdd_json.utils import class_utils, property_utils
 
-from bsdd_json import BsddClass, BsddDictionary, BsddClassProperty,BsddProperty
+from bsdd_json import BsddClass, BsddDictionary, BsddClassProperty
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, FieldSignals
 from bsdd_gui.module.iso_export import ui, trigger,constants
-from openpyxl.worksheet.table import Table, TableStyleInfo
 from uuid import UUID, uuid4
 from datetime import datetime
 
 from bsdd_gui.module.iso_export.datamodel import (
     NameInLanguage,
     PropertyGroup,
-    Language,
     DefinitionInLanguage,
     Property,
     PhysicalQuantity,
@@ -50,7 +41,7 @@ class SettingsDict(TypedDict):
 
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.iso_export.prop import IsoExportProperties,PropertyGroupDict,GroupPropertyDict
+    from bsdd_gui.module.iso_export.prop import IsoExportProperties
 
 class Signals(FieldSignals):
     pass

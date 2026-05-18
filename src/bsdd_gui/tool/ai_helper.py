@@ -7,10 +7,8 @@ import qtawesome as qta
 import logging
 from bsdd_gui.module.ai_helper import ui, constants, trigger
 import bsdd_gui
-from bsdd_json import BsddClass
 from openai import OpenAI
 from bsdd_gui import tool
-import json
 import os
 
 if TYPE_CHECKING:

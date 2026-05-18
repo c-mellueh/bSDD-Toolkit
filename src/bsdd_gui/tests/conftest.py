@@ -23,7 +23,7 @@ import bsdd_gui  # noqa: E402
 bsdd_gui.register()
 
 import pytest  # noqa: E402
-from bsdd_json.models import BsddClass, BsddDictionary  # noqa: E402
+from bsdd_json.models import BsddDictionary  # noqa: E402
 from bsdd_gui.tool import ClassTreeView  # noqa: E402
 
 

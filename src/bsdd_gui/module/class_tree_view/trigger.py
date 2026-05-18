@@ -2,8 +2,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from bsdd_gui import tool
 from bsdd_gui.core import class_tree_view as core
-from PySide6.QtCore import QModelIndex
-from PySide6.QtGui import QDropEvent
 from bsdd_json import BsddDictionary
 
 TOOGLE_CONSOLE_ACTION = "toggle_console"

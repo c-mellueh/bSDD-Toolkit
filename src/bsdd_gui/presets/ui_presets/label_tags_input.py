@@ -1,11 +1,7 @@
 from __future__ import annotations
-from typing import Iterable, Optional
+from typing import Optional
 
 from PySide6.QtCore import (
-    QPoint,
-    QRect,
-    QSize,
-    Qt,
     Signal,
     QRect,
     QSize,
@@ -13,11 +9,9 @@ from PySide6.QtCore import (
     Qt,
     QEvent,
     QTimer,
-    QMargins,
 )
-from PySide6.QtGui import QFontMetrics, QKeyEvent, QFont
+from PySide6.QtGui import QFontMetrics, QKeyEvent
 from PySide6.QtWidgets import (
-    QApplication,
     QWidget,
     QFrame,
     QLabel,
@@ -26,9 +20,6 @@ from PySide6.QtWidgets import (
     QStyleOption,
     QHBoxLayout,
     QLineEdit,
-    QSizePolicy,
-    QLayout,
-    QLayoutItem,
     QCompleter,
     QLayout,
     QLayoutItem,
@@ -36,7 +27,6 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QStylePainter,
 )
-import logging
 
 STYLE_SHEET = """
         #Chip {

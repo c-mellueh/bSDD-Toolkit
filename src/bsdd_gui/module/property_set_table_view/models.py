@@ -1,17 +1,13 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QTreeView, QTreeWidget
 from PySide6.QtCore import (
     Qt,
-    QCoreApplication,
     QModelIndex,
     QSortFilterProxyModel,
 )
 
 from typing import Type
 from bsdd_json.utils import class_utils
-from bsdd_gui.resources.icons import get_icon
-from . import trigger
-from bsdd_json.models import BsddDictionary, BsddClass
+from bsdd_json.models import BsddDictionary
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
 import qtawesome as qta

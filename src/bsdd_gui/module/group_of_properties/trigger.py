@@ -1,5 +1,4 @@
 from __future__ import annotations
-import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import group_of_properties as core
 from bsdd_gui.core import class_property_table_view as ptv_core
@@ -69,7 +68,7 @@ def class_view_created(view: GopClassView):
 
 
 def context_menu_requested(view: GopClassView, pos: QPoint):
-    from .views import GopClassView, GopPropertyView
+    from .views import GopClassView
 
     if isinstance(view, GopClassView):
         core.create_context_menu(view, pos, tool.GopClassView)

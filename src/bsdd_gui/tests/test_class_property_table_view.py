@@ -5,7 +5,6 @@ Covers the pure-Python helpers that do not require a live Qt table view.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_json.models import BsddClass, BsddClassProperty, BsddAllowedValue
 
 from bsdd_gui.tool import ClassPropertyTableView

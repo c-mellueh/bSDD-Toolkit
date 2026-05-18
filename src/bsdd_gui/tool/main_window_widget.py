@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QApplication, QMenu, QMenuBar, QStatusBar, QLabel
 import bsdd_gui
 from bsdd_gui.module.main_window_widget import ui
 from bsdd_json.models import BsddClass, BsddClassProperty
-from PySide6.QtCore import QObject, Signal, QSortFilterProxyModel
+from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QAction, QIcon
 from bsdd_gui.module.main_window_widget import trigger
 from bsdd_gui.presets.tool_presets import ActionTool

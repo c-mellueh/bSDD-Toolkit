@@ -1,10 +1,8 @@
 from __future__ import annotations
 from PySide6.QtCore import QCoreApplication, Qt
-from PySide6.QtWidgets import QMenu
 from typing import Type, TYPE_CHECKING
 from bsdd_gui.module.project.constants import FILETYPE, OPEN_PATH, SAVE_PATH, RECENT_PATHS
 import logging
-import bsdd_gui
 import os
 import json
 from pydantic import ValidationError
@@ -14,7 +12,6 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
 
 
-import logging
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -26,7 +23,7 @@ def connect_signals(project: Type[tool.Project]):
 
 
 def create_project(project: Type[tool.Project]):
-    logging.debug(f"Create Project")
+    logging.debug("Create Project")
     bsdd_dictionary = project.create_project()
     project.register_project(bsdd_dictionary)
 
@@ -271,4 +268,4 @@ def save_project(path: str, project: Type[tool.Project], appdata: Type[tool.Appd
     appdata.set_path(SAVE_PATH, path)
     appdata.add_path(RECENT_PATHS, path)
     project.set_last_save(bsdd_dictionary)
-    logging.info(f"Save Done!")
+    logging.info("Save Done!")

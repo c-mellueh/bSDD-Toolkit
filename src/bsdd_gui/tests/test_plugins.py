@@ -6,7 +6,6 @@ These tests do not activate or deactivate any plugin.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_gui.tool import Plugins
 
 
