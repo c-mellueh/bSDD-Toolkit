@@ -113,7 +113,9 @@ def export( widget: ui.Widget,
     waiting_widget.set_title("Load Data")
 
     bsdd_dict = project.get()
-    specs = list(property_picker.get_properties().specs.values())
+    specs = property_picker.select_specs_dialog(parent=widget)
+    if specs is None:
+        return
     checked_classes = property_picker.get_checked_classes(specs, bsdd_dict)
     checked_properties = property_picker.get_checked_properties(specs, bsdd_dict)
     checked_predefined_porperties = property_picker.get_checked_predefined_properties(specs, bsdd_dict)

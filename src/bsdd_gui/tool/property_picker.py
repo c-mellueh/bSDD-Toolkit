@@ -1,7 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
 import logging
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QSizePolicy,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 from uuid import UUID, uuid4
 
 from datetime import datetime
@@ -361,6 +370,74 @@ class PropertyPicker(ActionTool, WidgetTool):
         if milestone.names:
             return milestone.names[0].text
         return str(milestone.guid)
+
+    @classmethod
+    def select_specs_dialog(
+        cls, parent: QWidget | None = None
+    ) -> list[LoinSpecification] | None:
+        """Show a purpose × milestone selection table and return the chosen specs.
+
+        Returns ``None`` when the user cancels, or an empty list when no cells
+        are checked.  All existing specs are pre-checked.
+        """
+        purposes = cls.get_purposes()
+        milestones = cls.get_milestones()
+        props = cls.get_properties()
+
+        if not purposes or not milestones:
+            return list(props.specs.values())
+
+        dlg = QDialog(parent)
+        dlg.setWindowTitle("Select Specifications to Export")
+
+        table = QTableWidget(len(purposes), len(milestones), dlg)
+        table.setVerticalHeaderLabels([cls.purpose_display_name(p) for p in purposes])
+        table.setHorizontalHeaderLabels([cls.milestone_display_name(m) for m in milestones])
+        table.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+
+        for r, purpose in enumerate(purposes):
+            for c, milestone in enumerate(milestones):
+                item = QTableWidgetItem()
+                item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                key = (purpose.guid, milestone.guid)
+                has_spec = key in props.specs
+                item.setCheckState(
+                    Qt.CheckState.Checked if has_spec else Qt.CheckState.Unchecked
+                )
+                table.setItem(r, c, item)
+
+        table.resizeColumnsToContents()
+        table.resizeRowsToContents()
+        table.setFixedHeight(
+            table.horizontalHeader().height()
+            + sum(table.rowHeight(r) for r in range(max(len(purposes), 1)))
+            + 4
+        )
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,
+            dlg,
+        )
+        buttons.accepted.connect(dlg.accept)
+        buttons.rejected.connect(dlg.reject)
+
+        layout = QVBoxLayout(dlg)
+        layout.addWidget(table)
+        layout.addWidget(buttons)
+
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return None
+
+        selected: list[LoinSpecification] = []
+        for r, purpose in enumerate(purposes):
+            for c, milestone in enumerate(milestones):
+                item = table.item(r, c)
+                if item and item.checkState() == Qt.CheckState.Checked:
+                    key = (purpose.guid, milestone.guid)
+                    spec = props.specs.get(key)
+                    if spec is not None:
+                        selected.append(spec)
+        return selected
 
     # ------------------------------------------------------------------ actors
 

@@ -241,8 +241,10 @@ def export_ids(
     property_picker: Type[tool.PropertyPicker],
 ):
     widget_tool.sync_to_model(widget, widget.bsdd_data)
+    specs = property_picker.select_specs_dialog(parent=widget)
+    if specs is None:
+        return
     bsdd_dict = project.get()
-    specs = list(property_picker.get_properties().specs.values())
     checked_classes = property_picker.get_checked_classes(specs, bsdd_dict)
     property_settings = property_picker.get_checked_properties(specs, bsdd_dict)
     base_settings = widget_tool.get_settings(widget)

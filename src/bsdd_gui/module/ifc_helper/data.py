@@ -22,13 +22,15 @@ class IfcHelperData:
 
     @classmethod
     def get_classes(cls):
+        cls.data["ifc_classes"] = ifc_backup()
+        return  cls.data["ifc_classes"]
         if not "ifc_classes" in cls.data:
             try:
                 c = bsdd.Client()
                 c1 = c.get_classes(IFC_URI, use_nested_classes=False, limit=1000)["classes"]
                 c2 = c.get_classes(IFC_URI, use_nested_classes=False, offset=1000)["classes"]
                 cls.data["ifc_classes"] = c1 + c2
-            except [ReadTimeout, ConnectionError]:
+            except [ReadTimeout, ConnectionError, TimeoutError]:
                 cls.data["ifc_classes"] = ifc_backup()
 
         return cls.data["ifc_classes"]
