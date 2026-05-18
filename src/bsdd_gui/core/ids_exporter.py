@@ -257,22 +257,24 @@ def export_ids(
         widget, checked_classes, property_settings, base_settings, metadata_settings
     )
 
+    def _show_error(exc: Exception):
+        stop_waiting_widget(waiting_worker)
+        t = QCoreApplication.translate("IDSExport", "Export Error")
+        popups.create_info_popup(str(exc), t, t, parent=widget)
+
     def _start_specification(payload: PayLoadDict):
         waiting_widget.set_title("Build IDS")
         logging.info("Create Specification")
         create_worker, creator_thread, creator_dialog = widget_tool.create_build_thread(
             payload, waiting_widget
         )
-        creator_thread.finished.connect(lambda: _export(payload["ids"], payload["out_path"]))
-        creator_thread.start()
-
-    def _show_error(exc: Exception):
-        stop_waiting_widget(waiting_worker)
-        t = QCoreApplication.translate("IDSExport", "Export Error")
-        popups.create_info_popup(str(exc), t, t, parent=widget)
+        # run_iterable_with_progress already starts the thread; marshal _export to the
+        # main thread explicitly so widget operations don't run from the worker thread.
+        create_worker.finished.connect(
+            lambda: QTimer.singleShot(0, widget, lambda: _export(payload["ids"], payload["out_path"]))
+        )
 
     def _dispatch_specification(payload: PayLoadDict):
-        # queue execution on the main thread (mw affinity)
         QTimer.singleShot(0, widget, lambda: _start_specification(payload))
 
     def _export(ids: Ids, out_path: str):
@@ -281,7 +283,9 @@ def export_ids(
 
         write_worker, write_thread = widget_tool.create_write_thread(ids, out_path)
         waiting_widget.set_title("Write IDS")
-        write_worker.finished.connect(
+        # Use write_thread.finished (QThread object lives in main thread) so these
+        # slots are delivered via QueuedConnection and run on the main thread.
+        write_thread.finished.connect(
             lambda: popups.create_info_popup(
                 f"{len(ids.specifications)} Specifications created.",
                 "IDS Export Done!",
@@ -289,11 +293,15 @@ def export_ids(
                 parent=widget,
             )
         )
-        write_worker.finished.connect(lambda: stop_waiting_widget(waiting_worker))
-        write_worker.error.connect(_show_error)
+        write_thread.finished.connect(lambda: stop_waiting_widget(waiting_worker))
+        write_worker.error.connect(
+            lambda exc: QTimer.singleShot(0, widget, lambda: _show_error(exc))
+        )
         logging.info("Export Done!")
         write_thread.start()
 
     setup_worker.finished.connect(_dispatch_specification)
-    setup_worker.error.connect(_show_error)
+    setup_worker.error.connect(
+        lambda exc: QTimer.singleShot(0, widget, lambda: _show_error(exc))
+    )
     setup_thread.start()
