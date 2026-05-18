@@ -380,7 +380,7 @@ class FieldTool(WidgetTool):
             elif datatype == "list":
                 return Appdata.get_list_setting(section, option, default)
             elif datatype == "bool":
-                return Appdata.get_bool_setting(section, option, default)
+                return Appdata.get_bool_setting(section, option, bool(default))
 
         def _setter(value):
             Appdata.set_setting(section, option, value)
@@ -624,7 +624,7 @@ class FieldTool(WidgetTool):
                     value = datetime.datetime.strptime(value, fmt)
                 field.setDateTime(QDateTime.fromSecsSinceEpoch(int(value.timestamp()), Qt.UTC))
             elif isinstance(field, QAbstractButton):
-                field.setChecked(value)
+                field.setChecked(bool(value))
 
     @classmethod
     def sync_to_model(cls, widget: FieldWidget, element, explicit_field: QWidget = None):
