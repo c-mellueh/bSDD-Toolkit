@@ -248,7 +248,7 @@ class Excel(ActionTool, FieldTool):
         column +=constants.COLUMN_COUNT
 
         for child in cls.get_all_children(root_class,bsdd_dict):
-            if not child in checked_classes:
+            if child not in checked_classes:
                 continue
 
             classes.append(child)

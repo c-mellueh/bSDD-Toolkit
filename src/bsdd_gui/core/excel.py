@@ -101,22 +101,24 @@ def import_settings(
 
 def export(    widget: ui.Widget,
     excel: Type[tool.Excel],
-    pp_class_view: Type[tool.PPClassView],
-    pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
     util:Type[tool.Util],
-    project:type[tool.Project]):
+    project:type[tool.Project],
+    property_picker:Type[tool.PropertyPicker],):
     
     excel.sync_to_model(widget, widget.bsdd_data)
     title = QCoreApplication.translate("Excel", "Export Excel")
     waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
     waiting_widget.set_title("Load Data")
-
-    class_settings = pp_class_view.get_checked_classes(widget.property_picker.tv_classes)
-    property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
-    base_settings = excel.get_settings(widget)
     bsdd_dict = project.get()
+
+    specs = property_picker.select_specs_dialog(widget)
+    if not specs:
+        return
+    checked_classes = property_picker.get_checked_classes(specs,bsdd_dict)
+    checked_properties = property_picker.get_checked_properties(specs,bsdd_dict)
+    base_settings = excel.get_settings(widget)
     out_path = widget.fw_output.get_path()
 
     def export_done(classes:list[BsddClass]):
@@ -128,7 +130,7 @@ def export(    widget: ui.Widget,
         
     
 
-    build_worker, build_thread = excel.create_build_thread(bsdd_dict,class_settings,property_settings,out_path)
+    build_worker, build_thread = excel.create_build_thread(bsdd_dict,checked_classes,checked_properties,out_path)
 
     build_worker.finished.connect(export_done )
     build_worker.error.connect(lambda: stop_waiting_widget(waiting_worker))
