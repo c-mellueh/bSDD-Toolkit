@@ -8,7 +8,6 @@ from . import trigger
 from bsdd_json import BsddClass
 from bsdd_gui.presets.ui_presets import TagInput, FieldWidget, BaseDialog
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
-from .qt import ui_ClassEditor
 
 
 class IfcTagInput(TagInput):
@@ -16,6 +15,9 @@ class IfcTagInput(TagInput):
         classes = IfcHelperData.get_classes()
         class_names = [c["code"] for c in classes]
         super().__init__(*args, allowed=class_names, **kwargs)
+
+
+from .qt import ui_ClassEditor  # noqa: E402
 
 
 class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
