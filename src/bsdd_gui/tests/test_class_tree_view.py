@@ -7,6 +7,7 @@ Coverage:
   - ClassTreeView   operations on the model (add / delete / move)
   - classes_to_payload serialization
 """
+
 from __future__ import annotations
 
 from PySide6.QtCore import QModelIndex
@@ -18,6 +19,7 @@ from bsdd_gui.tool import ClassTreeView
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def make_class(code: str, name: str | None = None, parent: str | None = None) -> BsddClass:
     return BsddClass(Code=code, Name=name or code, ParentClassCode=parent)
 
@@ -25,6 +27,7 @@ def make_class(code: str, name: str | None = None, parent: str | None = None) ->
 # ---------------------------------------------------------------------------
 # 1. depth_of  –  pure Python, no Qt
 # ---------------------------------------------------------------------------
+
 
 class TestDepthOf:
     def test_root_class_has_depth_zero(self):
@@ -54,6 +57,7 @@ class TestDepthOf:
 # 2. is_payload_valid  –  pure Python, no Qt
 # ---------------------------------------------------------------------------
 
+
 class TestIsPayloadValid:
     def test_valid_payload(self):
         payload = {"kind": "BsddClassTransfer", "version": 1, "classes": []}
@@ -78,6 +82,7 @@ class TestIsPayloadValid:
 # 3. create_class_from_mime  –  pure Python, no Qt
 # ---------------------------------------------------------------------------
 
+
 class TestCreateClassFromMime:
     def test_basic_creation(self):
         rc = {"Code": "OLD", "Name": "My Class", "ClassType": "Class"}
@@ -89,14 +94,18 @@ class TestCreateClassFromMime:
 
     def test_parent_code_is_remapped(self):
         rc = {"Code": "CHILD", "Name": "Child", "ClassType": "Class", "ParentClassCode": "OLD_P"}
-        result = ClassTreeView.create_class_from_mime(rc, "CHILD_NEW", {"OLD_P": "NEW_P"}, set(), None)
+        result = ClassTreeView.create_class_from_mime(
+            rc, "CHILD_NEW", {"OLD_P": "NEW_P"}, set(), None
+        )
         assert result.ParentClassCode == "NEW_P"
 
     def test_root_in_import_attaches_to_dest_parent(self):
         dest = make_class("DEST", "Destination")
         rc = {"Code": "ROOT", "Name": "Root", "ClassType": "Class"}
         # ROOT is in root_codes → should be attached to dest_parent
-        result = ClassTreeView.create_class_from_mime(rc, "ROOT_NEW", {"ROOT": "ROOT_NEW"}, {"ROOT"}, dest)
+        result = ClassTreeView.create_class_from_mime(
+            rc, "ROOT_NEW", {"ROOT": "ROOT_NEW"}, {"ROOT"}, dest
+        )
         assert result.ParentClassCode == "DEST"
 
     def test_invalid_data_returns_none(self):
@@ -115,6 +124,7 @@ class TestCreateClassFromMime:
 # ---------------------------------------------------------------------------
 # 4. ClassTreeModel – Qt item-model behaviour
 # ---------------------------------------------------------------------------
+
 
 class TestClassTreeModel:
     def test_empty_dictionary_has_no_rows(self, model_fixture):
@@ -180,6 +190,7 @@ class TestClassTreeModel:
 # 5. add_class_to_dictionary
 # ---------------------------------------------------------------------------
 
+
 class TestAddClass:
     def test_class_is_added_to_dictionary(self, model_fixture):
         _, model, dictionary = model_fixture
@@ -204,6 +215,7 @@ class TestAddClass:
 # ---------------------------------------------------------------------------
 # 6. delete_class
 # ---------------------------------------------------------------------------
+
 
 class TestDeleteClass:
     def test_class_is_removed_from_dictionary(self, model_fixture):
@@ -248,6 +260,7 @@ class TestDeleteClass:
 # 7. move_class
 # ---------------------------------------------------------------------------
 
+
 class TestMoveClass:
     def test_move_child_to_root(self, model_fixture):
         _, model, dictionary = model_fixture
@@ -277,6 +290,7 @@ class TestMoveClass:
 # ---------------------------------------------------------------------------
 # 8. classes_to_payload
 # ---------------------------------------------------------------------------
+
 
 class TestClassesToPayload:
     def test_payload_has_required_keys(self, model_fixture):

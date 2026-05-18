@@ -1,5 +1,5 @@
 import bsdd_gui
-from . import prop, trigger, ui
+from . import prop, trigger, ui as ui
 
 
 def register():

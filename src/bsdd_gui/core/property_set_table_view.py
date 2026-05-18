@@ -223,7 +223,7 @@ def connect_to_main_window(
     pset_view = main_window.get_pset_view()
     main_window.signals.active_class_changed.connect(reset_pset)
     property_set_table.signals.selection_changed.connect(
-        lambda v, n: (main_window.set_active_pset(n) if v == main_window.get_pset_view() else None)
+        lambda v, n: main_window.set_active_pset(n) if v == main_window.get_pset_view() else None
     )
     main_window.signals.new_property_set_requested.connect(
         lambda: property_set_table.request_new_property_set(main_window.get_active_class())
@@ -353,6 +353,7 @@ def delete_selection(
 
     property_table.signals.model_refresh_requested.emit()
     property_set_table.signals.model_refresh_requested.emit()
+
 
 def reset_models(
     property_table: Type[tool.PropertySetTableView],

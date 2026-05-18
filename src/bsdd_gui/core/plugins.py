@@ -15,7 +15,6 @@ def settings_accepted(plugins: Type[tool.Plugins]):
         cb: QCheckBox = layout.itemAt(index, QFormLayout.ItemRole.FieldRole).widget()
         new_checkstate = cb.isChecked()
         old_checkstate = plugins.is_plugin_active(plugin_name)
-        friendly_name = plugins.get_friendly_name(plugin_name)
         if new_checkstate == old_checkstate:
             continue
         if new_checkstate:

@@ -4,6 +4,7 @@ Tests for the MainWindowWidget module (tool/main_window_widget.py).
 Covers the pure state-management helpers (active class, pset, property)
 and is_console_visible(), which must return a bool on any platform.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -15,6 +16,7 @@ from bsdd_gui.tool import MainWindowWidget
 # ---------------------------------------------------------------------------
 # Fixture: restore active-state fields after each test
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(autouse=True)
 def _restore_active_state():
@@ -28,6 +30,7 @@ def _restore_active_state():
 # ---------------------------------------------------------------------------
 # active_class
 # ---------------------------------------------------------------------------
+
 
 class TestActiveClass:
     def test_default_is_none(self):
@@ -49,6 +52,7 @@ class TestActiveClass:
 # active_pset
 # ---------------------------------------------------------------------------
 
+
 class TestActivePset:
     def test_set_and_get(self):
         MainWindowWidget.set_active_pset("Pset_A")
@@ -63,6 +67,7 @@ class TestActivePset:
 # ---------------------------------------------------------------------------
 # active_property
 # ---------------------------------------------------------------------------
+
 
 class TestActiveProperty:
     def test_set_and_get(self):
@@ -80,6 +85,7 @@ class TestActiveProperty:
 # ---------------------------------------------------------------------------
 # is_console_visible
 # ---------------------------------------------------------------------------
+
 
 class TestIsConsoleVisible:
     def test_returns_bool(self):

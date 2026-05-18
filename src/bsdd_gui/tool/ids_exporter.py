@@ -19,9 +19,7 @@ import datetime
 from ifctester.facet import Classification as ClassificationFacet
 
 if TYPE_CHECKING:
-    from bsdd_gui.module.ids_exporter.prop import (
-        IdsExporterProperties
-    )
+    from bsdd_gui.module.ids_exporter.prop import IdsExporterProperties
 from bsdd_gui.module.ids_exporter import trigger
 import ifctester
 import os
@@ -140,7 +138,7 @@ class IdsExporter(ActionTool, FieldTool):
                 new_checkstate_dict[child.Code] = checkstate
                 _iter_classes(class_utils.get_children(child), checkstate)
 
-        new_checkstate_dict: dict[str, bool] = dict()
+        new_checkstate_dict: dict[str, bool] = {}
         root_classes = [c for c in bsdd_classes if not c.ParentClassCode]
         _iter_classes(root_classes, True)
         return new_checkstate_dict
@@ -158,13 +156,13 @@ class IdsExporter(ActionTool, FieldTool):
 
     @classmethod
     def is_class_prop_active(cls, class_prop: BsddClassProperty, property_settings: PsetDict):
-        pset_dict = property_settings.get(class_prop.PropertySet, dict())
+        pset_dict = property_settings.get(class_prop.PropertySet, {})
         pset_checkstate = pset_dict.get("checked")
         if pset_checkstate is None:
             return True
         elif pset_checkstate is False:
             return False
-        return pset_dict.get("properties", dict()).get(class_prop.Code, True)
+        return pset_dict.get("properties", {}).get(class_prop.Code, True)
 
     # Copyright (c) 2024 BIM-Tools
     # Licensed under the MIT License
@@ -254,7 +252,7 @@ class IdsExporter(ActionTool, FieldTool):
         """
         from bsdd_gui.tool.ifc_helper import IfcHelper
 
-        data_dict = dict()
+        data_dict = {}
         for ifc_reference in bsdd_class.RelatedIfcEntityNamesList:
             entity, predefined = IfcHelper.split_ifc_term(ifc_reference)
             if entity not in data_dict:
@@ -470,7 +468,7 @@ class IdsExporter(ActionTool, FieldTool):
         base_settings: BasicSettingsDict,
         metadata_settings: MetadataDict,
     ) -> PayLoadDict:
-        
+
         out_path = widget.fw_output.get_path()
         logging.debug(f"Output path: {out_path}")
         template_path = cls.get_template()
@@ -488,7 +486,7 @@ class IdsExporter(ActionTool, FieldTool):
         if base_settings.get("classification", False):
             logging.debug("Use Classification: True")
 
-            ids.specifications = list()
+            ids.specifications = []
         else:
             logging.debug("Use Classification: False")
 
@@ -528,7 +526,9 @@ class IdsExporter(ActionTool, FieldTool):
         else:
             cs = {c.Code: True for c in checked_classes}
 
-        sorted_classes = sorted([c for c in checked_classes if c.ClassType == "Class"], key=lambda x: x.Code)
+        sorted_classes = sorted(
+            [c for c in checked_classes if c.ClassType == "Class"], key=lambda x: x.Code
+        )
         payload: PayLoadDict = {
             "ids": ids,
             "sorted_classes": sorted_classes,
@@ -639,7 +639,7 @@ class IdsExporter(ActionTool, FieldTool):
             spec.applicability.append(applicability_facet)
             for class_prop in bsdd_class.ClassProperties:
                 if not cls.is_class_prop_active(
-                    class_prop, property_settings.get(bsdd_class.Code, dict())
+                    class_prop, property_settings.get(bsdd_class.Code, {})
                 ):
                     continue
 
@@ -695,7 +695,7 @@ class IdsExporter(ActionTool, FieldTool):
         ids.info["copyright"] = metadata.get("copyright", ids.info.get("copyright"))
 
     @classmethod
-    def create_write_thread(cls, ids:Ids, out_path:str):
+    def create_write_thread(cls, ids: Ids, out_path: str):
         class _SetupWorker(QObject):
             finished = Signal()
             error = Signal(object)
@@ -723,7 +723,3 @@ class IdsExporter(ActionTool, FieldTool):
         write_thread.finished.connect(write_thread.deleteLater)
         write_thread.started.connect(write_worker.run, Qt.ConnectionType.QueuedConnection)
         return write_worker, write_thread
-
-
-
-

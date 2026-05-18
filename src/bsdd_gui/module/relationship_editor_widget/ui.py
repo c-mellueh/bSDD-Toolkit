@@ -8,7 +8,6 @@ from bsdd_gui.presets.ui_presets import BaseWidget
 
 
 class RelationshipWidget(BaseWidget, Ui_Form):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.bsdd_data = None

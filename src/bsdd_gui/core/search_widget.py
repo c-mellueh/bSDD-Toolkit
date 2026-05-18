@@ -30,8 +30,6 @@ def update_filter_table(dialog: SearchDialog, search: Type[tool.SearchWidget]):
     threshold = search.get_threshold()
     table_widget = search.get_table(dialog)
     search_text = search.get_search_text(dialog)
-    search_mode = search.get_search_mode(dialog)
-
     search_text = search_text.translate(UMLAUT_DICT)  # Tanslate Umlauts (ä->ae, ö->oe etc..)
     table_widget.setSortingEnabled(False)  # disable sorting
     # Hide match score column

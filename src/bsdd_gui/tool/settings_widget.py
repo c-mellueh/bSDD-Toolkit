@@ -33,7 +33,7 @@ class SettingsWidget:
     @classmethod
     def add_page_to_toolbox(cls, widget_function, page_name: str, accept_function: Callable):
         if page_name not in cls.get_page_dict():
-            cls.get_properties().page_dict[page_name] = list()
+            cls.get_properties().page_dict[page_name] = []
         cls.get_properties().page_dict[page_name].append(widget_function)
         cls.get_properties().accept_functions.append(accept_function)
 

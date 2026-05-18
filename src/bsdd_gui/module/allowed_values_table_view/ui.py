@@ -30,7 +30,6 @@ class AllowedValuesTable(TableItemView):
 
 
 class LiveEditDelegate(QStyledItemDelegate):
-
     text_edited = Signal(QModelIndex, str, str)
     text_set = Signal(QModelIndex, str)
 

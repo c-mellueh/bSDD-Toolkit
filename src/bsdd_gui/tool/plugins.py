@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
 
 class Plugins:
-
     @classmethod
     def get_properties(cls) -> PluginsProperties:
         return bsdd_gui.PluginsProperties

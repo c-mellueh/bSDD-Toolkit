@@ -5,6 +5,7 @@ Tests cover pure data-model operations only (create, load, offline mode,
 plugin save functions, last-save tracking).  Signal-heavy UI operations are
 out of scope here.
 """
+
 from __future__ import annotations
 
 import json
@@ -17,6 +18,7 @@ from bsdd_gui.tool import Project
 # ---------------------------------------------------------------------------
 # Helper
 # ---------------------------------------------------------------------------
+
 
 def _minimal_dict_data(**overrides) -> dict:
     base = {
@@ -34,6 +36,7 @@ def _minimal_dict_data(**overrides) -> dict:
 # ---------------------------------------------------------------------------
 # 1. create_project
 # ---------------------------------------------------------------------------
+
 
 class TestCreateProject:
     def test_returns_bsdd_dictionary(self):
@@ -60,6 +63,7 @@ class TestCreateProject:
 # ---------------------------------------------------------------------------
 # 2. load_project
 # ---------------------------------------------------------------------------
+
 
 class TestLoadProject:
     def test_loads_json_file(self, tmp_path):
@@ -90,6 +94,7 @@ class TestLoadProject:
 # 3. offline_mode
 # ---------------------------------------------------------------------------
 
+
 class TestOfflineMode:
     def test_default_is_false(self):
         # Reset to known state
@@ -111,6 +116,7 @@ class TestOfflineMode:
 # 4. plugin_save_functions
 # ---------------------------------------------------------------------------
 
+
 class TestPluginSaveFunctions:
     def test_add_returns_index(self):
         initial = len(Project.get_plugin_save_functions())
@@ -118,7 +124,9 @@ class TestPluginSaveFunctions:
         assert idx == initial
 
     def test_function_is_retrievable(self):
-        func = lambda: "sentinel"
+        def func():
+            return "sentinel"
+
         idx = Project.add_plugin_save_function(func)
         assert Project.get_plugin_save_functions()[idx] is func
 
@@ -131,6 +139,7 @@ class TestPluginSaveFunctions:
 # ---------------------------------------------------------------------------
 # 5. set_last_save / get_last_save
 # ---------------------------------------------------------------------------
+
 
 class TestLastSave:
     def test_last_save_is_deep_copy(self):

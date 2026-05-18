@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
-from PySide6.QtCore import Signal, QCoreApplication,QObject,QThread,Qt
+from PySide6.QtCore import Signal, QCoreApplication, QObject, QThread, Qt
 from openpyxl import styles
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -11,10 +11,8 @@ import openpyxl
 from bsdd_json import BsddClass, BsddDictionary, BsddClassProperty
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, FieldSignals
-from bsdd_gui.module.excel import ui, trigger,constants
+from bsdd_gui.module.excel import ui, trigger, constants
 from openpyxl.worksheet.table import Table, TableStyleInfo
-
-
 
 
 class PsetDict(TypedDict):
@@ -46,6 +44,7 @@ class Signals(FieldSignals):
 
 class Excel(ActionTool, FieldTool):
     signals = Signals()
+
     @classmethod
     def get_properties(cls) -> ExcelProperties:
         return bsdd_gui.ExcelProperties
@@ -82,7 +81,7 @@ class Excel(ActionTool, FieldTool):
         start_row: int,
         start_column: int,
         sheet: Worksheet,
-        property_filter: dict[str,PsetDict],
+        property_filter: dict[str, PsetDict],
         bsdd_dictionary: BsddDictionary,
     ):
         sheet.cell(start_row, start_column, QCoreApplication.translate("Excel", "Name"))
@@ -113,15 +112,17 @@ class Excel(ActionTool, FieldTool):
         start_row += 3
         row = 0
 
-        def is_active(bsdd_property:BsddClassProperty):
+        def is_active(bsdd_property: BsddClassProperty):
             pset_data = property_filter.get(bsdd_property.PropertySet)
             if not pset_data:
                 return True
-            if not pset_data.get("checked",True):
+            if not pset_data.get("checked", True):
                 return False
-            return pset_data.get("properties",{}).get(bsdd_property.Code,True)
+            return pset_data.get("properties", {}).get(bsdd_property.Code, True)
 
-        bsdd_properties = sorted([p for p in bsdd_class.ClassProperties if is_active(p)],key=lambda p:p.PropertySet)
+        bsdd_properties = sorted(
+            [p for p in bsdd_class.ClassProperties if is_active(p)], key=lambda p: p.PropertySet
+        )
 
         for row, bsdd_property in enumerate(bsdd_properties, start=1):
             name = property_utils.get_name(bsdd_property, bsdd_dictionary)
@@ -169,7 +170,6 @@ class Excel(ActionTool, FieldTool):
     @classmethod
     def set_settings(cls, widget: ui.Widget, settings_dict: BasicSettingsDict):
         pass
-
 
     @classmethod
     def draw_border(
@@ -220,7 +220,7 @@ class Excel(ActionTool, FieldTool):
     def create_table(
         cls, row_range: tuple[int, int], column_range: tuple[int, int], sheet: Worksheet, name
     ):
-        name = dictionary_utils.slugify(name,delimiter="_")
+        name = dictionary_utils.slugify(name, delimiter="_")
         table_range = f"{sheet.cell(row_range[0], column_range[0]).coordinate}:{sheet.cell(row_range[1], column_range[1]).coordinate}"
         table = Table(displayName=name, ref=table_range)
         style = TableStyleInfo(
@@ -235,46 +235,53 @@ class Excel(ActionTool, FieldTool):
         # cls.autoadjust_column_widths(sheet, 5)
 
     @classmethod
-    def create_class_sheet(cls,root_class:BsddClass,bsdd_dict:BsddDictionary,workbook:Workbook,checked_classes:list[BsddClass],property_settings:dict):
+    def create_class_sheet(
+        cls,
+        root_class: BsddClass,
+        bsdd_dict: BsddDictionary,
+        workbook: Workbook,
+        checked_classes: list[BsddClass],
+        property_settings: dict,
+    ):
         classes = [root_class]
-        property_dict = property_settings.get(root_class.Code,{})
+        property_dict = property_settings.get(root_class.Code, {})
         class_sheet = workbook.create_sheet(root_class.Name)
-        row, column = 1,1
+        row, column = 1, 1
         max_row = 0
-        max_row = cls.draw_class(root_class,row,column,class_sheet,property_dict,bsdd_dict)
+        max_row = cls.draw_class(root_class, row, column, class_sheet, property_dict, bsdd_dict)
         items_in_row = 1
-        column +=constants.COLUMN_COUNT
+        column += constants.COLUMN_COUNT
 
-        for child in cls.get_all_children(root_class,bsdd_dict):
+        for child in cls.get_all_children(root_class, bsdd_dict):
             if child not in checked_classes:
                 continue
 
             classes.append(child)
-            property_dict = property_settings.get(child.Code,{})
+            property_dict = property_settings.get(child.Code, {})
 
-            bottom_row = cls.draw_class(child,row,column,class_sheet,property_dict,bsdd_dict)
-            column +=constants.COLUMN_COUNT
+            bottom_row = cls.draw_class(child, row, column, class_sheet, property_dict, bsdd_dict)
+            column += constants.COLUMN_COUNT
             max_row = bottom_row if bottom_row > max_row else max_row
-            items_in_row +=1
+            items_in_row += 1
 
             if items_in_row > constants.MAX_ENTRIES:
                 column = 1
-                row = max_row+2
+                row = max_row + 2
                 items_in_row = 0
         return classes
-    
+
     @classmethod
-    def create_overview_sheet(cls,classes:list[BsddClass],sheet:Worksheet):
-        sheet.title = QCoreApplication.translate("Excel","Overview")
-        sheet.cell(1,1,"Code")
-        sheet.cell(1,2,"Name")
-        sheet.cell(1,3,"Definition")
+    def create_overview_sheet(cls, classes: list[BsddClass], sheet: Worksheet):
+        sheet.title = QCoreApplication.translate("Excel", "Overview")
+        sheet.cell(1, 1, "Code")
+        sheet.cell(1, 2, "Name")
+        sheet.cell(1, 3, "Definition")
         row = 2
-        for row,bsdd_class in enumerate(classes,start=2):
-            sheet.cell(row,1,bsdd_class.Code)
-            sheet.cell(row,2,bsdd_class.Name)
-            sheet.cell(row,3,bsdd_class.Definition)
-        cls.create_table((1,row),(1,3),sheet,sheet.title)
+        for row, bsdd_class in enumerate(classes, start=2):
+            sheet.cell(row, 1, bsdd_class.Code)
+            sheet.cell(row, 2, bsdd_class.Name)
+            sheet.cell(row, 3, bsdd_class.Definition)
+        cls.create_table((1, row), (1, 3), sheet, sheet.title)
 
     @classmethod
     def create_build_thread(
@@ -282,7 +289,7 @@ class Excel(ActionTool, FieldTool):
         bsdd_dict: BsddDictionary,
         checked_classes: dict[str, bool],
         checked_properties: PsetDict,
-        out_path:str
+        out_path: str,
     ):
         class _BuildWorker(QObject):
             finished = Signal(object)
@@ -293,18 +300,20 @@ class Excel(ActionTool, FieldTool):
 
             def run(self):
                 try:
-                    bsdd_classes = [c for c in checked_classes if  c.ClassType == "Class"]
-                    root_classes = [c for c in bsdd_classes if not c.ParentClassCode ]
+                    bsdd_classes = [c for c in checked_classes if c.ClassType == "Class"]
+                    root_classes = [c for c in bsdd_classes if not c.ParentClassCode]
                     workbook = openpyxl.Workbook()
                     overview_sheet = workbook.active
 
-                    filtered_classes:list[BsddClass] = list()
+                    filtered_classes: list[BsddClass] = []
 
                     for bsdd_class in root_classes:
-                        created_classes =cls.create_class_sheet(bsdd_class,bsdd_dict,workbook,checked_classes,checked_properties)
+                        created_classes = cls.create_class_sheet(
+                            bsdd_class, bsdd_dict, workbook, checked_classes, checked_properties
+                        )
                         filtered_classes.extend(created_classes)
 
-                    cls.create_overview_sheet(filtered_classes,overview_sheet)
+                    cls.create_overview_sheet(filtered_classes, overview_sheet)
                     workbook.save(out_path)
 
                     self.finished.emit(filtered_classes)

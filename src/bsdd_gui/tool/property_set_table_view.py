@@ -87,7 +87,7 @@ class PropertySetTableView(ItemViewTool):
 
     @classmethod
     def get_pset_names_with_temporary(cls, bsdd_class: BsddClass) -> list[str]:
-        bsdd_properties = list()
+        bsdd_properties = []
         if bsdd_class is None:
             return bsdd_properties
         for cp in bsdd_class.ClassProperties:
@@ -118,14 +118,14 @@ class PropertySetTableView(ItemViewTool):
     def add_temporary_pset(cls, bsdd_class: BsddClass, name: str):
         class_code = bsdd_class.Code
         if class_code not in cls.get_properties().temporary_pset:
-            cls.get_properties().temporary_pset[class_code] = list()
+            cls.get_properties().temporary_pset[class_code] = []
         cls.get_properties().temporary_pset[class_code].append(name)
 
     @classmethod
     def remove_temporary_pset(cls, bsdd_class: BsddClass, name: str):
         class_code = bsdd_class.Code
         if class_code not in cls.get_properties().temporary_pset:
-            cls.get_properties().temporary_pset[class_code] = list()
+            cls.get_properties().temporary_pset[class_code] = []
         if name in cls.get_properties().temporary_pset[class_code]:
             cls.get_properties().temporary_pset[class_code].remove(name)
 
@@ -225,7 +225,7 @@ class PropertySetTableView(ItemViewTool):
     def get_related_psets(
         cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary
     ) -> list[BsddClass]:
-        related_psets = list()
+        related_psets = []
 
         for cr in bsdd_class.ClassRelations:
             if cr.RelationType != "HasReference":

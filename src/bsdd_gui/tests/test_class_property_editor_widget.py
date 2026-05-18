@@ -4,6 +4,7 @@ Tests for the ClassPropertyEditorWidget module (tool/class_property_editor_widge
 Covers the pure-Python helpers: create_window_title, get_property_reference,
 is_property_reference_valid, create_temporary_property, and set_code.
 """
+
 from __future__ import annotations
 
 from bsdd_json.models import BsddClass, BsddClassProperty, BsddDictionary, BsddProperty
@@ -32,6 +33,7 @@ def _make_cp(code="P1", pset="Pset_A", prop_code="PROP1") -> BsddClassProperty:
 # create_window_title
 # ---------------------------------------------------------------------------
 
+
 class TestCreateWindowTitle:
     def test_no_pset_returns_code_only(self):
         cp = BsddClassProperty(Code="P1", PropertyCode="X")
@@ -54,6 +56,7 @@ class TestCreateWindowTitle:
 # get_property_reference
 # ---------------------------------------------------------------------------
 
+
 class TestGetPropertyReference:
     def test_returns_property_code_when_set(self):
         cp = _make_cp(prop_code="PROP1")
@@ -68,13 +71,15 @@ class TestGetPropertyReference:
 # is_property_reference_valid
 # ---------------------------------------------------------------------------
 
+
 class TestIsPropertyReferenceValid:
     def test_uri_is_always_valid(self):
         cp = _make_cp()
         d = _make_dict()
-        assert ClassPropertyEditorWidget.is_property_reference_valid(
-            "https://example.com/prop", cp, d
-        ) is True
+        assert (
+            ClassPropertyEditorWidget.is_property_reference_valid("https://example.com/prop", cp, d)
+            is True
+        )
 
     def test_unknown_code_is_invalid(self):
         cp = _make_cp()
@@ -105,6 +110,7 @@ class TestIsPropertyReferenceValid:
 # create_temporary_property
 # ---------------------------------------------------------------------------
 
+
 class TestCreateTemporaryProperty:
     def test_returns_class_property(self):
         cls = BsddClass(Code="C", Name="C")
@@ -125,6 +131,7 @@ class TestCreateTemporaryProperty:
 # ---------------------------------------------------------------------------
 # set_code
 # ---------------------------------------------------------------------------
+
 
 class TestSetCode:
     def test_updates_code(self):

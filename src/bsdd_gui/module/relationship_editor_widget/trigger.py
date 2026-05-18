@@ -17,7 +17,10 @@ def connect():
         tool.ClassEditorWidget,
         tool.PropertyEditorWidget,
     )
-    func = lambda: core.splitter_settings_accepted(tool.RelationshipEditorWidget, tool.Appdata)
+
+    def func():
+        core.splitter_settings_accepted(tool.RelationshipEditorWidget, tool.Appdata)
+
     core.add_settings(func, tool.SettingsWidget)
 
 

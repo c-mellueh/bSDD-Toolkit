@@ -28,9 +28,7 @@ Subdivision = Annotated[str, Field(pattern=r"^[A-Z]{2}-[0-9A-Z]{1,4}$")]
 # http/https/ftp/file URL
 Url = Annotated[
     str,
-    Field(
-        pattern=r"^(https?|ftp|file)://[-a-zA-Z0-9+@#/%?=~_|!:,.;]*[-a-zA-Z0-9+@#/%=~_|]$"
-    ),
+    Field(pattern=r"^(https?|ftp|file)://[-a-zA-Z0-9+@#/%?=~_|!:,.;]*[-a-zA-Z0-9+@#/%=~_|]$"),
 ]
 
 # Non-empty string up to 1 500 characters
@@ -136,9 +134,7 @@ class PhysicalQuantity(BaseXmlModel, tag="physicalQuantity"):
     language: Language = element()
 
 
-class SymbolInPropertyGroup(
-    BaseXmlModel, tag="symbolsOfThePropertyInAGivenPropertyGroup"
-):
+class SymbolInPropertyGroup(BaseXmlModel, tag="symbolsOfThePropertyInAGivenPropertyGroup"):
     """PA022 – (symbol, propGroupID) pair."""
 
     symbol: BimDeString = element()
@@ -262,15 +258,13 @@ class Property(BaseXmlModel, tag="property"):
     replaces: List[Guid] = element(default_factory=list)  # PA011
     replacedBy: List[Guid] = element(default_factory=list)  # PA012
     deprecationExplanation: Optional[BimDeString] = element(default=None)  # PA013
-    relationOfThePropertyIdentifiersInTheInterconnectedDictionaries: List[
-        PropertyDictRelation
-    ] = element(default_factory=list)  # PA014
+    relationOfThePropertyIdentifiersInTheInterconnectedDictionaries: List[PropertyDictRelation] = (
+        element(default_factory=list)
+    )  # PA014
     creatorsLanguage: Language = element()  # PA015
     namesInLanguage: List[NameInLanguage] = element(min_length=1)  # PA016
     definitionsInLanguage: List[DefinitionInLanguage] = element(min_length=1)  # PA017
-    descriptionsInLanguage: List[DescriptionInLanguage] = element(
-        default_factory=list
-    )  # PA018
+    descriptionsInLanguage: List[DescriptionInLanguage] = element(default_factory=list)  # PA018
     examplesInLanguage: List[ExampleInLanguage] = element(default_factory=list)  # PA019
     connectedProperties: List[Guid] = element(default_factory=list)  # PA020
     groupOfProperties: List[Guid] = element(min_length=0)  # PA021
@@ -288,9 +282,7 @@ class Property(BaseXmlModel, tag="property"):
     dynamicProperty: DynamicProperty = element()  # PA031
     parametersOfTheDynamicProperty: List[Guid] = element(default_factory=list)  # PA032
     units: List[BimDeString] = element(default_factory=list)  # PA033
-    namesOfTheDefiningValues: List[NameOfDefiningValue] = element(
-        default_factory=list
-    )  # PA034
+    namesOfTheDefiningValues: List[NameOfDefiningValue] = element(default_factory=list)  # PA034
     definingValues: List[BimDeString] = element(default_factory=list)  # PA035
     tolerance: List[Decimal] = element(default_factory=list)  # PA036
     digitalFormat: List[DigitalFormat] = element(default_factory=list)  # PA037
@@ -502,21 +494,11 @@ class IsoDataType(BaseXmlModel, tag="DataType", ns="dt", nsmap=LOIN_NSMAP):
     """dt:DataTypeType — wraps DataType name + optional constraints."""
 
     name: Optional[IsoDataTypeName] = attr(name="name", default=None)
-    min_inclusive: Optional[IsoBoundary] = element(
-        tag="MinInclusive", ns="dt", default=None
-    )
-    min_exclusive: Optional[IsoBoundary] = element(
-        tag="MinExclusive", ns="dt", default=None
-    )
-    max_inclusive: Optional[IsoBoundary] = element(
-        tag="MaxInclusive", ns="dt", default=None
-    )
-    max_exclusive: Optional[IsoBoundary] = element(
-        tag="MaxExclusive", ns="dt", default=None
-    )
-    data_format: Optional[IsoDataFormat] = element(
-        tag="DataFormat", ns="dt", default=None
-    )
+    min_inclusive: Optional[IsoBoundary] = element(tag="MinInclusive", ns="dt", default=None)
+    min_exclusive: Optional[IsoBoundary] = element(tag="MinExclusive", ns="dt", default=None)
+    max_inclusive: Optional[IsoBoundary] = element(tag="MaxInclusive", ns="dt", default=None)
+    max_exclusive: Optional[IsoBoundary] = element(tag="MaxExclusive", ns="dt", default=None)
+    data_format: Optional[IsoDataFormat] = element(tag="DataFormat", ns="dt", default=None)
     possible_values: Optional[IsoPossibleValues] = element(
         tag="PossibleValues", ns="dt", default=None
     )
@@ -537,27 +519,15 @@ class DtConceptType(BaseXmlModel, ns="dt", nsmap=LOIN_NSMAP):
     # Elements — every dt:ConceptType-derived element nests its children in
     # the dt namespace because ISO 23387 declares elementFormDefault=qualified.
     names: List[DtMultiLangText] = element(tag="Name", ns="dt", min_length=1)
-    definition: Optional[DtMultiLangText] = element(
-        tag="Definition", ns="dt", default=None
-    )
+    definition: Optional[DtMultiLangText] = element(tag="Definition", ns="dt", default=None)
     reference_document_refs: List[DtRef] = element(
         tag="ReferenceDocumentRef", ns="dt", default_factory=list
     )
-    descriptions: List[DtMultiLangText] = element(
-        tag="Description", ns="dt", default_factory=list
-    )
-    examples: List[DtMultiLangText] = element(
-        tag="Example", ns="dt", default_factory=list
-    )
-    similar_to_refs: List[DtRef] = element(
-        tag="SimilarToRef", ns="dt", default_factory=list
-    )
-    language_of_creator: Optional[str] = element(
-        tag="LanguageOfCreator", ns="dt", default=None
-    )
-    country_of_origin: Optional[str] = element(
-        tag="CountryOfOrigin", ns="dt", default=None
-    )
+    descriptions: List[DtMultiLangText] = element(tag="Description", ns="dt", default_factory=list)
+    examples: List[DtMultiLangText] = element(tag="Example", ns="dt", default_factory=list)
+    similar_to_refs: List[DtRef] = element(tag="SimilarToRef", ns="dt", default_factory=list)
+    language_of_creator: Optional[str] = element(tag="LanguageOfCreator", ns="dt", default=None)
+    country_of_origin: Optional[str] = element(tag="CountryOfOrigin", ns="dt", default=None)
     visual_representation: List[str] = element(
         tag="VisualRepresentation", ns="dt", default_factory=list
     )
@@ -570,20 +540,14 @@ class DtConceptType(BaseXmlModel, ns="dt", nsmap=LOIN_NSMAP):
     deprecation_explanation: List[str] = element(
         tag="DeprecationExplanation", ns="dt", default_factory=list
     )
-    dictionary_ref: Optional[DtRef] = element(
-        tag="DictionaryRef", ns="dt", default=None
-    )
+    dictionary_ref: Optional[DtRef] = element(tag="DictionaryRef", ns="dt", default=None)
 
 
 class DtSubjectType(DtConceptType):
     """dt:SubjectType — ConceptType + HasPartRef / IsSubtypeOfRef."""
 
-    has_part_refs: List[DtRef] = element(
-        tag="HasPartRef", ns="dt", default_factory=list
-    )
-    is_subtype_of_ref: Optional[DtRef] = element(
-        tag="IsSubtypeOfRef", ns="dt", default=None
-    )
+    has_part_refs: List[DtRef] = element(tag="HasPartRef", ns="dt", default_factory=list)
+    is_subtype_of_ref: Optional[DtRef] = element(tag="IsSubtypeOfRef", ns="dt", default=None)
 
 
 class IsoObjectType(DtSubjectType):
@@ -595,9 +559,7 @@ class IsoObjectType(DtSubjectType):
 class IsoGroupOfProperties(DtSubjectType):
     """dt:GroupOfPropertiesType — groups properties (HasPropertyRef 1..*)."""
 
-    has_property_refs: List[DtRef] = element(
-        tag="HasPropertyRef", ns="dt", min_length=1
-    )
+    has_property_refs: List[DtRef] = element(tag="HasPropertyRef", ns="dt", min_length=1)
 
 
 class IsoProperty(DtConceptType):
@@ -607,9 +569,7 @@ class IsoProperty(DtConceptType):
     symbols: List[str] = element(tag="Symbol", ns="dt", default_factory=list)
     dimension_ref: Optional[DtRef] = element(tag="DimensionRef", ns="dt", default=None)
     unit_refs: List[DtRef] = element(tag="UnitRef", ns="dt", default_factory=list)
-    quantity_kind_refs: List[DtRef] = element(
-        tag="QuantityKindRef", ns="dt", default_factory=list
-    )
+    quantity_kind_refs: List[DtRef] = element(tag="QuantityKindRef", ns="dt", default_factory=list)
     is_dependent_on_refs: List[DtRef] = element(
         tag="IsDependentOnRef", ns="dt", default_factory=list
     )
@@ -621,9 +581,7 @@ class IsoProperty(DtConceptType):
 class IsoUnit(DtConceptType):
     """dt:UnitType — a unit of measurement."""
 
-    symbols: List[DtMultiLangText] = element(
-        tag="Symbol", ns="dt", default_factory=list
-    )
+    symbols: List[DtMultiLangText] = element(tag="Symbol", ns="dt", default_factory=list)
     dimension_ref: DtRef = element(tag="DimensionRef", ns="dt")
     scale: IsoScale = element(tag="Scale", ns="dt")
     base: IsoBase = element(tag="Base", ns="dt")
@@ -634,16 +592,10 @@ class IsoUnit(DtConceptType):
 class IsoDimensionConcept(DtConceptType):
     """dt:DimensionType — physical dimension expressed via exponents."""
 
-    amount_of_substance: Decimal = element(
-        tag="DimensionExponentForAmountOfSubstance", ns="dt"
-    )
-    electric_current: Decimal = element(
-        tag="DimensionExponentForElectricCurrent", ns="dt"
-    )
+    amount_of_substance: Decimal = element(tag="DimensionExponentForAmountOfSubstance", ns="dt")
+    electric_current: Decimal = element(tag="DimensionExponentForElectricCurrent", ns="dt")
     length: Decimal = element(tag="DimensionExponentForLength", ns="dt")
-    luminous_intensity: Decimal = element(
-        tag="DimensionExponentForLuminousIntensity", ns="dt"
-    )
+    luminous_intensity: Decimal = element(tag="DimensionExponentForLuminousIntensity", ns="dt")
     mass: Decimal = element(tag="DimensionExponentForMass", ns="dt")
     thermodynamic_temperature: Decimal = element(
         tag="DimensionExponentForThermodynamicTemperature", ns="dt"
@@ -684,12 +636,8 @@ class LoinPurpose(BaseXmlModel, tag="Purpose"):
 
     names: List[DtMultiLangText] = element(tag="Name", min_length=1)
     definitions: List[DtMultiLangText] = element(tag="Definition", default_factory=list)
-    reference_documents: List[DtRef] = element(
-        tag="ReferenceDocument", default_factory=list
-    )
-    descriptions: List[DtMultiLangText] = element(
-        tag="Description", default_factory=list
-    )
+    reference_documents: List[DtRef] = element(tag="ReferenceDocument", default_factory=list)
+    descriptions: List[DtMultiLangText] = element(tag="Description", default_factory=list)
     language: Optional[str] = element(tag="Language", default=None)
     region: Optional[str] = element(tag="Region", default=None)
     dictionary_ref: Optional[DtRef] = element(tag="DictionaryRef", default=None)
@@ -709,21 +657,15 @@ class LoinActor(BaseXmlModel):
     email_address: Optional[str] = element(tag="EMailAddress", default=None)
 
 
-class LoinInformationDeliveryMilestone(
-    BaseXmlModel, tag="InformationDeliveryMilestone"
-):
+class LoinInformationDeliveryMilestone(BaseXmlModel, tag="InformationDeliveryMilestone"):
     """loin:InformationDeliveryMilestoneType — when information is needed."""
 
     date: Optional[datetime] = attr(name="Date", default=None)
     guid: Guid = attr(name="GUID", ns="dt")
 
     names: List[DtMultiLangText] = element(tag="Name", min_length=1)
-    descriptions: List[DtMultiLangText] = element(
-        tag="Description", default_factory=list
-    )
-    reference_documents: List[DtRef] = element(
-        tag="ReferenceDocument", default_factory=list
-    )
+    descriptions: List[DtMultiLangText] = element(tag="Description", default_factory=list)
+    reference_documents: List[DtRef] = element(tag="ReferenceDocument", default_factory=list)
 
 
 class LoinPrerequisites(BaseXmlModel, tag="Prerequisites"):
@@ -745,11 +687,11 @@ class LoinPrerequisites(BaseXmlModel, tag="Prerequisites"):
 class LoinGroupsOfProperties(BaseXmlModel, tag="GroupsOfProperties"):
     """Wrapper element holding inline GroupOfProperties and/or references."""
 
-    #Internal Properties
+    # Internal Properties
     group_of_properties: List[IsoGroupOfProperties] = element(
         tag="GroupOfProperties", ns="dt", default_factory=list
     )
-    #External Properties
+    # External Properties
     group_of_properties_refs: List[DtRef] = element(
         tag="GroupOfPropertiesRef", default_factory=list
     )
@@ -760,9 +702,7 @@ class LoinAlphanumericalInformation(BaseXmlModel, tag="AlphanumericalInformation
 
     guid: Guid = attr(name="GUID", ns="dt")
 
-    properties: List[IsoProperty] = element(
-        tag="Property", ns="dt", default_factory=list
-    )
+    properties: List[IsoProperty] = element(tag="Property", ns="dt", default_factory=list)
     quantity_kinds: List[IsoQuantityKind] = element(
         tag="QuantityKind", ns="dt", default_factory=list
     )
@@ -772,9 +712,7 @@ class LoinAlphanumericalInformation(BaseXmlModel, tag="AlphanumericalInformation
     reference_documents: List[IsoReferenceDocument] = element(
         tag="ReferenceDocument", ns="dt", default_factory=list
     )
-    dimensions: List[IsoDimensionConcept] = element(
-        tag="Dimension", ns="dt", default_factory=list
-    )
+    dimensions: List[IsoDimensionConcept] = element(tag="Dimension", ns="dt", default_factory=list)
     units: List[IsoUnit] = element(tag="Unit", ns="dt", default_factory=list)
 
 
@@ -784,9 +722,7 @@ class LoinAlphanumericalInformation(BaseXmlModel, tag="AlphanumericalInformation
 class LoinFormat(BaseXmlModel, tag="Format"):
     format_names: List[DtMultiLangText] = element(tag="FormatName", min_length=1)
     format_versions: List[DtMultiLangText] = element(tag="FormatVersion", min_length=1)
-    format_specifications: List[DtRef] = element(
-        tag="FormatSpecification", default_factory=list
-    )
+    format_specifications: List[DtRef] = element(tag="FormatSpecification", default_factory=list)
 
 
 class LoinRequiredDocument(BaseXmlModel, tag="Document"):
@@ -796,20 +732,14 @@ class LoinRequiredDocument(BaseXmlModel, tag="Document"):
     guid: Guid = attr(name="GUID", ns="dt")
 
     name: DtMultiLangText = element(tag="Name")
-    reference_documents: List[DtRef] = element(
-        tag="ReferenceDocument", default_factory=list
-    )
-    descriptions: List[DtMultiLangText] = element(
-        tag="Description", default_factory=list
-    )
+    reference_documents: List[DtRef] = element(tag="ReferenceDocument", default_factory=list)
+    descriptions: List[DtMultiLangText] = element(tag="Description", default_factory=list)
     format: LoinFormat = element(tag="Format")
 
 
 class LoinDocumentation(BaseXmlModel, tag="Documentation"):
     guid: Guid = attr(name="GUID", ns="dt")
-    documents: List[LoinRequiredDocument] = element(
-        tag="Document", default_factory=list
-    )
+    documents: List[LoinRequiredDocument] = element(tag="Document", default_factory=list)
 
 
 # --- Geometrical information ------------------------------------------------
@@ -822,9 +752,7 @@ class LoinThresholdDimension(BaseXmlModel, tag="ThresholdDimension"):
 
 
 class LoinShapeInfluence(BaseXmlModel, tag="ShapeInfluence"):
-    inside_geometry: Optional[LoinInsideGeometry] = element(
-        tag="InsideGeometry", default=None
-    )
+    inside_geometry: Optional[LoinInsideGeometry] = element(tag="InsideGeometry", default=None)
     connections: Optional[LoinConnections] = element(tag="Connections", default=None)
     openings: Optional[LoinOpenings] = element(tag="Openings", default=None)
     operating_and_clearance_zones: Optional[LoinOperatingAndClearanceZones] = element(
@@ -838,15 +766,11 @@ class LoinShapeInfluence(BaseXmlModel, tag="ShapeInfluence"):
 
 class LoinDetail(BaseXmlModel, tag="Detail"):
     dictionary: Optional[DtRef] = element(tag="Dictionary", default=None)
-    shape_assembly: Optional[LoinShapeAssembly] = element(
-        tag="ShapeAssembly", default=None
-    )
+    shape_assembly: Optional[LoinShapeAssembly] = element(tag="ShapeAssembly", default=None)
     shape_representation: Optional[LoinShapeRepresentation] = element(
         tag="ShapeRepresentation", default=None
     )
-    shape_influence: Optional[LoinShapeInfluence] = element(
-        tag="ShapeInfluence", default=None
-    )
+    shape_influence: Optional[LoinShapeInfluence] = element(tag="ShapeInfluence", default=None)
 
 
 class LoinPositioning(BaseXmlModel, tag="Location"):
@@ -859,9 +783,7 @@ class LoinGeometricalInformation(BaseXmlModel, tag="GeometricalInformation"):
     placeholder: bool = attr(name="placeholder", default=False)
 
     detail: Optional[LoinDetail] = element(tag="Detail", default=None)
-    dimensionality: Optional[LoinDimensionality] = element(
-        tag="Dimensionality", default=None
-    )
+    dimensionality: Optional[LoinDimensionality] = element(tag="Dimensionality", default=None)
     appearance: Optional[LoinAppearance] = element(tag="Appearance", default=None)
     parametric_behaviour: Optional[LoinParametricBehaviour] = element(
         tag="ParametricBehaviour", default=None
@@ -876,12 +798,8 @@ class LoinDatumRegistryReference(BaseXmlModel, tag="Type"):
     """loin:DatumRegistryReference — geodetic registry descriptor."""
 
     name: DtMultiLangText = element(tag="Name")
-    descriptions: List[DtMultiLangText] = element(
-        tag="Description", default_factory=list
-    )
-    registry_reference: Optional[DtRef] = element(
-        tag="RegistryReference", default=None
-    )
+    descriptions: List[DtMultiLangText] = element(tag="Description", default_factory=list)
+    registry_reference: Optional[DtRef] = element(tag="RegistryReference", default=None)
 
 
 class LoinDatum(BaseXmlModel, tag="Datum"):
@@ -930,9 +848,7 @@ class LoinSpecificationPerObjectType(DtConceptType, tag="SpecificationPerObjectT
     alphanumerical_information: Optional[LoinAlphanumericalInformation] = element(
         tag="AlphanumericalInformation", default=None
     )
-    documentation: Optional[LoinDocumentation] = element(
-        tag="Documentation", default=None
-    )
+    documentation: Optional[LoinDocumentation] = element(tag="Documentation", default=None)
     geometrical_information: Optional[LoinGeometricalInformation] = element(
         tag="GeometricalInformation", default=None
     )
@@ -949,9 +865,7 @@ class LoinSpecification(BaseXmlModel, tag="Specification"):
     specifications_per_object_type: List[LoinSpecificationPerObjectType] = element(
         tag="SpecificationPerObjectType", default_factory=list
     )
-    geo_referencing: Optional[LoinGeoReferencing] = element(
-        tag="GeoReferencing", default=None
-    )
+    geo_referencing: Optional[LoinGeoReferencing] = element(tag="GeoReferencing", default=None)
 
 
 # --- Root element -----------------------------------------------------------
@@ -965,6 +879,4 @@ class LoinLevelOfInformationNeed(
 ):
     """Root element of an ISO 7817-3 Level of Information Need document."""
 
-    specifications: List[LoinSpecification] = element(
-        tag="Specification", min_length=1
-    )
+    specifications: List[LoinSpecification] = element(tag="Specification", min_length=1)

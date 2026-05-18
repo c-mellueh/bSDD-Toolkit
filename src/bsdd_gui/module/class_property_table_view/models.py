@@ -11,7 +11,6 @@ import qtawesome as qta
 
 
 class ClassPropertyTableModel(ItemModel):
-
     def __init__(self, tl=None, bsdd_data=None, *args, **kwargs):
         if not tl:
             tl = tool.ClassPropertyTableView

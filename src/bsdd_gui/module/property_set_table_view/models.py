@@ -18,7 +18,6 @@ from bsdd_gui.module.class_tree_view.constants import (
 
 
 class PsetTableModel(ItemModel):
-
     def __init__(self, tl=None, bsdd_data: BsddDictionary = None, *args, **kwargs):
         super().__init__(tool.PropertySetTableView, bsdd_data, *args, **kwargs)
         self.bsdd_data: BsddDictionary
@@ -44,9 +43,6 @@ class PsetTableModel(ItemModel):
         pset_name = tool.PropertySetTableView.get_pset_names_with_temporary(self.active_class)[row]
         index = self.createIndex(row, column, pset_name)
         return index
-
-    def flags(self, index):
-        return super().flags(index) | Qt.ItemFlag.ItemIsEditable
 
     # def setData(self, index: QModelIndex, value, role=Qt.EditRole):
     #     return super().setData(index,value,role)
@@ -130,9 +126,7 @@ class PsetTableModel(ItemModel):
         if not codes:
             return False
 
-        related = tool.PropertySetTableView.get_related_psets(
-            self.active_class, self.bsdd_data
-        )
+        related = tool.PropertySetTableView.get_related_psets(self.active_class, self.bsdd_data)
         related_names = {c.Name for c in related}
         added = False
         for code in codes:

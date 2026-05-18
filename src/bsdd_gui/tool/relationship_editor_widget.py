@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Type
 import logging
 
-from PySide6.QtWidgets import QTreeView, QCompleter, QTableView
+from PySide6.QtWidgets import QCompleter, QTableView
 from PySide6.QtCore import Qt, Signal
 import bsdd_gui
 from bsdd_json import (
@@ -51,11 +51,6 @@ class RelationshipEditorWidget(FieldTool, ItemViewTool):
     @classmethod
     def _get_trigger(cls):
         return trigger
-
-    @classmethod
-    def delete_selection(view: QTreeView):
-        # TODO
-        return None
 
     @classmethod
     def add_class_columns_to_table(cls, model: models.RelationshipModel):

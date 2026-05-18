@@ -25,7 +25,7 @@ class ContextMenuDict(TypedDict, total=False):
 class ActionsProperties:
     def __init__(self):
         super().__init__()
-        self.actions = dict()
+        self.actions = {}
 
 
 @dataclass
@@ -43,25 +43,25 @@ class PluginProperty:
 class PluginProperties:
     def __init__(self):
         super().__init__()
-        self.signal_handlers = list()
+        self.signal_handlers = []
 
 
 class WidgetProperties:
     def __init__(self):
         super().__init__()
-        self.widgets = list()
-        self.plugin_widget_list: list[PluginProperty] = list()
+        self.widgets = []
+        self.plugin_widget_list: list[PluginProperty] = []
 
 
 class FieldProperties(WidgetProperties):
     def __init__(self):
         super().__init__()
         # widget -> (field widget -> getter/setter/validators)
-        self.field_getter: dict[FieldWidget, dict[QWidget, callable]] = dict()
-        self.field_setter: dict[FieldWidget, dict[QWidget, callable]] = dict()
+        self.field_getter: dict[FieldWidget, dict[QWidget, callable]] = {}
+        self.field_setter: dict[FieldWidget, dict[QWidget, callable]] = {}
         self.validator_functions: dict[
             FieldWidget, dict[QWidget, list[tuple[callable, callable]]]
-        ] = dict()
+        ] = {}
 
 
 class DialogProperties(FieldProperties):
@@ -73,8 +73,8 @@ class DialogProperties(FieldProperties):
 class ViewProperties:
     def __init__(self):
         super().__init__()
-        self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = dict()
+        self.context_menu_list: dict[QAbstractItemView, list[ContextMenuDict]] = {}
         # columns: (header, getter, optional setter)
-        self.columns: dict[QAbstractItemModel, list[tuple[str, callable, callable | None]]] = dict()
+        self.columns: dict[QAbstractItemModel, list[tuple[str, callable, callable | None]]] = {}
         self.models: set[ItemModel] = set()
         self.views: set[ItemViewType] = set()

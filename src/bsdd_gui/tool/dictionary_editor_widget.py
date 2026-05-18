@@ -77,7 +77,7 @@ class DictionaryEditorWidget(FieldTool, ActionTool):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
             return []
-        invalid_inputs = list()
+        invalid_inputs = []
         for f, (validator_function, result_function) in function_dict.items():
             value = cls.get_value_from_field(f)
             is_valid = validator_function(value, widget)

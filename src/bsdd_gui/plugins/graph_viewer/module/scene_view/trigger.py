@@ -7,12 +7,13 @@ from typing import TYPE_CHECKING
 from bsdd_gui.plugins.graph_viewer import tool as gv_tool
 
 if TYPE_CHECKING:
-
     from PySide6.QtCore import QPointF
 
 
 def activate():
-    core.connect_signals(gv_tool.Window, gv_tool.SceneView, gv_tool.Settings, gv_tool.Physics,gv_tool.HTMLExport)
+    core.connect_signals(
+        gv_tool.Window, gv_tool.SceneView, gv_tool.Settings, gv_tool.Physics, gv_tool.HTMLExport
+    )
 
 
 def deactivate():

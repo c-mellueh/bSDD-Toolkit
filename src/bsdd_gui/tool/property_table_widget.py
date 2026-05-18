@@ -275,7 +275,6 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
 
         new_properties = []
         for property_code, property_json in property_code_dict.items():
-
             if property_code in existing_properties:
                 continue
             try:

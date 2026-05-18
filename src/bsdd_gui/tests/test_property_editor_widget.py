@@ -4,6 +4,7 @@ Tests for the PropertyEditorWidget module (tool/property_editor_widget.py).
 Covers validators and the generate_virtual_property helper.
 The widget parameter is mocked where needed.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock
@@ -39,6 +40,7 @@ def _widget_for(prop: BsddProperty) -> MagicMock:
 # is_code_valid
 # ---------------------------------------------------------------------------
 
+
 class TestIsCodeValid:
     def test_empty_code_is_invalid(self):
         d = _make_dict()
@@ -71,6 +73,7 @@ class TestIsCodeValid:
 # is_name_valid
 # ---------------------------------------------------------------------------
 
+
 class TestIsNameValid:
     def test_nonempty_name_is_valid(self):
         assert PropertyEditorWidget.is_name_valid("Wall", None) is True
@@ -82,6 +85,7 @@ class TestIsNameValid:
 # ---------------------------------------------------------------------------
 # is_datatype_valid
 # ---------------------------------------------------------------------------
+
 
 class TestIsDataTypeValid:
     @pytest.mark.parametrize("dt", ["Boolean", "Character", "Integer", "Real", "String", "Time"])
@@ -98,6 +102,7 @@ class TestIsDataTypeValid:
 # ---------------------------------------------------------------------------
 # generate_virtual_property
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateVirtualProperty:
     def test_creates_property_with_default_values(self):

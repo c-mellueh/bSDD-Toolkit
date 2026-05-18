@@ -5,6 +5,7 @@ Each test gets a fresh temp file so that lock/unlock operations are isolated.
 The FileLock tool uses class-level state (bsdd_gui.FileLockProperties), so
 we always call unlock_file() in teardown to keep the state clean.
 """
+
 from __future__ import annotations
 
 import os
@@ -16,6 +17,7 @@ from bsdd_gui.tool import FileLock
 # ---------------------------------------------------------------------------
 # Fixture: temp target file + automatic unlock
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture()
 def target_file(tmp_path):
@@ -30,6 +32,7 @@ def target_file(tmp_path):
 # ---------------------------------------------------------------------------
 # 1. build_lockpath
 # ---------------------------------------------------------------------------
+
 
 class TestBuildLockpath:
     def test_appends_lock_extension(self, tmp_path):
@@ -46,6 +49,7 @@ class TestBuildLockpath:
 # ---------------------------------------------------------------------------
 # 2. lock_file
 # ---------------------------------------------------------------------------
+
 
 class TestLockFile:
     def test_lock_creates_lock_file(self, target_file):
@@ -81,6 +85,7 @@ class TestLockFile:
 # 3. unlock_file
 # ---------------------------------------------------------------------------
 
+
 class TestUnlockFile:
     def test_unlock_removes_lock_file(self, target_file):
         FileLock.lock_file(target_file)
@@ -105,6 +110,7 @@ class TestUnlockFile:
 # ---------------------------------------------------------------------------
 # 4. _build_lock_contents
 # ---------------------------------------------------------------------------
+
 
 class TestBuildLockContents:
     def test_contains_pid(self):

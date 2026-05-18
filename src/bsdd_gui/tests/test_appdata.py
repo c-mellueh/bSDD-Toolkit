@@ -4,6 +4,7 @@ Tests for the Appdata module (tool/appdata.py).
 All tests redirect the INI file to a temporary directory via monkeypatch so
 that real user configuration is never touched.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -16,20 +17,20 @@ SECTION = "test_section"
 # Fixture: redirect Appdata to a temp folder
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def appdata(tmp_path, monkeypatch):
     """Return Appdata with its INI file redirected to *tmp_path*."""
     ini = str(tmp_path / "config.ini")
     monkeypatch.setattr(Appdata, "get_ini_path", classmethod(lambda cls: ini))
-    monkeypatch.setattr(
-        Appdata, "get_appdata_folder", classmethod(lambda cls: str(tmp_path))
-    )
+    monkeypatch.setattr(Appdata, "get_appdata_folder", classmethod(lambda cls: str(tmp_path)))
     return Appdata
 
 
 # ---------------------------------------------------------------------------
 # 1. CustomConfigParser
 # ---------------------------------------------------------------------------
+
 
 class TestCustomConfigParser:
     def test_get_returns_none_for_missing_section(self):
@@ -67,6 +68,7 @@ class TestCustomConfigParser:
 # 2. Settings – read / write round-trips
 # ---------------------------------------------------------------------------
 
+
 class TestSettings:
     def test_string_setting_default(self, appdata):
         val = appdata.get_string_setting(SECTION, "missing", default="fallback")
@@ -102,6 +104,7 @@ class TestSettings:
 # 3. Path management
 # ---------------------------------------------------------------------------
 
+
 class TestPaths:
     def test_get_paths_returns_empty_list_when_not_set(self, appdata):
         assert appdata.get_paths("nonexistent") == []
@@ -112,6 +115,7 @@ class TestPaths:
         appdata.add_path("recent", p)
         paths = appdata.get_paths("recent")
         import os
+
         assert os.path.abspath(p) in paths
 
     def test_add_path_most_recent_first(self, appdata, tmp_path):
@@ -123,6 +127,7 @@ class TestPaths:
         appdata.add_path("recent", str(f2))
         paths = appdata.get_paths("recent")
         import os
+
         assert paths[0] == os.path.abspath(str(f2))
 
     def test_add_path_deduplicates(self, appdata, tmp_path):
@@ -132,6 +137,7 @@ class TestPaths:
         appdata.add_path("recent", str(f))
         paths = appdata.get_paths("recent")
         import os
+
         count = paths.count(os.path.abspath(str(f)))
         assert count == 1
 

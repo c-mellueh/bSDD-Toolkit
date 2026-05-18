@@ -180,7 +180,7 @@ def connect_to_main_window(
     )
 
     class_tree.signals.selection_changed.connect(
-        lambda v, n: (main_window.set_active_class(n) if v == view else None),
+        lambda v, n: main_window.set_active_class(n) if v == view else None,
     )
 
 
@@ -316,7 +316,7 @@ def paste_class_from_clipboard(
     clipboard_text = QApplication.clipboard().text()
     try:
         payload: constants.PAYLOAD = json.loads(clipboard_text)
-    except:
+    except Exception:
         return
 
     selected_classes = class_tree.get_selected(view)
@@ -341,7 +341,7 @@ def paste_class_payload_to_view(
     raw_classes = payload["classes"]
     root_codes = set(payload.get("roots", []))
 
-    old2new = dict()
+    old2new = {}
     existing_codes = [c.Code for c in bsdd_dictionary.Classes]
     class_code_dict = {rc["Code"]: rc for rc in raw_classes}
     ordered_class_codes = sorted(

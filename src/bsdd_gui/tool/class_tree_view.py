@@ -164,7 +164,6 @@ class ClassTreeView(ItemViewTool):
 
     @classmethod
     def delete_class_with_children(cls, bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
-        model: ClassTreeModel = cls.get_model(bsdd_dictionary)
         to_delete = []
         stack = [bsdd_class]
         while stack:
@@ -305,7 +304,7 @@ class ClassTreeView(ItemViewTool):
             if unexpanded_classes is not None
             else {c.Code for c in classes if c.Code}
         )
-        dictionary_properties = list()
+        dictionary_properties = []
 
         for c in classes:
             roots.append(c.Code)

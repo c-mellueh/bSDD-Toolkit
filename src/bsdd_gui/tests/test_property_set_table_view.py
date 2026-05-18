@@ -4,6 +4,7 @@ Tests for the PropertySetTableView module (tool/property_set_table_view.py).
 Covers the pure-Python property-set state helpers that do not require
 a live Qt table view.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -15,6 +16,7 @@ from bsdd_gui.tool import PropertySetTableView
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _class_with_psets(*pset_names: str) -> BsddClass:
     """Build a BsddClass whose ClassProperties span the given pset names."""
@@ -31,6 +33,7 @@ def _class_with_psets(*pset_names: str) -> BsddClass:
 # Fixture: ensure temporary pset state is clean between tests
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(autouse=True)
 def _clear_temp_psets():
     """Wipe all temporary property-set entries before each test."""
@@ -42,6 +45,7 @@ def _clear_temp_psets():
 # ---------------------------------------------------------------------------
 # 1. get_temporary_psets
 # ---------------------------------------------------------------------------
+
 
 class TestGetTemporaryPsets:
     def test_returns_empty_list_when_no_temp_psets(self):
@@ -58,6 +62,7 @@ class TestGetTemporaryPsets:
 # ---------------------------------------------------------------------------
 # 2. get_pset_names_with_temporary
 # ---------------------------------------------------------------------------
+
 
 class TestGetPsetNamesWithTemporary:
     def test_returns_empty_for_class_without_properties(self):

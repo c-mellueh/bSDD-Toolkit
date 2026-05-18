@@ -48,12 +48,4 @@ def export_settings(widget: ui.Widget):
 
 
 def export(widget: ui.Widget):
-    core.export(
-        widget,
-        tool.Excel,
-        tool.Appdata,
-        tool.Popups,
-        tool.Util,
-        tool.Project,
-        tool.Loin
-    )
+    core.export(widget, tool.Excel, tool.Appdata, tool.Popups, tool.Util, tool.Project, tool.Loin)

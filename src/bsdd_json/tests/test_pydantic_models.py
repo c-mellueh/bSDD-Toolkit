@@ -3,9 +3,11 @@
 Covers models, class_utils, property_utils, and dictionary_utils.
 These tests are pure-Python and do not require network access.
 """
+
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -29,6 +31,7 @@ from .helpers import make_class, make_dictionary, make_property
 # ===========================================================================
 # 1. build_unique_code
 # ===========================================================================
+
 
 class TestBuildUniqueCode:
     def test_returns_base_when_not_in_list(self):
@@ -58,6 +61,7 @@ class TestBuildUniqueCode:
 # 9. BsddDictionary model
 # ===========================================================================
 
+
 class TestBsddDictionary:
     def test_required_fields(self, dictionary):
         assert dictionary.OrganizationCode == "TST"
@@ -77,8 +81,12 @@ class TestBsddDictionary:
     def test_model_post_init_sets_class_parents(self):
         cls = make_class("C1", "Class 1")
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
             Classes=[cls],
         )
         assert d.Classes[0].parent() is d
@@ -86,8 +94,12 @@ class TestBsddDictionary:
     def test_model_post_init_sets_property_parents(self):
         prop = make_property("P1", "Prop 1")
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
             Properties=[prop],
         )
         assert d.Properties[0].parent() is d
@@ -105,9 +117,14 @@ class TestBsddDictionary:
         cls = make_class("C1", "Class 1")
         prop = make_property("P1", "Prop 1")
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
         path = str(tmp_path / "test.json")
         d.save(path)
@@ -126,7 +143,7 @@ class TestBsddDictionary:
             "Status": "NOT_A_VALID_STATUS",
         }
         path = str(tmp_path / "bad.json")
-        with open(path, "w") as f:
+        with Path(path).open("w") as f:
             json.dump(raw, f)
         d = BsddDictionary.load(path, sloppy=True)
         assert d is not None
@@ -143,26 +160,29 @@ class TestBsddDictionary:
             "Status": "NOT_A_VALID_STATUS",
         }
         path = str(tmp_path / "bad.json")
-        with open(path, "w") as f:
+        with Path(path).open("w") as f:
             json.dump(raw, f)
         with pytest.raises(ValidationError):
             BsddDictionary.load(path, sloppy=False)
 
     def test_case_insensitive_validation(self):
-        d = BsddDictionary.model_validate({
-            "organizationCode": "TST",
-            "dictionaryCode": "TEST",
-            "dictionaryVersion": "1.0",
-            "languageIsoCode": "en-GB",
-            "languageOnly": False,
-            "useOwnUri": False,
-        })
+        d = BsddDictionary.model_validate(
+            {
+                "organizationCode": "TST",
+                "dictionaryCode": "TEST",
+                "dictionaryVersion": "1.0",
+                "languageIsoCode": "en-GB",
+                "languageOnly": False,
+                "useOwnUri": False,
+            },
+        )
         assert d.OrganizationCode == "TST"
 
 
 # ===========================================================================
 # 10. BsddClass model
 # ===========================================================================
+
 
 class TestBsddClass:
     def test_required_fields(self):
@@ -215,8 +235,12 @@ class TestBsddClass:
         c1 = make_class("C1", "Class 1")
         c2 = make_class("C2", "Class 2")
         BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
             Classes=[c1, c2],
         )
         with pytest.raises(ValueError, match="exists already"):
@@ -226,8 +250,12 @@ class TestBsddClass:
         child = make_class("CHILD", "Child", ParentClassCode="PARENT")
         parent = make_class("PARENT", "Parent")
         BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
             Classes=[parent, child],
         )
         parent._apply_code_side_effects("NEW_PARENT")
@@ -237,6 +265,7 @@ class TestBsddClass:
 # ===========================================================================
 # 11. BsddClassProperty validation
 # ===========================================================================
+
 
 class TestBsddClassProperty:
     def test_property_code_only_valid(self):
@@ -283,6 +312,7 @@ class TestBsddClassProperty:
 # 12. BsddAllowedValue model
 # ===========================================================================
 
+
 class TestBsddAllowedValue:
     def test_required_fields(self):
         av = BsddAllowedValue(Code="AV1", Value="Option A")
@@ -299,6 +329,7 @@ class TestBsddAllowedValue:
 # ===========================================================================
 # 13. BsddProperty model
 # ===========================================================================
+
 
 class TestBsddProperty:
     def test_required_fields(self):
@@ -334,6 +365,7 @@ class TestBsddProperty:
 # 14. BsddPropertyRelation model
 # ===========================================================================
 
+
 class TestBsddPropertyRelation:
     def test_required_fields(self):
         pr = BsddPropertyRelation(
@@ -357,6 +389,7 @@ class TestBsddPropertyRelation:
 # 15. BsddClassRelation model
 # ===========================================================================
 
+
 class TestBsddClassRelation:
     def test_required_fields(self):
         cr = BsddClassRelation(
@@ -379,6 +412,7 @@ class TestBsddClassRelation:
 # ===========================================================================
 # 16. class_utils – tree navigation
 # ===========================================================================
+
 
 class TestClassUtilsNavigation:
     def test_get_root_classes_returns_classes_without_parent(self, populated_dictionary):
@@ -443,6 +477,7 @@ class TestClassUtilsNavigation:
 # 17. class_utils – remove_class
 # ===========================================================================
 
+
 class TestRemoveClass:
     def test_removes_from_dictionary(self, populated_dictionary):
         child1 = cl_utils.get_class_by_code(populated_dictionary, "CHILD1")
@@ -466,6 +501,7 @@ class TestRemoveClass:
 # 18. class_utils – set_code
 # ===========================================================================
 
+
 class TestSetCode:
     def test_changes_code(self, populated_dictionary):
         child1 = cl_utils.get_class_by_code(populated_dictionary, "CHILD1")
@@ -485,13 +521,14 @@ class TestSetCode:
 
     def test_raises_on_duplicate(self, populated_dictionary):
         child1 = cl_utils.get_class_by_code(populated_dictionary, "CHILD1")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="exists already"):
             cl_utils.set_code(child1, "CHILD2")
 
 
 # ===========================================================================
 # 19. class_utils – shared_parent
 # ===========================================================================
+
 
 class TestSharedParent:
     def test_siblings_highest_is_common_root(self, populated_dictionary):
@@ -534,6 +571,7 @@ class TestSharedParent:
 # 20. class_utils – build_bsdd_uri
 # ===========================================================================
 
+
 class TestClassUtilsBuildUri:
     def test_uri_contains_expected_parts(self, populated_dictionary):
         root = cl_utils.get_class_by_code(populated_dictionary, "ROOT")
@@ -557,10 +595,12 @@ class TestClassUtilsBuildUri:
 # 21. class_utils – is_ifc_reference
 # ===========================================================================
 
+
 class TestClassIsIfcReference:
     def test_class_with_ifc_uri(self):
         c = make_class(
-            "C1", "Wall",
+            "C1",
+            "Wall",
             OwnedUri="https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/class/Wall",
         )
         assert cl_utils.is_ifc_reference(c)
@@ -570,7 +610,8 @@ class TestClassIsIfcReference:
 
     def test_class_with_non_ifc_uri(self):
         c = make_class(
-            "C1", "Wall",
+            "C1",
+            "Wall",
             OwnedUri="https://identifier.buildingsmart.org/uri/hw/som/0.2.0/class/Wall",
         )
         assert not cl_utils.is_ifc_reference(c)
@@ -580,13 +621,18 @@ class TestClassIsIfcReference:
 # 22. class_utils – GroupOfProperties relations
 # ===========================================================================
 
+
 class TestGroupOfPropertiesRelations:
     def _make_pset_dictionary(self):
         pset = make_class("PSET1", "My PSet", ClassType="GroupOfProperties")
         wall = make_class("WALL", "Wall")
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
             Classes=[pset, wall],
         )
         pset_uri = cl_utils.build_bsdd_uri(pset, d)
@@ -618,6 +664,7 @@ class TestGroupOfPropertiesRelations:
 # 23. class_utils – build_dummy_class
 # ===========================================================================
 
+
 class TestBuildDummyClass:
     def test_creates_class_from_uri(self):
         uri = "https://identifier.buildingsmart.org/uri/tst/test/1.0/class/MyClass"
@@ -629,6 +676,7 @@ class TestBuildDummyClass:
 # ===========================================================================
 # 24. property_utils – lookups
 # ===========================================================================
+
 
 class TestPropertyUtilsLookups:
     def test_get_property_by_code_finds_property(self, populated_dictionary):
@@ -654,15 +702,21 @@ class TestPropertyUtilsLookups:
 # 25. property_utils – get_classes_with_bsdd_property
 # ===========================================================================
 
+
 class TestGetClassesWithBsddProperty:
     def _make_dict(self):
         prop = make_property("PROP1", "Property 1")
         cp = BsddClassProperty(Code="CP1", PropertyCode="PROP1")
         cls = BsddClass(Code="WALL", Name="Wall", ClassProperties=[cp])
         return BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
 
     def test_finds_class_using_property_code(self):
@@ -680,6 +734,7 @@ class TestGetClassesWithBsddProperty:
 # 26. property_utils – get_class_properties_from_property_code/uri
 # ===========================================================================
 
+
 class TestGetClassPropertiesFromCode:
     def _make_dict(self):
         cp1 = BsddClassProperty(Code="CP1", PropertyCode="PROP1")
@@ -687,8 +742,12 @@ class TestGetClassPropertiesFromCode:
         cls1 = BsddClass(Code="C1", Name="Class 1", ClassProperties=[cp1])
         cls2 = BsddClass(Code="C2", Name="Class 2", ClassProperties=[cp2])
         return BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
             Classes=[cls1, cls2],
         )
 
@@ -706,8 +765,12 @@ class TestGetClassPropertiesFromCode:
         cp = BsddClassProperty(Code="CP1", PropertyUri=uri)
         cls = BsddClass(Code="C1", Name="Class 1", ClassProperties=[cp])
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
             Classes=[cls],
         )
         result = prop_utils.get_class_properties_from_property_uri(uri, d)
@@ -718,15 +781,21 @@ class TestGetClassPropertiesFromCode:
 # 27. property_utils – delete_property
 # ===========================================================================
 
+
 class TestDeleteProperty:
     def _make_dict(self):
         prop = make_property("PROP1", "Property 1")
         cp = BsddClassProperty(Code="CP1", PropertyCode="PROP1")
         cls = BsddClass(Code="WALL", Name="Wall", ClassProperties=[cp])
         return BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
 
     def test_removes_property_from_dictionary(self):
@@ -748,9 +817,14 @@ class TestDeleteProperty:
         cls1 = BsddClass(Code="C1", Name="Class 1", ClassProperties=[cp1])
         cls2 = BsddClass(Code="C2", Name="Class 2", ClassProperties=[cp2])
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls1, cls2], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls1, cls2],
+            Properties=[prop],
         )
         removed = prop_utils.delete_property(prop, d)
         assert len(removed) == 2
@@ -760,14 +834,20 @@ class TestDeleteProperty:
 # 28. property_utils – create_class_property_from_property
 # ===========================================================================
 
+
 class TestCreateClassPropertyFromProperty:
     def test_creates_with_property_code(self):
         prop = make_property("PROP1", "Property 1")
         cls = make_class("WALL", "Wall")
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
         result = prop_utils.create_class_property_from_property(prop, cls, d)
         assert result.PropertyCode == "PROP1"
@@ -775,7 +855,8 @@ class TestCreateClassPropertyFromProperty:
 
     def test_creates_with_property_uri_when_owned_uri_set(self):
         prop = make_property(
-            "PROP1", "Property 1",
+            "PROP1",
+            "Property 1",
             OwnedUri="https://identifier.buildingsmart.org/uri/tst/test/1.0/prop/PROP1",
         )
         cls = make_class("WALL", "Wall")
@@ -789,9 +870,14 @@ class TestCreateClassPropertyFromProperty:
         cp_existing = BsddClassProperty(Code="PROP1", PropertyCode="PROP1")
         cls = BsddClass(Code="WALL", Name="Wall", ClassProperties=[cp_existing])
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
         result = prop_utils.create_class_property_from_property(prop, cls, d)
         assert result.Code == "PROP1-2"
@@ -807,6 +893,7 @@ class TestCreateClassPropertyFromProperty:
 # ===========================================================================
 # 29. property_utils – build_bsdd_uri
 # ===========================================================================
+
 
 class TestPropertyUtilsBuildUri:
     def test_uri_contains_expected_parts(self):
@@ -830,6 +917,7 @@ class TestPropertyUtilsBuildUri:
 # 30. property_utils – get_most_used_property_set
 # ===========================================================================
 
+
 class TestGetMostUsedPropertySet:
     def test_returns_most_frequent_pset(self):
         prop = make_property("PROP1", "Property 1")
@@ -838,9 +926,14 @@ class TestGetMostUsedPropertySet:
         cp3 = BsddClassProperty(Code="CP3", PropertyCode="PROP1", PropertySet="PsetB")
         cls = BsddClass(Code="C1", Name="C1", ClassProperties=[cp1, cp2, cp3])
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
         assert prop_utils.get_most_used_property_set(prop, d) == "PsetA"
 
@@ -854,6 +947,7 @@ class TestGetMostUsedPropertySet:
 # ===========================================================================
 # 31. property_utils – get_class_properties_by_pset_name
 # ===========================================================================
+
 
 class TestGetClassPropertiesByPsetName:
     def test_filters_by_pset_name(self):
@@ -873,6 +967,7 @@ class TestGetClassPropertiesByPsetName:
 # ===========================================================================
 # 32. property_utils – get_property_relation
 # ===========================================================================
+
 
 class TestGetPropertyRelation:
     def test_finds_matching_relation(self):
@@ -897,6 +992,7 @@ class TestGetPropertyRelation:
 # 33. property_utils – build_dummy_property
 # ===========================================================================
 
+
 class TestBuildDummyProperty:
     def test_creates_property_from_prop_uri(self):
         uri = "https://identifier.buildingsmart.org/uri/tst/test/1.0/prop/MyProp"
@@ -909,15 +1005,21 @@ class TestBuildDummyProperty:
 # 34. property_utils – get_name, get_values, get_datatype, get_units
 # ===========================================================================
 
+
 class TestPropertyUtilsAccessors:
     def _make_dict_with_prop(self, **prop_kwargs):
         prop = make_property("P1", "My Property", **prop_kwargs)
         cp = BsddClassProperty(Code="CP1", PropertyCode="P1")
         cls = BsddClass(Code="C1", Name="Class 1", ClassProperties=[cp])
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
         return d.Classes[0].ClassProperties[0], d
 
@@ -938,12 +1040,12 @@ class TestPropertyUtilsAccessors:
         assert prop_utils.get_data_type(cp, d) == "String"
 
     def test_get_units_returns_units(self):
-        cp, d = self._make_dict_with_prop(Units=["m"])
+        cp, _ = self._make_dict_with_prop(Units=["m"])
         result = prop_utils.get_units(cp)
         assert result == ["m"]
 
     def test_get_units_returns_empty_when_no_units(self):
-        cp, d = self._make_dict_with_prop()
+        cp, _ = self._make_dict_with_prop()
         result = prop_utils.get_units(cp)
         assert result == []
 
@@ -953,9 +1055,14 @@ class TestPropertyUtilsAccessors:
         cp = BsddClassProperty(Code="CP1", PropertyCode="P1", AllowedValues=[av])
         cls = BsddClass(Code="C1", Name="Class 1", ClassProperties=[cp])
         BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
         result = prop_utils.get_values(cp)
         assert len(result) == 1
@@ -967,9 +1074,14 @@ class TestPropertyUtilsAccessors:
         cp = BsddClassProperty(Code="CP1", PropertyCode="P1")  # no local allowed values
         cls = BsddClass(Code="C1", Name="Class 1", ClassProperties=[cp])
         BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
-            Classes=[cls], Properties=[prop],
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
+            Classes=[cls],
+            Properties=[prop],
         )
         result = prop_utils.get_values(cp)
         assert len(result) == 1
@@ -978,6 +1090,7 @@ class TestPropertyUtilsAccessors:
 # ===========================================================================
 # 35. property_utils – get_dictionary_from_property
 # ===========================================================================
+
 
 class TestGetDictionaryFromProperty:
     def test_from_bsdd_property(self):
@@ -990,8 +1103,12 @@ class TestGetDictionaryFromProperty:
         cp = BsddClassProperty(Code="CP1", PropertyCode="P1")
         cls = BsddClass(Code="C1", Name="Class 1", ClassProperties=[cp])
         d = BsddDictionary(
-            OrganizationCode="TST", DictionaryCode="TEST", DictionaryVersion="1.0",
-            LanguageIsoCode="en-GB", LanguageOnly=False, UseOwnUri=False,
+            OrganizationCode="TST",
+            DictionaryCode="TEST",
+            DictionaryVersion="1.0",
+            LanguageIsoCode="en-GB",
+            LanguageOnly=False,
+            UseOwnUri=False,
             Classes=[cls],
         )
         result = prop_utils.get_dictionary_from_property(d.Classes[0].ClassProperties[0])

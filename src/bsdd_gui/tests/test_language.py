@@ -3,6 +3,7 @@ Tests for the Language module (tool/language.py).
 
 Covers the get/set language state helpers.
 """
+
 from __future__ import annotations
 
 import pytest

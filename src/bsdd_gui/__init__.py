@@ -17,7 +17,7 @@ module = importlib.import_module("bsdd_gui.module")
 preregister = ["main_window_widget"]
 
 # Import Modules
-modules: list[tuple[str, ModuleType]] = list()
+modules: list[tuple[str, ModuleType]] = []
 for m in pkgutil.iter_modules(module.__path__):
     if not m.ispkg:
         continue

@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 
 
 class GraphViewerEdgeProperties(PluginProperties):
-
     def __init__(self):
         super().__init__()
         self.edge_drag_active: bool = False
@@ -18,7 +17,7 @@ class GraphViewerEdgeProperties(PluginProperties):
         self.edge_preview_item: QGraphicsPathItem | None = None
         self.active_edge: constants.ALLOWED_EDGE_TYPES_TYPING = None
         self.orthogonal_edges: bool = False
-        self.edges = list()
+        self.edges = []
         self.filters: dict[constants.ALLOWED_EDGE_TYPES_TYPING, bool] = {
             et: True for et in constants.ALLOWED_EDGE_TYPES
         }

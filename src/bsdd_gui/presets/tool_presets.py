@@ -25,7 +25,7 @@ Notes
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Callable, TYPE_CHECKING, Iterable, Type, TypeAlias
+from typing import Callable, TYPE_CHECKING, Iterable, Literal, Type, TypeAlias
 from types import ModuleType
 from PySide6.QtWidgets import (
     QWidget,
@@ -60,9 +60,16 @@ from bsdd_gui.presets.ui_presets import (
     ItemViewType,
     ItemWithToggleSwitch,
 )
-from bsdd_json import *
+from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary, BsddProperty
 import logging
-from .signal_presets import WidgetSignals, DialogSignals, ViewSignals, FieldSignals, PluginSignals, BaseSignals
+from .signal_presets import (
+    WidgetSignals,
+    DialogSignals,
+    ViewSignals,
+    FieldSignals,
+    PluginSignals,
+    BaseSignals,
+)
 from .models_presets import ItemModel
 import datetime
 import re
@@ -94,8 +101,6 @@ class BaseTool(ABC):
     @abstractmethod
     def get_properties(cls) -> object:
         return None
-
-
 
     @classmethod
     @abstractmethod
@@ -140,7 +145,7 @@ class PluginTool(BaseTool):
                 signal.disconnect(func)
             except Exception as e:
                 logging.debug(str(e))
-        cls.get_properties().signal_handlers = list()
+        cls.get_properties().signal_handlers = []
 
 
 class ActionTool(BaseTool):
@@ -172,7 +177,7 @@ class ActionTool(BaseTool):
         save all actions so that the translation functions work
         """
         if widget not in cls.get_properties().actions:
-            cls.get_properties().actions[widget] = dict()
+            cls.get_properties().actions[widget] = {}
         cls.get_properties().actions[widget][name] = action
 
     @classmethod
@@ -345,8 +350,8 @@ class FieldTool(WidgetTool):
     @classmethod
     def register_widget(cls, widget: FieldWidget):
         super().register_widget(widget)
-        cls.get_properties().field_getter[widget] = dict()
-        cls.get_properties().field_setter[widget] = dict()
+        cls.get_properties().field_getter[widget] = {}
+        cls.get_properties().field_setter[widget] = {}
 
     @classmethod
     def unregister_widget(cls, widget: FieldWidget):
@@ -426,7 +431,7 @@ class FieldTool(WidgetTool):
         """
 
         if widget not in cls.get_properties().field_getter:
-            cls.get_properties().field_getter[widget] = dict()
+            cls.get_properties().field_getter[widget] = {}
         cls.get_properties().field_getter[widget][field] = getter_func
 
     @classmethod
@@ -435,7 +440,7 @@ class FieldTool(WidgetTool):
         the setter func gets called with func(data,value)
         """
         if widget not in cls.get_properties().field_setter:
-            cls.get_properties().field_setter[widget] = dict()
+            cls.get_properties().field_setter[widget] = {}
         cls.get_properties().field_setter[widget][field] = setter_func
 
     @classmethod
@@ -501,15 +506,16 @@ class FieldTool(WidgetTool):
         """
 
         if widget not in cls.get_properties().validator_functions:
-            cls.get_properties().validator_functions[widget] = dict()
+            cls.get_properties().validator_functions[widget] = {}
         if field not in cls.get_properties().validator_functions[widget]:
-            cls.get_properties().validator_functions[widget][field] = list()
+            cls.get_properties().validator_functions[widget][field] = []
         cls.get_properties().validator_functions[widget][field].append(
             (validator_function, result_function)
         )
         rf, vf, f, w = result_function, validator_function, field, widget
 
-        func = lambda: rf(f, vf(cls.get_value_from_field(f), w))
+        def func():
+            rf(f, vf(cls.get_value_from_field(f), w))
 
         if isinstance(f, ItemWithToggleSwitch):
             f.active_toggle.toggled.connect(func)
@@ -626,7 +632,7 @@ class FieldTool(WidgetTool):
 
     @classmethod
     def sync_to_model(cls, widget: FieldWidget, element, explicit_field: QWidget = None):
-        field_dict = cls.get_properties().field_setter.get(widget) or dict()
+        field_dict = cls.get_properties().field_setter.get(widget) or {}
         for field, setter_func in field_dict.items():
             if explicit_field is not None and explicit_field != field:
                 continue
@@ -653,7 +659,7 @@ class FieldTool(WidgetTool):
         function_dict = cls.get_properties().validator_functions.get(widget)
         if not function_dict:
             return []
-        invalid_inputs = list()
+        invalid_inputs = []
         for f, validator in function_dict.items():
             is_valid = True
             for validator_function, result_function in validator:
@@ -795,7 +801,6 @@ class DialogTool(FieldTool):
 
 
 class ItemViewTool(BaseTool):
-
     signals = ViewSignals()
     # TODO: make info_requested a signal for all handlers
 
@@ -840,7 +845,7 @@ class ItemViewTool(BaseTool):
 
     @classmethod
     def get_selected(cls, view: ItemViewType) -> list[object]:
-        selected_values = list()
+        selected_values = []
         for proxy_index in view.selectionModel().selectedIndexes():
             source_index = view.model().mapToSource(proxy_index)
             value = source_index.internalPointer()
@@ -880,7 +885,7 @@ class ItemViewTool(BaseTool):
         logging.info(f"Register View: {view}")
 
         cls.get_properties().views.add(view)
-        cls.get_properties().context_menu_list[view] = list()
+        cls.get_properties().context_menu_list[view] = []
 
     @classmethod
     def unregister_view(cls, view: ItemViewType):
@@ -912,7 +917,7 @@ class ItemViewTool(BaseTool):
     @classmethod
     def clear_context_menu_list(cls, view: ItemViewType):
         prop = cls.get_properties()
-        prop.context_menu_list[view] = list()
+        prop.context_menu_list[view] = []
 
     @classmethod
     def add_context_menu_entry(
@@ -939,7 +944,7 @@ class ItemViewTool(BaseTool):
         :return: A dictionary representing the context menu entry.
         """
 
-        entry: ContextMenuDict = dict()
+        entry: ContextMenuDict = {}
         entry["label_func"] = label_func
         entry["action_func"] = action_func
         entry["allow_multi"] = allow_multi
@@ -1006,7 +1011,7 @@ class ItemViewTool(BaseTool):
         :return:
         """
         if model not in cls.get_properties().columns:
-            cls.get_properties().columns[model] = list()
+            cls.get_properties().columns[model] = []
         cls.get_properties().columns[model].append((name, get_function, set_function))
 
     @classmethod

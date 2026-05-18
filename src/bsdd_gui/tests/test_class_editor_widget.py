@@ -3,6 +3,7 @@ Tests for the ClassEditorWidget module (tool/class_editor_widget.py).
 
 Covers the pure validators that do not require a live Qt dialog.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock
@@ -35,6 +36,7 @@ def _widget_for(bsdd_class: BsddClass) -> MagicMock:
 # is_code_valid
 # ---------------------------------------------------------------------------
 
+
 class TestIsCodeValid:
     def test_empty_code_is_invalid(self):
         cls = BsddClass(Code="A", Name="A")
@@ -62,6 +64,7 @@ class TestIsCodeValid:
 # ---------------------------------------------------------------------------
 # is_name_valid
 # ---------------------------------------------------------------------------
+
 
 class TestIsNameValid:
     def test_nonempty_name_is_valid(self):

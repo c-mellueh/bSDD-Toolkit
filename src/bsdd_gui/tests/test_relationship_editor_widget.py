@@ -4,6 +4,7 @@ Tests for the RelationshipEditorWidget module (tool/relationship_editor_widget.p
 Covers the pure data-model helpers: read_relation, make_class_relation_bidirectional,
 and make_property_relation_bidirectional.  Signal emissions are not verified here.
 """
+
 from __future__ import annotations
 
 from bsdd_json.models import (
@@ -42,6 +43,7 @@ def _make_dict(classes=None, properties=None) -> BsddDictionary:
 # ---------------------------------------------------------------------------
 # read_relation
 # ---------------------------------------------------------------------------
+
 
 class TestReadRelation:
     def test_reads_class_relation(self):
@@ -84,6 +86,7 @@ class TestReadRelation:
 # ---------------------------------------------------------------------------
 # make_class_relation_bidirectional
 # ---------------------------------------------------------------------------
+
 
 class TestMakeClassRelationBidirectional:
     def _setup(self):
@@ -130,7 +133,6 @@ class TestMakeClassRelationBidirectional:
     def test_remove_removes_inverse_relation(self):
         parent, child, bsdd_dict = self._setup()
         child_uri = class_utils.build_bsdd_uri(child, bsdd_dict)
-        parent_uri = class_utils.build_bsdd_uri(parent, bsdd_dict)
 
         rel = BsddClassRelation(
             RelationType="IsParentOf",
@@ -163,6 +165,7 @@ class TestMakeClassRelationBidirectional:
 # ---------------------------------------------------------------------------
 # make_property_relation_bidirectional
 # ---------------------------------------------------------------------------
+
 
 class TestMakePropertyRelationBidirectional:
     def test_adds_inverse_property_relation(self):

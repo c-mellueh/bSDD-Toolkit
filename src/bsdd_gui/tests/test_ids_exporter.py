@@ -4,6 +4,7 @@ Tests for the IdsExporter module (tool/ids_exporter.py).
 Covers the pure-Python helpers that do not require a live Qt widget or
 IDS file access.
 """
+
 from __future__ import annotations
 
 from bsdd_json.models import BsddClass, BsddClassProperty, BsddDictionary
@@ -25,6 +26,7 @@ def _make_dict() -> BsddDictionary:
 # ---------------------------------------------------------------------------
 # build_inherited_checkstate_dict
 # ---------------------------------------------------------------------------
+
 
 class TestBuildInheritedCheckstateDict:
     def test_empty_list(self):
@@ -69,6 +71,7 @@ class TestBuildInheritedCheckstateDict:
 # is_class_active
 # ---------------------------------------------------------------------------
 
+
 class TestIsClassActive:
     def test_returns_true_by_default(self):
         cls = BsddClass(Code="A", Name="A")
@@ -90,6 +93,7 @@ class TestIsClassActive:
 # ---------------------------------------------------------------------------
 # is_class_prop_active
 # ---------------------------------------------------------------------------
+
 
 class TestIsClassPropActive:
     def test_returns_true_when_pset_not_in_settings(self):
@@ -114,6 +118,7 @@ class TestIsClassPropActive:
 # ---------------------------------------------------------------------------
 # get_data_type
 # ---------------------------------------------------------------------------
+
 
 class TestGetDataType:
     def test_unknown_type_returns_ifctext(self):

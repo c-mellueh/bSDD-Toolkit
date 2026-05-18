@@ -21,7 +21,7 @@ def create_module(name: str):
     tool_name = to_camel_case(name)
     prop_name = f"{to_camel_case(name)}Properties"
     widget_name = "Widget"
-    ctx = dict(name=name, tool_name=tool_name, prop_name=prop_name, widget_name=widget_name)
+    ctx = {"name": name, "tool_name": tool_name, "prop_name": prop_name, "widget_name": widget_name}
 
     if os.path.exists(module_path):
         logging.warning("Module already exists")
@@ -56,7 +56,7 @@ def create_module(name: str):
 def create_core(name: str):
     tool_name = to_camel_case(name)
     widget_name = "Widget"
-    ctx = dict(name=name, tool_name=tool_name, widget_name=widget_name)
+    ctx = {"name": name, "tool_name": tool_name, "widget_name": widget_name}
     core_path = os.path.abspath(os.path.join(os.curdir, "core", f"{name}.py"))
     if os.path.exists(core_path):
         logging.warning("core.py already exists")
@@ -69,7 +69,7 @@ def create_tool(name: str):
     tool_name = to_camel_case(name)
     prop_name = f"{to_camel_case(name)}Properties"
     widget_name = "Widget"
-    ctx = dict(name=name, tool_name=tool_name, prop_name=prop_name, widget_name=widget_name)
+    ctx = {"name": name, "tool_name": tool_name, "prop_name": prop_name, "widget_name": widget_name}
 
     if os.path.exists(tool_path):
         logging.warning("tool.py already exists")

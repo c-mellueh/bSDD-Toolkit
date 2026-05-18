@@ -6,7 +6,7 @@ from bsdd_gui.resources.data import get_ifc_type_classes
 class IdsExporterProperties(ActionsProperties, DialogProperties):
     def __init__(self):
         super().__init__()
-        self.property_count = dict()
+        self.property_count = {}
         self.setup_worker = None
         self.setup_thread = None
         self.waiting_worker = None
@@ -18,4 +18,3 @@ class IdsExporterProperties(ActionsProperties, DialogProperties):
         self.write_worker = None
         self.write_thread = None
         self.type_classes = get_ifc_type_classes()
-

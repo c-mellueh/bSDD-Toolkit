@@ -15,8 +15,6 @@ class LineEditWithButton(QLineEdit):
         # Create theme-aware colors
         pal = QApplication.palette()
         base = pal.color(QPalette.Base)
-        highlight = pal.color(QPalette.Highlight)
-
         # Hover: blend base + highlight slightly
         hover_color = base.lighter(110) if base.lightness() > 128 else base.darker(110)
         pressed_color = base.lighter(120) if base.lightness() > 128 else base.darker(120)

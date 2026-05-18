@@ -1,1 +1,1 @@
-from . import icons
+from . import icons as icons

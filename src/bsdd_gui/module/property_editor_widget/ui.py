@@ -15,7 +15,6 @@ class PropertyCreator(BaseDialog):
 
 
 class PropertyEditor(FieldWidget, Ui_PropertyWindow):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)

@@ -50,6 +50,7 @@ from bsdd_gui import tool
 from bsdd_json import BsddClass, BsddClassProperty
 from bsdd_json.utils import class_utils
 from bsdd_json.utils import property_utils as prop_utils
+
 if TYPE_CHECKING:
     pass
 
@@ -63,9 +64,12 @@ def _get_root_classes():
     rc = class_utils.get_root_classes(tool.Project.get())
     return [c for c in rc if c.ClassType != "GroupOfProperties" and tool.Loin.is_class_added(c)]
 
+
 def _get_children(bsdd_class: BsddClass):
     children = class_utils.get_children(bsdd_class)
-    return [c for c in children if c.ClassType != "GroupOfProperties" and tool.Loin.is_class_added(c)]
+    return [
+        c for c in children if c.ClassType != "GroupOfProperties" and tool.Loin.is_class_added(c)
+    ]
 
 
 def _current_purposes() -> list:
@@ -74,8 +78,6 @@ def _current_purposes() -> list:
 
 def _current_milestones() -> list:
     return tool.Loin.get_milestones()
-
-
 
 
 def _column_to_guids(column: int, prefix_cols: int) -> Optional[tuple[UUID, UUID]]:
@@ -116,9 +118,9 @@ class _CenteredCheckDelegate(QStyledItemDelegate):
             opts.state |= QStyle.StateFlag.State_NoChange
         else:
             opts.state |= QStyle.StateFlag.State_Off
-        indicator_size = QApplication.style().subElementRect(
-            QStyle.SubElement.SE_CheckBoxIndicator, opts
-        ).size()
+        indicator_size = (
+            QApplication.style().subElementRect(QStyle.SubElement.SE_CheckBoxIndicator, opts).size()
+        )
         x = option.rect.x() + (option.rect.width() - indicator_size.width()) // 2
         y = option.rect.y() + (option.rect.height() - indicator_size.height()) // 2
         opts.rect = QRect(x, y, indicator_size.width(), indicator_size.height())
@@ -255,7 +257,7 @@ class ClassModel(QAbstractItemModel):
 
     # ------------------------------------------------------------------ column count
 
-    def rowCount(self, /, parent = QModelIndex()):
+    def rowCount(self, /, parent=QModelIndex()):
         if parent.isValid() and parent.column() != 0:
             return 0
         if not parent.isValid():
@@ -266,7 +268,7 @@ class ClassModel(QAbstractItemModel):
     def columnCount(self, _parent=QModelIndex()) -> int:
         return self._prefix_cols + len(_current_purposes()) * len(_current_milestones())
 
-    def parent(self,index:QModelIndex) -> QModelIndex:
+    def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():
             return QModelIndex()
 
@@ -282,9 +284,7 @@ class ClassModel(QAbstractItemModel):
         gp_code = parent_cls.ParentClassCode
         if gp_code:
             gp_cls = class_utils.get_class_by_code(tool.Project.get(), gp_code)
-            siblings = (
-                _get_children(gp_cls) if gp_cls is not None else _get_root_classes()
-            )
+            siblings = _get_children(gp_cls) if gp_cls is not None else _get_root_classes()
         else:
             siblings = _get_root_classes()
 
@@ -312,7 +312,6 @@ class ClassModel(QAbstractItemModel):
         if 0 <= row < len(children):
             return self.createIndex(row, column, children[row])
         return QModelIndex()
-
 
     def _row_payload(self, index: QModelIndex):
         return index.internalPointer()
@@ -350,9 +349,7 @@ class ClassModel(QAbstractItemModel):
                 bsdd_class = self._owning_class_for_property_view(index)
                 if bsdd_class is None:
                     return False
-                tool.Loin.set_property_included(
-                    bsdd_class, payload, pm[0], pm[1], included
-                )
+                tool.Loin.set_property_included(bsdd_class, payload, pm[0], pm[1], included)
             else:
                 return False
             self.dataChanged.emit(index, index, [role])
@@ -372,11 +369,7 @@ class ClassModel(QAbstractItemModel):
                 | Qt.ItemFlag.ItemIsUserCheckable
             )
         else:
-            return         (
-                Qt.ItemFlag.ItemIsEnabled
-                | Qt.ItemFlag.ItemIsSelectable
-            )
-
+            return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
     # ------------------------------------------------------------------ state lookups
 
@@ -416,7 +409,7 @@ class ClassModel(QAbstractItemModel):
             return getattr(inner_model, "bsdd_data", None)
         return None
 
-    def headerData(self, section, orientation, /, role = ...):
+    def headerData(self, section, orientation, /, role=...):
         if orientation == Qt.Orientation.Vertical:
             return None
         if section >= self._prefix_cols:
@@ -587,9 +580,7 @@ class PropertyModel(QAbstractItemModel):
             )
             return True
         if isinstance(ptr, BsddClassProperty):
-            tool.Loin.set_property_included(
-                self.bsdd_data, ptr, pm[0], pm[1], included
-            )
+            tool.Loin.set_property_included(self.bsdd_data, ptr, pm[0], pm[1], included)
             return True
         return False
 
@@ -615,9 +606,7 @@ class PropertyModel(QAbstractItemModel):
         ptr = index.internalPointer()
 
         if isinstance(ptr, BsddClassProperty):
-            included = tool.Loin.is_property_included(
-                self.bsdd_data, ptr, pm[0], pm[1]
-            )
+            included = tool.Loin.is_property_included(self.bsdd_data, ptr, pm[0], pm[1])
             return Qt.CheckState.Checked if included else Qt.CheckState.Unchecked
 
         if isinstance(ptr, str):
@@ -625,8 +614,7 @@ class PropertyModel(QAbstractItemModel):
             if not props:
                 return Qt.CheckState.Unchecked
             states = [
-                tool.Loin.is_property_included(self.bsdd_data, p, pm[0], pm[1])
-                for p in props
+                tool.Loin.is_property_included(self.bsdd_data, p, pm[0], pm[1]) for p in props
             ]
             if all(states):
                 return Qt.CheckState.Checked
@@ -644,7 +632,8 @@ class PropertyModel(QAbstractItemModel):
 
 class _PsetNode:
     """One row per unique PropertySet name across all added classes."""
-    __slots__ = ('name', 'entries')
+
+    __slots__ = ("name", "entries")
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -653,7 +642,8 @@ class _PsetNode:
 
 class _PropEntry:
     """One row per unique (pset, property-code) pair; holds all class instances."""
-    __slots__ = ('pset_node', 'code', 'name', 'instances')
+
+    __slots__ = ("pset_node", "code", "name", "instances")
 
     def __init__(self, pset_node: _PsetNode, code: str, name: str) -> None:
         self.pset_node = pset_node
@@ -872,7 +862,8 @@ class PsetModel(QAbstractItemModel):
             if not total:
                 return Qt.CheckState.Unchecked
             n = sum(
-                1 for bc, cp in ptr.instances
+                1
+                for bc, cp in ptr.instances
                 if tool.Loin.is_property_included(bc, cp, pm[0], pm[1])
             )
             if n == total:
@@ -898,7 +889,6 @@ class PsetModel(QAbstractItemModel):
 # ---------------------------------------------------------------------------
 # Two-row header
 # ---------------------------------------------------------------------------
-
 
 
 class TwoRowHeaderView(QHeaderView):
@@ -983,8 +973,9 @@ class TwoRowHeaderView(QHeaderView):
                             act.setCheckable(True)
                             act.setChecked(visible)
                             act.triggered.connect(
-                                lambda _=None, pg=p_guid, mg=ms.guid:
+                                lambda _=None, pg=p_guid, mg=ms.guid: (
                                     get_filter_window().toggle_combination(pg, mg)
+                                )
                             )
                     else:
                         menu.addAction(f"Rename '{m_name}'…", lambda g=m_guid: self._rename_ms(g))
@@ -998,8 +989,9 @@ class TwoRowHeaderView(QHeaderView):
                             act.setCheckable(True)
                             act.setChecked(visible)
                             act.triggered.connect(
-                                lambda _=None, pg=pu.guid, mg=m_guid:
+                                lambda _=None, pg=pu.guid, mg=m_guid: (
                                     get_filter_window().toggle_combination(pg, mg)
+                                )
                             )
 
                     menu.addSeparator()
@@ -1045,7 +1037,7 @@ class TwoRowHeaderView(QHeaderView):
 
     def _remove_ms(self, guid: UUID) -> None:
         tool.Loin.remove_milestone(guid)
-        
+
     def _on_loin_changed(self) -> None:
         self.updateGeometry()
         self.viewport().update()
@@ -1056,10 +1048,7 @@ class TwoRowHeaderView(QHeaderView):
         if not milestones:
             return self._PADDING
         return (
-            max(
-                fm.horizontalAdvance(tool.Loin.milestone_display_name(m))
-                for m in milestones
-            )
+            max(fm.horizontalAdvance(tool.Loin.milestone_display_name(m)) for m in milestones)
             + self._PADDING
         )
 
@@ -1088,9 +1077,12 @@ class TwoRowHeaderView(QHeaderView):
             w = self.sectionSize(col)
             label = ""
             if self.model():
-                label = self.model().headerData(
-                    col, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole
-                ) or ""
+                label = (
+                    self.model().headerData(
+                        col, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole
+                    )
+                    or ""
+                )
             self._draw_cell(painter, x, 0, w, total_h, str(label), bold)
             x += w
 
@@ -1232,12 +1224,8 @@ class FilterTableWindow(QWidget):
         purposes = _current_purposes()
         milestones = _current_milestones()
         table = QTableWidget(len(purposes), len(milestones))
-        table.setVerticalHeaderLabels(
-            [tool.Loin.purpose_display_name(p) for p in purposes]
-        )
-        table.setHorizontalHeaderLabels(
-            [tool.Loin.milestone_display_name(m) for m in milestones]
-        )
+        table.setVerticalHeaderLabels([tool.Loin.purpose_display_name(p) for p in purposes])
+        table.setHorizontalHeaderLabels([tool.Loin.milestone_display_name(m) for m in milestones])
         table.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
 
         for ui_idx in range(len(purposes)):

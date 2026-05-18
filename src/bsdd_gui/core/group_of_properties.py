@@ -130,7 +130,7 @@ def connect_widget(
     prop_view = widget.tv_properties
 
     gop_prop_view.signals.selection_changed.connect(
-        lambda v, n: (widget_tool.set_active_property(n) if v == prop_view else None)
+        lambda v, n: widget_tool.set_active_property(n) if v == prop_view else None
     )
 
     widget_tool.signals.active_class_changed.connect(lambda c: gop_prop_view.reset_view(prop_view))
@@ -207,7 +207,7 @@ def add_context_menu_to_class_view(
     class_view: Type[tool.GopClassView],
     project: Type[tool.Project],
     class_property_view: Type[tool.ClassPropertyTableView],
-    pset_table_view:Type[tool.PropertySetTableView]
+    pset_table_view: Type[tool.PropertySetTableView],
 ):
 
     def delete_synced_psets():
@@ -217,8 +217,9 @@ def add_context_menu_to_class_view(
                     if cp.PropertySet != bsdd_class.Name:
                         continue
                     class_property_view.remove_property(relating_class, cp)
-                
+
         pset_table_view.request_model_refresh()
+
     class_view.add_context_menu_entry(
         view,
         lambda: QCoreApplication.translate("ClassView", "Delete Synced PropertySets"),
@@ -242,7 +243,7 @@ def paste_property_from_clipboard(
     clipboard_text = QApplication.clipboard().text()
     try:
         payload = json.loads(clipboard_text)
-    except:
+    except Exception:
         return
 
     if not isinstance(payload, dict) or payload.get("kind") != CLASS_PROP_CLIPBOARD_KIND:
@@ -277,7 +278,7 @@ def paste_property_from_clipboard(
             new_property = BsddProperty.model_validate(bsdd_property)
             property_table.add_property_to_dictionary(new_property, bsdd_dictionary)
             existing_property_codes.append(new_property.Code)
-        except:
+        except Exception:
             pass
 
 

@@ -4,6 +4,7 @@ Tests for the Logging module (tool/logging.py).
 Covers CustomFormatter (pure Python) and the level-management helpers that
 delegate to Appdata (also pure Python).
 """
+
 from __future__ import annotations
 
 import logging
@@ -15,6 +16,7 @@ from bsdd_gui.tool.logging import CustomFormatter
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_record(
     pathname: str = os.path.join("some", "package", "module.py"),
@@ -37,6 +39,7 @@ def _make_record(
 # ---------------------------------------------------------------------------
 # 1. CustomFormatter.format
 # ---------------------------------------------------------------------------
+
 
 class TestCustomFormatter:
     def test_format_adds_module_func_attribute(self):

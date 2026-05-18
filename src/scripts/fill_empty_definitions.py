@@ -40,18 +40,19 @@ def read_excel(excel_path, input_dict_path, ouput_dict_path):
         bsdd_class_property.Description = description
     bsdd_dict.save(ouput_dict_path)
 
+
 def read_json(json_path, input_dict_path, ouput_dict_path):
     bsdd_dict = BsddDictionary.load(input_dict_path)
-    with open(json_path,"r") as file:
+    with open(json_path, "r") as file:
         data = json.load(file)
 
     name_dict = {c.Name: c for c in bsdd_dict.Classes}
-    for class_name,property_dict in data.items():
+    for class_name, property_dict in data.items():
         bsdd_class = name_dict.get(class_name)
         if not bsdd_class:
-            continue 
+            continue
 
-        for property_name,description in property_dict.items():
+        for property_name, description in property_dict.items():
             bsdd_class_property = find_property(bsdd_class, property_name)
             if not bsdd_class_property:
                 continue
@@ -78,8 +79,8 @@ def parse_args() -> argparse.Namespace:
 if __name__ == "__main__":
     args = parse_args()
     if args.mode == "json":
-        read_json(args.input_file,args.bsdd_input,args.bsdd_output)
+        read_json(args.input_file, args.bsdd_input, args.bsdd_output)
     elif args.mode == "excel":
-        read_excel(args.input_file,args.bsdd_input,args.bsdd_output)
+        read_excel(args.input_file, args.bsdd_input, args.bsdd_output)
     else:
         print(f"mode '{args.mode}' not found")

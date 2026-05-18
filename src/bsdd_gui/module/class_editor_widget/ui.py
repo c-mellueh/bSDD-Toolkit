@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from PySide6.QtWidgets import (
     QDialogButtonBox,
 )
@@ -16,11 +17,10 @@ class IfcTagInput(TagInput):
         super().__init__(*args, allowed=class_names, **kwargs)
 
 
-from .qt import ui_ClassEditor
+from .qt import ui_ClassEditor  # noqa: E402
 
 
 class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
-
     def __init__(self, bsdd_class: BsddClass, *args, **kwargs):
         super().__init__(bsdd_class, *args, **kwargs)
         self.setupUi(self)

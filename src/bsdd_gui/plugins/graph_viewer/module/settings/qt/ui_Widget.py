@@ -33,7 +33,7 @@ class Ui_SettingsSidebar(object):
             SettingsSidebar.setObjectName("SettingsSidebar")
         SettingsSidebar.resize(772, 942)
         SettingsSidebar.setStyleSheet(
-            " QWidget#SettingsSidebar {\n" "                background: transparent; }"
+            " QWidget#SettingsSidebar {\n                background: transparent; }"
         )
         self.horizontalLayout = QHBoxLayout(SettingsSidebar)
         self.horizontalLayout.setSpacing(3)
@@ -44,11 +44,7 @@ class Ui_SettingsSidebar(object):
         self.expand_button = QToolButton(SettingsSidebar)
         self.expand_button.setObjectName("expand_button")
         self.expand_button.setStyleSheet(
-            "QToolButton {\n"
-            "    background: transparent;\n"
-            "    border: none;\n"
-            "    padding: 0px;\n"
-            "}"
+            "QToolButton {\n    background: transparent;\n    border: none;\n    padding: 0px;\n}"
         )
         self.expand_button.setIconSize(QSize(20, 20))
         self.expand_button.setCheckable(True)

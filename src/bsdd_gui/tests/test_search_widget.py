@@ -3,6 +3,7 @@ Tests for the SearchWidget module (tool/search_widget.py).
 
 Tests cover the pure helpers that do not require a live Qt dialog.
 """
+
 from __future__ import annotations
 
 from bsdd_gui.tool import SearchWidget
@@ -11,6 +12,7 @@ from bsdd_gui.tool import SearchWidget
 # ---------------------------------------------------------------------------
 # 1. get_column_texts
 # ---------------------------------------------------------------------------
+
 
 class TestGetColumnTexts:
     def test_class_mode_returns_three_columns(self):
@@ -33,6 +35,7 @@ class TestGetColumnTexts:
 # ---------------------------------------------------------------------------
 # 2. get_threshold
 # ---------------------------------------------------------------------------
+
 
 class TestGetThreshold:
     def test_threshold_is_integer(self):

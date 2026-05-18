@@ -75,8 +75,6 @@ class Signals(WidgetSignals):
 class Loin(ActionTool, WidgetTool):
     signals = Signals()
 
-
-
     @classmethod
     def get_properties(cls) -> LoinProperties:
         return bsdd_gui.LoinProperties
@@ -108,7 +106,7 @@ class Loin(ActionTool, WidgetTool):
         super().connect_widget_signals(widget)
 
     @classmethod
-    def get_loin(cls) -> LoinLevelOfInformationNeed|None:
+    def get_loin(cls) -> LoinLevelOfInformationNeed | None:
         """Return the LOIN root, or None if no specifications exist yet.
 
         The XSD requires LoinLevelOfInformationNeed.specifications to have at
@@ -127,8 +125,7 @@ class Loin(ActionTool, WidgetTool):
 
     @classmethod
     def get_checked_classes(
-        cls,
-        active_specifications: list[LoinSpecification],bsdd_dictionary: BsddDictionary
+        cls, active_specifications: list[LoinSpecification], bsdd_dictionary: BsddDictionary
     ) -> list[BsddClass]:
         """Return BsddClass objects included in at least one of the given specs."""
         props = cls.get_properties()
@@ -143,8 +140,11 @@ class Loin(ActionTool, WidgetTool):
         return [existing[code] for code in checked_codes if code in existing]
 
     @classmethod
-    def _get_spec_key(cls,spec: LoinSpecification) -> tuple[UUID, UUID]:
-        return spec.prerequisites.purpose.guid, spec.prerequisites.information_delivery_milestone.guid
+    def _get_spec_key(cls, spec: LoinSpecification) -> tuple[UUID, UUID]:
+        return (
+            spec.prerequisites.purpose.guid,
+            spec.prerequisites.information_delivery_milestone.guid,
+        )
 
     @classmethod
     def get_checked_properties(
@@ -174,7 +174,7 @@ class Loin(ActionTool, WidgetTool):
                     p_guid, m_guid = cls._get_spec_key(spec)
                     if cls.is_property_included(bsdd_class, cp, p_guid, m_guid):
                         prop_checked = True
-    
+
                 entry = psets.setdefault(pset_name, {"checked": False, "properties": {}})
                 entry["properties"][cp.Code] = prop_checked
                 if prop_checked:
@@ -317,7 +317,7 @@ class Loin(ActionTool, WidgetTool):
         cls,
         name: str,
         language: str = "en",
-        date: datetime|None = None,
+        date: datetime | None = None,
     ) -> LoinInformationDeliveryMilestone:
         milestone = LoinInformationDeliveryMilestone(
             guid=uuid4(),
@@ -356,7 +356,7 @@ class Loin(ActionTool, WidgetTool):
                 return
 
     @classmethod
-    def set_milestone_date(cls, milestone_guid: UUID, date: datetime|None) -> None:
+    def set_milestone_date(cls, milestone_guid: UUID, date: datetime | None) -> None:
         for m in cls.get_properties().milestones:
             if m.guid == milestone_guid:
                 m.date = date
@@ -370,9 +370,7 @@ class Loin(ActionTool, WidgetTool):
         return str(milestone.guid)
 
     @classmethod
-    def select_specs_dialog(
-        cls, parent: QWidget | None = None
-    ) -> list[LoinSpecification] | None:
+    def select_specs_dialog(cls, parent: QWidget | None = None) -> list[LoinSpecification] | None:
         """Show a purpose × milestone selection table and return the chosen specs.
 
         Returns ``None`` when the user cancels, or an empty list when no cells
@@ -399,9 +397,7 @@ class Loin(ActionTool, WidgetTool):
                 item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 key = (purpose.guid, milestone.guid)
                 has_spec = key in props.specs
-                item.setCheckState(
-                    Qt.CheckState.Checked if has_spec else Qt.CheckState.Unchecked
-                )
+                item.setCheckState(Qt.CheckState.Checked if has_spec else Qt.CheckState.Unchecked)
                 table.setItem(r, c, item)
 
         table.resizeColumnsToContents()
@@ -440,11 +436,11 @@ class Loin(ActionTool, WidgetTool):
     # ------------------------------------------------------------------ actors
 
     @classmethod
-    def get_providing_actor(cls) -> LoinActor|None:
+    def get_providing_actor(cls) -> LoinActor | None:
         return cls.get_properties().providing_actor
 
     @classmethod
-    def get_receiving_actor(cls) -> LoinActor|None:
+    def get_receiving_actor(cls) -> LoinActor | None:
         return cls.get_properties().receiving_actor
 
     @classmethod
@@ -452,11 +448,11 @@ class Loin(ActionTool, WidgetTool):
         cls,
         role: str,
         language: str = "en",
-        first_name: str|None = None,
-        middle_name: str|None = None,
-        last_name: str|None = None,
-        affiliation: str|None = None,
-        email_address: str|None = None,
+        first_name: str | None = None,
+        middle_name: str | None = None,
+        last_name: str | None = None,
+        affiliation: str | None = None,
+        email_address: str | None = None,
     ) -> LoinActor:
         actor = LoinActor(
             guid=uuid4(),
@@ -477,11 +473,11 @@ class Loin(ActionTool, WidgetTool):
         cls,
         role: str,
         language: str = "en",
-        first_name: str|None = None,
-        middle_name: str|None = None,
-        last_name: str|None = None,
-        affiliation: str|None = None,
-        email_address: str|None = None,
+        first_name: str | None = None,
+        middle_name: str | None = None,
+        last_name: str | None = None,
+        affiliation: str | None = None,
+        email_address: str | None = None,
     ) -> LoinActor:
         actor = LoinActor(
             guid=uuid4(),
@@ -522,8 +518,7 @@ class Loin(ActionTool, WidgetTool):
         milestone = next((m for m in props.milestones if m.guid == milestone_guid), None)
         if purpose is None or milestone is None:
             raise KeyError(
-                f"Cannot create spec: missing purpose {purpose_guid} "
-                f"or milestone {milestone_guid}"
+                f"Cannot create spec: missing purpose {purpose_guid} or milestone {milestone_guid}"
             )
 
         providing = props.providing_actor or LoinActor(
@@ -535,9 +530,7 @@ class Loin(ActionTool, WidgetTool):
             role=DtMultiLangText(language="en", text="Receiver"),
         )
 
-        spec_name = (
-            f"{cls.purpose_display_name(purpose)} – " f"{cls.milestone_display_name(milestone)}"
-        )
+        spec_name = f"{cls.purpose_display_name(purpose)} – {cls.milestone_display_name(milestone)}"
         spec = LoinSpecification(
             name=spec_name,
             guid=uuid4(),
@@ -677,7 +670,9 @@ class Loin(ActionTool, WidgetTool):
         milestone_guid: UUID,
         included: bool,
     ) -> None:
-        cls._set_property_included_silent(bsdd_class, bsdd_property, purpose_guid, milestone_guid, included)
+        cls._set_property_included_silent(
+            bsdd_class, bsdd_property, purpose_guid, milestone_guid, included
+        )
         cls.get_signals().spec_membership_changed.emit()
 
     @classmethod
@@ -742,7 +737,9 @@ class Loin(ActionTool, WidgetTool):
             if spec is not None:
                 spec_per_obj = cls._find_spec_per_object_type(spec, bsdd_class)
                 if spec_per_obj is not None:
-                    cls._remove_property_from_spec_per_obj(spec_per_obj, bsdd_class, bsdd_property, remaining_in_pset)
+                    cls._remove_property_from_spec_per_obj(
+                        spec_per_obj, bsdd_class, bsdd_property, remaining_in_pset
+                    )
 
     @classmethod
     def set_pset_included(
@@ -755,7 +752,9 @@ class Loin(ActionTool, WidgetTool):
         """Set all properties of a pset across multiple classes, emitting the signal once."""
         for bsdd_class, props in pset_classes:
             for cp in props:
-                cls._set_property_included_silent(bsdd_class, cp, purpose_guid, milestone_guid, included)
+                cls._set_property_included_silent(
+                    bsdd_class, cp, purpose_guid, milestone_guid, included
+                )
         cls.get_signals().spec_membership_changed.emit()
 
     # ----------------------------------------- LoinSpecificationPerObjectType helpers
@@ -798,7 +797,7 @@ class Loin(ActionTool, WidgetTool):
     @classmethod
     def _find_spec_per_object_type(
         cls, spec: LoinSpecification, bsdd_class: "BsddClass"
-    ) -> LoinSpecificationPerObjectType|None:
+    ) -> LoinSpecificationPerObjectType | None:
         for s in spec.specifications_per_object_type:
             if s.__dict__.get("_bsdd_class_code") == bsdd_class.Code:
                 return s
@@ -815,11 +814,15 @@ class Loin(ActionTool, WidgetTool):
         if alpha is None:
             alpha = LoinAlphanumericalInformation(
                 guid=uuid4(),
-                groups_of_properties=LoinGroupsOfProperties(group_of_properties=[], group_of_properties_refs=[]),
+                groups_of_properties=LoinGroupsOfProperties(
+                    group_of_properties=[], group_of_properties_refs=[]
+                ),
             )
             spec_per_obj.alphanumerical_information = alpha
         if alpha.groups_of_properties is None:
-            alpha.groups_of_properties = LoinGroupsOfProperties(group_of_properties=[], group_of_properties_refs=[])
+            alpha.groups_of_properties = LoinGroupsOfProperties(
+                group_of_properties=[], group_of_properties_refs=[]
+            )
 
         pset = bsdd_property.PropertySet
         bsdd_dictionary = tool.Project.get()
@@ -830,8 +833,12 @@ class Loin(ActionTool, WidgetTool):
         )
 
         if external_group is not None:
-            uri = external_group.OwnedUri or class_utils.build_bsdd_uri(external_group, bsdd_dictionary)
-            if uri and not any(r.reference_uri == uri for r in alpha.groups_of_properties.group_of_properties_refs):
+            uri = external_group.OwnedUri or class_utils.build_bsdd_uri(
+                external_group, bsdd_dictionary
+            )
+            if uri and not any(
+                r.reference_uri == uri for r in alpha.groups_of_properties.group_of_properties_refs
+            ):
                 alpha.groups_of_properties.group_of_properties_refs.append(DtRef(reference_uri=uri))
             return
 
@@ -881,10 +888,13 @@ class Loin(ActionTool, WidgetTool):
 
         if external_group is not None:
             if not remaining_in_pset:
-                uri = external_group.OwnedUri or class_utils.build_bsdd_uri(external_group, bsdd_dictionary)
+                uri = external_group.OwnedUri or class_utils.build_bsdd_uri(
+                    external_group, bsdd_dictionary
+                )
                 if uri:
                     alpha.groups_of_properties.group_of_properties_refs = [
-                        r for r in alpha.groups_of_properties.group_of_properties_refs
+                        r
+                        for r in alpha.groups_of_properties.group_of_properties_refs
                         if r.reference_uri != uri
                     ]
             return
@@ -911,7 +921,7 @@ class Loin(ActionTool, WidgetTool):
         cls,
         groups: LoinGroupsOfProperties,
         pset: str,
-    ) -> IsoGroupOfProperties|None:
+    ) -> IsoGroupOfProperties | None:
         for g in groups.group_of_properties:
             if g.__dict__.get("_pset") == pset:
                 return g
@@ -957,11 +967,11 @@ class Loin(ActionTool, WidgetTool):
         return len(loin.specifications)
 
     @classmethod
-    def request_xml_import(cls, widget: ui.Widget) :
+    def request_xml_import(cls, widget: ui.Widget):
         trigger.import_xml(widget)
 
     @classmethod
-    def request_xml_export(cls, widget: ui.Widget) :
+    def request_xml_export(cls, widget: ui.Widget):
         trigger.export_xml(widget)
 
     @classmethod
@@ -971,7 +981,7 @@ class Loin(ActionTool, WidgetTool):
         pset: str,
         uri: str,
         bsdd_dictionary: "BsddDictionary",
-    ) -> str|None:
+    ) -> str | None:
         """Return the BsddClassProperty.Code whose URI matches *uri*.
 
         Uses get_property_by_uri so version segments in the URI are ignored.
@@ -1049,12 +1059,18 @@ class Loin(ActionTool, WidgetTool):
                             uri = ref.reference_uri or (str(ref.guid) if ref.guid else None)
                             if uri is None:
                                 continue
-                            prop_code = cls._resolve_property_uri_to_code(
-                                bsdd_class, pset, uri, bsdd_dictionary
-                            ) if bsdd_class else None
+                            prop_code = (
+                                cls._resolve_property_uri_to_code(
+                                    bsdd_class, pset, uri, bsdd_dictionary
+                                )
+                                if bsdd_class
+                                else None
+                            )
                             if prop_code:
                                 prop_buckets.setdefault(code, set()).add((pset, prop_code))
-                    for ref in s.alphanumerical_information.groups_of_properties.group_of_properties_refs:
+                    for (
+                        ref
+                    ) in s.alphanumerical_information.groups_of_properties.group_of_properties_refs:
                         uri = ref.reference_uri or (str(ref.guid) if ref.guid else None)
                         if uri is None:
                             continue
@@ -1098,6 +1114,7 @@ class Loin(ActionTool, WidgetTool):
 class ClassSignals(ViewSignals):
     pass
 
+
 class PPClassView(ItemViewTool):
     signals = ClassSignals()
 
@@ -1121,7 +1138,6 @@ class PPClassView(ItemViewTool):
     def connect_internal_signals(cls):
         return super().connect_internal_signals()
 
-
     @classmethod
     def build_full_check_dict(cls, view: model_views.ClassView, bsdd_dictionary: BsddDictionary):
         partial = cls.get_checked_classes(view)
@@ -1138,8 +1154,6 @@ class PPClassView(ItemViewTool):
 
         return full
 
-
-
     @classmethod
     def get_property_view(cls, class_view: model_views.ClassView) -> model_views.PropertyView:
         widget: ui.Widget = class_view.parent().parent().parent().parent()
@@ -1147,7 +1161,6 @@ class PPClassView(ItemViewTool):
 
     @classmethod
     def on_current_changed(cls, view, curr, prev):
-        proxy_model = view.model()
         if not curr.isValid():
             return
         index = curr
@@ -1189,9 +1202,6 @@ class PPPropertyView(ItemViewTool):
             return ""
         return bsdd_property.Code
 
-
     @classmethod
     def get_check_dict(cls, view: model_views.PropertyView) -> dict[ClassCode, PsetDict]:
         return None
-
-

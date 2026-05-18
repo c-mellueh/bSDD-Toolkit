@@ -194,7 +194,6 @@ def create_relation(
     from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
 
     if start_node.node_type == node_constants.CLASS_NODE_TYPE:
-
         if end_node.node_type in [
             node_constants.PROPERTY_NODE_TYPE,
             node_constants.EXTERNAL_PROPERTY_NODE_TYPE,
@@ -234,13 +233,6 @@ def paint_edge_legend(edge_legend: ui._EdgeLegendIcon, edge: Type[gv_tool.Edge])
 
 def update_path(focus_edge: ui.Edge, edge: Type[gv_tool.Edge], scene_view: Type[gv_tool.SceneView]):
     # Determine routing mode from scene
-    sc = scene_view.get_scene()
-    orth = False
-    try:
-        orth = bool(getattr(sc, "orthogonal_edges", False))
-    except Exception:
-        orth = False
-
     # Compute anchors on node boundaries
 
     path = QPainterPath()

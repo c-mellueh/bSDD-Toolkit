@@ -1,3 +1,4 @@
+from bsdd_json.tests.helpers import make_dictionary
 from bsdd_json.utils import dictionary_utils as dict_utils
 
 
@@ -121,7 +122,7 @@ class TestParseBsddUrl:
     def test_full_class_uri(self) -> None:
         uri = "https://identifier.buildingsmart.org/uri/hw/som/0.2.0/class/Leiter"
         r = dict_utils.parse_bsdd_url(uri)
-        assert r["path_segments"] ==  ["uri", "hw", "som", "0.2.0", "class", "Leiter"]
+        assert r["path_segments"] == ["uri", "hw", "som", "0.2.0", "class", "Leiter"]
         assert r["namespace"] == "hw/som"
         assert r["version"] == "0.2.0"
         assert r["resource_type"] == "class"

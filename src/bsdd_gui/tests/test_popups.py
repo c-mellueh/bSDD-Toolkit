@@ -5,6 +5,7 @@ The _get_path helper wraps QFileDialog but contains pure-Python extension-
 appending logic after the dialog call.  QFileDialog is monkeypatched so
 no real dialog ever opens.
 """
+
 from __future__ import annotations
 
 from unittest.mock import patch
@@ -31,6 +32,7 @@ def _save(return_value):
 # ---------------------------------------------------------------------------
 # _get_path — open mode
 # ---------------------------------------------------------------------------
+
 
 class TestGetPathOpen:
     def test_appends_missing_extension(self):
@@ -64,6 +66,7 @@ class TestGetPathOpen:
 # _get_path — save mode
 # ---------------------------------------------------------------------------
 
+
 class TestGetPathSave:
     def test_appends_missing_extension_on_save(self):
         with _save(("/dir/out", "IDS Files (*.ids)")):
@@ -79,6 +82,7 @@ class TestGetPathSave:
 # ---------------------------------------------------------------------------
 # _get_path — path pre-processing
 # ---------------------------------------------------------------------------
+
 
 class TestGetPathPreProcessing:
     def test_strips_extension_from_input_path_before_passing_to_dialog(self):

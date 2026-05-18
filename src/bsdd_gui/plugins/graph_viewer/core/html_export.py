@@ -31,7 +31,7 @@ def export_html_graph(
     html_export: type[gv_tool.HTMLExport],
 ):
     """Generate HTML Export of all Nodes that are currently contained in the Scene."""
-    #reqest Path
+    # reqest Path
     last_path = appdata.get_path(constants.HTML_PATH_NAME) or "graph_view.html"
     text = QCoreApplication.translate("GraphViewer", "Export Graph as HTML")
     path = popups.get_save_path(constants.HTML_FILETYPE, window.get_widget(), last_path, text)
@@ -39,21 +39,20 @@ def export_html_graph(
         return
     appdata.set_path(constants.HTML_PATH_NAME, path)
 
-
-    #Get data from Scene
+    # Get data from Scene
     bsdd_dictionary = project.get()
     orthogonal = edge.is_orthogonal_mode()
     arrow_length = edge.get_properties().arrow_length
     nodes = node.get_visible_nodes()
     edges = edge.get_visible_edges(nodes)
 
-    #If Empty
+    # If Empty
     if not nodes:
         html_content = html_export.generate_empty_html()
         html_export.write_html(html_content, path, window)
-        return 
+        return
 
-    #Generate HTML Parts
+    # Generate HTML Parts
     svg_w, svg_h, offset_x, offset_y = html_export.compute_bounding_box(nodes)
     defs_parts, edge_parts = html_export.generate_edge_parts(
         edges,
@@ -68,7 +67,7 @@ def export_html_graph(
 
     page_title, heading_suffix = html_export.generate_title(bsdd_dictionary)
 
-    #Generate HTML Content
+    # Generate HTML Content
     html_content = html_export.generate_html(
         page_title,
         heading_suffix,
@@ -81,5 +80,5 @@ def export_html_graph(
         edge_legend_html,
     )
 
-    #Write to File
+    # Write to File
     html_export.write_html(html_content, path, window)

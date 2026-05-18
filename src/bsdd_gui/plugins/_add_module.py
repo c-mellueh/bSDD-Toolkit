@@ -157,7 +157,7 @@ class {to_camel_case(module_name)}:
 def main(plugin_name: str, module_name: str, abbreviation: str):
     curdir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(curdir)
-    prop_name = f"{to_camel_case(f"{plugin_name}_{module_name}")}Properties"
+    prop_name = f"{to_camel_case(f'{plugin_name}_{module_name}')}Properties"
 
     create_core(plugin_name, module_name, abbreviation)
     create_tool(plugin_name, module_name, prop_name)

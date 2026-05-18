@@ -1,10 +1,10 @@
-import os
+import json
 import logging
+import os
 
 
 def list_files_in_directory(root_dir):
     for dirpath, dirnames, filenames in os.walk(root_dir):
-
         if ".venv" in dirpath:
             continue
         if dirpath.startswith(".\\plugins\\"):
@@ -28,7 +28,6 @@ def list_files_in_directory(root_dir):
 output_dict = {"files": []}
 root_directory = "."
 list_files_in_directory(root_directory)
-import json
 
 with open("bsdd_gui.pyproject", "w") as file:
     json.dump(output_dict, file, indent=4)

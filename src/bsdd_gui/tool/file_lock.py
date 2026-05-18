@@ -37,7 +37,7 @@ class FileLock:
         cls.unlock_file()
 
         lock_path = cls.build_lockpath(normalized_path)
-        return True #DEBUG: TODO: REMOVE
+        return True  # DEBUG: TODO: REMOVE
         try:
             file = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_RDWR)
             os.write(file, cls._build_lock_contents())
