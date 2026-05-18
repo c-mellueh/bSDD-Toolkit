@@ -129,14 +129,27 @@ class _CenteredCheckDelegate(QStyledItemDelegate):
     def editorEvent(self, event, model, option, index) -> bool:
         if index.data(Qt.ItemDataRole.CheckStateRole) is None:
             return super().editorEvent(event, model, option, index)
-        if event.type() == QEvent.Type.MouseButtonRelease:
+        if (
+            event.type() == QEvent.Type.MouseButtonRelease
+            and event.button() == Qt.MouseButton.LeftButton
+        ):
             current = index.data(Qt.ItemDataRole.CheckStateRole)
             new_state = (
                 Qt.CheckState.Unchecked
                 if current == Qt.CheckState.Checked
                 else Qt.CheckState.Checked
             )
-            model.setData(index, new_state, Qt.ItemDataRole.CheckStateRole)
+            col = index.column()
+            targets = {index}
+            view = self.parent()
+            if view is not None and hasattr(view, "selectionModel"):
+                sel = view.selectionModel()
+                if sel.isSelected(index):
+                    for sel_idx in sel.selectedIndexes():
+                        if sel_idx.column() == col:
+                            targets.add(sel_idx)
+            for target in targets:
+                model.setData(target, new_state, Qt.ItemDataRole.CheckStateRole)
             return True
         return False
 

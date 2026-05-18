@@ -118,7 +118,9 @@ class ClassView(_UcMsViewMixin):
                     p_guid = purpose.guid
                     m_guid = milestone.guid
                     action.triggered.connect(
-                        lambda _checked, n=node, pg=p_guid, mg=m_guid: trigger.apply_checkstate_to_children(n, pg, mg)
+                        lambda _checked, nodes=selected_nodes, pg=p_guid, mg=m_guid: [
+                            trigger.apply_checkstate_to_children(n, pg, mg) for n in nodes
+                        ]
                     )
 
             apply_action = menu.addMenu(submenu)
@@ -129,7 +131,9 @@ class ClassView(_UcMsViewMixin):
             if clicked_guids is not None:
                 p_guid, m_guid = clicked_guids
                 apply_action._direct_callback = (
-                    lambda n=node, pg=p_guid, mg=m_guid: trigger.apply_checkstate_to_children(n, pg, mg)
+                    lambda nodes=selected_nodes, pg=p_guid, mg=m_guid: [
+                        trigger.apply_checkstate_to_children(n, pg, mg) for n in nodes
+                    ]
                 )
 
         menu.exec(self.viewport().mapToGlobal(pos))
@@ -193,10 +197,12 @@ class ClassView(_UcMsViewMixin):
 class PropertyView(_UcMsViewMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         trigger.property_view_created(self)
 
 
 class PsetView(_UcMsViewMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         trigger.pset_view_created(self)
