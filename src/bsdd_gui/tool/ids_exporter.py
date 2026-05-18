@@ -498,18 +498,29 @@ class IdsExporter(ActionTool, FieldTool):
 
             mp = base_settings.get("main_property", "")
             mps = base_settings.get("main_pset", "")
-            base_requirement: PropertyFacet = base_spec.requirements[0]
-            base_requirement.propertySet = mps
-            base_requirement.baseName = mp
-            base_restriction = base_requirement.value
 
             identifiers = set()
             for bsdd_class in bsdd_dict.Classes:
-
                 for identifier in cls.get_identifiers_by_class(bsdd_class, mp, mps, bsdd_dict):
                     identifiers.add(identifier)
 
-            base_restriction.options = {"enumeration": sorted(identifiers)}
+            base_restriction = Restriction(options={"enumeration": sorted(identifiers)})
+
+            if base_spec.requirements:
+                base_requirement: PropertyFacet = base_spec.requirements[0]
+                base_requirement.propertySet = mps
+                base_requirement.baseName = mp
+                base_requirement.value = base_restriction
+            else:
+                base_requirement = PropertyFacet(
+                    mps,
+                    mp,
+                    base_restriction,
+                    base_settings.get("datatype", "IFCTEXT"),
+                    cardinality="optional",
+                )
+                base_spec.requirements.append(base_requirement)
+
             base_requirement.dataType = base_settings.get("datatype")
             base_spec.ifcVersion = ifc_version
 
