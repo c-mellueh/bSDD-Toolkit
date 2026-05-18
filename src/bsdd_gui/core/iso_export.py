@@ -115,7 +115,8 @@ def export( widget: ui.Widget,
     bsdd_dict = project.get()
     specs = list(property_picker.get_properties().specs.values())
     checked_classes = property_picker.get_checked_classes(specs, bsdd_dict)
-    checked_properties = property_picker.build_property_check_dict(specs, bsdd_dict)
+    checked_properties = property_picker.get_checked_properties(specs, bsdd_dict)
+    checked_predefined_porperties = property_picker.get_checked_predefined_properties(specs, bsdd_dict)
 
     def export_done(class_count:int):
         stop_waiting_widget(waiting_worker)
@@ -124,10 +125,15 @@ def export( widget: ui.Widget,
         text = QCoreApplication.translate("IsoExport","{} classes exported!").format(class_count)
         QTimer.singleShot(0, widget,  lambda: popups.create_info_popup(text,t,text_title,parent=widget))
 
-    build_worker, build_thread = iso_export.create_build_thread(bsdd_dict,checked_classes,checked_properties,out_path)
+    build_worker, build_thread = iso_export.create_build_thread(bsdd_dict,checked_classes,checked_properties,checked_predefined_porperties,out_path)
 
-    build_worker.finished.connect(export_done )
-    build_worker.error.connect(lambda: stop_waiting_widget(waiting_worker))
+    def export_error(exc):
+        stop_waiting_widget(waiting_worker)
+        t = QCoreApplication.translate("IsoExport", "Export Error")
+        popups.create_info_popup(str(exc), t, t, parent=widget)
+
+    build_worker.finished.connect(export_done)
+    build_worker.error.connect(export_error)
 
     build_thread.start()
 

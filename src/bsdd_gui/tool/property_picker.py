@@ -140,7 +140,7 @@ class PropertyPicker(ActionTool, WidgetTool):
         return spec.prerequisites.purpose.guid, spec.prerequisites.information_delivery_milestone.guid
 
     @classmethod
-    def build_property_check_dict(
+    def get_checked_properties(
         cls,
         active_specifications: list[LoinSpecification],
         bsdd_dictionary: BsddDictionary,
@@ -176,6 +176,45 @@ class PropertyPicker(ActionTool, WidgetTool):
             if psets:
                 result[bsdd_class.Code] = psets
 
+        return result
+
+    @classmethod
+    def get_checked_predefined_properties(
+        cls,
+        active_specifications: list[LoinSpecification],
+        bsdd_dictionary: BsddDictionary,
+    ) -> dict[str, set[str]]:
+        """Return pset_name → set of property codes checked in at least one spec.
+
+        Aggregates across all added classes exactly like the pset tree view:
+        each unique (pset, property_code) pair appears once and is included
+        when ANY class that owns it has it checked in any active specification.
+        """
+        if bsdd_dictionary is None:
+            return {}
+
+        # (pset_name, prop_code) → True once confirmed checked
+        seen: dict[tuple[str, str], bool] = {}
+
+        for bsdd_class in bsdd_dictionary.Classes:
+            if not cls.is_class_added(bsdd_class):
+                continue
+            for cp in bsdd_class.ClassProperties:
+                key = (cp.PropertySet or "", cp.Code or "")
+                if seen.get(key):
+                    continue  # already confirmed checked — skip further lookups
+                for spec in active_specifications:
+                    p_guid, m_guid = cls._get_spec_key(spec)
+                    if cls.is_property_included(bsdd_class, cp, p_guid, m_guid):
+                        seen[key] = True
+                        break
+                else:
+                    seen.setdefault(key, False)
+
+        result: dict[str, set[str]] = {}
+        for (pset, code), checked in seen.items():
+            if checked:
+                result.setdefault(pset, set()).add(code)
         return result
 
     @classmethod

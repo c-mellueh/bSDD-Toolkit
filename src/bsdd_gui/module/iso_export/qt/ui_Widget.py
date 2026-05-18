@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -43,8 +43,8 @@ class Ui_Form(object):
         self.button_layout.addWidget(self.label)
 
         self.cb_format = QComboBox(Form)
-        self.cb_format.addItem("")
-        self.cb_format.addItem("")
+        self.cb_format.addItem("", u"iso_23386")
+        self.cb_format.addItem("", u"loin")
         self.cb_format.setObjectName(u"cb_format")
 
         self.button_layout.addWidget(self.cb_format)
@@ -160,8 +160,8 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.label.setText(QCoreApplication.translate("Form", u"Format:", None))
-        self.cb_format.setItemText(0, QCoreApplication.translate("Form", u"ISO 23386 XML", u"iso_23386"))
-        self.cb_format.setItemText(1, QCoreApplication.translate("Form", u"ISO 7817-3 XML (LOIN)", u"loin"))
+        self.cb_format.setItemText(0, QCoreApplication.translate("Form", u"ISO 23386 XML", None))
+        self.cb_format.setItemText(1, QCoreApplication.translate("Form", u"ISO 7817-3 XML (LOIN)", None))
 
         self.pb_create.setText(QCoreApplication.translate("Form", u"Create", None))
         self.label_3.setText(QCoreApplication.translate("Form", u"Export:", None))

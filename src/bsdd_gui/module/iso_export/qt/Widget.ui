@@ -30,12 +30,18 @@
       <widget class="QComboBox" name="cb_format">
        <item>
         <property name="text">
-         <string comment="iso_23386">ISO 23386 XML</string>
+         <string>ISO 23386 XML</string>
+        </property>
+        <property name="userData">
+         <string>iso_23386</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string comment="loin">ISO 7817-3 XML (LOIN)</string>
+         <string>ISO 7817-3 XML (LOIN)</string>
+        </property>
+        <property name="userData">
+         <string>loin</string>
         </property>
        </item>
       </widget>
