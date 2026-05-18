@@ -297,6 +297,7 @@ class Loin(ActionTool, WidgetTool):
         for p in cls.get_properties().purposes:
             if p.guid == purpose_guid:
                 p.names = [DtMultiLangText(language=language, text=name)]
+                cls._rename_specs_for(purpose_guid=purpose_guid)
                 cls.get_signals().purposes_changed.emit()
                 return
 
@@ -352,8 +353,30 @@ class Loin(ActionTool, WidgetTool):
         for m in cls.get_properties().milestones:
             if m.guid == milestone_guid:
                 m.names = [DtMultiLangText(language=language, text=name)]
+                cls._rename_specs_for(milestone_guid=milestone_guid)
                 cls.get_signals().milestones_changed.emit()
                 return
+
+    @classmethod
+    def _rename_specs_for(
+        cls,
+        purpose_guid: UUID | None = None,
+        milestone_guid: UUID | None = None,
+    ) -> None:
+        props = cls.get_properties()
+        for (p_guid, m_guid), spec in props.specs.items():
+            if purpose_guid is not None and p_guid != purpose_guid:
+                continue
+            if milestone_guid is not None and m_guid != milestone_guid:
+                continue
+            purpose = next((p for p in props.purposes if p.guid == p_guid), None)
+            milestone = next((m for m in props.milestones if m.guid == m_guid), None)
+            if purpose is None or milestone is None:
+                continue
+            spec.name = (
+                f"{cls.purpose_display_name(purpose)} – "
+                f"{cls.milestone_display_name(milestone)}"
+            )
 
     @classmethod
     def set_milestone_date(cls, milestone_guid: UUID, date: datetime | None) -> None:
@@ -948,18 +971,29 @@ class Loin(ActionTool, WidgetTool):
 
     @classmethod
     def export_to_xml(cls, out_path: str) -> int:
+        import copy
+        from bsdd_gui.module.loin.uc_ms import get_filter_window
+
         loin = cls.get_loin()
-        spec = loin.specifications[0]
-        spec.specifications_per_object_type
         if loin is None:
             raise ValueError(
                 "Cannot export an empty LOIN — add at least one Purpose, "
                 "Milestone and class selection first."
             )
+        loin = copy.deepcopy(loin)
+        checked = get_filter_window().checked_combinations()
+        loin.specifications = [
+            spec for spec in loin.specifications if cls._get_spec_key(spec) in checked
+        ]
+        if not loin.specifications:
+            raise ValueError(
+                "No specifications are checked in the filter window — "
+                "check at least one Purpose × Milestone cell before exporting."
+            )
         xml_bytes = loin.to_xml(
             encoding="UTF-8",
             xml_declaration=True,
-            exclude_none=False,
+            exclude_none=True,
             exclude_unset=True,
         )
         with open(out_path, "wb") as f:

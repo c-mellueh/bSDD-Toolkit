@@ -141,6 +141,10 @@ def import_from_xml(
     new_loin = LoinLevelOfInformationNeed.from_xml(xml_bytes)
     loin._adopt_loin(new_loin, project.get())
 
+    for view in (widget.tv_classes, widget.tv_properties, widget.tv_pset):
+        for col in range(view.model().columnCount()):
+            view.resizeColumnToContents(col)
+
 
 def reset(loin: type[tool.Loin]):
     loin.reset()

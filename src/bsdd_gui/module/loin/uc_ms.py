@@ -26,6 +26,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtGui import QFont, QPainter
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QApplication,
     QFormLayout,
     QGroupBox,
@@ -110,21 +111,36 @@ class _CenteredCheckDelegate(QStyledItemDelegate):
         if check is None:
             super().paint(painter, option, index)
             return
-        opts = QStyleOptionButton()
-        opts.state = QStyle.StateFlag.State_Enabled
-        if check == Qt.CheckState.Checked:
-            opts.state |= QStyle.StateFlag.State_On
-        elif check == Qt.CheckState.PartiallyChecked:
-            opts.state |= QStyle.StateFlag.State_NoChange
+        if hasattr(check, "value"):
+            state_value = check.value
         else:
-            opts.state |= QStyle.StateFlag.State_Off
+            try:
+                state_value = int(check)
+            except (TypeError, ValueError):
+                super().paint(painter, option, index)
+                return
+        if state_value == Qt.CheckState.Checked.value:
+            opts = QStyleOptionButton()
+            opts.state = QStyle.StateFlag.State_Enabled | QStyle.StateFlag.State_On
+        elif state_value == Qt.CheckState.PartiallyChecked.value:
+            opts = QStyleOptionButton()
+            opts.state = QStyle.StateFlag.State_Enabled | QStyle.StateFlag.State_NoChange
+        else:
+            opts = QStyleOptionButton()
+            opts.state = QStyle.StateFlag.State_Enabled | QStyle.StateFlag.State_Off
         indicator_size = (
             QApplication.style().subElementRect(QStyle.SubElement.SE_CheckBoxIndicator, opts).size()
         )
         x = option.rect.x() + (option.rect.width() - indicator_size.width()) // 2
         y = option.rect.y() + (option.rect.height() - indicator_size.height()) // 2
         opts.rect = QRect(x, y, indicator_size.width(), indicator_size.height())
-        QApplication.style().drawControl(QStyle.ControlElement.CE_CheckBox, opts, painter)
+        QApplication.style().drawPrimitive(
+            QStyle.PrimitiveElement.PE_IndicatorCheckBox, opts, painter
+        )
+
+    # When True, multi-toggle is restricted to the clicked column (tree views).
+    # When False, every selected cell toggles regardless of column (filter grid).
+    restrict_to_column = True
 
     def editorEvent(self, event, model, option, index) -> bool:
         if index.data(Qt.ItemDataRole.CheckStateRole) is None:
@@ -134,10 +150,11 @@ class _CenteredCheckDelegate(QStyledItemDelegate):
             and event.button() == Qt.MouseButton.LeftButton
         ):
             current = index.data(Qt.ItemDataRole.CheckStateRole)
+            current_value = current.value if hasattr(current, "value") else int(current)
             new_state = (
-                Qt.CheckState.Unchecked
-                if current == Qt.CheckState.Checked
-                else Qt.CheckState.Checked
+                Qt.CheckState.Unchecked.value
+                if current_value == Qt.CheckState.Checked.value
+                else Qt.CheckState.Checked.value
             )
             col = index.column()
             targets = {index}
@@ -146,12 +163,19 @@ class _CenteredCheckDelegate(QStyledItemDelegate):
                 sel = view.selectionModel()
                 if sel.isSelected(index):
                     for sel_idx in sel.selectedIndexes():
-                        if sel_idx.column() == col:
-                            targets.add(sel_idx)
+                        if self.restrict_to_column and sel_idx.column() != col:
+                            continue
+                        targets.add(sel_idx)
             for target in targets:
                 model.setData(target, new_state, Qt.ItemDataRole.CheckStateRole)
             return True
         return False
+
+
+class _FilterCheckDelegate(_CenteredCheckDelegate):
+    """Centered-checkbox delegate that toggles every selected cell, any column."""
+
+    restrict_to_column = False
 
 
 # Column proxy — adds UC × MS checkbox columns to any tree model
@@ -1199,6 +1223,20 @@ class FilterTableWindow(QWidget):
     def unregister_view(self, view: QTreeView) -> None:
         self._views = [v for v in self._views if v is not view]
 
+    def checked_combinations(self) -> set[tuple[UUID, UUID]]:
+        """Return (purpose_guid, milestone_guid) pairs checked in the filter table."""
+        purposes = _current_purposes()
+        milestones = _current_milestones()
+        result: set[tuple[UUID, UUID]] = set()
+        if self._filter_table is None:
+            return result
+        for p_idx, purpose in enumerate(purposes):
+            for m_idx, milestone in enumerate(milestones):
+                item = self._filter_table.item(p_idx, m_idx)
+                if item is not None and item.checkState() == Qt.CheckState.Checked:
+                    result.add((purpose.guid, milestone.guid))
+        return result
+
     def toggle_combination(self, purpose_guid: UUID, milestone_guid: UUID) -> None:
         """Toggle visibility of the given purpose × milestone column on all views."""
         purposes = _current_purposes()
@@ -1227,11 +1265,18 @@ class FilterTableWindow(QWidget):
         table.setVerticalHeaderLabels([tool.Loin.purpose_display_name(p) for p in purposes])
         table.setHorizontalHeaderLabels([tool.Loin.milestone_display_name(m) for m in milestones])
         table.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        table.setItemDelegate(_FilterCheckDelegate(table))
+        table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectItems)
 
         for ui_idx in range(len(purposes)):
             for mi in range(len(milestones)):
                 item = QTableWidgetItem()
-                item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                item.setFlags(
+                    Qt.ItemFlag.ItemIsUserCheckable
+                    | Qt.ItemFlag.ItemIsEnabled
+                    | Qt.ItemFlag.ItemIsSelectable
+                )
                 item.setCheckState(Qt.CheckState.Checked)
                 table.setItem(ui_idx, mi, item)
 

@@ -667,6 +667,13 @@ class LoinInformationDeliveryMilestone(BaseXmlModel, tag="InformationDeliveryMil
     descriptions: List[DtMultiLangText] = element(tag="Description", default_factory=list)
     reference_documents: List[DtRef] = element(tag="ReferenceDocument", default_factory=list)
 
+    @field_validator("date", mode="before")
+    @classmethod
+    def _empty_date_to_none(cls, v):
+        if isinstance(v, str) and v.strip() == "":
+            return None
+        return v
+
 
 class LoinPrerequisites(BaseXmlModel, tag="Prerequisites"):
     """loin:PrerequisitesType — purpose + milestone + two actors."""
