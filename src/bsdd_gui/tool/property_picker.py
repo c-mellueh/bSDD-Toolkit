@@ -51,7 +51,7 @@ if TYPE_CHECKING:
         PropertyCode,
     )
 
-
+from bsdd_gui import tool
 
 
 def _now() -> datetime:
@@ -319,7 +319,7 @@ class PropertyPicker(ActionTool, WidgetTool):
         cls,
         name: str,
         language: str = "en",
-        date: Optional[datetime] = None,
+        date: datetime|None = None,
     ) -> LoinInformationDeliveryMilestone:
         milestone = LoinInformationDeliveryMilestone(
             guid=uuid4(),
@@ -358,7 +358,7 @@ class PropertyPicker(ActionTool, WidgetTool):
                 return
 
     @classmethod
-    def set_milestone_date(cls, milestone_guid: UUID, date: Optional[datetime]) -> None:
+    def set_milestone_date(cls, milestone_guid: UUID, date: datetime|None) -> None:
         for m in cls.get_properties().milestones:
             if m.guid == milestone_guid:
                 m.date = date
@@ -442,11 +442,11 @@ class PropertyPicker(ActionTool, WidgetTool):
     # ------------------------------------------------------------------ actors
 
     @classmethod
-    def get_providing_actor(cls) -> Optional[LoinActor]:
+    def get_providing_actor(cls) -> LoinActor|None:
         return cls.get_properties().providing_actor
 
     @classmethod
-    def get_receiving_actor(cls) -> Optional[LoinActor]:
+    def get_receiving_actor(cls) -> LoinActor|None:
         return cls.get_properties().receiving_actor
 
     @classmethod
@@ -454,11 +454,11 @@ class PropertyPicker(ActionTool, WidgetTool):
         cls,
         role: str,
         language: str = "en",
-        first_name: Optional[str] = None,
-        middle_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        affiliation: Optional[str] = None,
-        email_address: Optional[str] = None,
+        first_name: str|None = None,
+        middle_name: str|None = None,
+        last_name: str|None = None,
+        affiliation: str|None = None,
+        email_address: str|None = None,
     ) -> LoinActor:
         actor = LoinActor(
             guid=uuid4(),
@@ -479,11 +479,11 @@ class PropertyPicker(ActionTool, WidgetTool):
         cls,
         role: str,
         language: str = "en",
-        first_name: Optional[str] = None,
-        middle_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        affiliation: Optional[str] = None,
-        email_address: Optional[str] = None,
+        first_name: str|None = None,
+        middle_name: str|None = None,
+        last_name: str|None = None,
+        affiliation: str|None = None,
+        email_address: str|None = None,
     ) -> LoinActor:
         actor = LoinActor(
             guid=uuid4(),
@@ -734,16 +734,17 @@ class PropertyPicker(ActionTool, WidgetTool):
             spec = cls.get_or_create_spec(purpose_guid, milestone_guid)
             spec_per_obj = cls._find_spec_per_object_type(spec, bsdd_class)
             if spec_per_obj is not None:
-                cls._add_property_to_spec_per_obj(spec_per_obj, bsdd_property)
+                cls._add_property_to_spec_per_obj(spec_per_obj, bsdd_class, bsdd_property)
         else:
             if prop_key not in bucket:
                 return
             bucket.discard(prop_key)
+            remaining_in_pset = any(k[0] == bsdd_property.PropertySet for k in bucket)
             spec = props.specs.get(key)
             if spec is not None:
                 spec_per_obj = cls._find_spec_per_object_type(spec, bsdd_class)
                 if spec_per_obj is not None:
-                    cls._remove_property_from_spec_per_obj(spec_per_obj, bsdd_property)
+                    cls._remove_property_from_spec_per_obj(spec_per_obj, bsdd_class, bsdd_property, remaining_in_pset)
 
     @classmethod
     def set_pset_included(
@@ -799,7 +800,7 @@ class PropertyPicker(ActionTool, WidgetTool):
     @classmethod
     def _find_spec_per_object_type(
         cls, spec: LoinSpecification, bsdd_class: "BsddClass"
-    ) -> Optional[LoinSpecificationPerObjectType]:
+    ) -> LoinSpecificationPerObjectType|None:
         for s in spec.specifications_per_object_type:
             if s.__dict__.get("_bsdd_class_code") == bsdd_class.Code:
                 return s
@@ -809,23 +810,35 @@ class PropertyPicker(ActionTool, WidgetTool):
     def _add_property_to_spec_per_obj(
         cls,
         spec_per_obj: LoinSpecificationPerObjectType,
+        bsdd_class: "BsddClass",
         bsdd_property: "BsddClassProperty",
     ) -> None:
         alpha = spec_per_obj.alphanumerical_information
         if alpha is None:
             alpha = LoinAlphanumericalInformation(
                 guid=uuid4(),
-                groups_of_properties=LoinGroupsOfProperties(group_of_properties=[]),
+                groups_of_properties=LoinGroupsOfProperties(group_of_properties=[], group_of_properties_refs=[]),
             )
             spec_per_obj.alphanumerical_information = alpha
         if alpha.groups_of_properties is None:
-            alpha.groups_of_properties = LoinGroupsOfProperties(group_of_properties=[])
-
-        # Build the property ref first so we can create the group with it
-        # (IsoGroupOfProperties.has_property_refs has min_length=1).
-        ref = cls._property_ref(bsdd_property)
+            alpha.groups_of_properties = LoinGroupsOfProperties(group_of_properties=[], group_of_properties_refs=[])
 
         pset = bsdd_property.PropertySet
+        bsdd_dictionary = tool.Project.get()
+        external_group = (
+            class_utils.get_related_pset(bsdd_class, bsdd_dictionary, pset)
+            if bsdd_dictionary is not None
+            else None
+        )
+
+        if external_group is not None:
+            uri = external_group.OwnedUri or class_utils.build_bsdd_uri(external_group, bsdd_dictionary)
+            if uri and not any(r.reference_uri == uri for r in alpha.groups_of_properties.group_of_properties_refs):
+                alpha.groups_of_properties.group_of_properties_refs.append(DtRef(reference_uri=uri))
+            return
+
+        # No external group — inline GroupOfProperties with HasPropertyRef.
+        ref = cls._property_ref(bsdd_property)
         group = cls._find_group_for_pset(alpha.groups_of_properties, pset)
         if group is None:
             group = IsoGroupOfProperties(
@@ -853,12 +866,31 @@ class PropertyPicker(ActionTool, WidgetTool):
     def _remove_property_from_spec_per_obj(
         cls,
         spec_per_obj: LoinSpecificationPerObjectType,
+        bsdd_class: "BsddClass",
         bsdd_property: "BsddClassProperty",
+        remaining_in_pset: bool,
     ) -> None:
         alpha = spec_per_obj.alphanumerical_information
         if alpha is None or alpha.groups_of_properties is None:
             return
         pset = bsdd_property.PropertySet
+        bsdd_dictionary = tool.Project.get()
+        external_group = (
+            class_utils.get_related_pset(bsdd_class, bsdd_dictionary, pset)
+            if bsdd_dictionary is not None
+            else None
+        )
+
+        if external_group is not None:
+            if not remaining_in_pset:
+                uri = external_group.OwnedUri or class_utils.build_bsdd_uri(external_group, bsdd_dictionary)
+                if uri:
+                    alpha.groups_of_properties.group_of_properties_refs = [
+                        r for r in alpha.groups_of_properties.group_of_properties_refs
+                        if r.reference_uri != uri
+                    ]
+            return
+
         group = cls._find_group_for_pset(alpha.groups_of_properties, pset)
         if group is None:
             return
@@ -881,7 +913,7 @@ class PropertyPicker(ActionTool, WidgetTool):
         cls,
         groups: LoinGroupsOfProperties,
         pset: str,
-    ) -> Optional[IsoGroupOfProperties]:
+    ) -> IsoGroupOfProperties|None:
         for g in groups.group_of_properties:
             if g.__dict__.get("_pset") == pset:
                 return g
@@ -941,7 +973,7 @@ class PropertyPicker(ActionTool, WidgetTool):
         pset: str,
         uri: str,
         bsdd_dictionary: "BsddDictionary",
-    ) -> Optional[str]:
+    ) -> str|None:
         """Return the BsddClassProperty.Code whose URI matches *uri*.
 
         Uses get_property_by_uri so version segments in the URI are ignored.
@@ -1007,6 +1039,7 @@ class PropertyPicker(ActionTool, WidgetTool):
                     s.alphanumerical_information
                     and s.alphanumerical_information.groups_of_properties
                 ):
+                    bsdd_class = existing_classes.get(code)
                     for g in s.alphanumerical_information.groups_of_properties.group_of_properties:
                         pset = g.__dict__.get("_pset")
                         if pset is None and g.names:
@@ -1014,7 +1047,6 @@ class PropertyPicker(ActionTool, WidgetTool):
                             g.__dict__["_pset"] = pset
                         if not pset:
                             continue
-                        bsdd_class = existing_classes.get(code)
                         for ref in g.has_property_refs:
                             uri = ref.reference_uri or (str(ref.guid) if ref.guid else None)
                             if uri is None:
@@ -1024,6 +1056,17 @@ class PropertyPicker(ActionTool, WidgetTool):
                             ) if bsdd_class else None
                             if prop_code:
                                 prop_buckets.setdefault(code, set()).add((pset, prop_code))
+                    for ref in s.alphanumerical_information.groups_of_properties.group_of_properties_refs:
+                        uri = ref.reference_uri or (str(ref.guid) if ref.guid else None)
+                        if uri is None:
+                            continue
+                        group_class = class_utils.get_class_by_uri(bsdd_dictionary, uri)
+                        if group_class is None or bsdd_class is None:
+                            continue
+                        pset_name = group_class.Name
+                        for cp in bsdd_class.ClassProperties:
+                            if cp.PropertySet == pset_name:
+                                prop_buckets.setdefault(code, set()).add((pset_name, cp.Code))
 
             added_classes = set(class_codes)
             # also add the Parent classes so they also get shown

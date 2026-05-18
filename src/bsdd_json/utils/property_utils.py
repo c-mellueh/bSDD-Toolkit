@@ -67,8 +67,8 @@ class Cache:
         cls.data = dict()
 
 
-def get_data_type(class_property: BsddClassProperty,bsdd_dictionary:BsddDictionary = None):
-    prop = get_property_by_class_property(class_property,bsdd_dictionary)
+def get_data_type(class_property: BsddClassProperty, bsdd_dictionary: BsddDictionary = None):
+    prop = get_property_by_class_property(class_property, bsdd_dictionary)
 
     if not prop:
         return None
@@ -384,3 +384,8 @@ def get_definition(bsdd_class_property: BsddClassProperty, bsdd_dictionary: Bsdd
     if bsdd_property.Description:
         return bsdd_property.Description
     return bsdd_property.Definition or ""
+
+
+def is_referencing_external_property(class_property: BsddClassProperty, bsdd_dictionary: BsddDictionary) -> bool:
+    return bool(class_property.PropertyUri and
+                dict_utils.is_external_ref(class_property.PropertyUri, bsdd_dictionary))
