@@ -23,12 +23,14 @@ def connect_signals(
     scene_view: Type[gv_tool.SceneView],
     settings: Type[gv_tool.Settings],
     physics: Type[gv_tool.Physics],
-    html_export:type[gv_tool.HTMLExport]
+    html_export: type[gv_tool.HTMLExport],
 ):
     window.signals.widget_created.connect(lambda w: handle_widget_creation(w, scene_view))
     window.signals.delete_selection_requested.connect(scene_view.request_delete_selection)
     scene_view.connect_internal_signals()
-    settings.signals.widget_created.connect(lambda sw: add_settings(scene_view, settings,html_export))
+    settings.signals.widget_created.connect(
+        lambda sw: add_settings(scene_view, settings, html_export)
+    )
     physics.signals.is_running_changed.connect(scene_view.request_retranslate)
 
 
@@ -37,7 +39,11 @@ def disconnect_signals(scene_view: Type[gv_tool.SceneView]):
     scene_view.disconnect_external_signals()
 
 
-def add_settings(scene_view: Type[gv_tool.SceneView], settings: Type[gv_tool.Settings],html_export:Type[gv_tool.HTMLExport]):
+def add_settings(
+    scene_view: Type[gv_tool.SceneView],
+    settings: Type[gv_tool.Settings],
+    html_export: Type[gv_tool.HTMLExport],
+):
     widget = scene_view.create_button_widget()
     scene_view.connect_button_settings()
     settings.add_content_widget(widget)
@@ -134,7 +140,7 @@ def mouse_press_event(
     view = scene_view.get_view()
     try:
         pos_view = scene_view._event_qpoint(event)
-        pos_scene = view.mapToScene(pos_view)
+        view.mapToScene(pos_view)
     except Exception:
         pass
 
@@ -254,8 +260,8 @@ def drop_event(
     scene_pos = scene_view.get_position_from_event(event)
     bsdd_dictionary = project.get()
 
-    classes_to_add: list[BsddClass] = list()
-    properties_to_add = list()
+    classes_to_add: list[BsddClass] = []
+    properties_to_add = []
     if mime_type == constants.CLASS_DRAG:
         payload = class_tree.get_payload_from_data(mime_data)
         classes_to_add += scene_view.read_classes_to_add(payload, bsdd_dictionary)

@@ -8,12 +8,11 @@ from bsdd_gui.presets.ui_presets import FieldWidget, BaseDialog, BaseWindow
 import logging
 
 
-
 class BaseSignals(QObject):
     pass
 
-class PluginSignals(BaseSignals):
 
+class PluginSignals(BaseSignals):
     def get_signals(self) -> dict[str, Signal]:
         return {name: obj for name, obj in self.__dict__.items() if isinstance(obj, Signal)}
 

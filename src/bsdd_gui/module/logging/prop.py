@@ -12,6 +12,6 @@ class LoggingProperties:
     log_format = "%(asctime)s | %(levelname)6s | %(module_func)50s [%(lineno)04d] |  %(message)s"
     log_level = None
     custom_formatter = None
-    ignore_texts = list()
+    ignore_texts = []
     signals: Signals = None
     settings_widget: ui.SettingsWidget = None

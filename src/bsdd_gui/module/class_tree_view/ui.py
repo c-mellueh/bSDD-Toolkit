@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 
 
 class ClassView(TreeItemView):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.run_created()

@@ -34,7 +34,7 @@ def disconnect_signals(settings: Type[gv_tool.Settings]):
 
 
 def create_widget(settings: Type[gv_tool.Settings]):
-    widget = settings.create_widget()
+    settings.create_widget()
 
 
 def register_widget(

@@ -4,6 +4,7 @@ Tests for the Plugins module (tool/plugins.py).
 Covers the helpers that inspect the bsdd_gui.plugins package structure.
 These tests do not activate or deactivate any plugin.
 """
+
 from __future__ import annotations
 
 from bsdd_gui.tool import Plugins

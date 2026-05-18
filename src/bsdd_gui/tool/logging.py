@@ -81,7 +81,9 @@ class Logging:
         icon, level = (
             states[0]
             if level_no < logging.WARNING
-            else states[1] if level_no < logging.ERROR else states[2]
+            else states[1]
+            if level_no < logging.ERROR
+            else states[2]
         )
         msg_box.setIcon(icon)
         cb = QCheckBox("nicht erneut anzeigen")

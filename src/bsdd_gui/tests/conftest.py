@@ -6,6 +6,7 @@ tool classes define Qt signals as class-level attributes (QObject subclasses).
 We create the application at module-import time so it is present when pytest
 collects the test files.
 """
+
 from __future__ import annotations
 
 import os

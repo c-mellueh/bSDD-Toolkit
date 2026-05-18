@@ -12,7 +12,6 @@ if TYPE_CHECKING:
     from bsdd_gui import tool
 
 
-
 if TYPE_CHECKING:
     from bsdd_gui import tool
 

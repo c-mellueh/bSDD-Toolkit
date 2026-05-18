@@ -27,7 +27,7 @@ def disconnect_signals(physics: Type[gv_tool.Physics]):
 
 
 def build_phyiscs(phyiscs: Type[gv_tool.Physics]):
-    ph = phyiscs.create_physics()
+    phyiscs.create_physics()
     timer = phyiscs.create_timer()
     phyiscs.set_running(True)
     timer.start()

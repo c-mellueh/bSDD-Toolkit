@@ -5,6 +5,7 @@ Covers the pure-Python helpers on AiHelper, AiClassDescription, and
 AiPropertyDescription that do not require a live OpenAI connection.
 The generate_class_definition method is tested with a mocked client.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock
@@ -17,6 +18,7 @@ from bsdd_gui.tool.ai_helper import AiClassDescription, AiPropertyDescription
 # ---------------------------------------------------------------------------
 # AiHelper
 # ---------------------------------------------------------------------------
+
 
 class TestAiHelper:
     def test_get_model_returns_string(self):
@@ -35,6 +37,7 @@ class TestAiHelper:
 # ---------------------------------------------------------------------------
 # AiClassDescription — build_class_instructions
 # ---------------------------------------------------------------------------
+
 
 class TestAiClassDescriptionBuildInstructions:
     def test_english_returns_non_empty_string(self):
@@ -62,6 +65,7 @@ class TestAiClassDescriptionBuildInstructions:
 # AiClassDescription — build_user_input
 # ---------------------------------------------------------------------------
 
+
 class TestAiClassDescriptionBuildUserInput:
     def test_json_text_appears_in_output(self):
         json_text = '{"Code": "Wall"}'
@@ -78,11 +82,10 @@ class TestAiClassDescriptionBuildUserInput:
 # AiClassDescription — generate_class_definition
 # ---------------------------------------------------------------------------
 
+
 class TestAiClassDescriptionGenerate:
     def test_no_api_key_returns_none(self):
-        result = AiClassDescription.generate_class_definition(
-            '{"Code": "Wall"}', api_key=None
-        )
+        result = AiClassDescription.generate_class_definition('{"Code": "Wall"}', api_key=None)
         assert result is None
 
     def test_returns_text_from_mock_client(self):
@@ -133,6 +136,7 @@ class TestAiClassDescriptionGenerate:
 # ---------------------------------------------------------------------------
 # AiPropertyDescription — build_class_instructions
 # ---------------------------------------------------------------------------
+
 
 class TestAiPropertyDescriptionBuildInstructions:
     def test_english_returns_non_empty_string(self):

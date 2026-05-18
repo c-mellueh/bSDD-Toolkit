@@ -14,7 +14,7 @@ class MenuDict(TypedDict):
 
 
 class UtilProperties:
-    shortcuts = list()
+    shortcuts = []
     waiting_worker = None
     waiting_thread = None
     waiting_widget = None

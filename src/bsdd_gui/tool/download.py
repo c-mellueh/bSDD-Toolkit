@@ -195,8 +195,8 @@ class Download(FieldTool, ActionTool):
     @classmethod
     def reset(cls, widget: ui.DownloadWidget):
         cls.set_widget_run_mode(widget, False)
-        cls.get_properties().workers = list()
-        cls.get_properties().threads = list()
+        cls.get_properties().workers = []
+        cls.get_properties().threads = []
         cls.get_properties().done_count = 0
 
     @classmethod
@@ -223,7 +223,7 @@ class Worker(QObject):
     def __init__(self, client):
         super().__init__()
         self._cancel = False
-        self.result = list()
+        self.result = []
         self.client = client
 
     @Slot()
@@ -232,7 +232,6 @@ class Worker(QObject):
 
 
 class ClassWorker(Worker):
-
     def __init__(
         self,
         bsdd_dictionary: BsddDictionary,
@@ -247,7 +246,7 @@ class ClassWorker(Worker):
     def run(self):
         try:
             self._cancel = False
-            classes_info = list()
+            classes_info = []
             class_count = 0
             total_count = None
             while total_count is None or class_count < total_count:
@@ -275,7 +274,7 @@ class ClassWorker(Worker):
                 self.result.append(bsdd_class)
                 pct = int((index + 1) / total * 100)
                 self.progress.emit(pct)
-                self.status.emit(f"Processed Classes: {index+1}/{total}")
+                self.status.emit(f"Processed Classes: {index + 1}/{total}")
             time.sleep(0.1)
         except Exception as e:
             self.error.emit(str(e))
@@ -284,7 +283,6 @@ class ClassWorker(Worker):
 
 
 class PropertyWorker(Worker):
-
     def __init__(self, dictionary_uri: str, client: Client):
         super().__init__(client)
         self.client = client
@@ -294,7 +292,7 @@ class PropertyWorker(Worker):
     def run(self):
         try:
             self._cancel = False
-            property_info = list()
+            property_info = []
             property_count = 0
             total_count = None
             while total_count is None or property_count < total_count:
@@ -322,7 +320,7 @@ class PropertyWorker(Worker):
                 self.result.append(bsdd_property)
                 pct = int((index + 1) / total * 100)
                 self.progress.emit(pct)
-                self.status.emit(f"Processed Properties: {index+1}/{total}")
+                self.status.emit(f"Processed Properties: {index + 1}/{total}")
             time.sleep(0.1)
         except Exception as e:
             self.error.emit(str(e))

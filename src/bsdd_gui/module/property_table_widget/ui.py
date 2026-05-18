@@ -8,7 +8,6 @@ from bsdd_gui.presets.ui_presets import FieldWidget
 
 
 class PropertyWidget(FieldWidget, Ui_Form):
-
     def __init__(self, *args, **kwargs):
         super().__init__(None, *args, **kwargs)
         self.setWindowIcon(get_icon())

@@ -5,11 +5,27 @@ import json
 import logging
 import weakref
 from datetime import datetime
+from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError, model_validator
 
-from .type_hints import *
+from .type_hints import (
+    CLASS_RELATION_TYPE,
+    CLASS_STATUS,
+    CLASS_TYPE,
+    COUNTRY_CODE,
+    DATATYPE_TYPE,
+    DOCUMENT_TYPE,
+    LANGUAGE_ISO_CODE,
+    PROPERTY_RELATION_TYPE,
+    PROPERTY_STATUS,
+    PROPERTY_VALUE_KIND_TYPE,
+    STATUS,
+    UNITS_TYPE,
+)
+
+logger = logging.getLogger(__name__)
 
 
 def _lower_first(s: str) -> str:
@@ -38,6 +54,7 @@ def _prune_error_path(data, loc):
             target = target.get(key)
             if target is None:
                 return
+
 
 class CaseInsensitiveModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True, alias_generator=_lower_first)
@@ -68,7 +85,7 @@ class BsddDictionary(CaseInsensitiveModel):
     def load(cls, path: str, *, sloppy: bool = False) -> BsddDictionary:
         if not path:
             return None
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             raw = json.load(f)
         if not sloppy:
             return cls.model_validate(raw)
@@ -93,10 +110,10 @@ class BsddDictionary(CaseInsensitiveModel):
                 except ValidationError as new_exc:
                     errors = new_exc.errors()
                     if not progress:
-                        raise new_exc
+                        raise
 
     def save(self, path):
-        with open(path, "w") as file:
+        with Path(path).open("w") as file:
             json.dump(self.model_dump(mode="json", exclude_none=True), file)
 
     # add Parent to children after loading
@@ -158,12 +175,12 @@ class BsddClass(CaseInsensitiveModel):
         from bsdd_json.utils import class_utils as cl_utils
 
         if not code.strip():
-            logging.info("Empty Code is not allowed")
+            logger.info("Empty Code is not allowed")
             raise ValueError("Empty Code is not allowed")
 
         parent = self._parent_ref() if self._parent_ref else None
         if parent is not None and code in cl_utils.get_all_class_codes(parent):
-            logging.info(f"Code '{code}' exists already")
+            logger.info("Code '%s' exists already", code)
             raise ValueError(f"Code '{code}' exists already")
 
         # propagate to children
@@ -226,19 +243,10 @@ class BsddClassProperty(CaseInsensitiveModel):
 
     @model_validator(mode="after")
     def _validate_property_code_or_uri(self):
-        """Only one of PropertyCode or PropertyUri must be set (XOR)
-        """
+        """Only one of PropertyCode or PropertyUri must be set (XOR)"""
         # normalize whitespace
-        code = (
-            self.PropertyCode.strip()
-            if self.PropertyCode and isinstance(self.PropertyCode, str)
-            else None
-        )
-        uri = (
-            self.PropertyUri.strip()
-            if self.PropertyUri and isinstance(self.PropertyUri, str)
-            else None
-        )
+        code = self.PropertyCode.strip() if self.PropertyCode and isinstance(self.PropertyCode, str) else None
+        uri = self.PropertyUri.strip() if self.PropertyUri and isinstance(self.PropertyUri, str) else None
 
         # XOR: exactly one must be provided
         if bool(code) == bool(uri):
@@ -326,4 +334,3 @@ class BsddPropertyRelation(CaseInsensitiveModel):
 
     def parent(self) -> BsddProperty | None:
         return self._parent_ref() if self._parent_ref is not None else None
-

@@ -92,7 +92,7 @@ def refresh_status_bar(main_window: Type[tool.MainWindowWidget], project: Type[t
     :return:
     """
     bsdd_dictionary = project.get()
-    version = f'{QCoreApplication.translate("MainWindow", "Version")}: {bsdd_dictionary.DictionaryVersion}'
+    version = f"{QCoreApplication.translate('MainWindow', 'Version')}: {bsdd_dictionary.DictionaryVersion}"
     status = " | ".join(
         [
             bsdd_dictionary.OrganizationCode or "",

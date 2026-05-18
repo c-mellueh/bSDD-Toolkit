@@ -18,7 +18,11 @@ def load_class(
     client: bsdd.Client | None = None,
 ):
     result = _load_class_json(
-        class_uri, bsdd_dictionary, include_properties, include_relations, client,
+        class_uri,
+        bsdd_dictionary,
+        include_properties,
+        include_relations,
+        client,
     )
     if not result:
         return None
@@ -81,13 +85,13 @@ def _load_class_json(
             result[key] = None
 
     # Remove IfcReferences that are handled by RelatedIfcEntityNamesList
-    filtered_class_relations = list()
+    filtered_class_relations = []
     for class_relation in list(result.get("classRelations", [])):
         cr_uri = class_relation.get("relatedClassUri")
         if not dict_utils.is_ifc_reference(cr_uri):
             filtered_class_relations.append(class_relation)
             continue
-        if not class_relation["relationType"] == "HasReference":
+        if class_relation["relationType"] != "HasReference":
             filtered_class_relations.append(class_relation)
             continue
         ifc_code = get_code_by_uri(cr_uri)
@@ -117,21 +121,27 @@ class Cache:
             return cls.data[class_uri]
 
         result = load_class(
-            class_uri, bsdd_dictionary, include_properties, include_relations, client,
+            class_uri,
+            bsdd_dictionary,
+            include_properties,
+            include_relations,
+            client,
         )
         cls.data[class_uri] = result
         return cls.data[class_uri]
 
     @classmethod
     def flush_data(cls):
-        cls.data = dict()
+        cls.data = {}
 
-def get_root_parent(bsdd_class:BsddClass,bsdd_dictionary:BsddDictionary):
+
+def get_root_parent(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
     parent = bsdd_class
     while parent:
         last_parent = parent
-        parent = get_parent(parent,bsdd_dictionary)
+        parent = get_parent(parent, bsdd_dictionary)
     return last_parent
+
 
 def get_root_classes(bsdd_dictionary: BsddDictionary):
     if bsdd_dictionary is None:
@@ -139,7 +149,7 @@ def get_root_classes(bsdd_dictionary: BsddDictionary):
     return [c for c in bsdd_dictionary.Classes if not c.ParentClassCode]
 
 
-def get_children(bsdd_class: BsddClass,bsdd_dictionary:BsddDictionary =None):
+def get_children(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary = None):
     if not bsdd_dictionary:
         bsdd_dictionary = get_dictionary_from_class(bsdd_class)
     if bsdd_dictionary is None:
@@ -163,7 +173,9 @@ def get_dictionary_from_class(bsdd_class: BsddClass):
 
 
 def get_parent(
-    bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary = None,class_dict: dict[str, BsddClass] | None = None,
+    bsdd_class: BsddClass,
+    bsdd_dictionary: BsddDictionary = None,
+    class_dict: dict[str, BsddClass] | None = None,
 ) -> BsddClass | None:
     if bsdd_class is None:
         return None
@@ -171,10 +183,10 @@ def get_parent(
         bsdd_dictionary = get_dictionary_from_class(bsdd_class)
     if bsdd_class.ParentClassCode is None:
         return None
-    return get_class_by_code(bsdd_dictionary, bsdd_class.ParentClassCode,class_dict)
+    return get_class_by_code(bsdd_dictionary, bsdd_class.ParentClassCode, class_dict)
 
 
-def get_class_by_code(bsdd_dictionary: BsddDictionary, code: str,class_dict: dict[str, BsddClass] | None = None) -> BsddClass | None:
+def get_class_by_code(bsdd_dictionary: BsddDictionary, code: str, class_dict: dict[str, BsddClass] | None = None) -> BsddClass | None:
     if class_dict is not None:
         return class_dict.get(code)
     return get_all_class_codes(bsdd_dictionary).get(code)
@@ -263,18 +275,21 @@ def shared_parent(
     # Choose highest (min depth) or lowest (max depth) among the shared set
     if mode == "highest":
         code, _ = min(
-            ((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1],
+            ((code, depth_by_code[code]) for code in shared_codes),
+            key=lambda x: x[1],
         )
     else:  # "lowest"
         code, _ = max(
-            ((code, depth_by_code[code]) for code in shared_codes), key=lambda x: x[1],
+            ((code, depth_by_code[code]) for code in shared_codes),
+            key=lambda x: x[1],
         )
 
     return get_class_by_code(dictionary, code)
 
 
 def update_internal_relations_to_new_version(
-    bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary,
+    bsdd_class: BsddClass,
+    bsdd_dictionary: BsddDictionary,
 ):
     """If the Version of the given dictionary has changed, update all internal
     class relations of the given class to point to the new version URIs.
@@ -308,18 +323,13 @@ def build_bsdd_uri(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):
 
 
 def get_class_relation(
-    start_class: BsddClass, end_class: BsddClass, relation_type: str,
+    start_class: BsddClass,
+    end_class: BsddClass,
+    relation_type: str,
 ) -> BsddClassRelation | None:
-    end_uri = (
-        end_class.OwnedUri
-        if not end_class.parent()
-        else build_bsdd_uri(end_class, end_class._parent_ref())
-    )
+    end_uri = end_class.OwnedUri if not end_class.parent() else build_bsdd_uri(end_class, end_class._parent_ref())
     for relation in start_class.ClassRelations:
-        if (
-            relation.RelatedClassUri == end_uri
-            and relation.RelationType == relation_type
-        ):
+        if relation.RelatedClassUri == end_uri and relation.RelationType == relation_type:
             return relation
     return None
 
@@ -338,9 +348,7 @@ def is_external_ref(uri: str, bsdd_dictionary: BsddDictionary) -> bool:
     from .dictionary_utils import bsdd_dictionary_url, get_dictionary_path_from_uri
 
     dict_path = get_dictionary_path_from_uri(uri)
-    if dict_path == bsdd_dictionary_url(bsdd_dictionary):
-        return False
-    return True
+    return dict_path != bsdd_dictionary_url(bsdd_dictionary)
 
 
 def is_ifc_reference(bsdd_class: BsddClass) -> bool:
@@ -352,11 +360,9 @@ def is_ifc_reference(bsdd_class: BsddClass) -> bool:
 def get_code_by_uri(uri: str):
     parsed_url = dict_utils.parse_bsdd_url(uri)
     resouce_type = parsed_url.get("resource_type")
-    if not resouce_type == "class":
+    if resouce_type != "class":
         return None
-
-    resource_id = parsed_url.get("resource_id")
-    return resource_id
+    return parsed_url.get("resource_id")
 
 
 def build_dummy_class(class_uri: str) -> BsddClass:
@@ -369,31 +375,35 @@ def build_dummy_class(class_uri: str) -> BsddClass:
 
 
 def get_class_property_by_name(
-    bsdd_class: BsddClass, name: str, pset: str = None, bsdd_dict: BsddDictionary = None,
+    bsdd_class: BsddClass,
+    name: str,
+    pset: str | None = None,
+    bsdd_dict: BsddDictionary | None = None,
 ):
     from . import property_utils as prop_utils
 
-    bsdd_dict = bsdd_class.parent() if not bsdd_dict else bsdd_dict
+    bsdd_dict = bsdd_dict or bsdd_class.parent()
     for cp in bsdd_class.ClassProperties:
         property_name = prop_utils.get_name(cp, bsdd_dict)
-        if property_name == name:
-            if not pset or pset == cp.PropertySet:
-                return cp
+        if property_name == name and (not pset or pset == cp.PropertySet):
+            return cp
     return cp
 
 
 def is_pset_linked(
-    bsdd_class: BsddClass, pset_name: str, bsdd_dictionary: BsddDictionary,
+    bsdd_class: BsddClass,
+    pset_name: str,
+    bsdd_dictionary: BsddDictionary,
 ):
     related_psets = get_related_psets(bsdd_class, bsdd_dictionary)
     return pset_name in [c.Name for c in related_psets]
 
 
 def get_related_psets(
-    bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary,
+    bsdd_class: BsddClass,
+    bsdd_dictionary: BsddDictionary,
 ) -> list[BsddClass]:
-    """Get Psets of a normal BsddClass that are Referencing a BsddClass of Type GroupOfProperties
-    """
+    """Get Psets of a normal BsddClass that are Referencing a BsddClass of Type GroupOfProperties"""
     related_psets: list[BsddClass] = []
 
     for cr in bsdd_class.ClassRelations:
@@ -407,18 +417,21 @@ def get_related_psets(
             related_psets.append(related_class)
     return list({c.Code: c for c in related_psets}.values())
 
-def get_related_pset(bsdd_class:BsddClass,bsdd_dictionary:BsddDictionary,pset_name:str) -> BsddClass|None:
-    psets = get_related_psets(bsdd_class,bsdd_dictionary)
-    return {p.Name:p for p in psets}.get(pset_name)
+
+def get_related_pset(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary, pset_name: str) -> BsddClass | None:
+    psets = get_related_psets(bsdd_class, bsdd_dictionary)
+    return {p.Name: p for p in psets}.get(pset_name)
+
 
 def get_relating_pset_classes(
-    group_of_properties: BsddClass, bsdd_dictionary: BsddDictionary,
+    group_of_properties: BsddClass,
+    bsdd_dictionary: BsddDictionary,
 ) -> list[BsddClass]:
     uri = build_bsdd_uri(group_of_properties, bsdd_dictionary)
-    relating_classes: list[BsddClass] = list()
-    for bsdd_class in bsdd_dictionary.Classes:
-        for cr in bsdd_class.ClassRelations:
-            if cr.RelationType == "HasReference" and cr.RelatedClassUri == uri:
-                relating_classes.append(bsdd_class)
-
+    relating_classes = [
+        bsdd_class
+        for bsdd_class in bsdd_dictionary.Classes
+        for cr in bsdd_class.ClassRelations
+        if cr.RelationType == "HasReference" and cr.RelatedClassUri == uri
+    ]
     return list({c.Code: c for c in relating_classes}.values())

@@ -2,9 +2,19 @@ import sys
 from PySide6.QtCore import Qt, QAbstractItemModel, QModelIndex, QRect, QTimer
 from PySide6.QtGui import QPainter, QFont
 from PySide6.QtWidgets import (
-    QApplication, QTreeView, QWidget, QVBoxLayout,
-    QHeaderView, QStyleOptionButton, QStyle, QStyledItemDelegate,
-    QTableWidget, QTableWidgetItem, QSizePolicy, QMenu, QInputDialog,
+    QApplication,
+    QTreeView,
+    QWidget,
+    QVBoxLayout,
+    QHeaderView,
+    QStyleOptionButton,
+    QStyle,
+    QStyledItemDelegate,
+    QTableWidget,
+    QTableWidgetItem,
+    QSizePolicy,
+    QMenu,
+    QInputDialog,
 )
 
 USE_CASES: list[str] = ["UC 1", "UC 2", "UC 3"]
@@ -14,6 +24,7 @@ MILESTONES: list[str] = ["MSaaaaaaaaaaa 1", "MS 2", "MS 3", "MS 4"]
 # ---------------------------------------------------------------------------
 # Data
 # ---------------------------------------------------------------------------
+
 
 class TreeNode:
     def __init__(self, name: str, num_cols: int = 0, parent: "TreeNode | None" = None):
@@ -51,6 +62,7 @@ def build_sample_data(num_cols: int) -> TreeNode:
 # ---------------------------------------------------------------------------
 # Model
 # ---------------------------------------------------------------------------
+
 
 class CheckboxTreeModel(QAbstractItemModel):
     def __init__(
@@ -185,6 +197,7 @@ class CheckboxTreeModel(QAbstractItemModel):
 # Header view (two rows)
 # ---------------------------------------------------------------------------
 
+
 class TwoRowHeaderView(QHeaderView):
     TOP_H = 24
     _PADDING = 16
@@ -263,6 +276,7 @@ class TwoRowHeaderView(QHeaderView):
 # Delegate
 # ---------------------------------------------------------------------------
 
+
 class CheckboxDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
         state = index.data(Qt.ItemDataRole.CheckStateRole)
@@ -272,7 +286,8 @@ class CheckboxDelegate(QStyledItemDelegate):
         opt = QStyleOptionButton()
         opt.rect = option.rect
         opt.state = QStyle.StateFlag.State_Enabled | (
-            QStyle.StateFlag.State_On if state == Qt.CheckState.Checked
+            QStyle.StateFlag.State_On
+            if state == Qt.CheckState.Checked
             else QStyle.StateFlag.State_Off
         )
         style = option.widget.style() if option.widget else QApplication.style()
@@ -282,7 +297,8 @@ class CheckboxDelegate(QStyledItemDelegate):
         if event.type() in (event.Type.MouseButtonRelease, event.Type.MouseButtonDblClick):
             current = index.data(Qt.ItemDataRole.CheckStateRole)
             new_state = (
-                Qt.CheckState.Unchecked if current == Qt.CheckState.Checked
+                Qt.CheckState.Unchecked
+                if current == Qt.CheckState.Checked
                 else Qt.CheckState.Checked
             )
             model.setData(index, new_state, Qt.ItemDataRole.CheckStateRole)
@@ -293,6 +309,7 @@ class CheckboxDelegate(QStyledItemDelegate):
 # ---------------------------------------------------------------------------
 # Main window
 # ---------------------------------------------------------------------------
+
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -305,7 +322,8 @@ class MainWindow(QWidget):
 
         self._model = CheckboxTreeModel(
             build_sample_data(len(self._uc) * len(self._ms)),
-            self._uc, self._ms,
+            self._uc,
+            self._ms,
         )
         self._header = TwoRowHeaderView(Qt.Orientation.Horizontal, self._uc, self._ms)
         self._delegate = CheckboxDelegate()

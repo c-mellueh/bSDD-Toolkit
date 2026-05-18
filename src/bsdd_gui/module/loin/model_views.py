@@ -6,7 +6,14 @@ from PySide6.QtWidgets import QAbstractItemView, QMenu, QTreeView
 
 from bsdd_gui import tool
 from . import trigger
-from .uc_ms import TwoRowHeaderView, ClassModel, get_filter_window, _current_purposes, _current_milestones, _column_to_guids
+from .uc_ms import (
+    TwoRowHeaderView,
+    ClassModel,
+    get_filter_window,
+    _current_purposes,
+    _current_milestones,
+    _column_to_guids,
+)
 from bsdd_gui.module.class_tree_view.constants import CODES_MIME, JSON_MIME
 
 
@@ -53,10 +60,6 @@ class _UcMsViewMixin(QTreeView):
         super().setModel(model)
 
 
-
-
-
-
 class ClassView(_UcMsViewMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -98,7 +101,10 @@ class ClassView(_UcMsViewMixin):
 
         menu = _ContextMenu(self)
         if len(selected_nodes) > 1:
-            menu.addAction(f"Remove {len(selected_nodes)} classes", lambda nodes=selected_nodes: [trigger.class_removed(n) for n in nodes])
+            menu.addAction(
+                f"Remove {len(selected_nodes)} classes",
+                lambda nodes=selected_nodes: [trigger.class_removed(n) for n in nodes],
+            )
         else:
             name = getattr(node, "Name", None) or getattr(node, "Code", None) or "Class"
             menu.addAction(f"Remove '{name}'", lambda: trigger.class_removed(node))
@@ -130,11 +136,9 @@ class ClassView(_UcMsViewMixin):
             clicked_guids = _column_to_guids(index.column(), prefix_cols)
             if clicked_guids is not None:
                 p_guid, m_guid = clicked_guids
-                apply_action._direct_callback = (
-                    lambda nodes=selected_nodes, pg=p_guid, mg=m_guid: [
-                        trigger.apply_checkstate_to_children(n, pg, mg) for n in nodes
-                    ]
-                )
+                apply_action._direct_callback = lambda nodes=selected_nodes, pg=p_guid, mg=m_guid: [
+                    trigger.apply_checkstate_to_children(n, pg, mg) for n in nodes
+                ]
 
         menu.exec(self.viewport().mapToGlobal(pos))
 

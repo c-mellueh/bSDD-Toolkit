@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.edge.ui import Edge
     from bsdd_gui.plugins.graph_viewer.tool import Window as WindowTool
 
+
 class Signals(PluginSignals):
     export_requested = Signal()
 
@@ -497,7 +498,7 @@ class HTMLExport(PluginTool):
     </html>"""
 
     @classmethod
-    def write_html(cls, html_content: str, path:str, window:WindowTool):
+    def write_html(cls, html_content: str, path: str, window: WindowTool):
         try:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(html_content)
@@ -506,10 +507,9 @@ class HTMLExport(PluginTool):
 
         except Exception as e:
             logging.exception("Failed to export HTML: %s", e)
-    
+
     @classmethod
     def generate_empty_html(cls):
-            return """<!DOCTYPE html><html><body>
+        return """<!DOCTYPE html><html><body>
             <p style='color:#ccc;background:#141520;padding:16px'>
             No visible nodes to export.</p></body></html>"""
-        

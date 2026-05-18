@@ -34,15 +34,11 @@ def widget_created(widget: IdsWidget):
 
 
 def import_settings(widget: IdsWidget):
-    core.import_settings(
-        widget, tool.IdsExporter,  tool.Appdata, tool.Popups
-    )
+    core.import_settings(widget, tool.IdsExporter, tool.Appdata, tool.Popups)
 
 
 def export_settings(widget: IdsWidget):
-    core.export_settings(
-        widget, tool.IdsExporter, tool.Appdata, tool.Popups
-    )
+    core.export_settings(widget, tool.IdsExporter, tool.Appdata, tool.Popups)
 
 
 def context_menu_requested(view: model_views.ClassView, pos: QPoint):
@@ -52,6 +48,4 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
 
 
 def export_ids(widget: IdsWidget):
-    core.export_ids(
-        widget, tool.IdsExporter, tool.Popups, tool.Util, tool.Project, tool.Loin
-    )
+    core.export_ids(widget, tool.IdsExporter, tool.Popups, tool.Util, tool.Project, tool.Loin)

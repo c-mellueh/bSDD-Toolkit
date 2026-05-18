@@ -62,7 +62,7 @@ def settings_widget_created(
     widget: ui.SettingsWidget, logging_tool: Type[tool.Logging], util: Type[tool.Util]
 ):
     logging_tool.set_settings_widget(widget)
-    names = [l[0].title() for l in sorted(logging._nameToLevel.items(), key=lambda x: x[1])]
+    names = [name.title() for name, _ in sorted(logging._nameToLevel.items(), key=lambda x: x[1])]
     cb = widget.ui.comboBox
     cb.clear()
     cb.addItems(names)

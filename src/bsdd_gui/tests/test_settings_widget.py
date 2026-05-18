@@ -4,6 +4,7 @@ Tests for the SettingsWidget module (tool/settings_widget.py).
 Covers add_page_to_toolbox, get_page_dict, and get_accept_functions without
 opening a real dialog.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -33,12 +34,14 @@ class TestAddPageToToolbox:
     def test_widget_function_stored_under_page_name(self):
         def wf():
             return None
+
         SettingsWidget.add_page_to_toolbox(wf, "page_general", lambda: None)
         assert wf in SettingsWidget.get_page_dict()["page_general"]
 
     def test_accept_function_is_stored(self):
         def af():
             return None
+
         SettingsWidget.add_page_to_toolbox(lambda: None, "page_general", af)
         assert af in SettingsWidget.get_accept_functions()
 

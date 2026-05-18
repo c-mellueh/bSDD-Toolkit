@@ -3,6 +3,7 @@ Tests for the Util module (tool/util.py).
 
 Covers the pure-Python methods that do not require a running Qt UI.
 """
+
 from __future__ import annotations
 
 import os
@@ -15,6 +16,7 @@ from bsdd_gui.tool import Util
 # ---------------------------------------------------------------------------
 # 1. get_unique_name
 # ---------------------------------------------------------------------------
+
 
 class TestGetUniqueName:
     def test_returns_base_name_when_not_in_list(self):
@@ -42,6 +44,7 @@ class TestGetUniqueName:
 # 2. transform_guid
 # ---------------------------------------------------------------------------
 
+
 class TestTransformGuid:
     def test_adds_zero_width_after_uppercase(self):
         result = Util.transform_guid("ABC", add_zero_width=True)
@@ -61,6 +64,7 @@ class TestTransformGuid:
 # ---------------------------------------------------------------------------
 # 3. checkstate_to_bool / bool_to_checkstate
 # ---------------------------------------------------------------------------
+
 
 class TestCheckstateConversions:
     def test_checked_is_true(self):
@@ -86,6 +90,7 @@ class TestCheckstateConversions:
 # 4. create_directory
 # ---------------------------------------------------------------------------
 
+
 class TestCreateDirectory:
     def test_creates_nested_directory(self, tmp_path):
         target = tmp_path / "a" / "b" / "c"
@@ -101,6 +106,7 @@ class TestCreateDirectory:
 # 5. create_tempfile
 # ---------------------------------------------------------------------------
 
+
 class TestCreateTempfile:
     def test_returns_string_path(self):
         path = Util.create_tempfile()
@@ -115,4 +121,5 @@ class TestCreateTempfile:
         filename = os.path.basename(path)
         # Timestamp format: YYYY-MM-DD-HH-MM-SS_
         import re
+
         assert re.match(r"\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}_", filename)

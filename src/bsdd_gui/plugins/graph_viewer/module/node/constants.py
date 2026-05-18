@@ -1,5 +1,8 @@
 from __future__ import annotations
+
 from typing import Literal
+
+from PySide6.QtGui import QColor
 
 """
 Styling registries for easy expansion of visuals.
@@ -10,8 +13,6 @@ Styling registries for easy expansion of visuals.
 """
 FILETYPE = "JSON Files (*.json);;all (*.*)"
 PATH_NAME = "graph_view"
-
-from PySide6.QtGui import QColor
 
 # Node Types
 PROPERTY_NODE_TYPE = "Property"

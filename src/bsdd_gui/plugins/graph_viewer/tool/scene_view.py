@@ -283,7 +283,7 @@ class SceneView(PluginTool):
 
     @classmethod
     def read_classes_to_add(cls, payload: dict, bsdd_dictionary: BsddDictionary):
-        classes_to_add = list()
+        classes_to_add = []
         if "classes" not in payload:
             return []
         for rc in payload["classes"]:
@@ -298,7 +298,7 @@ class SceneView(PluginTool):
 
     @classmethod
     def read_properties_to_add(cls, payload: dict, bsdd_dictionary: BsddDictionary):
-        properties_to_add = list()
+        properties_to_add = []
         if "properties" not in payload:
             return []
         for rp in payload["properties"]:

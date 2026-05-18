@@ -51,7 +51,7 @@ class Node(PluginTool):
 
     @classmethod
     def clear(cls):
-        cls.get_properties().nodes = list()
+        cls.get_properties().nodes = []
 
     @classmethod
     def remove_node(
@@ -62,7 +62,7 @@ class Node(PluginTool):
     ):
         if node not in cls.get_nodes():
             return
-        ignored_edges = list() if ignored_edges is None else ignored_edges
+        ignored_edges = [] if ignored_edges is None else ignored_edges
         for e in list(gv_tool.Edge.get_edges()):
             if e.edge_type != edge_constants.PARENT_CLASS and e in ignored_edges:
                 continue
@@ -200,14 +200,18 @@ class Node(PluginTool):
 
     @classmethod
     def get_class_nodes(cls) -> list[ui.Node]:
-        return [n for n in cls.get_nodes() if n.node_type in [constants.CLASS_NODE_TYPE,constants.GOP_NODE_TYPE]]
+        return [
+            n
+            for n in cls.get_nodes()
+            if n.node_type in [constants.CLASS_NODE_TYPE, constants.GOP_NODE_TYPE]
+        ]
 
     @classmethod
     def get_internal_nodes(cls, bsdd_dictionary: BsddDictionary):
         return {
             cl_utils.build_bsdd_uri(n.bsdd_data, bsdd_dictionary): n
             for n in cls.get_nodes()
-            if n.node_type in [constants.CLASS_NODE_TYPE,constants.GOP_NODE_TYPE]
+            if n.node_type in [constants.CLASS_NODE_TYPE, constants.GOP_NODE_TYPE]
         }
 
     @classmethod
@@ -216,7 +220,7 @@ class Node(PluginTool):
 
     @classmethod
     def get_uri_dict(cls, bsdd_dictionary: BsddDictionary):
-        uri_dict = dict()
+        uri_dict = {}
 
         for node in cls.get_nodes():
             if node.node_type == constants.CLASS_NODE_TYPE:
@@ -243,8 +247,8 @@ class Node(PluginTool):
 
     @classmethod
     def get_node_name(cls, node_type: constants.ALLOWED_NODE_TYPES_TYPING):
-        l = constants.NODE_TYPE_LABEL_MAP.get(str(node_type), str(node_type))
-        return QCoreApplication.translate("GraphViewer", l)
+        label = constants.NODE_TYPE_LABEL_MAP.get(str(node_type), str(node_type))
+        return QCoreApplication.translate("GraphViewer", label)
 
     @classmethod
     def get_allowed_node_types(cls):
@@ -261,7 +265,7 @@ class Node(PluginTool):
 
     @classmethod
     def create_node_toggles(cls):
-        rows = list()
+        rows = []
         for node_type in cls.get_allowed_node_types():
             row = QHBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
@@ -342,7 +346,7 @@ class Node(PluginTool):
             x, y = float(pos[0]), float(pos[1])
             bsdd_obj = None
             if bsdd_dictionary is not None:
-                if ntype in [constants.CLASS_NODE_TYPE,constants.GOP_NODE_TYPE]:
+                if ntype in [constants.CLASS_NODE_TYPE, constants.GOP_NODE_TYPE]:
                     bsdd_obj = cl_utils.get_class_by_code(bsdd_dictionary, code)
                 elif ntype == constants.PROPERTY_NODE_TYPE:
                     bsdd_obj = prop_utils.get_property_by_code(code, bsdd_dictionary)

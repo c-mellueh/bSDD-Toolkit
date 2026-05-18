@@ -26,11 +26,7 @@ def create_widget(*args, **kwargs):
 
 
 def widget_created(widget: ui.Widget):
-    core.register_widget(
-        widget,
-        tool.Loin,
-        tool.Project
-    )
+    core.register_widget(widget, tool.Loin, tool.Project)
     core.connect_widget(widget, tool.Loin, tool.PPClassView, tool.PPPropertyView)
 
 
@@ -63,8 +59,10 @@ def class_removed(bsdd_class) -> None:
 def apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid) -> None:
     core.apply_checkstate_to_children(bsdd_class, purpose_guid, milestone_guid, tool.Loin)
 
+
 def import_xml(widget: ui.Widget) -> None:
     core.import_from_xml(widget, tool.Loin, tool.Project, tool.Appdata, tool.Popups)
 
+
 def export_xml(widget: ui.Widget) -> None:
-    core.export_to_xml(widget,tool.Loin, tool.Appdata, tool.Popups)
+    core.export_to_xml(widget, tool.Loin, tool.Appdata, tool.Popups)

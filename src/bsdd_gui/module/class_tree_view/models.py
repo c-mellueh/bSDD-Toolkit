@@ -14,7 +14,6 @@ from .constants import JSON_MIME, CODES_MIME
 
 
 class ClassTreeModel(ItemModel):
-
     def __init__(self, tl=None, bsdd_data: BsddDictionary = None, *args, **kwargs):
         if tl is None:
             tl = tool.ClassTreeView
@@ -189,8 +188,6 @@ class ClassTreeModel(ItemModel):
         return False
 
     def dropMimeData(self, data, action, row, column, parent: QModelIndex) -> bool:
-        dest_parent = parent.siblingAtColumn(0) if parent.isValid() else QModelIndex()
-        dest_parent_node = dest_parent.internalPointer() if dest_parent.isValid() else None
         if action == Qt.MoveAction and data.hasFormat(CODES_MIME):
             trigger.mime_move_event(self.bsdd_data, data, row, parent, self.tool)
         elif action in (Qt.CopyAction, Qt.IgnoreAction):

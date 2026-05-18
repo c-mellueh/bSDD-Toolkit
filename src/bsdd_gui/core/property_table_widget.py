@@ -273,7 +273,7 @@ def paste_property_from_clipboard(
     clipboard_text = QApplication.clipboard().text()
     try:
         payload = json.loads(clipboard_text)
-    except:
+    except Exception:
         return
 
     if not isinstance(payload, dict) or payload.get("kind") != PROP_CLIPBOARD_KIND:

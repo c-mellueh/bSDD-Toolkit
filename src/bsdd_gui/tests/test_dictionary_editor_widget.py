@@ -5,6 +5,7 @@ Covers the pure validator class methods that do not require a live Qt widget.
 The widget parameter is only used in is_dictionary_uri_valid, so None is
 acceptable for all other validators.
 """
+
 from __future__ import annotations
 
 from bsdd_gui.tool import DictionaryEditorWidget

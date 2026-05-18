@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from PySide6.QtWidgets import (
     QDialogButtonBox,
 )
@@ -7,6 +8,7 @@ from . import trigger
 from bsdd_json import BsddClass
 from bsdd_gui.presets.ui_presets import TagInput, FieldWidget, BaseDialog
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
+from .qt import ui_ClassEditor
 
 
 class IfcTagInput(TagInput):
@@ -16,11 +18,7 @@ class IfcTagInput(TagInput):
         super().__init__(*args, allowed=class_names, **kwargs)
 
 
-from .qt import ui_ClassEditor
-
-
 class ClassEditor(FieldWidget, ui_ClassEditor.Ui_ClassEditor):
-
     def __init__(self, bsdd_class: BsddClass, *args, **kwargs):
         super().__init__(bsdd_class, *args, **kwargs)
         self.setupUi(self)

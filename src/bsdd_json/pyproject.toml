@@ -29,8 +29,37 @@ src = ["gis2bim"]
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D103","D100","D104"]
+ignore = [
+  # Docstrings: module, package, function/method (intentionally omitted)
+  "D100", "D103", "D104",
+  # Docstrings: class and method bodies (progressive adoption)
+  "D101", "D102",
+  # Docstring formatting style choices
+  "D200", "D205", "D400", "D401", "D415",
+  # Type annotations: adding these progressively
+  "ANN001", "ANN002", "ANN003", "ANN201", "ANN202", "ANN204", "ANN206",
+  # Boolean positional arguments: common Python pattern here
+  "FBT001", "FBT002",
+  # Magic values in comparisons
+  "PLR2004",
+  # Private member access: intentional in utilities
+  "SLF001",
+  # Exception message style choices
+  "TRY003", "EM101", "EM102",
+  # Unused method arguments: interface/override methods
+  "ARG002",
+  # Ambiguous unicode in comments (e.g. units like m², °C)
+  "RUF003",
+  # Type-checking import style: deferred to avoid circular deps handled via PLC0415 ignore
+  "TC001", "TC002", "TC003",
+  # Deferred/local imports to avoid circular dependencies
+  "PLC0415",
+  # Complexity thresholds
+  "C901", "PLR0912", "PLR0913",
+  # Mutable class attributes via ClassVar annotation
+  "RUF012",
+]
 pylint.max-args = 8
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101","D101","D102"]
+"tests/**/*.py" = ["S101", "D101", "D102", "ANN001", "ANN201", "ANN202", "ANN206"]

@@ -4,14 +4,14 @@ from bsdd_json.models import BsddClass, BsddDictionary, BsddProperty
 
 
 def make_dictionary(**kwargs) -> BsddDictionary:
-    defaults = dict(
-        OrganizationCode="TST",
-        DictionaryCode="TEST",
-        DictionaryVersion="1.0",
-        LanguageIsoCode="en-GB",
-        LanguageOnly=False,
-        UseOwnUri=False,
-    )
+    defaults = {
+        "OrganizationCode": "TST",
+        "DictionaryCode": "TEST",
+        "DictionaryVersion": "1.0",
+        "LanguageIsoCode": "en-GB",
+        "LanguageOnly": False,
+        "UseOwnUri": False,
+    }
     defaults.update(kwargs)
     return BsddDictionary(**defaults)
 

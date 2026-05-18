@@ -3,6 +3,7 @@ Tests for the GroupOfProperties module (tool/group_of_properties.py).
 
 Covers the pure state-management helpers that do not require a live Qt widget.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -16,6 +17,7 @@ from bsdd_gui.tool.group_of_properties import GopClassView
 # Fixture: restore active class/property state after each test
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(autouse=True)
 def _restore_active_state():
     yield
@@ -26,6 +28,7 @@ def _restore_active_state():
 # ---------------------------------------------------------------------------
 # generate_pset_name
 # ---------------------------------------------------------------------------
+
 
 class TestGeneratePsetName:
     def test_returns_class_name(self):
@@ -39,6 +42,7 @@ class TestGeneratePsetName:
 # ---------------------------------------------------------------------------
 # get_active_class / set_active_class
 # ---------------------------------------------------------------------------
+
 
 class TestActiveClass:
     def test_default_active_class_is_none(self):
@@ -55,6 +59,7 @@ class TestActiveClass:
 # get_active_property / set_active_property
 # ---------------------------------------------------------------------------
 
+
 class TestActiveProperty:
     def test_default_active_property_is_none(self):
         GroupOfProperties.set_active_property(None)
@@ -69,6 +74,7 @@ class TestActiveProperty:
 # ---------------------------------------------------------------------------
 # GopClassView.get_allowed_class_types
 # ---------------------------------------------------------------------------
+
 
 class TestGopClassViewAllowedClassTypes:
     def test_contains_group_of_properties(self):

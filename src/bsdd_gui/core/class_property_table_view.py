@@ -142,7 +142,7 @@ def connect_to_main_window(
     view = main_window.get_property_view()
 
     property_table.signals.selection_changed.connect(
-        lambda v, n: (main_window.set_active_property(n) if v == view else None)
+        lambda v, n: main_window.set_active_property(n) if v == view else None
     )
     main_window.signals.active_pset_changed.connect(lambda c: property_table.reset_view(view))
     main_window.signals.active_pset_changed.connect(
@@ -175,9 +175,9 @@ def copy_property_to_clipboard(
     if not selected_properties:
         return
 
-    seen_property_codes = list()
+    seen_property_codes = []
     properties = []
-    class_properties = list()
+    class_properties = []
     for class_property in selected_properties:
         internal_prop = prop_utils.get_internal_property(class_property=class_property)
         if internal_prop:
@@ -209,7 +209,7 @@ def paste_property_from_clipboard(
 
     try:
         payload = json.loads(clipboard_text)
-    except:
+    except Exception:
         return
 
     if not isinstance(payload, dict) or payload.get("kind") != CLASS_PROP_CLIPBOARD_KIND:
@@ -244,5 +244,5 @@ def paste_property_from_clipboard(
             new_property = BsddProperty.model_validate(bsdd_property)
             property_table.add_property_to_dictionary(new_property, bsdd_dictionary)
             existing_property_codes.append(new_property.Code)
-        except:
+        except Exception:
             pass

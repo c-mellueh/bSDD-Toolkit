@@ -54,7 +54,6 @@ def create_widget(
     widget.setWindowTitle(text)
 
 
-
 def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget_tool.register_widget(widget)
     widget.dt_date.hide_toggle_switch()
@@ -68,6 +67,7 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget.fw_output.load_path()
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
+
 
 def register_fields(
     widget: ui.IdsWidget,
@@ -106,7 +106,9 @@ def register_fields(
     widget_tool.sync_from_model(widget, widget.bsdd_data)
 
 
-def register_validators(widget:ui.IdsWidget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]):
+def register_validators(
+    widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter], util: Type[tool.Util]
+):
     def _is_not_empty(value, _):
         if value is None:
             return False
@@ -157,7 +159,6 @@ def connect_widget(
 def export_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
@@ -246,7 +247,9 @@ def export_ids(
         # run_iterable_with_progress already starts the thread; marshal _export to the
         # main thread explicitly so widget operations don't run from the worker thread.
         create_worker.finished.connect(
-            lambda: QTimer.singleShot(0, widget, lambda: _export(payload["ids"], payload["out_path"]))
+            lambda: QTimer.singleShot(
+                0, widget, lambda: _export(payload["ids"], payload["out_path"])
+            )
         )
 
     def _dispatch_specification(payload: PayLoadDict):
@@ -276,7 +279,5 @@ def export_ids(
         write_thread.start()
 
     setup_worker.finished.connect(_dispatch_specification)
-    setup_worker.error.connect(
-        lambda exc: QTimer.singleShot(0, widget, lambda: _show_error(exc))
-    )
+    setup_worker.error.connect(lambda exc: QTimer.singleShot(0, widget, lambda: _show_error(exc)))
     setup_thread.start()

@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 
 
 class SettingsWidgetProperties:
-    page_dict: dict[str, list[Type[QWidget]]] = dict()  # dict[pageName,list[Widget]]
-    tab_widget_dict: dict[str, tuple[QToolBox, dict[str, QWidget]]] = dict()
-    accept_functions: list[Callable] = list()
+    page_dict: dict[str, list[Type[QWidget]]] = {}  # dict[pageName,list[Widget]]
+    tab_widget_dict: dict[str, tuple[QToolBox, dict[str, QWidget]]] = {}
+    accept_functions: list[Callable] = []
     widget: ui.Dialog = None
-    actions: dict[str, QAction] = dict()
+    actions: dict[str, QAction] = {}

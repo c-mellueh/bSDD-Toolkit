@@ -18,12 +18,12 @@ class IfcHelperData:
 
     @classmethod
     def flush_data(cls):
-        cls.data = dict()
+        cls.data = {}
 
     @classmethod
     def get_classes(cls):
         cls.data["ifc_classes"] = ifc_backup()
-        return  cls.data["ifc_classes"]
+        return cls.data["ifc_classes"]
         if "ifc_classes" not in cls.data:
             try:
                 c = bsdd.Client()

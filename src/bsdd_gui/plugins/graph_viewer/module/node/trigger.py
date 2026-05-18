@@ -35,8 +35,13 @@ def on_new_project():
 
 def node_double_clicked(node):
     core.node_double_clicked(
-        node, tool.PropertyTableWidget, tool.ClassTreeView, tool.MainWindowWidget,tool.GroupOfProperties,tool.GopClassView,tool.Project
-
+        node,
+        tool.PropertyTableWidget,
+        tool.ClassTreeView,
+        tool.MainWindowWidget,
+        tool.GroupOfProperties,
+        tool.GopClassView,
+        tool.Project,
     )
 
 

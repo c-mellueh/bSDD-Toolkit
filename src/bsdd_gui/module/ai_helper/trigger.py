@@ -12,7 +12,9 @@ from bsdd_gui.module.class_property_editor_widget import ui as class_property_ui
 
 
 def connect():
-    func = lambda: core.splitter_settings_accepted(tool.AiHelper, tool.Appdata)
+    def func():
+        core.splitter_settings_accepted(tool.AiHelper, tool.Appdata)
+
     core.fill_settings(func, tool.SettingsWidget)
     core.connect_signals(
         tool.AiHelper,

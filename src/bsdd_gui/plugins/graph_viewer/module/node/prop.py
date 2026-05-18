@@ -7,7 +7,7 @@ class GraphViewerNodeProperties(PluginProperties):
     def __init__(self):
         super().__init__()
         self.filters: dict[str, bool] = {nt: True for nt in constants.ALLOWED_NODE_TYPES}
-        self.nodes: list[ui.Node] = list()
+        self.nodes: list[ui.Node] = []
         self.settings_widget: ui.NodeTypeSettingsWidget = None
         self.allowed_nodes_types = constants.ALLOWED_NODE_TYPES
 

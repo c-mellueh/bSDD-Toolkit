@@ -3,6 +3,7 @@ Tests for the ClassPropertyTableView module (tool/class_property_table_view.py).
 
 Covers the pure-Python helpers that do not require a live Qt table view.
 """
+
 from __future__ import annotations
 
 from bsdd_json.models import BsddClass, BsddClassProperty, BsddAllowedValue
@@ -22,6 +23,7 @@ def _make_class_with_props(*pset_names: str) -> BsddClass:
 # ---------------------------------------------------------------------------
 # filter_properties_by_pset
 # ---------------------------------------------------------------------------
+
 
 class TestFilterPropertiesByPset:
     def test_returns_matching_properties(self):
@@ -43,6 +45,7 @@ class TestFilterPropertiesByPset:
 # get_allowed_values
 # ---------------------------------------------------------------------------
 
+
 class TestGetAllowedValues:
     def test_empty_allowed_values_returns_empty_string(self):
         cp = BsddClassProperty(Code="P", PropertySet="S", PropertyCode="X")
@@ -63,6 +66,7 @@ class TestGetAllowedValues:
 # ---------------------------------------------------------------------------
 # set_allowed_class_types
 # ---------------------------------------------------------------------------
+
 
 class TestSetAllowedClassTypes:
     def test_stores_provided_types(self):

@@ -40,14 +40,12 @@ class BaseWidget(QWidget):
 
 
 class BaseWindow(BaseWidget):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setWindowFlag(Qt.WindowType.Window, True)
 
 
 class BaseDialog(QDialog):
-
     def __init__(self, widget: FieldWidget, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.button_box = QDialogButtonBox(Qt.Horizontal)
@@ -61,7 +59,6 @@ class BaseDialog(QDialog):
 
 
 class FieldWidget(BaseWindow):
-
     def __init__(self, bsdd_data, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.bsdd_data: object = bsdd_data

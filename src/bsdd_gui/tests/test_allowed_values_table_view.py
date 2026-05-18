@@ -5,6 +5,7 @@ The set_* helpers all operate via index.internalPointer() to obtain the
 BsddAllowedValue to mutate.  A unittest.mock.MagicMock is used to supply
 the internalPointer without a live Qt model.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock
@@ -31,6 +32,7 @@ def _null_index() -> MagicMock:
 # set_code
 # ---------------------------------------------------------------------------
 
+
 class TestSetCode:
     def test_sets_code(self):
         av = BsddAllowedValue(Code="old", Value="Val")
@@ -49,6 +51,7 @@ class TestSetCode:
 # ---------------------------------------------------------------------------
 # set_value
 # ---------------------------------------------------------------------------
+
 
 class TestSetValue:
     def test_updates_value(self):
@@ -81,6 +84,7 @@ class TestSetValue:
 # set_description
 # ---------------------------------------------------------------------------
 
+
 class TestSetDescription:
     def test_sets_description(self):
         av = BsddAllowedValue(Code="c", Value="V")
@@ -97,6 +101,7 @@ class TestSetDescription:
 # set_sort_number
 # ---------------------------------------------------------------------------
 
+
 class TestSetSortNumber:
     def test_sets_sort_number(self):
         av = BsddAllowedValue(Code="c", Value="V")
@@ -112,6 +117,7 @@ class TestSetSortNumber:
 # ---------------------------------------------------------------------------
 # set_owned_uri
 # ---------------------------------------------------------------------------
+
 
 class TestSetOwnedUri:
     def test_sets_owned_uri(self):

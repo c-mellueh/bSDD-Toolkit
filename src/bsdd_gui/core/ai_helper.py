@@ -81,7 +81,7 @@ def generate_class_definition(
     util: Type[tool.Util],
 ):
     bsdd_class = class_editor.get_data()
-    dump = dict()
+    dump = {}
     if isinstance(bsdd_class, BsddClass):
         dump = bsdd_class.model_dump()
     dump["Name"] = widget.le_name.text()

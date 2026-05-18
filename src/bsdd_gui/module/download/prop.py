@@ -8,10 +8,10 @@ class DownloadProperties(FieldProperties, ActionsProperties):
     def __init__(self):
         super().__init__()
         self.client: Client = None
-        self.threads = list()
-        self.workers = list()
+        self.threads = []
+        self.workers = []
         self.done_count = 0
-        self.bsdd_classes = list()
+        self.bsdd_classes = []
         self.bsdd_dictionary: BsddDictionary = None
-        self.bsdd_properies = list()
+        self.bsdd_properies = []
         self.save_path = "export.json"

@@ -36,7 +36,11 @@ def list_empty_definitions(input_path: Path, output_path: Path) -> None:
     sheet.title = "Classes"
     for bsdd_class in empty_classes:
         sheet.append(
-            [bsdd_class.Code, bsdd_class.Name, "; ".join(bsdd_class.RelatedIfcEntityNamesList)]
+            [
+                bsdd_class.Code,
+                bsdd_class.Name,
+                "; ".join(bsdd_class.RelatedIfcEntityNamesList),
+            ]
         )
 
     property_sheet = excel.create_sheet("Properties")
@@ -44,7 +48,11 @@ def list_empty_definitions(input_path: Path, output_path: Path) -> None:
         bsdd_class = bsdd_class_property.parent()
         name = prop_utils.get_name(bsdd_class_property)
         property_sheet.append(
-            [bsdd_class.Name, name, "; ".join([x.Value for x in bsdd_class_property.AllowedValues])]
+            [
+                bsdd_class.Name,
+                name,
+                "; ".join([x.Value for x in bsdd_class_property.AllowedValues]),
+            ]
         )
 
     excel.save(output_path)
@@ -55,7 +63,9 @@ def parse_args() -> argparse.Namespace:
         description="List BSDD classes and properties without definitions into an Excel file."
     )
     parser.add_argument("input_path", type=Path, help="Path to the BSDD JSON file")
-    parser.add_argument("output_path", type=Path, help="Path where the Excel file will be written")
+    parser.add_argument(
+        "output_path", type=Path, help="Path where the Excel file will be written"
+    )
     return parser.parse_args()
 
 

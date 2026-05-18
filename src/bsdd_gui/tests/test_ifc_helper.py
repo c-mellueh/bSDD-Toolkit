@@ -4,6 +4,7 @@ Tests for the IfcHelper module (tool/ifc_helper.py).
 Covers split_ifc_term which uses a regex to separate the IFC entity name
 from an optional predefined type suffix.
 """
+
 from __future__ import annotations
 
 from bsdd_gui.tool import IfcHelper

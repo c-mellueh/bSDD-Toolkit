@@ -12,7 +12,7 @@ class ProjectProperties(ActionsProperties):
         super().__init__()
         self.project_dictionary: BsddDictionary = None
         self.dialog = None
-        self.plugin_save_functions = list()
+        self.plugin_save_functions = []
         self.offline_mode = False
         self.last_save: BsddDictionary = None
         self.recent_menu: QMenu | None = None

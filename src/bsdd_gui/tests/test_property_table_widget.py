@@ -3,6 +3,7 @@ Tests for the PropertyTableWidget module (tool/property_table_widget.py).
 
 Covers get_properties_from_mime_payload which is pure Python.
 """
+
 from __future__ import annotations
 
 from bsdd_json.models import BsddDictionary, BsddProperty
@@ -30,6 +31,7 @@ def _prop_json(code: str, name: str = None, data_type: str = "String") -> dict:
 # ---------------------------------------------------------------------------
 # get_properties_from_mime_payload
 # ---------------------------------------------------------------------------
+
 
 class TestGetPropertiesFromMimePayload:
     def test_returns_new_properties(self):

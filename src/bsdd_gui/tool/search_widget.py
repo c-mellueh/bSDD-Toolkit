@@ -53,7 +53,6 @@ class SearchWidget(WidgetTool):
         :param data_getters: getter functions for row values
         :return:
         """
-        prop = cls.get_properties()
         search_dialog = ui.SearchDialog()
         cls.register_widget(search_dialog)
 
@@ -178,7 +177,7 @@ class SearchWidget(WidgetTool):
         :param dialog:
         :return:
         """
-        item_list = list()
+        item_list = []
         for entity in search_items:  # Iterate over Classes or Properties
             row_data = [m(entity) for m in getter_methods]  # use getter Methods for Row Values
             items = [QTableWidgetItem(text) for text in row_data]

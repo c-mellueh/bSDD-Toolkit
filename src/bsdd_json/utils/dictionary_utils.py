@@ -126,7 +126,7 @@ def get_dictionary_path_from_uri(uri: str) -> str:
     path_parts = parsed.path.strip("/").split("/")
 
     # Path must contain at least company, library, version
-    if len(path_parts) <min_path_length:
+    if len(path_parts) < min_path_length:
         return ""
 
     # Construct normalized result
@@ -336,9 +336,7 @@ def is_external_ref(uri: str, bsdd_dictionary: BsddDictionary) -> bool:
     from .dictionary_utils import bsdd_dictionary_url, get_dictionary_path_from_uri
 
     dict_path = get_dictionary_path_from_uri(uri)
-    if dict_path == bsdd_dictionary_url(bsdd_dictionary):
-        return False
-    return True
+    return dict_path != bsdd_dictionary_url(bsdd_dictionary)
 
 
 def is_ifc_reference(uri: str) -> bool:
@@ -358,6 +356,4 @@ def is_ifc_reference(uri: str) -> bool:
         ``True`` when *uri* is an IFC reference, ``False`` otherwise.
 
     """
-    if "/uri/buildingsmart/ifc/" in uri:
-        return True
-    return False
+    return "/uri/buildingsmart/ifc/" in uri

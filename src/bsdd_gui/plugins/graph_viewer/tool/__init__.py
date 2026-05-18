@@ -1,9 +1,9 @@
-from .window import Window
-from .scene_view import SceneView
-from .edge import Edge
-from .node import Node
-from .settings import Settings
-from .physics import Physics
-from .input_bar import InputBar
-from .buchheim import Buchheim
-from .html_export import HTMLExport
+from .window import Window as Window
+from .scene_view import SceneView as SceneView
+from .edge import Edge as Edge
+from .node import Node as Node
+from .settings import Settings as Settings
+from .physics import Physics as Physics
+from .input_bar import InputBar as InputBar
+from .buchheim import Buchheim as Buchheim
+from .html_export import HTMLExport as HTMLExport

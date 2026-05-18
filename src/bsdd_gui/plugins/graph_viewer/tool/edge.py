@@ -68,7 +68,7 @@ class Edge(PluginTool):
 
     @classmethod
     def clear(cls):
-        cls.get_properties().edges = list()
+        cls.get_properties().edges = []
 
     @classmethod
     def remove_edge(
@@ -235,9 +235,9 @@ class Edge(PluginTool):
         except Exception:
             css_style = "solid"
         if isinstance(color, QColor):
-            r, g, b, a = color.red(), color.green(), color.blue(), color.alpha()
+            r, g, b, _ = color.red(), color.green(), color.blue(), color.alpha()
         else:
-            r, g, b, a = 130, 130, 150, 255
+            r, g, b, _ = 130, 130, 150, 255
         css = f"QGraphicsView {{ border: {max(1, int(round(width)))}px {css_style} rgba({r}, {g}, {b}, 255); }}"
         return css
 
@@ -320,7 +320,8 @@ class Edge(PluginTool):
     ):
         bsdd_class = (
             start_node.bsdd_data
-            if start_node.node_type in [node_constants.CLASS_NODE_TYPE,node_constants.GOP_NODE_TYPE]
+            if start_node.node_type
+            in [node_constants.CLASS_NODE_TYPE, node_constants.GOP_NODE_TYPE]
             else end_node.bsdd_data
         )
         bsdd_property = (
@@ -420,7 +421,7 @@ class Edge(PluginTool):
 
     @classmethod
     def get_relations_dict(cls, bsdd_dictionary: BsddDictionary):
-        relations_dict: RelationsDict = {et: dict() for et in constants.ALLOWED_EDGE_TYPES}
+        relations_dict: RelationsDict = {et: {} for et in constants.ALLOWED_EDGE_TYPES}
         for edge in cls.get_edges():
             info = cls._info(edge.start_node, edge.end_node, bsdd_dictionary)
             if info in relations_dict[edge.edge_type]:
@@ -436,7 +437,7 @@ class Edge(PluginTool):
         existing_relations_dict: dict[str, dict[tuple[str, str, str, str], ui.Edge]],
         bsdd_dictionary: BsddDictionary,
     ) -> list[ui.Edge]:
-        new_edges = list()
+        new_edges = []
         for start_node in nodes:
             if start_node.node_type not in [
                 node_constants.CLASS_NODE_TYPE,
@@ -479,9 +480,12 @@ class Edge(PluginTool):
         bsdd_dictionary: BsddDictionary,
     ) -> list[ui.Edge]:
 
-        new_edges = list()
+        new_edges = []
         for start_node in nodes:
-            if start_node.node_type not in  [node_constants.CLASS_NODE_TYPE,node_constants.GOP_NODE_TYPE]:
+            if start_node.node_type not in [
+                node_constants.CLASS_NODE_TYPE,
+                node_constants.GOP_NODE_TYPE,
+            ]:
                 continue
             start_class = start_node.bsdd_data
             for cp in start_class.ClassProperties:
@@ -510,7 +514,7 @@ class Edge(PluginTool):
         existing_relations_dict: dict[str, dict[tuple[str, str, str, str], ui.Edge]],
         bsdd_dictionary: BsddDictionary,
     ) -> list[ui.Edge]:
-        new_edges = list()
+        new_edges = []
         for start_node in nodes:
             if start_node.node_type != node_constants.PROPERTY_NODE_TYPE:
                 continue
@@ -536,10 +540,14 @@ class Edge(PluginTool):
         bsdd_dictionary: BsddDictionary,
     ):
         ifc_dict = {c["code"]: c for c in IfcHelperData.get_classes()}
-        new_edges = list()
+        new_edges = []
         relation_type = constants.IFC_REFERENCE_REL
         for start_node in nodes:
-            if start_node.node_type not in [node_constants.CLASS_NODE_TYPE,node_constants.GOP_NODE_TYPE] or start_node.is_external:
+            if (
+                start_node.node_type
+                not in [node_constants.CLASS_NODE_TYPE, node_constants.GOP_NODE_TYPE]
+                or start_node.is_external
+            ):
                 continue
             start_class = start_node.bsdd_data
             for ifc_name in start_class.RelatedIfcEntityNamesList or []:
@@ -651,7 +659,7 @@ class Edge(PluginTool):
 
     @classmethod
     def create_edge_toggles(cls):
-        toggles = list()
+        toggles = []
         for edge_type in cls.get_allowed_edge_types():
             row = QHBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
@@ -718,9 +726,10 @@ class Edge(PluginTool):
         start_data, end_data, relation_type = RelationshipEditorWidget.read_relation(
             relation, bsdd_dictionary
         )
-        start_node, end_node = NodeTool.get_node_from_bsdd_data(
-            start_data
-        ), NodeTool.get_node_from_bsdd_data(end_data)
+        start_node, end_node = (
+            NodeTool.get_node_from_bsdd_data(start_data),
+            NodeTool.get_node_from_bsdd_data(end_data),
+        )
         return cls.get_edge_from_nodes(start_node, end_node, relation_type)
 
     @classmethod
@@ -906,11 +915,11 @@ class Edge(PluginTool):
         return glow_pen
 
     @classmethod
-    def get_visible_edges(cls,visible_nodes:list[Node]):
-        edges = list()
+    def get_visible_edges(cls, visible_nodes: list[Node]):
+        edges = []
         edge_filter = cls.get_filters()
         for e in cls.get_edges():
-            if not edge_filter.get(e.edge_type,True):
+            if not edge_filter.get(e.edge_type, True):
                 continue
             if e.start_node not in visible_nodes:
                 continue
@@ -918,4 +927,3 @@ class Edge(PluginTool):
                 continue
             edges.append(e)
         return edges
-

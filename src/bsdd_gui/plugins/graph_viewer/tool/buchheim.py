@@ -41,7 +41,7 @@ class Buchheim(PluginTool):
     def reset_children_dict(cls, nodes: list[Node], edges: list[Edge], active_edge_type: str):
         if not active_edge_type:
             return False
-        children_dict = dict()  # list all children
+        children_dict = {}  # list all children
         parent_dict = {node: None for node in nodes}
 
         for edge in edges:
@@ -51,7 +51,7 @@ class Buchheim(PluginTool):
             end_node = edge.end_node
             parent_dict[start_node] = end_node
             if end_node not in children_dict:
-                children_dict[end_node] = list()
+                children_dict[end_node] = []
             children_dict[end_node].append(start_node)
         cls.get_properties().children_dict = children_dict
         cls.get_properties().parent_dict = parent_dict
@@ -59,7 +59,7 @@ class Buchheim(PluginTool):
 
     @classmethod
     def find_roots(cls, nodes: list[Node]) -> list[Node]:
-        roots = list()
+        roots = []
         for node in nodes:
             if cls.parent(node) is None:
                 roots.append(node)

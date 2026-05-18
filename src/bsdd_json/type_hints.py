@@ -262,7 +262,7 @@ CLASS_TYPE = Literal[
 ]
 
 STATUS = Literal["Preview", "Active", "Inactive"]
-CLASS_STATUS = Literal["Active", "Inactive","Preview"]
+CLASS_STATUS = Literal["Active", "Inactive", "Preview"]
 PROPERTY_STATUS = Literal["Active", "Inactive", "Preview"]
 
 # Pydantic-validated DateTime adhering to bSDD import rules
@@ -1515,7 +1515,7 @@ DOCUMENT_TYPE = Literal[
     "EwaGlos",
     "ICOMOS-ISCS-Glossary",
     "UNI 11182:2006",
-    "ASTM D 610 – 08",
+    "ASTM D 610 - 08",
     "NORMAL 1/88",
 ]
 

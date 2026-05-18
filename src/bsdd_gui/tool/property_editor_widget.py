@@ -112,7 +112,7 @@ class PropertyEditorWidget(DialogTool):
 
     @classmethod
     def generate_virtual_property(cls, code: str, model_dict: dict | None):
-        model_dict = dict() if not model_dict else model_dict
+        model_dict = {} if not model_dict else model_dict
         if "Code" not in model_dict:
             model_dict["Code"] = code
         if "Name" not in model_dict:

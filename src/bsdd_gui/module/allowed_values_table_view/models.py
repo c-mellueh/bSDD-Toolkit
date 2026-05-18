@@ -10,7 +10,6 @@ from bsdd_gui.presets.models_presets import ItemModel
 
 
 class AllowedValuesModel(ItemModel):
-
     def __init__(
         self, tl=None, bsdd_data: BsddClassProperty | BsddProperty = None, *args, **kwargs
     ):

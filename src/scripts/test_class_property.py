@@ -9,9 +9,10 @@ def _():
     import bsdd
     from bsdd_json.utils import class_utils as class_utils
     from bsdd_json import BsddDictionary
+
     client = bsdd.Client()
 
-    def swap_codes(data_dict,old,new):
+    def swap_codes(data_dict, old, new):
         if old not in data_dict:
             return
         data_dict[new] = data_dict[old]
@@ -25,12 +26,12 @@ def _():
 
         dictionary_data = client.get_dictionary(dictionary_uri)["dictionaries"][0]
         read_lang_code()
-        swap_codes(dictionary_data,"organizationCodeOwner","OrganizationCode")
-        swap_codes(dictionary_data,"code","DictionaryCode")
-        swap_codes(dictionary_data,"version","DictionaryVersion")
-        swap_codes(dictionary_data,"defaultLanguageCode","LanguageIsoCode")
-        swap_codes(dictionary_data,"name","DictionaryName")
-        swap_codes(dictionary_data,"changeRequestEmail","ChangeRequestEmailAddress")
+        swap_codes(dictionary_data, "organizationCodeOwner", "OrganizationCode")
+        swap_codes(dictionary_data, "code", "DictionaryCode")
+        swap_codes(dictionary_data, "version", "DictionaryVersion")
+        swap_codes(dictionary_data, "defaultLanguageCode", "LanguageIsoCode")
+        swap_codes(dictionary_data, "name", "DictionaryName")
+        swap_codes(dictionary_data, "changeRequestEmail", "ChangeRequestEmailAddress")
         dictionary_data["LanguageOnly"] = False
         dictionary_data["UseOwnUri"] = False
         return BsddDictionary.model_validate(dictionary_data)
@@ -43,9 +44,7 @@ def _():
         return old_dict
 
     dictionary_uri = "https://identifier.buildingsmart.org/uri/etim/etim/10.1"
-    save_path = "test.json"
-
-    bsdd_dictionary = import_dictionary(dictionary_uri)
+    import_dictionary(dictionary_uri)
 
     return client, dictionary_uri
 
@@ -53,19 +52,20 @@ def _():
 @app.cell
 def _():
 
-
     return
 
 
 @app.cell
 def _(client, dictionary_uri):
-    classes_info = list() 
+    classes_info = list()
     class_count = 0
     total_count = 1_000_000
     while class_count < total_count:
-        cd = client.get_classes(dictionary_uri,use_nested_classes=False,limit=1_000,offset=class_count)
-        classes_info+=cd["classes"]
-        class_count+=cd["classesCount"]
+        cd = client.get_classes(
+            dictionary_uri, use_nested_classes=False, limit=1_000, offset=class_count
+        )
+        classes_info += cd["classes"]
+        class_count += cd["classesCount"]
         total_count = cd["classesTotalCount"]
         print(class_count)
     return cd, classes_info

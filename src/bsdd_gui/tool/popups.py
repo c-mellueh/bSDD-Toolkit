@@ -116,7 +116,7 @@ class Popups:
             if not pure_path.lower().endswith(ending.lower()):
                 pure_path += ending
             return pure_path
-        except:
+        except Exception:
             return pure_path
 
     @classmethod

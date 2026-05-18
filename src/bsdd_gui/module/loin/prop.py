@@ -1,5 +1,5 @@
 from __future__ import annotations
-from bsdd_gui.presets.prop_presets import ActionsProperties,WidgetProperties,ViewProperties
+from bsdd_gui.presets.prop_presets import ActionsProperties, WidgetProperties, ViewProperties
 from typing import TYPE_CHECKING, Dict, Optional, Set, Tuple
 from uuid import UUID
 
@@ -28,7 +28,7 @@ SpecKey = Tuple[UUID, UUID]
 # by (purpose_guid, milestone_guid) gives us that.
 
 
-class LoinProperties(ActionsProperties,WidgetProperties):
+class LoinProperties(ActionsProperties, WidgetProperties):
     def __init__(self):
         super().__init__()
         # The in-memory LOIN document. Created fresh per project.
@@ -46,16 +46,14 @@ class LoinProperties(ActionsProperties,WidgetProperties):
         # Spec membership caches:
         #   (purpose_guid, milestone_guid) -> set of class codes / property keys
         self.classes_in_spec: Dict[SpecKey, Set[ClassCode]] = {}
-        self.properties_in_spec: Dict[
-            SpecKey, Dict[ClassCode, Set[PropertyKey]]
-        ] = {}
+        self.properties_in_spec: Dict[SpecKey, Dict[ClassCode, Set[PropertyKey]]] = {}
 
         # Underlying LoinSpecification objects, keyed the same way as above.
         # Lazily created when the user first checks something.
         self.specs: Dict[SpecKey, "LoinSpecification"] = {}
 
         # The signal hub (QObject so we can emit Qt signals).
-        self.added_classes:set[ClassCode] = set()
+        self.added_classes: set[ClassCode] = set()
 
 
 class PPClassViewProperties(ViewProperties):

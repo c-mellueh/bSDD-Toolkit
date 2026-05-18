@@ -59,8 +59,8 @@ class Util:
                 menu.setTitle(menu.tr(menu_name))
                 d = {
                     "name": menu_name,
-                    "submenu": list(),
-                    "actions": list(),
+                    "submenu": [],
+                    "actions": [],
                     "menu": menu,
                 }
                 focus_dict["submenu"].append(d)
@@ -117,7 +117,7 @@ class Util:
         If the displayname contains '/' submenus will be created
         """
 
-        menu_dict = dict()
+        menu_dict = {}
         menu = QMenu()
         menu_dict[""] = menu
         for text, function in menu_list:
@@ -180,7 +180,7 @@ class Util:
 
     @classmethod
     def create_directory(cls, path: os.PathLike):
-        cur_path = list()
+        cur_path = []
         split_path = str(path).split(os.sep)
         for path in split_path:
             if path == "":

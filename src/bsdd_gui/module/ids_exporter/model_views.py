@@ -1,5 +1,6 @@
 from bsdd_gui.presets.ui_presets import TagInput
 
+
 class TagInput_IfcVersion(TagInput):
     def __init__(self, *args, **kwargs):
         super().__init__(

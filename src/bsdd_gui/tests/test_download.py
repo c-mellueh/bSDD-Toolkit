@@ -4,6 +4,7 @@ Tests for the Download module (tool/download.py).
 Only the pure-Python helpers are tested here; the threading / HTTP logic
 that requires a live bSDD server is out of scope.
 """
+
 from __future__ import annotations
 
 from bsdd_gui.tool import Download
@@ -12,6 +13,7 @@ from bsdd_gui.tool import Download
 # ---------------------------------------------------------------------------
 # swap_codes
 # ---------------------------------------------------------------------------
+
 
 class TestSwapCodes:
     def test_renames_key(self):

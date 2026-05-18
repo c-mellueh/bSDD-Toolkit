@@ -9,4 +9,4 @@ if TYPE_CHECKING:
 class AllowedValuesTableViewProperties(ViewProperties):
     def __init__(self):
         super().__init__()
-        self.model: list[models.AllowedValuesModel] = list()
+        self.model: list[models.AllowedValuesModel] = []

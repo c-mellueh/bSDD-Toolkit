@@ -10,5 +10,5 @@ from bsdd_gui.presets.prop_presets import ViewProperties
 
 class PropertySetTableViewProperties(ViewProperties):
     views: set[ui.PsetTableView] = set()
-    temporary_pset: dict[BsddClass, list[str]] = dict()
+    temporary_pset: dict[BsddClass, list[str]] = {}
     combo_box: QComboBox = None

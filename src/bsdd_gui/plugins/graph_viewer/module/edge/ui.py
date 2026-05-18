@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from bsdd_gui.plugins.graph_viewer.module.settings.ui import _SettingsWidget
-from bsdd_json import *
 from PySide6.QtCore import QRectF, Qt, Signal, QSize
 from PySide6.QtGui import QPainter, QPolygonF
 from PySide6.QtWidgets import (
@@ -18,7 +17,6 @@ if TYPE_CHECKING:
 
 
 class Edge(QGraphicsPathItem):
-
     def __init__(
         self,
         start_node: Node,
