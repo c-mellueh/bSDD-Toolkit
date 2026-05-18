@@ -1,5 +1,4 @@
 from __future__ import annotations
-import bsdd_gui
 from bsdd_json import BsddClass, BsddProperty
 
 from bsdd_gui import tool
@@ -8,7 +7,6 @@ from typing import TYPE_CHECKING
 from bsdd_gui.plugins.graph_viewer import tool as gv_tool
 
 if TYPE_CHECKING:
-    from . import ui
 
     from PySide6.QtCore import QPointF
 

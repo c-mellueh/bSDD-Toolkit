@@ -207,3 +207,4 @@ __marimo__/
 
 .pre-commit-config.yaml
 .vscode*
+.claude*

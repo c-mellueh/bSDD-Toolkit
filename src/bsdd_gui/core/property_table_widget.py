@@ -1,10 +1,10 @@
 from __future__ import annotations
 import json
 from PySide6.QtCore import QCoreApplication, Qt, QPoint
-from PySide6.QtWidgets import QWidget, QTreeView, QApplication
+from PySide6.QtWidgets import QTreeView, QApplication
 from typing import TYPE_CHECKING, Type
-from bsdd_gui.module.property_table_widget import views, ui, models
-from bsdd_json import BsddProperty, BsddClass, BsddClassProperty
+from bsdd_gui.module.property_table_widget import views, ui
+from bsdd_json import BsddProperty, BsddClassProperty
 import qtawesome as qta
 from bsdd_gui.module.util.constants import PROP_CLIPBOARD_KIND
 from pydantic import ValidationError

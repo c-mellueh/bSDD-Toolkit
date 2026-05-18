@@ -1,15 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import logging
 
 import bsdd_gui
 from bsdd_json import BsddClassProperty, BsddDictionary, BsddProperty, BsddClass
 from bsdd_gui.module.class_property_editor_widget import ui, views
-from PySide6.QtWidgets import QLayout, QWidget, QCompleter
+from PySide6.QtWidgets import QWidget, QCompleter
 from PySide6.QtCore import Signal, QCoreApplication, Qt
 from bsdd_gui.module.class_property_editor_widget import trigger
 from bsdd_gui.presets.tool_presets import DialogTool, DialogSignals
-from urllib.parse import urlparse
 from bsdd_gui.module.allowed_values_table_view.ui import AllowedValuesTable
 from bsdd_gui.module.property_editor_widget import ui as property_editor_ui
 from bsdd_json.utils.dictionary_utils import is_uri
@@ -192,7 +190,7 @@ class ClassPropertyEditorWidget(DialogTool):
             return True  # Todo: check if this really exists
 
         # Code doesn't exist
-        if not value in prop_utils.get_property_code_dict(bsdd_dictionary):
+        if value not in prop_utils.get_property_code_dict(bsdd_dictionary):
             return False
 
         bsdd_class = bsdd_class_property.parent()

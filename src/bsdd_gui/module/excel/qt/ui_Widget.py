@@ -3,24 +3,19 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
+    QSize, Qt)
+from PySide6.QtWidgets import (QFrame, QGridLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QSizePolicy,
     QSpacerItem, QSplitter, QToolButton, QVBoxLayout,
     QWidget)
 
-from bsdd_gui.module.property_picker.ui import Widget
+from bsdd_gui.module.loin.ui import Widget
 from bsdd_gui.presets.ui_presets import FileSelector
 
 class Ui_Form(object):
@@ -63,9 +58,9 @@ class Ui_Form(object):
         self.splitter.setSizePolicy(sizePolicy)
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(6)
-        self.property_picker = Widget(self.splitter)
-        self.property_picker.setObjectName(u"property_picker")
-        self.splitter.addWidget(self.property_picker)
+        self.loin = Widget(self.splitter)
+        self.loin.setObjectName(u"loin")
+        self.splitter.addWidget(self.loin)
         self.settings_widget = QWidget(self.splitter)
         self.settings_widget.setObjectName(u"settings_widget")
         self.verticalLayout = QVBoxLayout(self.settings_widget)

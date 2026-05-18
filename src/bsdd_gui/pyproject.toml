@@ -24,10 +24,11 @@ dependencies = [
   "openai",
   "jinja2>=3.1.6",
   "openpyxl>=3.1.5",
+  "pydantic-xml>=2.19.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-qt", "mypy", "ruff", "black", "pyinstaller","qtawesome"]
+dev = ["pytest", "pytest-qt", "mypy", "ruff", "black", "pyinstaller","qtawesome", "jupyter>=1.1.1"]
 
 [project.scripts]
 bsdd-gui = "bsdd_gui.__main__:main"

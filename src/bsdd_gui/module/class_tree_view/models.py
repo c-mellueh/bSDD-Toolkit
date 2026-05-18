@@ -1,19 +1,14 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QTreeView, QTreeWidget, QWidget
 from PySide6.QtCore import (
     Qt,
     QModelIndex,
     QSortFilterProxyModel,
 )
-from bsdd_gui.resources.icons import get_icon
 from . import trigger
-from bsdd_json.models import BsddDictionary, BsddClass, BsddProperty
+from bsdd_json.models import BsddDictionary, BsddClass
 from bsdd_json.utils import class_utils as cl_utils
-from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
-from PySide6.QtTest import QAbstractItemModelTester
-import json
 
 from .constants import JSON_MIME, CODES_MIME
 
@@ -188,7 +183,7 @@ class ClassTreeModel(ItemModel):
                 return False
 
             bsdd_class = cl_utils.get_class_by_code(self.bsdd_dictionary, codes[0])
-            if not bsdd_class.ClassType in self.tool.get_allowed_class_types():
+            if bsdd_class.ClassType not in self.tool.get_allowed_class_types():
                 return False
             return True
         return False

@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui import tool
 from bsdd_gui.module.logging.constants import LOG_PATH, LOG_SECTION, LOG_LEVEL
-import os
 
 
 class CustomFormatter(logging.Formatter):

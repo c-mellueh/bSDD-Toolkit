@@ -3,8 +3,8 @@ from bsdd_gui.module.ai_helper import ui, constants
 from typing import TYPE_CHECKING, Type
 import json
 from bsdd_json import BsddClass, BsddClassProperty
-from PySide6.QtCore import QModelIndex, QCoreApplication, QTimer
-from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
+from PySide6.QtCore import QTimer
+from bsdd_gui.presets.ui_presets.waiting import stop_waiting_widget
 from bsdd_json.utils import property_utils as prop_utils
 
 if TYPE_CHECKING:

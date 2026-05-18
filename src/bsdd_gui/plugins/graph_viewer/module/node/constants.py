@@ -11,22 +11,7 @@ Styling registries for easy expansion of visuals.
 FILETYPE = "JSON Files (*.json);;all (*.*)"
 PATH_NAME = "graph_view"
 
-from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
-from PySide6.QtGui import QBrush, QColor, QFontMetrics, QPainter, QPainterPath, QPen
-from PySide6.QtWidgets import (
-    QApplication,
-    QGraphicsItem,
-    QGraphicsObject,
-    QGraphicsPathItem,
-    QGraphicsScene,
-    QGraphicsView,
-    QLabel,
-    QMainWindow,
-    QSlider,
-    QToolBar,
-    QToolButton,
-    QFileDialog,
-)
+from PySide6.QtGui import QColor
 
 # Node Types
 PROPERTY_NODE_TYPE = "Property"

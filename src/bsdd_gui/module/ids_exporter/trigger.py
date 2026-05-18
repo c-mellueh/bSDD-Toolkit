@@ -1,6 +1,5 @@
 from __future__ import annotations
 from PySide6.QtCore import QPoint
-from bsdd_json import BsddDictionary
 from bsdd_gui import tool
 from bsdd_gui.core import ids_exporter as core
 from typing import TYPE_CHECKING
@@ -31,18 +30,18 @@ def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
     core.register_fields(widget, tool.IdsExporter)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
-    core.connect_widget(widget, tool.IdsExporter, tool.PPClassView, tool.MainWindowWidget)
+    core.connect_widget(widget, tool.IdsExporter, tool.PPClassView, tool.Loin)
 
 
 def import_settings(widget: IdsWidget):
     core.import_settings(
-        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
+        widget, tool.IdsExporter,  tool.Appdata, tool.Popups
     )
 
 
 def export_settings(widget: IdsWidget):
     core.export_settings(
-        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
+        widget, tool.IdsExporter, tool.Appdata, tool.Popups
     )
 
 
@@ -54,5 +53,5 @@ def context_menu_requested(view: model_views.ClassView, pos: QPoint):
 
 def export_ids(widget: IdsWidget):
     core.export_ids(
-        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Popups, tool.Util
+        widget, tool.IdsExporter, tool.Popups, tool.Util, tool.Project, tool.Loin
     )

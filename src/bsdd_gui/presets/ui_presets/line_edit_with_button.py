@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QApplication, QLineEdit, QToolButton, QHBoxLayout, QWidget, QStyle
+from PySide6.QtWidgets import QApplication, QLineEdit, QToolButton, QStyle
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette, QColor
+from PySide6.QtGui import QPalette
 
 
 class LineEditWithButton(QLineEdit):

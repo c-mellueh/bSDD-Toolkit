@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QDialogButtonBox, QLabel
+from PySide6.QtWidgets import QDialog
 
 from bsdd_gui.resources.icons import get_icon
 from .qt.ui_DeleteRequest import Ui_DeleteRequest

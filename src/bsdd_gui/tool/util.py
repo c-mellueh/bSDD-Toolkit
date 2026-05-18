@@ -24,9 +24,7 @@ import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.module.util import ui
 from bsdd_gui.module.util.constants import OPTION_SEPERATOR
-from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget, stop_waiting_widget
-from bsdd_gui.presets.ui_presets import ComboBoxWithToggleSwitch
-from bsdd_gui.presets.tool_presets import FieldTool
+from bsdd_gui.presets.ui_presets.waiting import start_waiting_widget
 from bsdd_json.utils import dictionary_utils as dict_utils
 
 if TYPE_CHECKING:
@@ -56,7 +54,7 @@ class Util:
         focus_dict = menu_dict
         parent = menu_bar
         for index, menu_name in enumerate(menu_steps):
-            if not menu_name in {menu["name"] for menu in focus_dict["submenu"]}:
+            if menu_name not in {menu["name"] for menu in focus_dict["submenu"]}:
                 menu = QMenu(parent)
                 menu.setTitle(menu.tr(menu_name))
                 d = {
@@ -291,7 +289,7 @@ class Util:
     @classmethod
     def request_path(cls, widget: ui.FileSelector):
         if widget is None:
-            logging.debug(f"Widget is not defined")
+            logging.debug("Widget is not defined")
             return []
         path, paths = None, []
         if widget.appdata_text:
@@ -315,7 +313,7 @@ class Util:
                 widget, widget.name, start_path, widget.extension
             )
         else:
-            logging.warning(f"inputs are missing. no path requestable")
+            logging.warning("inputs are missing. no path requestable")
             return []
 
         if path is not None:

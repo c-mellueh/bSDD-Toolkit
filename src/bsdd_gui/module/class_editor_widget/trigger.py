@@ -1,5 +1,4 @@
 from __future__ import annotations
-import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import class_editor_widget as core
 from bsdd_json import BsddClass
@@ -26,7 +25,7 @@ def on_new_project():
 
 
 def create_widget(*args, **kwargs):
-    logging.error(f"Function not defined!")
+    logging.error("Function not defined!")
 
 
 def create_dialog(allowed_class_types, bsdd_class: BsddClass):

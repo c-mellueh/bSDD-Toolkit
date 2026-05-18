@@ -6,7 +6,6 @@ from PySide6.QtWidgets import QTreeView, QCompleter, QTableView
 from PySide6.QtCore import Qt, Signal
 import bsdd_gui
 from bsdd_json import (
-    BsddProperty,
     BsddClass,
     BsddProperty,
     BsddDictionary,

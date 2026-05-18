@@ -1,13 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import logging
 from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtWidgets import (
     QApplication,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
-    QInputDialog,
     QLabel,
     QListWidgetItem,
     QMessageBox,

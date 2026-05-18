@@ -3,24 +3,20 @@ from PySide6.QtCore import QCoreApplication,QTimer
 from typing import TYPE_CHECKING, Type
 import qtawesome as qta
 from bsdd_gui.module.excel import constants
-import json
-from bsdd_json.utils import class_utils
 from bsdd_gui.presets.ui_presets.waiting import stop_waiting_widget
 
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.excel import ui
-    from bsdd_gui.tool.property_picker import PsetDict
-    from bsdd_gui.tool.excel import SettingsDict
     from bsdd_json import BsddClass
+
 def connect_to_main_window(
     excel: Type[tool.Excel],
     main_window: Type[tool.MainWindowWidget],
     project: Type[tool.Project],
 ):
-    # Action uses the WidgetTool request to allow trigger routing
-
+    # Action uses the WidgetTool request to allow trigger routing 
     action = main_window.add_action(
         "menuFile",
         "Export Excel",
@@ -58,7 +54,7 @@ def register_widget(widget: ui.Widget, excel: Type[tool.Excel]):
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
-
+    widget.settings_widget.setVisible(False)
 
 def register_fields(widget: ui.Widget, excel: Type[tool.Excel]):
     pass
@@ -86,29 +82,7 @@ def export_settings(
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
-    # Create Dict
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    class_dict: dict[str, bool] = pp_class_view.get_check_dict(class_tree)
-    property_dict: PsetDict = pp_property_view.get_check_dict(property_tree)
-    settings_dict: SettingsDict = widget_tool.get_settings(widget)
-    full_dict: SettingsDict = {
-        "class_settings": class_dict,
-        "property_settings": property_dict,
-        "settings": settings_dict,
-    }
-
-    # Set Path
-    text = QCoreApplication.translate("Excel", "Export Excel settings")
-    old_path = appdata.get_path(constants.APPDATA_OPTION)
-    new_path = popups.get_save_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
-    if not new_path:
-        return
-    appdata.set_path(constants.APPDATA_OPTION, new_path)
-
-    # Write Json
-    with open(new_path, "w") as file:
-        json.dump(full_dict, file)
+    return
 
 
 def import_settings(
@@ -119,47 +93,28 @@ def import_settings(
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
-    # Handle Path
-    old_path = appdata.get_path(constants.APPDATA_OPTION)
-    text = QCoreApplication.translate("Excel", "Import Excel settings")
-    new_path = popups.get_open_path(constants.SETTINGS_FILETYPE, widget.window(), old_path, text)
-    if not new_path:
-        return
-    appdata.set_path(constants.APPDATA_OPTION, new_path)
+    return
 
-    # Read Settings
-    with open(new_path, "r") as file:
-        full_dict: SettingsDict = json.load(file)
-    class_dict = full_dict.get("class_settings", {})
-    property_dict = full_dict.get("property_settings", {})
-    settings_dict = full_dict.get("settings", {})
-
-    # Fill Fields and Checkstates
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    pp_class_view.set_check_dict(class_dict, class_tree)
-    pp_property_view.set_check_dict(property_dict, property_tree)
-    widget_tool.set_settings(widget, settings_dict)
-    pass
-
-def export_excel(    widget: ui.Widget,
+def export(    widget: ui.Widget,
     excel: Type[tool.Excel],
-    pp_class_view: Type[tool.PPClassView],
-    pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
     util:Type[tool.Util],
-    project:type[tool.Project]):
+    project:type[tool.Project],
+    loin:Type[tool.Loin],):
     
     excel.sync_to_model(widget, widget.bsdd_data)
     title = QCoreApplication.translate("Excel", "Export Excel")
     waiting_worker, waiting_thread, waiting_widget = util.create_waiting_widget(title)
     waiting_widget.set_title("Load Data")
-
-    class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
-    property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
-    base_settings = excel.get_settings(widget)
     bsdd_dict = project.get()
+
+    specs = loin.select_specs_dialog(widget)
+    if not specs:
+        return
+    checked_classes = loin.get_checked_classes(specs,bsdd_dict)
+    checked_properties = loin.get_checked_properties(specs,bsdd_dict)
+    base_settings = excel.get_settings(widget)
     out_path = widget.fw_output.get_path()
 
     def export_done(classes:list[BsddClass]):
@@ -171,7 +126,7 @@ def export_excel(    widget: ui.Widget,
         
     
 
-    build_worker, build_thread = excel.create_build_thread(bsdd_dict,class_settings,property_settings,out_path)
+    build_worker, build_thread = excel.create_build_thread(bsdd_dict,checked_classes,checked_properties,out_path)
 
     build_worker.finished.connect(export_done )
     build_worker.error.connect(lambda: stop_waiting_widget(waiting_worker))

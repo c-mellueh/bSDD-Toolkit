@@ -1,11 +1,13 @@
 from __future__ import annotations
-from bsdd_json import BsddDictionary
+
 import pytest
 
-from .helpers import make_class, make_dictionary, make_property
+from bsdd_json import BsddDictionary
+
+from .helpers import make_class, make_property
 
 
-@pytest.fixture()
+@pytest.fixture
 def populated_dictionary() -> BsddDictionary:
     """Dictionary with a small class/property tree for navigation tests.
 

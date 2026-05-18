@@ -1,5 +1,4 @@
 from __future__ import annotations
-import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.plugins.graph_viewer.core import window as core
 from typing import TYPE_CHECKING

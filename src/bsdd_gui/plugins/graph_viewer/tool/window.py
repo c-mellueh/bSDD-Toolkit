@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtCore import Signal, QCoreApplication
-import logging
+from PySide6.QtCore import Signal
 
 import bsdd_gui
 from bsdd_gui.plugins.graph_viewer.module.window import ui, trigger
@@ -10,7 +9,6 @@ from bsdd_gui.presets.signal_presets import FieldSignals
 
 if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.window.prop import GraphViewerWindowProperties
-    from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
 
 
 class Signals(PluginSignals, FieldSignals):

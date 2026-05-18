@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict, Literal
 import logging
-from bsdd_json import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
+from bsdd_json import BsddDictionary, BsddClass, BsddClassProperty
 import bsdd_gui
 from ifctester.facet import Property as PropertyFacet
 from ifctester.facet import Entity as EntityFacet
@@ -125,18 +125,18 @@ class IdsExporter(ActionTool, FieldTool):
 
         var = "ids_template"
         path = tool.Appdata.get_path(var)
-        if not path:
+        if not path or not os.path.exists(path):
             path = os.path.join(DATA_PATH, "template.ids")
         tool.Appdata.set_path(var, path)
         return path
 
     @classmethod
     def build_inherited_checkstate_dict(
-        cls, bsdd_classes: list[BsddClass], old_checkstate_dict: dict[str, bool]
+        cls, bsdd_classes: list[BsddClass], checked_classes: list[BsddClass]
     ):
         def _iter_classes(child_classes: list[BsddClass], parent_checkstate: bool):
             for child in child_classes:
-                checkstate = old_checkstate_dict.get(child.Code, True) and parent_checkstate
+                checkstate = child in checked_classes and parent_checkstate
                 new_checkstate_dict[child.Code] = checkstate
                 _iter_classes(class_utils.get_children(child), checkstate)
 
@@ -367,7 +367,6 @@ class IdsExporter(ActionTool, FieldTool):
     def get_settings(cls, widget: ui.IdsWidget) -> BasicSettingsDict:
 
         settings_dict = {
-            "inherit": widget.cb_inh.isChecked(),
             "classification": widget.cb_clsf.isChecked(),
             "type_objects": widget.cb_type_objects.isChecked(),
             "main_pset": widget.cb_pset.currentText(),
@@ -412,13 +411,10 @@ class IdsExporter(ActionTool, FieldTool):
 
     @classmethod
     def set_settings(cls, widget: ui.IdsWidget, settings_dict: BasicSettingsDict):
-        inherit = settings_dict.get("inherit")
         classification = settings_dict.get("classification")
         pset = settings_dict.get("main_pset")
         prop = settings_dict.get("main_property")
 
-        if inherit is not None:
-            widget.cb_inh.setChecked(inherit)
         if classification is not None:
             widget.cb_clsf.setChecked(classification)
         if pset is not None:
@@ -469,44 +465,70 @@ class IdsExporter(ActionTool, FieldTool):
     def _run_setup(
         cls,
         widget: ui.IdsWidget,
-        class_settings: dict[str, bool],
+        checked_classes: list[BsddClass],
         property_settings: PsetDict,
         base_settings: BasicSettingsDict,
         metadata_settings: MetadataDict,
     ) -> PayLoadDict:
+        
         out_path = widget.fw_output.get_path()
+        logging.debug(f"Output path: {out_path}")
         template_path = cls.get_template()
+        logging.debug(f"Template path: {template_path}")
+
         ifc_version = metadata_settings.get("ifc_versions", ["IFC4X3_ADD2"])
         bsdd_dict = widget.bsdd_data
+        logging.debug("load Template")
         ids = ifctester.ids.open(template_path)
+        logging.debug(f"Template IDS loaded with {len(ids.specifications)} specifications")
+
         base_spec = ids.specifications[0]
+        logging.debug(f"Base specification: {base_spec}")
+
         if base_settings.get("classification", False):
+            logging.debug("Use Classification: True")
+
             ids.specifications = list()
         else:
+            logging.debug("Use Classification: False")
+
             mp = base_settings.get("main_property", "")
             mps = base_settings.get("main_pset", "")
-            base_requirement: PropertyFacet = base_spec.requirements[0]
-            base_requirement.propertySet = mps
-            base_requirement.baseName = mp
-            base_restriction = base_requirement.value
 
             identifiers = set()
-            for bsdd_class in bsdd_dict.Classes:
-
+            for bsdd_class in checked_classes:
                 for identifier in cls.get_identifiers_by_class(bsdd_class, mp, mps, bsdd_dict):
                     identifiers.add(identifier)
 
-            base_restriction.options = {"enumeration": sorted(identifiers)}
+            base_restriction = Restriction(options={"enumeration": sorted(identifiers)})
+
+            if base_spec.requirements:
+                base_requirement: PropertyFacet = base_spec.requirements[0]
+                base_requirement.propertySet = mps
+                base_requirement.baseName = mp
+                base_requirement.value = base_restriction
+            else:
+                base_requirement = PropertyFacet(
+                    mps,
+                    mp,
+                    base_restriction,
+                    base_settings.get("datatype", "IFCTEXT"),
+                    cardinality="optional",
+                )
+                base_spec.requirements.append(base_requirement)
+
             base_requirement.dataType = base_settings.get("datatype")
             base_spec.ifcVersion = ifc_version
 
+        logging.debug("Basic Classification created")
+
         cls.fill_ids_by_metadata(ids, metadata_settings)
         if base_settings["inherit"]:
-            cs = cls.build_inherited_checkstate_dict(bsdd_dict.Classes, class_settings)
+            cs = cls.build_inherited_checkstate_dict(bsdd_dict.Classes, checked_classes)
         else:
-            cs = class_settings
+            cs = {c.Code: True for c in checked_classes}
 
-        sorted_classes = sorted([c for c in bsdd_dict.Classes if c.ClassType == "Class"],key=lambda x: x.Code)
+        sorted_classes = sorted([c for c in checked_classes if c.ClassType == "Class"], key=lambda x: x.Code)
         payload: PayLoadDict = {
             "ids": ids,
             "sorted_classes": sorted_classes,
@@ -517,13 +539,15 @@ class IdsExporter(ActionTool, FieldTool):
             "ifc_version": ifc_version,
             "out_path": out_path,
         }
+        logging.debug("Payload created")
+
         return payload
 
     @classmethod
     def create_setup_thread(
         cls,
         widget: ui.IdsWidget,
-        class_settings: dict[str, bool],
+        checked_classes: list[BsddClass],
         property_settings: PsetDict,
         base_settings: BasicSettingsDict,
         metadata_settings: MetadataDict,
@@ -537,13 +561,15 @@ class IdsExporter(ActionTool, FieldTool):
 
             def run(self):
                 try:
+                    logging.info("Start setup thread!")
                     payload = cls._run_setup(
                         widget,
-                        class_settings,
+                        checked_classes,
                         property_settings,
                         base_settings,
                         metadata_settings,
                     )
+                    logging.info("Finished setup thread!")
                     self.finished.emit(payload)
 
                 except Exception as exc:  # pragma: no cover - pass through
@@ -595,7 +621,7 @@ class IdsExporter(ActionTool, FieldTool):
 
         def _process_bsdd_class(bsdd_class: BsddClass, idx: int):
             logging.info(f"Process {bsdd_class.Name} [{bsdd_class.Code}]")
-            if not class_settings.get(bsdd_class.Code, True):
+            if not class_settings.get(bsdd_class.Code, False):
                 return
 
             spec = Specification(
@@ -658,6 +684,7 @@ class IdsExporter(ActionTool, FieldTool):
 
     @classmethod
     def fill_ids_by_metadata(cls, ids, metadata: MetadataDict):
+        logging.debug("Fill IDS metadata")
 
         ids.info["title"] = metadata.get("title", ids.info.get("title"))
         ids.info["description"] = metadata.get("description", ids.info.get("description"))

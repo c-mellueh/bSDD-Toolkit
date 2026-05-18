@@ -1,5 +1,5 @@
 from __future__ import annotations
-from PySide6.QtCore import QCoreApplication, QModelIndex, QTimer
+from PySide6.QtCore import QCoreApplication, QTimer
 from typing import TYPE_CHECKING, Type
 from bsdd_gui.module.ids_exporter import constants
 import json
@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from bsdd_gui.tool.ids_exporter import (
         BasicSettingsDict,
         MetadataDict,
-        PsetDict,
         SettingsDict,
         PayLoadDict,
     )
@@ -66,11 +65,9 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget.fw_output.section = "paths"
     widget.fw_output.option = "ids"
     widget.fw_output.title = "get IDS-Export Path"
-
+    widget.fw_output.load_path()
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
-    widget.fw_output.load_path()
-
 
 def register_fields(
     widget: ui.IdsWidget,
@@ -79,7 +76,6 @@ def register_fields(
 
     widget_tool.register_appdata_field(widget, widget.cb_clsf, "ids", "classif", "bool")
     widget_tool.register_appdata_field(widget, widget.cb_type_objects, "ids", "type_obj", "bool")
-    widget_tool.register_appdata_field(widget, widget.cb_inh, "ids", "inherit", "bool")
     widget_tool.register_appdata_field(widget, widget.le_title, "ids", "title", "string")
     widget_tool.register_appdata_field(widget, widget.le_desc, "ids", "desc", "string")
     widget_tool.register_appdata_field(widget, widget.le_author, "ids", "author", "string")
@@ -141,7 +137,7 @@ def connect_widget(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
     pp_class_view: Type[tool.PPClassView],
-    main_window: Type[tool.MainWindowWidget],
+    loin: Type[tool.Loin],
 ):
     widget.cb_prop.hide()
     widget.cb_pset.hide()
@@ -156,31 +152,19 @@ def connect_widget(
     thread.finished.connect(lambda: setattr(widget, "_count_dialog", None))
     worker.finished.connect(lambda: widget_tool.fill_pset_combobox(widget))
     widget_tool.connect_widget_signals(widget)
-    class_view = widget.property_picker.tv_classes
-    widget.cb_inh.toggled.connect(lambda cs: pp_class_view.request_set_inheritance(cs,class_view))
-
-
-
 
 
 def export_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    pp_class_view: Type[tool.PPClassView],
-    pp_property_view: Type[tool.PPPropertyView],
+
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
     # Create Dict
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    class_dict: dict[str, bool] = pp_class_view.get_check_dict(class_tree)
-    property_dict: PsetDict = pp_property_view.get_check_dict(property_tree)
     settings_dict: BasicSettingsDict = widget_tool.get_settings(widget)
     ids_metadata: MetadataDict = widget_tool.get_ids_metadata(widget)
     full_dict: SettingsDict = {
-        "class_settings": class_dict,
-        "property_settings": property_dict,
         "settings": settings_dict,
         "ids_metadata": ids_metadata,
     }
@@ -201,8 +185,6 @@ def export_settings(
 def import_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    pp_class_view: Type[tool.PPClassView],
-    pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
@@ -217,33 +199,27 @@ def import_settings(
     # Read Settings
     with open(new_path, "r") as file:
         full_dict: SettingsDict = json.load(file)
-    class_dict = full_dict.get("class_settings", {})
-    property_dict = full_dict.get("property_settings", {})
     settings_dict = full_dict.get("settings", {})
     ids_metadata = full_dict.get("ids_metadata", {})
-
-    # Fill Fields and Checkstates
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    pp_class_view.set_check_dict(class_dict, class_tree)
-    pp_property_view.set_check_dict(property_dict, property_tree)
     widget_tool.set_settings(widget, settings_dict)
     widget_tool.set_ids_metadata(widget, ids_metadata)
-    pass
 
 
 def export_ids(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    pp_class_view: Type[tool.PPClassView],
-    pp_property_view: Type[tool.PPPropertyView],
     popups: Type[tool.Popups],
     util: Type[tool.Util],
+    project: Type[tool.Project],
+    loin: Type[tool.Loin],
 ):
-
     widget_tool.sync_to_model(widget, widget.bsdd_data)
-    class_settings = pp_class_view.get_check_dict(widget.property_picker.tv_classes)
-    property_settings = pp_property_view.get_check_dict(widget.property_picker.tv_properties)
+    specs = loin.select_specs_dialog(parent=widget)
+    if specs is None:
+        return
+    bsdd_dict = project.get()
+    checked_classes = loin.get_checked_classes(specs, bsdd_dict)
+    property_settings = loin.get_checked_properties(specs, bsdd_dict)
     base_settings = widget_tool.get_settings(widget)
     metadata_settings = widget_tool.get_ids_metadata(widget)
 
@@ -253,8 +229,13 @@ def export_ids(
     waiting_widget.set_title("Load Data")
 
     setup_worker, setup_thread = widget_tool.create_setup_thread(
-        widget, class_settings, property_settings, base_settings, metadata_settings
+        widget, checked_classes, property_settings, base_settings, metadata_settings
     )
+
+    def _show_error(exc: Exception):
+        stop_waiting_widget(waiting_worker)
+        t = QCoreApplication.translate("IDSExport", "Export Error")
+        popups.create_info_popup(str(exc), t, t, parent=widget)
 
     def _start_specification(payload: PayLoadDict):
         waiting_widget.set_title("Build IDS")
@@ -262,14 +243,13 @@ def export_ids(
         create_worker, creator_thread, creator_dialog = widget_tool.create_build_thread(
             payload, waiting_widget
         )
-        creator_thread.finished.connect(lambda: _export(payload["ids"], payload["out_path"]))
-        creator_thread.start()
-
-    def _setup_failed(_exc: Exception):
-        stop_waiting_widget(waiting_worker)
+        # run_iterable_with_progress already starts the thread; marshal _export to the
+        # main thread explicitly so widget operations don't run from the worker thread.
+        create_worker.finished.connect(
+            lambda: QTimer.singleShot(0, widget, lambda: _export(payload["ids"], payload["out_path"]))
+        )
 
     def _dispatch_specification(payload: PayLoadDict):
-        # queue execution on the main thread (mw affinity)
         QTimer.singleShot(0, widget, lambda: _start_specification(payload))
 
     def _export(ids: Ids, out_path: str):
@@ -278,6 +258,8 @@ def export_ids(
 
         write_worker, write_thread = widget_tool.create_write_thread(ids, out_path)
         waiting_widget.set_title("Write IDS")
+        # Use write_thread.finished (QThread object lives in main thread) so these
+        # slots are delivered via QueuedConnection and run on the main thread.
         write_thread.finished.connect(
             lambda: popups.create_info_popup(
                 f"{len(ids.specifications)} Specifications created.",
@@ -286,10 +268,15 @@ def export_ids(
                 parent=widget,
             )
         )
-        logging.info("Export Done!")
         write_thread.finished.connect(lambda: stop_waiting_widget(waiting_worker))
+        write_worker.error.connect(
+            lambda exc: QTimer.singleShot(0, widget, lambda: _show_error(exc))
+        )
+        logging.info("Export Done!")
         write_thread.start()
 
     setup_worker.finished.connect(_dispatch_specification)
-    setup_worker.error.connect(_setup_failed)
+    setup_worker.error.connect(
+        lambda exc: QTimer.singleShot(0, widget, lambda: _show_error(exc))
+    )
     setup_thread.start()

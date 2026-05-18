@@ -6,7 +6,6 @@ and make_property_relation_bidirectional.  Signal emissions are not verified her
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_json.models import (
     BsddClass,
     BsddClassRelation,

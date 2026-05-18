@@ -92,7 +92,7 @@ def on_new_project():
         logging.warning("ui.py already exists")
     with open(ui_path, "w") as f:
         f.write(
-            f"""from __future__ import annotations
+            """from __future__ import annotations
 from typing import TYPE_CHECKING
 from bsdd_gui.resources.icons import get_icon
 from bsdd_gui.presets.ui_presets import BaseWindow

@@ -1,21 +1,16 @@
 from __future__ import annotations
-from PySide6.QtWidgets import QTreeView, QTreeWidget, QWidget
 from PySide6.QtCore import (
-    QAbstractItemModel,
     Qt,
-    QCoreApplication,
     QModelIndex,
     QSortFilterProxyModel,
     QMimeData,
     QByteArray,
 )
 from bsdd_json.utils import property_utils as prop_utils
-from bsdd_gui.resources.icons import get_icon
-from . import trigger
-from bsdd_json.models import BsddDictionary, BsddClass, BsddClassProperty, BsddProperty
+from bsdd_json.models import BsddClass, BsddProperty
 from bsdd_gui import tool
 from bsdd_gui.presets.models_presets import ItemModel
-from .constants import JSON_MIME as PROP_JSON_MIME, CODES_MIME as PROP_CODES_MIME
+from .constants import JSON_MIME as PROP_JSON_MIME
 from bsdd_gui.module.class_tree_view.constants import (
     JSON_MIME as CLASS_JSON_MIME,
 )

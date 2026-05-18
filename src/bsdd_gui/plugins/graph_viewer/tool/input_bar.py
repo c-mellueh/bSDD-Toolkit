@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import logging
 from bsdd_json import BsddDictionary
 import bsdd_gui
 from PySide6.QtCore import Qt

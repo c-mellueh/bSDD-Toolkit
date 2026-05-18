@@ -1,15 +1,10 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, get_origin, Union, get_args
-from types import NoneType  # Python 3.10+
-import logging
+from typing import TYPE_CHECKING
 import re
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import FieldTool, ActionTool, FieldSignals
-from PySide6.QtCore import Qt, QDateTime, QObject, Signal
-from PySide6.QtWidgets import QCheckBox, QComboBox, QFormLayout, QWidget, QLineEdit, QLabel
-from datetime import datetime
-from bsdd_gui import tool
-from bsdd_gui.module.dictionary_editor_widget import constants, ui, trigger
+from PySide6.QtWidgets import QWidget
+from bsdd_gui.module.dictionary_editor_widget import ui, trigger
 from bsdd_json import BsddDictionary
 
 if TYPE_CHECKING:

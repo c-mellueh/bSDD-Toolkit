@@ -1,20 +1,12 @@
 from __future__ import annotations
 from PySide6.QtWidgets import (
-    QApplication,
-    QWidget,
-    QDialog,
     QDialogButtonBox,
-    QVBoxLayout,
-    QToolButton,
 )
-from PySide6.QtCore import QCoreApplication, Qt, QEvent
-import qtawesome as qta
 from bsdd_gui.resources.icons import get_icon
 from . import trigger
 from bsdd_json import BsddClass
 from bsdd_gui.presets.ui_presets import TagInput, FieldWidget, BaseDialog
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
-from PySide6.QtCore import QRect
 
 
 class IfcTagInput(TagInput):

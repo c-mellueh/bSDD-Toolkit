@@ -34,7 +34,7 @@ def retranslate_ui(settings: Type[tool.SettingsWidget], util: Type[tool.Util]):
 
 
 def open_window(settings: Type[tool.SettingsWidget]):
-    logging.info(f"Opening Settings Window")
+    logging.info("Opening Settings Window")
     dialog = settings.create_dialog()
     from bsdd_gui.module.settings_widget import trigger
 

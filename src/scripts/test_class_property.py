@@ -6,18 +6,13 @@ app = marimo.App(width="full")
 
 @app.cell
 def _():
-    import marimo as mo
     import bsdd
-    import bsdd_json
-    from bsdd_json.utils import dictionary_utils as dict_utils
-    from bsdd_json.utils import property_utils as prop_utils
     from bsdd_json.utils import class_utils as class_utils
-    from bsdd_json import BsddClass,BsddDictionary,BsddClassProperty,BsddProperty,BsddClassRelation,BsddPropertyRelation
-    import tqdm
+    from bsdd_json import BsddDictionary
     client = bsdd.Client()
 
     def swap_codes(data_dict,old,new):
-        if not old in data_dict:
+        if old not in data_dict:
             return
         data_dict[new] = data_dict[old]
         data_dict.pop(old)

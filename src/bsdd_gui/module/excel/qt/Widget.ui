@@ -62,7 +62,7 @@
      <property name="handleWidth">
       <number>6</number>
      </property>
-     <widget class="Widget" name="property_picker" native="true"/>
+     <widget class="Widget" name="loin" native="true"/>
      <widget class="QWidget" name="settings_widget" native="true">
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="leftMargin">
@@ -242,7 +242,7 @@
   <customwidget>
    <class>Widget</class>
    <extends>QWidget</extends>
-   <header>bsdd_gui.module.property_picker.ui</header>
+   <header>bsdd_gui.module.loin.ui</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

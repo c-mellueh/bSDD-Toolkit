@@ -5,14 +5,12 @@ import logging
 import bsdd_gui
 from PySide6.QtCore import (
     QModelIndex,
-    QObject,
     Signal,
-    Qt,
     QSortFilterProxyModel,
     QItemSelectionModel,
 )
-from PySide6.QtWidgets import QWidget, QAbstractItemView, QTreeView
-from bsdd_json.models import BsddClassProperty, BsddClass, BsddProperty, BsddDictionary
+from PySide6.QtWidgets import QWidget, QAbstractItemView
+from bsdd_json.models import BsddClass, BsddProperty, BsddDictionary
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.property_table_widget import ui, models, trigger, views, constants
 import json
@@ -21,7 +19,6 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_table_widget.prop import PropertyTableWidgetProperties
 
 from bsdd_gui.presets.tool_presets import (
-    ItemViewTool,
     ItemViewTool,
     ViewSignals,
     WidgetSignals,
@@ -51,7 +48,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
     @classmethod
     def create_model(cls, data):
         logging.info(
-            f"Create Model not isable in this module use create_class_model and create_property_model"
+            "Create Model not isable in this module use create_class_model and create_property_model"
         )
         return None
 

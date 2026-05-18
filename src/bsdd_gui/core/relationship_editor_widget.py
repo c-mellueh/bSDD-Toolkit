@@ -2,15 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type, Literal
 from bsdd_json import BsddProperty, BsddClass, BsddClassRelation, BsddPropertyRelation
-from PySide6.QtWidgets import QWidget, QTableView
+from PySide6.QtWidgets import QTableView
 from PySide6.QtCore import QCoreApplication, QPoint
 from bsdd_gui.module.relationship_editor_widget import ui, constants
 import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.dictionary_editor_widget import ui as ui_dict
-    from bsdd_gui.presets.ui_presets import ToggleSwitch
     from bsdd_gui.module.class_editor_widget import ui as ui_class
     from bsdd_gui.module.property_editor_widget import ui as ui_property
 

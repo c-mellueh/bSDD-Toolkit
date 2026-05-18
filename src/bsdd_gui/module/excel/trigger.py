@@ -1,5 +1,4 @@
 from __future__ import annotations
-import bsdd_gui
 from bsdd_gui import tool
 from bsdd_gui.core import excel as core
 from typing import TYPE_CHECKING
@@ -48,14 +47,13 @@ def export_settings(widget: ui.Widget):
     )
 
 
-def export_ids(widget: ui.Widget):
-    core.export_excel(
+def export(widget: ui.Widget):
+    core.export(
         widget,
         tool.Excel,
-        tool.PPClassView,
-        tool.PPPropertyView,
         tool.Appdata,
         tool.Popups,
         tool.Util,
-        tool.Project
+        tool.Project,
+        tool.Loin
     )

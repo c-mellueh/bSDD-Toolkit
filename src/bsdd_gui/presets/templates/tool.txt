@@ -15,6 +15,7 @@ class Signals(FieldSignals):
     pass
 
 class {{ tool_name }}(ActionTool,FieldTool):
+    signals = Signals()
     @classmethod
     def get_properties(cls) -> {{ prop_name }}:
         return bsdd_gui.{{ prop_name }}

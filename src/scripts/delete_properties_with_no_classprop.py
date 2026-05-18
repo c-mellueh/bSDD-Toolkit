@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
+from bsdd_json import BsddClassProperty, BsddDictionary
 
 
 def find_classes(bsdd_dictionary: BsddDictionary, bsdd_prop: BsddClassProperty):

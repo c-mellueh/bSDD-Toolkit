@@ -1,8 +1,6 @@
-from PySide6.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QDateTimeEdit, QPushButton
-from PySide6.QtCore import Signal, QDateTime, Qt, QMargins
-from typing import Any
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QDateTimeEdit, QPushButton
+from PySide6.QtCore import QDateTime, Qt, QMargins
 from .toggle_switch import ItemWithToggleSwitch
-from datetime import datetime
 
 
 class DateTimeWithNow(ItemWithToggleSwitch):

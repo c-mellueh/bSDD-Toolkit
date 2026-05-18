@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os
 
-import pytest
 from PySide6.QtCore import Qt
 
 from bsdd_gui.tool import Util

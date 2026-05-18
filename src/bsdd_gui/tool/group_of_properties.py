@@ -1,17 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import logging
 
 from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import (
     FieldTool,
     ActionTool,
-    ItemViewTool,
     FieldSignals,
-    ViewSignals,
 )
-from bsdd_json.utils import class_utils
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_gui.module.group_of_properties import trigger, models, views, ui
 from PySide6.QtWidgets import QWidget

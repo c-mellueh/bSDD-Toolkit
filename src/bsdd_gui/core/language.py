@@ -7,8 +7,6 @@ from PySide6.QtCore import QCoreApplication
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.language import ui
-import bsdd_gui
-import importlib
 
 SECTION = "langugage"
 PATH = "current_language"

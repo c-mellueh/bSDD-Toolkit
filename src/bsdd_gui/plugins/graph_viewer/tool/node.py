@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 import logging
-from PySide6.QtCore import Signal, QPointF, QObject, QCoreApplication, Qt, QRectF
+from PySide6.QtCore import Signal, QPointF, QCoreApplication, Qt, QRectF
 from PySide6.QtWidgets import QGraphicsItem, QHBoxLayout, QLabel, QApplication
 from PySide6.QtGui import QColor, QPen, QBrush, QFontMetrics, QPainterPath, QPainter
 import random

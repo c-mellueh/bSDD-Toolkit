@@ -7,12 +7,11 @@ from bsdd_gui.module.class_property_editor_widget.constants import (
     SEPERATOR,
     SEPERATOR_STATUS,
 )
-from PySide6.QtCore import QCoreApplication, Qt
+from PySide6.QtCore import QCoreApplication
 from bsdd_gui.module.class_property_editor_widget import ui, views, constants
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
-    from bsdd_gui.module.property_editor_widget import ui as property_editor_ui
 
 
 def connect_signals(

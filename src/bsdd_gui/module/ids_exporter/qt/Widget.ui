@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1600</width>
+    <width>1661</width>
     <height>900</height>
    </rect>
   </property>
@@ -62,9 +62,21 @@
      <property name="handleWidth">
       <number>6</number>
      </property>
-
-     <widget class="Widget" name="property_picker" native="true"/>
-          <widget class="QWidget" name="settings_widget" native="true">
+     <widget class="Widget" name="loin" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+     <widget class="QWidget" name="settings_widget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="leftMargin">
         <number>0</number>
@@ -88,8 +100,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>969</width>
-            <height>908</height>
+            <width>224</width>
+            <height>937</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -117,7 +129,7 @@
               <enum>QFrame::Shadow::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
-              <item row="3" column="1">
+              <item row="2" column="1">
                <widget class="ToggleSwitch" name="cb_clsf">
                 <property name="toolTip">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -130,7 +142,37 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0" colspan="2">
+              <item row="1" column="1">
+               <widget class="ToggleSwitch" name="cb_type_objects">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_15">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Check IfcTypeObjects</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>**Settings**</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::TextFormat::MarkdownText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0" colspan="2">
                <widget class="QWidget" name="widget_prop" native="true">
                 <layout class="QGridLayout" name="gridLayout_3">
                  <property name="leftMargin">
@@ -185,57 +227,13 @@
                 </layout>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="label_classification">
                 <property name="toolTip">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
                  <string>Check for Classification</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_15">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Check IfcTypeObjects</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="ToggleSwitch" name="cb_inh">
-                <property name="layoutDirection">
-                 <enum>Qt::LayoutDirection::LeftToRight</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>Inherit Checkstates</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="ToggleSwitch" name="cb_type_objects">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="2">
-               <widget class="QLabel" name="label_13">
-                <property name="text">
-                 <string>**Settings**</string>
-                </property>
-                <property name="textFormat">
-                 <enum>Qt::TextFormat::MarkdownText</enum>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
                 </property>
                </widget>
               </item>
@@ -560,7 +558,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Import</string>
+             <string>Import Settings</string>
             </property>
             <property name="text">
              <string/>
@@ -588,7 +586,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Export</string>
+             <string>Export Settings</string>
             </property>
             <property name="text">
              <string/>
@@ -631,7 +629,7 @@
   <customwidget>
    <class>Widget</class>
    <extends>QWidget</extends>
-   <header>bsdd_gui.module.property_picker.ui</header>
+   <header>bsdd_gui.module.loin.ui</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

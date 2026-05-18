@@ -9,9 +9,8 @@ Coverage:
 """
 from __future__ import annotations
 
-import pytest
 from PySide6.QtCore import QModelIndex
-from bsdd_json.models import BsddClass, BsddDictionary
+from bsdd_json.models import BsddClass
 from bsdd_gui.tool import ClassTreeView
 
 

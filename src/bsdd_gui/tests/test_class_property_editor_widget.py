@@ -6,7 +6,6 @@ is_property_reference_valid, create_temporary_property, and set_code.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_json.models import BsddClass, BsddClassProperty, BsddDictionary, BsddProperty
 
 from bsdd_gui.tool import ClassPropertyEditorWidget

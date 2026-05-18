@@ -6,7 +6,6 @@ from an optional predefined type suffix.
 """
 from __future__ import annotations
 
-import pytest
 from bsdd_gui.tool import IfcHelper
 
 

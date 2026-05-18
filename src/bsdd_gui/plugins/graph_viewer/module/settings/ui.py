@@ -1,25 +1,17 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, Iterable, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt, Signal, QMargins, QCoreApplication
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
     QFrame,
-    QToolButton,
-    QSizePolicy,
-    QScrollArea,
-    QSpacerItem,
 )
 from bsdd_gui.presets.ui_presets import BaseWidget
 from .qt import ui_Widget
 from . import constants, trigger
 
 if TYPE_CHECKING:
-    from .ui import GraphWindow
-    from ..scene_view.ui import GraphScene
+    pass
 
 
 class _SettingsWidget(QFrame):

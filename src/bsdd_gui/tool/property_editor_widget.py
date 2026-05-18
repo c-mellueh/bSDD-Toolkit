@@ -1,13 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type
-import logging
 
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import DialogTool, DialogSignals
 from bsdd_json import BsddClassProperty, BsddDictionary, BsddProperty
 from bsdd_gui.module.property_editor_widget import ui
-from PySide6.QtWidgets import QLayout, QWidget, QCompleter
-from PySide6.QtCore import Signal, QCoreApplication, Qt
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Signal, Qt
 from bsdd_gui.module.property_editor_widget import trigger
 
 if TYPE_CHECKING:

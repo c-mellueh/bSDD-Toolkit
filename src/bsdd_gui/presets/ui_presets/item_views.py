@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QTreeView, QTableView, QListView
+from PySide6.QtWidgets import QTreeView, QTableView
 from typing import TypeAlias
 
 

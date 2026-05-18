@@ -1,7 +1,6 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QWidget, QDialog, QVBoxLayout, QDialogButtonBox
-from PySide6.QtCore import Signal, Qt, QObject
-from typing import TypeAlias
+from PySide6.QtCore import Signal, Qt
 from bsdd_gui.resources.icons import get_icon
 
 

@@ -1,18 +1,12 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Iterable, Callable, Dict
+from typing import TYPE_CHECKING
 from bsdd_gui.plugins.graph_viewer.module.settings.ui import _SettingsWidget
-from bsdd_gui.presets.ui_presets import ToggleSwitch
 from bsdd_json import *
-from . import constants
-from bsdd_gui.plugins.graph_viewer.module.node import constants as node_constants
-from PySide6.QtCore import QPointF, QRectF, Qt, QCoreApplication, Signal, QSize
-from PySide6.QtGui import QBrush, QColor, QPainter, QPainterPath, QPen, QPolygonF
+from PySide6.QtCore import QRectF, Qt, Signal, QSize
+from PySide6.QtGui import QPainter, QPolygonF
 from PySide6.QtWidgets import (
-    QGraphicsItem,
     QGraphicsPathItem,
     QVBoxLayout,
-    QLabel,
-    QHBoxLayout,
     QWidget,
     QSizePolicy,
 )

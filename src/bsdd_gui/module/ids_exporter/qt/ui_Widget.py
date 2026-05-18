@@ -3,32 +3,27 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
+    QSize, Qt)
+from PySide6.QtWidgets import (QComboBox, QFrame, QGridLayout,
     QHBoxLayout, QLabel, QLineEdit, QPushButton,
     QScrollArea, QSizePolicy, QSpacerItem, QSplitter,
     QToolButton, QVBoxLayout, QWidget)
 
 from bsdd_gui.module.ids_exporter.model_views import TagInput_IfcVersion
-from bsdd_gui.module.property_picker.ui import Widget
+from bsdd_gui.module.loin.ui import Widget
 from bsdd_gui.presets.ui_presets import (DateTimeWithNow, FileSelector, ToggleSwitch)
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(1600, 900)
+        Form.resize(1661, 900)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
         self.fw_output = FileSelector(Form)
@@ -64,11 +59,21 @@ class Ui_Form(object):
         self.splitter.setSizePolicy(sizePolicy)
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(6)
-        self.property_picker = Widget(self.splitter)
-        self.property_picker.setObjectName(u"property_picker")
-        self.splitter.addWidget(self.property_picker)
+        self.loin = Widget(self.splitter)
+        self.loin.setObjectName(u"loin")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.loin.sizePolicy().hasHeightForWidth())
+        self.loin.setSizePolicy(sizePolicy1)
+        self.splitter.addWidget(self.loin)
         self.settings_widget = QWidget(self.splitter)
         self.settings_widget.setObjectName(u"settings_widget")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.settings_widget.sizePolicy().hasHeightForWidth())
+        self.settings_widget.setSizePolicy(sizePolicy2)
         self.verticalLayout = QVBoxLayout(self.settings_widget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -77,7 +82,7 @@ class Ui_Form(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollAreaWidgetContents_3 = QWidget()
         self.scrollAreaWidgetContents_3.setObjectName(u"scrollAreaWidgetContents_3")
-        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 969, 908))
+        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 224, 937))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_3)
         self.verticalLayout_3.setSpacing(6)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -92,7 +97,24 @@ class Ui_Form(object):
         self.cb_clsf.setObjectName(u"cb_clsf")
         self.cb_clsf.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
-        self.gridLayout_2.addWidget(self.cb_clsf, 3, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.cb_clsf, 2, 1, 1, 1)
+
+        self.cb_type_objects = ToggleSwitch(self.main_settings)
+        self.cb_type_objects.setObjectName(u"cb_type_objects")
+
+        self.gridLayout_2.addWidget(self.cb_type_objects, 1, 1, 1, 1)
+
+        self.label_15 = QLabel(self.main_settings)
+        self.label_15.setObjectName(u"label_15")
+
+        self.gridLayout_2.addWidget(self.label_15, 1, 0, 1, 1)
+
+        self.label_13 = QLabel(self.main_settings)
+        self.label_13.setObjectName(u"label_13")
+        self.label_13.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.label_13.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.label_13, 0, 0, 1, 2)
 
         self.widget_prop = QWidget(self.main_settings)
         self.widget_prop.setObjectName(u"widget_prop")
@@ -106,11 +128,11 @@ class Ui_Form(object):
 
         self.cb_pset = QComboBox(self.widget_prop)
         self.cb_pset.setObjectName(u"cb_pset")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.cb_pset.sizePolicy().hasHeightForWidth())
-        self.cb_pset.setSizePolicy(sizePolicy1)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.cb_pset.sizePolicy().hasHeightForWidth())
+        self.cb_pset.setSizePolicy(sizePolicy3)
         self.cb_pset.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 
         self.gridLayout_3.addWidget(self.cb_pset, 0, 0, 1, 1)
@@ -128,40 +150,12 @@ class Ui_Form(object):
         self.gridLayout_3.addWidget(self.label_2, 1, 0, 1, 1)
 
 
-        self.gridLayout_2.addWidget(self.widget_prop, 4, 0, 1, 2)
+        self.gridLayout_2.addWidget(self.widget_prop, 3, 0, 1, 2)
 
         self.label_classification = QLabel(self.main_settings)
         self.label_classification.setObjectName(u"label_classification")
 
-        self.gridLayout_2.addWidget(self.label_classification, 3, 0, 1, 1)
-
-        self.label_15 = QLabel(self.main_settings)
-        self.label_15.setObjectName(u"label_15")
-
-        self.gridLayout_2.addWidget(self.label_15, 2, 0, 1, 1)
-
-        self.cb_inh = ToggleSwitch(self.main_settings)
-        self.cb_inh.setObjectName(u"cb_inh")
-        self.cb_inh.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-
-        self.gridLayout_2.addWidget(self.cb_inh, 1, 1, 1, 1)
-
-        self.label = QLabel(self.main_settings)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
-
-        self.cb_type_objects = ToggleSwitch(self.main_settings)
-        self.cb_type_objects.setObjectName(u"cb_type_objects")
-
-        self.gridLayout_2.addWidget(self.cb_type_objects, 2, 1, 1, 1)
-
-        self.label_13 = QLabel(self.main_settings)
-        self.label_13.setObjectName(u"label_13")
-        self.label_13.setTextFormat(Qt.TextFormat.MarkdownText)
-        self.label_13.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.label_13, 0, 0, 1, 2)
+        self.gridLayout_2.addWidget(self.label_classification, 2, 0, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.main_settings)
@@ -386,11 +380,11 @@ class Ui_Form(object):
 
         self.pb_export = QToolButton(self.fr_download)
         self.pb_export.setObjectName(u"pb_export")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.pb_export.sizePolicy().hasHeightForWidth())
-        self.pb_export.setSizePolicy(sizePolicy2)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.pb_export.sizePolicy().hasHeightForWidth())
+        self.pb_export.setSizePolicy(sizePolicy4)
         self.pb_export.setMinimumSize(QSize(30, 30))
         self.pb_export.setMaximumSize(QSize(24, 24))
 
@@ -417,6 +411,14 @@ class Ui_Form(object):
         self.cb_clsf.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.cb_clsf.setText(QCoreApplication.translate("Form", u"CheckBox", None))
+#if QT_CONFIG(tooltip)
+        self.cb_type_objects.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.label_15.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_15.setText(QCoreApplication.translate("Form", u"Check IfcTypeObjects", None))
+        self.label_13.setText(QCoreApplication.translate("Form", u"**Settings**", None))
         self.cb_datatype.setItemText(0, QCoreApplication.translate("Form", u"IfcLabel", None))
         self.cb_datatype.setItemText(1, QCoreApplication.translate("Form", u"IfcText", None))
 
@@ -425,15 +427,6 @@ class Ui_Form(object):
         self.label_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.label_classification.setText(QCoreApplication.translate("Form", u"Check for Classification", None))
-#if QT_CONFIG(tooltip)
-        self.label_15.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.label_15.setText(QCoreApplication.translate("Form", u"Check IfcTypeObjects", None))
-        self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
-#if QT_CONFIG(tooltip)
-        self.cb_type_objects.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.label_13.setText(QCoreApplication.translate("Form", u"**Settings**", None))
         self.label_6.setText(QCoreApplication.translate("Form", u"Author", None))
         self.label_8.setText(QCoreApplication.translate("Form", u"Date", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"IFC-Versions", None))
@@ -466,11 +459,11 @@ class Ui_Form(object):
         self.cb_time.setItemText(0, QCoreApplication.translate("Form", u"IFCDATETIME", None))
 
 #if QT_CONFIG(tooltip)
-        self.pb_import.setToolTip(QCoreApplication.translate("Form", u"Import", None))
+        self.pb_import.setToolTip(QCoreApplication.translate("Form", u"Import Settings", None))
 #endif // QT_CONFIG(tooltip)
         self.pb_import.setText("")
 #if QT_CONFIG(tooltip)
-        self.pb_export.setToolTip(QCoreApplication.translate("Form", u"Export", None))
+        self.pb_export.setToolTip(QCoreApplication.translate("Form", u"Export Settings", None))
 #endif // QT_CONFIG(tooltip)
         self.pb_export.setText("")
     # retranslateUi

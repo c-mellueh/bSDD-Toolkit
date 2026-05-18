@@ -78,7 +78,7 @@ def on_new_project():
         logging.warning("ui.py already exists")
     with open(ui_path, "w") as f:
         f.write(
-            f"""
+            """
 
     """
         )
@@ -90,7 +90,7 @@ def create_core(name: str):
         logging.warning("core.py already exists")
     with open(core_path, "w") as f:
         f.write(
-            f"""from __future__ import annotations
+            """from __future__ import annotations
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

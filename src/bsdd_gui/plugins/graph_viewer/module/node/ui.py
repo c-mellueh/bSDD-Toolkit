@@ -1,7 +1,7 @@
 from __future__ import annotations
 from bsdd_json import BsddProperty, BsddClass
 from PySide6.QtWidgets import QGraphicsObject, QGraphicsItem, QWidget, QSizePolicy, QVBoxLayout
-from PySide6.QtCore import QPointF, QRectF, QPointF, QSize, Signal
+from PySide6.QtCore import QRectF, QPointF, QSize, Signal
 from PySide6.QtGui import QBrush, QPen, QPainterPath, QPainter
 from bsdd_gui.plugins.graph_viewer.module.settings.ui import _SettingsWidget
 from . import trigger
