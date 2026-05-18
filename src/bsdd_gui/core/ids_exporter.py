@@ -77,7 +77,6 @@ def register_fields(
 
     widget_tool.register_appdata_field(widget, widget.cb_clsf, "ids", "classif", "bool")
     widget_tool.register_appdata_field(widget, widget.cb_type_objects, "ids", "type_obj", "bool")
-    widget_tool.register_appdata_field(widget, widget.cb_inh, "ids", "inherit", "bool")
     widget_tool.register_appdata_field(widget, widget.le_title, "ids", "title", "string")
     widget_tool.register_appdata_field(widget, widget.le_desc, "ids", "desc", "string")
     widget_tool.register_appdata_field(widget, widget.le_author, "ids", "author", "string")
@@ -154,11 +153,6 @@ def connect_widget(
     thread.finished.connect(lambda: setattr(widget, "_count_dialog", None))
     worker.finished.connect(lambda: widget_tool.fill_pset_combobox(widget))
     widget_tool.connect_widget_signals(widget)
-    class_view = widget.loin.tv_classes
-    widget.cb_inh.toggled.connect(lambda cs: pp_class_view.request_set_inheritance(cs,class_view))
-
-
-
 
 
 def export_settings(

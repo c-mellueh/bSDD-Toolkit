@@ -28,7 +28,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(1600, 900)
+        Form.resize(1661, 900)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
         self.fw_output = FileSelector(Form)
@@ -87,7 +87,7 @@ class Ui_Form(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollAreaWidgetContents_3 = QWidget()
         self.scrollAreaWidgetContents_3.setObjectName(u"scrollAreaWidgetContents_3")
-        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 224, 962))
+        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 224, 937))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_3)
         self.verticalLayout_3.setSpacing(6)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -102,7 +102,24 @@ class Ui_Form(object):
         self.cb_clsf.setObjectName(u"cb_clsf")
         self.cb_clsf.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
-        self.gridLayout_2.addWidget(self.cb_clsf, 3, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.cb_clsf, 2, 1, 1, 1)
+
+        self.cb_type_objects = ToggleSwitch(self.main_settings)
+        self.cb_type_objects.setObjectName(u"cb_type_objects")
+
+        self.gridLayout_2.addWidget(self.cb_type_objects, 1, 1, 1, 1)
+
+        self.label_15 = QLabel(self.main_settings)
+        self.label_15.setObjectName(u"label_15")
+
+        self.gridLayout_2.addWidget(self.label_15, 1, 0, 1, 1)
+
+        self.label_13 = QLabel(self.main_settings)
+        self.label_13.setObjectName(u"label_13")
+        self.label_13.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.label_13.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.label_13, 0, 0, 1, 2)
 
         self.widget_prop = QWidget(self.main_settings)
         self.widget_prop.setObjectName(u"widget_prop")
@@ -138,40 +155,12 @@ class Ui_Form(object):
         self.gridLayout_3.addWidget(self.label_2, 1, 0, 1, 1)
 
 
-        self.gridLayout_2.addWidget(self.widget_prop, 4, 0, 1, 2)
+        self.gridLayout_2.addWidget(self.widget_prop, 3, 0, 1, 2)
 
         self.label_classification = QLabel(self.main_settings)
         self.label_classification.setObjectName(u"label_classification")
 
-        self.gridLayout_2.addWidget(self.label_classification, 3, 0, 1, 1)
-
-        self.label_15 = QLabel(self.main_settings)
-        self.label_15.setObjectName(u"label_15")
-
-        self.gridLayout_2.addWidget(self.label_15, 2, 0, 1, 1)
-
-        self.cb_inh = ToggleSwitch(self.main_settings)
-        self.cb_inh.setObjectName(u"cb_inh")
-        self.cb_inh.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-
-        self.gridLayout_2.addWidget(self.cb_inh, 1, 1, 1, 1)
-
-        self.label = QLabel(self.main_settings)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
-
-        self.cb_type_objects = ToggleSwitch(self.main_settings)
-        self.cb_type_objects.setObjectName(u"cb_type_objects")
-
-        self.gridLayout_2.addWidget(self.cb_type_objects, 2, 1, 1, 1)
-
-        self.label_13 = QLabel(self.main_settings)
-        self.label_13.setObjectName(u"label_13")
-        self.label_13.setTextFormat(Qt.TextFormat.MarkdownText)
-        self.label_13.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.label_13, 0, 0, 1, 2)
+        self.gridLayout_2.addWidget(self.label_classification, 2, 0, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.main_settings)
@@ -427,6 +416,14 @@ class Ui_Form(object):
         self.cb_clsf.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.cb_clsf.setText(QCoreApplication.translate("Form", u"CheckBox", None))
+#if QT_CONFIG(tooltip)
+        self.cb_type_objects.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.label_15.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_15.setText(QCoreApplication.translate("Form", u"Check IfcTypeObjects", None))
+        self.label_13.setText(QCoreApplication.translate("Form", u"**Settings**", None))
         self.cb_datatype.setItemText(0, QCoreApplication.translate("Form", u"IfcLabel", None))
         self.cb_datatype.setItemText(1, QCoreApplication.translate("Form", u"IfcText", None))
 
@@ -435,15 +432,6 @@ class Ui_Form(object):
         self.label_classification.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When checked, the IDS-Rules will automatically evaluate all entities classified under the <span style=\" font-weight:700;\">bSDD classification</span>. If unchecked, you must manually specify a Property to associate the entities with a class definition.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.label_classification.setText(QCoreApplication.translate("Form", u"Check for Classification", None))
-#if QT_CONFIG(tooltip)
-        self.label_15.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.label_15.setText(QCoreApplication.translate("Form", u"Check IfcTypeObjects", None))
-        self.label.setText(QCoreApplication.translate("Form", u"Inherit Checkstates", None))
-#if QT_CONFIG(tooltip)
-        self.cb_type_objects.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.label_13.setText(QCoreApplication.translate("Form", u"**Settings**", None))
         self.label_6.setText(QCoreApplication.translate("Form", u"Author", None))
         self.label_8.setText(QCoreApplication.translate("Form", u"Date", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"IFC-Versions", None))

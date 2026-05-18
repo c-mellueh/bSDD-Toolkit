@@ -158,7 +158,6 @@ class Excel(ActionTool, FieldTool):
     def get_settings(cls, widget: ui.Widget) -> BasicSettingsDict:
 
         settings_dict = {
-            # "inherit": widget.cb_inh.isChecked(),
             # "classification": widget.cb_clsf.isChecked(),
             # "type_objects": widget.cb_type_objects.isChecked(),
             # "main_pset": widget.cb_pset.currentText(),

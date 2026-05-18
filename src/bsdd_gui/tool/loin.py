@@ -1098,8 +1098,7 @@ class Loin(ActionTool, WidgetTool):
 
 
 class ClassSignals(ViewSignals):
-    set_inheritance_requested = Signal(bool, model_views.ClassView)
-
+    pass
 
 class PPClassView(ItemViewTool):
     signals = ClassSignals()
@@ -1121,12 +1120,7 @@ class PPClassView(ItemViewTool):
         return models.SortModel
 
     @classmethod
-    def request_set_inheritance(cls, state: bool, view: model_views.ClassView):
-        cls.signals.set_inheritance_requested.emit(state, view)
-
-    @classmethod
     def connect_internal_signals(cls):
-        cls.signals.set_inheritance_requested.connect(cls.set_checkstate_inheritance)
         return super().connect_internal_signals()
 
 
@@ -1147,10 +1141,6 @@ class PPClassView(ItemViewTool):
         return full
 
 
-    @classmethod
-    def set_checkstate_inheritance(cls, state: bool, view: model_views.ClassView):
-        class_model: models.ClassTreeModel = view.model().sourceModel()
-        class_model.set_checkstate_inheritance(state)
 
     @classmethod
     def get_property_view(cls, class_view: model_views.ClassView) -> model_views.PropertyView:

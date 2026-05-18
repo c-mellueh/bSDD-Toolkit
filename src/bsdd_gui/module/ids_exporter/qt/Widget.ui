@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1600</width>
+    <width>1661</width>
     <height>900</height>
    </rect>
   </property>
@@ -101,7 +101,7 @@
             <x>0</x>
             <y>0</y>
             <width>224</width>
-            <height>962</height>
+            <height>937</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -129,7 +129,7 @@
               <enum>QFrame::Shadow::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
-              <item row="3" column="1">
+              <item row="2" column="1">
                <widget class="ToggleSwitch" name="cb_clsf">
                 <property name="toolTip">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -142,7 +142,37 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0" colspan="2">
+              <item row="1" column="1">
+               <widget class="ToggleSwitch" name="cb_type_objects">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_15">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Check IfcTypeObjects</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>**Settings**</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::TextFormat::MarkdownText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0" colspan="2">
                <widget class="QWidget" name="widget_prop" native="true">
                 <layout class="QGridLayout" name="gridLayout_3">
                  <property name="leftMargin">
@@ -197,57 +227,13 @@
                 </layout>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="label_classification">
                 <property name="toolTip">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
                  <string>Check for Classification</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_15">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Check IfcTypeObjects</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="ToggleSwitch" name="cb_inh">
-                <property name="layoutDirection">
-                 <enum>Qt::LayoutDirection::LeftToRight</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>Inherit Checkstates</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="ToggleSwitch" name="cb_type_objects">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="2">
-               <widget class="QLabel" name="label_13">
-                <property name="text">
-                 <string>**Settings**</string>
-                </property>
-                <property name="textFormat">
-                 <enum>Qt::TextFormat::MarkdownText</enum>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
                 </property>
                </widget>
               </item>

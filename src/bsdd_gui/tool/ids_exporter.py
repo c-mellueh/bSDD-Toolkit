@@ -367,7 +367,6 @@ class IdsExporter(ActionTool, FieldTool):
     def get_settings(cls, widget: ui.IdsWidget) -> BasicSettingsDict:
 
         settings_dict = {
-            "inherit": widget.cb_inh.isChecked(),
             "classification": widget.cb_clsf.isChecked(),
             "type_objects": widget.cb_type_objects.isChecked(),
             "main_pset": widget.cb_pset.currentText(),
@@ -412,13 +411,10 @@ class IdsExporter(ActionTool, FieldTool):
 
     @classmethod
     def set_settings(cls, widget: ui.IdsWidget, settings_dict: BasicSettingsDict):
-        inherit = settings_dict.get("inherit")
         classification = settings_dict.get("classification")
         pset = settings_dict.get("main_pset")
         prop = settings_dict.get("main_property")
 
-        if inherit is not None:
-            widget.cb_inh.setChecked(inherit)
         if classification is not None:
             widget.cb_clsf.setChecked(classification)
         if pset is not None:
