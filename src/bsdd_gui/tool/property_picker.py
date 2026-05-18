@@ -110,7 +110,7 @@ class PropertyPicker(ActionTool, WidgetTool):
         super().connect_widget_signals(widget)
 
     @classmethod
-    def get_loin(cls) -> Optional[LoinLevelOfInformationNeed]:
+    def get_loin(cls) -> LoinLevelOfInformationNeed|None:
         """Return the LOIN root, or None if no specifications exist yet.
 
         The XSD requires LoinLevelOfInformationNeed.specifications to have at
@@ -815,11 +815,11 @@ class PropertyPicker(ActionTool, WidgetTool):
         if alpha is None:
             alpha = LoinAlphanumericalInformation(
                 guid=uuid4(),
-                groups_of_properties=LoinGroupsOfProperties(),
+                groups_of_properties=LoinGroupsOfProperties(group_of_properties=[]),
             )
             spec_per_obj.alphanumerical_information = alpha
         if alpha.groups_of_properties is None:
-            alpha.groups_of_properties = LoinGroupsOfProperties()
+            alpha.groups_of_properties = LoinGroupsOfProperties(group_of_properties=[])
 
         # Build the property ref first so we can create the group with it
         # (IsoGroupOfProperties.has_property_refs has min_length=1).
@@ -909,6 +909,8 @@ class PropertyPicker(ActionTool, WidgetTool):
     @classmethod
     def export_to_xml(cls, out_path: str) -> int:
         loin = cls.get_loin()
+        spec = loin.specifications[0]
+        spec.specifications_per_object_type
         if loin is None:
             raise ValueError(
                 "Cannot export an empty LOIN — add at least one Purpose, "

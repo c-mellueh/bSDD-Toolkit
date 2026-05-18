@@ -745,9 +745,11 @@ class LoinPrerequisites(BaseXmlModel, tag="Prerequisites"):
 class LoinGroupsOfProperties(BaseXmlModel, tag="GroupsOfProperties"):
     """Wrapper element holding inline GroupOfProperties and/or references."""
 
+    #Internal Properties
     group_of_properties: List[IsoGroupOfProperties] = element(
         tag="GroupOfProperties", ns="dt", default_factory=list
     )
+    #External Properties
     group_of_properties_refs: List[DtRef] = element(
         tag="GroupOfPropertiesRef", default_factory=list
     )
