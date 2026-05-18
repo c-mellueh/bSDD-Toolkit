@@ -6,7 +6,11 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPalette
 
-os.environ.setdefault("QT_QPA_PLATFORMTHEME", "xdgdesktopportal")
+# xdg-desktop-portal is the Linux/Wayland portal integration. On Windows the
+# platform-theme plugin doesn't exist; forcing it causes Qt to crash with a
+# native access violation when the main window is shown.
+if sys.platform.startswith("linux"):
+    os.environ.setdefault("QT_QPA_PLATFORMTHEME", "xdgdesktopportal")
 
 if TYPE_CHECKING:
     from os import PathLike
