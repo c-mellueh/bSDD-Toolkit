@@ -500,7 +500,7 @@ class IdsExporter(ActionTool, FieldTool):
             mps = base_settings.get("main_pset", "")
 
             identifiers = set()
-            for bsdd_class in bsdd_dict.Classes:
+            for bsdd_class in checked_classes:
                 for identifier in cls.get_identifiers_by_class(bsdd_class, mp, mps, bsdd_dict):
                     identifiers.add(identifier)
 
@@ -532,7 +532,7 @@ class IdsExporter(ActionTool, FieldTool):
         else:
             cs = {c.Code: True for c in checked_classes}
 
-        sorted_classes = sorted([c for c in bsdd_dict.Classes if c.ClassType == "Class"],key=lambda x: x.Code)
+        sorted_classes = sorted([c for c in checked_classes if c.ClassType == "Class"], key=lambda x: x.Code)
         payload: PayLoadDict = {
             "ids": ids,
             "sorted_classes": sorted_classes,
@@ -625,7 +625,7 @@ class IdsExporter(ActionTool, FieldTool):
 
         def _process_bsdd_class(bsdd_class: BsddClass, idx: int):
             logging.info(f"Process {bsdd_class.Name} [{bsdd_class.Code}]")
-            if not class_settings.get(bsdd_class.Code, True):
+            if not class_settings.get(bsdd_class.Code, False):
                 return
 
             spec = Specification(
