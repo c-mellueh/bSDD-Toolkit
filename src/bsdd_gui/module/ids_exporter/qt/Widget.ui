@@ -62,9 +62,21 @@
      <property name="handleWidth">
       <number>6</number>
      </property>
-
-     <widget class="Widget" name="property_picker" native="true"/>
-          <widget class="QWidget" name="settings_widget" native="true">
+     <widget class="Widget" name="property_picker" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+     <widget class="QWidget" name="settings_widget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="leftMargin">
         <number>0</number>
@@ -88,8 +100,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>969</width>
-            <height>908</height>
+            <width>224</width>
+            <height>962</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -560,7 +572,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Import</string>
+             <string>Import Settings</string>
             </property>
             <property name="text">
              <string/>
@@ -588,7 +600,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Export</string>
+             <string>Export Settings</string>
             </property>
             <property name="text">
              <string/>

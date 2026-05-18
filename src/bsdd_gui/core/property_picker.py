@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from bsdd_gui.module.property_picker import ui,models,model_views
     from bsdd_json import BsddClass
 
-
+import qtawesome as qta
 
 def connect_signals(property_picker: Type[tool.PropertyPicker],class_view:type[tool.PPClassView],property_view:type[tool.PPPropertyView]):
     property_picker.connect_internal_signals()
@@ -26,12 +26,15 @@ def register_widget(widget: ui.Widget, property_picker: Type[tool.PropertyPicker
     model.beginResetModel()
     model.bsdd_data = project.get()
     model.endResetModel()
+    widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
+    widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
 
 def connect_widget(widget: ui.Widget, property_picker: Type[tool.PropertyPicker],class_view:type[tool.PPClassView],property_view:type[tool.PPPropertyView]):
     property_picker.connect_widget_signals(widget)
     class_view.connect_view_signals(widget.tv_classes)
     property_view.connect_view_signals(widget.tv_properties)
-
+    widget.pb_import.clicked.connect(lambda _=False, w=widget: property_picker.request_xml_import(w))
+    widget.pb_export.clicked.connect(lambda _=False, w=widget: property_picker.request_xml_export(w))
 
 def register_class_view(view: model_views.ClassView, class_view: type[tool.PPClassView]):
     class_view.register_view(view)
@@ -66,8 +69,8 @@ def connect_property_view(
         class_tree_view: model_views.ClassView,
         data: BsddClass,
     ):
-        property_tree_ivew = class_view.get_property_view(class_tree_view)
-        proxy_model: models.SortModel = property_tree_ivew.model()
+        property_tree_view = class_view.get_property_view(class_tree_view)
+        proxy_model: models.SortModel = property_tree_view.model()
         model = proxy_model
         model.beginResetModel()
         model.bsdd_data = data

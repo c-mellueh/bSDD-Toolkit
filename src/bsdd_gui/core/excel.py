@@ -58,7 +58,7 @@ def register_widget(widget: ui.Widget, excel: Type[tool.Excel]):
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
-
+    widget.settings_widget.setVisible(False)
 
 def register_fields(widget: ui.Widget, excel: Type[tool.Excel]):
     pass

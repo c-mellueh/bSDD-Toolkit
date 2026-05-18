@@ -66,11 +66,9 @@ def register_widget(widget: ui.IdsWidget, widget_tool: Type[tool.IdsExporter]):
     widget.fw_output.section = "paths"
     widget.fw_output.option = "ids"
     widget.fw_output.title = "get IDS-Export Path"
-
+    widget.fw_output.load_path()
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
-    widget.fw_output.load_path()
-
 
 def register_fields(
     widget: ui.IdsWidget,
@@ -141,7 +139,7 @@ def connect_widget(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
     pp_class_view: Type[tool.PPClassView],
-    main_window: Type[tool.MainWindowWidget],
+    property_picker: Type[tool.PropertyPicker],
 ):
     widget.cb_prop.hide()
     widget.cb_pset.hide()
@@ -166,21 +164,14 @@ def connect_widget(
 def export_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    pp_class_view: Type[tool.PPClassView],
-    pp_property_view: Type[tool.PPPropertyView],
+
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
     # Create Dict
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    class_dict: dict[str, bool] = pp_class_view.get_checked_classes(class_tree)
-    property_dict: PsetDict = pp_property_view.get_check_dict(property_tree)
     settings_dict: BasicSettingsDict = widget_tool.get_settings(widget)
     ids_metadata: MetadataDict = widget_tool.get_ids_metadata(widget)
     full_dict: SettingsDict = {
-        "class_settings": class_dict,
-        "property_settings": property_dict,
         "settings": settings_dict,
         "ids_metadata": ids_metadata,
     }
@@ -201,8 +192,6 @@ def export_settings(
 def import_settings(
     widget: ui.IdsWidget,
     widget_tool: Type[tool.IdsExporter],
-    pp_class_view: Type[tool.PPClassView],
-    pp_property_view: Type[tool.PPPropertyView],
     appdata: Type[tool.Appdata],
     popups: Type[tool.Popups],
 ):
@@ -217,19 +206,10 @@ def import_settings(
     # Read Settings
     with open(new_path, "r") as file:
         full_dict: SettingsDict = json.load(file)
-    class_dict = full_dict.get("class_settings", {})
-    property_dict = full_dict.get("property_settings", {})
     settings_dict = full_dict.get("settings", {})
     ids_metadata = full_dict.get("ids_metadata", {})
-
-    # Fill Fields and Checkstates
-    class_tree = widget.property_picker.tv_classes
-    property_tree = widget.property_picker.tv_properties
-    pp_class_view.set_check_dict(class_dict, class_tree)
-    pp_property_view.set_check_dict(property_dict, property_tree)
     widget_tool.set_settings(widget, settings_dict)
     widget_tool.set_ids_metadata(widget, ids_metadata)
-    pass
 
 
 def export_ids(

@@ -53,7 +53,7 @@ def register_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],property
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
-
+    widget.settings_widget.setVisible(False)
 
 def register_fields(widget: ui.Widget, iso_export: Type[tool.IsoExport]):
     pass
@@ -65,8 +65,6 @@ def register_validators(widget: ui.Widget, iso_epxort: Type[tool.IsoExport], uti
 
 
 def connect_widget(widget: ui.Widget, iso_export: Type[tool.IsoExport],property_picker:Type[tool.PropertyPicker]):
-    widget.pb_import.clicked.connect(lambda _=False, w=widget: property_picker.request_xml_import(w))
-    widget.pb_export.clicked.connect(lambda _=False, w=widget: property_picker.request_xml_export(w))
     iso_export.connect_widget_signals(widget)
 
 

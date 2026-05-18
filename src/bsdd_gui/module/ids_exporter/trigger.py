@@ -31,18 +31,18 @@ def widget_created(widget: IdsWidget):
     core.register_widget(widget, tool.IdsExporter)
     core.register_fields(widget, tool.IdsExporter)
     core.register_validators(widget, tool.IdsExporter, tool.Util)
-    core.connect_widget(widget, tool.IdsExporter, tool.PPClassView, tool.MainWindowWidget)
+    core.connect_widget(widget, tool.IdsExporter, tool.PPClassView, tool.PropertyPicker)
 
 
 def import_settings(widget: IdsWidget):
     core.import_settings(
-        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
+        widget, tool.IdsExporter,  tool.Appdata, tool.Popups
     )
 
 
 def export_settings(widget: IdsWidget):
     core.export_settings(
-        widget, tool.IdsExporter, tool.PPClassView, tool.PPPropertyView, tool.Appdata, tool.Popups
+        widget, tool.IdsExporter, tool.Appdata, tool.Popups
     )
 
 

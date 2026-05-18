@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -66,9 +66,19 @@ class Ui_Form(object):
         self.splitter.setHandleWidth(6)
         self.property_picker = Widget(self.splitter)
         self.property_picker.setObjectName(u"property_picker")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.property_picker.sizePolicy().hasHeightForWidth())
+        self.property_picker.setSizePolicy(sizePolicy1)
         self.splitter.addWidget(self.property_picker)
         self.settings_widget = QWidget(self.splitter)
         self.settings_widget.setObjectName(u"settings_widget")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.settings_widget.sizePolicy().hasHeightForWidth())
+        self.settings_widget.setSizePolicy(sizePolicy2)
         self.verticalLayout = QVBoxLayout(self.settings_widget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -77,7 +87,7 @@ class Ui_Form(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollAreaWidgetContents_3 = QWidget()
         self.scrollAreaWidgetContents_3.setObjectName(u"scrollAreaWidgetContents_3")
-        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 969, 908))
+        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 224, 962))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_3)
         self.verticalLayout_3.setSpacing(6)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -106,11 +116,11 @@ class Ui_Form(object):
 
         self.cb_pset = QComboBox(self.widget_prop)
         self.cb_pset.setObjectName(u"cb_pset")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.cb_pset.sizePolicy().hasHeightForWidth())
-        self.cb_pset.setSizePolicy(sizePolicy1)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.cb_pset.sizePolicy().hasHeightForWidth())
+        self.cb_pset.setSizePolicy(sizePolicy3)
         self.cb_pset.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 
         self.gridLayout_3.addWidget(self.cb_pset, 0, 0, 1, 1)
@@ -386,11 +396,11 @@ class Ui_Form(object):
 
         self.pb_export = QToolButton(self.fr_download)
         self.pb_export.setObjectName(u"pb_export")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.pb_export.sizePolicy().hasHeightForWidth())
-        self.pb_export.setSizePolicy(sizePolicy2)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.pb_export.sizePolicy().hasHeightForWidth())
+        self.pb_export.setSizePolicy(sizePolicy4)
         self.pb_export.setMinimumSize(QSize(30, 30))
         self.pb_export.setMaximumSize(QSize(24, 24))
 
@@ -466,11 +476,11 @@ class Ui_Form(object):
         self.cb_time.setItemText(0, QCoreApplication.translate("Form", u"IFCDATETIME", None))
 
 #if QT_CONFIG(tooltip)
-        self.pb_import.setToolTip(QCoreApplication.translate("Form", u"Import", None))
+        self.pb_import.setToolTip(QCoreApplication.translate("Form", u"Import Settings", None))
 #endif // QT_CONFIG(tooltip)
         self.pb_import.setText("")
 #if QT_CONFIG(tooltip)
-        self.pb_export.setToolTip(QCoreApplication.translate("Form", u"Export", None))
+        self.pb_export.setToolTip(QCoreApplication.translate("Form", u"Export Settings", None))
 #endif // QT_CONFIG(tooltip)
         self.pb_export.setText("")
     # retranslateUi
