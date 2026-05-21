@@ -166,8 +166,13 @@ class _CenteredCheckDelegate(QStyledItemDelegate):
                         if self.restrict_to_column and sel_idx.column() != col:
                             continue
                         targets.add(sel_idx)
-            for target in targets:
-                model.setData(target, new_state, Qt.ItemDataRole.CheckStateRole)
+            if len(targets) > 1:
+                with tool.Loin.defer_spec_membership_changed():
+                    for target in targets:
+                        model.setData(target, new_state, Qt.ItemDataRole.CheckStateRole)
+            else:
+                for target in targets:
+                    model.setData(target, new_state, Qt.ItemDataRole.CheckStateRole)
             return True
         return False
 
@@ -462,14 +467,29 @@ class PropertyModel(QAbstractItemModel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.bsdd_data: Optional[BsddClass] = None
+        self._bsdd_data: Optional[BsddClass] = None
+        self._pset_names_cache: Optional[list[str]] = None
+        self._props_for_pset_cache: dict[str, list[BsddClassProperty]] = {}
         self._tracked_views: list[QTreeView] = []
 
         signals = tool.Loin.get_signals()
         signals.purposes_changed.connect(self._reset_view)
         signals.milestones_changed.connect(self._reset_view)
         signals.loin_reset.connect(self._reset_view)
-        signals.spec_membership_changed.connect(self._reset_preserving_expansion)
+        signals.spec_membership_changed.connect(self._emit_check_data_changed)
+
+    @property
+    def bsdd_data(self) -> Optional[BsddClass]:
+        return self._bsdd_data
+
+    @bsdd_data.setter
+    def bsdd_data(self, value: Optional[BsddClass]) -> None:
+        self._bsdd_data = value
+        self._invalidate_caches()
+
+    def _invalidate_caches(self) -> None:
+        self._pset_names_cache = None
+        self._props_for_pset_cache = {}
 
     def register_view(self, view: QTreeView) -> None:
         if view not in self._tracked_views:
@@ -479,8 +499,33 @@ class PropertyModel(QAbstractItemModel):
     # ------------------------------------------------------------------ helpers
 
     def _reset_view(self) -> None:
+        self._invalidate_caches()
         self.beginResetModel()
         self.endResetModel()
+
+    def _emit_check_data_changed(self) -> None:
+        """Repaint check columns in-place without resetting the model."""
+        nc = self.columnCount()
+        if nc <= self._prefix_cols:
+            return
+        psets = self._pset_names()
+        if not psets:
+            return
+        self.dataChanged.emit(
+            self.index(0, self._prefix_cols),
+            self.index(len(psets) - 1, nc - 1),
+            [Qt.ItemDataRole.CheckStateRole],
+        )
+        for row, pset_name in enumerate(psets):
+            props = self._props_for_pset(pset_name)
+            if not props:
+                continue
+            parent_idx = self.index(row, 0)
+            self.dataChanged.emit(
+                self.index(0, self._prefix_cols, parent_idx),
+                self.index(len(props) - 1, nc - 1, parent_idx),
+                [Qt.ItemDataRole.CheckStateRole],
+            )
 
     def _collect_expanded(self, view: QTreeView) -> set[str]:
         expanded: set[str] = set()
@@ -499,6 +544,7 @@ class PropertyModel(QAbstractItemModel):
                 view.setExpanded(idx, True)
 
     def _reset_preserving_expansion(self) -> None:
+        self._invalidate_caches()
         snapshots = [(v, self._collect_expanded(v)) for v in self._tracked_views]
         self.beginResetModel()
         self.endResetModel()
@@ -506,14 +552,22 @@ class PropertyModel(QAbstractItemModel):
             self._apply_expanded(view, expanded)
 
     def _pset_names(self) -> list[str]:
-        if self.bsdd_data is None:
+        if self._bsdd_data is None:
             return []
-        return tool.PropertySetTableView.get_pset_names_with_temporary(self.bsdd_data)
+        if self._pset_names_cache is None:
+            self._pset_names_cache = (
+                tool.PropertySetTableView.get_pset_names_with_temporary(self._bsdd_data)
+            )
+        return self._pset_names_cache
 
     def _props_for_pset(self, pset_name: str) -> list[BsddClassProperty]:
-        if self.bsdd_data is None:
+        if self._bsdd_data is None:
             return []
-        return prop_utils.get_class_properties_by_pset_name(self.bsdd_data, pset_name)
+        cached = self._props_for_pset_cache.get(pset_name)
+        if cached is None:
+            cached = prop_utils.get_class_properties_by_pset_name(self._bsdd_data, pset_name)
+            self._props_for_pset_cache[pset_name] = cached
+        return cached
 
     # ------------------------------------------------------------------ QAbstractItemModel
 

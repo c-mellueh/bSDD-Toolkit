@@ -1,4 +1,5 @@
 from __future__ import annotations
+from contextlib import contextmanager
 from typing import TYPE_CHECKING, TypedDict
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
@@ -82,6 +83,34 @@ class Loin(ActionTool, WidgetTool):
     @classmethod
     def get_signals(cls) -> Signals:
         return super().get_signals()
+
+    # ------------------------------------------------------------------ signal deferral
+    _spec_emit_depth: int = 0
+    _spec_emit_pending: bool = False
+
+    @classmethod
+    @contextmanager
+    def defer_spec_membership_changed(cls):
+        """Suppress spec_membership_changed emits inside the block and fire
+        once on exit if anything tried to emit during it.
+
+        Use to batch many toggle calls into a single repaint cycle.
+        """
+        cls._spec_emit_depth += 1
+        try:
+            yield
+        finally:
+            cls._spec_emit_depth -= 1
+            if cls._spec_emit_depth == 0 and cls._spec_emit_pending:
+                cls._spec_emit_pending = False
+                cls.get_signals().spec_membership_changed.emit()
+
+    @classmethod
+    def _emit_spec_membership_changed(cls) -> None:
+        if cls._spec_emit_depth > 0:
+            cls._spec_emit_pending = True
+            return
+        cls.get_signals().spec_membership_changed.emit()
 
     @classmethod
     def _get_widget_class(cls) -> type[ui.Widget]:
@@ -607,7 +636,7 @@ class Loin(ActionTool, WidgetTool):
                 walk(child)
 
         walk(bsdd_class)
-        cls.get_signals().spec_membership_changed.emit()
+        cls._emit_spec_membership_changed()
         cls.get_signals().added_classes_changed.emit()
 
     @classmethod
@@ -668,7 +697,7 @@ class Loin(ActionTool, WidgetTool):
         included: bool,
     ) -> None:
         cls._set_class_included_silent(bsdd_class, purpose_guid, milestone_guid, included)
-        cls.get_signals().spec_membership_changed.emit()
+        cls._emit_spec_membership_changed()
 
     @classmethod
     def is_property_included(
@@ -696,7 +725,7 @@ class Loin(ActionTool, WidgetTool):
         cls._set_property_included_silent(
             bsdd_class, bsdd_property, purpose_guid, milestone_guid, included
         )
-        cls.get_signals().spec_membership_changed.emit()
+        cls._emit_spec_membership_changed()
 
     @classmethod
     def _set_class_included_silent(
@@ -778,7 +807,7 @@ class Loin(ActionTool, WidgetTool):
                 cls._set_property_included_silent(
                     bsdd_class, cp, purpose_guid, milestone_guid, included
                 )
-        cls.get_signals().spec_membership_changed.emit()
+        cls._emit_spec_membership_changed()
 
     # ----------------------------------------- LoinSpecificationPerObjectType helpers
 
@@ -789,7 +818,7 @@ class Loin(ActionTool, WidgetTool):
         object_type = IsoObjectType(
             guid=uuid4(),
             date_of_creation=_now(),
-            names=[DtMultiLangText(language="en", text=bsdd_class.Name or bsdd_class.Code)],
+            names=[DtMultiLangText(language="en", text=bsdd_class.Code)],
         )
         spec_per_obj = LoinSpecificationPerObjectType(
             guid=uuid4(),
@@ -803,6 +832,7 @@ class Loin(ActionTool, WidgetTool):
                     group_of_properties_refs=[],
                 ),
             ),
+            definition=DtMultiLangText(language="en",text=bsdd_class.Definition or ""),
         )
         # Remember which bSDD class this represents — stored as an attribute
         # on the Pydantic instance, not part of the XML schema.
@@ -994,7 +1024,6 @@ class Loin(ActionTool, WidgetTool):
             encoding="UTF-8",
             xml_declaration=True,
             exclude_none=True,
-            exclude_unset=True,
         )
         with open(out_path, "wb") as f:
             f.write(xml_bytes)
@@ -1055,6 +1084,7 @@ class Loin(ActionTool, WidgetTool):
         existing_classes = {c.Code: c for c in bsdd_dictionary.Classes}
 
         for spec in loin.specifications:
+            spec.specifications_per_object_type = list(spec.specifications_per_object_type)
             purpose = spec.prerequisites.purpose
             milestone = spec.prerequisites.information_delivery_milestone
             seen_purposes.setdefault(purpose.guid, purpose)
