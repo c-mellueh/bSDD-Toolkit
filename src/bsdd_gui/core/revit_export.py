@@ -118,21 +118,21 @@ def export(
     specs = loin.select_specs_dialog(widget)
     if not specs:
         return
-    checked_classes = loin.get_checked_classes(specs, bsdd_dict)
-    checked_properties = loin.get_checked_properties(specs, bsdd_dict)
+    pset_dict = loin.get_pset_dict(specs, bsdd_dict)
+    checkstate_dict = loin.get_check_dict(specs,bsdd_dict)
     out_path = widget.fw_output.get_path()
 
-    def export_done(classes: list[BsddClass]):
+    def export_done(lines: list[str]):
         stop_waiting_widget(waiting_worker)
         title = QCoreApplication.translate("RevitExport", "Export Done!")
         text_title = QCoreApplication.translate("RevitExport", "Revit Export Done!")
-        text = QCoreApplication.translate("RevitExport", "{} classes exported!").format(len(classes))
+        text = QCoreApplication.translate("RevitExport", "{} Lines written!").format(len(lines))
         QTimer.singleShot(
             0, widget, lambda: popups.create_info_popup(text, title, text_title, parent=widget)
         )
 
     build_worker, build_thread = revit_export.create_build_thread(
-        bsdd_dict, checked_classes, checked_properties, out_path
+        bsdd_dict, checkstate_dict,pset_dict, out_path
     )
 
     build_worker.finished.connect(export_done)

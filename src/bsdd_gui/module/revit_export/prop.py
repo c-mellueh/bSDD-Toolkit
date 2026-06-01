@@ -8,3 +8,4 @@ class RevitExportProperties(ActionsProperties, FieldProperties):
         super().__init__()
         self.build_worker: QObject = None
         self.build_thread: QThread = None
+        self.text_or_label = "Text"

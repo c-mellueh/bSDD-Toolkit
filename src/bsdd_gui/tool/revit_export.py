@@ -1,42 +1,22 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
 from PySide6.QtCore import Signal, QCoreApplication, QObject, QThread, Qt
-from openpyxl import styles
-from openpyxl import Workbook
-from openpyxl.worksheet.worksheet import Worksheet
 from bsdd_json.utils import class_utils, property_utils, dictionary_utils
 from openpyxl.utils import get_column_letter
-import openpyxl
 
-from bsdd_json import BsddClass, BsddDictionary, BsddClassProperty
+import logging
+from bsdd_json import BsddClass, BsddDictionary, BsddProperty
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, FieldSignals
-from bsdd_gui.module.excel import ui, trigger, constants
+from bsdd_gui.module.revit_export import ui, trigger, constants
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
-
-class PsetDict(TypedDict):
-    checked: bool
-    properties: dict[str, bool]
-
-
-class BasicSettingsDict(TypedDict):
-    inherit: bool
-    classification: bool
-    type_objects: bool
-    main_pset: str
-    main_property: str
-
-
-class SettingsDict(TypedDict):
-    class_settings: dict[str, bool]
-    property_settings: dict[str, dict[str, PsetDict]]
-    settings: BasicSettingsDict
-
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from bsdd_gui.module.revit_export.prop import RevitExportProperties
-
+    from bsdd_gui.tool.loin import CheckstateDict
+    from io import TextIOWrapper
 
 class Signals(FieldSignals):
     pass
@@ -74,12 +54,107 @@ class RevitExport(ActionTool, FieldTool):
         widget.pb_create.clicked.connect(lambda _, w=widget: trigger.export(w))
         super().connect_widget_signals(widget)
 
+
+    @classmethod
+    def get_datatype(cls,bsdd_property:BsddProperty) -> str:
+
+        datatype_mapping = {
+            "Boolean":"Boolean",
+            "Character":"Label",
+            "Integer":"Integer",
+            "Real":"Real",
+            "String":cls.get_properties().text_or_label,
+            "Time":"Time"
+        }
+
+        return datatype_mapping.get(bsdd_property.DataType,cls.get_properties().text_or_label)
+
+    @classmethod
+    def get_revit_name(cls,pset_name:str,bsdd_property:BsddProperty):
+        #TODO: Extend to allow different possibilities like only the Property name without the pset name, other seperators etc
+        return  f"{pset_name}.{bsdd_property.Name}"
+
+    @classmethod
+    def get_property_name(cls,bsdd_property:BsddProperty):
+        #TODO: Extend to allow other property names, e.g. The Property Code or with a prefix:
+        return bsdd_property.Name
+
+    @classmethod
+    def create_line(cls,pset_name:str,bsdd_property:BsddProperty):
+        revit_name = cls.get_revit_name(pset_name,bsdd_property)
+        datatype = cls.get_datatype(bsdd_property)
+        name = cls.get_property_name(bsdd_property)
+        return "\t".join([name,datatype,revit_name])
+
+
+    @classmethod
+    def get_ifc_types(cls,checkstates:CheckstateDict,pset_name:str):
+        ifc_types:set[str] = set()
+        for _,class_dict in checkstates.items():
+            bsdd_class = class_dict["bsdd_entity"]
+            if pset_dict:= class_dict["property_sets"].get(pset_name):
+                if not pset_dict["checked"]:
+                    continue
+                ifc_types.update(set(bsdd_class.RelatedIfcEntityNamesList or[]))
+        return ifc_types
+
+    @classmethod
+    def run(cls,checkstates:CheckstateDict,psets:dict[str,set[str]],bsdd_dictionary:BsddDictionary):
+        lines = list()
+        for pset_name,class_property_codes in psets.items():
+            if pset_name == "Schaltschrank":
+                print("HIER")
+            ifc_types = sorted(cls.get_ifc_types(checkstates,pset_name))
+            text = "\t".join(["PropertySet:",pset_name,"I",",".join(ifc_types)])
+            property_texts = list()
+            for class_property_code in class_property_codes:
+                logger.debug(f"Search for {pset_name}.{class_property_code}")
+                bsdd_property = cls.get_properties_by_codes(pset_name,class_property_code,bsdd_dictionary,checkstates)
+                if not bsdd_property:
+                    logger.warning(f"bSDD Property '{pset_name}.{class_property_code}' konnte nicht gefunden werden")
+                    continue
+                logger.debug(f"Ppoperty Found: {bsdd_property.Code}")
+                line = cls.create_line(pset_name,bsdd_property)
+                property_texts.append(line)
+                logger.debug(f"Line Created:\n\t {line}")
+
+            if not property_texts:
+                continue
+            
+            lines.append(f"{text}")
+            lines+=property_texts
+            lines.append("")
+        return lines
+
+    @classmethod
+    def get_properties_by_codes(cls,pset_name:str,class_property_code:str,bsdd_dictionary:BsddDictionary,checkstates:CheckstateDict) -> BsddProperty:
+        predefined_psets = {pset.Name:pset for pset in bsdd_dictionary.Classes if pset.ClassType == "GroupOfProperties"}
+        if pset_class:= predefined_psets.get(pset_name):
+            if class_property:={cp.Code:cp for cp in pset_class.ClassProperties}.get(class_property_code):
+                return property_utils.get_property_by_class_property(class_property,bsdd_dictionary)
+        #Fallback if no predefined PSet is created
+        #Search all Classes and find a checked property with correct pset
+        else:
+            for _,class_dict in checkstates.items():
+                if not class_dict.get("checked",False):
+                    continue
+                for pset_name_key,pset_dict in class_dict["property_sets"].items():
+                    if not pset_dict.get("checked"):
+                        continue
+
+                    if pset_name != pset_name_key:
+                        continue
+                    for property_code_key,property_dict in pset_dict["properties"].items():
+                        if property_code_key == class_property_code:
+                            if bsdd_property:= property_dict.get("bsdd_property"):
+                                return bsdd_property
+        return None
     @classmethod
     def create_build_thread(
         cls,
         bsdd_dict: BsddDictionary,
-        checked_classes: dict[str, bool],
-        checked_properties: PsetDict,
+        checkstate_dict:CheckstateDict,
+        pset_dict:dict[str,dict[str,bool]],
         out_path: str,
     ):
         class _BuildWorker(QObject):
@@ -91,10 +166,13 @@ class RevitExport(ActionTool, FieldTool):
 
             def run(self):
                 try:
-                    bsdd_classes = [c for c in checked_classes if c.ClassType == "Class"]
-                    root_classes = [c for c in bsdd_classes if not c.ParentClassCode]
-                    pass
+                    logging.info("Start Export!")
 
+                    lines = cls.run(checkstate_dict,pset_dict,bsdd_dict)
+                    with open(out_path,"w") as file:
+                        file.write("\n".join(lines))
+                    logging.info("Export Done!")
+                    self.finished.emit(lines)
                 except Exception as exc:  # pragma: no cover - pass through
                     self.error.emit(exc)
 

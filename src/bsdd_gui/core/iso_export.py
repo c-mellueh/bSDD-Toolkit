@@ -119,7 +119,7 @@ def export(
         return
     checked_classes = loin.get_checked_classes(specs, bsdd_dict)
     checked_properties = loin.get_checked_properties(specs, bsdd_dict)
-    checked_predefined_porperties = loin.get_checked_predefined_properties(specs, bsdd_dict)
+    checked_predefined_porperties = loin.get_pset_dict(specs, bsdd_dict)
 
     def export_done(class_count: int):
         stop_waiting_widget(waiting_worker)
