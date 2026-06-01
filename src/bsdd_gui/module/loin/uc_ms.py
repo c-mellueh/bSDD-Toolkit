@@ -1323,15 +1323,19 @@ class FilterTableWindow(QWidget):
         table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectItems)
 
-        for ui_idx in range(len(purposes)):
-            for mi in range(len(milestones)):
+        existing_specs = tool.Loin.get_properties().specs
+        for ui_idx, purpose in enumerate(purposes):
+            for mi, milestone in enumerate(milestones):
                 item = QTableWidgetItem()
                 item.setFlags(
                     Qt.ItemFlag.ItemIsUserCheckable
                     | Qt.ItemFlag.ItemIsEnabled
                     | Qt.ItemFlag.ItemIsSelectable
                 )
-                item.setCheckState(Qt.CheckState.Checked)
+                has_spec = (purpose.guid, milestone.guid) in existing_specs
+                item.setCheckState(
+                    Qt.CheckState.Checked if has_spec else Qt.CheckState.Unchecked
+                )
                 table.setItem(ui_idx, mi, item)
 
         table.resizeColumnsToContents()
@@ -1346,10 +1350,14 @@ class FilterTableWindow(QWidget):
         vh = table.verticalHeader()
         vh.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         vh.customContextMenuRequested.connect(self._uc_context_menu)
+        vh.setSectionsMovable(True)
+        vh.sectionMoved.connect(self._on_purpose_moved)
 
         hh = table.horizontalHeader()
         hh.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         hh.customContextMenuRequested.connect(self._ms_context_menu)
+        hh.setSectionsMovable(True)
+        hh.sectionMoved.connect(self._on_milestone_moved)
 
         self._filter_table = table
         return table
@@ -1363,6 +1371,32 @@ class FilterTableWindow(QWidget):
                 w.deleteLater()
         self._table_layout.addWidget(self._build_table())
         self._sync_all_views()
+
+    def _on_purpose_moved(self, *_args) -> None:
+        """Translate a row-header drag into a Loin.reorder_purposes call.
+
+        After the tool fires purposes_changed, _rebuild_table redraws from
+        scratch so the header's visual order resets to logical — no manual
+        moveSection cleanup needed here.
+        """
+        if self._filter_table is None:
+            return
+        purposes = _current_purposes()
+        if not purposes:
+            return
+        vh = self._filter_table.verticalHeader()
+        new_order = [purposes[vh.logicalIndex(v)].guid for v in range(len(purposes))]
+        tool.Loin.reorder_purposes(new_order)
+
+    def _on_milestone_moved(self, *_args) -> None:
+        if self._filter_table is None:
+            return
+        milestones = _current_milestones()
+        if not milestones:
+            return
+        hh = self._filter_table.horizontalHeader()
+        new_order = [milestones[hh.logicalIndex(v)].guid for v in range(len(milestones))]
+        tool.Loin.reorder_milestones(new_order)
 
     def _on_filter_changed(self, item: QTableWidgetItem) -> None:
         purposes = _current_purposes()

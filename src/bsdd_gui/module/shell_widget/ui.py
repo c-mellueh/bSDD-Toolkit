@@ -24,3 +24,8 @@ class Shell(
     def closeEvent(self, event):
         self.closed.emit()
         return super().closeEvent(event)
+
+    def input_buffer(self):
+        # QTextCursor.selectedText() (used upstream) returns U+2029 for line
+        # breaks, which Python's tokenizer rejects. Normalize to '\n'.
+        return super().input_buffer().replace("\u2029", "\n")

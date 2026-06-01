@@ -141,11 +141,24 @@ class Loin(ActionTool, WidgetTool):
         The XSD requires LoinLevelOfInformationNeed.specifications to have at
         least one entry, so an empty draft is represented by None on disk and
         in memory.
+
+        Specs are sorted by their position in the current purposes/milestones
+        lists so that reordering UC/MS in the UI is reflected in the XML's
+        <Specification> element order (the only ordering the schema allows).
         """
         props = cls.get_properties()
-        specs = list(props.specs.values())
-        if not specs:
+        if not props.specs:
             return None
+        p_idx = {p.guid: i for i, p in enumerate(props.purposes)}
+        m_idx = {m.guid: i for i, m in enumerate(props.milestones)}
+        fallback = len(props.specs)
+        specs = sorted(
+            props.specs.values(),
+            key=lambda s: (
+                p_idx.get(s.prerequisites.purpose.guid, fallback),
+                m_idx.get(s.prerequisites.information_delivery_milestone.guid, fallback),
+            ),
+        )
         return LoinLevelOfInformationNeed(specifications=specs)
 
     @classmethod
@@ -331,6 +344,24 @@ class Loin(ActionTool, WidgetTool):
                 return
 
     @classmethod
+    def reorder_purposes(cls, new_order: list[UUID]) -> None:
+        """Rearrange ``props.purposes`` to match the given GUID order.
+
+        Any purposes whose GUID is not in *new_order* are kept at the end in
+        their existing relative order (defensive — should not happen during
+        normal drag-and-drop).
+        """
+        props = cls.get_properties()
+        by_guid = {p.guid: p for p in props.purposes}
+        seen = set(new_order)
+        reordered = [by_guid[g] for g in new_order if g in by_guid]
+        reordered.extend(p for p in props.purposes if p.guid not in seen)
+        if reordered == props.purposes:
+            return
+        props.purposes = reordered
+        cls.get_signals().purposes_changed.emit()
+
+    @classmethod
     def purpose_display_name(cls, purpose: LoinPurpose) -> str:
         if purpose.names:
             return purpose.names[0].text
@@ -414,6 +445,19 @@ class Loin(ActionTool, WidgetTool):
                 m.date = date
                 cls.get_signals().milestones_changed.emit()
                 return
+
+    @classmethod
+    def reorder_milestones(cls, new_order: list[UUID]) -> None:
+        """Rearrange ``props.milestones`` to match the given GUID order."""
+        props = cls.get_properties()
+        by_guid = {m.guid: m for m in props.milestones}
+        seen = set(new_order)
+        reordered = [by_guid[g] for g in new_order if g in by_guid]
+        reordered.extend(m for m in props.milestones if m.guid not in seen)
+        if reordered == props.milestones:
+            return
+        props.milestones = reordered
+        cls.get_signals().milestones_changed.emit()
 
     @classmethod
     def milestone_display_name(cls, milestone: LoinInformationDeliveryMilestone) -> str:
