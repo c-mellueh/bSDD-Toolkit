@@ -609,9 +609,17 @@ class PropertyModel(QAbstractItemModel):
         if pset_name is None:
             return QModelIndex()
         psets = self._pset_names()
-        if pset_name in psets:
-            return self.createIndex(psets.index(pset_name), 0, pset_name)
-        return QModelIndex()
+        try:
+            row = psets.index(pset_name)
+        except ValueError:
+            return QModelIndex()
+        # Use the canonical string object from the cache as the internal pointer.
+        # index() assigns psets[row]; different BsddClassProperty objects may
+        # return distinct str instances for the same PropertySet value, and Qt
+        # compares QModelIndex by pointer identity. Reusing pset_name here would
+        # make sibling rows report unequal parents, so dataChanged() ranges that
+        # span a pset get rejected as an "invalid index range".
+        return self.createIndex(row, 0, psets[row])
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         base = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
