@@ -36,7 +36,9 @@ def connect_signals(iso_export: Type[tool.IsoExport]):
 def retranslate_ui(iso_export: Type[tool.IsoExport], main_window: type[tool.MainWindowWidget]):
     action = iso_export.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("IsoExport", "Export ISO 23386"))
-
+    for wid in iso_export.get_widgets():
+        wid:ui.Widget
+        wid.setWindowTitle(wid.tr("Export to ISO 23386"))
 
 def create_widget(data, parent, iso_export: Type[tool.IsoExport]):
     iso_export.show_widget(data, parent)

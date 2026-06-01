@@ -37,7 +37,9 @@ def connect_signals(revit_export: Type[tool.RevitExport]):
 def retranslate_ui(revit_export: Type[tool.RevitExport], main_window: type[tool.MainWindowWidget]):
     action = revit_export.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("RevitExport", "Export Revit"))
-
+    for wid in revit_export.get_widgets():
+        wid:ui.Widget
+        wid.setWindowTitle(wid.tr("Export to Revit"))
 
 def create_widget(data, parent, revit_export: Type[tool.RevitExport]):
     revit_export.show_widget(data, parent)
