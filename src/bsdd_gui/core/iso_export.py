@@ -18,7 +18,7 @@ def connect_to_main_window(
 ):
     # Action uses the WidgetTool request to allow trigger routing
     action = main_window.add_action(
-        "menuFile",
+        "menuExport",
         "Export ISO 23386",
         lambda: iso_export.request_widget(
             project.get(),

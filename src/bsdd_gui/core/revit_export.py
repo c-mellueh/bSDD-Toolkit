@@ -19,13 +19,13 @@ def connect_to_main_window(
 ):
     # Action uses the WidgetTool request to allow trigger routing
     action = main_window.add_action(
-        "menuFile",
+        "menuExport",
         "Export Revit",
         lambda: revit_export.request_widget(
             project.get(),
             main_window.get(),
         ),
-        qta.icon("mdi6.file"),
+        qta.icon("mdi6.office-building"),
     )
     revit_export.set_action(main_window.get(), "open_window", action)
 
@@ -47,7 +47,7 @@ def create_widget(data, parent, revit_export: Type[tool.RevitExport]):
 
 def register_widget(widget: ui.Widget, revit_export: Type[tool.RevitExport]):
     revit_export.register_widget(widget)
-    widget.fw_output.file_format = constants.SHARED_PARAMETERS_FILETYPE
+    widget.fw_output.file_format = constants.USERDEFINED_PARAMETERS_FILETYPE
     widget.fw_output.section = "paths"
     widget.fw_output.option = "RevitExport"
     widget.fw_output.title = "get Revit-Export Path"
