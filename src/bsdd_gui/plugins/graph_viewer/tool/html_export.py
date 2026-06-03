@@ -188,16 +188,34 @@ class HTMLExport(PluginTool):
 
         try:
             if node.node_type in (nc.CLASS_NODE_TYPE, nc.GOP_NODE_TYPE):
-                return cl_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+                uri = cl_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+                return cls._use_latest_version(uri, bsdd_dictionary)
             if node.node_type == nc.EXTERNAL_CLASS_NODE_TYPE:
                 return node.bsdd_data.OwnedUri
             if node.node_type == nc.PROPERTY_NODE_TYPE:
-                return prop_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+                uri = prop_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+                return cls._use_latest_version(uri, bsdd_dictionary)
             if node.node_type in (nc.EXTERNAL_PROPERTY_NODE_TYPE, nc.IFC_NODE_TYPE):
                 return node.bsdd_data.OwnedUri
         except Exception:
             pass
         return None
+
+    @classmethod
+    def _use_latest_version(
+        cls, uri: str | None, bsdd_dictionary: BsddDictionary | None
+    ) -> str | None:
+        """Replace the dictionary version segment in an internal bSDD URI with ``latest``.
+
+        bSDD resolves ``.../<org>/<dict>/latest/...`` to the most recent version, so the
+        exported links keep working as the dictionary is republished.
+        """
+        if not uri or bsdd_dictionary is None:
+            return uri
+        version = bsdd_dictionary.DictionaryVersion
+        if not version:
+            return uri
+        return uri.replace(f"/{version}/", "/latest/", 1)
 
     @classmethod
     def _node_shape_element(cls, node: Node, cx: float, cy: float) -> str:
