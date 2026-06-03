@@ -64,7 +64,7 @@ def export_html_graph(
     node_parts = html_export.generate_node_parts(nodes, offset_x, offset_y, bsdd_dictionary)
     node_legend_html = html_export.generate_node_legend(nodes)
     edge_legend_html = html_export.generate_edge_legend(edges)
-    class_props_json = html_export.generate_class_property_data(nodes, bsdd_dictionary)
+    node_info_json = html_export.generate_node_info_data(nodes, bsdd_dictionary)
 
     page_title, heading_suffix = html_export.generate_title(bsdd_dictionary)
 
@@ -79,7 +79,7 @@ def export_html_graph(
         node_parts,
         node_legend_html,
         edge_legend_html,
-        class_props_json,
+        node_info_json,
     )
 
     # Write to File

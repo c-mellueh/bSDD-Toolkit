@@ -343,14 +343,15 @@ class HTMLExport(PluginTool):
                 f'font-size="12" font-family="sans-serif" pointer-events="none">{label}</text>'
             )
 
-            # Class / GroupOfProperties nodes are selectable: a single click updates the
-            # property table, a double click opens the bSDD page (see inline script).
-            class_id = cls._node_class_id(node)
-            if class_id is not None:
+            # Class and Property nodes are selectable: a single click shows the node's
+            # definition (and, for classes, its property table); a double click opens the
+            # bSDD page (see inline script).
+            select_id = cls._node_select_id(node)
+            if select_id is not None:
                 url = cls._node_url(node, bsdd_dictionary) if bsdd_dictionary else None
                 href_attr = f' data-href="{html.escape(url)}"' if url else ""
                 node_parts.append(
-                    f'<g class="selectable" data-class-id="{html.escape(class_id)}"'
+                    f'<g class="selectable" data-node-id="{html.escape(select_id)}"'
                     f"{href_attr}>{shape_el}{text_el}</g>"
                 )
                 continue
@@ -366,44 +367,59 @@ class HTMLExport(PluginTool):
         return node_parts
 
     @classmethod
-    def _node_class_id(cls, node: Node) -> str | None:
-        """Return a stable selection id for class-like nodes, else None.
+    def _node_select_id(cls, node: Node) -> str | None:
+        """Return a stable, type-namespaced selection id for selectable nodes, else None.
 
-        Class codes are unique within a dictionary, so the code doubles as the id
-        that links a node in the SVG to its row set in the property table.
+        Codes are unique per resource type within a dictionary; the ``class:``/``prop:``
+        prefix keeps a class and a property that happen to share a code from colliding.
         """
-        if node.node_type in (nc.CLASS_NODE_TYPE, nc.GOP_NODE_TYPE) and node.bsdd_data is not None:
-            return node.bsdd_data.Code
+        if node.bsdd_data is None:
+            return None
+        if node.node_type in (nc.CLASS_NODE_TYPE, nc.GOP_NODE_TYPE):
+            return f"class:{node.bsdd_data.Code}"
+        if node.node_type == nc.PROPERTY_NODE_TYPE:
+            return f"prop:{node.bsdd_data.Code}"
         return None
 
     @classmethod
-    def generate_class_property_data(
-        cls, nodes: list[Node], bsdd_dictionary: BsddDictionary
-    ) -> str:
-        """Build the JSON payload mapping each class id to its property rows.
+    def generate_node_info_data(cls, nodes: list[Node], bsdd_dictionary: BsddDictionary) -> str:
+        """Build the JSON payload mapping each selectable node id to its display info.
 
-        Each entry is ``{"name": <class name>, "rows": [[name, pset, datatype, desc], ...]}``
-        and is embedded verbatim into an inline script so the page needs no network access.
+        Each entry is ``{"name", "kind", "definition", "rows"}`` where ``rows`` is
+        ``[[name, pset, datatype, desc], ...]`` (empty for properties). It is embedded
+        verbatim into an inline script so the page needs no network access.
         """
         import json
         from bsdd_json.utils import property_utils as prop_utils
 
         data: dict[str, dict] = {}
         for node in nodes:
-            class_id = cls._node_class_id(node)
-            if class_id is None or class_id in data:
+            select_id = cls._node_select_id(node)
+            if select_id is None or select_id in data:
                 continue
-            bsdd_class = node.bsdd_data
+            bsdd_data = node.bsdd_data
+            definition = bsdd_data.Definition or bsdd_data.Description or ""
+
             rows: list[list[str]] = []
-            for cp in bsdd_class.ClassProperties:
-                prop = prop_utils.get_property_by_class_property(cp, bsdd_dictionary)
-                name = prop.Name if prop else (cp.PropertyCode or cp.PropertyUri or "")
-                pset = cp.PropertySet or ""
-                datatype = (prop.DataType if prop else None) or ""
-                description = cp.Description or (prop.Description if prop else None) or ""
-                rows.append([name, pset, datatype, description])
-            rows.sort(key=lambda r: (r[1].lower(), r[0].lower()))
-            data[class_id] = {"name": bsdd_class.Name or class_id, "rows": rows}
+            if node.node_type in (nc.CLASS_NODE_TYPE, nc.GOP_NODE_TYPE):
+                kind = "Class"
+                for cp in bsdd_data.ClassProperties:
+                    prop = prop_utils.get_property_by_class_property(cp, bsdd_dictionary)
+                    name = prop.Name if prop else (cp.PropertyCode or cp.PropertyUri or "")
+                    pset = cp.PropertySet or ""
+                    datatype = (prop.DataType if prop else None) or ""
+                    description = cp.Description or (prop.Description if prop else None) or ""
+                    rows.append([name, pset, datatype, description])
+                rows.sort(key=lambda r: (r[1].lower(), r[0].lower()))
+            else:
+                kind = "Property"
+
+            data[select_id] = {
+                "name": bsdd_data.Name or bsdd_data.Code,
+                "kind": kind,
+                "definition": definition,
+                "rows": rows,
+            }
 
         # Escape "</" so the payload can never terminate the surrounding <script> element.
         return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
@@ -488,7 +504,7 @@ class HTMLExport(PluginTool):
         node_parts: str,
         node_legend_html: str,
         edge_legend_html: str,
-        class_props_json: str = "{}",
+        node_info_json: str = "{}",
     ) -> str:
 
         defs_block = f"<defs>{''.join(defs_parts)}</defs>" if defs_parts else ""
@@ -522,6 +538,28 @@ class HTMLExport(PluginTool):
         .selectable {{ cursor: pointer; }}
         .selectable:hover .node-shape {{ filter: brightness(1.35); }}
         .selectable.selected .node-shape {{ stroke: #ffffff; stroke-width: 2.5; }}
+        .def-panel {{
+        margin-top: 16px;
+        background: #1a1d2e;
+        border: 1px solid #2a3050;
+        border-radius: 6px;
+        padding: 12px;
+        }}
+        .def-panel h3 {{ margin: 0 0 8px; font-size: 1rem; color: #c0c8e0; }}
+        .def-kind {{
+        display: inline-block;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #0f1018;
+        background: #7080a0;
+        border-radius: 3px;
+        padding: 1px 6px;
+        margin-left: 8px;
+        vertical-align: middle;
+        }}
+        #def-text {{ margin: 0; font-size: 13px; line-height: 1.5; color: #c8d0e0; white-space: pre-wrap; }}
+        #def-text.def-empty {{ color: #7080a0; font-style: italic; }}
         .prop-panel {{
         margin-top: 16px;
         background: #1a1d2e;
@@ -596,6 +634,10 @@ class HTMLExport(PluginTool):
         {edge_legend_html}
         </div>
     </div>
+    <div class="def-panel">
+        <h3><span id="def-name">Definition</span><span id="def-kind" class="def-kind" hidden></span></h3>
+        <p id="def-text" class="def-empty">Select a class or property node to view its definition.</p>
+    </div>
     <div class="prop-panel">
         <h3 id="prop-title">Class Properties</h3>
         <table class="prop-table">
@@ -613,10 +655,13 @@ class HTMLExport(PluginTool):
         </table>
     </div>
     <script>
-    const CLASS_PROPS = {class_props_json};
+    const NODE_INFO = {node_info_json};
     (function () {{
         const tbody = document.getElementById('prop-tbody');
         const title = document.getElementById('prop-title');
+        const defName = document.getElementById('def-name');
+        const defKind = document.getElementById('def-kind');
+        const defText = document.getElementById('def-text');
         let selectedEl = null;
 
         function setEmpty(message) {{
@@ -630,9 +675,28 @@ class HTMLExport(PluginTool):
         tbody.appendChild(tr);
         }}
 
+        function renderDefinition(data) {{
+        defName.textContent = data.name;
+        defKind.textContent = data.kind;
+        defKind.hidden = false;
+        if (data.definition) {{
+            defText.textContent = data.definition;
+            defText.classList.remove('def-empty');
+        }} else {{
+            defText.textContent = 'No definition available.';
+            defText.classList.add('def-empty');
+        }}
+        }}
+
         function render(id) {{
-        const data = CLASS_PROPS[id];
-        if (!data) {{ setEmpty('No property data available for this class.'); return; }}
+        const data = NODE_INFO[id];
+        if (!data) return;
+        renderDefinition(data);
+        if (data.kind !== 'Class') {{
+            title.textContent = 'Class Properties';
+            setEmpty('Select a class node to view its properties.');
+            return;
+        }}
         title.textContent = 'Class Properties \\u2013 ' + data.name;
         if (!data.rows.length) {{ setEmpty('This class has no properties.'); return; }}
         tbody.innerHTML = '';
@@ -647,13 +711,13 @@ class HTMLExport(PluginTool):
         }}
         }}
 
-        document.querySelectorAll('[data-class-id]').forEach(function (el) {{
+        document.querySelectorAll('[data-node-id]').forEach(function (el) {{
         el.addEventListener('click', function (e) {{
             e.preventDefault();
             if (selectedEl) selectedEl.classList.remove('selected');
             el.classList.add('selected');
             selectedEl = el;
-            render(el.getAttribute('data-class-id'));
+            render(el.getAttribute('data-node-id'));
         }});
         el.addEventListener('dblclick', function (e) {{
             e.preventDefault();
