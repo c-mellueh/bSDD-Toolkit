@@ -17,6 +17,9 @@ if TYPE_CHECKING:
     from bsdd_gui.module.revit_export.prop import RevitExportProperties
     from bsdd_gui.tool.loin import CheckstateDict
 
+
+Mode = Literal["CustomPropertySet", "SharedParameters"]
+
 class Signals(FieldSignals):
     pass
 
@@ -51,11 +54,30 @@ class RevitExport(ActionTool, FieldTool):
         widget.pb_import.clicked.connect(lambda: trigger.import_settings(widget))
         widget.pb_export.clicked.connect(lambda: trigger.export_settings(widget))
         widget.pb_create.clicked.connect(lambda _, w=widget: trigger.export(w))
+        widget.cb_mode.currentIndexChanged.connect(lambda _,w=widget: cls.sync_settings_layout(w))
+        widget.cb_mode.currentIndexChanged.connect(lambda _,w=widget: cls.sync_settings_to_properties(w))
+        widget.cb_text.currentIndexChanged.connect(lambda _,w=widget: cls.sync_settings_to_properties(w))
         super().connect_widget_signals(widget)
 
 
     @classmethod
-    def get_datatype(cls,bsdd_property:BsddProperty,mode:Literal["CustomPropertySet", "SharedParameters"] = "CustomPropertySet") -> str:
+    def sync_settings_layout(cls,widget:ui.Widget):
+        mode = widget.cb_mode
+        widget.cb_text.setVisible(mode.currentText() == "CustomPropertySet")
+        widget.lb_text_or_label.setVisible(mode.currentText() == "CustomPropertySet")
+
+
+    @classmethod
+    def sync_settings_to_properties(cls,widget:ui.Widget):
+        cls.get_properties().text_or_label = widget.cb_text.currentText()
+        cls.get_properties().mode = widget.cb_mode.currentText()
+
+    @classmethod
+    def get_mode(cls) -> Mode:
+        return cls.get_properties().mode
+
+    @classmethod
+    def get_datatype(cls,bsdd_property:BsddProperty,mode:Mode = "CustomPropertySet") -> str:
 
         datatype_mapping = {
             "Boolean":"Boolean",

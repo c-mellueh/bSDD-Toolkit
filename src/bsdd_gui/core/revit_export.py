@@ -56,7 +56,9 @@ def register_widget(widget: ui.Widget, revit_export: Type[tool.RevitExport]):
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
     widget.settings_widget.setVisible(True)
-
+    widget.fr_download.setVisible(False)
+    revit_export.sync_settings_layout(widget)
+    revit_export.sync_settings_to_properties(widget)
 
 def register_fields(widget: ui.Widget, revit_export: Type[tool.RevitExport]):
     pass
@@ -131,10 +133,16 @@ def export(
             0, widget, lambda: popups.create_info_popup(text, title, text_title, parent=widget)
         )
 
-    build_worker, build_thread = revit_export.create_shared_paramaters_thread(
-        bsdd_dict, checkstate_dict,pset_dict, out_path
-    )
+    mode = revit_export.get_mode()
 
+    if mode == "SharedParameters":
+        build_worker, build_thread = revit_export.create_shared_paramaters_thread(
+            bsdd_dict, checkstate_dict,pset_dict, out_path
+        )
+    else:
+        build_worker, build_thread = revit_export.create_userdefined_pset_thread(
+            bsdd_dict, checkstate_dict,pset_dict, out_path
+        )
     build_worker.finished.connect(export_done)
     build_worker.error.connect(lambda: stop_waiting_widget(waiting_worker))
 
