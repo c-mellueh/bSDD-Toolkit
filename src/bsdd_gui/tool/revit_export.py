@@ -1,22 +1,21 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, TypedDict
-from PySide6.QtCore import Signal, QCoreApplication, QObject, QThread, Qt
-from bsdd_json.utils import class_utils, property_utils, dictionary_utils
-from openpyxl.utils import get_column_letter
+from typing import TYPE_CHECKING,Literal
+from PySide6.QtCore import Signal, QObject, QThread, Qt
+from bsdd_json.utils import property_utils
+from pathlib import Path
+from jinja2 import Template
 
 import logging
-from bsdd_json import BsddClass, BsddDictionary, BsddProperty
+from bsdd_json import BsddDictionary, BsddProperty
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import ActionTool, FieldTool, FieldSignals
-from bsdd_gui.module.revit_export import ui, trigger, constants
-from openpyxl.worksheet.table import Table, TableStyleInfo
-
+from bsdd_gui.module.revit_export import ui, trigger
+from bsdd_gui.resources.data import get_shared_parameter_template_path
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from bsdd_gui.module.revit_export.prop import RevitExportProperties
     from bsdd_gui.tool.loin import CheckstateDict
-    from io import TextIOWrapper
 
 class Signals(FieldSignals):
     pass
@@ -56,7 +55,7 @@ class RevitExport(ActionTool, FieldTool):
 
 
     @classmethod
-    def get_datatype(cls,bsdd_property:BsddProperty) -> str:
+    def get_datatype(cls,bsdd_property:BsddProperty,mode:Literal["CustomPropertySet", "SharedParameters"] = "CustomPropertySet") -> str:
 
         datatype_mapping = {
             "Boolean":"Boolean",
@@ -65,9 +64,16 @@ class RevitExport(ActionTool, FieldTool):
             "Real":"Real",
             "String":cls.get_properties().text_or_label,
             "Time":"Time"
-        }
-
-        return datatype_mapping.get(bsdd_property.DataType,cls.get_properties().text_or_label)
+    } if mode == "CustomPropertySet" else {
+            "Boolean":"YESNO",
+            "Character":"TEXT",
+            "Integer":"INTEGER",
+            "Real":"NUMBER",
+            "String":"TEXT",
+            "Time":"TIMEINTERVAL"
+    }
+        default = cls.get_properties().text_or_label if mode == "CustomPropertySet" else "TEXT"
+        return datatype_mapping.get(bsdd_property.DataType,default)
 
     @classmethod
     def get_revit_name(cls,pset_name:str,bsdd_property:BsddProperty):
@@ -80,9 +86,15 @@ class RevitExport(ActionTool, FieldTool):
         return bsdd_property.Name
 
     @classmethod
+    def get_template_path(cls) -> Path:
+        #TODO: Add settings menu to set custom template Path
+        return  get_shared_parameter_template_path()
+
+
+    @classmethod
     def create_line(cls,pset_name:str,bsdd_property:BsddProperty):
         revit_name = cls.get_revit_name(pset_name,bsdd_property)
-        datatype = cls.get_datatype(bsdd_property)
+        datatype = cls.get_datatype(bsdd_property,mode = "CustomPropertySet")
         name = cls.get_property_name(bsdd_property)
         return "\t".join([name,datatype,revit_name])
 
@@ -99,11 +111,9 @@ class RevitExport(ActionTool, FieldTool):
         return ifc_types
 
     @classmethod
-    def run(cls,checkstates:CheckstateDict,psets:dict[str,set[str]],bsdd_dictionary:BsddDictionary):
+    def create_userdefined_psets(cls,checkstates:CheckstateDict,psets:dict[str,set[str]],bsdd_dictionary:BsddDictionary):
         lines = list()
         for pset_name,class_property_codes in psets.items():
-            if pset_name == "Schaltschrank":
-                print("HIER")
             ifc_types = sorted(cls.get_ifc_types(checkstates,pset_name))
             text = "\t".join(["PropertySet:",pset_name,"I",",".join(ifc_types)])
             property_texts = list()
@@ -149,8 +159,33 @@ class RevitExport(ActionTool, FieldTool):
                             if bsdd_property:= property_dict.get("bsdd_property"):
                                 return bsdd_property
         return None
+    
     @classmethod
-    def create_build_thread(
+    def create_shared_parameters(cls,checkstates:CheckstateDict,psets:dict[str,set[str]],bsdd_dictionary:BsddDictionary):
+        template_path = cls.get_template_path()
+        lines = list()
+        groups = ["SOM"]
+        for pset_name,class_property_codes in psets.items():
+            for class_property_code in class_property_codes:
+                bsdd_property = cls.get_properties_by_codes(pset_name,class_property_code,bsdd_dictionary,checkstates)
+                if not bsdd_property:
+                    logger.warning(f"bSDD Property '{pset_name}.{class_property_code}' konnte nicht gefunden werden")
+                    continue
+                uid = property_utils.get_uid(bsdd_property)
+                name = cls.get_revit_name(pset_name,bsdd_property)
+                datatype = cls.get_datatype(bsdd_property,mode = "SharedParameters")
+                datacategory = ""
+                group_index = 1
+                visible = 1
+                description = bsdd_property.Definition
+                usermodifiable = 0
+                hide_when_no_value = 0
+                lines.append((uid,name,datatype,datacategory,group_index,visible,description,usermodifiable,hide_when_no_value))
+        result = Template(open(template_path).read()).render(groups = groups,params = lines)
+        return result, lines
+    
+    @classmethod
+    def create_userdefined_pset_thread(
         cls,
         bsdd_dict: BsddDictionary,
         checkstate_dict:CheckstateDict,
@@ -168,9 +203,50 @@ class RevitExport(ActionTool, FieldTool):
                 try:
                     logging.info("Start Export!")
 
-                    lines = cls.run(checkstate_dict,pset_dict,bsdd_dict)
+                    lines = cls.create_userdefined_psets(checkstate_dict,pset_dict,bsdd_dict)
                     with open(out_path,"w") as file:
                         file.write("\n".join(lines))
+                    logging.info("Export Done!")
+                    self.finished.emit(lines)
+                except Exception as exc:  # pragma: no cover - pass through
+                    self.error.emit(exc)
+
+        build_worker = _BuildWorker()
+        cls.get_properties().build_worker = build_worker
+        build_thread = QThread()
+
+        cls.get_properties().build_thread = build_thread
+
+        build_worker.moveToThread(build_thread)
+        build_worker.finished.connect(build_thread.quit)
+        build_worker.finished.connect(build_worker.deleteLater)
+        build_worker.error.connect(build_thread.quit)
+        build_worker.error.connect(build_worker.deleteLater)
+        build_thread.finished.connect(build_thread.deleteLater)
+        build_thread.started.connect(build_worker.run, Qt.ConnectionType.QueuedConnection)
+        return build_worker, build_thread
+
+    @classmethod
+    def create_shared_paramaters_thread(
+        cls,
+        bsdd_dict: BsddDictionary,
+        checkstate_dict:CheckstateDict,
+        pset_dict:dict[str,dict[str,bool]],
+        out_path: str,
+    ):
+        class _BuildWorker(QObject):
+            finished = Signal(object)
+            error = Signal(object)
+
+            def __init__(self):
+                super().__init__()
+
+            def run(self):
+                try:
+                    logging.info("Start Export!")
+                    text,lines = cls.create_shared_parameters(checkstate_dict,pset_dict,bsdd_dict)
+                    with open(out_path,"w",encoding="utf-16") as file:
+                        file.write(text)
                     logging.info("Export Done!")
                     self.finished.emit(lines)
                 except Exception as exc:  # pragma: no cover - pass through

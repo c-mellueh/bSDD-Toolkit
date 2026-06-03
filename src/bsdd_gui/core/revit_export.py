@@ -55,7 +55,7 @@ def register_widget(widget: ui.Widget, revit_export: Type[tool.RevitExport]):
     widget.pb_import.setIcon(qta.icon("mdi6.tray-arrow-up"))
     widget.pb_export.setIcon(qta.icon("mdi6.tray-arrow-down"))
     widget.fw_output.load_path()
-    widget.settings_widget.setVisible(False)
+    widget.settings_widget.setVisible(True)
 
 
 def register_fields(widget: ui.Widget, revit_export: Type[tool.RevitExport]):
@@ -131,7 +131,7 @@ def export(
             0, widget, lambda: popups.create_info_popup(text, title, text_title, parent=widget)
         )
 
-    build_worker, build_thread = revit_export.create_build_thread(
+    build_worker, build_thread = revit_export.create_shared_paramaters_thread(
         bsdd_dict, checkstate_dict,pset_dict, out_path
     )
 

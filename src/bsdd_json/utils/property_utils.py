@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from uuid import UUID, uuid4
 
 import bsdd
 
@@ -388,3 +389,20 @@ def get_definition(bsdd_class_property: BsddClassProperty, bsdd_dictionary: Bsdd
 
 def is_referencing_external_property(class_property: BsddClassProperty, bsdd_dictionary: BsddDictionary) -> bool:
     return bool(class_property.PropertyUri and dict_utils.is_external_ref(class_property.PropertyUri, bsdd_dictionary))
+
+
+def get_uid(bsdd_property: BsddProperty) -> UUID:
+    """Return the property's UID as a UUID, generating one if missing.
+
+    Normalizes ``bsdd_property.Uid`` to a UUID: parses it if it's a string,
+    keeps it as-is if it's already a UUID, or creates a fresh one if unset.
+    The property's ``Uid`` is written back as a string in all cases.
+    """
+    if not bsdd_property.Uid:
+        guid = uuid4()
+    elif isinstance(bsdd_property.Uid, str):
+        guid = UUID(bsdd_property.Uid)
+    else:
+        guid = bsdd_property.Uid
+    bsdd_property.Uid = str(guid)
+    return guid
