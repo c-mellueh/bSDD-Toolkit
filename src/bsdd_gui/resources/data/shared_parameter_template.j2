@@ -1,0 +1,12 @@
+# This is a Revit shared parameter file.
+# Do not edit manually.
+*META	VERSION	MINVERSION
+META	2	1
+*GROUP	ID	NAME
+{% for group_name in groups -%}
+GROUP	{{ loop.index }}	{{ group_name }}
+{% endfor %}
+*PARAM	GUID	NAME	DATATYPE	DATACATEGORY	GROUP	VISIBLE	DESCRIPTION	USERMODIFIABLE	HIDEWHENNOVALUE
+{% for guid, name, datatype, datacategory, group, visible, description, usermodifiable, hidewhennovalue in params -%}
+PARAM	{{ guid }}	{{ name }}	{{ datatype }}	{{ datacategory }}	{{ group }}	{{ visible }}	{{ description }}	{{ usermodifiable }}	{{ hidewhennovalue }}
+{% endfor %}

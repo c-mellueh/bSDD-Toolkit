@@ -38,7 +38,9 @@ def connect_to_main_window(
 def retranslate_ui(ids_exporter: Type[tool.IdsExporter], main_window: Type[tool.MainWindowWidget]):
     action = ids_exporter.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("IDSExport", "IDS Exporter"))
-
+    for wid in ids_exporter.get_widgets():
+        wid:ui.Widget
+        wid.setWindowTitle(wid.tr("Export to IDS"))
 
 def connect_signals(widget_tool: Type[tool.IdsExporter]):
     widget_tool.connect_internal_signals()

@@ -18,7 +18,7 @@ def connect_to_main_window(
 ):
     # Action uses the WidgetTool request to allow trigger routing
     action = main_window.add_action(
-        "menuFile",
+        "menuExport",
         "Export ISO 23386",
         lambda: iso_export.request_widget(
             project.get(),
@@ -36,7 +36,9 @@ def connect_signals(iso_export: Type[tool.IsoExport]):
 def retranslate_ui(iso_export: Type[tool.IsoExport], main_window: type[tool.MainWindowWidget]):
     action = iso_export.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("IsoExport", "Export ISO 23386"))
-
+    for wid in iso_export.get_widgets():
+        wid:ui.Widget
+        wid.setWindowTitle(wid.tr("Export to ISO 23386"))
 
 def create_widget(data, parent, iso_export: Type[tool.IsoExport]):
     iso_export.show_widget(data, parent)
@@ -117,7 +119,7 @@ def export(
         return
     checked_classes = loin.get_checked_classes(specs, bsdd_dict)
     checked_properties = loin.get_checked_properties(specs, bsdd_dict)
-    checked_predefined_porperties = loin.get_checked_predefined_properties(specs, bsdd_dict)
+    checked_predefined_porperties = loin.get_pset_dict(specs, bsdd_dict)
 
     def export_done(class_count: int):
         stop_waiting_widget(waiting_worker)

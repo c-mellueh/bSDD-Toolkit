@@ -154,13 +154,7 @@ class IsoExport(ActionTool, FieldTool):
     ):
         language = cls.get_properties().language
         bsdd_property = property_utils.get_property_by_class_property(bsdd_class_property, project)
-        if bsdd_property.Uid:
-            guid = (
-                UUID(bsdd_property.Uid) if isinstance(bsdd_property.Uid, str) else bsdd_property.Uid
-            )
-        else:
-            guid = uuid4()
-        bsdd_property.Uid = str(guid)
+        guid = property_utils.get_uid(bsdd_property)
         status = (
             bsdd_property.Status.lower()
             if bsdd_property.Status != "Preview" and bsdd_property.Status

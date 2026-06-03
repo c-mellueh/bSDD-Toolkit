@@ -15,7 +15,7 @@ from uuid import UUID, uuid4
 
 from datetime import datetime
 import bsdd_gui
-from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
+from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary, BsddProperty
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils
 from bsdd_gui.presets.tool_presets import (
@@ -56,10 +56,31 @@ from bsdd_gui import tool
 def _now() -> datetime:
     return datetime.now()
 
-
+Code = str
+Name = str
 class PsetDict(TypedDict):
     checked: bool
-    properties: dict[str, bool]
+    properties: dict[Code, bool]
+
+
+class PropertyDict(TypedDict):
+    checked: bool
+    bsdd_entity: BsddClassProperty
+    bsdd_property: BsddProperty
+
+
+class PsetDictv2(TypedDict):
+    checked: bool
+    properties: dict[Code,PropertyDict]
+
+
+class ClassDict(TypedDict):
+    checked: bool
+    bsdd_entity: BsddClass
+    property_sets: dict[Name,PsetDictv2]
+
+
+CheckstateDict = dict[Code, ClassDict]
 
 
 class Signals(WidgetSignals):
@@ -166,6 +187,51 @@ class Loin(ActionTool, WidgetTool):
         return bool(cls.get_properties().specs)
 
     @classmethod
+    def get_check_dict(
+        cls, active_specifications: list[LoinSpecification], bsdd_dictionary: BsddDictionary
+    ) ->CheckstateDict:
+        return_dict = dict()
+
+        for bsdd_class in bsdd_dictionary.Classes:
+            if bsdd_class.ClassType != "Class":
+                continue
+
+            is_class_checked = any(
+                [
+                    cls.is_class_included(bsdd_class, *cls._get_spec_key(spec))
+                    for spec in active_specifications
+                ]
+            )
+            pset_dict: dict[str, PsetDict] = {}
+            for class_property in bsdd_class.ClassProperties:
+                bsdd_property = prop_utils.get_property_by_class_property(
+                    class_property, bsdd_dictionary
+                )
+                pset_name = class_property.PropertySet or ""
+                prop_checked = False
+                for spec in active_specifications:
+                    p_guid, m_guid = cls._get_spec_key(spec)
+                    if cls.is_property_included(bsdd_class, class_property, p_guid, m_guid):
+                        prop_checked = True
+
+                entry = pset_dict.setdefault(pset_name, {"checked": False, "properties": {}})
+                entry["properties"][class_property.Code] = {
+                    "bsdd_entity": class_property,
+                    "checked": prop_checked,
+                    "bsdd_property": bsdd_property,
+                }
+                if prop_checked:
+                    entry["checked"] = True
+
+            class_dict = {
+                "bsdd_entity": bsdd_class,
+                "checked": is_class_checked,
+                "property_sets": pset_dict,
+            }
+            return_dict[bsdd_class.Code] = class_dict
+        return return_dict
+
+    @classmethod
     def get_checked_classes(
         cls, active_specifications: list[LoinSpecification], bsdd_dictionary: BsddDictionary
     ) -> list[BsddClass]:
@@ -228,15 +294,15 @@ class Loin(ActionTool, WidgetTool):
         return result
 
     @classmethod
-    def get_checked_predefined_properties(
+    def get_pset_dict(
         cls,
         active_specifications: list[LoinSpecification],
         bsdd_dictionary: BsddDictionary,
-    ) -> dict[str, set[str]]:
+    ) -> dict[Name, set[Code]]:
         """Return pset_name → set of property codes checked in at least one spec.
 
         Aggregates across all added classes exactly like the pset tree view:
-        each unique (pset, property_code) pair appears once and is included
+        each unique (pset, class_property_code) pair appears once and is included
         when ANY class that owns it has it checked in any active specification.
         """
         if bsdd_dictionary is None:
@@ -434,8 +500,7 @@ class Loin(ActionTool, WidgetTool):
             if purpose is None or milestone is None:
                 continue
             spec.name = (
-                f"{cls.purpose_display_name(purpose)} – "
-                f"{cls.milestone_display_name(milestone)}"
+                f"{cls.purpose_display_name(purpose)} – {cls.milestone_display_name(milestone)}"
             )
 
     @classmethod
@@ -876,7 +941,7 @@ class Loin(ActionTool, WidgetTool):
                     group_of_properties_refs=[],
                 ),
             ),
-            definition=DtMultiLangText(language="en",text=bsdd_class.Definition or ""),
+            definition=DtMultiLangText(language="en", text=bsdd_class.Definition or ""),
         )
         # Remember which bSDD class this represents — stored as an attribute
         # on the Pydantic instance, not part of the XML schema.

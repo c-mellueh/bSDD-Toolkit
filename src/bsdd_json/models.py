@@ -85,7 +85,10 @@ class BsddDictionary(CaseInsensitiveModel):
     def load(cls, path: str, *, sloppy: bool = False) -> BsddDictionary:
         if not path:
             return None
-        with Path(path).open(encoding="utf-8") as f:
+        path = Path(path)
+        if not path.exists():
+            return None
+        with path.open(encoding="utf-8") as f:
             raw = json.load(f)
         if not sloppy:
             return cls.model_validate(raw)

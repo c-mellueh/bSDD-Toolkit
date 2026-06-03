@@ -352,6 +352,12 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+    </widget>
+    <addaction name="menuExport"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -371,6 +377,11 @@
   <action name="actiondqwd">
    <property name="text">
     <string>dqwd</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>_</string>
    </property>
   </action>
  </widget>

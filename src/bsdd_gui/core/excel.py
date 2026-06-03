@@ -19,7 +19,7 @@ def connect_to_main_window(
 ):
     # Action uses the WidgetTool request to allow trigger routing
     action = main_window.add_action(
-        "menuFile",
+        "menuExport",
         "Export Excel",
         lambda: excel.request_widget(
             project.get(),
@@ -37,6 +37,9 @@ def connect_signals(excel: Type[tool.Excel]):
 def retranslate_ui(excel: Type[tool.Excel], main_window: type[tool.MainWindowWidget]):
     action = excel.get_action(main_window.get(), "open_window")
     action.setText(QCoreApplication.translate("Excel", "Export Excel"))
+    for wid in excel.get_widgets():
+        wid:ui.Widget
+        wid.setWindowTitle(wid.tr("Export to Excel"))
 
 
 def create_widget(data, parent, excel: Type[tool.Excel]):
