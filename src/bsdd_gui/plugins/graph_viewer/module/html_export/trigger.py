@@ -30,3 +30,17 @@ def export_html():
         tool.Appdata,
         gv_tool.HTMLExport,
     )
+
+
+def export_html_tabs():
+    core.export_html_tabs(
+        gv_tool.Window,
+        gv_tool.Node,
+        gv_tool.Edge,
+        gv_tool.SceneView,
+        gv_tool.Buchheim,
+        tool.Project,
+        tool.Popups,
+        tool.Appdata,
+        gv_tool.HTMLExport,
+    )
