@@ -8,6 +8,7 @@ import bsdd
 from bsdd_json.models import BsddClass, BsddClassRelation, BsddDictionary
 
 from . import dictionary_utils as dict_utils
+from .cache import BaseCache
 
 
 def load_class(
@@ -102,8 +103,10 @@ def _load_class_json(
     return result
 
 
-class Cache:
-    data = {}
+class Cache(BaseCache):
+    cache_filename = "external_class_cache.json"
+    model_cls = BsddClass
+    label = "class"
 
     @classmethod
     def get_external_class(
@@ -114,25 +117,10 @@ class Cache:
         include_relations=False,
         client: bsdd.Client | None = None,
     ) -> BsddClass | None:
-
-        if not class_uri:
-            return None
-        if class_uri in cls.data:
-            return cls.data[class_uri]
-
-        result = load_class(
+        return cls._get(
             class_uri,
-            bsdd_dictionary,
-            include_properties,
-            include_relations,
-            client,
+            lambda: load_class(class_uri, bsdd_dictionary, include_properties, include_relations, client),
         )
-        cls.data[class_uri] = result
-        return cls.data[class_uri]
-
-    @classmethod
-    def flush_data(cls):
-        cls.data = {}
 
 
 def get_root_parent(bsdd_class: BsddClass, bsdd_dictionary: BsddDictionary):

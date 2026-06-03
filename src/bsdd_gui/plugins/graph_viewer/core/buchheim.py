@@ -34,6 +34,8 @@ def create_tree(
     physics.set_running(False)
 
     roots = buchheim.find_roots(all_nodes)
+    if not roots:
+        return
     root = roots[0]
     buchheim.intialize(root)
     root_x_pos = [n.pos().x() for n in roots]

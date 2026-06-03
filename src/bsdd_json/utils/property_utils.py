@@ -15,6 +15,7 @@ from bsdd_json import (
 
 from . import build_unique_code
 from . import dictionary_utils as dict_utils
+from .cache import BaseCache
 
 logger = logging.getLogger(__name__)
 
@@ -51,23 +52,14 @@ def _load_property_json(uri, include_classes=False, language_code="", client: bs
     return result
 
 
-class Cache:
-    data = {}
+class Cache(BaseCache):
+    cache_filename = "external_property_cache.json"
+    model_cls = BsddProperty
+    label = "property"
 
     @classmethod
-    def get_external_property(cls, property_uri: str, client: bsdd.Client | None = None) -> BsddClassProperty | None:
-
-        if not property_uri:
-            return None
-        if property_uri in cls.data:
-            return cls.data[property_uri]
-        result = load_property(property_uri, client=client)
-        cls.data[property_uri] = result
-        return cls.data[property_uri]
-
-    @classmethod
-    def flush_data(cls):
-        cls.data = {}
+    def get_external_property(cls, property_uri: str, client: bsdd.Client | None = None) -> BsddProperty | None:
+        return cls._get(property_uri, lambda: load_property(property_uri, client=client))
 
 
 def get_data_type(class_property: BsddClassProperty, bsdd_dictionary: BsddDictionary = None):
