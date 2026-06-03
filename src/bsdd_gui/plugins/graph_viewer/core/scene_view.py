@@ -49,6 +49,7 @@ def add_settings(
     settings.add_content_widget(widget)
     button_widget = scene_view.get_buttons_widget()
     button_widget.bt_export_html.clicked.connect(html_export.request_export)
+    button_widget.bt_export_html_tabs.clicked.connect(html_export.request_export_tabs)
 
 
 def retranslate_ui(scene_view: Type[gv_tool.SceneView], phyiscs: Type[gv_tool.Physics]):

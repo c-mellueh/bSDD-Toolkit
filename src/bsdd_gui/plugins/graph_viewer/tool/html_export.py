@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 class Signals(PluginSignals):
     export_requested = Signal()
+    export_tabs_requested = Signal()
 
 
 class HTMLExport(PluginTool):
@@ -32,11 +33,16 @@ class HTMLExport(PluginTool):
     @classmethod
     def connect_internal_signals(cls):
         cls.signals.export_requested.connect(trigger.export_html)
+        cls.signals.export_tabs_requested.connect(trigger.export_html_tabs)
         return super().connect_internal_signals()
 
     @classmethod
     def request_export(cls):
         cls.signals.export_requested.emit()
+
+    @classmethod
+    def request_export_tabs(cls):
+        cls.signals.export_tabs_requested.emit()
 
     @classmethod
     def _qcolor_to_css(cls, color) -> str:
@@ -188,16 +194,34 @@ class HTMLExport(PluginTool):
 
         try:
             if node.node_type in (nc.CLASS_NODE_TYPE, nc.GOP_NODE_TYPE):
-                return cl_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+                uri = cl_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+                return cls._use_latest_version(uri, bsdd_dictionary)
             if node.node_type == nc.EXTERNAL_CLASS_NODE_TYPE:
                 return node.bsdd_data.OwnedUri
             if node.node_type == nc.PROPERTY_NODE_TYPE:
-                return prop_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+                uri = prop_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
+                return cls._use_latest_version(uri, bsdd_dictionary)
             if node.node_type in (nc.EXTERNAL_PROPERTY_NODE_TYPE, nc.IFC_NODE_TYPE):
                 return node.bsdd_data.OwnedUri
         except Exception:
             pass
         return None
+
+    @classmethod
+    def _use_latest_version(
+        cls, uri: str | None, bsdd_dictionary: BsddDictionary | None
+    ) -> str | None:
+        """Replace the dictionary version segment in an internal bSDD URI with ``latest``.
+
+        bSDD resolves ``.../<org>/<dict>/latest/...`` to the most recent version, so the
+        exported links keep working as the dictionary is republished.
+        """
+        if not uri or bsdd_dictionary is None:
+            return uri
+        version = bsdd_dictionary.DictionaryVersion
+        if not version:
+            return uri
+        return uri.replace(f"/{version}/", "/latest/", 1)
 
     @classmethod
     def _node_shape_element(cls, node: Node, cx: float, cy: float) -> str:
@@ -226,6 +250,47 @@ class HTMLExport(PluginTool):
             f'width="{w:.1f}" height="{h:.1f}" fill="{fill}" '
             f'stroke="{stroke}" stroke-width="1.2"/>'
         )
+
+    @classmethod
+    def ensure_node_sizes(cls, nodes: list[Node]) -> None:
+        """Recompute every node's ``_w``/``_h`` from its label's font metrics.
+
+        A node is only sized while it is painted, so freshly inserted nodes (such as
+        those built by the automated per-root export, which are never rendered to the
+        screen) keep their default size and collapse to the minimum box width. Running
+        the same sizing the view uses makes the exported boxes hug the text, matching
+        the live class view.
+        """
+        from bsdd_gui.plugins.graph_viewer.tool import Node as NodeTool
+
+        for node in nodes:
+            try:
+                NodeTool._update_size_for_text(node)
+            except Exception:
+                pass
+
+    @classmethod
+    def _label_font(cls) -> tuple[int, str]:
+        """Return the (pixel size, CSS family) of the application font.
+
+        Box widths are measured with this font, so the SVG labels must use it too or
+        the text will not line up with the boxes.
+        """
+        from PySide6.QtWidgets import QApplication
+        from PySide6.QtGui import QFontInfo
+
+        if QApplication.instance() is None:
+            return 12, "sans-serif"
+        try:
+            info = QFontInfo(QApplication.font())
+            size = info.pixelSize()
+            family = info.family()
+        except Exception:
+            return 12, "sans-serif"
+        if size <= 0:
+            size = 12
+        family_css = f"'{family}', sans-serif" if family else "sans-serif"
+        return size, family_css
 
     @classmethod
     def compute_bounding_box(cls, nodes: list[Node]):
@@ -313,6 +378,7 @@ class HTMLExport(PluginTool):
     ) -> list[str]:
 
         # Node elements
+        font_size, font_family = cls._label_font()
         node_parts: list[str] = []
         for node in nodes:
             cx = node.pos().x() + offset_x
@@ -322,8 +388,23 @@ class HTMLExport(PluginTool):
             text_el = (
                 f'<text x="{cx:.1f}" y="{cy:.1f}" text-anchor="middle" '
                 f'dominant-baseline="middle" fill="{constants.TEXT_COLOR}" '
-                f'font-size="12" font-family="sans-serif" pointer-events="none">{label}</text>'
+                f'font-size="{font_size}" font-family="{font_family}" '
+                f'pointer-events="none">{label}</text>'
             )
+
+            # Class and Property nodes are selectable: a single click shows the node's
+            # definition (and, for classes, its property table); a double click opens the
+            # bSDD page (see inline script).
+            select_id = cls._node_select_id(node)
+            if select_id is not None:
+                url = cls._node_url(node, bsdd_dictionary) if bsdd_dictionary else None
+                href_attr = f' data-href="{html.escape(url)}"' if url else ""
+                node_parts.append(
+                    f'<g class="selectable" data-node-id="{html.escape(select_id)}"'
+                    f"{href_attr}>{shape_el}{text_el}</g>"
+                )
+                continue
+
             inner = f"<g>{shape_el}{text_el}</g>"
             url = cls._node_url(node, bsdd_dictionary) if bsdd_dictionary else None
             if url:
@@ -333,6 +414,64 @@ class HTMLExport(PluginTool):
                 )
             node_parts.append(inner)
         return node_parts
+
+    @classmethod
+    def _node_select_id(cls, node: Node) -> str | None:
+        """Return a stable, type-namespaced selection id for selectable nodes, else None.
+
+        Codes are unique per resource type within a dictionary; the ``class:``/``prop:``
+        prefix keeps a class and a property that happen to share a code from colliding.
+        """
+        if node.bsdd_data is None:
+            return None
+        if node.node_type in (nc.CLASS_NODE_TYPE, nc.GOP_NODE_TYPE):
+            return f"class:{node.bsdd_data.Code}"
+        if node.node_type == nc.PROPERTY_NODE_TYPE:
+            return f"prop:{node.bsdd_data.Code}"
+        return None
+
+    @classmethod
+    def generate_node_info_data(cls, nodes: list[Node], bsdd_dictionary: BsddDictionary) -> str:
+        """Build the JSON payload mapping each selectable node id to its display info.
+
+        Each entry is ``{"name", "kind", "definition", "rows"}`` where ``rows`` is
+        ``[[name, pset, datatype, desc], ...]`` (empty for properties). It is embedded
+        verbatim into an inline script so the page needs no network access.
+        """
+        import json
+        from bsdd_json.utils import property_utils as prop_utils
+
+        data: dict[str, dict] = {}
+        for node in nodes:
+            select_id = cls._node_select_id(node)
+            if select_id is None or select_id in data:
+                continue
+            bsdd_data = node.bsdd_data
+            definition = bsdd_data.Definition or bsdd_data.Description or ""
+
+            rows: list[list[str]] = []
+            if node.node_type in (nc.CLASS_NODE_TYPE, nc.GOP_NODE_TYPE):
+                kind = "Class"
+                for cp in bsdd_data.ClassProperties:
+                    prop = prop_utils.get_property_by_class_property(cp, bsdd_dictionary)
+                    name = prop.Name if prop else (cp.PropertyCode or cp.PropertyUri or "")
+                    pset = cp.PropertySet or ""
+                    datatype = (prop.DataType if prop else None) or ""
+                    description = cp.Description or (prop.Description if prop else None) or ""
+                    rows.append([name, pset, datatype, description])
+                rows.sort(key=lambda r: (r[1].lower(), r[0].lower()))
+            else:
+                kind = "Property"
+
+            data[select_id] = {
+                "name": bsdd_data.Name or bsdd_data.Code,
+                "kind": kind,
+                "definition": definition,
+                "rows": rows,
+            }
+
+        # Escape "</" so the payload can never terminate the surrounding <script> element.
+        return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
     @classmethod
     def generate_node_legend(cls, nodes: list[Node]) -> str:
@@ -414,12 +553,138 @@ class HTMLExport(PluginTool):
         node_parts: str,
         node_legend_html: str,
         edge_legend_html: str,
+        node_info_json: str = "{}",
     ) -> str:
 
+        tab = {
+            "title": "",
+            "svg_w": svg_w,
+            "svg_h": svg_h,
+            "defs_parts": defs_parts,
+            "edge_parts": edge_parts,
+            "node_parts": node_parts,
+            "node_legend_html": node_legend_html,
+            "edge_legend_html": edge_legend_html,
+            "node_info_json": node_info_json,
+        }
+        return cls.generate_tabbed_html(page_title, heading_suffix, [tab])
+
+    @classmethod
+    def generate_graph_tab(
+        cls,
+        title: str,
+        nodes: list[Node],
+        edges: list[Edge],
+        bsdd_dictionary: BsddDictionary,
+        orthogonal: bool,
+        arrow_length: float,
+    ) -> dict:
+        """Bundle every HTML fragment a single graph (one tab) needs."""
+        cls.ensure_node_sizes(nodes)
+        svg_w, svg_h, offset_x, offset_y = cls.compute_bounding_box(nodes)
+        defs_parts, edge_parts = cls.generate_edge_parts(
+            edges, offset_x, offset_y, orthogonal, arrow_length
+        )
+        node_parts = cls.generate_node_parts(nodes, offset_x, offset_y, bsdd_dictionary)
+        return {
+            "title": title,
+            "svg_w": svg_w,
+            "svg_h": svg_h,
+            "defs_parts": defs_parts,
+            "edge_parts": edge_parts,
+            "node_parts": node_parts,
+            "node_legend_html": cls.generate_node_legend(nodes),
+            "edge_legend_html": cls.generate_edge_legend(edges),
+            "node_info_json": cls.generate_node_info_data(nodes, bsdd_dictionary),
+        }
+
+    @classmethod
+    def build_graph_section(cls, index: int, tab: dict, active: bool) -> str:
+        """Render one tab's graph, legend, definition frame and property table.
+
+        Element hooks are CSS classes (not ids) so any number of sections can coexist
+        on one page; the shared script scopes its queries to each section.
+        """
+        svg_w = tab["svg_w"]
+        svg_h = tab["svg_h"]
+        defs_parts = tab["defs_parts"]
         defs_block = f"<defs>{''.join(defs_parts)}</defs>" if defs_parts else ""
         bg_rect = f'<rect width="{svg_w:.0f}" height="{svg_h:.0f}" fill="{constants.SCENE_BG}"/>'
-        svg_inner = "\n      ".join([defs_block, bg_rect] + edge_parts + node_parts)
+        svg_inner = "\n      ".join([defs_block, bg_rect] + tab["edge_parts"] + tab["node_parts"])
+        active_cls = " active" if active else ""
+        return f"""
+    <section class="graph-section{active_cls}" data-tab="{index}">
+        <div class="graph-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            width="{svg_w:.0f}" height="{svg_h:.0f}"
+            viewBox="0 0 {svg_w:.0f} {svg_h:.0f}">
+        {svg_inner}
+        </svg>
+        </div>
+        <div class="legend">
+        <div class="legend-section">
+            <div class="legend-title">Node Types</div>
+            {tab["node_legend_html"]}
+        </div>
+        <div class="legend-section">
+            <div class="legend-title">Relationship Types</div>
+            {tab["edge_legend_html"]}
+        </div>
+        </div>
+        <div class="def-panel">
+        <h3><span class="def-name">Definition</span><span class="def-kind" hidden></span></h3>
+        <p class="def-text def-empty">Select a class or property node to view its definition.</p>
+        </div>
+        <div class="prop-panel">
+        <h3 class="prop-title">Class Properties</h3>
+        <table class="prop-table">
+            <thead>
+            <tr>
+                <th>Property Name</th>
+                <th>Property Set</th>
+                <th>Data Type</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody class="prop-tbody">
+            <tr><td class="prop-empty" colspan="4">Select a class node to view its properties.</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <script type="application/json" class="node-info">{tab["node_info_json"]}</script>
+    </section>"""
 
+    @classmethod
+    def generate_tabbed_html(cls, page_title: str, heading_suffix: str, tabs: list[dict]) -> str:
+        """Compose a single page holding one graph per tab (a tab bar is shown for 2+)."""
+        if not tabs:
+            return cls.generate_empty_html()
+
+        tab_buttons: list[str] = []
+        sections: list[str] = []
+        for i, tab in enumerate(tabs):
+            active = i == 0
+            active_cls = " active" if active else ""
+            title = html.escape(tab.get("title") or f"Graph {i + 1}")
+            tab_buttons.append(
+                f'<button class="tab-button{active_cls}" data-tab="{i}">{title}</button>'
+            )
+            sections.append(cls.build_graph_section(i, tab, active))
+
+        tab_bar_html = ""
+        if len(tabs) > 1:
+            tab_bar_html = f'<div class="tab-bar">{"".join(tab_buttons)}</div>'
+
+        return cls.generate_page(page_title, heading_suffix, tab_bar_html, "".join(sections))
+
+    # ---------------------------------------------------------------------------
+    # Page shell — static CSS + tab/selection script, shared by every export
+    # ---------------------------------------------------------------------------
+    @classmethod
+    def generate_page(
+        cls, page_title: str, heading_suffix: str, tab_bar_html: str, sections_html: str
+    ) -> str:
         return f"""<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -436,6 +701,27 @@ class HTMLExport(PluginTool):
         box-sizing: border-box;
         }}
         h2 {{ margin: 0 0 12px; font-size: 1.1rem; color: #c0c8e0; }}
+        .tab-bar {{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid #2a3050;
+        }}
+        .tab-button {{
+        background: #1a1d2e;
+        color: #c8d0e0;
+        border: 1px solid #2a3050;
+        border-bottom: none;
+        border-radius: 6px 6px 0 0;
+        padding: 6px 14px;
+        font-size: 13px;
+        cursor: pointer;
+        }}
+        .tab-button:hover {{ background: #20243a; }}
+        .tab-button.active {{ background: #2a3050; color: #ffffff; font-weight: 600; }}
+        .graph-section {{ display: none; }}
+        .graph-section.active {{ display: block; }}
         .graph-wrap {{
         overflow: auto;
         border: 1px solid #2a3050;
@@ -444,6 +730,55 @@ class HTMLExport(PluginTool):
         }}
         svg {{ display: block; }}
         a:hover .node-shape {{ filter: brightness(1.35); }}
+        .selectable {{ cursor: pointer; }}
+        .selectable:hover .node-shape {{ filter: brightness(1.35); }}
+        .selectable.selected .node-shape {{ stroke: #ffffff; stroke-width: 2.5; }}
+        .def-panel {{
+        margin-top: 16px;
+        background: #1a1d2e;
+        border: 1px solid #2a3050;
+        border-radius: 6px;
+        padding: 12px;
+        }}
+        .def-panel h3 {{ margin: 0 0 8px; font-size: 1rem; color: #c0c8e0; }}
+        .def-kind {{
+        display: inline-block;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #0f1018;
+        background: #7080a0;
+        border-radius: 3px;
+        padding: 1px 6px;
+        margin-left: 8px;
+        vertical-align: middle;
+        }}
+        .def-text {{ margin: 0; font-size: 13px; line-height: 1.5; color: #c8d0e0; white-space: pre-wrap; }}
+        .def-text.def-empty {{ color: #7080a0; font-style: italic; }}
+        .prop-panel {{
+        margin-top: 16px;
+        background: #1a1d2e;
+        border: 1px solid #2a3050;
+        border-radius: 6px;
+        padding: 12px;
+        }}
+        .prop-panel h3 {{ margin: 0 0 10px; font-size: 1rem; color: #c0c8e0; }}
+        .prop-table {{ width: 100%; border-collapse: collapse; font-size: 12px; }}
+        .prop-table th, .prop-table td {{
+        text-align: left;
+        padding: 6px 8px;
+        border-bottom: 1px solid #2a3050;
+        vertical-align: top;
+        }}
+        .prop-table th {{
+        color: #7080a0;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        }}
+        .prop-table td {{ color: #c8d0e0; }}
+        .prop-table tr:hover td {{ background: #20243a; }}
+        .prop-empty {{ color: #7080a0; font-style: italic; }}
         .legend {{
         display: flex;
         flex-wrap: wrap;
@@ -476,24 +811,100 @@ class HTMLExport(PluginTool):
     </head>
     <body>
     <h2>bSDD Graph View{heading_suffix}</h2>
-    <div class="graph-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            width="{svg_w:.0f}" height="{svg_h:.0f}"
-            viewBox="0 0 {svg_w:.0f} {svg_h:.0f}">
-        {svg_inner}
-        </svg>
-    </div>
-    <div class="legend">
-        <div class="legend-section">
-        <div class="legend-title">Node Types</div>
-        {node_legend_html}
-        </div>
-        <div class="legend-section">
-        <div class="legend-title">Relationship Types</div>
-        {edge_legend_html}
-        </div>
-    </div>
+    {tab_bar_html}
+    {sections_html}
+    <script>
+    (function () {{
+        const buttons = Array.prototype.slice.call(document.querySelectorAll('.tab-button'));
+        const sections = Array.prototype.slice.call(document.querySelectorAll('.graph-section'));
+
+        buttons.forEach(function (btn) {{
+        btn.addEventListener('click', function () {{
+            buttons.forEach(function (b) {{ b.classList.remove('active'); }});
+            sections.forEach(function (s) {{ s.classList.remove('active'); }});
+            btn.classList.add('active');
+            const target = document.querySelector(
+                '.graph-section[data-tab="' + btn.getAttribute('data-tab') + '"]'
+            );
+            if (target) target.classList.add('active');
+        }});
+        }});
+
+        sections.forEach(function (section) {{
+        let info = {{}};
+        const infoEl = section.querySelector('.node-info');
+        if (infoEl) {{ try {{ info = JSON.parse(infoEl.textContent); }} catch (e) {{}} }}
+        const tbody = section.querySelector('.prop-tbody');
+        const title = section.querySelector('.prop-title');
+        const defName = section.querySelector('.def-name');
+        const defKind = section.querySelector('.def-kind');
+        const defText = section.querySelector('.def-text');
+        let selectedEl = null;
+
+        function setEmpty(message) {{
+            tbody.innerHTML = '';
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.className = 'prop-empty';
+            td.colSpan = 4;
+            td.textContent = message;
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        }}
+
+        function renderDefinition(data) {{
+            defName.textContent = data.name;
+            defKind.textContent = data.kind;
+            defKind.hidden = false;
+            if (data.definition) {{
+            defText.textContent = data.definition;
+            defText.classList.remove('def-empty');
+            }} else {{
+            defText.textContent = 'No definition available.';
+            defText.classList.add('def-empty');
+            }}
+        }}
+
+        function render(id) {{
+            const data = info[id];
+            if (!data) return;
+            renderDefinition(data);
+            if (data.kind !== 'Class') {{
+            title.textContent = 'Class Properties';
+            setEmpty('Select a class node to view its properties.');
+            return;
+            }}
+            title.textContent = 'Class Properties \\u2013 ' + data.name;
+            if (!data.rows.length) {{ setEmpty('This class has no properties.'); return; }}
+            tbody.innerHTML = '';
+            for (const row of data.rows) {{
+            const tr = document.createElement('tr');
+            for (const cell of row) {{
+                const td = document.createElement('td');
+                td.textContent = cell == null ? '' : cell;
+                tr.appendChild(td);
+            }}
+            tbody.appendChild(tr);
+            }}
+        }}
+
+        section.querySelectorAll('[data-node-id]').forEach(function (el) {{
+            el.addEventListener('click', function (e) {{
+            e.preventDefault();
+            if (selectedEl) selectedEl.classList.remove('selected');
+            el.classList.add('selected');
+            selectedEl = el;
+            render(el.getAttribute('data-node-id'));
+            }});
+            el.addEventListener('dblclick', function (e) {{
+            e.preventDefault();
+            const href = el.getAttribute('data-href');
+            if (href) window.open(href, '_blank');
+            }});
+        }});
+        }});
+    }})();
+    </script>
     </body>
     </html>"""
 
