@@ -149,6 +149,8 @@ def download_dictionary(widget: ui.DownloadWidget, download_widget: Type[tool.Do
     bsdd_uri = widget.le_uri.text()
     save_path = widget.fs_save_path.get_path()
     bsdd_dictionary = download_widget.import_dictionary(bsdd_uri)
+    if bsdd_dictionary is None:
+        return None
     download_widget.set_bsdd_dictionary(bsdd_dictionary)
     download_widget.set_save_path(save_path)
 

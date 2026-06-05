@@ -45,49 +45,51 @@ def _load_class_json(
     c = bsdd.Client() if client is None else client
 
     # Request from bSDD
-    result = c.get_class(
+    class_result = c.get_class(
         class_uri,
-        include_class_properties=include_properties,
+        include_class_properties=False,
         include_class_relations=include_relations,
         include_reverse_relations=False,
     )
-    if not result:
+    class_properties_result = c.get_class_properties(class_uri)
+
+    if not class_result:
         return None
 
-    if "statusCode" in result and result["statusCode"] == 400:
+    if "statusCode" in class_result and class_result["statusCode"] == 400:
         return None
+    if include_properties:
+        for bsdd_prop in class_properties_result.get("classProperties", []):
+            code = prop_utils.get_code_by_uri(bsdd_prop.get("uri"))
+            bsdd_prop["Code"] = code
+            prop_uri = bsdd_prop["propertyUri"]
 
-    for bsdd_prop in result.get("classProperties", []):
-        code = prop_utils.get_code_by_uri(bsdd_prop.get("uri"))
-        bsdd_prop["Code"] = code
-        prop_uri = bsdd_prop["propertyUri"]
+            if not dict_utils.is_external_ref(prop_uri, bsdd_dictionary):
+                bsdd_prop["propertyUri"] = None
+            else:
+                bsdd_prop["propertyCode"] = None
+            if bsdd_prop.get("description") == bsdd_prop.get("definition"):
+                bsdd_prop["description"] = None
 
-        if not dict_utils.is_external_ref(prop_uri, bsdd_dictionary):
-            bsdd_prop["propertyUri"] = None
-        else:
-            bsdd_prop["propertyCode"] = None
-        if bsdd_prop.get("description") == bsdd_prop.get("definition"):
-            bsdd_prop["description"] = None
+            for allowed_value in bsdd_prop.get("allowedValues", []):
+                allowed_value["uri"] = None
 
-        for allowed_value in bsdd_prop.get("allowedValues", []):
-            allowed_value["uri"] = None
-
-    pr = result.get("parentClassReference")
+    pr = class_result.get("parentClassReference")
     if pr:
-        result["ParentClassCode"] = pr["code"]
-    result["OwnedUri"] = class_uri
-    result["RelatedIfcEntityNamesList"] = result.get("relatedIfcEntityNames", [])
-    if result["referenceCode"] == result["code"]:
-        result["referenceCode"] = None
-    result["CreatorLanguageIsoCode"] = result.get("creatorLanguageCode")
+        class_result["ParentClassCode"] = pr["code"]
+    class_result["OwnedUri"] = class_uri
+    class_result["RelatedIfcEntityNamesList"] = class_result.get("relatedIfcEntityNames", [])
+    if class_result["referenceCode"] == class_result["code"]:
+        class_result["referenceCode"] = None
+    class_result["CreatorLanguageIsoCode"] = class_result.get("creatorLanguageCode")
 
-    for key, value in result.items():
+    for key, value in class_result.items():
         if not value:
-            result[key] = None
+            class_result[key] = None
 
     # Remove IfcReferences that are handled by RelatedIfcEntityNamesList
     filtered_class_relations = []
-    for class_relation in list(result.get("classRelations", [])):
+    for class_relation in list(class_result.get("classRelations", [])):
         cr_uri = class_relation.get("relatedClassUri")
         if not dict_utils.is_ifc_reference(cr_uri):
             filtered_class_relations.append(class_relation)
@@ -96,11 +98,11 @@ def _load_class_json(
             filtered_class_relations.append(class_relation)
             continue
         ifc_code = get_code_by_uri(cr_uri)
-        if ifc_code not in result["RelatedIfcEntityNamesList"]:
+        if ifc_code not in class_result["RelatedIfcEntityNamesList"]:
             filtered_class_relations.append(class_relation)
-    result["classRelations"] = filtered_class_relations
+    class_result["classRelations"] = filtered_class_relations
 
-    return result
+    return class_result
 
 
 class Cache(BaseCache):

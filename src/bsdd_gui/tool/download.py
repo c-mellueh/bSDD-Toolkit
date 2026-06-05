@@ -36,8 +36,8 @@ class Download(FieldTool, ActionTool):
     def connect_widget_signals(cls, widget: ui.DownloadWidget):
         super().connect_widget_signals(widget)
         widget.btn_start.clicked.connect(lambda _, w=widget: trigger.start_download(w))
-        widget.btn_cancel.clicked.connect(lambda w=widget: cls.cancel(w))
-        widget.cb_save.toggled.connect(lambda v: widget.fs_save_path.setVisible(v))
+        widget.btn_cancel.clicked.connect(lambda _,w=widget: cls.cancel(w))
+        widget.cb_save.toggled.connect(lambda _,v: widget.fs_save_path.setVisible(v))
 
     @classmethod
     def get_properties(cls) -> DownloadProperties:
@@ -72,7 +72,12 @@ class Download(FieldTool, ActionTool):
                 return
             dictionary_data.pop("availableLanguages")
 
-        dictionary_data = cls.get_client().get_dictionary(dictionary_uri)["dictionaries"][0]
+
+        result = cls.get_client().get_dictionary(dictionary_uri)["dictionaries"]
+        if not result:
+            logging.error(f"No Dictionaries found under the URI '{dictionary_uri}'")
+            return None
+        dictionary_data = result[0]
         read_lang_code()
         cls.swap_codes(dictionary_data, "organizationCodeOwner", "OrganizationCode")
         cls.swap_codes(dictionary_data, "code", "DictionaryCode")

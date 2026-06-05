@@ -20,8 +20,8 @@ from .cache import BaseCache
 logger = logging.getLogger(__name__)
 
 
-def load_property(uri, include_classes=False, language_code="", client: bsdd.Client | None = None):
-    result = _load_property_json(uri, include_classes, language_code, client)
+def load_property(uri, language_code="", client: bsdd.Client | None = None):
+    result = _load_property_json(uri, language_code, client)
     if result is None:
         return None
     prop = BsddProperty.model_validate(result)
@@ -29,14 +29,14 @@ def load_property(uri, include_classes=False, language_code="", client: bsdd.Cli
     return prop
 
 
-def _load_property_json(uri, include_classes=False, language_code="", client: bsdd.Client | None = None):
+def _load_property_json(uri, language_code="", client: bsdd.Client | None = None):
     if not dict_utils.is_uri(uri):
         return None
     # Load Client
     c = bsdd.Client() if client is None else client
 
     # Request from bSDD
-    result = c.get_property(uri, include_classes, language_code)
+    result = c.get_property(uri,  language_code)
     if not result:
         return None
 

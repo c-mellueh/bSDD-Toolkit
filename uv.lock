@@ -267,7 +267,7 @@ wheels = [
 
 [[package]]
 name = "bsdd"
-version = "0.8.4"
+version = "0.8.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
@@ -275,7 +275,7 @@ dependencies = [
     { name = "typing-extensions" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2d/c0/4b18af0124f15e3042372a6b57887cc3628d5eb2963706b1d80a8fd09b8f/bsdd-0.8.4-py3-none-any.whl", hash = "sha256:a2d8cb38fd337f4dde5937fa213e25baf149d5946bb0653445145f8026b01fae", size = 7010, upload-time = "2025-11-20T09:41:20.778Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/ae/ff84baf677237cff884e1a5a0a6698144fe9ce07f3640d669a2b8a87305b/bsdd-0.8.5-py3-none-any.whl", hash = "sha256:c2bb0742e10e1cbf0ee9f2081db1c26ba33d1a413b10ac9fcf2ecfe5b4a34565", size = 7679, upload-time = "2026-04-13T13:16:29.087Z" },
 ]
 
 [[package]]
