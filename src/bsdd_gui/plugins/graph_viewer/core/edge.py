@@ -33,8 +33,11 @@ def connect_signals(
     edge.signals.filter_changed.connect(
         lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
     )
+    edge.signals.filter_changed.connect(
+        lambda key,state: appdata.set_setting(constants.APPDATA_SECTION,key,state)
+    )
     scene_view.signals.clear_scene_requested.connect(lambda: clear_all_edges(edge, scene_view))
-
+    edge.signals.ortho_mode_changed.connect(lambda state:appdata.set_setting(constants.APPDATA_ORTH,constants.APPDATA_ORTH,state))
     # Connect Outside Signals
 
     def _handle_rel_update(edge: ui.Edge):
@@ -52,9 +55,7 @@ def connect_signals(
     edge.signals.edge_removed.connect(_handle_rel_update)
     edge.signals.new_class_property_created.connect(_handle_prop_update)
     edge.signals.class_property_removed.connect(_handle_prop_update)
-    edge.signals.filter_changed.connect(
-        lambda key,state: appdata.set_setting(constants.APPDATA_SECTION,key,state)
-    )
+
     window.signals.widget_closed.connect(edge.clear)
     edge.connect_internal_signals()
 
@@ -64,7 +65,8 @@ def sync_filter_states_from_appdata(edge:type[gv_tool.Edge],appdata:type[tool.Ap
         state = appdata.get_bool_setting(constants.APPDATA_SECTION,node_type,True)
         switch.setChecked(state)
 
-
+    ortho_mode = appdata.get_bool_setting(constants.APPDATA_ORTH,constants.APPDATA_ORTH,True)
+    edge.get_properties().ortho_toggle.setChecked(ortho_mode)
 
 def connect_to_project_signals(
     node: Type[gv_tool.Node],

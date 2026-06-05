@@ -283,7 +283,7 @@ class Node(PluginTool):
             lbl = QLabel(name)
             lbl.setToolTip(name)
             sw = ToggleSwitch(checked=True)
-            sw.toggled.connect(lambda state, et=node_type: cls.signals.filter_changed.emit(node_type,state))
+            sw.toggled.connect(lambda state, nt=node_type: cls.signals.filter_changed.emit(nt,state))
             toggle_dict[node_type] = sw
             row.addWidget(icon, 0)
             row.addWidget(lbl, 1)

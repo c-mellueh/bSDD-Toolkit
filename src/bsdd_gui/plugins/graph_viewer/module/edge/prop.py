@@ -24,3 +24,4 @@ class GraphViewerEdgeProperties(PluginProperties):
         self.arrow_length = 12.0
         self.arrow_width = 8.0
         self.toggle_dict: dict[str,ToggleSwitch] = dict()
+        self.ortho_toggle:ToggleSwitch = None

@@ -145,3 +145,4 @@ EDGE_TYPE_LABEL_MAP: dict[str, str] = {
 }
 
 APPDATA_SECTION =  "graph_edge"
+APPDATA_ORTH = "ortho_mode"

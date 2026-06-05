@@ -44,6 +44,7 @@ class Signals(PluginSignals):
     class_property_removed = Signal(BsddClassProperty, BsddClass)
     property_relation_removed = Signal(BsddPropertyRelation)
     filter_changed = Signal(str, bool)
+    ortho_mode_changed =Signal(bool)
     sync_filters_requested = Signal()
 
 
@@ -645,13 +646,7 @@ class Edge(PluginTool):
 
     @classmethod
     def is_orthogonal_mode(cls) -> bool:
-        return cls.get_properties().orthogonal_edges
-
-    @classmethod
-    def set_orthogonal_mode(cls, value: bool):
-        cls.get_properties().orthogonal_edges = value
-        for e in cls.get_edges():
-            cls.requeste_path_update(e)
+        return cls.get_properties().ortho_toggle.isChecked()
 
     @classmethod
     def create_edge_type_settings_widget(cls) -> ui.EdgeTypeSettingsWidget:
@@ -676,7 +671,7 @@ class Edge(PluginTool):
             label = QLabel(name)
             label.setToolTip(name)
             switch = ToggleSwitch(checked=True)
-            switch.toggled.connect(lambda state, et=edge_type: cls.signals.filter_changed.emit(edge_type,state))
+            switch.toggled.connect(lambda state, et=edge_type: cls.signals.filter_changed.emit(et,state))
             toggle_dict[edge_type] = switch
             row.addWidget(icon, 0)
             row.addWidget(label, 1)
@@ -689,9 +684,8 @@ class Edge(PluginTool):
     def create_edge_routing_settings_widget(cls) -> ui.EdgeRoutingWidget:
         widget = ui.EdgeRoutingWidget()
         cls.get_properties().edge_routing_settings_widget = widget
-        widget.checkBox.toggled.connect(
-            lambda: cls.set_orthogonal_mode(not cls.is_orthogonal_mode())
-        )
+        cls.get_properties().ortho_toggle = widget.checkBox
+        widget.checkBox.toggled.connect(cls.signals.ortho_mode_changed.emit)
         return widget
 
     @classmethod
