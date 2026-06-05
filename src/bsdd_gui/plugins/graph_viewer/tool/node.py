@@ -12,6 +12,7 @@ from bsdd_gui.plugins.graph_viewer.module.node import ui, trigger, constants
 from bsdd_gui.plugins.graph_viewer.module.edge import constants as edge_constants
 from bsdd_json.utils import class_utils as cl_utils
 from bsdd_json.utils import property_utils as prop_utils
+from bsdd_json.utils import dictionary_utils as dict_utils
 
 import bsdd_gui.plugins.graph_viewer.tool as gv_tool
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
@@ -140,13 +141,17 @@ class Node(PluginTool):
                 for n in cls.get_nodes()
                 if hasattr(n, "bsdd_data") and n.node_type == constants.CLASS_NODE_TYPE
             }
-            external_nodes = {n.bsdd_data.OwnedUri: n for n in existing_nodes if n.is_external}
+            external_nodes = {
+                dict_utils.normalize_uri(n.bsdd_data.OwnedUri): n
+                for n in existing_nodes
+                if n.is_external
+            }
 
         ifc_class_dict = ifc_classes.get(ifc_code)
         if not ifc_class_dict:
             return
         uri = ifc_class_dict.get("uri")
-        if uri in external_nodes:
+        if dict_utils.normalize_uri(uri) in external_nodes:
             return
         ifc_class = BsddClass(
             Code=ifc_code,
@@ -207,14 +212,18 @@ class Node(PluginTool):
     @classmethod
     def get_internal_nodes(cls, bsdd_dictionary: BsddDictionary):
         return {
-            cl_utils.build_bsdd_uri(n.bsdd_data, bsdd_dictionary): n
+            dict_utils.normalize_uri(cl_utils.build_bsdd_uri(n.bsdd_data, bsdd_dictionary)): n
             for n in cls.get_nodes()
             if n.node_type in [constants.CLASS_NODE_TYPE, constants.GOP_NODE_TYPE]
         }
 
     @classmethod
     def get_external_nodes(cls):
-        return {n.bsdd_data.OwnedUri: n for n in cls.get_nodes() if n.is_external}
+        return {
+            dict_utils.normalize_uri(n.bsdd_data.OwnedUri): n
+            for n in cls.get_nodes()
+            if n.is_external
+        }
 
     @classmethod
     def get_uri_dict(cls, bsdd_dictionary: BsddDictionary):
@@ -236,7 +245,7 @@ class Node(PluginTool):
             else:
                 logging.warning(f"Unknown node type for uri extraction: {node.node_type}")
                 continue
-            uri_dict[uri] = node
+            uri_dict[dict_utils.normalize_uri(uri)] = node
         return uri_dict
 
     @classmethod

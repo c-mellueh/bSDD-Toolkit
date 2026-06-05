@@ -5,6 +5,7 @@ from bsdd_json import BsddDictionary
 import bsdd_gui
 from bsdd_json.utils import property_utils as prop_utils
 from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import dictionary_utils as dict_utils
 
 from bsdd_json import (
     BsddClass,
@@ -115,8 +116,10 @@ class Edge(PluginTool):
             elif isinstance(end_data, BsddProperty):
                 if end_node.is_external:
                     class_property = {
-                        cp.PropertyUri: cp for cp in start_data.ClassProperties if cp.PropertyUri
-                    }.get(end_data.OwnedUri)
+                        dict_utils.normalize_uri(cp.PropertyUri): cp
+                        for cp in start_data.ClassProperties
+                        if cp.PropertyUri
+                    }.get(dict_utils.normalize_uri(end_data.OwnedUri))
                 else:
                     class_property = {cp.PropertyCode: cp for cp in start_data.ClassProperties}.get(
                         end_data.Code
@@ -373,8 +376,11 @@ class Edge(PluginTool):
                 end_uri = end_class.OwnedUri
             else:
                 end_uri = cl_utils.build_bsdd_uri(end_class, bsdd_dictionary)
+            normalized_end_uri = dict_utils.normalize_uri(end_uri)
             existing_relations = [
-                r.RelationType for r in start_class.ClassRelations if r.RelatedClassUri == end_uri
+                r.RelationType
+                for r in start_class.ClassRelations
+                if dict_utils.normalize_uri(r.RelatedClassUri) == normalized_end_uri
             ]
             if relation in existing_relations:
                 return
@@ -404,10 +410,11 @@ class Edge(PluginTool):
             end_uri = end_property.OwnedUri
         else:
             end_uri = prop_utils.build_bsdd_uri(end_property, bsdd_dictionary)
+        normalized_end_uri = dict_utils.normalize_uri(end_uri)
         existing_relations = [
             r.RelationType
             for r in start_property.PropertyRelations
-            if r.RelatedPropertyUri == end_uri
+            if dict_utils.normalize_uri(r.RelatedPropertyUri) == normalized_end_uri
         ]
         if relation in existing_relations:
             return
@@ -448,7 +455,7 @@ class Edge(PluginTool):
             parent_class = cl_utils.get_class_by_code(bsdd_dictionary, start_class.ParentClassCode)
             if parent_class:
                 parent_uri = cl_utils.build_bsdd_uri(parent_class, bsdd_dictionary)
-                related_node = uri_dict.get(parent_uri)
+                related_node = uri_dict.get(dict_utils.normalize_uri(parent_uri))
                 relation_type = constants.PARENT_CLASS
                 info = cls._info(start_node, related_node, bsdd_dictionary)
 
@@ -460,7 +467,7 @@ class Edge(PluginTool):
                     existing_relations_dict[relation_type][info] = edge
 
             for relation in start_class.ClassRelations:
-                related_node = uri_dict.get(relation.RelatedClassUri)
+                related_node = uri_dict.get(dict_utils.normalize_uri(relation.RelatedClassUri))
                 if related_node is None:
                     continue
                 info = cls._info(start_node, related_node, bsdd_dictionary)
@@ -490,11 +497,13 @@ class Edge(PluginTool):
             start_class = start_node.bsdd_data
             for cp in start_class.ClassProperties:
                 if cp.PropertyUri:
-                    related_node = uri_dict.get(cp.PropertyUri)
+                    related_node = uri_dict.get(dict_utils.normalize_uri(cp.PropertyUri))
                 else:
                     bsdd_property = prop_utils.get_property_by_class_property(cp, bsdd_dictionary)
                     related_node = uri_dict.get(
-                        prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
+                        dict_utils.normalize_uri(
+                            prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
+                        )
                     )
                 if related_node is None:
                     continue
@@ -520,7 +529,7 @@ class Edge(PluginTool):
                 continue
             start_property = start_node.bsdd_data
             for relation in start_property.PropertyRelations:
-                related_node = uri_dict.get(relation.RelatedPropertyUri)
+                related_node = uri_dict.get(dict_utils.normalize_uri(relation.RelatedPropertyUri))
                 if related_node is None:
                     continue
                 info = cls._info(start_node, related_node, bsdd_dictionary)
@@ -552,7 +561,7 @@ class Edge(PluginTool):
             start_class = start_node.bsdd_data
             for ifc_name in start_class.RelatedIfcEntityNamesList or []:
                 ifc_uri = ifc_dict.get(ifc_name).get("uri")
-                related_node = uri_dict.get(ifc_uri)
+                related_node = uri_dict.get(dict_utils.normalize_uri(ifc_uri))
                 if not related_node:
                     continue
                 info = cls._info(start_node, related_node, bsdd_dictionary)
@@ -582,7 +591,7 @@ class Edge(PluginTool):
                 uri = prop_utils.build_bsdd_uri(node.bsdd_data, bsdd_dictionary)
             else:
                 uri = None
-            return uri
+            return dict_utils.normalize_uri(uri)
 
         d = [None, None, None, None]
         d[0] = start_node.node_type
@@ -736,16 +745,16 @@ class Edge(PluginTool):
         if isinstance(start_data, BsddClass):
             if not isinstance(end_data, BsddClass):
                 return
-            end_uri = cl_utils.build_bsdd_uri(end_data, bsdd_dictionary)
+            end_uri = dict_utils.normalize_uri(cl_utils.build_bsdd_uri(end_data, bsdd_dictionary))
             for rel in start_data.ClassRelations:
-                if rel.RelatedClassUri == end_uri:
+                if dict_utils.normalize_uri(rel.RelatedClassUri) == end_uri:
                     return rel
         elif isinstance(start_data, BsddProperty):
             if not isinstance(end_data, BsddProperty):
                 return
-            end_uri = prop_utils.build_bsdd_uri(end_data, bsdd_dictionary)
+            end_uri = dict_utils.normalize_uri(prop_utils.build_bsdd_uri(end_data, bsdd_dictionary))
             for rel in start_data.PropertyRelations:
-                if rel.RelatedPropertyUri == end_uri:
+                if dict_utils.normalize_uri(rel.RelatedPropertyUri) == end_uri:
                     return rel
 
         # ---------- Edge Drawing ----------------------

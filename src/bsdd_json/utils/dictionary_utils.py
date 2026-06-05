@@ -133,6 +133,22 @@ def get_dictionary_path_from_uri(uri: str) -> str:
     return f"{BASE_PREFIX}{path_parts[1]}/{path_parts[2]}/{path_parts[3]}/"
 
 
+def normalize_uri(uri: str | None) -> str | None:
+    """Return a casing-normalized form of *uri* for use as a lookup/dict key.
+
+    bSDD URIs may be stored with differing casing in different places (e.g. a
+    ``RelatedClassUri`` copied from another source vs. one built locally). Using
+    the raw value as a dictionary key therefore causes lookups to miss. This
+    helper lowercases the URI so all comparisons happen on a common form.
+
+    ``None`` is passed through unchanged so callers can normalize optional URIs
+    without extra guarding.
+    """
+    if uri is None:
+        return None
+    return str(uri).lower()
+
+
 def is_uri(s: str) -> bool:
     """Return True if the string looks like an absolute URI with scheme and host.
 
@@ -336,7 +352,7 @@ def is_external_ref(uri: str, bsdd_dictionary: BsddDictionary) -> bool:
     from .dictionary_utils import bsdd_dictionary_url, get_dictionary_path_from_uri
 
     dict_path = get_dictionary_path_from_uri(uri)
-    return dict_path != bsdd_dictionary_url(bsdd_dictionary)
+    return dict_path.lower() != str(bsdd_dictionary_url(bsdd_dictionary)).lower()
 
 
 def is_ifc_reference(uri: str) -> bool:
@@ -356,4 +372,4 @@ def is_ifc_reference(uri: str) -> bool:
         ``True`` when *uri* is an IFC reference, ``False`` otherwise.
 
     """
-    return "/uri/buildingsmart/ifc/" in uri
+    return "/uri/buildingsmart/ifc/" in uri.lower()

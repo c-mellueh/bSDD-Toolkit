@@ -184,7 +184,7 @@ def get_class_by_code(bsdd_dictionary: BsddDictionary, code: str, class_dict: di
 
 def get_class_by_uri(bsdd_dictionary: BsddDictionary, uri: str) -> BsddClass | None:
     if dict_utils.is_uri(uri):
-        if is_external_ref(uri, bsdd_dictionary):
+        if dict_utils.is_external_ref(uri, bsdd_dictionary):
             bsdd_class = Cache.get_external_class(uri, bsdd_dictionary)
         else:
             code = dict_utils.parse_bsdd_url(uri).get("resource_id")
@@ -318,8 +318,9 @@ def get_class_relation(
     relation_type: str,
 ) -> BsddClassRelation | None:
     end_uri = end_class.OwnedUri if not end_class.parent() else build_bsdd_uri(end_class, end_class._parent_ref())
+    end_uri = dict_utils.normalize_uri(end_uri)
     for relation in start_class.ClassRelations:
-        if relation.RelatedClassUri == end_uri and relation.RelationType == relation_type:
+        if dict_utils.normalize_uri(relation.RelatedClassUri) == end_uri and relation.RelationType == relation_type:
             return relation
     return None
 
@@ -330,15 +331,6 @@ def set_code(bsdd_class: BsddClass, code: str) -> None:
     bsdd_class._apply_code_side_effects(code)
     # assign without recursion (no property involved)
     object.__setattr__(bsdd_class, "Code", code)
-
-
-def is_external_ref(uri: str, bsdd_dictionary: BsddDictionary) -> bool:
-    if not uri:
-        return False
-    from .dictionary_utils import bsdd_dictionary_url, get_dictionary_path_from_uri
-
-    dict_path = get_dictionary_path_from_uri(uri)
-    return dict_path != bsdd_dictionary_url(bsdd_dictionary)
 
 
 def is_ifc_reference(bsdd_class: BsddClass) -> bool:

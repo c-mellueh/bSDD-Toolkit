@@ -259,8 +259,9 @@ def create_class_property_from_property(bsdd_property: BsddProperty, bsdd_class:
 
 
 def get_property_relation(start_property: BsddProperty, end_uri: str, relation_type: str) -> BsddPropertyRelation | None:
+    end_uri = dict_utils.normalize_uri(end_uri)
     for relation in start_property.PropertyRelations:
-        if relation.RelatedPropertyUri == end_uri and relation.RelationType == relation_type:
+        if dict_utils.normalize_uri(relation.RelatedPropertyUri) == end_uri and relation.RelationType == relation_type:
             return relation
     return None
 

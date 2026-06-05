@@ -302,7 +302,7 @@ def insert_classes_in_scene(
     internal_nodes = node.get_internal_nodes(bsdd_dictionary)
 
     for bsdd_class in classes:
-        class_uri = cl_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary)
+        class_uri = dict_utils.normalize_uri(cl_utils.build_bsdd_uri(bsdd_class, bsdd_dictionary))
         if class_uri not in internal_nodes:
             new_node = node.add_node(bsdd_class, pos=cur_position, is_external=False)
             internal_nodes[class_uri] = new_node
@@ -313,26 +313,35 @@ def insert_classes_in_scene(
             new_node = node.add_ifc_node(e, cur_position, ifc_classes, external_nodes)
             if new_node:
                 cur_position += offset_step
-                external_nodes[new_node.bsdd_data.OwnedUri] = new_node.bsdd_data
+                external_nodes[dict_utils.normalize_uri(new_node.bsdd_data.OwnedUri)] = (
+                    new_node.bsdd_data
+                )
 
         for class_relation in bsdd_class.ClassRelations:
             related_uri = class_relation.RelatedClassUri
-            if related_uri in external_nodes or related_uri in internal_nodes:
+            if (
+                dict_utils.normalize_uri(related_uri) in external_nodes
+                or dict_utils.normalize_uri(related_uri) in internal_nodes
+            ):
                 continue
 
             related_bsdd_class = cl_utils.get_class_by_uri(bsdd_dictionary, related_uri)
             if related_bsdd_class is None:
                 related_bsdd_class = cl_utils.build_dummy_class(related_uri)
 
-            if related_bsdd_class.OwnedUri and cl_utils.is_external_ref(
+            if related_bsdd_class.OwnedUri and dict_utils.is_external_ref(
                 related_bsdd_class.OwnedUri, bsdd_dictionary
             ):
                 new_node = node.add_node(related_bsdd_class, pos=cur_position, is_external=True)
-                external_nodes[related_bsdd_class.OwnedUri] = new_node.bsdd_data
+                external_nodes[dict_utils.normalize_uri(related_bsdd_class.OwnedUri)] = (
+                    new_node.bsdd_data
+                )
 
             else:
                 new_node = node.add_node(related_bsdd_class, pos=cur_position, is_external=False)
-                uri = cl_utils.build_bsdd_uri(related_bsdd_class, bsdd_dictionary)
+                uri = dict_utils.normalize_uri(
+                    cl_utils.build_bsdd_uri(related_bsdd_class, bsdd_dictionary)
+                )
                 internal_nodes[uri] = new_node.bsdd_data
             cur_position += offset_step
 
@@ -356,7 +365,7 @@ def insert_properties_in_scene(
     internal_nodes = node.get_internal_nodes(bsdd_dictionary)
 
     for bsdd_property in bsdd_properties:
-        prop_uri = prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary)
+        prop_uri = dict_utils.normalize_uri(prop_utils.build_bsdd_uri(bsdd_property, bsdd_dictionary))
         if prop_uri not in internal_nodes:
             new_node = node.add_node(bsdd_property, pos=cur_position, is_external=False)
             internal_nodes[prop_uri] = new_node
@@ -364,7 +373,10 @@ def insert_properties_in_scene(
 
         for property_relation in bsdd_property.PropertyRelations:
             related_uri = property_relation.RelatedPropertyUri
-            if related_uri in external_nodes or related_uri in internal_nodes:
+            if (
+                dict_utils.normalize_uri(related_uri) in external_nodes
+                or dict_utils.normalize_uri(related_uri) in internal_nodes
+            ):
                 continue
 
             related_bsdd_property = prop_utils.get_property_by_uri(related_uri, bsdd_dictionary)
@@ -374,10 +386,14 @@ def insert_properties_in_scene(
                 related_bsdd_property.OwnedUri, bsdd_dictionary
             ):
                 new_node = node.add_node(related_bsdd_property, pos=cur_position, is_external=True)
-                external_nodes[related_bsdd_property.OwnedUri] = new_node.bsdd_data
+                external_nodes[dict_utils.normalize_uri(related_bsdd_property.OwnedUri)] = (
+                    new_node.bsdd_data
+                )
             else:
                 new_node = node.add_node(related_bsdd_property, pos=cur_position, is_external=False)
-                uri = cl_utils.build_bsdd_uri(related_bsdd_property, bsdd_dictionary)
+                uri = dict_utils.normalize_uri(
+                    cl_utils.build_bsdd_uri(related_bsdd_property, bsdd_dictionary)
+                )
                 internal_nodes[uri] = new_node.bsdd_data
             cur_position += offset_step
 
