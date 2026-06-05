@@ -31,6 +31,7 @@ class Signals(PluginSignals):
     node_double_clicked = Signal(ui.Node)
     node_changed = Signal(QGraphicsItem.GraphicsItemChange, ui.Node)
     filter_changed = Signal(str, bool)
+    sync_filters_requested = Signal()
 
 
 class Node(PluginTool):
@@ -44,6 +45,7 @@ class Node(PluginTool):
     def connect_internal_signals(cls):
         cls.signals.node_double_clicked.connect(trigger.node_double_clicked)
         super().connect_internal_signals()
+        cls.signals.sync_filters_requested.connect(trigger.sync_filter_states_from_appdata)
 
     @classmethod
     def _get_trigger(cls):
@@ -179,20 +181,16 @@ class Node(PluginTool):
 
     @classmethod
     def get_filter_state(cls, key: constants.ALLOWED_NODE_TYPES_TYPING) -> bool:
-        return cls.get_properties().filters.get(key, True)
+        node_filter = cls.get_properties().toggle_dict.get(key)
+        if not node_filter:
+            logging.warning(f"No FIlter with key {key} found")
+            return True
+        return node_filter.isChecked()
 
     @classmethod
-    def get_filters(cls):
-        return cls.get_properties().filters
+    def get_filters(cls) -> dict[str, bool]:
+        return {key: toggle.isChecked() for key, toggle in cls.get_properties().toggle_dict.items()}
 
-    @classmethod
-    def set_filters(cls, key: str, value: bool):
-        cls.get_properties().filters[key] = value
-        cls.signals.filter_changed.emit(key, value)
-
-    @classmethod
-    def toggle_filter_state(cls, node_type: str):
-        cls.set_filters(node_type, not cls.get_filter_state(node_type))
 
     @classmethod
     def get_nodes(cls):
@@ -266,6 +264,7 @@ class Node(PluginTool):
     @classmethod
     def create_node_toggles(cls):
         rows = []
+        toggle_dict = dict()
         for node_type in cls.get_allowed_node_types():
             row = QHBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
@@ -275,11 +274,13 @@ class Node(PluginTool):
             lbl = QLabel(name)
             lbl.setToolTip(name)
             sw = ToggleSwitch(checked=True)
-            sw.toggled.connect(lambda _, nt=node_type: cls.toggle_filter_state(nt))
+            sw.toggled.connect(lambda state, et=node_type: cls.signals.filter_changed.emit(node_type,state))
+            toggle_dict[node_type] = sw
             row.addWidget(icon, 0)
             row.addWidget(lbl, 1)
             row.addWidget(sw, 0, alignment=Qt.AlignRight)
             rows.append(row)
+        cls.get_properties().toggle_dict = toggle_dict
         return rows
 
     @classmethod
@@ -379,3 +380,7 @@ class Node(PluginTool):
         nodes = cls.get_nodes()
         node_filters = cls.get_filters()
         return [n for n in nodes if node_filters.get(n.node_type, True)]
+
+    @classmethod
+    def request_toggle_sync(cls):
+        cls.signals.sync_filters_requested.emit()

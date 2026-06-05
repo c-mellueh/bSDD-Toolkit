@@ -21,6 +21,7 @@ def connect_signals(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     class_property_table: Type[tool.ClassPropertyTableView],
     property_set_table: Type[tool.PropertySetTableView],
+    appdata:type[tool.Appdata],
 ):
 
     window.signals.active_edgetype_requested.connect(edge.request_active_edge)
@@ -51,8 +52,18 @@ def connect_signals(
     edge.signals.edge_removed.connect(_handle_rel_update)
     edge.signals.new_class_property_created.connect(_handle_prop_update)
     edge.signals.class_property_removed.connect(_handle_prop_update)
+    edge.signals.filter_changed.connect(
+        lambda key,state: appdata.set_setting(constants.APPDATA_SECTION,key,state)
+    )
     window.signals.widget_closed.connect(edge.clear)
     edge.connect_internal_signals()
+
+
+def sync_filter_states_from_appdata(edge:type[gv_tool.Edge],appdata:type[tool.Appdata]):
+    for node_type,switch in edge.get_properties().toggle_dict.items():
+        state = appdata.get_bool_setting(constants.APPDATA_SECTION,node_type,True)
+        switch.setChecked(state)
+
 
 
 def connect_to_project_signals(
@@ -161,6 +172,7 @@ def add_settings(edge: Type[gv_tool.Edge], settings: Type[gv_tool.Settings]):
     routing_widget = edge.create_edge_routing_settings_widget()
     settings.add_content_widget(routing_widget)
     settings.add_content_widget(type_widget)
+    edge.request_toggle_sync()
 
 
 def set_active_edge(

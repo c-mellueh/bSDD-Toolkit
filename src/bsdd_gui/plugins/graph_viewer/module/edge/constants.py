@@ -69,73 +69,61 @@ EDGE_STYLE_MAP: dict[str, dict[str, object]] = {
         "style": Qt.PenStyle.DotLine,
         "width": 1.5,
         "color": QColor("#06D6A0"),
-        "enabled": True,
     },
     C_P_REL: {
         "style": Qt.PenStyle.DashDotDotLine,
         "width": 1.5,
         "color": QColor("#F8FFE5"),
-        "enabled": True,
     },
     MATERIAL_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#1B9AAA"),
-        "enabled": True,
     },
     REFERENCE_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#EF476F"),
-        "enabled": True,
     },
     IS_EQUAL_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#FFC43D"),
-        "enabled": True,
     },
     IS_SIMILAR_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#7D1538"),
-        "enabled": True,
     },
     IS_PARENT_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#80DACC3E"),
-        "enabled": False,
     },
     IS_CHILD_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#DACC3E"),
-        "enabled": True,
     },
     HAS_PART_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#807FB7BE"),
-        "enabled": False,
     },
     IS_PART_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#7FB7BE"),
-        "enabled": True,
     },
     GENERIC_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#9D2129"),
-        "enabled": True,
     },
     IFC_REFERENCE_REL: {
         "style": Qt.PenStyle.SolidLine,
         "width": 1.5,
         "color": QColor("#213E9D78"),
-        "enabled": True,
     },
 }
 
@@ -155,3 +143,5 @@ EDGE_TYPE_LABEL_MAP: dict[str, str] = {
     IS_PART_REL: "Is Part Of",
     GENERIC_REL: "Generic",
 }
+
+APPDATA_SECTION =  "graph_edge"

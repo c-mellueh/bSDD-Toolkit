@@ -20,6 +20,7 @@ def activate():
         tool.RelationshipEditorWidget,
         tool.ClassPropertyTableView,
         tool.PropertySetTableView,
+        tool.Appdata,
     )
     core.connect_to_project_signals(
         gv_tool.Node,
@@ -62,3 +63,6 @@ def update_path(edge: ui.Edge):
 
 def paint_path(painter: QPainter, edge: ui.Edge):
     core.paint_path(painter, edge, gv_tool.Edge)
+
+def sync_filter_states_from_appdata():
+    core.sync_filter_states_from_appdata(gv_tool.Edge,tool.Appdata)

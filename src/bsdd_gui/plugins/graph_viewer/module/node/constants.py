@@ -83,3 +83,5 @@ NODE_SHAPE_MAP: dict[str, str] = {
     EXTERNAL_PROPERTY_NODE_TYPE: SHAPE_STYLE_ROUNDED_RECT,
     "generic": SHAPE_STYLE_RECT,
 }
+
+APPDATA_SECTION = "graph_node"

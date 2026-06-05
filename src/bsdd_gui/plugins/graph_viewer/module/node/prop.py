@@ -1,7 +1,9 @@
 from __future__ import annotations
 from . import constants, ui
 from bsdd_gui.presets.prop_presets import PluginProperties
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from bsdd_gui.presets.ui_presets import ToggleSwitch
 
 class GraphViewerNodeProperties(PluginProperties):
     def __init__(self):
@@ -14,3 +16,4 @@ class GraphViewerNodeProperties(PluginProperties):
         self.color_map = constants.NODE_COLOR_MAP
         self.shape_map = constants.NODE_SHAPE_MAP
         self.text_padding = 10.0, 6.0
+        self.toggle_dict:dict[str,ToggleSwitch] = dict()

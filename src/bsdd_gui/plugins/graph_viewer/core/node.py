@@ -12,7 +12,7 @@ from PySide6.QtCore import Qt, QRectF
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.plugins.graph_viewer import tool as gv_tool
-    from bsdd_gui.plugins.graph_viewer.module.node import ui
+    from bsdd_gui.plugins.graph_viewer.module.node import ui,constants
     from bsdd_json import BsddClass, BsddProperty
     from bsdd_gui.module.property_table_widget.ui import PropertyWidget
 
@@ -26,6 +26,7 @@ def connect_signals(
     settings: Type[gv_tool.Settings],
     project: Type[tool.Project],
     window: Type[gv_tool.Window],
+    appdata:type[tool.Appdata]
 ):
     node.signals.remove_edge_requested.connect(
         lambda e, s, ov, ap: edge.remove_edge(e, s, project.get(), ov, ap)
@@ -49,7 +50,14 @@ def connect_signals(
     scene_view.signals.clear_scene_requested.connect(lambda: clear_all_nodes(node, scene_view))
     window.signals.widget_closed.connect(node.clear)
 
-
+    node.signals.filter_changed.connect(
+        lambda key,state: appdata.set_setting(constants.APPDATA_SECTION,key,state)
+    )
+def sync_filter_states_from_appdata(node:type[gv_tool.Node],appdata:type[tool.Appdata]):
+    for node_type,switch in node.get_properties().toggle_dict.items():
+        state = appdata.get_bool_setting(constants.APPDATA_SECTION,node_type,True)
+        switch.setChecked(state)
+    
 def connect_to_project_signals(node: Type[gv_tool.Node], project: Type[tool.Project]):
     def handle_remove(bsdd_data):
         if isinstance(bsdd_data, BsddClassProperty):
@@ -83,7 +91,7 @@ def add_settings(node: Type[gv_tool.Node], settings: Type[gv_tool.Settings]):
     for row in node.create_node_toggles():
         widget.layout().addLayout(row)
     settings.add_content_widget(widget)
-
+    node.request_toggle_sync()
 
 def node_double_clicked(
     node: ui.Node,

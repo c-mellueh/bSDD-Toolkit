@@ -17,6 +17,7 @@ def activate():
         gv_tool.Settings,
         tool.Project,
         gv_tool.Window,
+        tool.Appdata,
     )
     core.connect_to_project_signals(gv_tool.Node, tool.Project)
 
@@ -51,3 +52,6 @@ def paint_node_legend(node_legend):
 
 def paint_node(painter: QPainter, node: ui.Node):
     core.paint_node(node, painter, gv_tool.Node)
+
+def sync_filter_states_from_appdata():
+    core.sync_filter_states_from_appdata(gv_tool.Node,tool.Appdata)

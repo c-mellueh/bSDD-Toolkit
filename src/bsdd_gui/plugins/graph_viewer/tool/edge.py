@@ -43,6 +43,7 @@ class Signals(PluginSignals):
     class_property_removed = Signal(BsddClassProperty, BsddClass)
     property_relation_removed = Signal(BsddPropertyRelation)
     filter_changed = Signal(str, bool)
+    sync_filters_requested = Signal()
 
 
 class Edge(PluginTool):
@@ -61,6 +62,7 @@ class Edge(PluginTool):
         super().connect_internal_signals()
         cls.signals.activate_edgetype_requested.connect(trigger.set_active_edge)
         cls.signals.new_edge_created.connect(lambda e: cls.get_properties().edges.append(e))
+        cls.signals.sync_filters_requested.connect(trigger.sync_filter_states_from_appdata)
 
     @classmethod
     def _get_trigger(cls):
@@ -188,21 +190,19 @@ class Edge(PluginTool):
         cls.get_properties().active_edge = edge_type
 
     @classmethod
-    def get_filter_state(cls, key: constants.ALLOWED_EDGE_TYPES_TYPING) -> bool:
-        return cls.get_properties().filters.get(key, True)
+    def get_filter_state(cls, key: constants.ALLOWED_NODE_TYPES_TYPING) -> bool:
+        edge_filter = cls.get_properties().toggle_dict.get(key)
+        if not edge_filter:
+            logging.warning(f"No FIlter with key {key} found")
+            return True
+        return edge_filter.isChecked()
 
     @classmethod
-    def get_filters(cls):
-        return cls.get_properties().filters
+    def get_filters(cls) -> dict[str,bool]:
+        return {key:toggle.isChecked() for key,toggle in cls.get_properties().toggle_dict.items()}
 
-    @classmethod
-    def set_filters(cls, key: constants.ALLOWED_EDGE_TYPES_TYPING, value: bool):
-        cls.get_properties().filters[key] = value
-        cls.signals.filter_changed.emit(key, value)
 
-    @classmethod
-    def toggle_filter_state(cls, edge_type: str):
-        cls.set_filters(edge_type, not cls.get_filter_state(edge_type))
+
 
     @classmethod
     def get_active_edge(cls) -> constants.ALLOWED_EDGE_TYPES_TYPING | None:
@@ -645,10 +645,6 @@ class Edge(PluginTool):
             cls.requeste_path_update(e)
 
     @classmethod
-    def is_edge_type_enabled(cls, edge_type: constants.ALLOWED_EDGE_TYPES_TYPING):
-        return cls.get_edge_style_map(edge_type).get("enabled")
-
-    @classmethod
     def create_edge_type_settings_widget(cls) -> ui.EdgeTypeSettingsWidget:
         widget = ui.EdgeTypeSettingsWidget()
         cls.get_properties().edge_type_settings_widget = widget
@@ -660,6 +656,7 @@ class Edge(PluginTool):
     @classmethod
     def create_edge_toggles(cls):
         toggles = []
+        toggle_dict = dict()
         for edge_type in cls.get_allowed_edge_types():
             row = QHBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
@@ -670,12 +667,13 @@ class Edge(PluginTool):
             label = QLabel(name)
             label.setToolTip(name)
             switch = ToggleSwitch(checked=True)
-            switch.toggled.connect(lambda _, et=edge_type: cls.toggle_filter_state(et))
-            switch.setChecked(cls.is_edge_type_enabled(edge_type))
+            switch.toggled.connect(lambda state, et=edge_type: cls.signals.filter_changed.emit(edge_type,state))
+            toggle_dict[edge_type] = switch
             row.addWidget(icon, 0)
             row.addWidget(label, 1)
             row.addWidget(switch, 0, alignment=Qt.AlignmentFlag.AlignRight)
             toggles.append(row)
+        cls.get_properties().toggle_dict = toggle_dict
         return toggles
 
     @classmethod
@@ -927,3 +925,7 @@ class Edge(PluginTool):
                 continue
             edges.append(e)
         return edges
+
+    @classmethod
+    def request_toggle_sync(cls):
+        cls.signals.sync_filters_requested.emit()
