@@ -200,7 +200,7 @@ class RevitExport(ActionTool, FieldTool):
                 group_index = 1
                 visible = 1
                 description = bsdd_property.Definition
-                usermodifiable = 0
+                usermodifiable = 1
                 hide_when_no_value = 0
                 lines.append((uid,name,datatype,datacategory,group_index,visible,description,usermodifiable,hide_when_no_value))
         result = Template(open(template_path).read()).render(groups = groups,params = lines)
