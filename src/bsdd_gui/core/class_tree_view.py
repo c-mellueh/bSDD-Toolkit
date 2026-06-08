@@ -261,16 +261,18 @@ def handle_mime_move(
     if not codes:
         return False
     # one-at-a-time move (extend to multi later if needed)
-    code = codes[0]
-    node = cl_utils.get_class_by_code(model.bsdd_dictionary, code)
-    if node is None:
-        return False
-    # destination row (append)
-    dest_parent_index = (
-        QModelIndex() if dest_parent_node is None else model._index_for_class(dest_parent_node)
-    )
-    dest_row = model.rowCount(dest_parent_index) if row == -1 else row
-    return class_tree.move_class(node, dest_parent_node, model.bsdd_data, dest_row)
+    class_dict = {c.Code:c for c in model.bsdd_dictionary.Classes}
+    for code in codes:
+        node = cl_utils.get_class_by_code(bsdd_dictionary=model.bsdd_dictionary, code = code, class_dict=class_dict)
+        if node is None:
+            logging.info(f"Code {code} not found, continue with next item")
+            continue
+        # destination row (append)
+        dest_parent_index = (
+            QModelIndex() if dest_parent_node is None else model._index_for_class(dest_parent_node)
+        )
+        dest_row = model.rowCount(dest_parent_index) if row == -1 else row
+        class_tree.move_class(node, dest_parent_node, model.bsdd_data, dest_row)
 
 
 def handle_mime_copy(

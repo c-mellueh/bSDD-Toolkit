@@ -21,7 +21,7 @@ def connect_signals(
     relationship_editor: Type[tool.RelationshipEditorWidget],
     class_property_table: Type[tool.ClassPropertyTableView],
     property_set_table: Type[tool.PropertySetTableView],
-    appdata:type[tool.Appdata],
+    appdata: type[tool.Appdata],
 ):
 
     window.signals.active_edgetype_requested.connect(edge.request_active_edge)
@@ -34,10 +34,16 @@ def connect_signals(
         lambda k, v: scene_view.apply_filters(edge.get_filters(), node.get_filters())
     )
     edge.signals.filter_changed.connect(
-        lambda key,state: appdata.set_setting(constants.APPDATA_SECTION,key,state)
+        lambda key, state: appdata.set_setting(constants.APPDATA_SECTION, key, state)
     )
     scene_view.signals.clear_scene_requested.connect(lambda: clear_all_edges(edge, scene_view))
-    edge.signals.ortho_mode_changed.connect(lambda state:appdata.set_setting(constants.APPDATA_ORTH,constants.APPDATA_ORTH,state))
+    edge.signals.ortho_mode_changed.connect(
+        lambda state: appdata.set_setting(constants.APPDATA_ORTH, constants.APPDATA_ORTH, state)
+    )
+    edge.signals.ortho_mode_changed.connect(
+        lambda _: [edge.requeste_path_update(e) for e in edge.get_edges()]
+    )
+
     # Connect Outside Signals
 
     def _handle_rel_update(edge: ui.Edge):
@@ -60,13 +66,14 @@ def connect_signals(
     edge.connect_internal_signals()
 
 
-def sync_filter_states_from_appdata(edge:type[gv_tool.Edge],appdata:type[tool.Appdata]):
-    for node_type,switch in edge.get_properties().toggle_dict.items():
-        state = appdata.get_bool_setting(constants.APPDATA_SECTION,node_type,True)
+def sync_filter_states_from_appdata(edge: type[gv_tool.Edge], appdata: type[tool.Appdata]):
+    for node_type, switch in edge.get_properties().toggle_dict.items():
+        state = appdata.get_bool_setting(constants.APPDATA_SECTION, node_type, True)
         switch.setChecked(state)
 
-    ortho_mode = appdata.get_bool_setting(constants.APPDATA_ORTH,constants.APPDATA_ORTH,True)
+    ortho_mode = appdata.get_bool_setting(constants.APPDATA_ORTH, constants.APPDATA_ORTH, True)
     edge.get_properties().ortho_toggle.setChecked(ortho_mode)
+
 
 def connect_to_project_signals(
     node: Type[gv_tool.Node],
