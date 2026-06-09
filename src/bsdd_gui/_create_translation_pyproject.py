@@ -32,4 +32,5 @@ list_files_in_directory(root_directory)
 with open("bsdd_gui.pyproject", "w") as file:
     json.dump(output_dict, file, indent=4)
 # pyside6-project lupdate .
+# pyside6-linguist.exe 
 # pyside6-project build .

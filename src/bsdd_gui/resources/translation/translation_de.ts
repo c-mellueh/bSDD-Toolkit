@@ -5,8 +5,8 @@
     <name>AllowedValuesTable</name>
     <message>
         <location filename="../../core/allowed_values_table_view.py" line="78"/>
-        <location filename="../../core/relationship_editor_widget.py" line="185"/>
-        <location filename="../../presets/core_presets/item_view_preset.py" line="50"/>
+        <location filename="../../core/relationship_editor_widget.py" line="183"/>
+        <location filename="../../presets/core_presets/item_view_preset.py" line="48"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
@@ -20,7 +20,7 @@
         <translation type="vanished">Neuer Wert</translation>
     </message>
     <message>
-        <location filename="../../tool/allowed_values_table_view.py" line="157"/>
+        <location filename="../../tool/allowed_values_table_view.py" line="156"/>
         <source>New-Value</source>
         <translation>Neuer-Wert</translation>
     </message>
@@ -28,37 +28,37 @@
 <context>
     <name>Class</name>
     <message>
-        <location filename="../../core/class_tree_view.py" line="73"/>
+        <location filename="../../core/class_tree_view.py" line="72"/>
         <source>Copy</source>
         <translation>Kopieren</translation>
     </message>
     <message>
-        <location filename="../../core/class_tree_view.py" line="83"/>
+        <location filename="../../core/class_tree_view.py" line="82"/>
         <source>Paste</source>
         <translation>Einfügen</translation>
     </message>
     <message>
-        <location filename="../../core/class_tree_view.py" line="94"/>
+        <location filename="../../core/class_tree_view.py" line="93"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../core/class_tree_view.py" line="104"/>
+        <location filename="../../core/class_tree_view.py" line="103"/>
         <source>Extend Selection</source>
         <translation>Ausklappen</translation>
     </message>
     <message>
-        <location filename="../../core/class_tree_view.py" line="114"/>
+        <location filename="../../core/class_tree_view.py" line="113"/>
         <source>Collapse Selection</source>
         <translation>Einklappen</translation>
     </message>
     <message>
-        <location filename="../../core/class_tree_view.py" line="135"/>
+        <location filename="../../core/class_tree_view.py" line="134"/>
         <source>Search</source>
         <translation>Suche</translation>
     </message>
     <message>
-        <location filename="../../core/class_tree_view.py" line="158"/>
+        <location filename="../../core/class_tree_view.py" line="157"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
@@ -71,7 +71,7 @@
         <translation type="vanished">Einklappen</translation>
     </message>
     <message>
-        <location filename="../../core/class_tree_view.py" line="124"/>
+        <location filename="../../core/class_tree_view.py" line="123"/>
         <source>Group</source>
         <translation>Gruppieren</translation>
     </message>
@@ -80,7 +80,7 @@
         <translation type="vanished">Info</translation>
     </message>
     <message>
-        <location filename="../../core/class_tree_view.py" line="146"/>
+        <location filename="../../core/class_tree_view.py" line="145"/>
         <source>Reset View</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -349,34 +349,34 @@
 <context>
     <name>ClassPropertyEditor</name>
     <message>
-        <location filename="../../core/class_property_editor_widget.py" line="177"/>
+        <location filename="../../core/class_property_editor_widget.py" line="176"/>
         <source>Create New Class Property</source>
         <translation>Erstelle neues Klassen Merkmal</translation>
     </message>
     <message>
-        <location filename="../../core/property_editor_widget.py" line="57"/>
-        <location filename="../../tool/class_property_editor_widget.py" line="306"/>
+        <location filename="../../core/property_editor_widget.py" line="56"/>
+        <location filename="../../tool/class_property_editor_widget.py" line="304"/>
         <source>New Code</source>
         <translation>Neuer Code</translation>
     </message>
     <message>
-        <location filename="../../core/property_editor_widget.py" line="65"/>
+        <location filename="../../core/property_editor_widget.py" line="64"/>
         <source>Create New Property</source>
         <translation>Erstelle neues Merkmal</translation>
     </message>
     <message>
-        <location filename="../../tool/class_property_editor_widget.py" line="219"/>
+        <location filename="../../tool/class_property_editor_widget.py" line="217"/>
         <source>View</source>
         <translation>Ansehen</translation>
     </message>
     <message>
-        <location filename="../../tool/class_property_editor_widget.py" line="223"/>
-        <location filename="../../tool/class_property_editor_widget.py" line="229"/>
+        <location filename="../../tool/class_property_editor_widget.py" line="221"/>
+        <location filename="../../tool/class_property_editor_widget.py" line="227"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../../tool/class_property_editor_widget.py" line="233"/>
+        <location filename="../../tool/class_property_editor_widget.py" line="231"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
@@ -402,7 +402,7 @@
 <context>
     <name>ClassView</name>
     <message>
-        <location filename="../../core/group_of_properties.py" line="224"/>
+        <location filename="../../core/group_of_properties.py" line="225"/>
         <source>Delete Synced PropertySets</source>
         <translation>Verknüpfte Merkmalssätze entfernen</translation>
     </message>
@@ -433,9 +433,13 @@
         <translation>Bibliotheks Daten</translation>
     </message>
     <message>
-        <location filename="../../core/dictionary_editor_widget.py" line="40"/>
-        <source> bSDD-Dictionary</source>
+        <location filename="../../core/dictionary_editor_widget.py" line="39"/>
+        <source>bSDD-Dictionary</source>
         <translation>bSDD-Bibliothek</translation>
+    </message>
+    <message>
+        <source> bSDD-Dictionary</source>
+        <translation type="vanished">bSDD-Bibliothek</translation>
     </message>
 </context>
 <context>
@@ -652,20 +656,90 @@
 <context>
     <name>Download</name>
     <message>
-        <location filename="../../core/download.py" line="31"/>
+        <location filename="../../core/download.py" line="30"/>
         <source>Download Done!</source>
         <translation>Download abgeschlossen!</translation>
     </message>
     <message>
-        <location filename="../../core/download.py" line="34"/>
+        <location filename="../../core/download.py" line="33"/>
         <source>{} Classes and {} Properties Downloaded!</source>
         <translation>{} Klassen und {} Merkmale heruntergeladen!</translation>
     </message>
     <message>
-        <location filename="../../core/download.py" line="68"/>
-        <location filename="../../core/download.py" line="70"/>
+        <location filename="../../core/download.py" line="67"/>
+        <location filename="../../core/download.py" line="69"/>
         <source>Download bSDD</source>
         <translation>bSDD herunterladen</translation>
+    </message>
+</context>
+<context>
+    <name>Excel</name>
+    <message>
+        <location filename="../../core/excel.py" line="39"/>
+        <location filename="../../core/excel.py" line="114"/>
+        <source>Export Excel</source>
+        <translation>Exportiere Excel</translation>
+    </message>
+    <message>
+        <location filename="../../core/excel.py" line="128"/>
+        <source>Export Done!</source>
+        <translation>Export Abgeschlossen!</translation>
+    </message>
+    <message>
+        <location filename="../../core/excel.py" line="129"/>
+        <source>Excel Export Done!</source>
+        <translation>Excel Export abgeschlossen!</translation>
+    </message>
+    <message>
+        <location filename="../../core/excel.py" line="130"/>
+        <source>{} classes exported!</source>
+        <translation>{} Klassen exportiert!</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="87"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="89"/>
+        <source>Parent Code</source>
+        <translation>Eltern Code</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="92"/>
+        <source>Identifier</source>
+        <translation>Identifier</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="95"/>
+        <location filename="../../tool/excel.py" line="104"/>
+        <source>Definition</source>
+        <translation>Definition</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="99"/>
+        <source>Property</source>
+        <translation>Merkmal</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="101"/>
+        <source>PropertySet</source>
+        <translation>PropertySet</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="106"/>
+        <source>Datatype</source>
+        <translation>Datentyp</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="107"/>
+        <source>Values</source>
+        <translation>Werte</translation>
+    </message>
+    <message>
+        <location filename="../../tool/excel.py" line="275"/>
+        <source>Overview</source>
+        <translation>Übersicht</translation>
     </message>
 </context>
 <context>
@@ -673,15 +747,15 @@
     <message>
         <location filename="../../module/ai_helper/qt/Settings.ui" line="14"/>
         <location filename="../../module/download/qt/Widget.ui" line="20"/>
+        <location filename="../../module/excel/qt/Widget.ui" line="14"/>
         <location filename="../../module/group_of_properties/qt/Widget.ui" line="14"/>
         <location filename="../../module/ids_exporter/qt/Widget.ui" line="14"/>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="14"/>
+        <location filename="../../module/loin/qt/Widget.ui" line="14"/>
         <location filename="../../module/property_table_widget/qt/Widget.ui" line="14"/>
         <location filename="../../module/relationship_editor_widget/qt/Settings.ui" line="14"/>
         <location filename="../../module/relationship_editor_widget/qt/Widget.ui" line="14"/>
-        <location filename="../../plugins/graph_viewer/module/edge/qt/RoutingWidget.ui" line="14"/>
-        <location filename="../../plugins/graph_viewer/module/physics/qt/Widget.ui" line="14"/>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="14"/>
-        <location filename="../../plugins/graph_viewer/module/window/qt/Widget.ui" line="14"/>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="14"/>
         <source>Form</source>
         <translation>Form</translation>
     </message>
@@ -791,193 +865,213 @@
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="89"/>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="157"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="135"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="233"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the IDS-Rules will automatically evaluate all entities classified under the &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD classification&lt;/span&gt;. If unchecked, you must manually specify a Property to associate the entities with a class definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wenn aktiviert,evaliert die IDS automatisch alle entitäten die über die &lt;span style=&quot; font-weight:700;&quot;&gt;bSDD Klassifikation&lt;/span&gt; klassifiziert sind. Wenn deaktiviert, muss ein Merkmal definiert werden als als Verknüfpung zwuschen Entität und Klasse dient&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="95"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="141"/>
         <source>CheckBox</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="134"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="210"/>
         <source>IfcLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="139"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="215"/>
         <source>IfcText</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="147"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="223"/>
         <source>Datatype:</source>
         <translation>Datentyp:</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="160"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="236"/>
         <source>Check for Classification</source>
         <translation>Nach Klassifikation prüfen</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="167"/>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="191"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="148"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="155"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the rules apply not only to the classes themselves, but also to their Type Objects (if they are typed).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wenn aktiviert gilt die prüfung nicht nur für die definierten IFC-Klassen sondern auch derer Type Objects (Wenn sie typisiert sind).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="170"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="158"/>
         <source>Check IfcTypeObjects</source>
         <translation>Prüfe IfcTypeObjects</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="184"/>
         <source>Inherit Checkstates</source>
-        <translation>Vererbe Checkstate</translation>
+        <translation type="vanished">Vererbe Checkstate</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="198"/>
+        <location filename="../../module/excel/qt/Widget.ui" line="122"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="165"/>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="149"/>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="182"/>
         <source>**Settings**</source>
         <translation>**Einstellungen**</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="229"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="261"/>
         <source>Author</source>
         <translation>Autor</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="236"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="268"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="243"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="275"/>
         <source>IFC-Versions</source>
         <translation>IFC-Versionen</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="250"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="282"/>
         <source>Copyright</source>
         <translation>Copyright</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="263"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="295"/>
         <source>Purpose</source>
         <translation>Nutzen</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="276"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="308"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="299"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="331"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="315"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="347"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="322"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="354"/>
         <source>Milestone</source>
         <translation>Meilenstein</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="329"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="361"/>
         <source>**IDS Metadata**</source>
         <translation>**IDS Metadaten**</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="354"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="386"/>
         <source>String</source>
         <translation>Zeichenkette</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="361"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="393"/>
         <source>**Datatype Mapping**</source>
         <translation>**Datentypen Mapping**</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="374"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="406"/>
         <source>Boolean</source>
         <translation>Boolesch</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="381"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="413"/>
         <source>Real</source>
         <translation>Reell</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="388"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="420"/>
         <source>Character</source>
         <translation>Zeichen</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="395"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="427"/>
         <source>Integer</source>
         <translation>Ganzzahl</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="402"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="434"/>
         <source>Time</source>
         <translation>Zeit</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="410"/>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="451"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="442"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="483"/>
         <source>IFCTEXT</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="415"/>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="456"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="447"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="488"/>
         <source>IFCLABEL</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="424"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="456"/>
         <source>IFCBOOLEAN</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="433"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="465"/>
         <source>IFCINTEGER</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="442"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="474"/>
         <source>IFCREAL</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="465"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="497"/>
         <source>IFCDATETIME</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="529"/>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="20"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="561"/>
+        <source>Import Settings</source>
+        <translation>Einstellungen Importieren</translation>
+    </message>
+    <message>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="589"/>
+        <source>Export Settings</source>
+        <translation>Einstellungen Exportieren</translation>
+    </message>
+    <message>
+        <location filename="../../module/excel/qt/Widget.ui" line="191"/>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="218"/>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="295"/>
         <source>Import</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="557"/>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="48"/>
+        <location filename="../../module/excel/qt/Widget.ui" line="219"/>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="246"/>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="323"/>
         <source>Export</source>
         <translation>Export</translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="574"/>
+        <location filename="../../module/excel/qt/Widget.ui" line="47"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="47"/>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="74"/>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="23"/>
         <source>Export:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../module/ids_exporter/qt/Widget.ui" line="599"/>
+        <location filename="../../module/excel/qt/Widget.ui" line="38"/>
+        <location filename="../../module/ids_exporter/qt/Widget.ui" line="38"/>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="65"/>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="45"/>
         <source>Create</source>
         <translation>Erstellen</translation>
     </message>
@@ -992,135 +1086,189 @@
         <translation>Erlaube unbekannte URIs</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/edge/qt/RoutingWidget.ui" line="20"/>
         <source>Edge Routing</source>
-        <translation>Kanten Routing</translation>
+        <translation type="vanished">Kanten Routing</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/edge/qt/RoutingWidget.ui" line="35"/>
         <source>Right-angle edges</source>
-        <translation>Rechtwinklige Kanten</translation>
+        <translation type="vanished">Rechtwinklige Kanten</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/physics/qt/Widget.ui" line="20"/>
         <source>Physics Settings</source>
-        <translation>Physik einstellungen</translation>
+        <translation type="vanished">Physik einstellungen</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/physics/qt/Widget.ui" line="27"/>
         <source>L₀ (spring length)</source>
-        <translation>L₀ (Federlänge)</translation>
+        <translation type="vanished">L₀ (Federlänge)</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/physics/qt/Widget.ui" line="50"/>
         <source>k_spring</source>
-        <translation>k_feder</translation>
+        <translation type="vanished">k_feder</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/physics/qt/Widget.ui" line="70"/>
         <source>repulsion</source>
-        <translation>Abstoßung</translation>
+        <translation type="vanished">Abstoßung</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="27"/>
         <source>Load All</source>
-        <translation>Alle laden</translation>
+        <translation type="vanished">Alle laden</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="34"/>
         <source>Center</source>
-        <translation>Zentrieren</translation>
+        <translation type="vanished">Zentrieren</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="41"/>
         <source>Actions</source>
-        <translation>Aktionen</translation>
+        <translation type="vanished">Aktionen</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="55"/>
         <source>Pause</source>
-        <translation>Pausieren</translation>
+        <translation type="vanished">Pausieren</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="62"/>
         <source>Clear</source>
-        <translation>Ansicht leeren</translation>
+        <translation type="vanished">Ansicht leeren</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/scene_view/qt/Buttons.ui" line="69"/>
         <source>Create Tree</source>
-        <translation>Baustruktur erstellen</translation>
+        <translation type="vanished">Baustruktur erstellen</translation>
+    </message>
+    <message>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="25"/>
+        <source>Format:</source>
+        <translation>Format:</translation>
+    </message>
+    <message>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="33"/>
+        <source>ISO 23386 XML</source>
+        <translation>ISO 23386 XML</translation>
+    </message>
+    <message>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="36"/>
+        <source>iso_23386</source>
+        <translation>iso_23386</translation>
+    </message>
+    <message>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="41"/>
+        <source>ISO 7817-3 XML (LOIN)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../module/iso_export/qt/Widget.ui" line="44"/>
+        <source>loin</source>
+        <translation>LOIN</translation>
+    </message>
+    <message>
+        <location filename="../../module/loin/qt/Widget.ui" line="49"/>
+        <source>Classes</source>
+        <translation>Klassen</translation>
+    </message>
+    <message>
+        <location filename="../../module/loin/qt/Widget.ui" line="63"/>
+        <source>Predefined Properties</source>
+        <translation>Vordefinierte Merkmale</translation>
+    </message>
+    <message>
+        <location filename="../../module/loin/qt/Widget.ui" line="78"/>
+        <source>Class Properties</source>
+        <translation>Klassen Merkmale</translation>
+    </message>
+    <message>
+        <location filename="../../module/loin/qt/Widget.ui" line="147"/>
+        <source>Import LOIN</source>
+        <translation>Importiere LOIN</translation>
+    </message>
+    <message>
+        <location filename="../../module/loin/qt/Widget.ui" line="175"/>
+        <source>Export LOIN</source>
+        <translation>Exportiere LOIN</translation>
+    </message>
+    <message>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="169"/>
+        <source>CustomPropertySet</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="174"/>
+        <source>SharedParameters</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="196"/>
+        <source>Text</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="201"/>
+        <source>Label</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="209"/>
+        <source>Text or Label:</source>
+        <translation>Text oder Label:</translation>
+    </message>
+    <message>
+        <location filename="../../module/revit_export/qt/Widget.ui" line="216"/>
+        <source>Mode:</source>
+        <translation>Modus:</translation>
     </message>
 </context>
 <context>
     <name>GraphView</name>
     <message>
-        <location filename="../../plugins/graph_viewer/tool/buchheim.py" line="74"/>
         <source>Select an edge type in the sidebar (Edge Types) by double-clicking the legend to activate it, then run Create Tree.</source>
-        <translation>Wähle in der Seitenleiste (Kantentypen) einen Kantentyp aus, indem du in der Legende doppelt klickst, um ihn zu aktivieren, und führe anschließend Create Tree aus.</translation>
+        <translation type="vanished">Wähle in der Seitenleiste (Kantentypen) einen Kantentyp aus, indem du in der Legende doppelt klickst, um ihn zu aktivieren, und führe anschließend Create Tree aus.</translation>
     </message>
 </context>
 <context>
     <name>GraphViewer</name>
     <message>
-        <location filename="../../plugins/graph_viewer/core/edge.py" line="181"/>
         <source>Create {} Relationship</source>
-        <translation>Erstelle {} Beziehung</translation>
+        <translation type="vanished">Erstelle {} Beziehung</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/core/scene_view.py" line="55"/>
         <source>Pause</source>
-        <translation>Pause</translation>
+        <translation type="vanished">Pause</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/core/scene_view.py" line="56"/>
         <source>Play</source>
-        <translation>Start</translation>
+        <translation type="vanished">Start</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/core/scene_view.py" line="431"/>
-        <location filename="../../plugins/graph_viewer/core/scene_view.py" line="462"/>
         <source>Export Graph View</source>
-        <translation>Graphenansicht exportieren</translation>
+        <translation type="vanished">Graphenansicht exportieren</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/core/scene_view.py" line="442"/>
         <source>Layout exported: </source>
-        <translation>Layout exportiert: </translation>
+        <translation type="vanished">Layout exportiert: </translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/core/scene_view.py" line="491"/>
         <source>Layout imported: </source>
-        <translation>Layout importiert: </translation>
+        <translation type="vanished">Layout importiert: </translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/core/window.py" line="42"/>
-        <location filename="../../plugins/graph_viewer/core/window.py" line="47"/>
         <source>Graph Viewer</source>
-        <translation>Graphen Ansicht</translation>
+        <translation type="vanished">Graphen Ansicht</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/tool/buchheim.py" line="73"/>
         <source>Create Tree</source>
-        <translation>Erstelle Baumstruktur</translation>
+        <translation type="vanished">Erstelle Baumstruktur</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/tool/edge.py" line="645"/>
         <source>Edge Types</source>
-        <translation>Kanten Typen</translation>
+        <translation type="vanished">Kanten Typen</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/tool/node.py" line="253"/>
         <source>Node Types</source>
-        <translation>Knoten Typen</translation>
+        <translation type="vanished">Knoten Typen</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/tool/scene_view.py" line="87"/>
         <source>Drag &amp; drop classes or properties in the view to edit their relations.
 Hold Shift and drag between nodes to create relations.
 Double-click an edge legend in the settings tab to change relation style.
 Editing Parent-Class-Code relations isn&apos;t supported so far.</source>
-        <translation>Ziehe Klassen oder Eigenschaften per Drag &amp; Drop in der Ansicht, um ihre Beziehungen zu bearbeiten.
+        <translation type="vanished">Ziehe Klassen oder Eigenschaften per Drag &amp; Drop in der Ansicht, um ihre Beziehungen zu bearbeiten.
 Halte die Umschalt-Taste (Shift) gedrückt und ziehe zwischen Knoten, um Beziehungen zu erstellen.
 Doppelklicke in der Registerkarte Einstellungen auf eine Kantenlegende, um den Beziehungsstil zu ändern.
 Das Bearbeiten von Parent-Class-Code-Beziehungen wird derzeit noch nicht unterstützt.</translation>
@@ -1129,12 +1277,12 @@ Das Bearbeiten von Parent-Class-Code-Beziehungen wird derzeit noch nicht unterst
 <context>
     <name>GroupOfProperties</name>
     <message>
-        <location filename="../../tool/group_of_properties.py" line="91"/>
+        <location filename="../../tool/group_of_properties.py" line="87"/>
         <source>Group of properties: {}</source>
         <translation>Merkmalsgruppe: {}</translation>
     </message>
     <message>
-        <location filename="../../tool/group_of_properties.py" line="100"/>
+        <location filename="../../tool/group_of_properties.py" line="96"/>
         <source>Property: {}</source>
         <translation>Merkmal: {}</translation>
     </message>
@@ -1150,30 +1298,37 @@ Das Bearbeiten von Parent-Class-Code-Beziehungen wird derzeit noch nicht unterst
 <context>
     <name>IDSExport</name>
     <message>
-        <location filename="../../core/ids_exporter.py" line="43"/>
+        <location filename="../../core/ids_exporter.py" line="40"/>
         <source>IDS Exporter</source>
         <translation>IDS Exporter</translation>
     </message>
     <message>
-        <location filename="../../core/ids_exporter.py" line="268"/>
+        <location filename="../../core/ids_exporter.py" line="176"/>
+        <location filename="../../core/loin.py" line="111"/>
+        <location filename="../../core/loin.py" line="130"/>
         <source>Export IDS settings</source>
         <translation>IDS Einstellungen exportieren</translation>
     </message>
     <message>
-        <location filename="../../core/ids_exporter.py" line="290"/>
+        <location filename="../../core/ids_exporter.py" line="196"/>
         <source>Import IDS settings</source>
         <translation>IDS Einstellungen importieren</translation>
     </message>
     <message>
-        <location filename="../../core/ids_exporter.py" line="328"/>
+        <location filename="../../core/ids_exporter.py" line="229"/>
         <source>Export IDS</source>
         <translation>IDS exportieren</translation>
+    </message>
+    <message>
+        <location filename="../../core/ids_exporter.py" line="240"/>
+        <source>Export Error</source>
+        <translation>Export Fehler</translation>
     </message>
 </context>
 <context>
     <name>IdsExport</name>
     <message>
-        <location filename="../../core/ids_exporter.py" line="62"/>
+        <location filename="../../core/ids_exporter.py" line="55"/>
         <source>IDS Exporter</source>
         <translation>IDS Exporter</translation>
     </message>
@@ -1181,9 +1336,57 @@ Das Bearbeiten von Parent-Class-Code-Beziehungen wird derzeit noch nicht unterst
 <context>
     <name>InputBar</name>
     <message>
-        <location filename="../../plugins/graph_viewer/module/input_bar/ui.py" line="19"/>
         <source>Add node by Code or URI and press Enter</source>
-        <translation>Füge Element ein, indem du den Code oder die URI eingibst und &quot;Enter&quot; drückst</translation>
+        <translation type="vanished">Füge Element ein, indem du den Code oder die URI eingibst und &quot;Enter&quot; drückst</translation>
+    </message>
+</context>
+<context>
+    <name>IsoExport</name>
+    <message>
+        <location filename="../../core/iso_export.py" line="38"/>
+        <source>Export ISO 23386</source>
+        <translation>Exportiere ISO 23386</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="89"/>
+        <source>Export ISO 7817-3 (LOIN)</source>
+        <translation>Exportiere ISO 7817-3 (LOIN)</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="95"/>
+        <location filename="../../core/iso_export.py" line="126"/>
+        <source>Export Done!</source>
+        <translation>Export abgeschlossen!</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="96"/>
+        <source>ISO 7817-3 LOIN Export Done!</source>
+        <translation>ISO 7817-3 LOIN Export abgeschlossen!</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="97"/>
+        <source>{} specification(s) exported!</source>
+        <translation>{} Spezifikation(en) exportiert!</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="112"/>
+        <source>Export ISO23386</source>
+        <translation>Exportiere ISO23386</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="127"/>
+        <source>ISO23386 Export Done!</source>
+        <translation>ISO23386 Export abgeschlossen!</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="128"/>
+        <source>{} classes exported!</source>
+        <translation>{} Klassen exportiert!</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="139"/>
+        <source>Export Error</source>
+        <translation>Export Fehler</translation>
     </message>
 </context>
 <context>
@@ -1253,27 +1456,37 @@ Das Bearbeiten von Parent-Class-Code-Beziehungen wird derzeit noch nicht unterst
         <translation>Datei</translation>
     </message>
     <message>
-        <location filename="../../module/main_window_widget/qt/MainWindow.ui" line="358"/>
+        <location filename="../../module/main_window_widget/qt/MainWindow.ui" line="357"/>
+        <source>Export</source>
+        <translation>Export</translation>
+    </message>
+    <message>
+        <location filename="../../module/main_window_widget/qt/MainWindow.ui" line="364"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../../module/main_window_widget/qt/MainWindow.ui" line="363"/>
+        <location filename="../../module/main_window_widget/qt/MainWindow.ui" line="369"/>
         <source>Data</source>
         <translation>Daten</translation>
     </message>
     <message>
-        <location filename="../../module/main_window_widget/qt/MainWindow.ui" line="373"/>
+        <location filename="../../module/main_window_widget/qt/MainWindow.ui" line="379"/>
         <source>dqwd</source>
         <translation>dqwd</translation>
     </message>
     <message>
-        <location filename="../../core/main_window_widget.py" line="81"/>
+        <location filename="../../module/main_window_widget/qt/MainWindow.ui" line="384"/>
+        <source>_</source>
+        <translation>_</translation>
+    </message>
+    <message>
+        <location filename="../../core/main_window_widget.py" line="80"/>
         <source>Hide Console</source>
         <translation>Konsole ausblenden</translation>
     </message>
     <message>
-        <location filename="../../core/main_window_widget.py" line="84"/>
+        <location filename="../../core/main_window_widget.py" line="83"/>
         <source>Show Console</source>
         <translation>Konsole einblenden</translation>
     </message>
@@ -1281,71 +1494,71 @@ Das Bearbeiten von Parent-Class-Code-Beziehungen wird derzeit noch nicht unterst
 <context>
     <name>Popups</name>
     <message>
+        <location filename="../../tool/popups.py" line="67"/>
         <location filename="../../tool/popups.py" line="69"/>
-        <location filename="../../tool/popups.py" line="71"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="37"/>
+        <location filename="../../tool/popups.py" line="35"/>
         <source>Warning! All unsaved changes will be lost!</source>
         <translation>Achtung! Alle nicht gespeicherten Änderungen gehen verloren!</translation>
     </message>
     <message>
+        <location filename="../../tool/popups.py" line="52"/>
         <location filename="../../tool/popups.py" line="54"/>
-        <location filename="../../tool/popups.py" line="56"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="140"/>
+        <location filename="../../tool/popups.py" line="138"/>
         <source>Delete Class?</source>
         <translation>Klasse löschen?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="142"/>
+        <location filename="../../tool/popups.py" line="140"/>
         <source>Delete Node?</source>
         <translation>Node Löschen?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="144"/>
+        <location filename="../../tool/popups.py" line="142"/>
         <source>Delete PropertySet?</source>
         <translation>PropertySet Löschen?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="146"/>
+        <location filename="../../tool/popups.py" line="144"/>
         <source>Delete Property?</source>
         <translation>Merkmal löschen?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="149"/>
+        <location filename="../../tool/popups.py" line="147"/>
         <source>Delete Classes?</source>
         <translation>Klassen löschen?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="155"/>
+        <location filename="../../tool/popups.py" line="153"/>
         <source>Delete Properties?</source>
         <translation>Merkmale löschen?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="251"/>
+        <location filename="../../tool/popups.py" line="249"/>
         <source>Save before exit</source>
         <translation>Vor dem Verlassen speichern</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="252"/>
+        <location filename="../../tool/popups.py" line="250"/>
         <source>You have some unsaved Changes!
 Do you want to save the project before leaving?</source>
         <translation>Du hast einige nicht gespeicherte Änderungen!
 Möchtest du das Projekt vor dem Verlassen speichern?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="151"/>
+        <location filename="../../tool/popups.py" line="149"/>
         <source>Delete Nodes?</source>
         <translation>Nodes Löschen?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="153"/>
+        <location filename="../../tool/popups.py" line="151"/>
         <source>Delete PropertySets?</source>
         <translation>PropertySets Löschen?</translation>
     </message>
@@ -1353,7 +1566,7 @@ Möchtest du das Projekt vor dem Verlassen speichern?</translation>
 <context>
     <name>Preset</name>
     <message>
-        <location filename="../../presets/core_presets/widget_preset.py" line="27"/>
+        <location filename="../../presets/core_presets/widget_preset.py" line="25"/>
         <source>Example Title</source>
         <translation>Beispiel Titel</translation>
     </message>
@@ -1361,12 +1574,12 @@ Möchtest du das Projekt vor dem Verlassen speichern?</translation>
 <context>
     <name>Project</name>
     <message>
-        <location filename="../../core/project.py" line="102"/>
+        <location filename="../../core/project.py" line="98"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="105"/>
+        <location filename="../../core/project.py" line="101"/>
         <source>Open</source>
         <translation>Öffnen</translation>
     </message>
@@ -1375,63 +1588,63 @@ Möchtest du das Projekt vor dem Verlassen speichern?</translation>
         <translation type="vanished">Projekt hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="41"/>
+        <location filename="../../core/project.py" line="37"/>
         <source>No Recent Files</source>
         <translation>Keine zuletzt verwendeten Dateien</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="109"/>
+        <location filename="../../core/project.py" line="105"/>
         <source>Open Recent</source>
         <translation>zuletzt verwendete Dateien öffnen</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="116"/>
+        <location filename="../../core/project.py" line="112"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="119"/>
+        <location filename="../../core/project.py" line="115"/>
         <source>Save As ...</source>
         <translation>Speichern unter ...</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="142"/>
+        <location filename="../../core/project.py" line="138"/>
         <source>is missing</source>
         <translation>fehlt</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="154"/>
+        <location filename="../../core/project.py" line="150"/>
         <source>New Project</source>
         <translation>Neues Projekt</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="183"/>
+        <location filename="../../core/project.py" line="179"/>
         <source>File Missing</source>
         <translation>Datei konnte nicht gefunden werden</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="184"/>
+        <location filename="../../core/project.py" line="180"/>
         <source>Recent file not found</source>
         <translation>Zuletzt verwendete Datei nicht gefunden</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="254"/>
+        <location filename="../../core/project.py" line="250"/>
         <source>Save Project</source>
         <translation>Projekt Speichern</translation>
     </message>
     <message>
-        <location filename="../../core/project.py" line="174"/>
+        <location filename="../../core/project.py" line="170"/>
         <source>Open Project</source>
         <translation>Projekt Öffnen</translation>
     </message>
     <message>
-        <location filename="../../core/dictionary_editor_widget.py" line="176"/>
-        <location filename="../../core/project.py" line="141"/>
+        <location filename="../../core/dictionary_editor_widget.py" line="174"/>
+        <location filename="../../core/project.py" line="137"/>
         <source>Required Inputs are missing!</source>
         <translation>Erforderliche Eingaben fehlen!</translation>
     </message>
     <message>
-        <location filename="../../core/dictionary_editor_widget.py" line="177"/>
+        <location filename="../../core/dictionary_editor_widget.py" line="175"/>
         <source>is mssing</source>
         <translation>fehlt</translation>
     </message>
@@ -1441,27 +1654,27 @@ Möchtest du das Projekt vor dem Verlassen speichern?</translation>
         <translation>Neues Projekt erstellen</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="169"/>
+        <location filename="../../tool/popups.py" line="167"/>
         <source>Project Load Warning</source>
         <translation>Projekt Lade Warnung</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="176"/>
+        <location filename="../../tool/popups.py" line="174"/>
         <source>The project failed validation.</source>
         <translation>Das Projekt hat die Validierung nicht bestanden.</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="182"/>
+        <location filename="../../tool/popups.py" line="180"/>
         <source>Do you want to try loading it in sloppy mode?</source>
         <translation>Möchtest du versuchen, es im Sloppy-Modus zu laden?</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="214"/>
+        <location filename="../../tool/popups.py" line="212"/>
         <source>Project Lock Warning</source>
         <translation>Projekt­sperr­warnung</translation>
     </message>
     <message>
-        <location filename="../../tool/popups.py" line="220"/>
+        <location filename="../../tool/popups.py" line="218"/>
         <source>The project file is already locked. Do you want to overwrite the lock?</source>
         <translation>Die Projektdatei ist bereits gesperrt. Möchtest du die Sperre überschreiben?</translation>
     </message>
@@ -1493,7 +1706,7 @@ Möchtest du das Projekt vor dem Verlassen speichern?</translation>
         <translation type="vanished">Merkmale löschen</translation>
     </message>
     <message>
-        <location filename="../../tool/property_set_table_view.py" line="194"/>
+        <location filename="../../tool/property_set_table_view.py" line="193"/>
         <source>There exists allready a ClassProperty with the Code &apos;{}&apos; in the PropertySet &apos;{}&apos;</source>
         <translation>Es existiert bereits eine Klassenmerkmal mit dem Code „{}“ im Merkmalssatz „{}“</translation>
     </message>
@@ -1508,7 +1721,7 @@ Möchtest du das Projekt vor dem Verlassen speichern?</translation>
 <context>
     <name>PropertySets</name>
     <message>
-        <location filename="../../core/main_window_widget.py" line="152"/>
+        <location filename="../../core/main_window_widget.py" line="151"/>
         <source>New PropertySet</source>
         <translation>Neuer Merkmalssatz</translation>
     </message>
@@ -1532,7 +1745,7 @@ Möchtest du das Projekt vor dem Verlassen speichern?</translation>
         <translation>Einfügen</translation>
     </message>
     <message>
-        <location filename="../../core/group_of_properties.py" line="336"/>
+        <location filename="../../core/group_of_properties.py" line="337"/>
         <source>Sync Allowed Values</source>
         <translation>Erlaubte Werte synchronisieren</translation>
     </message>
@@ -1751,7 +1964,6 @@ Möchtest du das Projekt vor dem Verlassen speichern?</translation>
 Beispiel: „IsExternal“</translation>
     </message>
     <message>
-        <location filename="../../module/property_editor_widget/qt/Window.ui" line="90"/>
         <source>The units represent a scale
                                                                 that enables a value to be
                                                                 measured (ISO 80000 or ISO 4217,
@@ -1763,7 +1975,7 @@ Beispiel: „IsExternal“</translation>
                                                                 or want to have the QUDT units
                                                                 in the API output, please let us
                                                                 know.</source>
-        <translation>Die Einheiten stellen eine Skala dar,
+        <translation type="vanished">Die Einheiten stellen eine Skala dar,
                 mit der ein Wert gemessen werden kann (ISO 80000 oder ISO 4217,
                 oder ISO 8601). Liste von Werten.
                 Siehe Referenzliste (JSON) units.
@@ -1773,8 +1985,6 @@ Beispiel: „IsExternal“</translation>
                 wissen.</translation>
     </message>
     <message>
-        <location filename="../../module/property_editor_widget/qt/Window.ui" line="169"/>
-        <location filename="../../module/property_editor_widget/qt/Window.ui" line="198"/>
         <source>Must be one of:
                                                                         Single (one value; this
                                                                         is the default), Range
@@ -1789,7 +1999,7 @@ Beispiel: „IsExternal“</translation>
                                                                         assembling properties),
                                                                         ComplexList (list of
                                                                         complex values).</source>
-        <translation>Muss eine der folgenden Optionen sein:
+        <translation type="vanished">Muss eine der folgenden Optionen sein:
                 Einzelwert (ein Wert; Standard), Bereich (zwei Werte), Liste (mehrere Werte),
                 Komplex (weder Einzelwert/Bereich/Liste, z. B. ein Objekt wie IfcActor
                 oder eine Aggregation verbundener Merkmale – siehe „assembling properties“),
@@ -1811,7 +2021,7 @@ Beispiel: „IsExternal“</translation>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="405"/>
         <source>Relations &amp; + Version</source>
-        <translation type="unfinished">Relationen &amp; + Versionen</translation>
+        <translation>Relationen &amp; + Versionen</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="445"/>
@@ -2011,6 +2221,40 @@ Beispiel: „IsExternal“</translation>
         <translation>Versionsdatum:</translation>
     </message>
     <message>
+        <location filename="../../module/property_editor_widget/qt/Window.ui" line="90"/>
+        <source>The units represent a scale
+that enables a value to be
+measured (ISO 80000 or ISO 4217,
+or ISO 8601). List of values.
+See reference list (JSON) units.
+We are working on supporting the
+QUDT vocabulary. If you would
+like to import using QUDT units
+or want to have the QUDT units
+in the API output, please let us
+know.</source>
+        <translation>Die Einheiten stellen eine Skala dar, die es ermöglicht, einen Wert zu messen (ISO 80000 oder ISO 4217 oder ISO 8601). Liste von Werten. Siehe Referenzliste (JSON) units. Wir arbeiten an der Unterstützung des QUDT-Vokabulars. Falls du beim Import QUDT-Einheiten verwenden möchtest oder die QUDT-Einheiten in der API-Ausgabe haben möchtest, lass es uns bitte wissen.</translation>
+    </message>
+    <message>
+        <location filename="../../module/property_editor_widget/qt/Window.ui" line="169"/>
+        <location filename="../../module/property_editor_widget/qt/Window.ui" line="198"/>
+        <source>Must be one of:
+Single (one value; this
+is the default), Range
+(two values), List
+(multiple values),
+Complex (neither
+single/range/list, for
+example an object like
+IfcActor or an
+aggregation of connected
+properties - see
+assembling properties),
+ComplexList (list of
+complex values).</source>
+        <translation>Muss einer der folgenden Werte sein: Single (ein Wert; dies ist die Voreinstellung), Range (zwei Werte), List (mehrere Werte), Complex (weder single/range/list, zum Beispiel ein Objekt wie IfcActor oder eine Aggregation verbundener Eigenschaften – siehe assembling properties), ComplexList (Liste komplexer Werte).</translation>
+    </message>
+    <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="501"/>
         <source>Version number:</source>
         <translation>Versionsnummer:</translation>
@@ -2039,7 +2283,7 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="615"/>
         <source>Example: &quot;Thermal transmittance according to
                                             ISO 10077-1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Beispiel: „Wärmedurchgangskoeffizient gemäß ISO 10077-1&quot;</translation>
     </message>
     <message>
         <location filename="../../module/property_editor_widget/qt/Window.ui" line="629"/>
@@ -2133,24 +2377,48 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
 <context>
     <name>RelationshipEditor</name>
     <message>
-        <location filename="../../core/relationship_editor_widget.py" line="145"/>
+        <location filename="../../core/relationship_editor_widget.py" line="143"/>
         <source>Related Class</source>
         <translation>Zugehörige Klasse</translation>
     </message>
     <message>
-        <location filename="../../core/relationship_editor_widget.py" line="147"/>
+        <location filename="../../core/relationship_editor_widget.py" line="145"/>
         <source>Related Property</source>
         <translation>Zugehöriges Merkmal</translation>
     </message>
     <message>
-        <location filename="../../core/relationship_editor_widget.py" line="271"/>
+        <location filename="../../core/relationship_editor_widget.py" line="269"/>
         <source>Unknown URI</source>
         <translation>Unbekannte URI</translation>
     </message>
     <message>
-        <location filename="../../core/relationship_editor_widget.py" line="272"/>
+        <location filename="../../core/relationship_editor_widget.py" line="270"/>
         <source>The specified URI &apos;{}&apos; is not recognized in the current dictionary.</source>
         <translation>Die spezifizierte URI &apos;{}&apos; existiert nicht in dieser Bibliothek.</translation>
+    </message>
+</context>
+<context>
+    <name>RevitExport</name>
+    <message>
+        <location filename="../../core/revit_export.py" line="39"/>
+        <location filename="../../core/revit_export.py" line="115"/>
+        <source>Export Revit</source>
+        <translation>Exporte für Revit</translation>
+    </message>
+    <message>
+        <location filename="../../core/revit_export.py" line="129"/>
+        <source>Export Done!</source>
+        <translation>Export abgeschlossen!</translation>
+    </message>
+    <message>
+        <location filename="../../core/revit_export.py" line="130"/>
+        <source>Revit Export Done!</source>
+        <translation>Revit Export abgeschlossen!</translation>
+    </message>
+    <message>
+        <location filename="../../core/revit_export.py" line="131"/>
+        <source>{} Lines written!</source>
+        <translation>{} Zeilen geschrieben!</translation>
     </message>
 </context>
 <context>
@@ -2176,29 +2444,29 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
         <translation type="vanished">Merkmal</translation>
     </message>
     <message>
-        <location filename="../../tool/search_widget.py" line="126"/>
-        <location filename="../../tool/search_widget.py" line="132"/>
+        <location filename="../../tool/search_widget.py" line="124"/>
+        <location filename="../../tool/search_widget.py" line="130"/>
         <source>Code</source>
         <translation>Code</translation>
     </message>
     <message>
-        <location filename="../../tool/search_widget.py" line="127"/>
-        <location filename="../../tool/search_widget.py" line="133"/>
+        <location filename="../../tool/search_widget.py" line="125"/>
+        <location filename="../../tool/search_widget.py" line="131"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../../tool/search_widget.py" line="128"/>
+        <location filename="../../tool/search_widget.py" line="126"/>
         <source>Classtyp</source>
         <translation>Klassentyp</translation>
     </message>
     <message>
-        <location filename="../../tool/search_widget.py" line="150"/>
+        <location filename="../../tool/search_widget.py" line="148"/>
         <source>Search Class</source>
         <translation>Klasse suchen</translation>
     </message>
     <message>
-        <location filename="../../tool/search_widget.py" line="152"/>
+        <location filename="../../tool/search_widget.py" line="150"/>
         <source>Search Property</source>
         <translation>Merkmal suchen</translation>
     </message>
@@ -2279,12 +2547,12 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
         <translation>Plugins</translation>
     </message>
     <message>
-        <location filename="../../core/language.py" line="65"/>
+        <location filename="../../core/language.py" line="63"/>
         <source>German</source>
         <translation>Deutsch</translation>
     </message>
     <message>
-        <location filename="../../core/language.py" line="66"/>
+        <location filename="../../core/language.py" line="64"/>
         <source>English</source>
         <translation>Englisch</translation>
     </message>
@@ -2314,20 +2582,18 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
 <context>
     <name>SettingsSidebar</name>
     <message>
-        <location filename="../../plugins/graph_viewer/module/settings/qt/Widget.ui" line="14"/>
         <source>Form</source>
-        <translation>Form</translation>
+        <translation type="vanished">Form</translation>
     </message>
     <message>
-        <location filename="../../plugins/graph_viewer/module/settings/qt/Widget.ui" line="41"/>
         <source>Show/Hide Settings</source>
-        <translation>Einblenden/Ausblenden der Einstellungen</translation>
+        <translation type="vanished">Einblenden/Ausblenden der Einstellungen</translation>
     </message>
 </context>
 <context>
     <name>Shell</name>
     <message>
-        <location filename="../../core/shell_widget.py" line="26"/>
+        <location filename="../../core/shell_widget.py" line="25"/>
         <source>Show Shell</source>
         <translation>Zeige Entwicklungsumgebung</translation>
     </message>
@@ -2379,6 +2645,29 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
         <location filename="../../module/util/qt/FileSelector.ui" line="60"/>
         <source>...</source>
         <translation>...</translation>
+    </message>
+</context>
+<context>
+    <name>wid</name>
+    <message>
+        <location filename="../../core/excel.py" line="42"/>
+        <source>Export to Excel</source>
+        <translation>Exportiere nach Excel</translation>
+    </message>
+    <message>
+        <location filename="../../core/ids_exporter.py" line="43"/>
+        <source>Export to IDS</source>
+        <translation>Exporiteren nach IDS</translation>
+    </message>
+    <message>
+        <location filename="../../core/iso_export.py" line="41"/>
+        <source>Export to ISO 23386</source>
+        <translation>Exportiere nach ISO 23386</translation>
+    </message>
+    <message>
+        <location filename="../../core/revit_export.py" line="42"/>
+        <source>Export to Revit</source>
+        <translation>Exportiere nach Revit</translation>
     </message>
 </context>
 </TS>
