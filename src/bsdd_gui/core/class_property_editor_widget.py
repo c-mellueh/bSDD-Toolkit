@@ -9,6 +9,7 @@ from bsdd_gui.module.class_property_editor_widget.constants import (
 )
 from PySide6.QtCore import QCoreApplication
 from bsdd_gui.module.class_property_editor_widget import ui, views, constants
+import qtawesome as qta
 
 if TYPE_CHECKING:
     from bsdd_gui import tool
@@ -55,7 +56,10 @@ def connect_signals(
 
 
 def retranslate_ui(class_property_editor: Type[tool.ClassPropertyEditorWidget]):
-    # TODO
+    for widget in class_property_editor.get_widgets():
+        widget.pb_new_value.setIcon(qta.icon("mdi6.plus"))
+        widget.pb_new_value.setText(widget.tr("Add"))
+        widget.retranslateUi(widget)
     pass
 
 

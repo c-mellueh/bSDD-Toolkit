@@ -66,6 +66,10 @@ class ClassPropertyEditorWidget(DialogTool):
         cls.signals.property_specific_redraw_requested.emit(widget)
 
     @classmethod
+    def get_widgets(cls) ->list[ui.ClassPropertyEditor]:
+        return super().get_widgets()
+
+    @classmethod
     def connect_internal_signals(cls):
         super().connect_internal_signals()
 
