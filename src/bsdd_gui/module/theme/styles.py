@@ -30,6 +30,7 @@ LIGHT_TOKENS = {
     "scroll_handle": "#C5CCD4",
     "scroll_handle_hover": "#ABB4BE",
     "link": "#0F6E84",
+    "error": "#C0392B",
 }
 
 DARK_TOKENS = {
@@ -56,6 +57,7 @@ DARK_TOKENS = {
     "scroll_handle": "#424A55",
     "scroll_handle_hover": "#525C68",
     "link": "#5CC7D6",
+    "error": "#E06055",
 }
 
 # SVG sources for QSS image: url(...) sub-controls; tinted at runtime.
@@ -497,5 +499,15 @@ QSlider::handle:horizontal {
 }
 QSlider::handle:horizontal:hover {
     background-color: $accent_hover;
+}
+
+/* ---- validation (see tool.Util.set_invalid) ----------------------------------------- */
+QLineEdit[invalid="true"], QComboBox[invalid="true"],
+QTextEdit[invalid="true"], QPlainTextEdit[invalid="true"],
+QAbstractSpinBox[invalid="true"] {
+    border: 1px solid $error;
+}
+QCheckBox[invalid="true"]::indicator {
+    border-color: $error;
 }
 """

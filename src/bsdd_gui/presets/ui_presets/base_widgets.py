@@ -15,16 +15,26 @@ class BaseWidget(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setWindowIcon(get_icon())
+        self._geometry_restored = False
 
         # self.setWindowFlag(Qt.WindowType.Window, True)
 
     def hideEvent(self, event):
         result = super().hideEvent(event)
+        if self.isWindow() and self._geometry_restored:
+            from bsdd_gui import tool
+
+            tool.Util.save_window_geometry(self)
         self.hidden.emit()
         return result
 
     def showEvent(self, event):
         result = super().showEvent(event)
+        if self.isWindow() and not self._geometry_restored:
+            self._geometry_restored = True
+            from bsdd_gui import tool
+
+            tool.Util.restore_window_geometry(self)
         self.shown.emit()
         return result
 

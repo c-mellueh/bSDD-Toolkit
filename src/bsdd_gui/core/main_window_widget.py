@@ -20,7 +20,6 @@ def create_main_window(application: QApplication, main_window: Type[tool.MainWin
     mw = main_window.create(application)
     mw.show()
     main_window.hide_console()
-    main_window.install_validation_styles(application)
     toggle_console_action = main_window.add_action(
         "menuEdit", "ToggleConsole", main_window.signals.toggle_console_requested.emit
     )
@@ -114,6 +113,7 @@ def close_event(
     project: Type[tool.Project],
     util: Type[tool.Util],
     popups: Type[tool.Popups],
+    main_window: Type[tool.MainWindowWidget],
 ):
     bsdd_dict = project.get()
     last_save = project.get_last_save()
@@ -130,6 +130,7 @@ def close_event(
             bsdd_dict.save(file_path)
             logging.info(f"File was saved before closing to: '{file_path}'")
     file_lock.unlock_file()
+    util.save_window_geometry(main_window.get())
     event.accept()
 
 

@@ -6,7 +6,7 @@ from string import Template
 from typing import TYPE_CHECKING, Callable
 
 import qtawesome as qta
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QApplication
 
@@ -32,7 +32,19 @@ VIEW_ZOOM_MAX = 300
 VIEW_ZOOM_STEP = 10
 
 
+def rgba(color: str, alpha: int) -> str:
+    """'#RRGGBB' + alpha (0-255) -> 'rgba(r, g, b, a)' for use in stylesheets."""
+    c = QColor(color)
+    return f"rgba({c.red()}, {c.green()}, {c.blue()}, {alpha})"
+
+
+class ThemeSignals(QObject):
+    theme_changed = Signal()
+
+
 class Theme:
+    signals = ThemeSignals()
+
     @classmethod
     def get_properties(cls) -> ThemeProperties:
         return bsdd_gui.ThemeProperties
@@ -137,11 +149,19 @@ class Theme:
         logging.info(f"Applying '{scheme}' theme (mode '{mode}')")
         tokens = cls.get_tokens(scheme)
         tokens.update(cls.build_icon_tokens(tokens))
+        cls.get_properties().active_tokens = dict(tokens)
         app.setStyle("Fusion")
         app.setPalette(cls.build_palette(tokens))
         cls.get_properties().base_qss = cls.build_stylesheet(tokens)
         cls._apply_stylesheet(app)
         cls._set_icon_defaults(tokens)
+        cls.signals.theme_changed.emit()
+
+    @classmethod
+    def get_active_tokens(cls) -> dict[str, str]:
+        """Tokens of the currently applied theme (light tokens before first apply)."""
+        tokens = cls.get_properties().active_tokens
+        return dict(tokens) if tokens else cls.get_tokens("light")
 
     @classmethod
     def get_view_zoom(cls) -> int:

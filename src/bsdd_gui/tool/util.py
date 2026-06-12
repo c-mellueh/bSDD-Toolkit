@@ -6,7 +6,7 @@ import re
 import tempfile
 from typing import Callable, TYPE_CHECKING
 import datetime
-from PySide6.QtCore import QModelIndex, Qt
+from PySide6.QtCore import QByteArray, QModelIndex, Qt
 from PySide6.QtGui import QAction, QKeySequence, QShortcut, QPalette, QBrush
 from PySide6.QtWidgets import (
     QComboBox,
@@ -29,6 +29,8 @@ from bsdd_json.utils import dictionary_utils as dict_utils
 
 if TYPE_CHECKING:
     from bsdd_gui.module.util.prop import MenuDict, UtilProperties
+
+GEOMETRY_SECTION = "window_geometry"
 
 
 class Util:
@@ -411,9 +413,39 @@ class Util:
         window.setTabOrder(inserted_widget, old_element)
 
     @classmethod
+    def save_window_geometry(cls, widget: QWidget) -> None:
+        data = bytes(widget.saveGeometry().toHex().data()).decode("ascii")
+        tool.Appdata.set_setting(GEOMETRY_SECTION, type(widget).__name__, data)
+
+    @classmethod
+    def restore_window_geometry(cls, widget: QWidget) -> bool:
+        value = tool.Appdata.get_string_setting(GEOMETRY_SECTION, type(widget).__name__)
+        restored = False
+        if value:
+            restored = widget.restoreGeometry(QByteArray.fromHex(value.encode("ascii")))
+        cls.clamp_to_screen(widget)
+        return restored
+
+    @classmethod
+    def clamp_to_screen(cls, widget: QWidget) -> None:
+        """Shrink/move a top-level widget so it fits the available screen area."""
+        screen = widget.screen()
+        if screen is None:
+            return
+        available = screen.availableGeometry()
+        width = min(widget.width(), available.width())
+        height = min(widget.height(), available.height())
+        if (width, height) != (widget.width(), widget.height()):
+            widget.resize(width, height)
+        x = min(max(widget.x(), available.left()), available.right() - width + 1)
+        y = min(max(widget.y(), available.top()), available.bottom() - height + 1)
+        if (x, y) != (widget.x(), widget.y()):
+            widget.move(x, y)
+
+    @classmethod
     def set_invalid(cls, widget: QWidget, invalid: bool) -> None:
         """
-        invalidates style of widget (see install_validation_styles in main_window_widget.py)
+        invalidates style of widget (styled by the [invalid="true"] rules in module/theme/styles.py)
         """
         widget.setProperty("invalid", invalid)
         cls._repolish_widget(widget)

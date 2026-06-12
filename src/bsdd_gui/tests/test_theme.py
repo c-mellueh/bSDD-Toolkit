@@ -55,6 +55,45 @@ class TestStylesheet:
             Theme.build_stylesheet({})
 
 
+class TestValidationStyles:
+    @pytest.mark.parametrize("scheme", ["light", "dark"])
+    def test_invalid_rules_are_part_of_base_stylesheet(self, scheme):
+        from bsdd_gui.tool.theme import ICON_TOKENS
+
+        tokens = Theme.get_tokens(scheme)
+        tokens.update({name: "icon.svg" for name in ICON_TOKENS})
+        qss = Theme.build_stylesheet(tokens)
+        assert 'QLineEdit[invalid="true"]' in qss
+        assert tokens["error"] in qss
+
+
+class TestActiveTokens:
+    def test_rgba_helper(self):
+        from bsdd_gui.tool.theme import rgba
+
+        assert rgba("#FF0000", 128) == "rgba(255, 0, 0, 128)"
+
+    def test_active_tokens_after_apply(self, qapp, icon_cache):
+        old_sheet = qapp.styleSheet()
+        try:
+            Theme.apply_theme(qapp, "dark")
+            assert Theme.get_active_tokens()["window"] == styles.DARK_TOKENS["window"]
+        finally:
+            qapp.setStyleSheet(old_sheet)
+
+    def test_theme_changed_signal_emitted(self, qapp, icon_cache):
+        received = []
+        slot = lambda: received.append(True)  # noqa: E731
+        Theme.signals.theme_changed.connect(slot)
+        old_sheet = qapp.styleSheet()
+        try:
+            Theme.apply_theme(qapp, "light")
+        finally:
+            Theme.signals.theme_changed.disconnect(slot)
+            qapp.setStyleSheet(old_sheet)
+        assert len(received) == 1
+
+
 class TestSchemeResolution:
     def test_explicit_modes_win_over_system(self, qapp):
         assert Theme.resolve_scheme(qapp, "light") == "light"

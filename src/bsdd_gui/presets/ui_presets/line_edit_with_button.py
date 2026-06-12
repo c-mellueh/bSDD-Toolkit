@@ -1,6 +1,5 @@
-from PySide6.QtWidgets import QApplication, QLineEdit, QToolButton, QStyle
+from PySide6.QtWidgets import QLineEdit, QToolButton, QStyle
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette
 
 
 class LineEditWithButton(QLineEdit):
@@ -12,26 +11,17 @@ class LineEditWithButton(QLineEdit):
         self.button.setCursor(Qt.PointingHandCursor)
         self.button.setAutoRaise(True)
         self.button_mode = "new"  # if needed the button can have multiple modes like
-        # Create theme-aware colors
-        pal = QApplication.palette()
-        base = pal.color(QPalette.Base)
-        # Hover: blend base + highlight slightly
-        hover_color = base.lighter(110) if base.lightness() > 128 else base.darker(110)
-        pressed_color = base.lighter(120) if base.lightness() > 128 else base.darker(120)
-        # Apply stylesheet
-        self.button.setStyleSheet(
-            f"""
-            QToolButton {{
-                border: 1px solid {pal.color(QPalette.Mid).name()};
+        # palette() references resolve at draw time, so the button follows theme changes
+        self.button.setStyleSheet("""
+            QToolButton {
+                border: 1px solid palette(mid);
                 border-radius: 8px;
                 padding: 0px 6px;
                 background-color: transparent;
-                font-size: 11px;
-            }}
-            QToolButton:hover {{ background-color: {hover_color.name()}; }}
-            QToolButton:pressed {{ background-color: {pressed_color.name()}; }}
-        """
-        )
+            }
+            QToolButton:hover { background-color: palette(midlight); }
+            QToolButton:pressed { background-color: palette(mid); }
+        """)
 
         self._update_margins_and_geometry()
 
