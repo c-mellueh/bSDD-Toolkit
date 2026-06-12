@@ -3,8 +3,6 @@ import os
 import sys
 from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QPalette
 
 # xdg-desktop-portal is the Linux/Wayland portal integration. On Windows the
 # platform-theme plugin doesn't exist; forcing it causes Qt to crash with a
@@ -20,40 +18,10 @@ import bsdd_gui.core.main_window_widget
 import importlib
 from bsdd_gui.module.project.constants import OPEN_PATH
 import bsdd_gui.core.project
+import bsdd_gui.core.theme
 import bsdd_gui.core.main_window_widget
 from bsdd_gui.module.language.trigger import set_language
 from bsdd_gui.module.ifc_helper.data import IfcHelperData
-
-
-def _apply_system_color_scheme(app: QApplication) -> None:
-    if app.styleHints().colorScheme() != Qt.ColorScheme.Dark:
-        return
-    app.setStyle("Fusion")
-    palette = QPalette()
-    dark = QColor(53, 53, 53)
-    darker = QColor(35, 35, 35)
-    text = Qt.GlobalColor.white
-    disabled = QColor(127, 127, 127)
-    highlight = QColor(42, 130, 218)
-    palette.setColor(QPalette.ColorRole.Window, dark)
-    palette.setColor(QPalette.ColorRole.WindowText, text)
-    palette.setColor(QPalette.ColorRole.Base, darker)
-    palette.setColor(QPalette.ColorRole.AlternateBase, dark)
-    palette.setColor(QPalette.ColorRole.ToolTipBase, darker)
-    palette.setColor(QPalette.ColorRole.ToolTipText, text)
-    palette.setColor(QPalette.ColorRole.Text, text)
-    palette.setColor(QPalette.ColorRole.Button, dark)
-    palette.setColor(QPalette.ColorRole.ButtonText, text)
-    palette.setColor(QPalette.ColorRole.BrightText, Qt.GlobalColor.red)
-    palette.setColor(QPalette.ColorRole.Link, highlight)
-    palette.setColor(QPalette.ColorRole.Highlight, highlight)
-    palette.setColor(QPalette.ColorRole.HighlightedText, Qt.GlobalColor.black)
-    palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.WindowText, disabled)
-    palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Text, disabled)
-    palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.ButtonText, disabled)
-    palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Highlight, QColor(80, 80, 80))
-    palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.HighlightedText, disabled)
-    app.setPalette(palette)
 
 
 def main(
@@ -81,7 +49,7 @@ def main(
 
     # Create UI
     app = QApplication(sys.argv)
-    _apply_system_color_scheme(app)
+    bsdd_gui.core.theme.apply_initial_theme(app, tool.Theme, tool.Appdata)
     bsdd_gui.core.main_window_widget.create_main_window(app, tool.MainWindowWidget)
     bsdd_gui.load_ui_triggers()
 

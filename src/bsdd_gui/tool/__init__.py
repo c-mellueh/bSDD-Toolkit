@@ -11,6 +11,7 @@ from .util import Util as Util
 from .language import Language as Language
 from .plugins import Plugins as Plugins
 from .settings_widget import SettingsWidget as SettingsWidget
+from .theme import Theme as Theme
 from .popups import Popups as Popups
 from .dictionary_editor_widget import DictionaryEditorWidget as DictionaryEditorWidget
 from .shell_widget import ShellWidget as ShellWidget
