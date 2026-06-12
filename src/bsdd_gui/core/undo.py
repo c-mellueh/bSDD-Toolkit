@@ -77,6 +77,8 @@ def perform_undo(
     undo: Type[tool.Undo],
     project: Type[tool.Project],
     main_window: Type[tool.MainWindowWidget],
+    class_tree: Type[tool.ClassTreeView],
+    pset_table: Type[tool.PropertySetTableView],
 ) -> None:
     # Focused text inputs keep their own character-level undo.
     focus = QApplication.focusWidget()
@@ -87,13 +89,15 @@ def perform_undo(
     if not undo.can_undo():
         return
     current = undo.serialize(project.get())
-    _restore(undo.pop_undo(current), undo, project, main_window)
+    _restore(undo.pop_undo(current), undo, project, main_window, class_tree, pset_table)
 
 
 def perform_redo(
     undo: Type[tool.Undo],
     project: Type[tool.Project],
     main_window: Type[tool.MainWindowWidget],
+    class_tree: Type[tool.ClassTreeView],
+    pset_table: Type[tool.PropertySetTableView],
 ) -> None:
     focus = QApplication.focusWidget()
     if isinstance(focus, (QLineEdit, QTextEdit, QPlainTextEdit)):
@@ -103,7 +107,7 @@ def perform_redo(
     if not undo.can_redo():
         return
     current = undo.serialize(project.get())
-    _restore(undo.pop_redo(current), undo, project, main_window)
+    _restore(undo.pop_redo(current), undo, project, main_window, class_tree, pset_table)
 
 
 def _restore(
@@ -111,19 +115,34 @@ def _restore(
     undo: Type[tool.Undo],
     project: Type[tool.Project],
     main_window: Type[tool.MainWindowWidget],
+    class_tree: Type[tool.ClassTreeView],
+    pset_table: Type[tool.PropertySetTableView],
 ) -> None:
     logging.info("Restoring project state from undo history")
+    window = main_window.get()
+    tree_view = main_window.get_class_view() if window else None
+    pset_view = main_window.get_pset_view() if window else None
     active_class = main_window.get_active_class()
     active_code = active_class.Code if active_class else None
+    active_pset = main_window.get_active_pset()
+    expanded_codes = class_tree.get_expanded_codes(tree_view) if tree_view else set()
     undo.set_restoring(True)
     try:
         new_dictionary = undo.deserialize(state)
         project.get_properties().project_dictionary = new_dictionary
         bsdd_gui.on_new_project()
+        if tree_view:
+            class_tree.expand_codes(expanded_codes, tree_view)
         if active_code:
             new_active = next((c for c in new_dictionary.Classes if c.Code == active_code), None)
             if new_active is not None:
-                main_window.set_active_class(new_active)
+                # Re-select through the view so dependent views re-enable normally.
+                if not class_tree.select_and_expand(new_active, tree_view):
+                    main_window.set_active_class(new_active)
+                if active_pset and pset_view:
+                    row = pset_table.get_row_by_name(pset_view, active_pset)
+                    if row is not None:
+                        pset_table.select_row(pset_view, row)
     finally:
         undo.set_restoring(False)
     update_action_states(undo)

@@ -1049,7 +1049,7 @@ class ItemViewTool(BaseTool):
             views = cls.get_views()
             if not views:
                 return False
-            view = views[0]
+            view = next(iter(views))
         if not isinstance(view, QTreeView):
             return
 

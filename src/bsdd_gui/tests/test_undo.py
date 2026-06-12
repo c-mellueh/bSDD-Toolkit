@@ -24,10 +24,23 @@ def project(dictionary, monkeypatch, qapp):
     props.project_dictionary = dictionary
     monkeypatch.setattr(bsdd_gui, "on_new_project", lambda: None)
     monkeypatch.setattr(tool.MainWindowWidget, "get_active_class", classmethod(lambda cls: None))
+    monkeypatch.setattr(tool.MainWindowWidget, "get_active_pset", classmethod(lambda cls: None))
     Undo.reset(Undo.serialize(dictionary))
     yield tool.Project
     props.project_dictionary = old_dictionary
     Undo.reset(None)
+
+
+def _undo(project):
+    core_undo.perform_undo(
+        Undo, project, tool.MainWindowWidget, tool.ClassTreeView, tool.PropertySetTableView
+    )
+
+
+def _redo(project):
+    core_undo.perform_redo(
+        Undo, project, tool.MainWindowWidget, tool.ClassTreeView, tool.PropertySetTableView
+    )
 
 
 def _add_class(project, code: str):
@@ -62,31 +75,31 @@ class TestUndoRedo:
     def test_undo_restores_previous_state(self, project):
         _add_class(project, "A")
         core_undo.flush(Undo, project)
-        core_undo.perform_undo(Undo, project, tool.MainWindowWidget)
+        _undo(project)
         assert [c.Code for c in project.get().Classes] == []
 
     def test_redo_restores_undone_state(self, project):
         _add_class(project, "A")
         core_undo.flush(Undo, project)
-        core_undo.perform_undo(Undo, project, tool.MainWindowWidget)
-        core_undo.perform_redo(Undo, project, tool.MainWindowWidget)
+        _undo(project)
+        _redo(project)
         assert [c.Code for c in project.get().Classes] == ["A"]
 
     def test_undo_without_history_is_noop(self, project):
         before = project.get()
-        core_undo.perform_undo(Undo, project, tool.MainWindowWidget)
+        _undo(project)
         assert project.get() is before
 
     def test_unsignaled_change_is_caught_on_undo(self, project):
         # No flush, no schedule -- mutation happens silently.
         _add_class(project, "A")
-        core_undo.perform_undo(Undo, project, tool.MainWindowWidget)
+        _undo(project)
         assert [c.Code for c in project.get().Classes] == []
 
     def test_new_change_clears_redo_stack(self, project):
         _add_class(project, "A")
         core_undo.flush(Undo, project)
-        core_undo.perform_undo(Undo, project, tool.MainWindowWidget)
+        _undo(project)
         assert Undo.can_redo() is True
         _add_class(project, "B")
         core_undo.flush(Undo, project)
@@ -97,7 +110,7 @@ class TestUndoRedo:
         core_undo.flush(Undo, project)
         _add_class(project, "B")
         core_undo.flush(Undo, project)
-        core_undo.perform_undo(Undo, project, tool.MainWindowWidget)
+        _undo(project)
         restored = project.get()
         assert [c.Code for c in restored.Classes] == ["A"]
         assert all(c.parent() is restored for c in restored.Classes)
@@ -110,3 +123,46 @@ class TestReset:
         Undo.reset(Undo.serialize(project.get()))
         assert Undo.can_undo() is False
         assert Undo.can_redo() is False
+
+
+class TestExpandedState:
+    @pytest.fixture()
+    def tree(self, qapp, dictionary):
+        from PySide6.QtWidgets import QTreeView
+
+        for code, parent_code in (("A", None), ("B", "A"), ("C", "B")):
+            bsdd_class = BsddClass(Code=code, Name=code, ParentClassCode=parent_code)
+            bsdd_class._set_parent(dictionary)
+            dictionary.Classes.append(bsdd_class)
+        proxy, model = tool.ClassTreeView.create_model(dictionary)
+        tool.ClassTreeView.add_column_to_table(model, "Name", lambda a: a.Name)
+        view = QTreeView()
+        view.setModel(proxy)
+
+        yield view
+
+        tool.ClassTreeView.remove_model(model)
+        tool.ClassTreeView.get_properties().columns.pop(model, None)
+        view.deleteLater()
+
+    def test_expanded_codes_roundtrip(self, tree):
+        model = tree.model()
+        root = model.index(0, 0)
+        if model.canFetchMore(root):
+            model.fetchMore(root)
+        child = model.index(0, 0, root)
+        assert child.isValid()
+        tree.expand(root)
+        tree.expand(child)
+
+        codes = tool.ClassTreeView.get_expanded_codes(tree)
+        assert codes == {"A", "B"}
+
+        tree.collapseAll()
+        tool.ClassTreeView.expand_codes(codes, tree)
+        assert tree.isExpanded(root)
+        assert tree.isExpanded(child)
+
+    def test_expand_codes_ignores_unknown(self, tree):
+        tool.ClassTreeView.expand_codes({"NOPE"}, tree)
+        assert tool.ClassTreeView.get_expanded_codes(tree) == set()

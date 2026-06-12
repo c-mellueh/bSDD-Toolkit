@@ -63,11 +63,23 @@ def debounce_elapsed():
 
 
 def undo_requested():
-    core.perform_undo(tool.Undo, tool.Project, tool.MainWindowWidget)
+    core.perform_undo(
+        tool.Undo,
+        tool.Project,
+        tool.MainWindowWidget,
+        tool.ClassTreeView,
+        tool.PropertySetTableView,
+    )
 
 
 def redo_requested():
-    core.perform_redo(tool.Undo, tool.Project, tool.MainWindowWidget)
+    core.perform_redo(
+        tool.Undo,
+        tool.Project,
+        tool.MainWindowWidget,
+        tool.ClassTreeView,
+        tool.PropertySetTableView,
+    )
 
 
 def stacks_changed():
