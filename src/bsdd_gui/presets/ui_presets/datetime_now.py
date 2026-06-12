@@ -20,7 +20,7 @@ class DateTimeWithNow(ItemWithToggleSwitch):
             special_return_item=self.dt_edit,
             **kwargs,
         )
-        self.now_btn.setMaximumWidth(50)
+        self.now_btn.setMaximumWidth(60)
         self.now_btn.clicked.connect(self.set_now)
         self.dt_edit.setCalendarPopup(True)  # nice calendar UI
         self.dt_edit.setDisplayFormat("yyyy-MM-dd HH:mm:ss")
