@@ -6,7 +6,7 @@ from PySide6.QtCore import QCoreApplication
 from bsdd_json.utils import property_utils as prop_utils
 from typing import get_args
 from bsdd_json.type_hints import COUNTRY_CODE, LANGUAGE_ISO_CODE, DOCUMENT_TYPE
-
+import qtawesome as qta
 if TYPE_CHECKING:
     from bsdd_gui import tool
     from bsdd_gui.module.property_editor_widget import ui
@@ -30,6 +30,11 @@ def connect_signals(
 
 
 def retranslate_ui(property_editor: Type[tool.PropertyEditorWidget]):
+    for widget in property_editor.get_widgets():
+        widget.pb_new_value.setIcon(qta.icon("mdi6.plus"))
+        widget.pb_new_value.setText(widget.tr("Add"))
+        widget.retranslateUi(widget)
+
     pass  # TODO
 
 

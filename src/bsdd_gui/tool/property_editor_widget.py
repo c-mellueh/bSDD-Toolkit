@@ -32,6 +32,10 @@ class PropertyEditorWidget(DialogTool):
         return trigger
 
     @classmethod
+    def get_widgets(cls) -> list[ui.PropertyEditor]:
+        return super().get_widgets()
+
+    @classmethod
     def _get_widget_class(cls) -> Type[ui.PropertyEditor]:
         return ui.PropertyEditor
 
