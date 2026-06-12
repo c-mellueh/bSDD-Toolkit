@@ -1,3 +1,5 @@
+<img src="src/bsdd_gui/resources/icons/icon.svg" alt="bSDD Toolkit Icon" width="100" >
+
 # bSDD-Toolkit
 
 Visual editor and Python toolkit for working with buildingSMART Data Dictionary (bSDD) JSON.
