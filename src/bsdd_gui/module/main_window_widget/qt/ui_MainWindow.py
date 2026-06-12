@@ -47,7 +47,7 @@ class Ui_MainWindow(object):
         self.layoutWidget.setObjectName(u"layoutWidget")
         self.verticalLayout_classes = QVBoxLayout(self.layoutWidget)
         self.verticalLayout_classes.setObjectName(u"verticalLayout_classes")
-        self.verticalLayout_classes.setContentsMargins(0, 0, 5, 0)
+        self.verticalLayout_classes.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_classes = QGridLayout()
         self.gridLayout_classes.setObjectName(u"gridLayout_classes")
         self.label_class = QLabel(self.layoutWidget)

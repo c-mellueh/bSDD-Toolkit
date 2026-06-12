@@ -3,15 +3,12 @@
 ################################################################################
 ## Form generated from reading UI file 'ClassEditor.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.1
+## Created by: Qt User Interface Compiler version 6.10.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (
-    QCoreApplication,
-    QMetaObject,
-)
+from PySide6.QtCore import QCoreApplication, QMetaObject
 from PySide6.QtWidgets import (
     QComboBox,
     QFormLayout,
@@ -145,10 +142,6 @@ class Ui_ClassEditor(object):
         self.te_definition = QTextEdit(self.gb_description)
         self.te_definition.setObjectName("te_definition")
         self.te_definition.setAutoFillBackground(True)
-        self.te_definition.setStyleSheet(
-            "background-color:\n"
-            "                                                            rgba(0, 0, 0,10);"
-        )
 
         self.verticalLayout_8.addWidget(self.te_definition)
 
@@ -174,10 +167,6 @@ class Ui_ClassEditor(object):
 
         self.te_description = QTextEdit(self.gb_description)
         self.te_description.setObjectName("te_description")
-        self.te_description.setStyleSheet(
-            "background-color:\n"
-            "                                                            rgba(0, 0, 0,10);"
-        )
 
         self.verticalLayout_8.addWidget(self.te_description)
 

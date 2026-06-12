@@ -6,6 +6,7 @@ from PySide6.QtCore import (
     QModelIndex,
     QMimeData,
     QByteArray,
+    QSortFilterProxyModel,
 )
 
 import bsdd_gui
@@ -69,6 +70,71 @@ class ClassTreeView(ItemViewTool):
     @classmethod
     def get_allowed_class_types(cls) -> list[CLASS_TYPE]:
         return ["Class", "Material", "AlternativeUse"]
+
+    @classmethod
+    def _index_to_class(cls, view: ui.ClassView, index: QModelIndex) -> BsddClass | None:
+        model = view.model()
+        while isinstance(model, QSortFilterProxyModel):
+            index = model.mapToSource(index)
+            model = model.sourceModel()
+        return index.internalPointer()
+
+    @classmethod
+    def get_expanded_codes(cls, view: ui.ClassView | None = None) -> set[str]:
+        """Codes of all classes whose tree nodes are currently expanded."""
+        if view is None:
+            views = cls.get_views()
+            if not views:
+                return set()
+            view = next(iter(views))
+        model = view.model()
+        if model is None:
+            return set()
+        codes: set[str] = set()
+
+        def walk(parent: QModelIndex):
+            if model.canFetchMore(parent):
+                model.fetchMore(parent)
+            for row in range(model.rowCount(parent)):
+                index = model.index(row, 0, parent)
+                if not index.isValid():
+                    continue
+                if view.isExpanded(index):
+                    bsdd_class = cls._index_to_class(view, index)
+                    if bsdd_class is not None:
+                        codes.add(bsdd_class.Code)
+                    walk(index)
+
+        walk(QModelIndex())
+        return codes
+
+    @classmethod
+    def expand_codes(cls, codes: set[str], view: ui.ClassView | None = None) -> None:
+        """Expand all tree nodes whose class code is in *codes*."""
+        if not codes:
+            return
+        if view is None:
+            views = cls.get_views()
+            if not views:
+                return
+            view = next(iter(views))
+        model = view.model()
+        if model is None:
+            return
+
+        def walk(parent: QModelIndex):
+            if model.canFetchMore(parent):
+                model.fetchMore(parent)
+            for row in range(model.rowCount(parent)):
+                index = model.index(row, 0, parent)
+                if not index.isValid():
+                    continue
+                bsdd_class = cls._index_to_class(view, index)
+                if bsdd_class is not None and bsdd_class.Code in codes:
+                    view.expand(index)
+                    walk(index)
+
+        walk(QModelIndex())
 
     @classmethod
     def get_selected(cls, view: ui.ClassView) -> list[BsddClass]:

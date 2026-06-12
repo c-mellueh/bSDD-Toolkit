@@ -56,6 +56,9 @@ class MainWindowWidget(ActionTool):
             cls.get_properties().status_text_label = QLabel()
             cls.get_statusbar().addPermanentWidget(cls.get_properties().status_text_label)
             cls.get_statusbar().setSizeGripEnabled(False)
+            from bsdd_gui import tool
+
+            tool.Util.restore_window_geometry(window)
         return cls.get_properties().ui
 
     @classmethod
@@ -170,23 +173,6 @@ class MainWindowWidget(ActionTool):
         else:
             menu = cls.get_menu_bar()
         menu.removeAction(sub_menu.menuAction())
-
-    @classmethod
-    def install_validation_styles(cls, app: QApplication) -> None:
-        app.setStyleSheet(
-            app.styleSheet()
-            + """
-            QLineEdit[invalid="true"],
-            QComboBox[invalid="true"] {
-                border: 1px solid red;
-                border-radius: 4px;
-            }
-            /* checkbox: highlight the indicator when invalid */
-            QCheckBox[invalid="true"]::indicator {
-                border: 1px solid red;
-            }
-        """
-        )
 
     @classmethod
     def get_statusbar(cls) -> QStatusBar:

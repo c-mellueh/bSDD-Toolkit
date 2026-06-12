@@ -201,10 +201,6 @@ class Ui_PropertyWindow(object):
         self.te_definition = QTextEdit(self.gb_description)
         self.te_definition.setObjectName("te_definition")
         self.te_definition.setAutoFillBackground(True)
-        self.te_definition.setStyleSheet(
-            "background-color:\n"
-            "                                                            rgba(0, 0, 0,10);"
-        )
 
         self.verticalLayout_3.addWidget(self.te_definition)
 
@@ -230,10 +226,6 @@ class Ui_PropertyWindow(object):
 
         self.te_description = QTextEdit(self.gb_description)
         self.te_description.setObjectName("te_description")
-        self.te_description.setStyleSheet(
-            "background-color:\n"
-            "                                                            rgba(0, 0, 0,10);"
-        )
 
         self.verticalLayout_3.addWidget(self.te_description)
 

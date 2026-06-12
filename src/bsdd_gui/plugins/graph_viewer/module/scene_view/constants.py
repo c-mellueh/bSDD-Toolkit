@@ -1,17 +1,23 @@
 from typing import Literal
 
+from bsdd_gui.tool.theme import rgba
+
 PATH_NAME = "graph_viewer"
 FILETYPE = "JSON Files (*.json);;all (*.*)"
 
-OVERLAY_STYLESHEET = """
-                QLabel {
-                    color: #e8e8f0;
-                    background: rgba(25, 25, 35, 180);
-                    border: 1px solid rgba(80, 90, 120, 160);
+
+def get_overlay_style_sheet(tokens: dict[str, str]) -> str:
+    return f"""
+                QLabel {{
+                    color: {tokens["text"]};
+                    background: {rgba(tokens["surface"], 200)};
+                    border: 1px solid {rgba(tokens["border_strong"], 160)};
                     border-radius: 8px;
                     padding: 10px 14px;
-                }
+                }}
                 """
+
+
 ALLOWED_DRAG_TYPES = Literal["property_drag", "class_drag"]
 
 PROPERTY_DRAG = "property_drag"

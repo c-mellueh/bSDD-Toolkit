@@ -11,6 +11,8 @@ from .util import Util as Util
 from .language import Language as Language
 from .plugins import Plugins as Plugins
 from .settings_widget import SettingsWidget as SettingsWidget
+from .theme import Theme as Theme
+from .undo import Undo as Undo
 from .popups import Popups as Popups
 from .dictionary_editor_widget import DictionaryEditorWidget as DictionaryEditorWidget
 from .shell_widget import ShellWidget as ShellWidget
@@ -36,4 +38,4 @@ from .group_of_properties import (
 from .excel import Excel as Excel
 from .loin import Loin as Loin, PPClassView as PPClassView, PPPropertyView as PPPropertyView
 from .iso_export import IsoExport as IsoExport
-from  .revit_export import RevitExport as RevitExport
+from .revit_export import RevitExport as RevitExport

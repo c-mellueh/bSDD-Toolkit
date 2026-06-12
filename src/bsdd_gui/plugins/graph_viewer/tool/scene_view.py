@@ -94,7 +94,9 @@ class SceneView(PluginTool):
         overlay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         overlay.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
         overlay.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-        overlay.setStyleSheet(constants.OVERLAY_STYLESHEET)
+        from bsdd_gui.tool import Theme
+
+        overlay.setStyleSheet(constants.get_overlay_style_sheet(Theme.get_active_tokens()))
         cls.get_properties()._help_overlay = overlay
         cls.reposition_help_overlay()
         cls.update_help_overlay_visibility()

@@ -106,18 +106,32 @@ class Settings(PluginTool, WidgetTool):
         widget.scroll_layout.insertWidget(0, input_widget)
 
     @classmethod
+    def get_required_width(cls, available_height: int) -> int:
+        """Width the scroll area needs so no horizontal scrollbar appears."""
+        widget = cls.get_widget()
+        if not widget:
+            return cls.get_expanded_width()
+        hint = widget.scroll_content.sizeHint()
+        width = hint.width()
+        if hint.height() > available_height:
+            width += widget.scroll_area.verticalScrollBar().sizeHint().width()
+        width += 2 * widget.scroll_area.frameWidth()
+        return max(cls.get_expanded_width(), width)
+
+    @classmethod
     def position_and_resize(
         cls, viewport_width: int, viewport_height: int, margin: int = 0
     ) -> None:
+        """Anchor to top-right of the given viewport size and stretch to full height."""
         widget = cls.get_widget()
         if not widget:
             return
-        """Anchor to top-right of the given viewport size and stretch to full height."""
-        width = widget.expand_button.width() + (
-            cls.get_expanded_width() if cls.is_expanded() else 0
-        )
+        h = max(0, viewport_height - 2 * margin)
+        width = widget.expand_button.width()
+        if cls.is_expanded():
+            width += widget.layout().spacing() + cls.get_required_width(h)
+        width = min(width, max(0, viewport_width))
         x = max(0, viewport_width - width)
         y = margin
-        h = max(0, viewport_height - 2 * margin)
         widget.setGeometry(x, y, width, h)
         widget.raise_()
