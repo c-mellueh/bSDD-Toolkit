@@ -30,3 +30,7 @@ def create_widget():
 def widget_created(widget: ui.SettingsWidget):
     core.register_widget(widget, gv_tool.Settings, gv_tool.SceneView)
     core.connect_widget(widget, gv_tool.Settings)
+
+
+def content_layout_changed():
+    core.reposition_widget(gv_tool.Settings, gv_tool.SceneView)

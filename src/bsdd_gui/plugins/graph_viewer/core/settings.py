@@ -7,6 +7,16 @@ if TYPE_CHECKING:
     from bsdd_gui.plugins.graph_viewer.module.settings import ui
 
 
+def reposition_widget(
+    settings: Type[gv_tool.Settings], scene_view: Type[gv_tool.SceneView], margin: int = 6
+) -> None:
+    view = scene_view.get_view()
+    if view is None or settings.get_widget() is None:
+        return
+    viewport = view.viewport()
+    settings.position_and_resize(viewport.width(), viewport.height(), margin)
+
+
 def connect_signals(
     settings: Type[gv_tool.Settings],
     window: Type[gv_tool.Window],
@@ -15,9 +25,7 @@ def connect_signals(
     settings.connect_internal_signals()
 
     def reposition(*_, **__):
-        viewport = scene_view.get_view().viewport()
-        margin = 6
-        settings.position_and_resize(viewport.width(), viewport.height(), margin)
+        reposition_widget(settings, scene_view)
 
     window.signals.widget_created.connect(
         lambda w: settings.create_widget(scene_view.get_view().viewport())
