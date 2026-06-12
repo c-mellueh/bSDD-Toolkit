@@ -21,6 +21,10 @@ def system_scheme_changed(*args):
     core.system_scheme_changed(tool.Theme, tool.MainWindowWidget)
 
 
+def view_zoom_scrolled(steps: int):
+    core.change_view_zoom(steps, tool.Theme, tool.Appdata, tool.MainWindowWidget)
+
+
 def on_new_project():
     pass
 

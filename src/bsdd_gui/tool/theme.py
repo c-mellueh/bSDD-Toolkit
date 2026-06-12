@@ -27,6 +27,10 @@ ICON_TOKENS = {
 
 MODES = ("system", "light", "dark")
 
+VIEW_ZOOM_MIN = 50
+VIEW_ZOOM_MAX = 300
+VIEW_ZOOM_STEP = 10
+
 
 class Theme:
     @classmethod
@@ -135,8 +139,51 @@ class Theme:
         tokens.update(cls.build_icon_tokens(tokens))
         app.setStyle("Fusion")
         app.setPalette(cls.build_palette(tokens))
-        app.setStyleSheet(cls.build_stylesheet(tokens))
+        cls.get_properties().base_qss = cls.build_stylesheet(tokens)
+        cls._apply_stylesheet(app)
         cls._set_icon_defaults(tokens)
+
+    @classmethod
+    def get_view_zoom(cls) -> int:
+        return cls.get_properties().view_zoom
+
+    @classmethod
+    def set_view_zoom(cls, zoom: int) -> None:
+        zoom = max(VIEW_ZOOM_MIN, min(VIEW_ZOOM_MAX, int(zoom)))
+        cls.get_properties().view_zoom = zoom
+
+    @classmethod
+    def build_view_zoom_rule(cls, app: QApplication, zoom: int) -> str:
+        if zoom == 100:
+            return ""
+        props = cls.get_properties()
+        if props.base_font_size <= 0:
+            size = app.font().pointSizeF()
+            props.base_font_size = size if size > 0 else 9.0
+        font_size = round(props.base_font_size * zoom / 100, 1)
+        return (
+            "\nQTreeView, QTableView, QListView, QHeaderView::section "
+            f"{{ font-size: {font_size}pt; }}\n"
+        )
+
+    @classmethod
+    def apply_view_zoom(cls, app: QApplication) -> None:
+        cls._apply_stylesheet(app)
+
+    @classmethod
+    def _apply_stylesheet(cls, app: QApplication) -> None:
+        base_qss = cls.get_properties().base_qss
+        app.setStyleSheet(base_qss + cls.build_view_zoom_rule(app, cls.get_view_zoom()))
+
+    @classmethod
+    def install_view_zoom_filter(cls, app: QApplication) -> None:
+        from bsdd_gui.module.theme import ui
+
+        props = cls.get_properties()
+        if props.zoom_filter is not None:
+            return
+        props.zoom_filter = ui.ViewZoomFilter(app)
+        app.installEventFilter(props.zoom_filter)
 
     @classmethod
     def _set_icon_defaults(cls, tokens: dict[str, str]) -> None:

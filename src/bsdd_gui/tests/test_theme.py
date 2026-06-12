@@ -18,8 +18,10 @@ from bsdd_gui.tool import Theme
 @pytest.fixture(autouse=True)
 def _restore_mode():
     old_mode = Theme.get_mode()
+    old_zoom = Theme.get_view_zoom()
     yield
     Theme.set_mode(old_mode)
+    Theme.set_view_zoom(old_zoom)
 
 
 @pytest.fixture()
@@ -88,3 +90,99 @@ class TestApplyTheme:
             assert list(icon_cache.glob("*.svg"))
         finally:
             qapp.setStyleSheet(old_sheet)
+
+
+class TestViewZoom:
+    def test_zoom_is_clamped(self):
+        from bsdd_gui.tool.theme import VIEW_ZOOM_MAX, VIEW_ZOOM_MIN
+
+        Theme.set_view_zoom(10)
+        assert Theme.get_view_zoom() == VIEW_ZOOM_MIN
+        Theme.set_view_zoom(9999)
+        assert Theme.get_view_zoom() == VIEW_ZOOM_MAX
+
+    def test_default_zoom_adds_no_rule(self, qapp):
+        assert Theme.build_view_zoom_rule(qapp, 100) == ""
+
+    def test_zoom_rule_scales_view_fonts(self, qapp):
+        rule = Theme.build_view_zoom_rule(qapp, 150)
+        assert "QTreeView" in rule and "QTableView" in rule
+        assert "font-size" in rule
+
+    def test_apply_view_zoom_appends_rule(self, qapp, icon_cache):
+        old_sheet = qapp.styleSheet()
+        try:
+            Theme.apply_theme(qapp, "light")
+            Theme.set_view_zoom(150)
+            Theme.apply_view_zoom(qapp)
+            assert "font-size" in qapp.styleSheet()
+            Theme.set_view_zoom(100)
+            Theme.apply_view_zoom(qapp)
+            assert qapp.styleSheet() == Theme.get_properties().base_qss
+        finally:
+            qapp.setStyleSheet(old_sheet)
+
+
+class TestViewZoomFilter:
+    @pytest.fixture()
+    def tree(self, qapp):
+        from PySide6.QtWidgets import QTreeWidget
+
+        tree = QTreeWidget()
+        yield tree
+        tree.deleteLater()
+
+    @staticmethod
+    def _wheel_event(delta_y: int, modifiers):
+        from PySide6.QtCore import QPoint, QPointF, Qt
+        from PySide6.QtGui import QWheelEvent
+
+        return QWheelEvent(
+            QPointF(5, 5),
+            QPointF(5, 5),
+            QPoint(0, 0),
+            QPoint(0, delta_y),
+            Qt.MouseButton.NoButton,
+            modifiers,
+            Qt.ScrollPhase.NoScrollPhase,
+            False,
+        )
+
+    def test_ctrl_wheel_over_view_triggers_zoom(self, tree, monkeypatch):
+        from PySide6.QtCore import Qt
+
+        from bsdd_gui.module.theme import trigger, ui
+
+        steps = []
+        monkeypatch.setattr(trigger, "view_zoom_scrolled", steps.append)
+        event_filter = ui.ViewZoomFilter()
+        event = self._wheel_event(120, Qt.KeyboardModifier.ControlModifier)
+        assert event_filter.eventFilter(tree.viewport(), event) is True
+        assert steps == [1]
+
+    def test_wheel_without_ctrl_is_ignored(self, tree, monkeypatch):
+        from PySide6.QtCore import Qt
+
+        from bsdd_gui.module.theme import trigger, ui
+
+        steps = []
+        monkeypatch.setattr(trigger, "view_zoom_scrolled", steps.append)
+        event_filter = ui.ViewZoomFilter()
+        event = self._wheel_event(120, Qt.KeyboardModifier.NoModifier)
+        assert event_filter.eventFilter(tree.viewport(), event) is False
+        assert steps == []
+
+    def test_ctrl_wheel_outside_views_is_ignored(self, qapp, monkeypatch):
+        from PySide6.QtCore import Qt
+        from PySide6.QtWidgets import QLineEdit
+
+        from bsdd_gui.module.theme import trigger, ui
+
+        steps = []
+        monkeypatch.setattr(trigger, "view_zoom_scrolled", steps.append)
+        line_edit = QLineEdit()
+        event_filter = ui.ViewZoomFilter()
+        event = self._wheel_event(120, Qt.KeyboardModifier.ControlModifier)
+        assert event_filter.eventFilter(line_edit, event) is False
+        assert steps == []
+        line_edit.deleteLater()
