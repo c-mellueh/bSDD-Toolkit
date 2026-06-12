@@ -38,8 +38,10 @@ def retranslate_ui(
     group_of_properties: Type[tool.GroupOfProperties], main_window: Type[tool.MainWindowWidget]
 ):
     action = group_of_properties.get_action(main_window.get(), "open_window")
-    action.setText(QCoreApplication.translate("GroupsOfProperties", "Groups of Properties"))
-
+    name = QCoreApplication.translate("GroupsOfProperties", "Groups of Properties")
+    action.setText(name)
+    for widget in group_of_properties.get_widgets():
+        widget.setWindowTitle(name)
 
 def connect_signals(
     widget_tool: Type[tool.GroupOfProperties],
