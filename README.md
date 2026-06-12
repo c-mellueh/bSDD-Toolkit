@@ -86,6 +86,10 @@ open_path           Optional path to a bSDD JSON file
 ### Graph View
 ![Graph View](docs/images/graph_view.png)
 
+### LOIN / IDS Exporter
+![Graph View](docs/images/loin-exporter.png)
+
+
 ## Use the Data Model (Python)
 
 Load, inspect, and write bSDD JSON using the Pydantic models:
