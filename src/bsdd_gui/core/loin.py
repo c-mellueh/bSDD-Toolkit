@@ -29,7 +29,7 @@ def retranslate_ui(loin: Type[tool.Loin]):
 
 def register_widget(widget: ui.Widget, loin: Type[tool.Loin], project: type[tool.Project]):
     loin.register_widget(widget)
-    model: models.ClassTreeModel = widget.tv_classes.model()
+    model: models.ClassTreeModel = widget.tv_classes.model().sourceModel()
     model.beginResetModel()
     model.bsdd_data = project.get()
     model.endResetModel()
@@ -52,9 +52,9 @@ def connect_widget(
 
 def register_class_view(view: model_views.ClassView, class_view: type[tool.PPClassView]):
     class_view.register_view(view)
-    from bsdd_gui.module.loin.uc_ms import ClassModel
+    from bsdd_gui.module.loin.uc_ms import ClassModel, ClassSortModel
 
-    view.setModel(ClassModel())
+    view.setModel(ClassSortModel(ClassModel()))
 
 
 def register_property_view(
@@ -67,9 +67,9 @@ def register_property_view(
 
 
 def register_pset_view(view: model_views.PsetView):
-    from bsdd_gui.module.loin.uc_ms import PsetModel
+    from bsdd_gui.module.loin.uc_ms import PsetModel, PsetSortModel
 
-    view.setModel(PsetModel())
+    view.setModel(PsetSortModel(PsetModel()))
 
 
 def connect_class_view(tree_view: model_views.ClassView, class_view: type[tool.PPClassView]):

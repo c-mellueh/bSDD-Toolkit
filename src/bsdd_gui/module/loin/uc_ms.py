@@ -22,6 +22,7 @@ from PySide6.QtCore import (
     QEvent,
     QModelIndex,
     QRect,
+    QSortFilterProxyModel,
     Qt,
 )
 from PySide6.QtGui import QFont, QPainter
@@ -555,8 +556,8 @@ class PropertyModel(QAbstractItemModel):
         if self._bsdd_data is None:
             return []
         if self._pset_names_cache is None:
-            self._pset_names_cache = (
-                tool.PropertySetTableView.get_pset_names_with_temporary(self._bsdd_data)
+            self._pset_names_cache = tool.PropertySetTableView.get_pset_names_with_temporary(
+                self._bsdd_data
             )
         return self._pset_names_cache
 
@@ -972,6 +973,52 @@ class PsetModel(QAbstractItemModel):
         return Qt.CheckState.Unchecked
 
 
+class _UcMsSortModel(QSortFilterProxyModel):
+    """Sort proxy for UC/MS models; delegates view registration to the source.
+
+    Name/code columns sort by text, UC×MS columns by check state.
+    """
+
+    def __init__(self, source, parent=None):
+        super().__init__(parent)
+        self.setSourceModel(source)
+        self.setSortCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+
+    @property
+    def _prefix_cols(self) -> int:
+        return self.sourceModel()._prefix_cols
+
+    def register_view(self, view: QTreeView) -> None:
+        self.sourceModel().register_view(view)
+
+    def _check_rank(self, index: QModelIndex) -> float:
+        state = self.sourceModel().data(index, Qt.ItemDataRole.CheckStateRole)
+        if state is None:
+            return 0.0
+        return {
+            Qt.CheckState.Unchecked: 0.0,
+            Qt.CheckState.PartiallyChecked: 0.5,
+            Qt.CheckState.Checked: 1.0,
+        }.get(Qt.CheckState(state), 0.0)
+
+    def lessThan(self, left: QModelIndex, right: QModelIndex) -> bool:
+        if left.column() >= self._prefix_cols:
+            return self._check_rank(left) < self._check_rank(right)
+        lv = str(self.sourceModel().data(left) or "").lower()
+        rv = str(self.sourceModel().data(right) or "").lower()
+        return lv < rv
+
+
+class PsetSortModel(_UcMsSortModel):
+    def sourceModel(self) -> PsetModel:
+        return super().sourceModel()
+
+
+class ClassSortModel(_UcMsSortModel):
+    def sourceModel(self) -> ClassModel:
+        return super().sourceModel()
+
+
 # ---------------------------------------------------------------------------
 # Two-row header
 # ---------------------------------------------------------------------------
@@ -1169,6 +1216,9 @@ class TwoRowHeaderView(QHeaderView):
                     )
                     or ""
                 )
+            if self.isSortIndicatorShown() and self.sortIndicatorSection() == col:
+                arrow = "▲" if self.sortIndicatorOrder() == Qt.SortOrder.AscendingOrder else "▼"
+                label = f"{label} {arrow}"
             self._draw_cell(painter, x, 0, w, total_h, str(label), bold)
             x += w
 
@@ -1341,9 +1391,7 @@ class FilterTableWindow(QWidget):
                     | Qt.ItemFlag.ItemIsSelectable
                 )
                 has_spec = (purpose.guid, milestone.guid) in existing_specs
-                item.setCheckState(
-                    Qt.CheckState.Checked if has_spec else Qt.CheckState.Unchecked
-                )
+                item.setCheckState(Qt.CheckState.Checked if has_spec else Qt.CheckState.Unchecked)
                 table.setItem(ui_idx, mi, item)
 
         table.resizeColumnsToContents()
