@@ -973,16 +973,20 @@ class PsetModel(QAbstractItemModel):
         return Qt.CheckState.Unchecked
 
 
-class PsetSortModel(QSortFilterProxyModel):
-    """Sort proxy for :class:`PsetModel`; delegates view registration to the source."""
+class _UcMsSortModel(QSortFilterProxyModel):
+    """Sort proxy for UC/MS models; delegates view registration to the source.
 
-    def __init__(self, source: PsetModel, parent=None):
+    Name/code columns sort by text, UC×MS columns by check state.
+    """
+
+    def __init__(self, source, parent=None):
         super().__init__(parent)
         self.setSourceModel(source)
         self.setSortCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
 
-    def sourceModel(self) -> PsetModel:
-        return super().sourceModel()
+    @property
+    def _prefix_cols(self) -> int:
+        return self.sourceModel()._prefix_cols
 
     def register_view(self, view: QTreeView) -> None:
         self.sourceModel().register_view(view)
@@ -998,11 +1002,21 @@ class PsetSortModel(QSortFilterProxyModel):
         }.get(Qt.CheckState(state), 0.0)
 
     def lessThan(self, left: QModelIndex, right: QModelIndex) -> bool:
-        if left.column() >= self.sourceModel()._prefix_cols:
+        if left.column() >= self._prefix_cols:
             return self._check_rank(left) < self._check_rank(right)
         lv = str(self.sourceModel().data(left) or "").lower()
         rv = str(self.sourceModel().data(right) or "").lower()
         return lv < rv
+
+
+class PsetSortModel(_UcMsSortModel):
+    def sourceModel(self) -> PsetModel:
+        return super().sourceModel()
+
+
+class ClassSortModel(_UcMsSortModel):
+    def sourceModel(self) -> ClassModel:
+        return super().sourceModel()
 
 
 # ---------------------------------------------------------------------------

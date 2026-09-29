@@ -66,15 +66,21 @@ class ClassView(_UcMsViewMixin):
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(False)
         self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.setSortingEnabled(True)
+        self.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.customContextMenuRequested.connect(self._show_context_menu)
         trigger.class_view_created(self)
+
+    def _source_node(self, index):
+        """Return the BsddClass behind a (proxy) index."""
+        return self.model().mapToSource(index).internalPointer()
 
     def keyPressEvent(self, event) -> None:
         if event.key() == Qt.Key.Key_Delete:
             nodes = [
-                idx.internalPointer()
+                self._source_node(idx)
                 for idx in self.selectedIndexes()
-                if idx.column() == 0 and idx.internalPointer() is not None
+                if idx.column() == 0 and self._source_node(idx) is not None
             ]
             for node in nodes:
                 trigger.class_removed(node)
@@ -85,15 +91,15 @@ class ClassView(_UcMsViewMixin):
         index = self.indexAt(pos)
         if not index.isValid():
             return
-        node = index.internalPointer()
+        node = self._source_node(index)
         if node is None:
             return
 
         # Collect every selected class (column 0 only, deduplicated).
         selected_nodes = [
-            idx.internalPointer()
+            self._source_node(idx)
             for idx in self.selectedIndexes()
-            if idx.column() == 0 and idx.internalPointer() is not None
+            if idx.column() == 0 and self._source_node(idx) is not None
         ]
         # Always include the right-clicked node even if it wasn't in the selection.
         if node not in selected_nodes:

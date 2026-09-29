@@ -1336,7 +1336,7 @@ class PPClassView(ItemViewTool):
     def on_current_changed(cls, view, curr, prev):
         if not curr.isValid():
             return
-        index = curr
+        index = view.model().mapToSource(curr)
         cls.signals.selection_changed.emit(view, index.internalPointer())
 
 
