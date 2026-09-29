@@ -209,4 +209,6 @@ class PsetView(_UcMsViewMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.setSortingEnabled(True)
+        self.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         trigger.pset_view_created(self)

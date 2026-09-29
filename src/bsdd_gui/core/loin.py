@@ -67,9 +67,9 @@ def register_property_view(
 
 
 def register_pset_view(view: model_views.PsetView):
-    from bsdd_gui.module.loin.uc_ms import PsetModel
+    from bsdd_gui.module.loin.uc_ms import PsetModel, PsetSortModel
 
-    view.setModel(PsetModel())
+    view.setModel(PsetSortModel(PsetModel()))
 
 
 def connect_class_view(tree_view: model_views.ClassView, class_view: type[tool.PPClassView]):
