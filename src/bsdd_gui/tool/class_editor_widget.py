@@ -1,12 +1,15 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
-from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QWidget
-import bsdd_gui
-from bsdd_gui.presets.tool_presets import DialogSignals, DialogTool
+
 from bsdd_json import BsddClass, BsddDictionary
 from bsdd_json.utils import dictionary_utils as dict_utils
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import QWidget
+
+import bsdd_gui
 from bsdd_gui.module.class_editor_widget import trigger, ui
+from bsdd_gui.presets.tool_presets import DialogSignals, DialogTool
 
 if TYPE_CHECKING:
     from bsdd_gui.module.class_editor_widget.prop import ClassEditorWidgetProperties
@@ -25,8 +28,9 @@ class Signals(DialogSignals):
     )  # the class is not added to the Dictionary So far, this gets handled by ClassTree
     related_ifc_removed = Signal(BsddClass, str)  # class, ifc code
     related_ifc_added = Signal(BsddClass, str)  # class, ifc code
-    code_changed = Signal(BsddClass,str) # class, old_code
-    name_changed = Signal(BsddClass,str) # class, old_name
+    code_changed = Signal(BsddClass, str)  # class, old_code
+    name_changed = Signal(BsddClass, str)  # class, old_name
+
 
 class ClassEditorWidget(DialogTool):
     signals = Signals()
@@ -135,9 +139,9 @@ class ClassEditorWidget(DialogTool):
             cls.signals.related_ifc_removed.emit(element, ifc_code)
 
         if old_code != new_code:
-            cls.signals.code_changed.emit(element,old_code)
+            cls.signals.code_changed.emit(element, old_code)
         if old_name != new_name:
-            cls.signals.name_changed.emit(element,old_name)
+            cls.signals.name_changed.emit(element, old_name)
 
     @classmethod
     def apply_allowed_class_types(cls, allowed_class_types: str, widget: ui.ClassEditor):
@@ -154,16 +158,22 @@ class ClassEditorWidget(DialogTool):
         widget.cb_class_type.setCurrentText(class_type)
 
     @classmethod
-    def update_class_relations(cls,old_uri:str,new_uri:str,bsdd_dictionary:BsddDictionary):
+    def update_class_relations(cls, old_uri: str, new_uri: str, bsdd_dictionary: BsddDictionary):
         for cl in bsdd_dictionary.Classes:
             for relationship in cl.ClassRelations:
                 if relationship.RelatedClassUri == old_uri:
                     relationship.RelatedClassUri = new_uri
-    
+
     @classmethod
-    def update_pset_reference(cls,pset_uri:str,old_pset_name,new_pset_name:str,bsdd_dictionary:BsddDictionary):
+    def update_pset_reference(
+        cls, pset_uri: str, old_pset_name, new_pset_name: str, bsdd_dictionary: BsddDictionary
+    ):
         for bsdd_class in bsdd_dictionary.Classes:
-            if pset_uri not in [cr.RelatedClassUri for cr in bsdd_class.ClassRelations if cr.RelationType == "HasReference"]:
+            if pset_uri not in [
+                cr.RelatedClassUri
+                for cr in bsdd_class.ClassRelations
+                if cr.RelationType == "HasReference"
+            ]:
                 continue
             for class_property in bsdd_class.ClassProperties:
                 if class_property.PropertySet == old_pset_name:

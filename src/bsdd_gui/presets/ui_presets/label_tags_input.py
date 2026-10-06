@@ -299,14 +299,15 @@ class TagInput(QWidget):
         return list(self._tags)
 
     def setTags(self, tags: list[str]) -> None:
+        new_tags = list(tags) #tags needs to be copied else this function will remove the tags of the class
         for t in list(self._tags):
-            if t not in tags:
+            if t not in new_tags:
                 self._remove_tag(t, emit_signal=False)
             else:
-                tags.remove(t)
-        for t in tags:
+                new_tags.remove(t)
+        for t in new_tags:
             self._add_tag(str(t), emit_signal=False)
-        if tags:
+        if new_tags:
             self.tagsChanged.emit(self.tags())
 
     def clear(self) -> None:
