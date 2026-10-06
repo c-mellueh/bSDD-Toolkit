@@ -278,16 +278,17 @@ class Excel(ActionTool, FieldTool):
         sheet.cell(1, 3, "Definition")
         row = 2
         for row, bsdd_class in enumerate(classes, start=2):
-            sheet.cell(row, 1, bsdd_class.Code)
-            sheet.cell(row, 2, bsdd_class.Name)
-            sheet.cell(row, 3, bsdd_class.Definition)
+            sheet.cell(row, 1, bsdd_class.Code.strip())
+            sheet.cell(row, 2, bsdd_class.Name.strip())
+            definition = bsdd_class.Definition or ""
+            sheet.cell(row, 3, definition)
         cls.create_table((1, row), (1, 3), sheet, sheet.title)
 
     @classmethod
     def create_build_thread(
         cls,
         bsdd_dict: BsddDictionary,
-        checked_classes: dict[str, bool],
+        checked_classes: list[BsddClass],
         checked_properties: PsetDict,
         out_path: str,
     ):
@@ -300,7 +301,9 @@ class Excel(ActionTool, FieldTool):
 
             def run(self):
                 try:
-                    bsdd_classes = [c for c in checked_classes if c.ClassType == "Class"]
+                    bsdd_classes = [
+                        c for c in checked_classes if c.ClassType != "GroupOfProperties"
+                    ]
                     root_classes = [c for c in bsdd_classes if not c.ParentClassCode]
                     workbook = openpyxl.Workbook()
                     overview_sheet = workbook.active
