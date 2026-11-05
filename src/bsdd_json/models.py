@@ -46,8 +46,13 @@ def _prune_error_path(data, loc):
                 return
             target = target[key]
         else:
-            if not isinstance(target, dict) or key not in target:
+            if not isinstance(target, dict):
                 return
+            if key not in target:
+                # error locations use the alias (lowerCamel), raw data may use PascalCase
+                key = next((k for k in target if isinstance(k, str) and k.lower() == str(key).lower()), None)
+                if key is None:
+                    return
             if is_last:
                 target.pop(key, None)
                 return
@@ -90,6 +95,11 @@ class BsddDictionary(CaseInsensitiveModel):
             return None
         with path.open(encoding="utf-8") as f:
             raw = json.load(f)
+        return cls.from_data(raw, sloppy=sloppy)
+
+    @classmethod
+    def from_data(cls, raw: dict, *, sloppy: bool = False) -> BsddDictionary:
+        """Validate raw JSON data. With ``sloppy=True`` invalid parts are dropped until it validates."""
         if not sloppy:
             return cls.model_validate(raw)
 
@@ -103,6 +113,9 @@ class BsddDictionary(CaseInsensitiveModel):
                 progress = False
                 for error in errors:
                     loc = tuple(error.get("loc", ()))
+                    if error.get("type") == "missing":
+                        # a required field is missing: drop the whole containing element
+                        loc = loc[:-1]
                     if not loc or loc in seen:
                         continue
                     seen.add(loc)
@@ -116,7 +129,7 @@ class BsddDictionary(CaseInsensitiveModel):
                         raise
 
     def save(self, path):
-        with Path(path).open("w") as file:
+        with Path(path).open("w", encoding="utf-8") as file:
             json.dump(self.model_dump(mode="json", exclude_none=True), file)
 
     # add Parent to children after loading

@@ -1,0 +1,2917 @@
+[
+    {
+        "Title": "CR 12793:1997",
+        "Name": "Measurement of the carbonation depth of hardened concrete",
+        "Date": "1997-03-19T00:00:00"
+    },
+    {
+        "Title": "CR 13933:2000",
+        "Name": "Masonry cement - Testing for workability (cohesivity)",
+        "Date": "2000-07-19T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 15697:2008",
+        "Name": "Cement - Performance testing for sulfate resistance - State of the art report",
+        "Date": "2008-04-23T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 15678:2008",
+        "Name": "Concrete - Release of regulated dangerous substances into soil, groundwater and surface water - Test method for new or unapproved constituents of concrete and for production concretes",
+        "Date": "2008-04-23T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16142:2011",
+        "Name": "Concrete - A study of the characteristic leaching behaviour of hardened concrete for use in the natural environment",
+        "Date": "2011-03-09T00:00:00"
+    },
+    {
+        "Title": "EN 13639:2017",
+        "Name": "Determination of total organic carbon in limestone",
+        "Date": "2017-09-27T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16632:2014",
+        "Name": "Isothermal Conduction Calorimetry (ICC) for the determination of heat of hydration of cement: State of Art Report and Recommendations",
+        "Date": "2014-06-18T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16912:2016",
+        "Name": "Guidelines for a procedure to support the European standardization of cements",
+        "Date": "2016-05-25T00:00:00"
+    },
+    {
+        "Title": "EN 413-2:2016",
+        "Name": "Masonry cement - Part 2: Test methods",
+        "Date": "2016-10-12T00:00:00"
+    },
+    {
+        "Title": "EN 196-3:2016",
+        "Name": "Methods of testing cement - Part 3: Determination of setting times and soundness",
+        "Date": "2016-11-23T00:00:00"
+    },
+    {
+        "Title": "EN 197-2:2020",
+        "Name": "Cement - Part 2: Assessment and verification of constancy of performance",
+        "Date": "2020-03-11T00:00:00"
+    },
+    {
+        "Title": "EN 196-10:2016",
+        "Name": "Methods of testing cement - Part 10: Determination of the water-soluble chromium (VI) content of cement ",
+        "Date": "2016-05-18T00:00:00"
+    },
+    {
+        "Title": "EN 13282-3:2015",
+        "Name": "Hydraulic road binders - Part 3: Conformity evaluation",
+        "Date": "2015-04-01T00:00:00"
+    },
+    {
+        "Title": "EN 459-3:2015",
+        "Name": "Building lime - Part 3: Conformity evaluation",
+        "Date": "2015-04-29T00:00:00"
+    },
+    {
+        "Title": "EN 13282-2:2015",
+        "Name": "Hydraulic road binders - Part 2: Normal hardening hydraulic road binders - Composition, specifications and conformity criteria ",
+        "Date": "2015-04-29T00:00:00"
+    },
+    {
+        "Title": "EN 459-1:2015",
+        "Name": "Building lime - Part 1: Definitions, specifications and conformity criteria",
+        "Date": "2015-04-29T00:00:00"
+    },
+    {
+        "Title": "EN 196-1:2016",
+        "Name": "Methods of testing cement - Part 1: Determination of strength",
+        "Date": "2016-04-27T00:00:00"
+    },
+    {
+        "Title": "EN 197-1:2011",
+        "Name": "Cement - Part 1: Composition, specifications and conformity criteria for common cements",
+        "Date": "2011-09-14T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 12390-9:2016",
+        "Name": "Testing hardened concrete - Part 9: Freeze-thaw resistance with de-icing salts - Scaling",
+        "Date": "2016-12-07T00:00:00"
+    },
+    {
+        "Title": "EN 196-9:2010",
+        "Name": "Methods of testing cement - Part 9: Heat of hydration - Semi-adiabatic method",
+        "Date": "2010-03-24T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 15177:2006",
+        "Name": "Testing the freeze-thaw resistance of concrete - Internal structural damage",
+        "Date": "2006-04-12T00:00:00"
+    },
+    {
+        "Title": "EN 15368:2008\u002BA1:2010",
+        "Name": "Hydraulic binder for non-structural applications - Definition, specifications and conformity criteria",
+        "Date": "2010-06-16T00:00:00"
+    },
+    {
+        "Title": "EN 196-6:2018",
+        "Name": "Methods of testing cement - Part 6: Determination of fineness",
+        "Date": "2018-12-19T00:00:00"
+    },
+    {
+        "Title": "EN 196-8:2010",
+        "Name": "Methods of testing cement - Part 8: Heat of hydration - Solution method",
+        "Date": "2010-03-24T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 17365:2019",
+        "Name": "Method for the determination of C3A in the clinker from cement analysis",
+        "Date": "2019-05-22T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 14245:2020",
+        "Name": "Cement - Guidelines for the application of EN 197-2: Assessment and verification of constancy of performance",
+        "Date": "2020-03-11T00:00:00"
+    },
+    {
+        "Title": "EN 13282-1:2013",
+        "Name": "Hydraulic road binders - Part 1: Rapid hardening hydraulic road binders - Composition, specifications and conformity criteria",
+        "Date": "2013-03-06T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 196-4:2007",
+        "Name": "Methods of testing cement - Part 4: Quantitative determination of constituents",
+        "Date": "2007-09-19T00:00:00"
+    },
+    {
+        "Title": "EN 196-5:2011",
+        "Name": "Methods of testing cement - Part 5: Pozzolanicity test for pozzolanic cement",
+        "Date": "2011-03-23T00:00:00"
+    },
+    {
+        "Title": "EN 14216:2015",
+        "Name": "Cement - Composition, specifications and conformity criteria for very low heat special cements",
+        "Date": "2015-07-15T00:00:00"
+    },
+    {
+        "Title": "EN 16908:2017",
+        "Name": "Cement and building lime - Environmental product declarations - Product category rules complementary to EN 15804",
+        "Date": "2017-02-01T00:00:00"
+    },
+    {
+        "Title": "EN 14647:2005/AC:2006",
+        "Name": "Calcium aluminate cement - Composition, specifications and conformity criteria",
+        "Date": "2006-11-29T00:00:00"
+    },
+    {
+        "Title": "EN 196-11:2018",
+        "Name": "Methods of testing cement - Part 11: Heat of hydration - Isothermal Conduction Calorimetry method",
+        "Date": "2018-12-19T00:00:00"
+    },
+    {
+        "Title": "EN 459-2:2010",
+        "Name": "Building lime - Part 2: Test methods",
+        "Date": "2010-09-08T00:00:00"
+    },
+    {
+        "Title": "EN 15743:2010\u002BA1:2015",
+        "Name": "Supersulfated cement - Composition, specifications and conformity criteria",
+        "Date": "2015-04-08T00:00:00"
+    },
+    {
+        "Title": "EN 196-7:2007",
+        "Name": "Methods of testing cement - Part 7: Methods of taking and preparing samples of cement",
+        "Date": "2007-12-05T00:00:00"
+    },
+    {
+        "Title": "EN 14647:2005",
+        "Name": "Calcium aluminate cement - Composition, specifications and conformity criteria",
+        "Date": "2005-10-19T00:00:00"
+    },
+    {
+        "Title": "EN 413-1:2011",
+        "Name": "Masonry cement - Part 1: Composition, specifications and conformity criteria",
+        "Date": "2011-04-20T00:00:00"
+    },
+    {
+        "Title": "EN 196-2:2013",
+        "Name": "Method of testing cement - Part 2: Chemical analysis of cement",
+        "Date": "2013-06-12T00:00:00"
+    },
+    {
+        "Title": "EN ISO 18233:2006",
+        "Name": "Acoustics - Application of new measurement methods in building and room acoustics (ISO 18233:2006)",
+        "Date": "2006-06-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10140-2:2010",
+        "Name": "Acoustics - Laboratory measurement of sound insulation of building elements - Part 2: Measurement of airborne sound insulation (ISO 10140-2:2010)",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3382-2:2008",
+        "Name": "Acoustics - Measurement of room acoustic parameters - Part 2: Reverberation time in ordinary rooms (ISO 3382-2:2008)",
+        "Date": "2008-06-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10140-3:2010",
+        "Name": "Acoustics - Laboratory measurement of sound insulation of building elements - Part 3: Measurement of impact sound insulation (ISO 10140-3:2010)",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10140-5:2010",
+        "Name": "Acoustics - Laboratory measurement of sound insulation of building elements - Part 5: Requirements for test facilities and equipment (ISO 10140-5:2010)",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3822-1:1999/A1:2008",
+        "Name": "Acoustics - Laboratory tests on noise emission from appliances and equipment used in water supply installations - Part 1: Method of measurement - Amendment 1: Measurement uncertainty (ISO 3822-1:1999/Amd 1:2008)",
+        "Date": "2008-12-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3822-2:1995",
+        "Name": "Acoustics - Laboratory tests on noise emission from appliances and equipment used in water supply installations - Part 2: Mounting and operating conditions for draw-off taps and mixing valves (ISO 3822-2:1995)",
+        "Date": "1995-03-28T00:00:00"
+    },
+    {
+        "Title": "EN 29052-1:1992",
+        "Name": "Acoustics - Determination of dynamic stiffness - Part 1: Materials used under floating floors in dwellings",
+        "Date": "1992-06-30T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10534-1:2001",
+        "Name": "Acoustics - Determination of sound absorption coefficient and impedance in impedances tubes - Part 1: Method using standing wave ratio (ISO 10534-1:1996)",
+        "Date": "2001-06-20T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10534-2:2001",
+        "Name": "Acoustics - Determination of sound absorption coefficient and impedance in impedances tubes - Part 2: Transfer-function method (ISO 10534-2:1998)",
+        "Date": "2001-06-20T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3822-1:1999",
+        "Name": "Acoustics - Laboratory tests on noise emission from appliances and equipment used in water supply installations - Part 1: Method of measurement (ISO 3822-1:1999)",
+        "Date": "1999-05-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 11654:1997",
+        "Name": "Acoustics - Sound absorbers for use in buildings - Rating of sound absorption (ISO 11654:1997)",
+        "Date": "1997-04-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12354-1:2017",
+        "Name": "Building acoustics - Estimation of acoustic performance of buildings from the performance of elements - Part 1: Airborne sound insulation between rooms (ISO 12354-1:2017)",
+        "Date": "2017-08-16T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12354-2:2017",
+        "Name": "Building acoustics - Estimation of acoustic performance of buildings from the performance of elements - Part 2: Impact sound insulation between rooms (ISO 12354-2:2017)",
+        "Date": "2017-08-16T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12354-3:2017",
+        "Name": "Building acoustics - Estimation of acoustic performance of buildings from the performance of elements - Part 3: Airborne sound insulation against outdoor sound (ISO 12354-3:2017)",
+        "Date": "2017-08-16T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12354-4:2017",
+        "Name": "Building acoustics - Estimation of acoustic performance of buildings from the performance of elements - Part 4: Transmission of indoor sound to the outside (ISO 12354-4:2017)",
+        "Date": "2017-08-16T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3382-1:2009",
+        "Name": "Acoustics - Measurement of room acoustic parameters - Part 1: Performance spaces (ISO 3382-1:2009)",
+        "Date": "2009-06-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16032:2004",
+        "Name": "Acoustics - Measurement of sound pressure level from service equipment in buildings - Engineering method (ISO 16032:2004)",
+        "Date": "2004-09-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3382-3:2012",
+        "Name": "Acoustics - Measurement of room acoustic parameters - Part 3: Open plan offices (ISO 3382-3:2012)",
+        "Date": "2012-02-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 717-1:2013",
+        "Name": "Acoustics - Rating of sound insulation in buildings and of building elements - Part 1: Airborne sound insulation (ISO 717-1:2013)",
+        "Date": "2013-03-06T00:00:00"
+    },
+    {
+        "Title": "EN ISO 717-2:2013",
+        "Name": "Acoustics - Rating of sound insulation in buildings and of building elements - Part 2: Impact sound insulation (ISO 717-2:2013)",
+        "Date": "2013-03-06T00:00:00"
+    },
+    {
+        "Title": "EN ISO 15186-2:2010",
+        "Name": "Acoustics - Measurement of sound insulation in buildings and of building elements using sound intensity - Part 2: Field measurements (ISO 15186-2:2003)",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 15186-3:2010",
+        "Name": "Acoustics - Measurement of sound insulation in buildings and of building elements using sound intensity - Part 3: Laboratory measurements at low frequencies (ISO 15186-3:2002)",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3382-2:2008/AC:2009",
+        "Name": "Acoustics - Measurement of room acoustic parameters - Part 2: Reverberation time in ordinary rooms (ISO 3382-2:2008/Cor 1:2009)",
+        "Date": "2009-05-27T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10052:2004/A1:2010",
+        "Name": "Acoustics - Field measurements of airborne and impact sound insulation and of service equipment sound - Survey method - Amendment 1 (ISO 10052:2004/Amd 1:2010)",
+        "Date": "2010-05-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12999-1:2014",
+        "Name": "Acoustics - Determination and application of measurement uncertainties in building acoustics - Part 1: Sound insulation (ISO 12999-1:2014)",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10140-5:2010/A1:2014",
+        "Name": "Acoustics - Laboratory measurement of sound insulation of building elements - Part 5: Requirements for test facilities and equipment - Amendment 1: Rainfall sound (ISO 10140-5:2010/Amd 1:2014)",
+        "Date": "2014-05-07T00:00:00"
+    },
+    {
+        "Title": "EN 12354-5:2009/AC:2010",
+        "Name": "Building acoustics - Estimation of acoustic performance of building from the performance of elements - Part 5: Sounds levels due to the service equipment",
+        "Date": "2010-10-20T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16283-3:2016",
+        "Name": "Acoustics - Field measurement of sound insulation in buildings and of building elements - Part 3: Fa\u00E7ade sound insulation (ISO 16283-3:2016)",
+        "Date": "2016-02-24T00:00:00"
+    },
+    {
+        "Title": "EN 16703:2015",
+        "Name": "Acoustics - Test code for drywall systems of plasterboard with steel studs - Airborne sound insulation",
+        "Date": "2015-09-16T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10140-3:2010/A1:2015",
+        "Name": "Acoustics - Laboratory measurement of sound insulation of building elements - Part 3: Measurement of impact sound insulation - Amendment 1 (ISO 10140-3:2010/Amd 1:2015)",
+        "Date": "2015-06-10T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10848-4:2017",
+        "Name": "Acoustics - Laboratory and field measurement of flanking transmission for airborne, impact and building service equipment sound between adjoining rooms - Part 4: Application to junctions with at least one Type A element (ISO 10848-4:2017)",
+        "Date": "2017-10-25T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3822-3:2018",
+        "Name": "Acoustics - Laboratory tests on noise emission from appliances and equipment used in water supply installations - Part 3: Mounting and operating conditions for in-line valves and appliances (ISO 3822-3:2018)",
+        "Date": "2018-02-07T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16283-1:2014/A1:2017",
+        "Name": "Acoustics - Field measurement of sound insulation in buildings and of building elements - Part 1: Airborne sound insulation - Amendment 1 (ISO 16283-1:2014/Amd 1:2017)",
+        "Date": "2017-12-06T00:00:00"
+    },
+    {
+        "Title": "EN 16205:2013\u002BA1:2018",
+        "Name": "Laboratory measurement of walking noise on floors",
+        "Date": "2018-03-21T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10848-3:2017",
+        "Name": "Acoustics - Laboratory and field measurement of flanking transmission for airborne, impact and building service equipment sound between adjoining rooms - Part 3: Application to Type B elements when the junction has a substantial influence (ISO 10848-3:2017)",
+        "Date": "2017-10-25T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16961:2018",
+        "Name": "Declaration of uncertainties in test reports",
+        "Date": "2018-05-23T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10848-2:2017",
+        "Name": "Acoustics - Laboratory and field measurement of flanking transmission for airborne, impact and building service equipment sound between adjoining rooms - Part 2: Application to Type B elements when the junction has a small influence (ISO 10848-2:2017)",
+        "Date": "2017-10-25T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16283-2:2020",
+        "Name": "Acoustics - Field measurement of sound insulation in buildings and of building elements - Part 2: Impact sound insulation (ISO 16283-2:2020)",
+        "Date": "2020-08-26T00:00:00"
+    },
+    {
+        "Title": "EN 15657:2017",
+        "Name": "Acoustic properties of building elements and of buildings - Laboratory measurement of structure-borne sound from building service equipment for all installation conditions",
+        "Date": "2017-07-19T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10140-1:2016",
+        "Name": "Acoustics - Laboratory measurement of sound insulation of building elements - Part 1: Application rules for specific products (ISO 10140-1:2016)",
+        "Date": "2016-08-24T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 15226:2006",
+        "Name": "Building products - Treatment of acoustics in product technical specifications",
+        "Date": "2006-03-29T00:00:00"
+    },
+    {
+        "Title": "EN 14366:2004\u002BA1:2019",
+        "Name": "Laboratory measurement of noise from waste water installations",
+        "Date": "2019-10-30T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10140-4:2010",
+        "Name": "Acoustics - Laboratory measurement of sound insulation of building elements - Part 4: Measurement procedures and requirements (ISO 10140-4:2010)",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 12354-6:2003",
+        "Name": "Building acoustics - Estimation of acoustic performance of buildings from the performance of elements - Part 6: Sound absorption in enclosed spaces",
+        "Date": "2003-12-17T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10848-1:2017",
+        "Name": "Acoustics - Laboratory and field measurement of flanking transmission for airborne, impact and building service equipment sound between adjoining rooms - Part 1: Frame document (ISO 10848-1:2017)",
+        "Date": "2017-10-25T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16251-1:2014",
+        "Name": "Acoustics - Laboratory measurement of the reduction of transmitted impact noise by floor coverings on a small floor mock-up - Part 1: Heavyweight compact floor (ISO 16251-1:2014)",
+        "Date": "2014-08-06T00:00:00"
+    },
+    {
+        "Title": "EN 12354-5:2009",
+        "Name": "Building acoustics - Estimation of acoustic performance of building from the performance of elements - Part 5: Sounds levels due to the service equipment",
+        "Date": "2009-04-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12999-2:2020",
+        "Name": "Acoustics - Determination and application of measurement uncertainties in building acoustics - Part 2: Sound absorption (ISO 12999-2:2020)",
+        "Date": "2020-07-08T00:00:00"
+    },
+    {
+        "Title": "EN ISO 9053-1:2018",
+        "Name": "Acoustics - Determination of airflow resistance - Part 1: Static airflow method (ISO 9053-1:2018)",
+        "Date": "2018-12-12T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3822-4:1997",
+        "Name": "Acoustics - Laboratory tests on noise emission from appliances and equipment used in water supply installations - Part 4: Mounting and operating conditions for special appliances",
+        "Date": "1997-01-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 15186-1:2003",
+        "Name": "Acoustics - Measurement of sound insulation in buildings and of building elements using sound intensity - Part 1: Laboratory measurements (ISO 15186-1:2000)",
+        "Date": "2003-07-30T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16283-1:2014",
+        "Name": "Acoustics - Field measurement of sound insulation in buildings and of building elements - Part 1: Airborne sound insulation (ISO 16283-1:2014)",
+        "Date": "2014-02-19T00:00:00"
+    },
+    {
+        "Title": "EN ISO 354:2003",
+        "Name": "Acoustics - Measurement of sound absorption in a reverberation room (ISO 354:2003)",
+        "Date": "2003-05-15T00:00:00"
+    },
+    {
+        "Title": "EN 16487:2014",
+        "Name": "Acoustics - Test code for suspended ceilings - Sound absorption",
+        "Date": "2014-11-12T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10052:2004",
+        "Name": "Acoustics - Field measurements of airborne and impact sound insulation and of service equipment sound - Survey method (ISO 10052:2004)",
+        "Date": "2004-12-15T00:00:00"
+    },
+    {
+        "Title": "EN 1748-2-1:2004",
+        "Name": "Glass in building - Special basic products - Glass ceramics - Part 2-1 Definitions and general physical and mechanical properties",
+        "Date": "2004-09-08T00:00:00"
+    },
+    {
+        "Title": "EN ISO 14438:2002",
+        "Name": "Glass in building - Determination of energy balance value - Calculation method (ISO 14438:2002)",
+        "Date": "2002-06-15T00:00:00"
+    },
+    {
+        "Title": "EN 14178-1:2004",
+        "Name": "Glass in building - Basic alkaline earth silicate glass products - Part 1: Float glass",
+        "Date": "2004-10-13T00:00:00"
+    },
+    {
+        "Title": "EN 14178-2:2004",
+        "Name": "Glass in building - Basic alkaline earth silicate glass products - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2004-10-13T00:00:00"
+    },
+    {
+        "Title": "EN 1748-1-1:2004",
+        "Name": "Glass in building - Special basic products -Borosilicate glasses - Part 1-1: Definition and general physical and mechanical properties",
+        "Date": "2004-09-08T00:00:00"
+    },
+    {
+        "Title": "EN 14449:2005/AC:2005",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Evaluation of conformity/Product standard",
+        "Date": "2005-12-07T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12543-5:2011",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Part 5: Dimensions and edge finishing (ISO 12543-5:2011)",
+        "Date": "2011-08-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12543-2:2011",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Part 2: Laminated safety glass (ISO 12543-2:2011)",
+        "Date": "2011-08-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12543-4:2011",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Part 4: Test methods for durability (ISO 12543-4:2011)",
+        "Date": "2011-08-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12543-3:2011",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Part 3: Laminated glass (ISO 12543-3:2011)",
+        "Date": "2011-08-15T00:00:00"
+    },
+    {
+        "Title": "EN 13024-1:2011",
+        "Name": "Glass in building - Thermally toughened borosilicate safety glass - Part 1: Definition and description",
+        "Date": "2011-11-30T00:00:00"
+    },
+    {
+        "Title": "EN 1863-1:2011",
+        "Name": "Glass in building - Heat strengthened soda lime silicate glass - Part 1: Definition and description",
+        "Date": "2011-11-30T00:00:00"
+    },
+    {
+        "Title": "EN 15681-1:2016",
+        "Name": "Glass in building - Basic alumino silicate glass products - Part 1: Definitions and general physical and mechanical properties",
+        "Date": "2016-01-27T00:00:00"
+    },
+    {
+        "Title": "EN 1096-5:2016",
+        "Name": "Glass in building - Coated glass - Part 5 - Test method and classification for the self-cleaning performances of coated glass surfaces",
+        "Date": "2016-01-27T00:00:00"
+    },
+    {
+        "Title": "EN 15681-2:2017",
+        "Name": "Glass in Building - Basic alumino silicate glass products - Part 2: Product standard",
+        "Date": "2017-02-15T00:00:00"
+    },
+    {
+        "Title": "EN 16612:2019",
+        "Name": "Glass in building - Determination of the lateral load resistance of glass panes by calculation",
+        "Date": "2019-10-16T00:00:00"
+    },
+    {
+        "Title": "EN 12150-1:2015\u002BA1:2019",
+        "Name": "Glass in building - Thermally toughened soda lime silicate safety glass - Part 1: Definition and description",
+        "Date": "2019-05-08T00:00:00"
+    },
+    {
+        "Title": "EN 1096-4:2018",
+        "Name": "Glass in building - Coated glass - Part 4: Product standard",
+        "Date": "2018-08-22T00:00:00"
+    },
+    {
+        "Title": "EN 1279-6:2018",
+        "Name": "Glass in building - Insulating glass units - Part 6: Factory production control and periodic tests",
+        "Date": "2018-07-25T00:00:00"
+    },
+    {
+        "Title": "EN 1279-3:2018",
+        "Name": "Glass in building - Insulating glass units - Part 3: Long term test method and requirements for gas leakage rate and for gas concentration tolerances",
+        "Date": "2018-07-25T00:00:00"
+    },
+    {
+        "Title": "EN 1279-5:2018",
+        "Name": "Glass in building - Insulating glass units - Part 5: Product standard",
+        "Date": "2018-07-25T00:00:00"
+    },
+    {
+        "Title": "EN 1279-1:2018",
+        "Name": "Glass in Building - Insulating glass units - Part 1: Generalities, system description, rules for substitution, tolerances and visual quality",
+        "Date": "2018-07-25T00:00:00"
+    },
+    {
+        "Title": "EN 14179-1:2016",
+        "Name": "Glass in building - Heat soaked thermally toughened soda lime silicate safety glass - Part 1: Definition and description",
+        "Date": "2016-07-27T00:00:00"
+    },
+    {
+        "Title": "EN 17074:2019",
+        "Name": "Glass in building - Environmental product declaration - Product category rules for flat glass products",
+        "Date": "2019-10-23T00:00:00"
+    },
+    {
+        "Title": "EN 12898:2019",
+        "Name": "Glass in building - Determination of the emissivity",
+        "Date": "2019-03-13T00:00:00"
+    },
+    {
+        "Title": "EN 12488:2016",
+        "Name": "Glass in building - Glazing recommendations - Assembly principles for vertical and sloping glazing",
+        "Date": "2016-06-29T00:00:00"
+    },
+    {
+        "Title": "EN 1748-1-2:2004",
+        "Name": "Glass in building - Special basic products - Borosilicate glasses - Part 1-2: Evaluation of conformity/Product standard",
+        "Date": "2004-10-06T00:00:00"
+    },
+    {
+        "Title": "EN 1748-2-2:2004",
+        "Name": "Glass in building - Special basic products - Glass ceramics - Part 2-2: Evaluation of conformity/Product standard",
+        "Date": "2004-10-06T00:00:00"
+    },
+    {
+        "Title": "EN 572-9:2004",
+        "Name": "Glass in building - Basic soda lime silicate glass products - Part 9: Evaluation of conformity/Product standard",
+        "Date": "2004-10-06T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12543-6:2011/AC:2012",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Part 6: Appearance - Technical Corrigendum 1 (ISO 12543-6:2011/Cor 1:2012)",
+        "Date": "2012-05-15T00:00:00"
+    },
+    {
+        "Title": "EN 16613:2019",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Determination of interlayer viscoelastic properties",
+        "Date": "2019-10-16T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12543-1:2011",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Part 1: Definitions and description of component parts (ISO 12543-1:2011)",
+        "Date": "2011-08-15T00:00:00"
+    },
+    {
+        "Title": "EN 14449:2005",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Evaluation of conformity/Product standard",
+        "Date": "2005-05-11T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12543-6:2011",
+        "Name": "Glass in building - Laminated glass and laminated safety glass - Part 6: Appearance (ISO 12543-6:2011)",
+        "Date": "2011-08-15T00:00:00"
+    },
+    {
+        "Title": "EN 1279-2:2018",
+        "Name": "Glass in building - Insulating glass units - Part 2: Long term test method and requirements for moisture penetration",
+        "Date": "2018-07-25T00:00:00"
+    },
+    {
+        "Title": "EN 1279-4:2018",
+        "Name": "Glass in Building - Insulating Glass Units - Part 4: Methods of test for the physical attributes of edge seal components and inserts",
+        "Date": "2018-07-25T00:00:00"
+    },
+    {
+        "Title": "EN 16477-1:2016",
+        "Name": "Glass in building - Painted glass for internal use - Part 1: Requirements",
+        "Date": "2016-12-07T00:00:00"
+    },
+    {
+        "Title": "EN 12758:2019",
+        "Name": "Glass in building - Glazing and airborne sound insulation - Product descriptions, determination of properties and extension rules",
+        "Date": "2019-09-04T00:00:00"
+    },
+    {
+        "Title": "EN 572-8:2012\u002BA1:2016",
+        "Name": "Glass in building - Basic soda-lime silicate glass products - Part 8: Supplied and final cut sizes",
+        "Date": "2016-02-10T00:00:00"
+    },
+    {
+        "Title": "EN 12337-2:2004",
+        "Name": "Glass in building - Chemically strengthened soda lime silicate glass - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2004-10-13T00:00:00"
+    },
+    {
+        "Title": "EN 1288-3:2000",
+        "Name": "Glass in building - Determination of the bending strength of glass - Part 3: Test with specimen supported at two points (four point bending)",
+        "Date": "2000-06-21T00:00:00"
+    },
+    {
+        "Title": "EN 572-7:2012",
+        "Name": "Glass in building - Basic soda lime silicate glass products - Part 7: Wired or unwired channel shaped glass",
+        "Date": "2012-07-18T00:00:00"
+    },
+    {
+        "Title": "EN 1096-1:2012",
+        "Name": "Glass in building - Coated glass - Part 1: Definitions and classification",
+        "Date": "2012-01-18T00:00:00"
+    },
+    {
+        "Title": "EN 1288-1:2000",
+        "Name": "Glass in building - Determination of the bending strength of glass - Part 1: Fundamentals of testing glass",
+        "Date": "2000-06-21T00:00:00"
+    },
+    {
+        "Title": "EN 14321-2:2005",
+        "Name": "Glass in building - Thermally toughened alkaline earth silicate safety glass - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2005-08-10T00:00:00"
+    },
+    {
+        "Title": "EN 572-1:2012\u002BA1:2016",
+        "Name": "Glass in building - Basic soda-lime silicate glass products - Part 1: Definitions and general physical and mechanical properties",
+        "Date": "2016-02-10T00:00:00"
+    },
+    {
+        "Title": "EN 1036-2:2008",
+        "Name": "Glass in building - Mirrors from silver-coated float glass for internal use - Part 2: Evaluation of conformity; product standard",
+        "Date": "2008-02-13T00:00:00"
+    },
+    {
+        "Title": "EN 356:1999",
+        "Name": "Glass in building - Security glazing - Testing and classification of resistance against manual attack",
+        "Date": "1999-11-17T00:00:00"
+    },
+    {
+        "Title": "EN 12150-2:2004",
+        "Name": "Glass in building - Thermally toughened soda lime silicate safety glass - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2004-10-06T00:00:00"
+    },
+    {
+        "Title": "EN 410:2011",
+        "Name": "Glass in building - Determination of luminous and solar characteristics of glazing",
+        "Date": "2011-02-09T00:00:00"
+    },
+    {
+        "Title": "EN 1288-4:2000",
+        "Name": "Glass in building - Determination of the bending strength of glass - Part 4: Testing of channel shaped glass",
+        "Date": "2000-06-21T00:00:00"
+    },
+    {
+        "Title": "EN 13541:2012",
+        "Name": "Glass in building - Security glazing - Testing and classification of resistance against explosion pressure",
+        "Date": "2012-02-29T00:00:00"
+    },
+    {
+        "Title": "EN 1051-2:2007",
+        "Name": "Glass in building - Glass blocks and glass pavers - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2007-10-03T00:00:00"
+    },
+    {
+        "Title": "EN 12600:2002",
+        "Name": "Glass in building - Pendulum test - Impact test method and classification for flat glass",
+        "Date": "2002-11-20T00:00:00"
+    },
+    {
+        "Title": "EN 12603:2002",
+        "Name": "Glass in building - Procedures for goodness of fit and confidence intervals for Weibull distributed glass strength data",
+        "Date": "2002-11-20T00:00:00"
+    },
+    {
+        "Title": "EN 673:2011",
+        "Name": "Glass in building - Determination of thermal transmittance (U value) - Calculation method",
+        "Date": "2011-02-09T00:00:00"
+    },
+    {
+        "Title": "EN 675:2011",
+        "Name": "Glass in building - Determination of thermal transmittance (U value) - Heat flow meter method ",
+        "Date": "2011-06-15T00:00:00"
+    },
+    {
+        "Title": "EN 13022-1:2014",
+        "Name": "Glass in building - Structural sealant glazing - Part 1: Glass products for structural sealant glazing systems for supported and unsupported monolithic and multiple glazing",
+        "Date": "2014-06-04T00:00:00"
+    },
+    {
+        "Title": "EN 1288-5:2000",
+        "Name": "Glass in building - Determination of the bending strength of glass - Part 5: Coaxial double ring test on flat specimens with small test surface areas",
+        "Date": "2000-06-21T00:00:00"
+    },
+    {
+        "Title": "EN 13022-2:2014",
+        "Name": "Glass in building - Structural sealant glazing - Part 2: Assembly rules",
+        "Date": "2014-06-04T00:00:00"
+    },
+    {
+        "Title": "EN 12337-1:2000",
+        "Name": "Glass in building - Chemically strengthened soda lime silicate glass - Part 1: Definition and description",
+        "Date": "2000-06-21T00:00:00"
+    },
+    {
+        "Title": "EN 15682-2:2013",
+        "Name": "Glass in building - Heat soaked thermally toughened alkaline earth silicate safety glass - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2013-07-31T00:00:00"
+    },
+    {
+        "Title": "EN 1288-2:2000",
+        "Name": "Glass in building - Determination of bending strength of glass - Part 2: Coaxial double ring test on flat specimens with large test surface areas",
+        "Date": "2000-06-21T00:00:00"
+    },
+    {
+        "Title": "EN 15755-1:2014",
+        "Name": "Glass in building - Adhesive backed polymeric filmed glass - Part 1: Definitions and requirements",
+        "Date": "2014-08-13T00:00:00"
+    },
+    {
+        "Title": "EN 14179-2:2005",
+        "Name": "Glass in building - Heat soaked thermally toughened soda lime silicate safety glass - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2005-05-18T00:00:00"
+    },
+    {
+        "Title": "EN 1096-3:2012",
+        "Name": "Glass in building - Coated glass - Part 3: Requirements and test methods for class C and D coatings",
+        "Date": "2012-01-18T00:00:00"
+    },
+    {
+        "Title": "EN 15998:2010",
+        "Name": "Glass in building - Safety in case of fire, fire resistance - Glass testing methodology for the purpose of classification",
+        "Date": "2010-11-10T00:00:00"
+    },
+    {
+        "Title": "EN 1063:1999",
+        "Name": "Glass in building - Security glazing - Testing and classification of resistance against bullet attack",
+        "Date": "1999-11-17T00:00:00"
+    },
+    {
+        "Title": "EN 1096-2:2012",
+        "Name": "Glass in building - Coated glass - Part 2: Requirements and test methods for class A, B and S coatings",
+        "Date": "2012-01-18T00:00:00"
+    },
+    {
+        "Title": "EN 15683-2:2013",
+        "Name": "Glass in building - Thermally toughened soda lime silicate channel shaped safety glass - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2013-12-11T00:00:00"
+    },
+    {
+        "Title": "EN 572-6:2012",
+        "Name": "Glass in building - Basic soda lime silicate glass products - Part 6: Wired patterned glass",
+        "Date": "2012-07-18T00:00:00"
+    },
+    {
+        "Title": "EN 14321-1:2005",
+        "Name": "Glass in building - Thermally toughened alkaline earth silicate safety glass - Part 1: Definition and description",
+        "Date": "2005-06-22T00:00:00"
+    },
+    {
+        "Title": "EN 1863-2:2004",
+        "Name": "Glass in building - Heat strengthened soda lime silicate glass - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2004-10-06T00:00:00"
+    },
+    {
+        "Title": "EN 15683-1:2013",
+        "Name": "Glass in building - Thermally toughened soda lime silicate channel shaped safety glass - Part 1: Definition and description",
+        "Date": "2013-07-24T00:00:00"
+    },
+    {
+        "Title": "EN 1036-1:2007",
+        "Name": "Glass in building - Mirrors from silver-coated float glass for internal use - Part 1: Definitions, requirements and test methods",
+        "Date": "2007-12-19T00:00:00"
+    },
+    {
+        "Title": "EN 15682-1:2013",
+        "Name": "Glass in building - Heat soaked thermally toughened alkaline earth silicate safety glass - Part 1: Definition and description",
+        "Date": "2013-07-31T00:00:00"
+    },
+    {
+        "Title": "EN 572-5:2012",
+        "Name": "Glass in building - Basic soda lime silicate glass products - Part 5: Patterned glass",
+        "Date": "2012-07-18T00:00:00"
+    },
+    {
+        "Title": "EN 572-4:2012",
+        "Name": "Glass in building - Basic soda lime silicate glass products - Part 4: Drawn sheet glass",
+        "Date": "2012-07-18T00:00:00"
+    },
+    {
+        "Title": "EN 13024-2:2004",
+        "Name": "Glass in building - Thermally toughened borosilicate safety glass - Part 2: Evaluation of conformity/Product standard",
+        "Date": "2004-10-13T00:00:00"
+    },
+    {
+        "Title": "EN 15752-1:2014",
+        "Name": "Glass in building - Adhesive backed polymeric film - Part 1: Definitions and requirements",
+        "Date": "2014-08-06T00:00:00"
+    },
+    {
+        "Title": "EN 572-2:2012",
+        "Name": "Glass in building - Basic soda lime silicate glass products - Part 2: Float glass",
+        "Date": "2012-07-18T00:00:00"
+    },
+    {
+        "Title": "EN 1051-1:2003",
+        "Name": "Glass in building - Glass blocks and glass pavers - Part 1: Definitions and description",
+        "Date": "2003-01-29T00:00:00"
+    },
+    {
+        "Title": "EN 674:2011",
+        "Name": "Glass in building - Determination of thermal transmittance (U value) - Guarded hot plate method",
+        "Date": "2011-06-15T00:00:00"
+    },
+    {
+        "Title": "EN 572-3:2012",
+        "Name": "Glass in building - Basic soda lime silicate glass products - Part 3: Polished wired glass",
+        "Date": "2012-07-18T00:00:00"
+    },
+    {
+        "Title": "EN ISO 5353:1998",
+        "Name": "Earth-moving machinery, and tractors and machinery for agriculture and forestry - Seat index point (ISO 5353:1995)",
+        "Date": "1998-09-23T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3411:2007",
+        "Name": "Earth-moving machinery - Physical dimensions of operators and minimum operator space envelope (ISO 3411:2007)",
+        "Date": "2007-07-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3450:2011",
+        "Name": "Earth-moving machinery - Wheeled or high-speed rubber-tracked machines - Performance requirements and test procedures for brake systems (ISO 3450:2011)",
+        "Date": "2011-11-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 2867:2011",
+        "Name": "Earth-moving machinery - Access systems (ISO 2867:2011)",
+        "Date": "2011-07-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 6683:2008",
+        "Name": "Earth-moving machinery - Seat belts and seat belt anchorages - Performance requirements and tests (ISO 6683:2005)",
+        "Date": "2008-08-13T00:00:00"
+    },
+    {
+        "Title": "EN ISO 2860:2008",
+        "Name": "Earth-moving machinery - Minimum access dimensions (ISO 2860:1992)",
+        "Date": "2008-09-17T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3457:2008",
+        "Name": "Earth-moving machinery - Guards - Definitions and requirements (ISO 3457:2003)",
+        "Date": "2008-09-17T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3449:2008",
+        "Name": "Earth-moving machinery - Falling-object protective structures - Laboratory tests and performance requirements (ISO 3449:2005)",
+        "Date": "2008-09-17T00:00:00"
+    },
+    {
+        "Title": "EN 13035-3:2003\u002BA1:2009/AC:2010",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 3: Cutting machines",
+        "Date": "2010-04-28T00:00:00"
+    },
+    {
+        "Title": "EN 474-2:2006\u002BA1:2008",
+        "Name": "Earth-moving machinery - Safety - Part 2: Requirements for tractor-dozers",
+        "Date": "2008-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 474-11:2006\u002BA1:2008",
+        "Name": "Earth-moving machinery - Safety - Part 11: Requirements for earth and landfill compactors",
+        "Date": "2008-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 474-12:2006\u002BA1:2008",
+        "Name": "Earth-moving machinery - Safety - Part 12: Requirements for cable excavators",
+        "Date": "2008-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 13019:2001\u002BA1:2008",
+        "Name": "Machines for road surface cleaning - Safety requirements",
+        "Date": "2008-12-10T00:00:00"
+    },
+    {
+        "Title": "EN 474-9:2006\u002BA1:2009",
+        "Name": "Earth-moving machinery - Safety - Part 9: Requirements for pipelayers",
+        "Date": "2009-02-11T00:00:00"
+    },
+    {
+        "Title": "EN 474-10:2006\u002BA1:2009",
+        "Name": "Earth-moving machinery - Safety - Part 10: Requirements for trenchers",
+        "Date": "2009-02-11T00:00:00"
+    },
+    {
+        "Title": "EN 474-8:2006\u002BA1:2009",
+        "Name": "Earth-moving machinery - Safety - Part 8: Requirements for graders",
+        "Date": "2009-02-11T00:00:00"
+    },
+    {
+        "Title": "EN 12110:2014",
+        "Name": "Tunnelling machines - Air locks - Safety requirements",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 13367:2005\u002BA1:2008/AC:2009",
+        "Name": "Ceramic machines - Safety - Transfer platforms and cars",
+        "Date": "2009-11-25T00:00:00"
+    },
+    {
+        "Title": "EN ISO 13766-2:2018",
+        "Name": "Earth-moving and building construction machinery - Electromagnetic compatibility (EMC) of machines with internal electrical power supply - Part 2: Additional EMC requirements for functional safety (ISO 13766-2:2018)",
+        "Date": "2018-06-06T00:00:00"
+    },
+    {
+        "Title": "EN ISO 13766-1:2018",
+        "Name": "Earth-moving and building construction machinery - Electromagnetic compatibility (EMC) of machines with internal electrical power supply - Part 1: General EMC requirements under typical electromagnetic environmental conditions (ISO 13766-1:2018)",
+        "Date": "2018-06-06T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3164:2013",
+        "Name": "Earth-moving machinery - Laboratory evaluations of protective structures - Specifications for deflection-limiting volume (ISO 3164:2013)",
+        "Date": "2013-05-08T00:00:00"
+    },
+    {
+        "Title": "EN 474-4:2006\u002BA2:2012",
+        "Name": "Earth-moving machinery - Safety - Part 4: Requirements for backhoe loaders",
+        "Date": "2012-01-11T00:00:00"
+    },
+    {
+        "Title": "EN 536:2015",
+        "Name": "Road construction machines - Mixing plants for road construction materials - Safety requirements",
+        "Date": "2015-08-12T00:00:00"
+    },
+    {
+        "Title": "EN 16564:2014",
+        "Name": "Machines and plants for mining and tooling of natural stone - Safety - Requirements for bridge type sawing/milling machines, included numerical control (NC/CNC) versions",
+        "Date": "2014-12-03T00:00:00"
+    },
+    {
+        "Title": "EN 1009-4:2020",
+        "Name": "Machines for mechanical processing of minerals and similar solid materials - Safety - Part 4: Specific requirements for screening machinery",
+        "Date": "2020-05-27T00:00:00"
+    },
+    {
+        "Title": "EN 1009-5:2020",
+        "Name": "Machines for mechanical processing of minerals and similar solid materials - Safety - Part 5: Specific requirements for cleaning, recycling, sorting and mud treatment machinery",
+        "Date": "2020-05-27T00:00:00"
+    },
+    {
+        "Title": "EN 1009-2:2020",
+        "Name": "Machines for mechanical processing of minerals and similar solid materials - Safety - Part 2: Specific requirements for feeding machinery and continuous handling equipment",
+        "Date": "2020-05-27T00:00:00"
+    },
+    {
+        "Title": "EN 474-5:2006\u002BA3:2013",
+        "Name": "Earth-moving machinery - Safety - Part 5: Requirements for hydraulic excavators",
+        "Date": "2013-07-24T00:00:00"
+    },
+    {
+        "Title": "EN 15163:2017",
+        "Name": "Machines and installations for the exploitation and processing of natural stone - Safety - Requirements for diamond wire saws",
+        "Date": "2017-06-14T00:00:00"
+    },
+    {
+        "Title": "EN 474-1:2006\u002BA4:2013/AC:2014",
+        "Name": "Earth-moving machinery - Safety - Part 1: General requirements",
+        "Date": "2014-03-05T00:00:00"
+    },
+    {
+        "Title": "EN 15059:2009\u002BA1:2015",
+        "Name": "Snow grooming equipment - Safety requirements",
+        "Date": "2015-02-25T00:00:00"
+    },
+    {
+        "Title": "EN ISO 19432-1:2020",
+        "Name": "Building construction machinery and equipment - Portable, hand-held, internal combustion engine-driven abrasive cutting machines - Part 1: Safety requirements for cut-off machines for centre-mounted rotating abrasive wheels (ISO 19432-1:2020)",
+        "Date": "2020-02-26T00:00:00"
+    },
+    {
+        "Title": "EN 13042-3:2007\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of hollow glass - Safety requirements - Part 3: IS machines",
+        "Date": "2009-07-22T00:00:00"
+    },
+    {
+        "Title": "EN 13102:2005\u002BA1:2008",
+        "Name": "Ceramic machines - Safety - Loading and unloading of fine clay tiles",
+        "Date": "2008-11-12T00:00:00"
+    },
+    {
+        "Title": "EN 500-4:2011",
+        "Name": "Mobile road construction machinery - Safety - Part 4: Specific requirements for compaction machines",
+        "Date": "2011-02-16T00:00:00"
+    },
+    {
+        "Title": "EN 12348:2000\u002BA1:2009",
+        "Name": "Core drilling machines on stand - Safety",
+        "Date": "2009-04-01T00:00:00"
+    },
+    {
+        "Title": "EN 500-1:2006\u002BA1:2009",
+        "Name": "Mobile road construction machinery - Safety - Part 1: Common requirements",
+        "Date": "2009-12-02T00:00:00"
+    },
+    {
+        "Title": "EN 500-6:2006\u002BA1:2008",
+        "Name": "Mobile road construction machinery - Safety - Part 6: Specific requirements for paver-finishers",
+        "Date": "2008-10-08T00:00:00"
+    },
+    {
+        "Title": "EN 13035-2:2008",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 2: Storage, handling and transportation equipment outside the factory",
+        "Date": "2008-03-12T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16001:2017",
+        "Name": "Earth-moving machinery - Object detection systems and visibility aids - Performance requirements and tests (ISO 16001:2017)",
+        "Date": "2017-12-20T00:00:00"
+    },
+    {
+        "Title": "EN 474-1:2006\u002BA6:2019",
+        "Name": "Earth-moving machinery - Safety - Part 1: General requirements",
+        "Date": "2019-10-09T00:00:00"
+    },
+    {
+        "Title": "EN ISO 19014-1:2018",
+        "Name": "Earth-moving machinery - Functional safety - Part 1: Methodology to determine safety-related parts of the control system and performance requirements (ISO 19014-1:2018, Corrected version 2019-02)",
+        "Date": "2018-08-15T00:00:00"
+    },
+    {
+        "Title": "EN ISO 7096:2020",
+        "Name": "Earth-moving machinery - Laboratory evaluation of operator seat vibration (ISO 7096:2020)",
+        "Date": "2020-03-11T00:00:00"
+    },
+    {
+        "Title": "EN ISO 19014-3:2018",
+        "Name": "Earth-moving machinery - Functional safety - Part 3: Environmental performance and test requirements of electronic and electrical components used in safety-related parts of the control system (ISO 19014-3:2018)",
+        "Date": "2018-10-24T00:00:00"
+    },
+    {
+        "Title": "EN 15573:2008",
+        "Name": "Earth-moving machinery - Design requirements for circulation on the road",
+        "Date": "2008-05-07T00:00:00"
+    },
+    {
+        "Title": "EN 12629-4:2001\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 4:Concrete roof tile making machines",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 12629-5-1:2003\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 5-1: Pipe making machines manufacturing in the vertical axis",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 13035-7:2006\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 7: Cutting machines for laminated glass",
+        "Date": "2009-12-02T00:00:00"
+    },
+    {
+        "Title": "EN 13035-3:2003\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 3: Cutting machines",
+        "Date": "2009-08-19T00:00:00"
+    },
+    {
+        "Title": "EN 15162:2008",
+        "Name": "Machines and plants for mining and tooling of natural stone - Safety requirements for gang saws",
+        "Date": "2008-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 13531:2001\u002BA1:2008",
+        "Name": "Earth-moving machinery - Tip-over protection structure (TOPS) for compact excavators - Laboratory tests and performance requirements (ISO 12117:1997 modified)",
+        "Date": "2008-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 15164:2008",
+        "Name": "Machines and plants for mining and tooling of natural stone - Safety - Requirements for chain- and belt-slotting machines",
+        "Date": "2008-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 12629-3:2002\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 3: Slide and turntable machines",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 12629-5-3:2003\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 5-3: Pipe prestressing machines",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 13042-5:2003\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of hollow glass - Safety requirements - Part 5: Presses",
+        "Date": "2009-07-01T00:00:00"
+    },
+    {
+        "Title": "EN 12629-8:2002\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 8: Machines and equipment for the manufacture of constructional products from calcium-silicate (and concrete)",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 13042-2:2004\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of hollow glass - Safety requirements - Part 2: Handling machines for feeding",
+        "Date": "2009-07-01T00:00:00"
+    },
+    {
+        "Title": "EN 12629-5-4:2003\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 5-4: Concrete pipe coating machines",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 13035-4:2003\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 4: Tilting tables",
+        "Date": "2009-12-16T00:00:00"
+    },
+    {
+        "Title": "EN 12629-1:2000\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 1: Common requirements",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 13035-9:2006\u002BA1:2010",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 9: Washing installations",
+        "Date": "2010-03-10T00:00:00"
+    },
+    {
+        "Title": "EN 12629-5-2:2003\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 5-2: Pipe making machines manufacturing in the horizontal axis",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 13042-1:2007\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of hollow glass - Safety requirements - Part 1: Gob feeder",
+        "Date": "2009-11-11T00:00:00"
+    },
+    {
+        "Title": "EN 12629-7:2004\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 7: Stationary and mobile equipment for long line manufacture of prestressed products",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 1009-1:2020",
+        "Name": "Machines for mechanical processing of minerals and similar solid materials - Safety - Part 1: Common requirements for machinery and processing plants",
+        "Date": "2020-05-27T00:00:00"
+    },
+    {
+        "Title": "EN 13524:2003\u002BA2:2014",
+        "Name": "Highway maintenance machines - Safety requirements",
+        "Date": "2014-02-19T00:00:00"
+    },
+    {
+        "Title": "EN 15572:2015",
+        "Name": "Machines and plants for mining and tooling of natural stone - Safety - Requirements for edge finishing machines",
+        "Date": "2015-08-19T00:00:00"
+    },
+    {
+        "Title": "EN 13020:2015",
+        "Name": "Road surface treatment machines - Safety requirements",
+        "Date": "2015-11-18T00:00:00"
+    },
+    {
+        "Title": "EN 474-6:2006\u002BA1:2009",
+        "Name": "Earth-moving machinery - Safety - Part 6: Requirements for dumpers",
+        "Date": "2009-02-11T00:00:00"
+    },
+    {
+        "Title": "EN 1009-3:2020",
+        "Name": "Machines for mechanical processing of minerals and similar solid materials - Safety - Part 3: Specific requirements for crushing and milling machinery",
+        "Date": "2020-05-27T00:00:00"
+    },
+    {
+        "Title": "EN ISO 19014-4:2020",
+        "Name": "Earth-moving machinery - Functional safety - Part 4: Design and evaluation of software and data transmission for safety-related parts of the control system (ISO 19014-4:2020)",
+        "Date": "2020-08-19T00:00:00"
+    },
+    {
+        "Title": "EN ISO 6682:2008",
+        "Name": "Earth-moving machinery - Zones of comfort and reach for controls (ISO 6682:1986, including Amd 1:1989)",
+        "Date": "2008-09-17T00:00:00"
+    },
+    {
+        "Title": "EN ISO 6165:2012",
+        "Name": "Earth-moving machinery - Basic types - Identification and terms and definitions (ISO 6165:2012)",
+        "Date": "2012-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 15571:2014",
+        "Name": "Machines and plants for mining and tooling of natural stone - Safety - Requirements for surface finishing machines",
+        "Date": "2014-11-26T00:00:00"
+    },
+    {
+        "Title": "EN 13367:2005\u002BA1:2008",
+        "Name": "Ceramic machines - Safety - Transfer platforms and cars",
+        "Date": "2008-10-08T00:00:00"
+    },
+    {
+        "Title": "EN 15027:2007\u002BA1:2009",
+        "Name": "Transportable wall saw and wire saw equipment for job site - Safety",
+        "Date": "2009-03-25T00:00:00"
+    },
+    {
+        "Title": "EN ISO 5010:2019",
+        "Name": "Earth-moving machinery - Wheeled machines - Steering requirements (ISO 5010:2019)",
+        "Date": "2019-12-18T00:00:00"
+    },
+    {
+        "Title": "EN 16191:2014",
+        "Name": "Tunnelling machinery - Safety requirements",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 500-3:2006\u002BA1:2008",
+        "Name": "Mobile road construction machinery - Safety - Part 3: Specific requirements for soil-stabilising machines and recycling machines",
+        "Date": "2008-10-22T00:00:00"
+    },
+    {
+        "Title": "EN 474-7:2006\u002BA1:2009",
+        "Name": "Earth-moving machinery - Safety - Part 7: Requirements for scrapers",
+        "Date": "2009-02-11T00:00:00"
+    },
+    {
+        "Title": "EN 13035-1:2008",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 1: Storage, handling and transportation equipment inside the factory",
+        "Date": "2008-03-12T00:00:00"
+    },
+    {
+        "Title": "EN 474-3:2006\u002BA1:2009",
+        "Name": "Earth-moving machinery - Safety - Part 3: Requirements for loaders",
+        "Date": "2009-02-11T00:00:00"
+    },
+    {
+        "Title": "EN 12001:2012",
+        "Name": "Conveying, spraying and placing machines for concrete and mortar - Safety requirements",
+        "Date": "2012-08-29T00:00:00"
+    },
+    {
+        "Title": "EN 13035-5:2006\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 5: Machines and installations for stacking and de-stacking",
+        "Date": "2009-12-16T00:00:00"
+    },
+    {
+        "Title": "EN ISO 3471:2008",
+        "Name": "Earth-moving machinery - Roll-over protective structures - Laboratory tests and performance requirements (ISO 3471:2008)",
+        "Date": "2008-08-15T00:00:00"
+    },
+    {
+        "Title": "EN 13021:2003\u002BA1:2008",
+        "Name": "Winter service machines - Safety requirements",
+        "Date": "2008-12-10T00:00:00"
+    },
+    {
+        "Title": "EN 13035-6:2006\u002BA1:2009",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 6: Machines for break-out",
+        "Date": "2009-12-16T00:00:00"
+    },
+    {
+        "Title": "EN 12629-2:2002\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 2: Block making machines",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 15730:2008",
+        "Name": "Earth-moving machinery - Guidelines for assessment of exposure to whole-body vibration of ride-on machines - Use of harmonized data measured by international institutes, organizations and manufacturers (ISO/TR 25398:2006)",
+        "Date": "2008-08-13T00:00:00"
+    },
+    {
+        "Title": "EN 12629-6:2004\u002BA1:2010",
+        "Name": "Machines for the manufacture of constructional products from concrete and calcium-silicate - Safety - Part 6: Stationary and mobile equipment for the manufacture of precast reinforced products",
+        "Date": "2010-09-01T00:00:00"
+    },
+    {
+        "Title": "EN 13035-11:2006\u002BA1:2010",
+        "Name": "Machines and plants for the manufacture, treatment and processing of flat glass - Safety requirements - Part 11: Drilling machines",
+        "Date": "2010-03-10T00:00:00"
+    },
+    {
+        "Title": "EN 16228-3:2014",
+        "Name": "Drilling and foundation equipment - Safety - Part 3: Horizontal directional drilling equipment (HDD)",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 13862:2001\u002BA1:2009",
+        "Name": "Floor cutting-off machines - Safety",
+        "Date": "2009-03-25T00:00:00"
+    },
+    {
+        "Title": "EN 16228-4:2014",
+        "Name": "Drilling and foundation equipment - Safety - Part 4: Foundation equipment",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 16228-1:2014",
+        "Name": "Drilling and foundation equipment - Safety - Part 1: Common requirements",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 12418:2000\u002BA1:2009",
+        "Name": "Masonry and stone cutting-off machines for job site - Safety",
+        "Date": "2009-03-25T00:00:00"
+    },
+    {
+        "Title": "EN 12649:2008\u002BA1:2011",
+        "Name": "Concrete compactors and smoothing machines - Safety",
+        "Date": "2011-07-13T00:00:00"
+    },
+    {
+        "Title": "EN 500-2:2006\u002BA1:2008",
+        "Name": "Mobile road construction machinery - Safety - Part 2: Specific requirements for road-milling machines",
+        "Date": "2008-10-22T00:00:00"
+    },
+    {
+        "Title": "EN 16228-2:2014",
+        "Name": "Drilling and foundation equipment - Safety - Part 2: Mobile drill rigs for civil and geotechnical engineering, quarrying and mining",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 16228-6:2014",
+        "Name": "Drilling and foundation equipment - Safety - Part 6: Jetting, grouting and injection equipment",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 16228-5:2014",
+        "Name": "Drilling and foundation equipment - Safety - Part 5: Diaphragm walling equipment",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 16228-7:2014",
+        "Name": "Drilling and foundation equipment - Safety - Part 7: Interchangeable auxiliary equipment",
+        "Date": "2014-05-21T00:00:00"
+    },
+    {
+        "Title": "EN 13813:2002",
+        "Name": "Screed material and floor screeds - Screed material - Properties and requirements",
+        "Date": "2002-10-16T00:00:00"
+    },
+    {
+        "Title": "EN 13318:2000",
+        "Name": "Screed material and floor screeds - Definitions",
+        "Date": "2000-06-21T00:00:00"
+    },
+    {
+        "Title": "EN 13892-6:2002",
+        "Name": "Methods of test for screed materials - Part 6: Determination of surface hardness",
+        "Date": "2002-11-20T00:00:00"
+    },
+    {
+        "Title": "EN 13892-9:2018",
+        "Name": "Methods of test for screed materials - Part 9: Dimensional stability",
+        "Date": "2018-10-10T00:00:00"
+    },
+    {
+        "Title": "EN 14016-1:2004",
+        "Name": "Binders for magnesite screeds - Caustic magnesia and magnesium chloride - Part 1: Definitions, requirements",
+        "Date": "2004-01-14T00:00:00"
+    },
+    {
+        "Title": "EN 13892-3:2014",
+        "Name": "Methods of test for screed materials - Part 3: Determination of wear resistance - B\u00F6hme",
+        "Date": "2014-12-17T00:00:00"
+    },
+    {
+        "Title": "EN 13892-2:2002",
+        "Name": "Methods of test for screed materials - Part 2: Determination of flexural and compressive strength",
+        "Date": "2002-11-20T00:00:00"
+    },
+    {
+        "Title": "EN 13892-4:2002",
+        "Name": "Methods of test for screed materials - Part 4: Determination of wear resistance-BCA",
+        "Date": "2002-11-20T00:00:00"
+    },
+    {
+        "Title": "EN 14016-2:2004",
+        "Name": "Binders for magnesite screeds - Caustic magnesia and magnesium chloride - Part 2: Test methods",
+        "Date": "2004-01-14T00:00:00"
+    },
+    {
+        "Title": "EN 13892-1:2002",
+        "Name": "Methods of test for screed materials - Part 1: Sampling, making and curing specimens for test",
+        "Date": "2002-11-20T00:00:00"
+    },
+    {
+        "Title": "EN 13892-7:2003",
+        "Name": "Methods of test for screed materials - Part 7: Determination of wear resistance to rolling wheel of screed material with floor coverings",
+        "Date": "2003-06-04T00:00:00"
+    },
+    {
+        "Title": "EN 13892-5:2003",
+        "Name": "Methods of test for screed materials - Part 5: Determination of wear resistance to rolling wheel of screed material for wearing layer",
+        "Date": "2003-06-04T00:00:00"
+    },
+    {
+        "Title": "EN 13892-8:2002",
+        "Name": "Methods of test for screed materials - Part 8: Determination of bond strength",
+        "Date": "2002-11-20T00:00:00"
+    },
+    {
+        "Title": "CWA 17377:2019",
+        "Name": "Design and Construction Codes for Gen II to IV nuclear facilities (pilot case for process for evolution of AFCEN codes)",
+        "Date": "2019-02-06T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12006-3:2016",
+        "Name": "Building construction - Organization of information about construction works - Part 3: Framework for object-oriented information (ISO 12006-3:2007)",
+        "Date": "2016-10-19T00:00:00"
+    },
+    {
+        "Title": "EN ISO 23387:2020",
+        "Name": "Building information modelling (BIM) - Data templates for construction objects used in the life cycle of built assets - Concepts and principles (ISO 23387:2020)",
+        "Date": "2020-07-22T00:00:00"
+    },
+    {
+        "Title": "EN ISO 23386:2020",
+        "Name": "Building information modelling and other digital processes used in construction - Methodology to describe, author and maintain properties in interconnected data dictionaries (ISO 23386:2020)",
+        "Date": "2020-03-25T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16757-2:2019",
+        "Name": "Data structures for electronic product catalogues for building services - Part 2: Geometry (ISO 16757-2:2016)",
+        "Date": "2019-05-29T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 17439:2020",
+        "Name": "Guidance on how to implement EN ISO 19650-1 and -2 in Europe",
+        "Date": "2020-06-10T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16739-1:2020",
+        "Name": "Industry Foundation Classes (IFC) for data sharing in the construction and facility management industries - Part 1: Data schema (ISO 16739-1:2018)",
+        "Date": "2020-02-19T00:00:00"
+    },
+    {
+        "Title": "EN ISO 19650-3:2020",
+        "Name": "Organization and digitization of information about buildings and civil engineering works, including building information modelling (BIM) - Information management using building information modelling - Part 3: Operational phase of the assets (ISO 19650-3:2020)",
+        "Date": "2020-08-19T00:00:00"
+    },
+    {
+        "Title": "EN ISO 19650-5:2020",
+        "Name": "Organization and digitization of information about buildings and civil engineering works, including building information modelling (BIM) - Information management using building information modelling - Part 5: Security-minded approach to information management (ISO 19650-5:2020)",
+        "Date": "2020-07-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 29481-2:2016",
+        "Name": "Building information models - Information delivery manual - Part 2: Interaction framework (ISO 29481-2:2012)",
+        "Date": "2016-10-19T00:00:00"
+    },
+    {
+        "Title": "EN ISO 29481-1:2017",
+        "Name": "Building information models - Information delivery manual - Part 1: Methodology and format (ISO 29481-1:2016)",
+        "Date": "2017-10-11T00:00:00"
+    },
+    {
+        "Title": "EN ISO 21597-1:2020",
+        "Name": "Information container for linked document delivery - Exchange specification - Part 1: Container (ISO 21597-1:2020)",
+        "Date": "2020-04-22T00:00:00"
+    },
+    {
+        "Title": "EN ISO 19650-2:2018",
+        "Name": "Organization and digitization of information about buildings and civil engineering works, including building information modelling (BIM) - Information management using building information modelling - Part 2: Delivery phase of the assets (ISO 19650-2:2018)",
+        "Date": "2018-12-19T00:00:00"
+    },
+    {
+        "Title": "EN ISO 16757-1:2019",
+        "Name": "Data structures for electronic product catalogues for building services - Part 1: Concepts, architecture and model (ISO 16757-1:2015)",
+        "Date": "2019-05-29T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12006-2:2020",
+        "Name": "Building construction - Organization of information about construction works - Part 2: Framework for classification (ISO 12006-2:2015)",
+        "Date": "2020-02-05T00:00:00"
+    },
+    {
+        "Title": "EN ISO 19650-1:2018",
+        "Name": "Organization and digitization of information about buildings and civil engineering works, including building information modelling (BIM) - Information management using building information modelling - Part 1: Concepts and principles (ISO 19650-1:2018)",
+        "Date": "2018-12-19T00:00:00"
+    },
+    {
+        "Title": "CWA 17316:2018",
+        "Name": "Smart CE marking for construction products",
+        "Date": "2018-07-04T00:00:00"
+    },
+    {
+        "Title": "EN ISO 8394-1:2010",
+        "Name": "Building construction - Jointing products - Part 1: Determination of extrudability of sealants (ISO 8394-1:2010)",
+        "Date": "2010-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 15651-1:2017",
+        "Name": "Sealants for non-structural use in joints in buildings and pedestrian walkways - Part 1: Sealants for facade elements",
+        "Date": "2017-02-15T00:00:00"
+    },
+    {
+        "Title": "EN 15651-4:2017",
+        "Name": "Sealants for non-structural use in joints in buildings and pedestrian walkways - Part 4: Sealants for pedestrian walkways",
+        "Date": "2017-02-15T00:00:00"
+    },
+    {
+        "Title": "EN 15651-5:2017",
+        "Name": "Sealants for non-structural use in joints in buildings and pedestrian walkways - Part 5: Assessment and verification of constancy of performance, marking and labelling",
+        "Date": "2017-03-08T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 17068:2017",
+        "Name": "Sealants for non-structural use in joints in buildings and pedestrian walkways - Guidance for CE marking and Declaration of Performance (DoP)",
+        "Date": "2017-02-15T00:00:00"
+    },
+    {
+        "Title": "EN 15651-4:2017/AC:2017",
+        "Name": "Sealants for non-structural use in joints in buildings and pedestrian walkways - Part 4: Sealants for pedestrian walkways",
+        "Date": "2017-07-05T00:00:00"
+    },
+    {
+        "Title": "EN ISO 8394-2:2017",
+        "Name": "Buildings and civil engineering works - Determination of extrudability for sealant - Part 2: Using standardized apparatus (ISO 8394-2:2017)",
+        "Date": "2017-11-22T00:00:00"
+    },
+    {
+        "Title": "EN 15651-3:2017",
+        "Name": "Sealants for non-structural use in joints in buildings and pedestrian walkways - Part 3: Sealants for sanitary joints",
+        "Date": "2017-02-15T00:00:00"
+    },
+    {
+        "Title": "EN 15651-2:2017",
+        "Name": "Sealants for non-structural use in joints in buildings and pedestrian walkways - Part 2: Sealants for glazing",
+        "Date": "2017-02-15T00:00:00"
+    },
+    {
+        "Title": "EN 15434:2006\u002BA1:2010",
+        "Name": "Glass in building - Product standard for structural and/or ultra-violet resistant sealant (for use with structural sealant glazing and/or insulating glass units with exposed seals)",
+        "Date": "2010-03-24T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 15941:2010",
+        "Name": "Sustainability of construction works - Environmental product declarations - Methodology for selection and use of generic data",
+        "Date": "2010-05-26T00:00:00"
+    },
+    {
+        "Title": "EN 15643-5:2017",
+        "Name": "Sustainability of construction works - Sustainability assessment of buildings and civil engineering works - Part 5: Framework on specific principles and requirement for civil engineering works",
+        "Date": "2017-11-01T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 17005:2016",
+        "Name": "Sustainability of construction works - Additional environmental impact categories and indicators - Background information and possibilities - Evaluation of the possibility of adding environmental impact categories and related indicators and calculation methods for the assessment of the environmental performance of buildings",
+        "Date": "2016-10-26T00:00:00"
+    },
+    {
+        "Title": "EN 15643-1:2010",
+        "Name": "Sustainability of construction works - Sustainability assessment of buildings - Part 1: General framework",
+        "Date": "2010-09-22T00:00:00"
+    },
+    {
+        "Title": "EN 15643-2:2011",
+        "Name": "Sustainability of construction works - Assessment of buildings - Part 2: Framework for the assessment of environmental performance",
+        "Date": "2011-03-02T00:00:00"
+    },
+    {
+        "Title": "EN 15643-4:2012",
+        "Name": "Sustainability of construction works - Assessment of buildings - Part 4: Framework for the assessment of economic performance",
+        "Date": "2012-01-25T00:00:00"
+    },
+    {
+        "Title": "EN 15804:2012\u002BA2:2019",
+        "Name": "Sustainability of construction works - Environmental product declarations - Core rules for the product category of construction products",
+        "Date": "2019-10-30T00:00:00"
+    },
+    {
+        "Title": "EN 16627:2015",
+        "Name": "Sustainability of construction works - Assessment of economic performance of buildings - Calculation methods",
+        "Date": "2015-06-24T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16970:2016",
+        "Name": "Sustainability of construction works - Guidance for the implementation of EN 15804",
+        "Date": "2016-07-27T00:00:00"
+    },
+    {
+        "Title": "EN 15643-3:2012",
+        "Name": "Sustainability of construction works - Assessment of buildings - Part 3: Framework for the assessment of social performance",
+        "Date": "2012-01-25T00:00:00"
+    },
+    {
+        "Title": "EN 16309:2014\u002BA1:2014",
+        "Name": "Sustainability of construction works - Assessment of social performance of buildings - Calculation methodology",
+        "Date": "2014-08-20T00:00:00"
+    },
+    {
+        "Title": "EN 15942:2011",
+        "Name": "Sustainability of construction works - Environmental product declarations - Communication format business-to-business",
+        "Date": "2011-10-19T00:00:00"
+    },
+    {
+        "Title": "EN 15978:2011",
+        "Name": "Sustainability of construction works - Assessment of environmental performance of buildings - Calculation method",
+        "Date": "2011-11-09T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 15858:2009",
+        "Name": "Construction products - Assessment of the release of regulated dangerous substances from construction products based on the WT, WFT/FT procedures",
+        "Date": "2009-03-25T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16496:2013",
+        "Name": "Construction Products - Assessment of release of dangerous substances - Use of harmonised horizontal assessment methods",
+        "Date": "2013-10-02T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16098:2010",
+        "Name": "Construction products: Assessment of release of dangerous substances - Concept of horizontal testing procedures in support of requirements under the CPD",
+        "Date": "2010-11-03T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 16637-3:2016",
+        "Name": "Construction products - Assessment of release of dangerous substances - Part 3: Horizontal up-flow percolation test",
+        "Date": "2016-06-01T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16220:2011",
+        "Name": "Construction products - Assessment of release of dangerous substances - Complement to sampling",
+        "Date": "2011-08-31T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 17216:2018",
+        "Name": "Construction products - Assessment of release of dangerous substances - Determination of activity concentrations of radium-226, thorium-232 and potassium-40 in construction products using semiconductor gamma-ray spectrometry",
+        "Date": "2018-10-17T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16410:2012",
+        "Name": "Construction products - Assessment of release of dangerous substances - Barriers to use - Extension to CEN/TR 15855 Barriers to trade",
+        "Date": "2012-10-17T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 17195:2018",
+        "Name": "Construction products: Assessment of release of dangerous substances - Analysis of inorganic substances in eluates",
+        "Date": "2018-07-18T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 17196:2018",
+        "Name": "Construction products: Assessment of release of dangerous substances - Digestion by aqua regia for subsequent analysis of inorganic substances",
+        "Date": "2018-07-18T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 17113:2017",
+        "Name": "Construction products - Assessment of release of dangerous substances - Radiation from construction products - Dose assessment of emitted gamma radiation",
+        "Date": "2017-10-18T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16797-1:2015",
+        "Name": "Construction products: Assessment of release of dangerous substances - Guidance on the statistical assessment of declared values - Part 1: Principles and rules of application",
+        "Date": "2015-08-26T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16797-2:2015",
+        "Name": "Construction products: Assessment of release of dangerous substances - Guidance on the statistical assessment of declared values - Part 2: Technical and statistical background",
+        "Date": "2015-08-26T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 17331:2019",
+        "Name": "Construction products: Assessment of release of dangerous substances - Content of organic substances - Methods for extraction and analysis",
+        "Date": "2019-05-08T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 17332:2019",
+        "Name": "Construction products: Assessment of release of dangerous substances - Analysis of organic substances in eluates",
+        "Date": "2019-05-08T00:00:00"
+    },
+    {
+        "Title": "EN 17087:2019",
+        "Name": "Construction products: Assessment of release of dangerous substances - Preparation of test portions from the laboratory sample for testing of release and analysis of content",
+        "Date": "2019-02-13T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 17105:2017",
+        "Name": "Construction products - Assessment of release of dangerous substances - Guidance on the use of ecotoxicity tests applied to construction products",
+        "Date": "2017-06-14T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 16637-1:2018",
+        "Name": "Construction products - Assessment of release of dangerous substances - Part 1: Guidance for the determination of leaching tests and additional testing steps",
+        "Date": "2018-10-10T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 17200:2018\u002BAC:2018",
+        "Name": "Construction products: Assessment of release of dangerous substances - Analysis of inorganic substances in digests and eluates - Analysis by Inductively Coupled Plasma - Mass Spectrometry (ICP-MS)",
+        "Date": "2018-12-19T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 17201:2018\u002BAC:2018",
+        "Name": "Construction products: Assessment of release of dangerous substances - Content of inorganic substances - Methods for analysis of aqua regia digests",
+        "Date": "2018-12-19T00:00:00"
+    },
+    {
+        "Title": "EN 16687:2015",
+        "Name": "Construction products - Assessment of release of dangerous substances - Terminology",
+        "Date": "2015-06-10T00:00:00"
+    },
+    {
+        "Title": "EN 16516:2017\u002BA1:2020",
+        "Name": "Construction products: Assessment of release of dangerous substances - Determination of emissions into indoor air",
+        "Date": "2020-07-22T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 15855:2009",
+        "Name": "Construction products - Assessment of release of dangerous substances - Barriers to trade",
+        "Date": "2009-03-11T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 16045:2010",
+        "Name": "Construction Products - Assessment of release of dangerous substances - Content of regulated dangerous substances - Selection of analytical methods",
+        "Date": "2010-11-03T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 16637-2:2014",
+        "Name": "Construction products - Assessment of release of dangerous substances - Part 2: Horizontal dynamic surface leaching test",
+        "Date": "2014-08-20T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 17197:2018\u002BAC:2018",
+        "Name": "Construction products: Assessment of release of dangerous substances - Analysis of inorganic substances in digests and eluates - Analysis by Inductively Coupled Plasma - Optical Emission Spectrometry (ICP-OES)",
+        "Date": "2018-12-19T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 17304:2018",
+        "Name": "Construction products - Assessment of release of dangerous substances - Determination of emissions into indoor air of ammonia from cellulose insulation at 90 % RH",
+        "Date": "2018-11-14T00:00:00"
+    },
+    {
+        "Title": "CWA 16519:2012",
+        "Name": "Design and Construction Code for mechanical equipments of innovative nuclear installations",
+        "Date": "2012-11-14T00:00:00"
+    },
+    {
+        "Title": "EN 771-3:2011",
+        "Name": "Specification for masonry units - part 3: aggregate concrete masonry units (dense and lightweight aggregates)",
+        "Date": "2011-05-01T00:00:00"
+    },
+    {
+        "Title": "EN 772-1:2011",
+        "Name": "Methods of test for masonry units - Part 1: Determination of compressive strength",
+        "Date": "2011-05-01T00:00:00"
+    },
+    {
+        "Title": "DIN EN 13460",
+        "Name": "Documentation for maintenance",
+        "Date": "2009-08-01T00:00:00"
+    },
+    {
+        "Title": "DIN EN 13306",
+        "Name": "Begriffe der Instandhaltung; Dreisprachige Fassung",
+        "Date": "2018-02-01T00:00:00"
+    },
+    {
+        "Title": "ISO 13372",
+        "Name": "Condition monitoring and diagnostics of machines Vocabulary",
+        "Date": "2012-09-15T00:00:00"
+    },
+    {
+        "Title": "VDMA 24223",
+        "Name": "Device profile for pumps and vacuum pumps in second edition",
+        "Date": "2021-03-11T00:00:00"
+    },
+    {
+        "Title": "VDMA 24223-1",
+        "Name": "Device profile for liquid and vacuum pumps - part 1: device information model - universal profile elements - generic pump",
+        "Date": "2013-12-01T00:00:00"
+    },
+    {
+        "Title": "DIN ISO 21360-1",
+        "Name": "Vacuum technology \u2014 Standard methods for measuring vacuum-pump performance \u2014 Part 1: General description",
+        "Date": "2016-09-01T00:00:00"
+    },
+    {
+        "Title": "DIN EN ISO 17769-1",
+        "Name": "Liquid pumps and installation - General terms, definitions, quantities, letter symbols and units - Part 1: Liquid pumps",
+        "Date": "2012-11-01T00:00:00"
+    },
+    {
+        "Title": "ISO/TR 25417",
+        "Name": "Acoustics \u2014 Definitions of basic quantities and terms",
+        "Date": "2007-12-01T00:00:00"
+    },
+    {
+        "Title": "DIN 28400-2",
+        "Name": "Vacuum technology; terms and definitions, vacuum pumps",
+        "Date": "1980-10-01T00:00:00"
+    },
+    {
+        "Title": "DIN EN ISO 17769-2",
+        "Name": "Liquid pumps and installation - General terms, definitions, quantities, letter symbols and units - Part 2: Pumping System",
+        "Date": "2012-11-01T00:00:00"
+    },
+    {
+        "Title": "DIN EN ISO 80000-8",
+        "Name": "Quantities and units - Part 8: Acoustics",
+        "Date": "2020-06-01T00:00:00"
+    },
+    {
+        "Title": "ISO 3529-2",
+        "Name": "Vacuum technology \u2014 Vocabulary \u2014 Part 2: Vacuum pumps and related terms",
+        "Date": "2020-02-01T00:00:00"
+    },
+    {
+        "Title": "VDI 3805-4",
+        "Name": "Product data exchange in the building services - Pumps (centrifugal pumps)",
+        "Date": "2021-02-01T00:00:00"
+    },
+    {
+        "Title": "IEC 60050-351",
+        "Name": "International electrotechnical vocabulary - Part 351: Control technology",
+        "Date": "2014-09-01T00:00:00"
+    },
+    {
+        "Title": "ISO 2710-1",
+        "Name": "Reciprocating internal combustion engines - Vocabulary - Part 1: Terms for engine design and operation",
+        "Date": "2017-11-01T00:00:00"
+    },
+    {
+        "Title": "ISO 7967-6",
+        "Name": "Reciprocating internal combustion engines Vocabulary of components and systems Part 6: Lubricating systems",
+        "Date": "2005-05-15T00:00:00"
+    },
+    {
+        "Title": "VDMA 24224",
+        "Name": "Wet runner circulating pumps - specification of PWM control signals",
+        "Date": "2013-05-12T00:00:00"
+    },
+    {
+        "Title": "DIN EN 1333",
+        "Name": "Flanges and their joints - Pipework components - Definition and selection of PN",
+        "Date": "1992-02-01T00:00:00"
+    },
+    {
+        "Title": "ISO 6708",
+        "Name": "Pipework Components - Definition and Selection of DN (Nominal Size)",
+        "Date": "1995-01-01T00:00:00"
+    },
+    {
+        "Title": "IEC CDD",
+        "Name": "IEC Common Data Dictionary",
+        "Date": "1980-01-01T00:00:00"
+    },
+    {
+        "Title": "OPC 10000-100 - Part 100",
+        "Name": "OPC Unified Architecture - part 100: Devices",
+        "Date": "2022-01-15T00:00:00"
+    },
+    {
+        "Title": "OPC 40001-1",
+        "Name": "OPC Unified Architecture for Machinery - part 1: Basic building blocks",
+        "Date": "1980-01-01T00:00:00"
+    },
+    {
+        "Title": "IEC 61987-1",
+        "Name": "Industrial-process measurement and control \u2013 Data structures and elements in process equipment catalogues \u2013 Part 1: Measuring equipment with analogue and digital output",
+        "Date": "2006-12-01T00:00:00"
+    },
+    {
+        "Title": "DIN 105-4:2019-01",
+        "Name": "Clay bricks\u00A0- Part\u00A04: Ceramic bricks",
+        "Date": "2019-01-01T00:00:00"
+    },
+    {
+        "Title": "DIN 1055-4:2005-03",
+        "Name": "Action on structures\u00A0- Part\u00A04: Wind loads",
+        "Date": "2005-03-01T00:00:00"
+    },
+    {
+        "Title": "DIN 1168-2:1975-07",
+        "Name": "Building Plasters, Requirements, Testing, Control",
+        "Date": "1975-07-01T00:00:00"
+    },
+    {
+        "Title": "DIN 17611:2022-08",
+        "Name": "Anodized products of wrought aluminium and wrought aluminium alloys\u00A0- Technical conditions of delivery",
+        "Date": "2022-08-01T00:00:00"
+    },
+    {
+        "Title": "DIN 18032-3:2018-11",
+        "Name": "Sports halls\u00A0- Halls and rooms for sports and multi-purpose use\u00A0- Part\u00A03: Testing of safety against ball throwing",
+        "Date": "2018-11-01T00:00:00"
+    },
+    {
+        "Title": "DIN 18202:2019-07",
+        "Name": "Tolerances in building construction\u00A0- Buildings",
+        "Date": "2019-07-01T00:00:00"
+    },
+    {
+        "Title": "DIN 18516-1:2010-06",
+        "Name": "Cladding for external walls",
+        "Date": "2010-06-01T00:00:00"
+    },
+    {
+        "Title": "DIN 4074-1:2012-06",
+        "Name": "Strength grading of wood\u00A0- Part\u00A01: Coniferous sawn timber",
+        "Date": "2012-06-01T00:00:00"
+    },
+    {
+        "Title": "DIN 4102-1:1998-05",
+        "Name": "Fire behaviour of building materials and building components\u00A0- Part\u00A01: Building materials, concepts, requirements and tests",
+        "Date": "1998-05-01T00:00:00"
+    },
+    {
+        "Title": "DIN 4102-17:2017-12",
+        "Name": "Fire behaviour of building materials and building components\u00A0- Part\u00A017: Melting point of mineral wool insulating materials\u00A0- Terms and definitions",
+        "Date": "2017-12-01T00:00:00"
+    },
+    {
+        "Title": "DIN 4102-4:2016-05",
+        "Name": "Fire behaviour of building materials and building components\u00A0- Part\u00A04: Synopsis and application of classified building materials",
+        "Date": "2016-05-01T00:00:00"
+    },
+    {
+        "Title": "DIN 4108-10:2021-11",
+        "Name": "Thermal insulation and energy economy in buildings\u00A0- Part\u00A010: Application-related requirements for thermal insulation materials",
+        "Date": "2021-11-01T00:00:00"
+    },
+    {
+        "Title": "DIN 4108-3:2018-10",
+        "Name": "Thermal protection and energy economy in buildings\u00A0- Part\u00A03: Protection against moisture subject to climate conditions\u00A0- Requirements",
+        "Date": "2018-10-01T00:00:00"
+    },
+    {
+        "Title": "DIN 4108-4:2020-11",
+        "Name": "Thermal insulation and energy economy in buildings\u00A0- Part\u00A04: Hygrothermal design values",
+        "Date": "2020-11-01T00:00:00"
+    },
+    {
+        "Title": "DIN 4109-1:2018-01",
+        "Name": "Sound insulation in buildings\u00A0- Part\u00A01: Minimum requirements",
+        "Date": "2018-01-01T00:00:00"
+    },
+    {
+        "Title": "EAD 090062-00-0404",
+        "Name": "Kits for external wall claddings mechanically fixed",
+        "Date": "2018-07-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-12:1997-12",
+        "Name": "Ceramic tiles\u00A0- Part\u00A012: Determination of frost resistance (ISO\u00A010545-12:1995)",
+        "Date": "1997-12-01T00:00:00"
+    },
+    {
+        "Title": "EN 12467:2018-07",
+        "Name": "Fibre-cement flat sheets\u00A0- Product specification and test methods",
+        "Date": "2018-07-01T00:00:00"
+    },
+    {
+        "Title": "EN 13162:2015-04",
+        "Name": "Thermal insulation products for buildings\u00A0- Factory made mineral wool\u00A0(MW) products\u00A0- Specification",
+        "Date": "2015-04-01T00:00:00"
+    },
+    {
+        "Title": "prEN 13300:2021-04",
+        "Name": "Paints and varnishes\u00A0- Paints and varnishes for interior walls and ceilings\u00A0- Classification",
+        "Date": "2021-02-26T00:00:00"
+    },
+    {
+        "Title": "EN 13501-1:2019-05",
+        "Name": "Fire classification of construction products and building elements\u00A0- Part\u00A01: Classification using data from reaction to fire tests",
+        "Date": "2019-05-01T00:00:00"
+    },
+    {
+        "Title": "EN 13830:2020-11",
+        "Name": "Curtain walling\u00A0- Product standard",
+        "Date": "2020-11-01T00:00:00"
+    },
+    {
+        "Title": "EN 1396:2015-06",
+        "Name": "Aluminium and aluminium alloys\u00A0- Coil coated sheet and strip for general applications\u00A0- Specifications",
+        "Date": "2015-06-01T00:00:00"
+    },
+    {
+        "Title": "EN 14081-1:2019-10",
+        "Name": "Timber structures\u00A0- Strength graded structural timber with rectangular cross section\u00A0- Part\u00A01: General requirements",
+        "Date": "2019-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 14351-1:2016-12",
+        "Name": "Windows and doors\u00A0- Product standard",
+        "Date": "2016-12-01T00:00:00"
+    },
+    {
+        "Title": "EN 14411:2016-12",
+        "Name": "Ceramic tiles\u00A0- Definition",
+        "Date": "2016-12-01T00:00:00"
+    },
+    {
+        "Title": "EN 1607:2013-05",
+        "Name": "Thermal insulating products for building applications\u00A0- Determination of tensile strength perpendicular to faces, German version EN\u00A01607:2013",
+        "Date": "2013-05-01T00:00:00"
+    },
+    {
+        "Title": "EN 16733:2016-07",
+        "Name": "Reaction to fire tests for building products\u00A0- Determination of a building product\u0027s propensity to undergo continuous smouldering",
+        "Date": "2016-07-01T00:00:00"
+    },
+    {
+        "Title": "EN 1991-1-4:2010-12",
+        "Name": "Eurocode\u00A01: Actions on structures\u00A0- Part\u00A01-4: General actions\u00A0- Wind actions",
+        "Date": "2010-12-01T00:00:00"
+    },
+    {
+        "Title": "EN 1992-4:2019-04",
+        "Name": "Eurocode\u00A02\u00A0- Design of concrete structures\u00A0- Part\u00A04: Design of fastenings for use in concrete",
+        "Date": "2019-04-01T00:00:00"
+    },
+    {
+        "Title": "EN 1993-1-4:2015-10",
+        "Name": "Eurocode\u00A03: Design of steel structures\u00A0- Part\u00A01-4: General rules\u00A0- Supplementary rules for stainless steels",
+        "Date": "2015-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 1998-1:2010-12",
+        "Name": "Eurocode\u00A08: Design of structures for earthquake resistance\u00A0- Part\u00A01: General rules",
+        "Date": "2020-12-01T00:00:00"
+    },
+    {
+        "Title": "EN 338:2016-07",
+        "Name": "Structural timber\u00A0- Strength classes",
+        "Date": "2016-07-01T00:00:00"
+    },
+    {
+        "Title": "EN 492:2018-07",
+        "Name": "Fibre-cement slates and fittings\u00A0- Product specification and test methods",
+        "Date": "2018-07-01T00:00:00"
+    },
+    {
+        "Title": "EN 494:2015-12",
+        "Name": "Fibre-cement profiled sheets and fittings\u00A0- Product specification and test methods",
+        "Date": "2015-12-01T00:00:00"
+    },
+    {
+        "Title": "EN 60672-2:2000-10",
+        "Name": "Ceramic and glass insulating materials\u00A0- Part\u00A02: Methods of test (IEC\u00A060672-2:1999)",
+        "Date": "2000-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 61140:2016-11",
+        "Name": "Protection against electric shock\u00A0- Common aspects for installation and equipment (IEC\u00A061140:2016)",
+        "Date": "2016-11-01T00:00:00"
+    },
+    {
+        "Title": "EN 998-1:2017-02",
+        "Name": "Specification for mortar for masonry\u00A0- Part\u00A01: Rendering and plastering mortar",
+        "Date": "2017-02-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10140-1:2021-09",
+        "Name": "Acoustics\u00A0- Laboratory measurement of sound insulation of building elements\u00A0- Part\u00A01: Application rules for specific products (ISO\u00A010140-1:2021)",
+        "Date": "2021-09-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10211:2018-03",
+        "Name": "Thermal bridges in building construction\u00A0- Heat flows and surface temperatures\u00A0- Detailed calculations (ISO\u00A010211:2017)",
+        "Date": "2018-03-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10456:2010-05",
+        "Name": "Building materials and products\u00A0- Hygrothermal properties\u00A0- Tabulated design values and procedures for determining declared and design thermal values (ISO\u00A010456:2007\u00A0\u002B Cor.\u00A01:2009)",
+        "Date": "2010-05-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-13:2017-04",
+        "Name": "Ceramic tiles\u00A0- Part\u00A013: Determination of chemical resistance (ISO\u00A010545-13:2016)",
+        "Date": "2017-04-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-14:2016-02",
+        "Name": "Ceramic tiles\u00A0- Part\u00A014: Determination of resistance to stains (ISO\u00A010545-14:2015)",
+        "Date": "2016-02-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-15:2021-09",
+        "Name": "Ceramic tiles\u00A0- Part\u00A015: Determination of lead and cadmium given off by tiles (ISO\u00A010545-15:2021)",
+        "Date": "2021-09-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-3:2018-06",
+        "Name": "Ceramic tiles\u00A0- Part\u00A03: Determination of water absorption",
+        "Date": "2018-06-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-4:2019-06",
+        "Name": "Ceramic tiles\u00A0- Part\u00A04: Determination of modulus of rupture and breaking strength (ISO\u00A010545-4:2019)",
+        "Date": "2019-06-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-5:1997-12",
+        "Name": "Ceramic tiles\u00A0- Part\u00A05: Determination of impact resistance by measurement of coefficient of restitution (ISO\u00A010545-5:1996",
+        "Date": "1997-12-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-6:2012-05",
+        "Name": "Ceramic tiles\u00A0- Part\u00A06: Determination of resistance to deep abrasion for unglazed tiles (ISO\u00A010545-6:2010)",
+        "Date": "2012-05-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 10545-9:2013-12",
+        "Name": "Ceramic tiles\u00A0- Part\u00A09: Determination of resistance to thermal shock (ISO\u00A010545-9:2013)",
+        "Date": "2013-12-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 12944-1:2019-01",
+        "Name": "Paints and varnishes\u00A0- Corrosion protection of steel structures by protective paint systems\u00A0- Part\u00A01: General introduction (ISO\u00A012944-1:2017)",
+        "Date": "2019-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 539-2:2013-08",
+        "Name": "Clay roofing tiles for discontinuous laying\u00A0- Determination of physical characteristics\u00A0- Part\u00A02: Test for frost resistance",
+        "Date": "2013-08-01T00:00:00"
+    },
+    {
+        "Title": "prEN IEC 60904-1:2019-10",
+        "Name": "Photovoltaic devices\u00A0- Part\u00A01: Measurement of photovoltaic current-voltage characteristics (IEC\u00A082/1556/CD:2019)",
+        "Date": "2019-09-20T00:00:00"
+    },
+    {
+        "Title": "EN IEC 61730-1:2018-10",
+        "Name": "Photovoltaic\u00A0(PV) module safety qualification\u00A0- Part\u00A01: Requirements for construction (IEC\u00A061730-1:2016)",
+        "Date": "2018-10-01T00:00:00"
+    },
+    {
+        "Title": "Musterbauordnung (MBO)",
+        "Name": "Model Building Code (MBO)",
+        "Date": "2012-09-21T00:00:00"
+    },
+    {
+        "Title": "MVV TB Anhang 6",
+        "Name": "Model Administrative Regulation Technical Building Regulations (MVV TB) - Annex 6",
+        "Date": "2016-06-01T00:00:00"
+    },
+    {
+        "Title": "VKF Pr\u00FCfbestimmungen",
+        "Name": "ACFI Test Specifications (CH)",
+        "Date": "2018-03-01T00:00:00"
+    },
+    {
+        "Title": "VW PV 3.10.7:1992-01",
+        "Name": "Pr\u00FCfung auf Stoffe die die Lackbenetzungsf\u00E4higkeit beeintr\u00E4chtigen",
+        "Date": "1992-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 54-11:2001/A1:2005",
+        "Name": "Fire detection and fire alarm systems - Part 11: Manual call points",
+        "Date": "2005-11-23T00:00:00"
+    },
+    {
+        "Title": "EN 54-2:1997/AC:1999",
+        "Name": "Fire detection and fire alarm systems - Part 2: Control and indicating equipment",
+        "Date": "1999-02-25T00:00:00"
+    },
+    {
+        "Title": "EN 54-4:1997/AC:1999",
+        "Name": "Fire detection and fire alarm systems - Part 4: Power supply equipment",
+        "Date": "1999-02-25T00:00:00"
+    },
+    {
+        "Title": "EN 54-25:2008",
+        "Name": "Fire detection and fire alarm systems - Part 25: Components using radio links",
+        "Date": "2008-03-05T00:00:00"
+    },
+    {
+        "Title": "EN 54-4:1997/A1:2002",
+        "Name": "Fire detection and fire alarm systems - Part 4: Power supply equipment",
+        "Date": "2002-12-04T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 14568:2003",
+        "Name": "EN 54 - Fire detection and fire alarm systems - Interpretation of specific clauses of EN 54-2:1997",
+        "Date": "2003-08-20T00:00:00"
+    },
+    {
+        "Title": "EN 54-4:1997/A2:2006",
+        "Name": "Fire detection and fire alarm systems - Part 4: Power supply equipment",
+        "Date": "2006-08-23T00:00:00"
+    },
+    {
+        "Title": "EN 54-21:2006",
+        "Name": "Fire detection and fire alarm systems - Part 21: Alarm transmission and fault warning routing equipment",
+        "Date": "2006-05-31T00:00:00"
+    },
+    {
+        "Title": "EN 54-18:2005/AC:2007",
+        "Name": "Fire detection and fire alarm systems - Part 18: Input/output devices",
+        "Date": "2007-01-24T00:00:00"
+    },
+    {
+        "Title": "EN 54-17:2005/AC:2007",
+        "Name": "Fire detection and fire alarm systems - Part 17: Short-circuit isolators",
+        "Date": "2007-10-24T00:00:00"
+    },
+    {
+        "Title": "EN 54-20:2006/AC:2008",
+        "Name": "Fire detection and fire alarm systems - Part 20: Aspirating smoke detectors",
+        "Date": "2008-11-19T00:00:00"
+    },
+    {
+        "Title": "EN 54-30:2015",
+        "Name": "Fire detection and fire alarm systems - Part 30: Multi-sensor fire detectors - Point detectors using a combination of carbon monoxide and heat sensors",
+        "Date": "2015-04-08T00:00:00"
+    },
+    {
+        "Title": "EN 54-26:2015",
+        "Name": "Fire detection and fire alarm systems - Part 26: Carbon monoxide detectors - Point detectors",
+        "Date": "2015-04-08T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 54-14:2018",
+        "Name": "Fire detection and fire alarm systems - Part 14: Guidelines for planning",
+        "Date": "2018-10-31T00:00:00"
+    },
+    {
+        "Title": "EN 54-29:2015",
+        "Name": "Fire detection and fire alarm systems - Part 29: Multi-sensor fire detectors - Point detectors using a combination of smoke and heat sensors",
+        "Date": "2015-04-08T00:00:00"
+    },
+    {
+        "Title": "EN 54-1:2021",
+        "Name": "Fire detection and fire alarm systems - Part 1: Introduction",
+        "Date": "2021-06-23T00:00:00"
+    },
+    {
+        "Title": "EN 54-3:2014\u002BA1:2019",
+        "Name": "Fire detection and fire alarm systems - Part 3: Fire alarm devices - Sounders",
+        "Date": "2019-03-27T00:00:00"
+    },
+    {
+        "Title": "EN 54-7:2018",
+        "Name": "Fire detection and fire alarm systems - Part 7: Smoke detectors - Point smoke detectors that operate using scattered light",
+        "Date": "2018-08-29T00:00:00"
+    },
+    {
+        "Title": "EN 54-22:2015\u002BA1:2020",
+        "Name": "Fire detection and fire alarm systems - Part 22: Resettable line-type heat detectors",
+        "Date": "2020-02-26T00:00:00"
+    },
+    {
+        "Title": "EN 14604:2005",
+        "Name": "Smoke alarm devices",
+        "Date": "2005-07-27T00:00:00"
+    },
+    {
+        "Title": "EN 54-27:2015",
+        "Name": "Fire detection and fire alarms systems - Part 27: Duct smoke detectors",
+        "Date": "2015-03-11T00:00:00"
+    },
+    {
+        "Title": "EN 54-18:2005",
+        "Name": "Fire detection and fire alarm systems - Part 18: Input/output devices",
+        "Date": "2005-12-07T00:00:00"
+    },
+    {
+        "Title": "EN 54-25:2008/AC:2012",
+        "Name": "Fire detection and fire alarm systems - Part 25: Components using radio links",
+        "Date": "2012-03-07T00:00:00"
+    },
+    {
+        "Title": "EN 54-2:1997/A1:2006",
+        "Name": "Fire detection and fire alarm systems - Part 2: Control and indicating equipment",
+        "Date": "2006-10-25T00:00:00"
+    },
+    {
+        "Title": "EN 14604:2005/AC:2008",
+        "Name": "Smoke alarm devices",
+        "Date": "2008-10-22T00:00:00"
+    },
+    {
+        "Title": "EN 54-12:2015",
+        "Name": "Fire detection and fire alarm systems - Part 12: Smoke detectors - Line detectors using an optical beam",
+        "Date": "2015-04-08T00:00:00"
+    },
+    {
+        "Title": "EN 54-10:2002/A1:2005",
+        "Name": "Fire detection and fire alarm systems - Part 10: Flame detectors - Point detectors",
+        "Date": "2005-11-23T00:00:00"
+    },
+    {
+        "Title": "EN 54-4:1997",
+        "Name": "Fire detection and fire alarm systems - Part 4: Power supply equipment",
+        "Date": "1997-10-22T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 54-32:2015",
+        "Name": "Fire detection and fire alarm systems - Part 32: Planning",
+        "Date": "2015-07-01T00:00:00"
+    },
+    {
+        "Title": "EN 54-5:2017\u002BA1:2018",
+        "Name": "Fire detection and fire alarm systems - Part 5: Heat detectors - Point heat detectors",
+        "Date": "2018-08-08T00:00:00"
+    },
+    {
+        "Title": "EN 54-24:2008",
+        "Name": "Fire detection and fire alarm systems - Part 24: Components of voice alarm systems - Loudspeakers",
+        "Date": "2008-04-02T00:00:00"
+    },
+    {
+        "Title": "EN 54-16:2008",
+        "Name": "Fire detection and fire alarm systems - Part 16: Voice alarm control and indicating equipment",
+        "Date": "2008-03-05T00:00:00"
+    },
+    {
+        "Title": "EN 54-13:2017\u002BA1:2019",
+        "Name": "Fire detection and fire alarm systems - Part 13: Compatibility and connectability assessment of system components",
+        "Date": "2019-12-18T00:00:00"
+    },
+    {
+        "Title": "EN 54-17:2005",
+        "Name": "Fire detection and fire alarm systems - Part 17: Short-circuit isolators",
+        "Date": "2005-12-07T00:00:00"
+    },
+    {
+        "Title": "EN 54-20:2006",
+        "Name": "Fire detection and fire alarm systems - Part 20: Aspirating smoke detectors",
+        "Date": "2006-06-21T00:00:00"
+    },
+    {
+        "Title": "EN 54-11:2001",
+        "Name": "Fire detection and fire alarm systems - Part 11: Manual call points",
+        "Date": "2001-05-23T00:00:00"
+    },
+    {
+        "Title": "EN 54-23:2010",
+        "Name": "Fire detection and fire alarm systems - Part 23: Fire alarm devices - Visual alarm devices",
+        "Date": "2010-03-10T00:00:00"
+    },
+    {
+        "Title": "EN 54-2:1997",
+        "Name": "Fire detection and fire alarm systems - Part 2: Control and indicating equipment",
+        "Date": "1997-10-22T00:00:00"
+    },
+    {
+        "Title": "EN 54-31:2014\u002BA1:2016",
+        "Name": "Fire detection and fire alarm systems - Part 31: Multi-sensor fire detectors - Point detectors using a combination of smoke",
+        "Date": "2016-04-27T00:00:00"
+    },
+    {
+        "Title": "EN 54-10:2002",
+        "Name": "Fire detection and fire alarm systems - Part 10: Flame detectors - Point detectors",
+        "Date": "2002-01-23T00:00:00"
+    },
+    {
+        "Title": "EN 54-28:2016",
+        "Name": "Fire detection and fire alarm system - Part 28: Non-resettable line-type heat detectors",
+        "Date": "2016-02-17T00:00:00"
+    },
+    {
+        "Title": "EN 13501-2:2016-06",
+        "Name": "Fire classification of construction products and building elements\u00A0- Part 2: Classification using data from fire resistance tests",
+        "Date": "2016-06-01T00:00:00"
+    },
+    {
+        "Title": "UNI 9795:2021",
+        "Name": "Sistemi fissi automatici di rivelazione e di segnalazione allarme d\u0027incendio - Progettazione, installazione ed esercizio",
+        "Date": "2021-12-02T00:00:00"
+    },
+    {
+        "Title": "EN 10545-2:2019",
+        "Name": "Ceramic tiles - Part 2: Determination of dimensions and surface quality",
+        "Date": "2019-03-01T00:00:00"
+    },
+    {
+        "Title": "EN 13986",
+        "Name": "wood-based panels for use in construction - characteristics, evaluation of conformity and marking",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 15497",
+        "Name": "structural finger jointed solid timber - performance requirements and minimum production requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 14342",
+        "Name": "wood flooring characteristics, evaluation of conformity and marking",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 14080",
+        "Name": "timber structures glued laminated timber and glued solid timber requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 14374",
+        "Name": "timber structures - structural laminated veneer lumber",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 14915",
+        "Name": "solid wood panelling and cladding",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 14322",
+        "Name": "wood-based panels - melamine faced boards for interior uses - definition, requirements and classification",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1912",
+        "Name": "structural timber - strength classes - assignment of visual grades and species",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 317",
+        "Name": "particleboards and fibreboards - determination of swelling in thickness after immersion in water",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 50001",
+        "Name": "energy management systems - requirements with guidance for use",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 12369-1",
+        "Name": "wood-based panels - characteristic values for structural design - part 1: OSB, particleboard and fibreboard",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "RAL",
+        "Name": "colour standard",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 789",
+        "Name": "timber structures - test methods - determination of mechanical properties of wood based panels?",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 319",
+        "Name": "particleboards and fibreboards - determination of tensile strength perpendicular to the plane of the board",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 13271",
+        "Name": "timber fasteners - characteristic load-carrying capacities and slip-moduli for connector joints",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 312",
+        "Name": "particleboards. specifications",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 318",
+        "Name": "wood-based panels - determination of dimensional changes associated with changes in relative humidity",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 383",
+        "Name": "timber structures - test methods - determination of embedment strength and foundation values for dowel type fasteners",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 350",
+        "Name": "durability of wood and wood-based products. testing and classification of the durability to biological agents of wood and wood-based materials",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 12524",
+        "Name": "building materials and products - hygrothermal properties - tabulated design values",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 12871",
+        "Name": "wood-based panels - determination of performance characteristics for load bearing panels for use in floors, roofs and walls",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "CITES",
+        "Name": "convention on international trade in endangered species of wild fauna and flora",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "OI3",
+        "Name": "Index of the thermal building envelope",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 320",
+        "Name": "particleboards and fibreboards - determination of resistance to axial withdrawal of screws",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "swiss eco-factors 2013",
+        "Name": "swiss eco-factors 2013",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1995-1-1",
+        "Name": "eurocode 5 - design of timber structures - part 1.1 - general Rules General rules and rules for buildings",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 15228",
+        "Name": "structural timber - structural timber preservative treated against biological attack",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "LVL",
+        "Name": "LVL Handbook",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1128",
+        "Name": "cement-bonded particleboards. determination of hard body impact resistance",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 13183-2",
+        "Name": "moisture content of a piece of sawn timber. estimation by electrical resistance method",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 13556",
+        "Name": "round and sawn timber - nomenclature of timbers used in Europe",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1995-1-2",
+        "Name": "eurocode 5: design of timber structures - part 1-2: general - structural fire design",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "NCS",
+        "Name": "NCS atlas",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 408",
+        "Name": "timber structures - structural timber and glued laminated timber - determination of some physical and mechanical properties",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 594",
+        "Name": "timber structures - test methods - racking strength and stiffness of timber frame wall panels",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 12664",
+        "Name": "thermal performance of building materials and products - determination of thermal resistance by means of guarded hot plate and heat flow meter methods - dry and moist products of medium and low thermal resistance",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 351-1",
+        "Name": "durability of wood and wood-based products - preservative-treated solid wood - part 1: classification of preservative penetration and retention",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 13354",
+        "Name": "solid wood panels - bonding quality - test method",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 324-1",
+        "Name": "wood-based panels - determination of dimensions of boards - part 1: determination of thickness, width and length",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 12114",
+        "Name": "thermal performance of buildings - air permeability of building components and building elements - laboratory test method",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 14001",
+        "Name": "environmental management systems - requirements with guidance for use",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 140-3",
+        "Name": "acoustics - measurement of sound insulation in buildings and of building elements - part 3: laboratory measurements of airborne sound insulation of building elements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1058",
+        "Name": "wood-based panels - determination of characteristic 5-percentile values and characteristic mean values",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EC Decision 2000/147/EC",
+        "Name": "commission decision of 8 February 2000",
+        "Date": "2000-02-08T00:00:00"
+    },
+    {
+        "Title": "EN 301",
+        "Name": "adhesives, phenolic and aminoplastic, for load-bearing timber structures - classification and performance requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 15686-8:2008",
+        "Name": "Buildings and constructed assets - Service life planning - Part 8: Reference service life and service life estimation",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 21930:2017",
+        "Name": "Sustainability in buildings and civil engineering works Core rules for environmental product declarations of construction products and services",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1328",
+        "Name": "cement bonded particleboards - determination of frost resistance",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1309-1",
+        "Name": "round and sawn timber - method of measurement of dimensions - part 1: sawn timber",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 717-1",
+        "Name": "acoustics - rating of sound insulation in buildings and of building elements - part 1: airborne sound insulation",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 322",
+        "Name": "wood-based panels. determination of moisture content",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 3340",
+        "Name": "fibre building board - determination of sand content",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 717-2",
+        "Name": "wood-based panels - determination of formaldehyde release - part 2: formaldehyde release by the gas analysis method",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1533",
+        "Name": "wood flooring - determination of bending strength under static load - test methods",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 9001",
+        "Name": "quality management systems - requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "WGSRPD",
+        "Name": "world geographical scheme for recording plant distributions",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 14046:2014",
+        "Name": "Environmental management - Water footprint - Principles, requirements and guidelines",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 15676",
+        "Name": "wood flooring - slip resistance - pendulum test",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 14755",
+        "Name": "extruded particleboards - Specifications",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 335",
+        "Name": "durability of wood and wood-based products - Use classes: definitions, application to solid wood and wood-based products",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 335-3",
+        "Name": "durability of wood and wood-based products - definition of hazard classes of biological attack - part 3: application to wood-based panels",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 975-1",
+        "Name": "sawn timber - appearance grading of hardwoods - part 1: oak and beech",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 13446",
+        "Name": "wood-based panels - determination of withdrawal capacity of fasteners",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 15425",
+        "Name": "adhesives. one component polyurethane for load bearing timber structures. classification and performance requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 382-2",
+        "Name": "fiberboards - determination of surface absorption - part 2 : test method for hardboards",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 323",
+        "Name": "wood-based panels - determination of density",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 326-1",
+        "Name": "wood-based panels - sampling, cutting and inspection - part 1: sampling and cutting of test pieces and expression of test results",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 717-1",
+        "Name": "wood-based panels - determination of formaldehyde release - part 1: formaldehyde emission by the chamber method",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 314-2",
+        "Name": "plywood - bonding quality - part 2: requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "CEN/TR 14823",
+        "Name": "durability of wood and wood-based products - quantitative determination of pentachlorophenol in wood - gas chromatographic method",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 13017-2",
+        "Name": "solid wood panel - classification by surface appearance - part 2: hardwood",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 18001",
+        "Name": "occupational health and safety management system requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "ISO 12572",
+        "Name": "hygrothermal performance of building materials and products - determination of water vapour transmission properties",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 384",
+        "Name": "structural timber - determination of characteristic values of mechanical properties and density",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 12369-2",
+        "Name": "wood-based panels - characteristic values for structural design - part 2: plywood",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 300",
+        "Name": "oriented strand boards (OSB) - definitions, classification and specifications",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 16351",
+        "Name": "timber structures - cross laminated timber - requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "CML-IA 4.1",
+        "Name": "Baseline, CML-IA Version 4.1, October 2012",
+        "Date": "2012-10-01T00:00:00"
+    },
+    {
+        "Title": "EN 13353",
+        "Name": "solid wood panels(SWP) - requirements",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 13017-1",
+        "Name": "solid wood panel - classification by surface appearance - part 1: softwood",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 1195",
+        "Name": "timber structures - test methods - performance of structural floor decking",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "CEN/TS 635-4",
+        "Name": "plywood - classification by surface appearance - part 4: parameters of ability for finishing, guideline",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN 635-1",
+        "Name": "plywood - classification by surface appearance - part 1: general",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 717-1:2021",
+        "Name": "Acoustics - Rating of sound insulation in buildings and of building elements - Part 1: Airborne sound insulation (ISO 717-1:2021)",
+        "Date": "2021-05-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 717-2:2021",
+        "Name": "Acoustics - Rating of sound insulation in buildings and of building elements - Part 2: Impact sound insulation (ISO 717-2:2021)",
+        "Date": "2021-05-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 6946:2017",
+        "Name": "Building components and building elements - Thermal resistance and thermal transmittance - Calculation methods",
+        "Date": "2017-07-01T00:00:00"
+    },
+    {
+        "Title": "EN ISO 13788:2012",
+        "Name": "Hygrothermal performance of building components and building elements - Internal surface temperature to avoid critical surface humidity and interstitial condensation - Calculation methods",
+        "Date": "2012-12-14T00:00:00"
+    },
+    {
+        "Title": "ISO 14021:2016",
+        "Name": "Environmental labels and declarations - Self-declared environmental claims (Type II environmental labelling)",
+        "Date": "2016-03-01T00:00:00"
+    },
+    {
+        "Title": "ATG-4",
+        "Name": "AASHTO transportation glossary",
+        "Date": "2009-01-01T00:00:00"
+    },
+    {
+        "Title": "FHWA-NHI-23-024",
+        "Name": "Bridge Inspector\u2019s Reference Manual (BIRM) (2022 NBIS)",
+        "Date": "2023-03-01T00:00:00"
+    },
+    {
+        "Title": "LRFDBDS-9",
+        "Name": "AASHTO LRFD Bridge Design Specification",
+        "Date": "2020-01-01T00:00:00"
+    },
+    {
+        "Title": "EwaGlos",
+        "Name": "EwaGlos \u2013 European Illustrated Glossary of Conservation Terms for Wall Paintings and Architectural Surfaces",
+        "Date": "2015-01-01T00:00:00"
+    },
+    {
+        "Title": "ICOMOS-ISCS-Glossary",
+        "Name": "Illustrated Glossary on Stone Deterioration Patterns",
+        "Date": "2008-09-01T00:00:00"
+    },
+    {
+        "Title": "UNI 11182:2006",
+        "Name": "Beni culturali - Materiali lapidei naturali ed artificiali - Descrizione della forma di alterazione - Termini e definizioni",
+        "Date": "2006-04-13T00:00:00"
+    },
+    {
+        "Title": "ASTM D 610 \u2013 08",
+        "Name": "Standard Practice for Evaluating Degree of Rusting on Painted Steel Surfaces",
+        "Date": "1900-01-01T00:00:00"
+    },
+    {
+        "Title": "NORMAL 1/88",
+        "Name": "Standard related to the characterization and classification of alterations in stone materials",
+        "Date": "1900-01-01T00:00:00"
+    }
+]

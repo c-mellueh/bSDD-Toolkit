@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bsdd_web"
+version = "0.1.0"
+description = "bSDD Toolkit web application (FastAPI backend)"
+requires-python = ">=3.10"
+authors = [{ name = "Christoph Mellüh" }]
+license = { text = "MIT" }
+dependencies = [
+  "bsdd_json>=0.1.2",
+  "pydantic>=2.7",
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "python-multipart>=0.0.9",
+  "openpyxl>=3.1.5",
+  "jinja2>=3.1.6",
+  "pydantic-xml[lxml]>=2.19.0",
+  "lxml>=5",
+  "ifctester",
+  "bsdd",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "httpx", "ruff"]
+
+[project.scripts]
+bsdd-web = "bsdd_web.__main__:main"
+
+[tool.setuptools]
+packages = ["bsdd_web", "bsdd_web.ops", "bsdd_web.services", "bsdd_web.api"]
+package-dir = { bsdd_web = "." }
+
+[tool.setuptools.package-data]
+bsdd_web = ["resources/*", "resources/**/*", "static/**/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

@@ -100,9 +100,9 @@ def get_internal_property(class_property: BsddClassProperty, bsdd_dictionary=Non
 
 
 def get_external_property(class_property: BsddClassProperty, client=None) -> BsddProperty | None:
-    from bsdd_gui import tool
+    from .cache import is_offline
 
-    if tool.Project.get_offline_mode():
+    if is_offline():
         return None
     return Cache.get_external_property(class_property.PropertyUri, client)
 
