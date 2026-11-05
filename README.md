@@ -104,12 +104,18 @@ Level of Information Need (ISO 7817-3), exports (Excel, IDS, ISO 23386, ISO 7817
 download from bSDD, fuzzy search, graph viewer, AI definitions (each user enters their own
 OpenAI key, it never reaches the server), English and German UI, and a Python shell.
 
+The web UI is organised in sections (overview with checks, classes, groups of properties,
+properties, LOIN, graph, export). Every class and property has its own URL
+(`/p/<id>/classes/<code>`, `/p/<id>/properties/<code>`) that can be shared, edits are made
+inline with a per-field merge of concurrent changes, and <kbd>Ctrl</kbd>+<kbd>K</kbd> opens a
+command palette to jump to any class, property or page.
+
 **Graph viewer:** a custom canvas renderer with a force-directed layout engine written in Rust
 and compiled to WebAssembly (`web/graph-engine`, Barnes-Hut repulsion, runs in a Web Worker).
 Drag & drop with pinning, filters per node and edge type, adding nodes by name / code / URI,
 expanding neighbours, straight / right-angle / curved edges, adjustable physics, tree, circle
 and grid layouts, creating and deleting relations directly in the graph, PNG / SVG /
-interactive HTML export, and a stand-alone window (`/p/<id>/graph`). The prebuilt
+interactive HTML export, and a stand-alone window (`/p/<id>/window/graph`). The prebuilt
 `web/src/graph/engine.wasm` is rebuilt from source in the Docker build (`npm run build:wasm` locally).
 
 **Python shell without server risk:** the shell runs Python *in the visitor's browser*

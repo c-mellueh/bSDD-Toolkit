@@ -5,24 +5,30 @@ import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Landing } from "./pages/Landing";
 import { GraphPage } from "./pages/GraphPage";
-import { ProjectPage } from "./pages/ProjectPage";
+import { ProjectLayout } from "./layout/ProjectLayout";
+import { ClassesPage } from "./pages/project/ClassesPage";
+import { ExportPage } from "./pages/project/ExportPage";
+import { GraphRoute } from "./pages/project/GraphRoute";
+import { LoinPage } from "./pages/project/LoinPage";
+import { OverviewPage } from "./pages/project/OverviewPage";
+import { PropertiesPage } from "./pages/project/PropertiesPage";
 import { useSettings } from "./state/settings";
 
 const theme = createTheme({
   primaryColor: "blue",
-  defaultRadius: "sm",
+  defaultRadius: "md",
   fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
   components: {
-    TextInput: { defaultProps: { size: "xs" } },
-    Textarea: { defaultProps: { size: "xs" } },
-    Select: { defaultProps: { size: "xs" } },
-    MultiSelect: { defaultProps: { size: "xs" } },
-    TagsInput: { defaultProps: { size: "xs" } },
-    NumberInput: { defaultProps: { size: "xs" } },
-    Autocomplete: { defaultProps: { size: "xs" } },
-    Checkbox: { defaultProps: { size: "xs" } },
-    Switch: { defaultProps: { size: "xs" } },
-    Button: { defaultProps: { size: "xs" } },
+    TextInput: { defaultProps: { size: "sm" } },
+    Textarea: { defaultProps: { size: "sm" } },
+    Select: { defaultProps: { size: "sm" } },
+    MultiSelect: { defaultProps: { size: "sm" } },
+    TagsInput: { defaultProps: { size: "sm" } },
+    NumberInput: { defaultProps: { size: "sm" } },
+    Autocomplete: { defaultProps: { size: "sm" } },
+    Checkbox: { defaultProps: { size: "sm" } },
+    Switch: { defaultProps: { size: "sm" } },
+    Button: { defaultProps: { size: "sm" } },
   },
 });
 
@@ -38,8 +44,16 @@ export function App() {
           <TitleReset />
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/p/:projectId" element={<ProjectPage />} />
-            <Route path="/p/:projectId/graph" element={<GraphPage />} />
+            <Route path="/p/:projectId/window/graph" element={<GraphPage />} />
+            <Route path="/p/:projectId" element={<ProjectLayout />}>
+              <Route index element={<OverviewPage />} />
+              <Route path="classes/:code?" element={<ClassesPage key="classes" mode="main" />} />
+              <Route path="groups/:code?" element={<ClassesPage key="groups" mode="gop" />} />
+              <Route path="properties/:code?" element={<PropertiesPage />} />
+              <Route path="loin" element={<LoinPage />} />
+              <Route path="graph" element={<GraphRoute />} />
+              <Route path="export" element={<ExportPage />} />
+            </Route>
             <Route path="*" element={<Landing />} />
           </Routes>
         </BrowserRouter>

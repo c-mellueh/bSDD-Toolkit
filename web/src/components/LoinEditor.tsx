@@ -12,9 +12,9 @@ import { askConfirm, askText } from "./dialogs";
 
 export const specKey = (p: string, m: string) => `${p}|${m}`;
 
-export function LoinEditor() {
+export function LoinEditor({ inline }: { inline?: boolean } = {}) {
   const { t } = useTranslation();
-  const opened = useUi((s) => s.loin);
+  const opened = useUi((s) => s.loin) || !!inline;
   const close = () => useUi.getState().set({ loin: false });
   const doc = useProject((s) => s.doc);
   const idx = useProject((s) => s.idx);
@@ -82,7 +82,7 @@ export function LoinEditor() {
   };
 
   return (
-    <Modal opened onClose={close} title={t("Level of Information Need (ISO 7817-3)")} size="95%" styles={{ body: { height: "80vh", display: "flex", flexDirection: "column" } }}>
+    <Wrap inline={inline} close={close} title={t("Level of Information Need (ISO 7817-3)")}>
       <Tabs defaultValue="selection" style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
         <Tabs.List mb="xs">
           <Tabs.Tab value="selection">{t("Specifications")}</Tabs.Tab>
@@ -130,7 +130,7 @@ export function LoinEditor() {
             </ScrollArea>
           </div>
         </Tabs.Panel>
-        <Tabs.Panel value="setup">
+        <Tabs.Panel value="setup" style={{ overflow: "auto", minHeight: 0 }}>
           <Grid>
             <Grid.Col span={6}><EntryList kind="purpose" title={t("Purposes")} items={purposes} /></Grid.Col>
             <Grid.Col span={6}><EntryList kind="milestone" title={t("Milestones")} items={milestones} /></Grid.Col>
@@ -139,6 +139,15 @@ export function LoinEditor() {
           </Grid>
         </Tabs.Panel>
       </Tabs>
+    </Wrap>
+  );
+}
+
+function Wrap({ inline, close, title, children }: { inline?: boolean; close: () => void; title: string; children: React.ReactNode }) {
+  if (inline) return <div style={{ height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>{children}</div>;
+  return (
+    <Modal opened onClose={close} title={title} size="95%" styles={{ body: { height: "80vh", display: "flex", flexDirection: "column" } }}>
+      {children}
     </Modal>
   );
 }

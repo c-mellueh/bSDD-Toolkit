@@ -961,7 +961,7 @@ document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>{co
           </Menu.Dropdown>
         </Menu>
         {!standalone && (
-          <Tooltip label={t("Open in a new window")}><ActionIcon variant="default" component="a" href={`/p/${projectId}/graph`} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
+          <Tooltip label={t("Open in a new window")}><ActionIcon variant="default" component="a" href={`/p/${projectId}/window/graph`} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
         )}
         <Tooltip
           multiline
