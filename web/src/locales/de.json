@@ -564,5 +564,7 @@
  "{{n}} included": "{{n}} enthalten",
  "{{n}} of {{total}} properties selected": "{{n}} von {{total}} Merkmalen ausgewählt",
  "{{n}} properties in {{c}} classes": "{{n}} Merkmale in {{c}} Klassen",
- "{{n}} sets": "{{n}} Gruppen"
+ "{{n}} sets": "{{n}} Gruppen",
+ "Full HTML (one tab per root class)": "Vollständiges HTML (ein Tab pro Wurzelklasse)",
+ "{{n}} root classes exported as tabs": "{{n}} Wurzelklassen als Tabs exportiert"
 }

@@ -30,6 +30,7 @@ import { op, useProject } from "../state/project";
 import { storageGet, storageSet } from "../state/settings";
 import { openUi } from "../state/ui";
 import { GraphLibrary } from "./GraphLibrary";
+import { buildTab, htmlPage, rootClassTabs } from "./htmlExport";
 import { hasGraphDrag, readGraphDrag } from "./dnd";
 import { circleLayout, gridLayout, treeLayout } from "./layout";
 import {
@@ -49,7 +50,7 @@ import {
   type GNode,
   type NodeKind,
 } from "./model";
-import { bounds, draw, hitEdge, hitNode, legendHtml, nodeSize, toSvg, type DrawOptions, type REdge, type RNode, type Routing, type View } from "./renderer";
+import { bounds, draw, hitEdge, hitNode, nodeSize, redgesFrom, toSvg, type DrawOptions, type REdge, type RNode, type Routing, type View } from "./renderer";
 import wasmUrl from "./engine.wasm?url";
 
 interface Physics {
@@ -792,11 +793,6 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
 
   // ------------------------------------------------------------------ export
 
-  const infos = () => {
-    const out: Record<string, Record<string, string>> = {};
-    for (const n of graph.nodes) if (n.info) out[n.id] = { Name: n.label, Type: n.kind, ...n.info };
-    return out;
-  };
   const exportName = (ext: string) => `${doc?.dictionary.DictionaryCode ?? "graph"}_graph.${ext}`;
   const exportPng = () => {
     const nodes = rnodes.current;
@@ -825,22 +821,17 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     saveBlob(new Blob([svg], { type: "image/svg+xml" }), exportName("svg"));
   };
   const exportHtml = () => {
-    const { svg } = toSvg(rnodes.current, redges.current, { ...optsRef.current, dark: false }, infos());
-    const usedNodes = [...new Set(graph.nodes.map((n) => n.kind))];
-    const usedEdges = [...new Set(graph.edges.map((e) => e.kind))];
-    const title = `${doc?.dictionary.DictionaryName ?? "bSDD"} – graph`;
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${title}</title><style>
-html,body{margin:0;height:100%;font-family:Inter,system-ui,sans-serif;overflow:hidden}#wrap{width:100%;height:100%;cursor:grab}#wrap svg{width:100%;height:100%}
-.legend{position:fixed;left:10px;top:10px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:12px;line-height:1.6}
-#info{position:fixed;right:10px;top:10px;max-width:360px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:12px;display:none;white-space:pre-wrap}
-.node{cursor:pointer}</style></head><body><div id="wrap">${svg}</div>${legendHtml(usedNodes, usedEdges)}<div id="info"></div><script>
-const svg=document.querySelector('#wrap svg');let vb=svg.viewBox.baseVal;let drag=null;
-svg.addEventListener('wheel',e=>{e.preventDefault();const r=svg.getBoundingClientRect();const f=Math.exp(e.deltaY*0.0015);const mx=vb.x+(e.clientX-r.left)/r.width*vb.width,my=vb.y+(e.clientY-r.top)/r.height*vb.height;vb.width*=f;vb.height*=f;vb.x=mx-(mx-vb.x)*f;vb.y=my-(my-vb.y)*f;},{passive:false});
-svg.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y}});window.addEventListener('pointerup',()=>drag=null);
-window.addEventListener('pointermove',e=>{if(!drag)return;const r=svg.getBoundingClientRect();vb.x=drag.vx-(e.clientX-drag.x)/r.width*vb.width;vb.y=drag.vy-(e.clientY-drag.y)/r.height*vb.height;});
-document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>{const i=document.getElementById('info');const d=n.dataset.info?JSON.parse(n.dataset.info):{};i.textContent=Object.entries(d).filter(([k,v])=>v).map(([k,v])=>k+': '+v).join('\\n');i.style.display='block';}));
-</script></body></html>`;
-    saveBlob(new Blob([html], { type: "text/html" }), exportName("html"));
+    if (!doc) return;
+    const tab = buildTab(doc, idx, "", graph.nodes, rnodes.current, graph.edges, optsRef.current);
+    saveBlob(new Blob([htmlPage(doc, [tab])], { type: "text/html" }), exportName("html"));
+  };
+  // desktop "Export Full HTML (Tabs)": one tab per root class with its whole subtree as a tree
+  const exportFullHtml = () => {
+    if (!doc) return;
+    const tabs = rootClassTabs(doc, idx, optsRef.current, hiddenEdges);
+    if (!tabs.length) return exportHtml();
+    saveBlob(new Blob([htmlPage(doc, tabs)], { type: "text/html" }), exportName("full.html"));
+    notifyHint(t("{{n}} root classes exported as tabs", { n: tabs.length }));
   };
   const exportScene = () => {
     save();
@@ -936,6 +927,7 @@ document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>{co
             <Menu.Item onClick={exportPng}>PNG</Menu.Item>
             <Menu.Item onClick={exportSvg}>SVG</Menu.Item>
             <Menu.Item onClick={exportHtml}>{t("Interactive HTML")}</Menu.Item>
+            <Menu.Item onClick={exportFullHtml}>{t("Full HTML (one tab per root class)")}</Menu.Item>
             <Menu.Divider />
             <Menu.Item onClick={exportScene}>{t("Save scene (JSON)")}</Menu.Item>
             <FileButton onChange={importScene} accept="application/json,.json">{(props) => <Menu.Item {...props} closeMenuOnClick={false}>{t("Load scene (JSON)")}</Menu.Item>}</FileButton>
@@ -1109,25 +1101,6 @@ function notifyHint(message: string) {
   import("@mantine/notifications").then(({ notifications }) => notifications.show({ message, autoClose: 4000 }));
 }
 
-function redgesFrom(edges: GEdge[], indexOf: Map<string, number>): REdge[] {
-  const pairCount = new Map<string, number>();
-  const out: REdge[] = [];
-  for (const e of edges) {
-    const s = indexOf.get(e.source);
-    const tt = indexOf.get(e.target);
-    if (s === undefined || tt === undefined) continue;
-    const key = s < tt ? `${s}-${tt}` : `${tt}-${s}`;
-    const lane = pairCount.get(key) ?? 0;
-    pairCount.set(key, lane + 1);
-    out.push({ id: e.id, s, t: tt, kind: e.kind, label: e.label, lane, lanes: 1 });
-  }
-  for (const e of out) {
-    const key = e.s < e.t ? `${e.s}-${e.t}` : `${e.t}-${e.s}`;
-    e.lanes = pairCount.get(key) ?? 1;
-    if (e.s > e.t) e.lane = e.lanes - 1 - e.lane; // keep opposite directions on different sides
-  }
-  return out;
-}
 
 // ------------------------------------------------------------------ create relations by connecting nodes
 

@@ -1,5 +1,5 @@
 /** Canvas renderer for the graph viewer: batched drawing, level of detail, hit testing, SVG export. */
-import { EDGE_STYLE, NODE_STYLE, type EdgeKind, type NodeKind } from "./model";
+import { EDGE_STYLE, NODE_STYLE, type EdgeKind, type GEdge, type NodeKind } from "./model";
 
 export type Routing = "straight" | "orthogonal" | "curved";
 
@@ -542,10 +542,24 @@ export function toSvg(nodes: RNode[], edges: REdge[], opts: DrawOptions, infos?:
   return { svg: parts.join(""), width: w, height: h };
 }
 
-export function legendHtml(nodeKinds: NodeKind[], edgeKinds: EdgeKind[]): string {
-  const nodes = nodeKinds.map((k) => `<div><span style="display:inline-block;width:14px;height:10px;border-radius:3px;background:${NODE_STYLE[k].color};margin-right:6px"></span>${k}</div>`).join("");
-  const edges = edgeKinds
-    .map((k) => `<div><svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="${EDGE_STYLE[k].color}" stroke-width="2" stroke-dasharray="${EDGE_STYLE[k].dash.join(" ")}"/></svg> ${k}</div>`)
-    .join("");
-  return `<div class="legend"><b>Nodes</b>${nodes}<b>Edges</b>${edges}</div>`;
+
+/** Render edges with lane indices for parallel edges between the same node pair. */
+export function redgesFrom(edges: GEdge[], indexOf: Map<string, number>): REdge[] {
+  const pairCount = new Map<string, number>();
+  const out: REdge[] = [];
+  for (const e of edges) {
+    const s = indexOf.get(e.source);
+    const tt = indexOf.get(e.target);
+    if (s === undefined || tt === undefined) continue;
+    const key = s < tt ? `${s}-${tt}` : `${tt}-${s}`;
+    const lane = pairCount.get(key) ?? 0;
+    pairCount.set(key, lane + 1);
+    out.push({ id: e.id, s, t: tt, kind: e.kind, label: e.label, lane, lanes: 1 });
+  }
+  for (const e of out) {
+    const key = e.s < e.t ? `${e.s}-${e.t}` : `${e.t}-${e.s}`;
+    e.lanes = pairCount.get(key) ?? 1;
+    if (e.s > e.t) e.lane = e.lanes - 1 - e.lane; // keep opposite directions on different sides
+  }
+  return out;
 }
