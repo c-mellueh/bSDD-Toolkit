@@ -1,7 +1,7 @@
 {
   "name": "bsdd-toolkit-web",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,8 @@
     "build:wasm": "cd graph-engine && (cargo build --release --target wasm32-unknown-unknown --lib 2>/dev/null || docker run --rm -u $(id -u):$(id -g) -e CARGO_HOME=/tmp/cargo -v \"$PWD\":/src -w /src rust:1.86-slim sh -c 'cargo build --release --target wasm32-unknown-unknown --lib') && cp target/wasm32-unknown-unknown/release/graph_engine.wasm ../src/graph/engine.wasm"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "1.4.0",
+    "@google/genai": "2.31.0",
     "@mantine/core": "7.17.8",
     "@mantine/dates": "7.17.8",
     "@mantine/hooks": "7.17.8",

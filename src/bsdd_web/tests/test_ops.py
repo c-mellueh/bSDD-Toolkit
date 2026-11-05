@@ -265,3 +265,76 @@ def test_loin_xml_roundtrip_keeps_single_properties_of_linked_group(h):
     assert b"GroupOfPropertiesRef" in xml
     parsed = ensure_state(parse_loin_xml(xml, h.d))
     assert sorted(parsed["specs"][key]["properties"]["Wall"]) == [["Pset_Fire", "fmat"], ["Pset_Fire", "rating"]]
+
+
+def test_loin_pset_view_covers_classes_not_yet_in_the_loin(h):
+    from bsdd_web.services.loin import spec_key
+
+    h.run("cp.create", class_code="Door", data={"Code": "height", "PropertyCode": "Height", "PropertySet": "Geometry"})
+    h.run("loin.init")
+    state = h.ctx.extras.loin
+    key = spec_key(state["purposes"][0]["guid"], state["milestones"][0]["guid"])
+    # no class included yet: switching the pset on includes every class that has it
+    n = h.run("loin.set_pset_properties_included", spec=key, items=[["Geometry", "height"]], included=True)
+    assert n == 2
+    assert set(state["specs"][key]["classes"]) >= {"Wall", "Door"}
+
+
+def test_loin_matrix_controls_export_including_empty_combinations(h):
+    from lxml import etree
+
+    from bsdd_web.services.loin import (
+        active_keys,
+        build_loin_xml,
+        ensure_state,
+        parse_loin_xml,
+        spec_key,
+        unqualify,
+    )
+
+    h.run("loin.init")
+    state = h.ctx.extras.loin
+    p1 = state["purposes"][0]["guid"]
+    m1 = state["milestones"][0]["guid"]
+    m2 = h.run("loin.add_milestone", name="MS 2")
+    p2 = h.run("loin.add_purpose", name="PP 2")
+    k11, k12, k21 = spec_key(p1, m1), spec_key(p1, m2), spec_key(p2, m1)
+    h.run("loin.set_class_included", spec=k11, codes=["Wall"], included=True)
+
+    # untouched matrix: like before, only combinations with classes are active / exported
+    assert state["matrix"] is None and active_keys(state) == [k11]
+    _, count = build_loin_xml(state, h.d)
+    assert count == 1
+
+    # tick an empty combination: it is exported as a specification without object types
+    h.run("loin.set_matrix", keys=[k12], active=True)
+    assert active_keys(state) == [k11, k12]
+    xml, count = build_loin_xml(state, h.d)
+    assert count == 2
+    # the empty combination is a Specification without SpecificationPerObjectType (minOccurs=0 in ISO 7817-3)
+    root = etree.fromstring(unqualify(xml))
+    specs = [e for e in root if etree.QName(e).localname == "Specification"]
+    assert len(specs) == 2
+    empty = [e for e in specs if not any(etree.QName(c).localname == "SpecificationPerObjectType" for c in e)]
+    assert len(empty) == 1 and "MS 2" in empty[0].get("name")
+    roundtrip = ensure_state(parse_loin_xml(xml, h.d))
+    assert spec_key(p1, m2) in roundtrip["matrix"] and roundtrip["specs"][spec_key(p1, m2)]["classes"] == []
+
+    # untick a filled combination: it is no longer exported
+    h.run("loin.set_matrix", keys=[k11], active=False)
+    _, count = build_loin_xml(state, h.d)
+    assert count == 1
+
+    # editing an inactive combination activates it
+    h.run("loin.set_class_included", spec=k21, codes=["Door"], included=True)
+    assert k21 in active_keys(state)
+
+    # import restores exactly the exported combinations
+    xml, _ = build_loin_xml(state, h.d)
+    parsed = ensure_state(parse_loin_xml(xml, h.d))
+    assert len(parsed["matrix"]) == 2
+
+    # nothing ticked -> nothing to export
+    h.run("loin.set_matrix", keys=active_keys(state), active=False)
+    with pytest.raises(ValueError):
+        build_loin_xml(state, h.d)

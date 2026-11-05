@@ -148,3 +148,15 @@ body[data-readonly] [data-edit] { display: none !important; }
 }
 .col-resize { position: absolute; top: 0; right: -3px; width: 7px; height: 100%; cursor: col-resize; z-index: 2; }
 .col-resize:hover, .col-resize:active { background: var(--mantine-primary-color-light); }
+.loin-matrix-wrap { overflow-x: auto; max-width: 100%; }
+.loin-matrix { width: auto; min-width: 360px; }
+.loin-matrix th, .loin-matrix td { min-width: 170px; }
+.loin-cell.on { background: var(--mantine-primary-color-light); }
+.loin-check { display: inline-flex; align-items: center; justify-content: center; flex: none; padding: 0; border-radius: 4px; border: 1.5px solid var(--mantine-color-gray-5); background: var(--mantine-color-body); color: #fff; cursor: pointer; }
+.loin-check.on { background: var(--mantine-primary-color-filled); border-color: var(--mantine-primary-color-filled); }
+.loin-check.partial { background: var(--mantine-primary-color-light); border-color: var(--mantine-primary-color-filled); color: var(--mantine-primary-color-filled); }
+.loin-check:disabled { cursor: default; opacity: 0.6; }
+[data-mantine-color-scheme="dark"] .loin-check { border-color: var(--mantine-color-dark-2); }
+.loin-cell.paintable { cursor: pointer; user-select: none; touch-action: none; }
+.loin-cell.paintable:hover { outline: 2px solid var(--mantine-primary-color-light); outline-offset: -2px; }
+.loin-matrix.painting { cursor: crosshair; }

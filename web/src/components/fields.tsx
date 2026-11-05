@@ -94,7 +94,7 @@ export function AiTextarea(props: {
   error?: string | false;
 }) {
   const { t } = useTranslation();
-  const hasKey = useSettings((s) => !!s.aiKey);
+  const hasKey = useSettings((s) => !!s.aiKeys[s.aiProvider]?.trim());
   const [busy, setBusy] = useState(false);
   const generate = async () => {
     setBusy(true);
@@ -111,7 +111,7 @@ export function AiTextarea(props: {
       label={
         <Group gap={4} component="span">
           {props.label}
-          <Tooltip label={hasKey ? t("Generate definition with AI") : t("Enter your OpenAI API key in the settings to use the AI helper")}>
+          <Tooltip label={hasKey ? t("Generate definition with AI") : t("Enter an API key (OpenAI, Claude or Gemini) in the settings to use the AI helper")}>
             <ActionIcon size="xs" variant="subtle" onClick={generate} disabled={!hasKey || busy} component="span">
               {busy ? <Loader size={10} /> : <IconSparkles size={12} />}
             </ActionIcon>

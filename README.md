@@ -102,7 +102,7 @@ Features: class tree (drag & drop, copy/paste, grouping), property sets, class p
 property / class / dictionary editors with relations and allowed values, Groups of Properties,
 Level of Information Need (ISO 7817-3), exports (Excel, IDS, ISO 23386, ISO 7817-3, Revit),
 download from bSDD, fuzzy search, graph viewer, AI definitions (each user enters their own
-OpenAI key, it never reaches the server), English and German UI, and a Python shell.
+OpenAI, Anthropic Claude or Google Gemini key; it never reaches the server), English and German UI, and a Python shell.
 
 The web UI is organised in sections (overview with checks, classes, groups of properties,
 properties, LOIN, graph, export). Every class and property has its own URL

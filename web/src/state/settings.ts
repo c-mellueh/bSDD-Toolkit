@@ -1,12 +1,24 @@
 import { create } from "zustand";
 
+/** AI providers the helper may use. xAI / Grok is deliberately not supported. */
+export type AiProvider = "openai" | "anthropic" | "gemini";
+
+export const AI_PROVIDERS: { value: AiProvider; label: string; defaultModel: string; keyHint: string }[] = [
+  { value: "openai", label: "OpenAI", defaultModel: "gpt-5-nano", keyHint: "sk-…" },
+  { value: "anthropic", label: "Anthropic Claude", defaultModel: "claude-opus-5-5", keyHint: "sk-ant-…" },
+  { value: "gemini", label: "Google Gemini", defaultModel: "gemini-3.5-flash-lite", keyHint: "AIza…" },
+];
+
 export interface Settings {
   language: "en" | "de";
   theme: "auto" | "light" | "dark";
   userName: string;
   pasteSeparator: string;
-  aiKey: string;
-  aiModel: string;
+  aiProvider: AiProvider;
+  /** API key per provider (stays in this browser) */
+  aiKeys: Record<AiProvider, string>;
+  /** model per provider */
+  aiModels: Record<AiProvider, string>;
   aiLanguage: "German" | "English";
   aiSentences: number;
   allowUnknownUri: boolean;
@@ -22,8 +34,9 @@ function load(): Settings {
     theme: "auto",
     userName: `Guest ${Math.floor(Math.random() * 900 + 100)}`,
     pasteSeparator: "\n",
-    aiKey: "",
-    aiModel: "gpt-5-nano",
+    aiProvider: "openai",
+    aiKeys: { openai: "", anthropic: "", gemini: "" },
+    aiModels: { openai: "gpt-5-nano", anthropic: "claude-opus-5-5", gemini: "gemini-3.5-flash-lite" },
     aiLanguage: "English",
     aiSentences: 2,
     allowUnknownUri: true,
@@ -31,7 +44,17 @@ function load(): Settings {
   };
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return { ...defaults, ...JSON.parse(raw) };
+    if (raw) {
+      const stored = JSON.parse(raw);
+      const merged: Settings = { ...defaults, ...stored, aiKeys: { ...defaults.aiKeys, ...stored.aiKeys }, aiModels: { ...defaults.aiModels, ...stored.aiModels } };
+      // settings from before multi-provider support: a single OpenAI key and model
+      if (typeof stored.aiKey === "string" && stored.aiKey && !stored.aiKeys) merged.aiKeys.openai = stored.aiKey;
+      if (typeof stored.aiModel === "string" && stored.aiModel && !stored.aiModels) merged.aiModels.openai = stored.aiModel;
+      delete (merged as unknown as Record<string, unknown>).aiKey;
+      delete (merged as unknown as Record<string, unknown>).aiModel;
+      if (!AI_PROVIDERS.some((p) => p.value === merged.aiProvider)) merged.aiProvider = "openai";
+      return merged;
+    }
   } catch {
     /* storage unavailable */
   }
