@@ -448,7 +448,7 @@ requires-dist = [
 
 [[package]]
 name = "bsdd-web"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "src/bsdd_web" }
 dependencies = [
     { name = "bsdd" },
