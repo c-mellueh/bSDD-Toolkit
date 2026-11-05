@@ -95,3 +95,23 @@ body.resizing { cursor: col-resize; user-select: none; }
 .split-side .pane-header, .split-single .pane-header { min-height: 52px; padding: 0 12px; }
 .split-side .pane-title, .split-single .pane-title { text-transform: none; font-size: 16px; letter-spacing: 0; color: var(--mantine-color-text); }
 .page-inner .mantine-ScrollArea-root { background: var(--mantine-color-body); border-radius: var(--mantine-radius-md); }
+
+/* ---------------------------------------------------------------- allowed values */
+.av-table-wrap { border: 1px solid var(--mantine-color-default-border); border-radius: var(--mantine-radius-md); overflow: auto; max-height: 60vh; background: var(--mantine-color-body); }
+.av-table { font-size: 13px; }
+.av-table th { font-size: 12px; font-weight: 600; padding: 6px 8px !important; white-space: nowrap; }
+.av-table td { padding: 0 !important; border-bottom: 1px solid var(--mantine-color-default-border); vertical-align: middle; }
+.av-table td:first-child, .av-table td:nth-child(2) { text-align: center; }
+.av-table th:nth-child(2) .mantine-Checkbox-root, .av-table td:nth-child(2) .mantine-Checkbox-root { display: inline-block; }
+.av-input { width: 100%; box-sizing: border-box; height: 32px; padding: 0 8px; border: 1px solid transparent; border-radius: 4px; background: transparent; font: inherit; color: inherit; outline: none; }
+.av-input.mono { font-size: 12px; }
+.av-input:hover { border-color: var(--mantine-color-default-border); }
+.av-input:focus { border-color: var(--mantine-primary-color-filled); background: var(--mantine-color-body); }
+.av-input.av-error { border-color: var(--mantine-color-red-5); background: var(--mantine-color-red-light); }
+.av-input::placeholder { color: var(--mantine-color-placeholder); }
+.av-static { display: block; padding: 7px 8px; }
+.av-inherited { color: var(--mantine-color-dimmed); font-style: italic; }
+.av-selected td { background: var(--mantine-primary-color-light); }
+.av-drop td { box-shadow: inset 0 2px 0 var(--mantine-primary-color-filled); }
+.av-grip { display: inline-flex; padding: 4px 2px; cursor: grab; color: var(--mantine-color-dimmed); }
+.av-grip[draggable="false"] { cursor: default; opacity: .3; }

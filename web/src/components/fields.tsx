@@ -5,12 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { generateDefinition } from "../ai";
 import { cached } from "../api";
-import { parseValuesText } from "../clipboard";
-import { CLASS_RELATION_TYPES, PROPERTY_RELATION_TYPES, isUri, slugify, uniqueCode } from "../model";
+import { CLASS_RELATION_TYPES, PROPERTY_RELATION_TYPES, isUri } from "../model";
 import { notifyError } from "../notify";
 import { useProject } from "../state/project";
 import { useSettings } from "../state/settings";
-import type { AllowedValue, ClassRelation, PropertyRelation } from "../types";
+import type { ClassRelation, PropertyRelation } from "../types";
 
 export interface Resources {
   units: { Code: string; Name: string }[];
@@ -115,90 +114,7 @@ export function AiTextarea(props: {
 
 // ------------------------------------------------------------------ allowed values
 
-export function AllowedValuesEditor({ values, onChange, inherited }: { values: AllowedValue[]; onChange: (v: AllowedValue[]) => void; inherited?: AllowedValue[] }) {
-  const { t } = useTranslation();
-  const separator = useSettings((s) => s.pasteSeparator);
-  const showInherited = values.length === 0 && (inherited?.length ?? 0) > 0;
-  const update = (i: number, patch: Partial<AllowedValue>) => {
-    const next = values.slice();
-    const old = next[i];
-    const item = { ...old, ...patch };
-    if (patch.Value !== undefined && (old.Code === slugify(old.Value) || !old.Code)) {
-      item.Code = uniqueCode(slugify(patch.Value) || "value", values.filter((_, j) => j !== i).map((v) => v.Code));
-    }
-    next[i] = item;
-    onChange(next);
-  };
-  const add = () => onChange([...values, { Code: uniqueCode("new-value", values.map((v) => v.Code)), Value: "new value" }]);
-  const onPaste = (e: React.ClipboardEvent) => {
-    const target = e.target as HTMLElement;
-    const text = e.clipboardData.getData("text/plain");
-    if (!text || (target.tagName === "INPUT" && !text.includes("\n") && !text.includes(";") && !text.includes("\t"))) return;
-    e.preventDefault();
-    const rows = parseValuesText(text, separator);
-    const existing = new Set(values.map((v) => v.Code.toLowerCase()));
-    const next = values.slice();
-    for (const cols of rows) {
-      const value = cols[0];
-      if (!value) continue;
-      const code = cols[1] || slugify(value) || "value";
-      if (existing.has(code.toLowerCase())) continue;
-      existing.add(code.toLowerCase());
-      next.push({ Value: value, Code: code, Description: cols[2] || undefined, SortNumber: cols[3] ? Number(cols[3]) : undefined, OwnedUri: cols[4] || undefined });
-    }
-    onChange(next);
-  };
-  return (
-    <div onPaste={onPaste}>
-      <Group justify="space-between" mb={4}>
-        <Text size="xs" c="dimmed">{t("Paste lists (one value per line, or CSV with ';': Value;Code;Description;SortNumber;OwnedUri)")}</Text>
-        <ActionIcon variant="light" size="sm" onClick={add}><IconPlus size={14} /></ActionIcon>
-      </Group>
-      <Table withTableBorder withColumnBorders striped fz="xs" verticalSpacing={2}>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t("Value")}</Table.Th>
-            <Table.Th>{t("Code")}</Table.Th>
-            <Table.Th>{t("Description")}</Table.Th>
-            <Table.Th w={70}>{t("Sort")}</Table.Th>
-            <Table.Th>{t("Owned URI")}</Table.Th>
-            <Table.Th w={30} />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {showInherited &&
-            inherited!.map((v, i) => (
-              <Table.Tr key={`inh-${i}`} style={{ opacity: 0.55, fontStyle: "italic" }}>
-                <Table.Td>{v.Value}</Table.Td>
-                <Table.Td>{v.Code}</Table.Td>
-                <Table.Td>{v.Description}</Table.Td>
-                <Table.Td>{v.SortNumber}</Table.Td>
-                <Table.Td>{v.OwnedUri}</Table.Td>
-                <Table.Td />
-              </Table.Tr>
-            ))}
-          {values.map((v, i) => (
-            <Table.Tr key={i}>
-              <Table.Td><CellInput value={v.Value} onChange={(x) => update(i, { Value: x })} /></Table.Td>
-              <Table.Td><CellInput value={v.Code} onChange={(x) => update(i, { Code: x })} /></Table.Td>
-              <Table.Td><CellInput value={v.Description ?? ""} onChange={(x) => update(i, { Description: x || undefined })} /></Table.Td>
-              <Table.Td><CellInput value={v.SortNumber?.toString() ?? ""} onChange={(x) => update(i, { SortNumber: x === "" || isNaN(Number(x)) ? undefined : Number(x) })} /></Table.Td>
-              <Table.Td><CellInput value={v.OwnedUri ?? ""} onChange={(x) => update(i, { OwnedUri: x || undefined })} /></Table.Td>
-              <Table.Td>
-                <ActionIcon size="xs" variant="subtle" color="red" onClick={() => onChange(values.filter((_, j) => j !== i))}><IconTrash size={12} /></ActionIcon>
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {showInherited && <Text size="xs" c="dimmed" mt={4}>{t("Grey values are inherited from the property. Add values to override them.")}</Text>}
-    </div>
-  );
-}
-
-function CellInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  return <input className="cell-edit" style={{ width: "100%", border: "none", background: "transparent", font: "inherit", color: "inherit" }} value={value} onChange={(e) => onChange(e.currentTarget.value)} />;
-}
+export { AllowedValuesEditor } from "./AllowedValuesEditor";
 
 // ------------------------------------------------------------------ relations
 
