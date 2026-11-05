@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ActionIcon, Autocomplete, Group, Loader, NumberInput, Select, Table, Text, TextInput, Textarea, Tooltip } from "@mantine/core";
-import { IconPlus, IconSparkles, IconTrash } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import { ActionIcon, Group, Loader, NumberInput, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { IconSparkles } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { generateDefinition } from "../ai";
 import { cached } from "../api";
-import { CLASS_RELATION_TYPES, PROPERTY_RELATION_TYPES, isUri } from "../model";
 import { notifyError } from "../notify";
-import { useProject } from "../state/project";
 import { useSettings } from "../state/settings";
-import type { ClassRelation, PropertyRelation } from "../types";
 
 export interface Resources {
   units: { Code: string; Name: string }[];
@@ -116,99 +113,4 @@ export function AiTextarea(props: {
 
 export { AllowedValuesEditor } from "./AllowedValuesEditor";
 
-// ------------------------------------------------------------------ relations
-
-type AnyRelation = ClassRelation | PropertyRelation;
-
-export function RelationsEditor({ kind, relations, onChange, selfCode }: { kind: "class" | "property"; relations: AnyRelation[]; onChange: (r: AnyRelation[]) => void; selfCode?: string }) {
-  const { t } = useTranslation();
-  const doc = useProject((s) => s.doc);
-  const allowUnknown = useSettings((s) => s.allowUnknownUri);
-  const [type, setType] = useState<string>(kind === "class" ? "IsSimilarTo" : "IsSimilarTo");
-  const [target, setTarget] = useState("");
-  const [fraction, setFraction] = useState<number | null>(null);
-  const [owned, setOwned] = useState("");
-  const d = doc?.dictionary;
-  const useOwnUri = !!d?.UseOwnUri;
-
-  const options = useMemo(() => {
-    if (!d) return [];
-    if (kind === "class") {
-      return (d.Classes ?? [])
-        .filter((c) => c.Code !== selfCode && (type !== "HasMaterial" || c.ClassType === "Material"))
-        .map((c) => ({ value: c.Code, label: `${c.Code} — ${c.Name}` }));
-    }
-    return (d.Properties ?? []).filter((p) => p.Code !== selfCode).map((p) => ({ value: p.Code, label: `${p.Code} — ${p.Name}` }));
-  }, [d, kind, type, selfCode]);
-
-  const uriKey = kind === "class" ? "RelatedClassUri" : "RelatedPropertyUri";
-  const nameKey = kind === "class" ? "RelatedClassName" : "RelatedPropertyName";
-  const codes = new Set(options.map((o) => o.value));
-  const targetValid = !!target && (codes.has(target) || (isUri(target) && allowUnknown) || (isUri(target) && !allowUnknown && target.includes("/uri/")));
-
-  const add = () => {
-    if (!targetValid) return;
-    const rel: any = { RelationType: type, [uriKey]: target };
-    if (kind === "class" && type === "HasMaterial" && fraction !== null) rel.Fraction = fraction;
-    if (useOwnUri && owned) rel.OwnedUri = owned;
-    onChange([...relations, rel]);
-    setTarget("");
-    setFraction(null);
-    setOwned("");
-  };
-
-  const label = (r: any) => {
-    const uri: string = r[uriKey] ?? "";
-    return r[nameKey] || (isUri(uri) ? uri.split("/").pop() : uri);
-  };
-
-  return (
-    <div>
-      <Table withTableBorder striped fz="xs" verticalSpacing={2} mb="xs">
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t("Relation")}</Table.Th>
-            <Table.Th>{t("Target")}</Table.Th>
-            <Table.Th>{t("URI / Code")}</Table.Th>
-            {kind === "class" && <Table.Th w={70}>{t("Fraction")}</Table.Th>}
-            {useOwnUri && <Table.Th>{t("Owned URI")}</Table.Th>}
-            <Table.Th w={30} />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {relations.length === 0 && (
-            <Table.Tr><Table.Td colSpan={6}><Text size="xs" c="dimmed">{t("No relations")}</Text></Table.Td></Table.Tr>
-          )}
-          {relations.map((r: any, i) => (
-            <Table.Tr key={i}>
-              <Table.Td>{r.RelationType}</Table.Td>
-              <Table.Td>{label(r)}</Table.Td>
-              <Table.Td style={{ maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis" }} title={r[uriKey]}>{r[uriKey]}</Table.Td>
-              {kind === "class" && <Table.Td>{r.Fraction ?? ""}</Table.Td>}
-              {useOwnUri && <Table.Td>{r.OwnedUri ?? ""}</Table.Td>}
-              <Table.Td>
-                <ActionIcon size="xs" variant="subtle" color="red" onClick={() => onChange(relations.filter((_, j) => j !== i))}><IconTrash size={12} /></ActionIcon>
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      <Group gap="xs" align="flex-end" wrap="nowrap">
-        <Select label={t("Relation")} data={kind === "class" ? CLASS_RELATION_TYPES : PROPERTY_RELATION_TYPES} value={type} onChange={(v) => setType(v ?? type)} w={150} allowDeselect={false} />
-        <Autocomplete
-          label={t("Target (code or URI)")}
-          data={options}
-          value={target}
-          onChange={setTarget}
-          style={{ flex: 1 }}
-          limit={50}
-          error={target && !targetValid ? t("Unknown code") : undefined}
-          onKeyDown={(e) => e.key === "Enter" && add()}
-        />
-        {kind === "class" && type === "HasMaterial" && <NumberInput label={t("Fraction")} value={fraction ?? ""} onChange={(v) => setFraction(v === "" ? null : Number(v))} w={90} min={0} max={1} step={0.1} decimalScale={4} />}
-        {useOwnUri && <TextInput label={t("Owned URI")} value={owned} onChange={(e) => setOwned(e.currentTarget.value)} w={180} />}
-        <ActionIcon variant="light" onClick={add} disabled={!targetValid} mb={2}><IconPlus size={16} /></ActionIcon>
-      </Group>
-    </div>
-  );
-}
+export { RelationsEditor } from "./RelationsEditor";
