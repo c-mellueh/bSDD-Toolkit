@@ -449,15 +449,30 @@ function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<st
   const [paint, setPaint] = useState<{ value: boolean; keys: Set<string> } | null>(null);
   const paintRef = useRef(paint);
   paintRef.current = paint;
+  const last = useRef<{ x: number; y: number } | null>(null);
   const isOn = (k: string) => (paint?.keys.has(k) ? paint.value : active.has(k));
 
   useEffect(() => {
     if (!paint) return;
+    const cellAt = (x: number, y: number) => (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>("[data-cell]")?.dataset.cell;
     const move = (e: PointerEvent) => {
-      const el = (document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null)?.closest<HTMLElement>("[data-cell]");
-      const k = el?.dataset.cell;
       const cur = paintRef.current;
-      if (k && cur && !cur.keys.has(k)) setPaint({ value: cur.value, keys: new Set(cur.keys).add(k) });
+      if (!cur) return;
+      // fast movements report only a few positions: also take every cell on the straight line
+      // between the previous and this position (sampled every 6 px), plus coalesced events
+      const points = (e.getCoalescedEvents?.() ?? []).map((c) => ({ x: c.clientX, y: c.clientY }));
+      points.push({ x: e.clientX, y: e.clientY });
+      const found = new Set<string>();
+      for (const pt of points) {
+        const from = last.current ?? pt;
+        const steps = Math.max(1, Math.ceil(Math.hypot(pt.x - from.x, pt.y - from.y) / 6));
+        for (let i = 1; i <= steps; i++) {
+          const k = cellAt(from.x + ((pt.x - from.x) * i) / steps, from.y + ((pt.y - from.y) * i) / steps);
+          if (k && !cur.keys.has(k)) found.add(k);
+        }
+        last.current = pt;
+      }
+      if (found.size) setPaint({ value: cur.value, keys: new Set([...cur.keys, ...found]) });
     };
     const up = () => {
       const cur = paintRef.current;
@@ -480,6 +495,7 @@ function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<st
   const start = (e: React.PointerEvent, k: string) => {
     if (ro || e.button !== 0) return;
     e.preventDefault(); // no text selection while dragging
+    last.current = { x: e.clientX, y: e.clientY };
     setPaint({ value: !active.has(k), keys: new Set([k]) });
   };
 
