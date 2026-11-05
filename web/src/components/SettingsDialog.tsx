@@ -1,7 +1,8 @@
 import { Button, Divider, Group, Modal, NumberInput, PasswordInput, Select, Stack, Switch, Text, TextInput } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { renameMe } from "../state/project";
-import { useSettings } from "../state/settings";
+import { forbiddenAi } from "../ai";
+import { AI_PROVIDERS, useSettings, type AiProvider } from "../state/settings";
 import { useUi } from "../state/ui";
 
 export function SettingsDialog() {
@@ -9,6 +10,8 @@ export function SettingsDialog() {
   const opened = useUi((s) => s.settings);
   const s = useSettings();
   if (!opened) return null;
+  const provider = AI_PROVIDERS.find((p) => p.value === s.aiProvider) ?? AI_PROVIDERS[0];
+  const blocked = forbiddenAi(s.aiKeys[s.aiProvider] ?? "", s.aiModels[s.aiProvider] ?? "");
   return (
     <Modal opened onClose={() => useUi.getState().set({ settings: false })} title={t("Settings")} size="md">
       <Stack>
@@ -20,10 +23,29 @@ export function SettingsDialog() {
         </Group>
         <TextInput label={t("Separator for pasting allowed values")} description={t("Use \\n for line breaks")} value={s.pasteSeparator === "\n" ? "\\n" : s.pasteSeparator} onChange={(e) => s.set({ pasteSeparator: e.currentTarget.value === "\\n" ? "\n" : e.currentTarget.value })} />
         <Switch label={t("Allow relations to unknown URIs")} checked={s.allowUnknownUri} onChange={(e) => s.set({ allowUnknownUri: e.currentTarget.checked })} />
-        <Divider label={t("AI helper (OpenAI)")} />
-        <PasswordInput label={t("OpenAI API key")} description={t("Used directly from your browser, never sent to this server.")} value={s.aiKey} onChange={(e) => s.set({ aiKey: e.currentTarget.value })} />
+        <Divider label={t("AI helper")} />
+        <Select
+          label={t("AI provider")}
+          data={AI_PROVIDERS.map((p) => ({ value: p.value, label: p.label }))}
+          value={s.aiProvider}
+          onChange={(v) => v && s.set({ aiProvider: v as AiProvider })}
+          allowDeselect={false}
+        />
+        <PasswordInput
+          label={t("{{provider}} API key", { provider: provider.label })}
+          description={t("Used directly from your browser, never sent to this server.")}
+          placeholder={provider.keyHint}
+          value={s.aiKeys[s.aiProvider] ?? ""}
+          onChange={(e) => s.set({ aiKeys: { ...s.aiKeys, [s.aiProvider]: e.currentTarget.value } })}
+          error={blocked ? t(blocked) : undefined}
+        />
         <Group grow>
-          <TextInput label={t("Model")} value={s.aiModel} onChange={(e) => s.set({ aiModel: e.currentTarget.value })} />
+          <TextInput
+            label={t("Model")}
+            placeholder={provider.defaultModel}
+            value={s.aiModels[s.aiProvider] ?? ""}
+            onChange={(e) => s.set({ aiModels: { ...s.aiModels, [s.aiProvider]: e.currentTarget.value } })}
+          />
           <Select label={t("Output language")} data={[{ value: "English", label: "English" }, { value: "German", label: "Deutsch" }]} value={s.aiLanguage} onChange={(v) => v && s.set({ aiLanguage: v as "English" | "German" })} allowDeselect={false} />
           <NumberInput label={t("Sentences")} min={1} max={10} value={s.aiSentences} onChange={(v) => s.set({ aiSentences: Number(v) || 2 })} />
         </Group>
