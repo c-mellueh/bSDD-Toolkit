@@ -1,7 +1,7 @@
 {
   "name": "bsdd-toolkit-web",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -24,18 +24,18 @@
     "react-arborist": "3.4.3",
     "react-dom": "18.3.1",
     "react-i18next": "15.4.1",
-    "react-router-dom": "6.30.0",
+    "react-router-dom": "7.18.5",
     "zustand": "5.0.3"
   },
   "devDependencies": {
     "@types/react": "18.3.20",
     "@types/react-dom": "18.3.6",
     "@vitejs/plugin-react": "4.3.4",
-    "postcss": "8.5.3",
+    "postcss": "8.5.32",
     "postcss-preset-mantine": "1.17.0",
     "postcss-simple-vars": "7.0.1",
     "typescript": "5.8.3",
-    "vite": "6.2.6",
-    "vitest": "3.1.1"
+    "vite": "6.4.5",
+    "vitest": "5.1.0"
   }
 }
