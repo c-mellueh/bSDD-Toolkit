@@ -238,3 +238,30 @@ def test_loin_pset_view_applies_to_all_added_classes(h):
     assert state["specs"][key]["properties"]["Door"] == [["Geometry", "height"]]
     h.run("loin.set_pset_properties_included", spec=key, items=[["Geometry", "height"]], included=False)
     assert "Wall" not in state["specs"][key]["properties"] and "Door" not in state["specs"][key]["properties"]
+
+
+def test_loin_xml_roundtrip_keeps_single_properties_of_linked_group(h):
+    """Selecting one property of a pset linked to a Group of Properties must survive export/import."""
+    from bsdd_web.ops.helpers import linked_gop
+    from bsdd_web.services.loin import build_loin_xml, ensure_state, parse_loin_xml, spec_key
+
+    h.run("cp.create", class_code="Wall", data={"Code": "rating", "PropertyCode": "FireRating", "PropertySet": "Pset_Fire"})
+    h.run("cp.create", class_code="Wall", data={"Code": "fmat", "PropertyCode": "Material", "PropertySet": "Pset_Fire"})
+    h.run("relation.add", kind="class", code="Wall", relation={"RelationType": "HasReference", "RelatedClassUri": "Pset_Fire"})
+    assert linked_gop(h.d, h.cls("Wall"), "Pset_Fire") is not None
+    h.run("loin.init")
+    state = h.ctx.extras.loin
+    key = spec_key(state["purposes"][0]["guid"], state["milestones"][0]["guid"])
+    h.run("loin.set_properties_included", spec=key, class_code="Wall", items=[["Pset_Fire", "rating"]], included=True)
+
+    xml, _ = build_loin_xml(state, h.d, [key])
+    assert b"GroupOfPropertiesRef" not in xml  # partial selection: individual property references
+    parsed = ensure_state(parse_loin_xml(xml, h.d))
+    assert parsed["specs"][key]["properties"]["Wall"] == [["Pset_Fire", "rating"]]
+
+    # the complete set is still exported as a reference to the group
+    h.run("loin.set_properties_included", spec=key, class_code="Wall", items=[["Pset_Fire", "fmat"]], included=True)
+    xml, _ = build_loin_xml(state, h.d, [key])
+    assert b"GroupOfPropertiesRef" in xml
+    parsed = ensure_state(parse_loin_xml(xml, h.d))
+    assert sorted(parsed["specs"][key]["properties"]["Wall"]) == [["Pset_Fire", "fmat"], ["Pset_Fire", "rating"]]

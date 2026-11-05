@@ -324,11 +324,20 @@ def build_loin_xml(state: dict[str, Any], d: BsddDictionary, keys: list[str] | N
                     continue
                 groups: dict[str, IsoGroupOfProperties] = {}
                 group_refs: list[DtRef] = []
-                for pset, cp_code in spec_state.get("properties", {}).get(code, []):
+                chosen = spec_state.get("properties", {}).get(code, [])
+                # A reference to a Group of Properties means "the whole group" (it is expanded to all
+                # properties of the set on import), so only use it when every property of the set is
+                # selected; otherwise reference the selected properties individually.
+                chosen_keys = {((ps or ""), c) for ps, c in chosen}
+                complete: dict[str, bool] = {}
+                for x in bsdd_class.ClassProperties:
+                    ps = x.PropertySet or ""
+                    complete[ps] = complete.get(ps, True) and (ps, x.Code) in chosen_keys
+                for pset, cp_code in chosen:
                     cp = next((x for x in bsdd_class.ClassProperties if x.Code == cp_code and (x.PropertySet or "") == pset), None)
                     if cp is None:
                         continue
-                    gop = linked_gop(d, bsdd_class, pset) if pset else None
+                    gop = linked_gop(d, bsdd_class, pset) if pset and complete.get(pset) else None
                     if gop is not None and gop.ClassType == GOP:
                         uri = gop.OwnedUri or class_uri(d, gop)
                         if not any(r.reference_uri == uri for r in group_refs):
