@@ -91,25 +91,32 @@ function clipRect(cx: number, cy: number, w: number, h: number, tx: number, ty: 
 export function edgeGeometry(a: RNode, b: RNode, routing: Routing, lane: number, lanes: number): Geometry {
   const offset = (lane - (lanes - 1) / 2) * 26;
   if (routing === "orthogonal") {
+    // Same rules as the desktop graph viewer: only nodes on (roughly) the same row are
+    // connected sideways; everything else leaves the source at its top/bottom centre and
+    // enters the target at its bottom/top centre, bending shortly before the target so
+    // edges into one node share a common "bus" line (clean trees).
+    const BEND = 30; // = 3 × arrow length on the desktop
     const dx = b.x - a.x;
     const dy = b.y - a.y;
-    const horizontal = Math.abs(dx) - (a.w + b.w) / 2 > Math.abs(dy) - (a.h + b.h) / 2;
-    if (horizontal) {
+    const lx = offset * 0.35; // parallel edges side by side
+    if (Math.abs(dy) < Math.max(BEND, (a.h + b.h) / 2)) {
       const sgn = Math.sign(dx) || 1;
       const sx = a.x + (sgn * a.w) / 2;
       const ex = b.x - (sgn * b.w) / 2;
-      const mx = (sx + ex) / 2 + offset * 0.5;
+      const gap = Math.abs(ex - sx);
+      const bx = ex - sgn * Math.min(BEND, gap / 2) + offset * 0.3;
       const sy = a.y + offset * 0.15;
       const ey = b.y + offset * 0.15;
-      return { type: "poly", pts: [sx, sy, mx, sy, mx, ey, ex, ey] };
+      return { type: "poly", pts: [sx, sy, bx, sy, bx, ey, ex, ey] };
     }
-    const sgn = Math.sign(dy) || 1;
-    const sy = a.y + (sgn * a.h) / 2;
-    const ey = b.y - (sgn * b.h) / 2;
-    const my = (sy + ey) / 2 + offset * 0.5;
-    const sx = a.x + offset * 0.15;
-    const ex = b.x + offset * 0.15;
-    return { type: "poly", pts: [sx, sy, sx, my, ex, my, ex, ey] };
+    const sgn = Math.sign(dy);
+    const sy = a.y + (sgn * a.h) / 2; // top of the source when the edge goes up, bottom when down
+    const ey = b.y - (sgn * b.h) / 2; // bottom of the target when the edge goes up, top when down
+    const gap = Math.abs(ey - sy);
+    const by = ey - sgn * Math.min(BEND, gap / 2) + offset * 0.3;
+    const sx = a.x + lx;
+    const ex = b.x + lx;
+    return { type: "poly", pts: [sx, sy, sx, by, ex, by, ex, ey] };
   }
   if (routing === "straight" && lanes <= 1) {
     const [x0, y0] = clipRect(a.x, a.y, a.w, a.h, b.x, b.y);
@@ -499,7 +506,7 @@ export function toSvg(nodes: RNode[], edges: REdge[], opts: DrawOptions, infos?:
   const h = b.y1 - b.y0 + 2 * pad;
   const parts: string[] = [];
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${b.x0 - pad} ${b.y0 - pad} ${w} ${h}" width="${Math.round(w)}" height="${Math.round(h)}" font-family="Inter, system-ui, sans-serif" font-size="12">`);
-  parts.push(`<rect x="${b.x0 - pad}" y="${b.y0 - pad}" width="${w}" height="${h}" fill="${opts.dark ? "#1a1b1e" : "#ffffff"}"/>`);
+  parts.push(`<rect class="svg-bg" x="${b.x0 - pad}" y="${b.y0 - pad}" width="${w}" height="${h}" fill="${opts.dark ? "#1a1b1e" : "#ffffff"}"/>`);
   parts.push('<g class="edges">');
   for (const e of edges) {
     const a = nodes[e.s];
@@ -521,7 +528,7 @@ export function toSvg(nodes: RNode[], edges: REdge[], opts: DrawOptions, infos?:
     }
     if (opts.edgeLabels && e.label) {
       const [mx, my] = midpoint(g);
-      parts.push(`<text x="${mx}" y="${my - 3}" text-anchor="middle" font-size="10" fill="#495057">${esc(e.label)}</text>`);
+      parts.push(`<text x="${mx}" y="${my - 3}" text-anchor="middle" font-size="10" class="edge-label" fill="${opts.dark ? "#adb5bd" : "#495057"}">${esc(e.label)}</text>`);
     }
   }
   parts.push("</g><g class=\"nodes\">");
@@ -533,8 +540,8 @@ export function toSvg(nodes: RNode[], edges: REdge[], opts: DrawOptions, infos?:
     const stroke = style.dashed ? ` stroke="${style.color}" stroke-width="2" stroke-dasharray="5 3"` : "";
     const textColor = style.dashed ? (opts.dark ? "#e9ecef" : "#212529") : "#ffffff";
     parts.push(
-      `<g class="node" data-id="${esc(n.id)}"${data}><path d="${svgShape(n)}" fill="${fill}"${stroke}/>` +
-        (opts.labels ? `<text x="${n.x}" y="${n.y + 4}" text-anchor="middle" fill="${textColor}">${esc(n.label)}</text>` : "") +
+      `<g class="node${style.dashed ? " dashed" : ""}" data-id="${esc(n.id)}"${data}><path class="node-shape" d="${svgShape(n)}" fill="${fill}"${stroke}/>` +
+        (opts.labels ? `<text class="node-label" x="${n.x}" y="${n.y + 4}" text-anchor="middle" fill="${textColor}">${esc(n.label)}</text>` : "") +
         `<title>${esc(n.label)}</title></g>`,
     );
   }

@@ -823,14 +823,14 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const exportHtml = () => {
     if (!doc) return;
     const tab = buildTab(doc, idx, "", graph.nodes, rnodes.current, graph.edges, optsRef.current);
-    saveBlob(new Blob([htmlPage(doc, [tab])], { type: "text/html" }), exportName("html"));
+    saveBlob(new Blob([htmlPage(doc, [tab], optsRef.current.dark)], { type: "text/html" }), exportName("html"));
   };
   // desktop "Export Full HTML (Tabs)": one tab per root class with its whole subtree as a tree
   const exportFullHtml = () => {
     if (!doc) return;
     const tabs = rootClassTabs(doc, idx, optsRef.current, hiddenEdges);
     if (!tabs.length) return exportHtml();
-    saveBlob(new Blob([htmlPage(doc, tabs)], { type: "text/html" }), exportName("full.html"));
+    saveBlob(new Blob([htmlPage(doc, tabs, optsRef.current.dark)], { type: "text/html" }), exportName("full.html"));
     notifyHint(t("{{n}} root classes exported as tabs", { n: tabs.length }));
   };
   const exportScene = () => {

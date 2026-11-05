@@ -108,7 +108,7 @@ function legend(kinds: HtmlTab["kinds"]): string {
 }
 
 /** Compose the full page. A tab bar is shown when there is more than one tab. */
-export function htmlPage(doc: Doc, tabs: HtmlTab[]): string {
+export function htmlPage(doc: Doc, tabs: HtmlTab[], dark = false): string {
   const d = doc.dictionary;
   const dictTitle = `${d.OrganizationCode}/${d.DictionaryCode} v${d.DictionaryVersion}`;
   const pageTitle = `${d.DictionaryName || d.DictionaryCode} – bSDD graph`;
@@ -138,29 +138,34 @@ export function htmlPage(doc: Doc, tabs: HtmlTab[]): string {
     .join("\n");
 
   return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en" data-theme="${dark ? "dark" : "light"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(pageTitle)}</title>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--text:#1f2328;--dim:#6b7280;--border:#dde1e6;--accent:#228be6;--accent-l:#e7f1fd}
-@media (prefers-color-scheme:dark){:root{--bg:#141517;--card:#1f2023;--text:#e6e8eb;--dim:#9aa0a6;--border:#33363b;--accent:#4dabf7;--accent-l:#1c3047}}
-*{box-sizing:border-box}html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
-header{padding:14px 20px 0}header h1{margin:0;font-size:20px}header .sub{color:var(--dim);font-size:13px}
+:root{--bg:#f6f7f9;--card:#fff;--text:#1f2328;--dim:#6b7280;--border:#dde1e6;--accent:#228be6;--accent-l:#e7f1fd;--graph:#ffffff;--overlay:rgba(255,255,255,.94)}
+[data-theme=dark]{--bg:#141517;--card:#1f2023;--text:#e6e8eb;--dim:#9aa0a6;--border:#33363b;--accent:#4dabf7;--accent-l:#1c3047;--graph:#1a1b1e;--overlay:rgba(31,32,35,.94)}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+header{padding:14px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+header h1{margin:0;font-size:20px}header .sub{color:var(--dim);font-size:13px}
+.theme{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:20px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.theme:hover{border-color:var(--accent)}
 .tabs{display:flex;gap:4px;overflow-x:auto;padding:12px 20px 0;border-bottom:1px solid var(--border)}
 .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);padding:8px 12px;font:inherit;cursor:pointer;white-space:nowrap}
 .tab:hover{color:var(--text)}.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
 .tab .count{margin-left:6px;font-size:11px;background:var(--accent-l);color:var(--accent);border-radius:10px;padding:1px 7px}
-.graph-section{display:none;flex:1;min-height:0;gap:16px;padding:16px 20px 20px}
-.graph-section.active{display:flex}
-.graph-area{flex:1;min-width:0;position:relative;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.graph-section{display:none;padding:16px 20px 24px}
+.graph-section.active{display:block}
+.graph-area{height:68vh;min-height:360px;position:relative;background:var(--graph);border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .graph-wrap,.graph-wrap svg{width:100%;height:100%;display:block}.graph-wrap{cursor:grab}.graph-wrap.drag{cursor:grabbing}
-.node{cursor:pointer}.node:hover path{filter:brightness(1.12)}.node.selected path{stroke:#111;stroke-width:3}
-.legend{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.94);color:#1f2328;border:1px solid #dde1e6;border-radius:8px;padding:8px 10px;font-size:12px;max-height:calc(100% - 20px);overflow:auto}
-.lg-title{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;margin:4px 0}
+.svg-bg{fill:var(--graph)}
+.node{cursor:pointer}.node:hover .node-shape{filter:brightness(1.12)}.node.selected .node-shape{stroke:var(--text);stroke-width:3}
+.node.dashed .node-shape{fill:var(--graph)}.node.dashed .node-label{fill:var(--text)}.edge-label{fill:var(--dim)}
+.legend{position:absolute;left:10px;top:10px;background:var(--overlay);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;max-height:calc(100% - 20px);overflow:auto}
+.lg-title{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin:4px 0}
 .lg-row{display:flex;align-items:center;gap:8px;margin:2px 0}.lg-node{display:inline-block;width:16px;height:10px;border-radius:3px}
 .tools{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px}
-.tools button{width:30px;height:30px;border:1px solid #dde1e6;background:#fff;color:#1f2328;border-radius:6px;cursor:pointer;font-size:15px}
-.details{width:420px;flex:none;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.tools button{width:30px;height:30px;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:6px;cursor:pointer;font-size:15px}
+.details{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:12px;margin-top:12px;align-items:start}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
 .card h3{margin:0;font-size:15px}.d-head{display:flex;align-items:center;gap:8px}
 .d-kind{font-size:10px;text-transform:uppercase;letter-spacing:.06em;background:var(--accent-l);color:var(--accent);border-radius:4px;padding:2px 6px}
@@ -170,14 +175,20 @@ header{padding:14px 20px 0}header h1{margin:0;font-size:20px}header .sub{color:v
 .props{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
 .props th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);padding:6px;border-bottom:1px solid var(--border)}
 .props td{padding:6px;border-bottom:1px solid var(--border);vertical-align:top}.props tr:hover td{background:var(--accent-l)}
-@media (max-width:900px){.graph-section.active{flex-direction:column}.graph-area{min-height:60vh}.details{width:auto}}
+@media (max-width:900px){.details{grid-template-columns:minmax(0,1fr)}.graph-area{height:60vh}}
 </style></head>
 <body>
-<header><h1>${esc(d.DictionaryName || d.DictionaryCode)}</h1><div class="sub">bSDD graph · ${esc(dictTitle)}</div></header>
+<header><div><h1>${esc(d.DictionaryName || d.DictionaryCode)}</h1><div class="sub">bSDD graph · ${esc(dictTitle)}</div></div>
+<button class="theme" type="button" title="Day / night mode"><span class="theme-icon"></span><span class="theme-label"></span></button></header>
 ${tabBar}
 ${sections}
 <script>
 (function(){
+  var root=document.documentElement,btn=document.querySelector('.theme');
+  function setTheme(t){root.setAttribute('data-theme',t);btn.querySelector('.theme-icon').textContent=t==='dark'?'\u2600':'\u263E';btn.querySelector('.theme-label').textContent=t==='dark'?'Day':'Night';try{localStorage.setItem('bsdd-graph-theme',t)}catch(e){}}
+  var saved=null;try{saved=localStorage.getItem('bsdd-graph-theme')}catch(e){}
+  setTheme(saved||root.getAttribute('data-theme'));
+  btn.addEventListener('click',function(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark')});
   var tabs=[].slice.call(document.querySelectorAll('.tab')),secs=[].slice.call(document.querySelectorAll('.graph-section'));
   var inits={};
   function show(i){tabs.forEach(function(t){t.classList.toggle('active',t.dataset.tab==i)});secs.forEach(function(s){s.classList.toggle('active',s.dataset.tab==i)});init(secs[i]);}
