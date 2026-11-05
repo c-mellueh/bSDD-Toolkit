@@ -22,6 +22,7 @@ import { GOP } from "../model";
 import { go, openClass, openProperty } from "../state/nav";
 import { useProject } from "../state/project";
 import { openUi, useUi } from "../state/ui";
+import { useReadOnly } from "../state/readonly";
 
 interface Item {
   key: string;
@@ -52,6 +53,7 @@ export function CommandPalette() {
     }
   }, [opened]);
 
+  const ro = useReadOnly();
   const actions = useMemo<Item[]>(() => {
     const a = (key: string, label: string, icon: React.ReactNode, run: () => void): Item => ({ key, kind: "action", label, cells: [label], icon, run });
     return [
@@ -66,8 +68,8 @@ export function CommandPalette() {
       a("new-property", t("New property"), <IconPlus size={16} />, () => openUi({ propertyEditor: {} })),
       a("shell", t("Python shell"), <IconTerminal2 size={16} />, () => openUi({ shell: !useUi.getState().shell })),
       a("share", t("Share"), <IconShare size={16} />, () => openUi({ share: true })),
-    ];
-  }, [t]);
+    ].filter((x) => !ro || !x.key.startsWith("new-"));
+  }, [t, ro]);
 
   const entities = useMemo<Item[]>(() => {
     if (!doc) return [];

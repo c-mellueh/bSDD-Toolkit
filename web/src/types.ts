@@ -132,6 +132,7 @@ export interface Doc {
 }
 
 export interface User {
+  role?: "edit" | "view";
   id: string;
   name: string;
   color: string;
@@ -139,7 +140,8 @@ export interface User {
 }
 
 export interface ProjectMeta {
-  id: string;
+  id?: string;
+  protected?: boolean;
   name?: string;
   created?: number;
   updated?: number;

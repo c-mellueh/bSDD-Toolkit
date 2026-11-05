@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
 import { storageGet, storageSet } from "../state/settings";
+import { useReadOnly } from "../state/readonly";
 import { useUi } from "../state/ui";
 
 interface Line {
@@ -25,6 +26,7 @@ With "Live" on, every change to 'd' is sent to the shared dictionary after each 
 export function ShellPanel() {
   const { t } = useTranslation();
   const doc = useProject((s) => s.doc);
+  const readOnly = useReadOnly();
   const [lines, setLines] = useState<Line[]>([{ kind: "info", text: HELP }]);
   const [code, setCode] = useState("");
   const [ready, setReady] = useState(false);
@@ -91,8 +93,8 @@ export function ShellPanel() {
     setHistory((h) => [...h, code]);
     setHPos(-1);
     setBusy(true);
-    worker.current?.postMessage({ type: "run", code, sync: live });
-    if (!live) setPending(true);
+    worker.current?.postMessage({ type: "run", code, sync: live && !readOnly });
+    if (!live && !readOnly) setPending(true);
     setCode("");
   };
 
@@ -118,10 +120,16 @@ export function ShellPanel() {
           </Tooltip>
         )}
         <Tooltip label={t("Reload dictionary from server")}><ActionIcon size="sm" variant={stale ? "light" : "subtle"} color={stale ? "yellow" : undefined} onClick={reload} disabled={!ready || busy}><IconRefresh size={14} /></ActionIcon></Tooltip>
-        <Tooltip label={t("Send every change to the shared dictionary after each command")}>
-          <Switch size="xs" label={t("Live")} checked={live} onChange={(e) => setLive(e.currentTarget.checked)} />
-        </Tooltip>
-        {!live && (
+        {readOnly ? (
+          <Tooltip label={t("Read-only link: changes to 'd' stay in this browser and are never sent.")} multiline w={260}>
+            <Badge size="sm" variant="light" color="gray">{t("Local only")}</Badge>
+          </Tooltip>
+        ) : (
+          <Tooltip label={t("Send every change to the shared dictionary after each command")}>
+            <Switch size="xs" label={t("Live")} checked={live} onChange={(e) => setLive(e.currentTarget.checked)} />
+          </Tooltip>
+        )}
+        {!live && !readOnly && (
           <Button size="compact-xs" variant={pending ? "filled" : "light"} leftSection={<IconCloudUpload size={12} />} onClick={syncNow} disabled={!ready || busy}>{t("Apply to shared dictionary")}</Button>
         )}
         <Tooltip label={t("Clear")}><ActionIcon size="sm" variant="subtle" onClick={() => setLines([])}><IconTrash size={14} /></ActionIcon></Tooltip>

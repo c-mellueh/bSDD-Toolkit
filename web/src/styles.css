@@ -134,3 +134,5 @@ body.resizing { cursor: col-resize; user-select: none; }
 .loin-chevron { width: 16px; flex: none; display: inline-flex; color: var(--mantine-color-dimmed); }
 .loin-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
 .loin-code { flex: none; max-width: 35%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--mantine-color-dimmed); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.ro-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+body[data-readonly] [data-edit] { display: none !important; }

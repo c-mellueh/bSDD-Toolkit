@@ -1,4 +1,5 @@
 import { ActionIcon, Group, Tooltip } from "@mantine/core";
+import { useReadOnly } from "../state/readonly";
 import { useElementSize } from "@mantine/hooks";
 import {
   IconArrowsMaximize,
@@ -36,6 +37,7 @@ interface TreeNode {
 
 export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
   const { t } = useTranslation();
+  const ro = useReadOnly();
   const doc = useProject((s) => s.doc);
   const idx = useProject((s) => s.idx);
   const users = useProject((s) => s.users);
@@ -239,7 +241,7 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
           <Tooltip label={t("Search") + " (Ctrl+F)"}><ActionIcon variant="subtle" size="sm" onClick={search}><IconSearch size={16} /></ActionIcon></Tooltip>
           <Tooltip label={t("Expand all")}><ActionIcon variant="subtle" size="sm" onClick={() => tree.current?.openAll()}><IconArrowsMaximize size={16} /></ActionIcon></Tooltip>
           <Tooltip label={t("Collapse all")}><ActionIcon variant="subtle" size="sm" onClick={() => tree.current?.closeAll()}><IconArrowsMinimize size={16} /></ActionIcon></Tooltip>
-          <Tooltip label={t("New class") + " (Ctrl+N)"}><ActionIcon variant="light" size="sm" onClick={() => newClass(activeClass && idx.classes.get(activeClass) && include(idx.classes.get(activeClass)!) ? activeClass : null)}><IconPlus size={16} /></ActionIcon></Tooltip>
+          {!ro && <Tooltip label={t("New class") + " (Ctrl+N)"}><ActionIcon variant="light" size="sm" onClick={() => newClass(activeClass && idx.classes.get(activeClass) && include(idx.classes.get(activeClass)!) ? activeClass : null)}><IconPlus size={16} /></ActionIcon></Tooltip>}
         </Group>
       </div>
       <div className="row" style={{ fontSize: 11, fontWeight: 600, color: "var(--mantine-color-dimmed)", borderBottom: "1px solid var(--mantine-color-default-border)" }}>
@@ -259,6 +261,8 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
         {data.length === 0 && <div className="empty-hint">{t("No classes yet. Create one with +.")}</div>}
         {width > 0 && height > 0 && (
           <Tree<TreeNode>
+            disableDrag={ro}
+            disableDrop={ro}
             ref={tree}
             data={data}
             width={width}

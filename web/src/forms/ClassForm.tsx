@@ -6,6 +6,7 @@ import { AiTextarea, DateField, OptionalNumber, RelationsEditor, useResources } 
 import { CLASS_STATUSES, CLASS_TYPES, clean, slugify } from "../model";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
+import { useReadOnly } from "../state/readonly";
 import type { BsddClass, ClassRelation } from "../types";
 import { SaveBar, changedKeys, mergeRemote, same, snap } from "./SaveBar";
 
@@ -42,6 +43,7 @@ function initial(c: BsddClass | undefined, props: ClassFormProps) {
 export function ClassForm(props: ClassFormProps) {
   const { code, section, inline, onDone, onCancel } = props;
   const { t } = useTranslation();
+  const readOnly = useReadOnly();
   const doc = useProject((s) => s.doc);
   const idx = useProject((s) => s.idx);
   const res = useResources();
@@ -168,9 +170,9 @@ export function ClassForm(props: ClassFormProps) {
   const rel = <RelationsEditor kind="class" relations={relations} onChange={(r) => setRelations(r as ClassRelation[])} selfCode={code} />;
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); void save(); }}>
+    <form onSubmit={(e) => { e.preventDefault(); if (!readOnly) void save(); }}>
       {section ? (
-        { general, details, relations: rel }[section]
+        <fieldset disabled={readOnly} className="ro-fieldset">{{ general, details, relations: rel }[section]}</fieldset>
       ) : (
         <Tabs defaultValue="general" keepMounted={false}>
           <Tabs.List mb="sm">
@@ -178,12 +180,12 @@ export function ClassForm(props: ClassFormProps) {
             <Tabs.Tab value="details">{t("Details")}</Tabs.Tab>
             <Tabs.Tab value="relations">{t("Relations")} ({relations.length})</Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel value="general">{general}</Tabs.Panel>
-          <Tabs.Panel value="details">{details}</Tabs.Panel>
-          <Tabs.Panel value="relations">{rel}</Tabs.Panel>
+          <Tabs.Panel value="general"><fieldset disabled={readOnly} className="ro-fieldset">{general}</fieldset></Tabs.Panel>
+          <Tabs.Panel value="details"><fieldset disabled={readOnly} className="ro-fieldset">{details}</fieldset></Tabs.Panel>
+          <Tabs.Panel value="relations"><fieldset disabled={readOnly} className="ro-fieldset">{rel}</fieldset></Tabs.Panel>
         </Tabs>
       )}
-      {inline ? (
+      {readOnly ? null : inline ? (
         <SaveBar dirty={dirty} busy={busy} invalid={!!codeError || !!nameError} onSave={save} onDiscard={reset} />
       ) : (
         <Group justify="flex-end" mt="md">

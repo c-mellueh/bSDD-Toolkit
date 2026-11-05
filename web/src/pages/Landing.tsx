@@ -18,9 +18,9 @@ export function Landing() {
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const open = (id: string, name: string) => {
-    rememberProject(id, name);
-    navigate(`/p/${id}`);
+  const open = (id: string, name: string, base: "/p" | "/v" = "/p") => {
+    rememberProject(id, name, base);
+    navigate(`${base}/${id}`);
   };
 
   const upload = async (file: File | null, sloppy = false, text?: string) => {
@@ -99,8 +99,11 @@ export function Landing() {
             {recent.map((p) => (
               <Card key={p.id} withBorder padding="xs">
                 <Group justify="space-between" wrap="nowrap">
-                  <Anchor onClick={() => open(p.id, p.name)} style={{ minWidth: 0 }}>
-                    <Text truncate fw={500}>{p.name}</Text>
+                  <Anchor onClick={() => open(p.id, p.name, p.base ?? "/p")} style={{ minWidth: 0 }}>
+                    <Group gap={6} wrap="nowrap">
+                      <Text truncate fw={500}>{p.name}</Text>
+                      {p.base === "/v" && <Badge size="xs" variant="light" color="gray">{t("read-only")}</Badge>}
+                    </Group>
                   </Anchor>
                   <Group gap="xs" wrap="nowrap">
                     <Badge variant="light" color="gray">{new Date(p.opened).toLocaleString()}</Badge>

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { DATA_TYPES, PROPERTY_VALUE_KINDS, clean, slugify } from "../model";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
+import { useReadOnly } from "../state/readonly";
 import type { AllowedValue, BsddProperty, PropertyRelation } from "../types";
 import { SaveBar, changedKeys, mergeRemote, same, snap } from "./SaveBar";
 import { AiTextarea, AllowedValuesEditor, DateField, OptionalNumber, RelationsEditor, useResources } from "../components/fields";
@@ -45,6 +46,7 @@ function initial(p: BsddProperty | undefined) {
 
 export function PropertyForm({ code, section, inline, onDone, onCancel }: PropertyFormProps) {
   const { t } = useTranslation();
+  const readOnly = useReadOnly();
   const doc = useProject((s) => s.doc);
   const idx = useProject((s) => s.idx);
   const res = useResources();
@@ -180,9 +182,9 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); void save(); }}>
+    <form onSubmit={(e) => { e.preventDefault(); if (!readOnly) void save(); }}>
       {section ? (
-        parts[section]
+        <fieldset disabled={readOnly} className="ro-fieldset">{parts[section]}</fieldset>
       ) : (
         <Tabs defaultValue="general" keepMounted={false}>
           <Tabs.List mb="sm">
@@ -192,10 +194,10 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
             <Tabs.Tab value="dimension">{t("Dimension")}</Tabs.Tab>
             <Tabs.Tab value="relations">{t("Relations")} ({relations.length})</Tabs.Tab>
           </Tabs.List>
-          {(Object.keys(parts) as PropertySection[]).map((k) => <Tabs.Panel key={k} value={k}>{parts[k]}</Tabs.Panel>)}
+          {(Object.keys(parts) as PropertySection[]).map((k) => <Tabs.Panel key={k} value={k}><fieldset disabled={readOnly} className="ro-fieldset">{parts[k]}</fieldset></Tabs.Panel>)}
         </Tabs>
       )}
-      {inline ? (
+      {readOnly ? null : inline ? (
         <SaveBar dirty={dirty} busy={busy} invalid={!!codeError || !!nameError} onSave={save} onDiscard={reset} />
       ) : (
         <Group justify="flex-end" mt="md">

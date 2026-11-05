@@ -62,7 +62,7 @@ function EmptyDetail({ mode }: { mode: "main" | "gop" }) {
           ? t("Select a group of properties on the left. Groups bundle properties that can be reused in classes as property sets.")
           : t("Select a class on the left to see its properties and details, or create a new one.")}
       </Text>
-      <Button leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: null, classType: gop ? GOP : "Class" } })}>
+      <Button data-edit leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: null, classType: gop ? GOP : "Class" } })}>
         {gop ? t("New group of properties") : t("New class")}
       </Button>
     </Stack>
@@ -156,7 +156,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
           <Group gap={6} wrap="nowrap">
             {!gop && (
               <Tooltip label={t("New subclass")}>
-                <Button variant="default" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })} visibleFrom="md">
+                <Button data-edit variant="default" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })} visibleFrom="md">
                   {t("Subclass")}
                 </Button>
               </Tooltip>
@@ -164,11 +164,11 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
             <Menu position="bottom-end" shadow="md">
               <Menu.Target><ActionIcon variant="default" size="lg" aria-label={t("More")}><IconDots size={16} /></ActionIcon></Menu.Target>
               <Menu.Dropdown>
-                {!gop && <Menu.Item leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })}>{t("New subclass")}</Menu.Item>}
+                {!gop && <Menu.Item data-edit leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })}>{t("New subclass")}</Menu.Item>}
                 <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => openUi({ classEditor: { code } })}>{t("Edit in dialog")}</Menu.Item>
                 <Menu.Item leftSection={<IconLink size={14} />} onClick={copyLink}>{t("Copy link to this class")}</Menu.Item>
                 <Menu.Divider />
-                <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={remove}>{t("Delete")}</Menu.Item>
+                <Menu.Item data-edit leftSection={<IconTrash size={14} />} color="red" onClick={remove}>{t("Delete")}</Menu.Item>
               </Menu.Dropdown>
             </Menu>
           </Group>
@@ -209,7 +209,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
                   </div>
                 ))}
               </Stack>
-              <Button mt="md" variant="light" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })}>{t("New subclass")}</Button>
+              <Button data-edit mt="md" variant="light" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })}>{t("New subclass")}</Button>
             </div>
           </Tabs.Panel>
         )}

@@ -1,5 +1,5 @@
 import { Accordion, Anchor, Avatar, Badge, Button, Card, CopyButton, Group, SimpleGrid, Stack, Text, TextInput, ThemeIcon, Title, Tooltip } from "@mantine/core";
-import { IconAlertTriangle, IconBinaryTree2, IconCheck, IconCircleCheck, IconCopy, IconFileExport, IconLink, IconList, IconListDetails, IconPlus, IconStack2 } from "@tabler/icons-react";
+import { IconAlertTriangle, IconBinaryTree2, IconCheck, IconCircleCheck, IconCopy, IconEye, IconFileExport, IconLink, IconList, IconListDetails, IconLock, IconLockOpen, IconPlus, IconStack2 } from "@tabler/icons-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DictionaryForm } from "../../forms/DictionaryForm";
@@ -54,7 +54,10 @@ export function OverviewPage() {
     ];
   }, [d, t]);
 
-  const url = `${location.origin}/p/${projectId}`;
+  const base = useProject((s) => s.base);
+  const meta = useProject((s) => s.meta);
+  const readOnly = base === "/v";
+  const url = `${location.origin}${base}/${projectId}`;
   const stat = (label: string, value: number, icon: React.ReactNode, color: string, section: Section) => (
     <Card withBorder padding="md" radius="md" className="stat-card" onClick={() => go(section)}>
       <Group justify="space-between" wrap="nowrap">
@@ -82,8 +85,8 @@ export function OverviewPage() {
             </Group>
           </div>
           <Group gap="xs">
-            <Button variant="default" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: null, classType: "Class" } })}>{t("New class")}</Button>
-            <Button variant="default" leftSection={<IconPlus size={14} />} onClick={() => openUi({ propertyEditor: { onCreated: (c) => openProperty(c) } })}>{t("New property")}</Button>
+            <Button data-edit variant="default" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: null, classType: "Class" } })}>{t("New class")}</Button>
+            <Button data-edit variant="default" leftSection={<IconPlus size={14} />} onClick={() => openUi({ propertyEditor: { onCreated: (c) => openProperty(c) } })}>{t("New property")}</Button>
             <Button leftSection={<IconFileExport size={14} />} onClick={() => go("export")}>{t("Export")}</Button>
           </Group>
         </Group>
@@ -104,8 +107,21 @@ export function OverviewPage() {
 
           <Stack gap="md">
             <Card withBorder radius="md" padding="lg">
-              <Title order={4} mb={4}>{t("Collaboration")}</Title>
-              <Text size="sm" c="dimmed" mb="sm">{t("Everybody who has this link can view and edit the dictionary together with you in real time.")}</Text>
+              <Group justify="space-between" mb={4} wrap="nowrap">
+                <Title order={4}>{t("Collaboration")}</Title>
+                {readOnly ? (
+                  <Badge variant="light" color="gray" leftSection={<IconEye size={12} />}>{t("Read-only")}</Badge>
+                ) : (
+                  <Badge variant="light" color={meta?.protected ? "green" : "gray"} leftSection={meta?.protected ? <IconLock size={12} /> : <IconLockOpen size={12} />}>
+                    {meta?.protected ? t("Password protected") : t("No password")}
+                  </Badge>
+                )}
+              </Group>
+              <Text size="sm" c="dimmed" mb="sm">
+                {readOnly
+                  ? t("You opened a read-only link: you can browse, search and export, but not edit.")
+                  : t("Everybody who has this link can view and edit the dictionary together with you in real time.")}
+              </Text>
               <Group gap="xs" wrap="nowrap">
                 <TextInput value={url} readOnly style={{ flex: 1 }} onFocus={(e) => e.currentTarget.select()} />
                 <CopyButton value={url}>
@@ -116,12 +132,16 @@ export function OverviewPage() {
                   )}
                 </CopyButton>
               </Group>
+              {!readOnly && (
+                <Button mt="sm" variant="light" size="xs" leftSection={<IconLock size={14} />} onClick={() => openUi({ share: true })}>{t("Password & read-only link…")}</Button>
+              )}
               <Text size="xs" c="dimmed" mt="md" mb={6}>{t("Online now")}</Text>
               <Stack gap={6}>
                 {users.map((u) => (
                   <Group key={u.id} gap="xs" wrap="nowrap">
                     <Avatar size={26} radius="xl" color={u.color} style={{ border: `2px solid ${u.color}` }}>{u.name.slice(0, 2).toUpperCase()}</Avatar>
                     <Text size="sm" truncate style={{ flex: 1 }}>{u.name}{u.id === me?.id ? ` (${t("you")})` : ""}</Text>
+                    {u.role === "view" && <Badge size="xs" variant="light" color="gray">{t("viewer")}</Badge>}
                     {u.selection?.class && (
                       <Anchor size="xs" c="dimmed" onClick={() => openClass(u.selection!.class!)} truncate maw={140}>{u.selection.class}</Anchor>
                     )}

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { GOP, clean, codeFromUri, internalCode, isUri, psetsOfClass, uniqueCode } from "../model";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
+import { useReadOnly } from "../state/readonly";
 import { openUi, useUi } from "../state/ui";
 import type { AllowedValue } from "../types";
 import { AllowedValuesEditor, OptionalNumber, useResources } from "./fields";
@@ -18,6 +19,7 @@ const EDITABLE = [
 
 export function ClassPropertyEditor() {
   const { t } = useTranslation();
+  const readOnly = useReadOnly();
   const target = useUi((s) => s.cpEditor);
   const close = () => useUi.getState().set({ cpEditor: null });
   const doc = useProject((s) => s.doc);
@@ -111,14 +113,14 @@ export function ClassPropertyEditor() {
 
   return (
     <Modal opened onClose={close} title={existing ? t("Edit class property: {{code}}", { code: existing.Code }) : t("New class property in {{cls}}", { cls: cls.Name })} size="xl">
-      <form onSubmit={(e) => { e.preventDefault(); void save(); }}>
+      <form onSubmit={(e) => { e.preventDefault(); if (!readOnly) void save(); }}>
         <Tabs defaultValue="general" keepMounted={false}>
           <Tabs.List mb="sm">
             <Tabs.Tab value="general">{t("General")}</Tabs.Tab>
             <Tabs.Tab value="values">{t("Allowed values")} ({(form.AllowedValues ?? []).length})</Tabs.Tab>
             <Tabs.Tab value="constraints">{t("Constraints")}</Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel value="general">
+          <Tabs.Panel value="general"><fieldset disabled={readOnly} className="ro-fieldset">
             <Grid>
               <Grid.Col span={12}>
                 <Group gap="xs" align="flex-end" wrap="nowrap">
@@ -172,11 +174,11 @@ export function ClassPropertyEditor() {
                 </Grid.Col>
               )}
             </Grid>
-          </Tabs.Panel>
-          <Tabs.Panel value="values">
+          </fieldset></Tabs.Panel>
+          <Tabs.Panel value="values"><fieldset disabled={readOnly} className="ro-fieldset">
             <AllowedValuesEditor values={(form.AllowedValues ?? []) as AllowedValue[]} onChange={(v) => set("AllowedValues", v)} inherited={prop?.AllowedValues} />
-          </Tabs.Panel>
-          <Tabs.Panel value="constraints">
+          </fieldset></Tabs.Panel>
+          <Tabs.Panel value="constraints"><fieldset disabled={readOnly} className="ro-fieldset">
             <Grid>
               <Grid.Col span={3}><OptionalNumber label={t("Min inclusive")} value={form.MinInclusive} onChange={(v) => set("MinInclusive", v)} /></Grid.Col>
               <Grid.Col span={3}><OptionalNumber label={t("Min exclusive")} value={form.MinExclusive} onChange={(v) => set("MinExclusive", v)} /></Grid.Col>
@@ -187,9 +189,9 @@ export function ClassPropertyEditor() {
               <Grid.Col span={3}><OptionalNumber label={t("Sort number")} value={form.SortNumber} onChange={(v) => set("SortNumber", v)} integer /></Grid.Col>
               <Grid.Col span={12}><TextInput label={t("Owned URI")} value={form.OwnedUri ?? ""} onChange={(e) => set("OwnedUri", e.currentTarget.value)} /></Grid.Col>
             </Grid>
-          </Tabs.Panel>
+          </fieldset></Tabs.Panel>
         </Tabs>
-        <Group justify="flex-end" mt="md">
+        <Group justify="flex-end" mt="md" hidden={readOnly}>
           <Button variant="default" onClick={close}>{t("Cancel")}</Button>
           <Button type="submit" loading={busy} disabled={!!refError || !!codeError}>{existing ? t("Save") : t("Create")}</Button>
         </Group>

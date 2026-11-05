@@ -3,9 +3,12 @@ import { create } from "zustand";
 import { applyPatch } from "../jsonpatch";
 import { buildIndexes, type Indexes } from "../model";
 import type { Doc, PatchOp, ProjectMeta, User } from "../types";
+import { getToken } from "./access";
 import { clientId, useSettings } from "./settings";
 
-export type Status = "idle" | "connecting" | "online" | "reconnecting" | "error";
+export type Status = "idle" | "connecting" | "online" | "reconnecting" | "error" | "locked";
+export type Role = "edit" | "view";
+export type LinkBase = "/p" | "/v";
 
 interface History {
   undo: string | null;
@@ -13,7 +16,12 @@ interface History {
 }
 
 interface ProjectState {
+  /** id used in links and API paths: the project id (edit link) or the read-only link id */
   projectId: string | null;
+  base: LinkBase;
+  role: Role;
+  /** which password the server asks for when status is "locked" */
+  locked: Role | null;
   status: Status;
   error: string | null;
   doc: Doc | null;
@@ -37,6 +45,9 @@ interface ProjectState {
 
 export const useProject = create<ProjectState>((set, get) => ({
   projectId: null,
+  base: "/p",
+  role: "edit",
+  locked: null,
   status: "idle",
   error: null,
   doc: null,
@@ -78,7 +89,8 @@ class Connection {
   url() {
     const proto = location.protocol === "https:" ? "wss" : "ws";
     const name = encodeURIComponent(useSettings.getState().userName);
-    return `${proto}://${location.host}/api/projects/${this.projectId}/ws?client=${clientId()}&name=${name}`;
+    const token = getToken(this.projectId);
+    return `${proto}://${location.host}/api/projects/${this.projectId}/ws?client=${clientId()}&name=${name}${token ? `&token=${encodeURIComponent(token)}` : ""}`;
   }
 
   open() {
@@ -87,14 +99,16 @@ class Connection {
     const ws = new WebSocket(this.url());
     this.ws = ws;
     ws.onmessage = (ev) => this.onMessage(JSON.parse(ev.data));
-    ws.onclose = () => {
+    ws.onclose = (ev) => {
       window.clearInterval(this.pingTimer);
       for (const p of this.pending.values()) p.reject(new Error("Connection lost"));
       this.pending.clear();
       if (this.closed) return;
-      if (useProject.getState().status === "error") return;
-      useProject.setState({ status: "reconnecting" });
-      const delay = Math.min(10000, 500 * 2 ** this.retry++);
+      const st = useProject.getState().status;
+      if (st === "error" || st === "locked") return;
+      useProject.setState({ status: state.doc ? "reconnecting" : "connecting" });
+      // 4001: access settings changed → reconnect right away (the token is checked again)
+      const delay = ev.code === 4001 ? 500 : Math.min(10000, 500 * 2 ** this.retry++);
       window.setTimeout(() => !this.closed && this.open(), delay);
     };
     ws.onopen = () => {
@@ -139,6 +153,8 @@ class Connection {
           idx: buildIndexes(msg.doc),
           version: msg.version,
           meta: msg.meta,
+          role: msg.role ?? "edit",
+          locked: null,
           me: msg.you,
           users: msg.users,
           history: msg.history,
@@ -175,6 +191,12 @@ class Connection {
         break;
       }
       case "error":
+        if (msg.auth) {
+          // password required (or no longer valid): keep the connection object, ask the user
+          useProject.setState({ status: "locked", locked: msg.role ?? "edit", error: null, doc: null, idx: buildIndexes(null) });
+          this.ws?.close();
+          break;
+        }
         useProject.setState({ status: msg.fatal ? "error" : state.status, error: msg.error });
         if (msg.fatal) this.close();
         break;
@@ -184,11 +206,14 @@ class Connection {
 
 let connection: Connection | null = null;
 
-export function connect(projectId: string) {
+export function connect(projectId: string, base: LinkBase = "/p") {
   if (connection?.projectId === projectId) return;
   connection?.close();
   useProject.setState({
     projectId,
+    base,
+    role: base === "/v" ? "view" : "edit",
+    locked: null,
     doc: null,
     idx: buildIndexes(null),
     version: 0,
@@ -204,22 +229,41 @@ export function connect(projectId: string) {
   connection = new Connection(projectId);
 }
 
+/** Reconnect after a password was entered (the stored token is used). */
+export function reconnect() {
+  if (!connection) return;
+  connection.retry = 0;
+  useProject.setState({ status: "connecting", locked: null });
+  connection.open();
+}
+
 export function disconnect() {
   connection?.close();
   connection = null;
   useProject.setState({ projectId: null, status: "idle", doc: null, idx: buildIndexes(null) });
 }
 
+export class ReadOnlyError extends Error {
+  constructor() {
+    super("This link is read-only");
+  }
+}
+
+export const isReadOnly = () => useProject.getState().role === "view";
+
 export function op<T = any>(name: string, args: Record<string, any> = {}): Promise<T> {
+  if (isReadOnly()) return Promise.reject(new ReadOnlyError());
   if (!connection) return Promise.reject(new Error("Not connected"));
   return connection.request({ type: "op", op: name, args });
 }
 
 export function undo() {
+  if (isReadOnly()) return Promise.reject(new ReadOnlyError());
   return connection?.request({ type: "undo" }) ?? Promise.reject(new Error("Not connected"));
 }
 
 export function redo() {
+  if (isReadOnly()) return Promise.reject(new ReadOnlyError());
   return connection?.request({ type: "redo" }) ?? Promise.reject(new Error("Not connected"));
 }
 

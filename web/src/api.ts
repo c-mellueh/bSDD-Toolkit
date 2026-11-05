@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { tokenHeaders } from "./state/access";
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -13,7 +15,7 @@ export async function api<T = any>(path: string, init: RequestInit & { json?: un
   const { json, ...rest } = init;
   const res = await fetch(path, {
     ...rest,
-    headers: { ...(json !== undefined ? { "Content-Type": "application/json" } : {}), ...(rest.headers || {}) },
+    headers: { ...(json !== undefined ? { "Content-Type": "application/json" } : {}), ...tokenHeaders(path), ...(rest.headers || {}) },
     body: json !== undefined ? JSON.stringify(json) : rest.body,
   });
   const text = await res.text();
@@ -34,7 +36,7 @@ export async function api<T = any>(path: string, init: RequestInit & { json?: un
 export async function downloadFile(path: string, json?: unknown, method = "POST"): Promise<number | null> {
   const res = await fetch(path, {
     method,
-    headers: json !== undefined ? { "Content-Type": "application/json" } : {},
+    headers: { ...(json !== undefined ? { "Content-Type": "application/json" } : {}), ...tokenHeaders(path) },
     body: json !== undefined ? JSON.stringify(json) : undefined,
   });
   if (!res.ok) {

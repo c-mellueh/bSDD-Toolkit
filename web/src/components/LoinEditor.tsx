@@ -1,5 +1,6 @@
 import { ActionIcon, Badge, Button, FileButton, Grid, Group, Modal, Select, Stack, Switch, Tabs, Text, TextInput, Tooltip } from "@mantine/core";
 import { Toggle } from "./Toggle";
+import { useReadOnly } from "../state/readonly";
 import { IconArrowDown, IconArrowUp, IconArrowsMaximize, IconArrowsMinimize, IconChevronDown, IconChevronRight, IconDownload, IconPencil, IconPlus, IconSearch, IconTrash, IconUpload } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +16,7 @@ export const specKey = (p: string, m: string) => `${p}|${m}`;
 
 export function LoinEditor({ inline }: { inline?: boolean } = {}) {
   const { t } = useTranslation();
+  const ro = useReadOnly();
   const opened = useUi((s) => s.loin) || !!inline;
   const close = () => useUi.getState().set({ loin: false });
   const doc = useProject((s) => s.doc);
@@ -26,8 +28,8 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
   const [recursive, setRecursive] = useState(true);
 
   useEffect(() => {
-    if (opened && loin && !loin.purposes?.length) void op("loin.init");
-  }, [opened, loin]);
+    if (opened && loin && !loin.purposes?.length && !ro) void op("loin.init");
+  }, [opened, loin, ro]);
 
   const purposes = loin?.purposes ?? [];
   const milestones = loin?.milestones ?? [];
@@ -52,9 +54,9 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
           <Tabs.Tab value="selection">{t("Specifications")}</Tabs.Tab>
           <Tabs.Tab value="setup">{t("Purposes, milestones & actors")}</Tabs.Tab>
           <Group gap="xs" ml="auto">
-            <FileButton onChange={importXml} accept=".xml,application/xml">
+            {!ro && <FileButton onChange={importXml} accept=".xml,application/xml">
               {(props) => <Button {...props} variant="default" leftSection={<IconUpload size={14} />}>{t("Import XML")}</Button>}
-            </FileButton>
+            </FileButton>}
             <Button variant="default" leftSection={<IconDownload size={14} />} onClick={() => attempt(() => downloadFile(`/api/projects/${projectId}/export/iso7817`, { specs: null }))}>{t("Export XML")}</Button>
           </Group>
         </Tabs.List>
@@ -75,12 +77,14 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
           )}
         </Tabs.Panel>
         <Tabs.Panel value="setup" style={{ overflow: "auto", minHeight: 0 }}>
+          <fieldset disabled={ro} className="ro-fieldset">
           <Grid>
             <Grid.Col span={{ base: 12, md: 6 }}><EntryList kind="purpose" title={t("Purposes")} items={purposes} /></Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}><EntryList kind="milestone" title={t("Milestones")} items={milestones} /></Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}><ActorForm which="providing" title={t("Providing actor")} actor={loin.providing_actor} /></Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}><ActorForm which="receiving" title={t("Receiving actor")} actor={loin.receiving_actor} /></Grid.Col>
           </Grid>
+          </fieldset>
         </Tabs.Panel>
       </Tabs>
     </Wrap>
@@ -148,6 +152,7 @@ function useOpenSet(initial: string[] = []) {
 
 function ClassPanel({ specKey: key, spec, recursive, current, setCurrent }: { specKey: string; spec?: LoinSpec; recursive: boolean; current: string | null; setCurrent: (c: string) => void }) {
   const { t } = useTranslation();
+  const ro = useReadOnly();
   const doc = useProject((s) => s.doc)!;
   const idx = useProject((s) => s.idx);
   const [filter, setFilter] = useState("");
@@ -187,7 +192,7 @@ function ClassPanel({ specKey: key, spec, recursive, current, setCurrent }: { sp
           <div key={c.Code}>
             <div className={`loin-row${current === c.Code ? " active" : ""}`} style={{ paddingLeft: 6 + depth * 16 }} onClick={() => setCurrent(c.Code)}>
               <Chevron open={isOpen} show={kids.length > 0} onClick={() => toggle(c.Code)} />
-              <span onClick={(e) => e.stopPropagation()}><Toggle size="xs" checked={included.has(c.Code)} onChange={(e) => setIncluded(c.Code, e.currentTarget.checked)} /></span>
+              <span onClick={(e) => e.stopPropagation()}><Toggle size="xs" disabled={ro} checked={included.has(c.Code)} onChange={(e) => setIncluded(c.Code, e.currentTarget.checked)} /></span>
               <span className="loin-name">{c.Name}</span>
               <span className="loin-code">{c.Code}</span>
               {included.has(c.Code) && nAll > 0 && (
@@ -225,6 +230,7 @@ function ClassPanel({ specKey: key, spec, recursive, current, setCurrent }: { sp
 
 function ClassPropsPanel({ specKey: key, spec, classCode }: { specKey: string; spec?: LoinSpec; classCode: string | null }) {
   const { t } = useTranslation();
+  const ro = useReadOnly();
   const doc = useProject((s) => s.doc)!;
   const idx = useProject((s) => s.idx);
   const { open, toggle } = useOpenSet();
@@ -248,7 +254,7 @@ function ClassPropsPanel({ specKey: key, spec, classCode }: { specKey: string; s
       count={cls && allItems.length > 0 ? <Badge variant="light">{checked.size}/{allItems.length}</Badge> : undefined}
       actions={
         cls && allItems.length > 0 ? (
-          <Tooltip label={t("All properties")}><span><Toggle size="xs" checked={tri === "on"} indeterminate={tri === "partial"} onChange={(e) => setProps(allItems, e.currentTarget.checked)} /></span></Tooltip>
+          <Tooltip label={t("All properties")}><span><Toggle size="xs" disabled={ro} checked={tri === "on"} indeterminate={tri === "partial"} onChange={(e) => setProps(allItems, e.currentTarget.checked)} /></span></Tooltip>
         ) : undefined
       }
     >
@@ -264,7 +270,7 @@ function ClassPropsPanel({ specKey: key, spec, classCode }: { specKey: string; s
             <div key={ps} className="loin-group">
               <div className="loin-row loin-group-row" onClick={() => toggle(ps)}>
                 <Chevron open={isOpen} show onClick={() => toggle(ps)} />
-                <span onClick={(e) => e.stopPropagation()}><Toggle size="xs" checked={st === "on"} indeterminate={st === "partial"} onChange={(e) => setProps(items, e.currentTarget.checked)} /></span>
+                <span onClick={(e) => e.stopPropagation()}><Toggle size="xs" disabled={ro} checked={st === "on"} indeterminate={st === "partial"} onChange={(e) => setProps(items, e.currentTarget.checked)} /></span>
                 <span className="loin-name">{ps || t("(no property set)")}</span>
                 <Badge size="xs" variant="light" color={n ? "blue" : "gray"}>{n}/{items.length}</Badge>
               </div>
@@ -272,7 +278,7 @@ function ClassPropsPanel({ specKey: key, spec, classCode }: { specKey: string; s
                 cps.map((cp) => (
                   <div key={cp.Code} className="loin-row" style={{ paddingLeft: 28 }}>
                     <span className="loin-chevron" />
-                    <Toggle size="xs" checked={checked.has(`${ps}|${cp.Code}`)} onChange={(e) => setProps([[ps, cp.Code]], e.currentTarget.checked)} />
+                    <Toggle size="xs" disabled={ro} checked={checked.has(`${ps}|${cp.Code}`)} onChange={(e) => setProps([[ps, cp.Code]], e.currentTarget.checked)} />
                     <span className="loin-name">{cpName(idx, doc.dictionary, cp)}</span>
                     <span className="loin-code">{cp.Code}</span>
                   </div>
@@ -294,6 +300,7 @@ interface PsetEntry {
 
 function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec }) {
   const { t } = useTranslation();
+  const ro = useReadOnly();
   const doc = useProject((s) => s.doc)!;
   const idx = useProject((s) => s.idx);
   const loin = doc.extras.loin;
@@ -344,7 +351,7 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
             <div className="loin-row loin-group-row" onClick={() => toggle(ps)}>
               <Chevron open={isOpen} show onClick={() => toggle(ps)} />
               <span onClick={(e) => e.stopPropagation()}>
-                <Toggle size="xs" checked={st === "on"} indeterminate={st === "partial"} onChange={(e) => set(list.map((x) => [ps, x.code]), e.currentTarget.checked)} />
+                <Toggle size="xs" disabled={ro} checked={st === "on"} indeterminate={st === "partial"} onChange={(e) => set(list.map((x) => [ps, x.code]), e.currentTarget.checked)} />
               </span>
               <span className="loin-name">{ps || t("(no property set)")}</span>
               <Tooltip label={t("{{n}} properties in {{c}} classes", { n: list.length, c: nClasses })}>
@@ -358,7 +365,7 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
                 return (
                   <div key={e.code} className="loin-row" style={{ paddingLeft: 28 }}>
                     <span className="loin-chevron" />
-                    <Toggle size="xs" checked={est === "on"} indeterminate={est === "partial"} onChange={(ev) => set([[ps, e.code]], ev.currentTarget.checked)} />
+                    <Toggle size="xs" disabled={ro} checked={est === "on"} indeterminate={est === "partial"} onChange={(ev) => set([[ps, e.code]], ev.currentTarget.checked)} />
                     <span className="loin-name">{e.name}</span>
                     <span className="loin-code">{e.code}</span>
                     <Tooltip label={e.classes.map((c) => idx.classes.get(c)?.Name ?? c).join(", ")} multiline w={260}>

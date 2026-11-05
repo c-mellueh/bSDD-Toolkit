@@ -7,6 +7,7 @@ import { DateField, useResources } from "../components/fields";
 import { clean } from "../model";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
+import { useReadOnly } from "../state/readonly";
 import { SaveBar, changedKeys, mergeRemote, snap } from "./SaveBar";
 
 const FIELDS = [
@@ -17,6 +18,7 @@ const FIELDS = [
 
 export function DictionaryForm({ inline, onDone, onCancel }: { inline?: boolean; onDone?: () => void; onCancel?: () => void }) {
   const { t } = useTranslation();
+  const readOnly = useReadOnly();
   const doc = useProject((s) => s.doc);
   const res = useResources();
   const d = doc?.dictionary;
@@ -81,7 +83,8 @@ export function DictionaryForm({ inline, onDone, onCancel }: { inline?: boolean;
   const languages = [...new Set(res.languages.map((l) => l.IsoCode))];
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); void save(); }}>
+    <form onSubmit={(e) => { e.preventDefault(); if (!readOnly) void save(); }}>
+      <fieldset disabled={readOnly} className="ro-fieldset">
         <Grid>
           <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Organization code")} value={form.OrganizationCode ?? ""} onChange={(e) => set("OrganizationCode", e.currentTarget.value)} error={errors.OrganizationCode} required /></Grid.Col>
           <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Dictionary code")} value={form.DictionaryCode ?? ""} onChange={(e) => set("DictionaryCode", e.currentTarget.value)} error={errors.DictionaryCode} required /></Grid.Col>
@@ -101,7 +104,8 @@ export function DictionaryForm({ inline, onDone, onCancel }: { inline?: boolean;
           <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Quality assurance procedure URL")} value={form.QualityAssuranceProcedureUrl ?? ""} onChange={(e) => set("QualityAssuranceProcedureUrl", e.currentTarget.value)} /></Grid.Col>
           <Grid.Col span={{ base: 12, sm: 6 }}><DateField label={t("Release date")} value={form.ReleaseDate} onChange={(v) => set("ReleaseDate", v)} /></Grid.Col>
         </Grid>
-      {inline ? (
+      </fieldset>
+      {readOnly ? null : inline ? (
         <SaveBar dirty={dirty} busy={busy} invalid={invalid} onSave={save} onDiscard={reset} />
       ) : (
         <Group justify="flex-end" mt="md">

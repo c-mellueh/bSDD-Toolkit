@@ -1,4 +1,5 @@
 import { ActionIcon, Group, Tooltip } from "@mantine/core";
+import { useReadOnly } from "../state/readonly";
 import { IconCheck, IconClipboard, IconCopy, IconEdit, IconLink, IconListSearch, IconPlus, IconRefresh, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,6 +19,7 @@ type SortKey = "name" | "code" | "pset" | "type" | "unit" | "values" | "required
 
 export function ClassPropertyTable({ classCode, pset, title }: { classCode: string | null; pset: string | null; title?: string }) {
   const { t } = useTranslation();
+  const ro = useReadOnly();
   const doc = useProject((s) => s.doc);
   const idx = useProject((s) => s.idx);
   const setActiveCp = useProject((s) => s.setActiveClassProperty);
@@ -130,7 +132,7 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
           {title ?? t("Class properties")}
           {cls ? ` · ${cls.Name}${pset !== null ? ` · ${pset || t("(no property set)")}` : ""}` : ""}
         </span>
-        {cls && (
+        {cls && !ro && (
           <Group gap={2}>
             <Tooltip label={t("Add existing property…")}><ActionIcon variant="subtle" size="sm" onClick={addExisting}><IconListSearch size={16} /></ActionIcon></Tooltip>
             <Tooltip label={t("New class property") + " (Ctrl+N)"}><ActionIcon variant="light" size="sm" onClick={newCp}><IconPlus size={16} /></ActionIcon></Tooltip>

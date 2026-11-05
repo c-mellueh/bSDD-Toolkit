@@ -11,8 +11,8 @@ export const setNavigator = (fn: NavigateFunction | null) => {
 export type Section = "" | "classes" | "groups" | "properties" | "loin" | "graph" | "export";
 
 export function projectPath(section: Section, code?: string | null) {
-  const id = useProject.getState().projectId;
-  const base = `/p/${id}${section ? `/${section}` : ""}`;
+  const { projectId: id, base: prefix } = useProject.getState();
+  const base = `${prefix}/${id}${section ? `/${section}` : ""}`;
   return code ? `${base}/${encodeURIComponent(code)}` : base;
 }
 

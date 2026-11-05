@@ -33,6 +33,8 @@ import {
   IconDeviceFloppy,
   IconDotsVertical,
   IconDownload,
+  IconEye,
+  IconLock,
   IconFileExport,
   IconHome,
   IconLayoutDashboard,
@@ -69,8 +71,11 @@ import { connect, disconnect, redo, undo, useProject } from "../state/project";
 import { rememberProject, storageGet, storageSet, useSettings } from "../state/settings";
 import { openUi, useUi } from "../state/ui";
 import { CommandPalette } from "./CommandPalette";
+import { useReadOnly } from "../state/readonly";
+import { PasswordScreen } from "../components/PasswordScreen";
+import { setToken } from "../state/access";
 
-export function ProjectLayout() {
+export function ProjectLayout({ base = "/p" }: { base?: "/p" | "/v" } = {}) {
   const { projectId } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -83,6 +88,12 @@ export function ProjectLayout() {
   const [collapsed, setCollapsed] = useState(() => storageGet("bsdd-nav-collapsed", false));
   const [downloadOpen, setDownloadOpen] = useState(false);
 
+  const role = useProject((s) => s.role);
+  useEffect(() => {
+    document.body.toggleAttribute("data-readonly", role === "view");
+    return () => document.body.removeAttribute("data-readonly");
+  }, [role]);
+
   useEffect(() => {
     setNavigator(navigate);
     return () => setNavigator(null);
@@ -90,18 +101,18 @@ export function ProjectLayout() {
 
   useEffect(() => {
     if (!projectId) return;
-    connect(projectId);
+    connect(projectId, base);
     return () => disconnect();
-  }, [projectId]);
+  }, [projectId, base]);
 
   const d = doc?.dictionary;
   useEffect(() => {
     if (d && projectId) {
       const name = d.DictionaryName || d.DictionaryCode;
       document.title = `${name} – bSDD Toolkit`;
-      rememberProject(projectId, name);
+      rememberProject(projectId, name, base);
     }
-  }, [d?.DictionaryName, d?.DictionaryCode, projectId, d]);
+  }, [d?.DictionaryName, d?.DictionaryCode, projectId, d, base]);
 
   // close the mobile navigation after navigating
   useEffect(() => mobile.close(), [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -154,6 +165,7 @@ export function ProjectLayout() {
     return () => window.removeEventListener("keydown", handler);
   }, [projectId]);
 
+  if (status === "locked") return <PasswordScreen />;
   if (status === "error") {
     return (
       <Center h="100%">
@@ -223,6 +235,8 @@ function Header({ mobileOpen, toggleMobile }: { mobileOpen: boolean; toggleMobil
   const history = useProject((s) => s.history);
   const users = useProject((s) => s.users);
   const me = useProject((s) => s.me);
+  const meta = useProject((s) => s.meta);
+  const readOnly = useReadOnly();
   const setSettings = useSettings((s) => s.set);
   const scheme = useComputedColorScheme("light");
   const mac = typeof navigator !== "undefined" && /Mac/.test(navigator.platform);
@@ -256,12 +270,20 @@ function Header({ mobileOpen, toggleMobile }: { mobileOpen: boolean; toggleMobil
       <div style={{ flex: 1 }} />
 
       {status !== "online" && <Badge color="orange" variant="light">{t("Reconnecting…")}</Badge>}
+      {readOnly && (
+        <Tooltip label={t("You opened a read-only link: you can browse, search and export, but not edit.")} multiline w={260}>
+          <Badge color="gray" variant="light" leftSection={<IconEye size={12} />}>{t("Read-only")}</Badge>
+        </Tooltip>
+      )}
+      {!readOnly && meta?.protected && (
+        <Tooltip label={t("This dictionary is password protected")}><Badge color="green" variant="light" leftSection={<IconLock size={12} />} visibleFrom="md">{t("Protected")}</Badge></Tooltip>
+      )}
       <Group gap={2} wrap="nowrap">
         <Tooltip label={`${t("Undo")}${history.undo ? `: ${history.undo}` : ""} (Ctrl+Z)`}>
-          <ActionIcon variant="subtle" color="gray" disabled={!history.undo} onClick={() => attempt(undo)} aria-label={t("Undo")}><IconArrowBackUp size={18} /></ActionIcon>
+          <ActionIcon data-edit variant="subtle" color="gray" disabled={!history.undo} onClick={() => attempt(undo)} aria-label={t("Undo")}><IconArrowBackUp size={18} /></ActionIcon>
         </Tooltip>
         <Tooltip label={`${t("Redo")}${history.redo ? `: ${history.redo}` : ""} (Ctrl+Y)`}>
-          <ActionIcon variant="subtle" color="gray" disabled={!history.redo} onClick={() => attempt(redo)} aria-label={t("Redo")}><IconArrowForwardUp size={18} /></ActionIcon>
+          <ActionIcon data-edit variant="subtle" color="gray" disabled={!history.redo} onClick={() => attempt(redo)} aria-label={t("Redo")}><IconArrowForwardUp size={18} /></ActionIcon>
         </Tooltip>
       </Group>
       <Avatar.Group spacing="xs" visibleFrom="md">
@@ -311,7 +333,8 @@ function Navigation({ collapsed, onToggle, onDownload }: { collapsed: boolean; o
   const shell = useUi((s) => s.shell);
   const classes = d.Classes ?? [];
   const nGop = classes.filter((c) => c.ClassType === GOP).length;
-  const base = `/p/${projectId}`;
+  const linkBase = useProject((s) => s.base);
+  const base = `${linkBase}/${projectId}`;
   const section = location.pathname.slice(base.length).split("/")[1] ?? "";
 
   const items: { key: Section; label: string; icon: React.ReactNode; count?: number }[] = [
@@ -326,8 +349,11 @@ function Navigation({ collapsed, onToggle, onDownload }: { collapsed: boolean; o
 
   const download = (path: string) => downloadFile(`/api/projects/${projectId}/${path}`, undefined, "GET").catch(notifyError);
   const duplicate = async () => {
-    const res = await attempt(() => api<{ id: string }>(`/api/projects/${projectId}/duplicate`, { method: "POST" }));
-    if (res) window.open(`/p/${res.id}`, "_blank");
+    const res = await attempt(() => api<{ id: string; token?: string }>(`/api/projects/${projectId}/duplicate`, { method: "POST" }));
+    if (res) {
+      if (res.token) setToken(res.id, res.token);
+      window.open(`/p/${res.id}`, "_blank");
+    }
   };
 
   const link = (label: string, icon: React.ReactNode, active: boolean, onClick: () => void, count?: number) => {
@@ -384,7 +410,7 @@ function FileMenu({ download, duplicate, onDownload }: { download: (p: string) =
     <Menu.Dropdown>
       <Menu.Item leftSection={<IconDownload size={14} />} rightSection={<Text size="xs" c="dimmed">Ctrl+S</Text>} onClick={() => download("dictionary.json")}>{t("Save as bSDD JSON")}</Menu.Item>
       <Menu.Item leftSection={<IconDownload size={14} />} onClick={() => download("project.json")}>{t("Save project file (incl. LOIN)")}</Menu.Item>
-      <Menu.Item leftSection={<IconCopy size={14} />} onClick={duplicate}>{t("Duplicate dictionary")}</Menu.Item>
+      <Menu.Item data-edit leftSection={<IconCopy size={14} />} onClick={duplicate}>{t("Duplicate dictionary")}</Menu.Item>
       <Menu.Divider />
       <Menu.Item leftSection={<IconHome size={14} />} onClick={() => navigate("/")}>{t("New / open…")}</Menu.Item>
       <Menu.Item leftSection={<IconCloudDownload size={14} />} onClick={onDownload}>{t("Download from bSDD")}</Menu.Item>

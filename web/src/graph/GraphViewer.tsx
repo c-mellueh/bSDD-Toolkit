@@ -914,7 +914,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           </Menu.Dropdown>
         </Menu>
         <Tooltip label={t("Create relations by dragging from node to node (or hold Alt)")}>
-          <Button variant={connectMode ? "filled" : "default"} color={connectMode ? "yellow" : undefined} onClick={() => setConnectMode((v) => !v)}>{t("Connect")}</Button>
+          <Button data-edit variant={connectMode ? "filled" : "default"} color={connectMode ? "yellow" : undefined} onClick={() => setConnectMode((v) => !v)}>{t("Connect")}</Button>
         </Tooltip>
         <div style={{ flex: 1 }} />
         <Badge variant="light">{graph.nodes.length} {t("nodes")} · {graph.edges.length} {t("edges")}</Badge>
@@ -934,7 +934,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           </Menu.Dropdown>
         </Menu>
         {!standalone && (
-          <Tooltip label={t("Open in a new window")}><ActionIcon variant="default" component="a" href={`/p/${projectId}/window/graph`} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
+          <Tooltip label={t("Open in a new window")}><ActionIcon variant="default" component="a" href={`${useProject.getState().base}/${projectId}/window/graph`} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
         )}
         <Tooltip
           multiline

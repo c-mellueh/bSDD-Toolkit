@@ -70,9 +70,10 @@ class ClientInfo:
     color: str
     queues: list[asyncio.Queue] = field(default_factory=list)
     selection: dict[str, Any] = field(default_factory=dict)
+    role: str = "edit"
 
     def public(self) -> dict[str, Any]:
-        return {"id": self.client_id, "name": self.name, "color": self.color, "selection": self.selection}
+        return {"id": self.client_id, "name": self.name, "color": self.color, "selection": self.selection, "role": self.role}
 
 
 class Project:
@@ -93,6 +94,8 @@ class Project:
         self.last_snapshot = time.time()
         self.last_seen = time.time()
         self._save_task: asyncio.Task | None = None
+        #: open websocket connections with the access version they were granted
+        self.connections: list[dict[str, Any]] = []
 
     # ------------------------------------------------------------------ state
 
@@ -231,6 +234,7 @@ class ProjectStore:
         self.projects: dict[str, Project] = {}
         self._load_lock = asyncio.Lock()
         self._bg: asyncio.Task | None = None
+        self._view_index: dict[str, str] | None = None
 
     @property
     def root(self) -> Path:
@@ -262,6 +266,44 @@ class ProjectStore:
         project.write_to_disk(self.settings)
         self.projects[pid] = project
         return project
+
+    # ------------------------------------------------------------------ read-only links
+
+    def _build_view_index(self) -> dict[str, str]:
+        index: dict[str, str] = {}
+        if self.root.exists():
+            for meta_path in self.root.glob("*/meta.json"):
+                try:
+                    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError):
+                    continue
+                view_id = (meta.get("access") or {}).get("view_id")
+                if view_id:
+                    index[view_id] = meta_path.parent.name
+        for pid, project in self.projects.items():
+            view_id = (project.meta.get("access") or {}).get("view_id")
+            if view_id:
+                index[view_id] = pid
+        return index
+
+    def resolve(self, ident: str) -> tuple[str, bool]:
+        """Map a link id to ``(project id, via read-only link)``; raises KeyError if unknown."""
+        if self.exists(ident):
+            return ident, False
+        if self._view_index is None:
+            self._view_index = self._build_view_index()
+        pid = self._view_index.get(ident)
+        if pid is None or not self.exists(pid):
+            raise KeyError(ident)
+        return pid, True
+
+    def update_view_id(self, pid: str, old: str | None, new: str | None) -> None:
+        if self._view_index is None:
+            self._view_index = self._build_view_index()
+        if old:
+            self._view_index.pop(old, None)
+        if new:
+            self._view_index[new] = pid
 
     async def get(self, pid: str) -> Project:
         if pid in self.projects:

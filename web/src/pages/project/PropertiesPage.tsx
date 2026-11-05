@@ -37,7 +37,7 @@ function Empty() {
       <ThemeIcon size={56} radius="xl" variant="light"><IconList size={30} /></ThemeIcon>
       <Title order={4}>{t("Properties")}</Title>
       <Text c="dimmed" ta="center" maw={420}>{t("Properties are defined once and then used in classes. Select a property on the left to edit it.")}</Text>
-      <Button leftSection={<IconPlus size={14} />} onClick={() => openUi({ propertyEditor: { onCreated: (c) => go("properties", c) } })}>{t("New property")}</Button>
+      <Button data-edit leftSection={<IconPlus size={14} />} onClick={() => openUi({ propertyEditor: { onCreated: (c) => go("properties", c) } })}>{t("New property")}</Button>
     </Stack>
   );
 }
@@ -109,7 +109,7 @@ function PropertyList({ current }: { current: string | null }) {
         <Group justify="space-between" wrap="nowrap">
           <Text fw={600}>{t("Properties")} <Text span c="dimmed" size="sm">{(doc.dictionary.Properties ?? []).length}</Text></Text>
           <Tooltip label={t("New property")}>
-            <ActionIcon variant="light" onClick={() => openUi({ propertyEditor: { onCreated: (c) => go("properties", c) } })} aria-label={t("New property")}><IconPlus size={16} /></ActionIcon>
+            <ActionIcon data-edit variant="light" onClick={() => openUi({ propertyEditor: { onCreated: (c) => go("properties", c) } })} aria-label={t("New property")}><IconPlus size={16} /></ActionIcon>
           </Tooltip>
         </Group>
         <TextInput mt={8} leftSection={<IconSearch size={14} />} placeholder={t("Filter…")} value={filter} onChange={(e) => setFilter(e.currentTarget.value)} />
@@ -234,7 +234,7 @@ function PropertyDetail({ code }: { code: string }) {
               <Menu.Item leftSection={<IconLink size={14} />} onClick={copyLink}>{t("Copy link to this property")}</Menu.Item>
               <Menu.Item leftSection={<IconCopy size={14} />} onClick={() => { copyProperties([p]); notifyOk(t("{{n}} properties copied", { n: 1 })); }}>{t("Copy")}</Menu.Item>
               <Menu.Divider />
-              <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={remove}>{t("Delete")}</Menu.Item>
+              <Menu.Item data-edit leftSection={<IconTrash size={14} />} color="red" onClick={remove}>{t("Delete")}</Menu.Item>
             </Menu.Dropdown>
           </Menu>
         </Group>
@@ -261,7 +261,7 @@ function PropertyDetail({ code }: { code: string }) {
           <div className="form-page">
             <Group justify="space-between" mb="xs">
               <Text size="sm" c="dimmed">{t("Classes using '{{code}}'", { code })}</Text>
-              <Button size="xs" variant="light" color="red" leftSection={<IconTrash size={14} />} disabled={!classSel.selected.length} onClick={removeFromClasses}>
+              <Button data-edit size="xs" variant="light" color="red" leftSection={<IconTrash size={14} />} disabled={!classSel.selected.length} onClick={removeFromClasses}>
                 {t("Remove from selected classes")}
               </Button>
             </Group>

@@ -1,4 +1,5 @@
 import { ActionIcon, Autocomplete, Group, Tooltip } from "@mantine/core";
+import { useReadOnly } from "../state/readonly";
 import { IconClipboard, IconCopy, IconEdit, IconLink, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,6 +13,7 @@ import { useListSelection } from "./useListSelection";
 
 export function PsetList() {
   const { t } = useTranslation();
+  const ro = useReadOnly();
   const doc = useProject((s) => s.doc);
   const idx = useProject((s) => s.idx);
   const activeClass = useProject((s) => s.activeClass);
@@ -88,7 +90,7 @@ export function PsetList() {
       <div className="pane-header">
         <span className="pane-title" style={{ flex: 1 }}>{t("Property sets")}</span>
       </div>
-      {cls && (
+      {cls && !ro && (
         <Group gap={4} p={6} wrap="nowrap" style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
           <Autocomplete
             placeholder={t("New PropertySet")}

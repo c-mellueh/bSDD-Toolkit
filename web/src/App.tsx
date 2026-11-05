@@ -45,7 +45,9 @@ export function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/p/:projectId/window/graph" element={<GraphPage />} />
-            <Route path="/p/:projectId" element={<ProjectLayout />}>
+            <Route path="/v/:projectId/window/graph" element={<GraphPage base="/v" />} />
+            {(["/p", "/v"] as const).map((base) => (
+            <Route key={base} path={`${base}/:projectId`} element={<ProjectLayout base={base} />}>
               <Route index element={<OverviewPage />} />
               <Route path="classes/:code?" element={<ClassesPage key="classes" mode="main" />} />
               <Route path="groups/:code?" element={<ClassesPage key="groups" mode="gop" />} />
@@ -54,6 +56,7 @@ export function App() {
               <Route path="graph" element={<GraphRoute />} />
               <Route path="export" element={<ExportPage />} />
             </Route>
+            ))}
             <Route path="*" element={<Landing />} />
           </Routes>
         </BrowserRouter>

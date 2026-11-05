@@ -120,11 +120,23 @@ interactive HTML export, and a stand-alone window (`/p/<id>/window/graph`). The 
 
 **Python shell without server risk:** the shell runs Python *in the visitor's browser*
 (Pyodide/WebAssembly) on a local copy of the dictionary with `bsdd_json` loaded. Nothing
-typed into it is executed on the server. Changes are only shared when the user clicks
-"Apply to shared dictionary"; the server then validates them like every other edit.
+typed into it is executed on the server. With "Live" on, changes to `d` are sent after each
+command as a small, conflict-checked patch; the server validates them like every other edit.
 
-> There is no login: anyone with a dictionary link can edit it. Keep links private and put
-> the app behind a reverse proxy / VPN if it must not be reachable publicly.
+**Sharing and access:** there are no user accounts, access is per link (Share dialog):
+
+- **Edit link** `/p/<id>` – optionally protected with a password. Everybody has to enter it
+  once per browser before they can view or edit anything.
+- **Read-only link** `/v/<other id>` – can be switched on, regenerated and protected with its
+  own password. It allows browsing, searching and exporting; the server rejects every change
+  made through it, and it never reveals the edit link.
+
+Passwords are stored as salted scrypt hashes; after entering one the browser receives a signed
+token. Changing the edit password signs out everybody, changing the read-only link or its
+password only signs out viewers. Password attempts are rate limited.
+
+> Without passwords anyone with a link can open it. Use HTTPS (reverse proxy) when the app is
+> reachable over a network, otherwise passwords and tokens travel in clear text.
 
 ### Run with Docker Compose
 
@@ -152,6 +164,7 @@ volumes:
 | `OFFLINE` | `0` | `1` disables lookups of external classes/properties on bSDD |
 | `SAVE_DELAY` | `2` | seconds after the last edit until the dictionary is written |
 | `SNAPSHOT_INTERVAL` / `MAX_SNAPSHOTS` | `600` / `20` | rolling backups in `<project>/snapshots` |
+| `SECRET_KEY` | *(generated)* | key for signing access tokens; by default a random key is created once in `<DATA_DIR>/secret.key` |
 
 The server must run as a single process (open dictionaries are held in memory); the image does this by default.
 A reverse proxy must forward WebSocket upgrades (`/api/projects/<id>/ws`).

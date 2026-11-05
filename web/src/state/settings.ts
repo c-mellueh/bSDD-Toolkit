@@ -74,11 +74,13 @@ export interface RecentProject {
   id: string;
   name: string;
   opened: number;
+  /** "/v" for read-only links */
+  base?: "/p" | "/v";
 }
 
-export function rememberProject(id: string, name: string) {
+export function rememberProject(id: string, name: string, base: "/p" | "/v" = "/p") {
   const list = storageGet<RecentProject[]>("bsdd-recent", []).filter((p) => p.id !== id);
-  list.unshift({ id, name, opened: Date.now() });
+  list.unshift({ id, name, opened: Date.now(), base });
   storageSet("bsdd-recent", list.slice(0, 30));
 }
 

@@ -176,3 +176,100 @@ def test_reload_from_disk(settings):
     with TestClient(create_app(settings)) as c:
         info = c.get(f"/api/projects/{pid}").json()
         assert info["meta"]["name"] == "Sample"
+
+
+def test_password_protection_and_read_only_link(client, settings):
+    pid = create(client)
+    # unprotected: open access, the caller can manage sharing
+    assert client.get(f"/api/projects/{pid}").json()["role"] == "edit"
+    r = client.post(f"/api/projects/{pid}/access", json={"edit_password": "geheim1", "view_enabled": True})
+    assert r.status_code == 200, r.text
+    info = r.json()
+    owner = info["token"]
+    view_id = info["view_id"]
+    assert info["edit_protected"] and info["view_enabled"] and not info["view_protected"]
+
+    # edit link now needs the password
+    r = client.get(f"/api/projects/{pid}/dictionary.json")
+    assert r.status_code == 401 and r.json()["reason"] == "password_required" and r.json()["role"] == "edit"
+    assert client.post(f"/api/projects/{pid}/auth", json={"password": "wrong"}).status_code == 401
+    token = client.post(f"/api/projects/{pid}/auth", json={"password": "geheim1"}).json()["token"]
+    assert client.get(f"/api/projects/{pid}/dictionary.json", headers={"X-Project-Token": token}).status_code == 200
+    assert client.get(f"/api/projects/{pid}/dictionary.json", headers={"X-Project-Token": owner}).status_code == 200
+
+    # websocket without token is refused
+    with client.websocket_connect(f"/api/projects/{pid}/ws?client=x") as ws:
+        msg = ws.receive_json()
+        assert msg["type"] == "error" and msg["error"] == "password_required" and msg["auth"]
+
+    # read-only link: no password needed, never leaks the project id, cannot edit
+    meta = client.get(f"/api/projects/{view_id}").json()
+    assert meta["role"] == "view" and "id" not in meta["meta"] and "access" not in meta["meta"]
+    assert client.get(f"/api/projects/{view_id}/dictionary.json").status_code == 200
+    assert client.post(f"/api/projects/{view_id}/duplicate").status_code == 403
+    assert client.get(f"/api/projects/{view_id}/access").status_code == 403
+    ws, session, hello = connect(client, view_id, "viewer")
+    assert hello["role"] == "view" and pid not in json.dumps(hello["meta"])
+    session.send_json({"type": "op", "rid": 1, "op": "class.update", "args": {"code": "Wall", "data": {"Name": "Hacked"}}})
+    ack = recv_until(session, "ack")
+    assert not ack["ok"] and "read-only" in ack["error"]
+    ws.__exit__(None, None, None)
+
+    # protect the read-only link: viewers need the view (or edit) password
+    r = client.post(f"/api/projects/{pid}/access", json={"view_password": "lesen"}, headers={"X-Project-Token": owner})
+    owner = r.json()["token"]
+    assert client.get(f"/api/projects/{view_id}").status_code == 401
+    vt = client.post(f"/api/projects/{view_id}/auth", json={"password": "lesen"}).json()
+    assert vt["role"] == "view"
+    assert client.get(f"/api/projects/{view_id}", headers={"X-Project-Token": vt["token"]}).status_code == 200
+    # a view token never grants edit access
+    assert client.get(f"/api/projects/{pid}", headers={"X-Project-Token": vt["token"]}).status_code == 401
+    # the edit password opens the read-only link too (read-only)
+    assert client.post(f"/api/projects/{view_id}/auth", json={"password": "geheim1"}).json()["role"] == "view"
+
+    # changing a password invalidates old tokens; the caller gets a new one
+    r = client.post(f"/api/projects/{pid}/access", json={"edit_password": "neu12345"}, headers={"X-Project-Token": owner})
+    new_owner = r.json()["token"]
+    assert client.get(f"/api/projects/{pid}", headers={"X-Project-Token": token}).status_code == 401
+    assert client.get(f"/api/projects/{pid}", headers={"X-Project-Token": new_owner}).status_code == 200
+
+    # disabling the read-only link makes it disappear
+    client.post(f"/api/projects/{pid}/access", json={"view_enabled": False}, headers={"X-Project-Token": new_owner})
+    assert client.get(f"/api/projects/{view_id}").status_code == 404
+
+    # settings survive a restart (hashes on disk, link index rebuilt)
+    r = client.post(f"/api/projects/{pid}/access", json={"view_enabled": True}, headers={"X-Project-Token": client.post(f"/api/projects/{pid}/auth", json={"password": "neu12345"}).json()["token"]})
+    view2 = r.json()["view_id"]
+    meta_file = json.loads((settings.data_dir / "projects" / pid / "meta.json").read_text())
+    assert "neu12345" not in json.dumps(meta_file) and meta_file["access"]["edit_password"].startswith("scrypt$")
+    with TestClient(create_app(settings)) as c2:
+        assert c2.get(f"/api/projects/{view2}").json()["role"] == "view"
+        assert c2.get(f"/api/projects/{pid}").status_code == 401
+
+
+def test_password_rate_limit(client):
+    pid = create(client)
+    client.post(f"/api/projects/{pid}/access", json={"edit_password": "geheim1"})
+    codes = [client.post(f"/api/projects/{pid}/auth", json={"password": "x"}).status_code for _ in range(12)]
+    assert codes[:10] == [401] * 10 and codes[-1] == 429
+
+
+def test_view_link_changes_do_not_sign_out_editors(client):
+    pid = create(client)
+    owner = client.post(f"/api/projects/{pid}/access", json={"edit_password": "geheim1", "view_enabled": True}).json()["token"]
+    editor = client.post(f"/api/projects/{pid}/auth", json={"password": "geheim1"}).json()["token"]
+    r = client.post(f"/api/projects/{pid}/access", json={"view_password": "lesen", "regenerate_view": True}, headers={"X-Project-Token": owner})
+    assert r.status_code == 200
+    # editors stay signed in
+    assert client.get(f"/api/projects/{pid}", headers={"X-Project-Token": editor}).status_code == 200
+    # an edit password change signs everybody out
+    client.post(f"/api/projects/{pid}/access", json={"edit_password": "anders1"}, headers={"X-Project-Token": r.json()["token"]})
+    assert client.get(f"/api/projects/{pid}", headers={"X-Project-Token": editor}).status_code == 401
+
+
+def test_connected_clients_are_disconnected_when_access_changes(client):
+    pid = create(client)
+    ws, session, _ = connect(client, pid, "someone")
+    client.post(f"/api/projects/{pid}/access", json={"edit_password": "geheim1"})
+    assert recv_until(session, "access_changed")["type"] == "access_changed"
+    ws.__exit__(None, None, None)
