@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="https://standards.iso.org/iso/23387/ed-2/en/" elementFormDefault="qualified" xmlns="https://standards.iso.org/iso/23387/ed-2/en/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+	<!--
+        File NOTES :
+
+            NOTES for the user of this XSD
+            Limitations of 12006-3:2022 implementation :
+                - ConceptType introduced in this XSD is aimed at capturing 12006-3:2022's xtdObject and xtdConcept. Nevertheless, ConceptType offers a different scope of attributes and cardinalities compared to 12006-3:2022's xtdConcept and xtdObject.
+                - The DataTemplate/property/Value(s) structure in this XSD represents just one possible implementation of 12006-3:2022, with the following constraints:
+                    - A value interval is limited to a single interval, whereas 12006-3:2022 allows multiple (0..*).
+                    - Values or lists of values are not uniquely identified, unlike in 12006-3:2022.
+                    - Lists of values cannot be linked to a referenceDocument, whereas this is possible in 12006-3:2022.
+                    - The ValueList → OrderedValue → Value structure from 12006-3:2022 is not fully represented.
+    -->
+
+	<!-- Library Element with Keys and Keyrefs -->
+	<xs:element name="Library">
+		<xs:annotation>
+			<xs:documentation>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<!-- name of the library-->
+				<xs:element name="Name" type="MultiLanguageTextType" maxOccurs="unbounded"/>
+
+				<xs:element ref="DataTemplate" maxOccurs="unbounded"/>
+				<xs:element ref="ObjectType" maxOccurs="unbounded"/>
+
+
+				<xs:element ref="GroupOfProperties" maxOccurs="unbounded"/>
+
+				<!-- reference document -->
+				<xs:element name="ReferenceDocument" type="ReferenceDocumentType" maxOccurs="unbounded"/>
+				<!-- property -->
+				<xs:element ref="Property" maxOccurs="unbounded"/>
+
+				<!-- concepts to properly define properties -->
+				<xs:element name="QuantityKind" type="QuantityKindType" maxOccurs="unbounded"/>
+				<xs:element name="Dimension" type="DimensionType" maxOccurs="unbounded"/>
+				<xs:element name="Unit" type="UnitType" maxOccurs="unbounded"/>
+
+			</xs:choice>
+			<xs:attribute ref="GUID" use="required"/>
+		</xs:complexType>
+
+		<!-- Keys and Keyrefs Definitions
+        Explanation :   This allows to "constraint" 23387 data schema using GUID
+                        allows validations that instances relationships are done under data schema relationships constraints,
+                        prevents forbidden instances relationships (eg: GoP and ObjectType)
+                        Key/keyref is limited to GUID, In order to constraint also with ReferenceURI, the following list of xs:key and xs:keyref shall
+                        be duplicated using <xs:field xpath="@ReferenceURI"/> -->
+
+		<!-- PropertyKey -->
+		<xs:key name="PropertyKey">
+			<xs:selector xpath="Property"/>
+			<xs:field xpath="@GUID"/>
+		</xs:key>
+
+		<!-- GroupOfPropertiesKey: Identifies all group of properties elements -->
+		<xs:key name="GroupOfPropertiesKey">
+			<xs:selector xpath="GroupOfProperties"/>
+			<xs:field xpath="@GUID"/>
+		</xs:key>
+
+		<!-- DataTemplateKey -->
+		<xs:key name="DataTemplateKey">
+			<xs:selector xpath="DataTemplate"/>
+			<xs:field xpath="@GUID"/>
+		</xs:key>
+
+		<!-- ObjectTypeKey -->
+		<xs:key name="ObjectTypeKey">
+			<xs:selector xpath="ObjectType"/>
+			<xs:field xpath="@GUID"/>
+		</xs:key>
+
+		<!-- HasGroupOfProperties Keyref for DataTemplate -->
+		<xs:keyref name="DataTemplateHasGroupOfProperties" refer="GroupOfPropertiesKey">
+			<xs:selector xpath="DataTemplate/HasGroupOfProperties"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<!-- HasPart Keyrefs for DataTemplate and ObjectType and GroupOfProperties-->
+		<xs:keyref name="DataTemplateHasPartRef" refer="DataTemplateKey">
+			<xs:selector xpath="DataTemplate/HasPart"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<xs:keyref name="ObjectTypeHasPartRef" refer="ObjectTypeKey">
+			<xs:selector xpath="ObjectType/HasPart"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<xs:keyref name="GroupOfPropertiesHasPartRef" refer="GroupOfPropertiesKey">
+			<xs:selector xpath="GroupOfProperties/HasPart"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<!-- IsSubtypeOf Keyrefs for DataTemplate and ObjectType and GroupOfProperties-->
+		<xs:keyref name="DataTemplateIsSubtypeOfRef" refer="DataTemplateKey">
+			<xs:selector xpath="DataTemplate/IsSubtypeOf"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<xs:keyref name="ObjectTypeIsSubtypeOfRef" refer="ObjectTypeKey">
+			<xs:selector xpath="ObjectType/IsSubtypeOf"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<xs:keyref name="GroupOfPropertiesIsSubtypeOfRef" refer="GroupOfPropertiesKey">
+			<xs:selector xpath="GroupOfProperties/IsSubtypeOf"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<!-- HasObjectType Keyref for DataTemplate -->
+		<xs:keyref name="DataTemplateHasObjectTypeRef" refer="ObjectTypeKey">
+			<xs:selector xpath="DataTemplate/HasObjectType"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<!-- hasProperty Keyref for DataTemplate -->
+		<xs:keyref name="DataTemplateHasPropertyRef" refer="PropertyKey">
+			<xs:selector xpath="DataTemplate/HasProperty"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<!-- hasProperties Keyrefs for GroupOfProperties -->
+		<xs:keyref name="GroupOfPropertiesHasPropertyRef" refer="PropertyKey">
+			<xs:selector xpath="GroupOfProperties/HasProperty"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<!-- IsDependentOnRef and IsSpecializationOf for Property -->
+		<xs:keyref name="PropertyIsDependentOnRef" refer="PropertyKey">
+			<xs:selector xpath="Property/IsDependentOn"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+		<xs:keyref name="PropertyIsSpecializationOfRef" refer="PropertyKey">
+			<xs:selector xpath="Property/IsSpecializationOf"/>
+			<xs:field xpath="@GUID"/>
+		</xs:keyref>
+
+	</xs:element>
+
+	<!-- Abstract Concept Type -->
+	<xs:complexType name="ConceptType" abstract="true">
+		<xs:choice maxOccurs="unbounded">
+			<!-- 12006-3:2022 xtdObject used attributes -->
+			<xs:element name="Name" type="MultiLanguageTextType" minOccurs="1" maxOccurs="unbounded"/>
+
+			<!-- 12006-3:2022 xtdConcept used attributes -->
+			<xs:element name="Definition" type="MultiLanguageTextType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="ReferenceDocumentRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+
+			<!-- 12006-3:2022 xtdConcept other attributes-->
+			<xs:element name="Description" type="MultiLanguageTextType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Example" type="MultiLanguageTextType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="SimilarToRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="LanguageOfCreator" type="xs:language" minOccurs="0" maxOccurs="1"/>
+			<!-- CountryOfOrigin changed to 0...1 / was 1 -->
+			<xs:element name="CountryOfOrigin" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="VisualRepresentation" type="xs:base64Binary" minOccurs="0" maxOccurs="unbounded"/>
+			<!-- VisualRepresentation could be xs:anyuri (see bSDD)	or xs:base64Binary -->
+
+			<!-- 12006-3:2022 xtdObject other attributes-->
+			<!-- 7817-3 Task group asked for optionnal versionning -->
+			<xs:element name="MajorVersion" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="MinorVersion" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Status" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="ReplacedObjectsRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="DeprecationExplanation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="DictionaryRef" type="ReferenceType" minOccurs="0" maxOccurs="1"/>
+
+		</xs:choice>
+		<xs:attribute ref="about"/>
+		<xs:attribute ref="GUID" use="required"/>
+		<xs:attribute name="dateOfCreation" type="xs:dateTime" use="required"/>
+	</xs:complexType>
+
+	<!-- Abstract Subject Type -->
+	<xs:complexType name="SubjectType" abstract="true">
+		<xs:complexContent>
+			<xs:extension base="ConceptType">
+				<xs:choice maxOccurs="unbounded">
+					<!-- Common elements (relationships in this case) shared by multiple types -->
+					<xs:element name="HasPartRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="IsSubtypeOfRef" type="ReferenceType" minOccurs="0" maxOccurs="1"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- DataTemplate Type -->
+	<xs:complexType name="DataTemplateType">
+		<xs:annotation>
+			<xs:documentation>
+				Data template is a kind of subject that can be assigned to an object type, and can contain other data templates, groups of properties and/or properties
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="SubjectType">
+				<xs:choice maxOccurs="unbounded">
+					<xs:element name="HasObjectTypeRef" type="ReferenceType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="HasPropertyRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="HasGroupOfPropertiesRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:choice>
+
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- ObjectType Type -->
+	<xs:complexType name="ObjectTypeType">
+		<xs:annotation>
+			<xs:documentation>
+				Object type is a kind of subject that can be composed of other object types, but shall not contain data templates, group of properties or properties
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="SubjectType">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- Abstract GroupOfPropertiesType -->
+	<xs:complexType name="GroupOfPropertiesType">
+		<xs:annotation>
+			<xs:documentation>
+				Group of properties is a kind of subject that contains properties and/or other groups of properties,
+				but shall not contain data templates and shall not be assigned to an object type.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="SubjectType">
+				<xs:choice maxOccurs="unbounded">
+					<xs:element name="HasPropertyRef" type="ReferenceType" minOccurs="1" maxOccurs="unbounded"/>
+					<!-- Additional group-specific elements can be added here -->
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- Head Element for Substitution Group -->
+	<!-- Substitution Group is used here to be able to constraint subject relationships
+	to the respective specilizations of subjects using key/keyref mechanism
+	eg: DataTemplate that isComposedOf, is usable only with another DataTemplate, this prevents cross relationships-->
+	<xs:element name="Subject" type="SubjectType" abstract="true"/>
+
+	<!-- Concrete Substituting Elements -->
+	<xs:element name="GroupOfProperties" type="GroupOfPropertiesType" substitutionGroup="Subject"/>
+
+	<xs:element name="DataTemplate" type="DataTemplateType" substitutionGroup="Subject"/>
+	<xs:element name="ObjectType" type="ObjectTypeType" substitutionGroup="Subject"/>
+
+
+	<!-- Property Element and Type -->
+	<xs:element name="Property" type="PropertyType"/>
+
+	<xs:complexType name="PropertyType">
+		<xs:complexContent>
+			<xs:extension base="ConceptType">
+				<xs:sequence>
+					<xs:element name="DataType" type="DataTypeType" minOccurs="1" maxOccurs="1"/>
+					<xs:choice maxOccurs="unbounded">
+						<xs:element name="Symbol" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="DimensionRef" type="ReferenceType" minOccurs="0" maxOccurs="1"/>
+						<xs:element name="UnitRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="QuantityKindRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="IsDependentOnRef" type="ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+					<xs:element name="IsSpecializationOfRef" type="ReferenceType" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- multilanguage text type -->
+	<xs:complexType name="MultiLanguageTextType">
+		<xs:annotation>
+			<xs:documentation>
+
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="language" type="xs:language" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+
+	</xs:complexType>
+
+	<!-- Unit type -->
+	<xs:complexType name="UnitType">
+		<xs:annotation>
+			<xs:documentation>
+
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ConceptType">
+				<xs:sequence>
+					<xs:element name="Symbol" type="MultiLanguageTextType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="DimensionRef" type="ReferenceType"/>
+					<xs:element name="Scale" type="ScaleType"/>
+					<xs:element name="Base" type="BaseType"/>
+					<xs:element name="Coefficient" type="RationalType"/>
+					<xs:element name="Offset" type="RationalType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="RationalType">
+		<xs:restriction base="xs:string">
+			<!-- Explanation:
+                [+-]?          : optional '+' or '-' sign
+                [0-9]+         : one or more digits (numerator)
+                (/[1-9][0-9]*)?: optional denominator starting with non-zero
+            -->
+			<xs:pattern value="[+-]?[0-9]+(/[1-9][0-9]*)?"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+
+
+
+	<!-- Dimension type -->
+	<xs:complexType name="DimensionType">
+		<xs:annotation>
+			<xs:documentation>
+
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ConceptType">
+				<xs:sequence>
+					<!-- issue : shall allow rational or at least xs:decimal to allow roots (exponent 1/2 & others),
+                     changed xd:int to xs:decimal -->
+					<xs:element name="DimensionExponentForAmountOfSubstance" type="xs:decimal"/>
+					<xs:element name="DimensionExponentForElectricCurrent" type="xs:decimal"/>
+					<xs:element name="DimensionExponentForLength" type="xs:decimal"/>
+					<xs:element name="DimensionExponentForLuminousIntensity" type="xs:decimal"/>
+					<xs:element name="DimensionExponentForMass" type="xs:decimal"/>
+					<xs:element name="DimensionExponentForThermodynamicTemperature" type="xs:decimal"/>
+					<xs:element name="DimensionExponentForTime" type="xs:decimal"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- Quantity kind type -->
+	<xs:complexType name="QuantityKindType">
+		<xs:annotation>
+			<xs:documentation>
+
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ConceptType">
+				<xs:sequence>
+					<xs:element name="DimensionRef" type="ReferenceType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- Reference document type  -->
+	<xs:complexType name="ReferenceDocumentType">
+		<xs:annotation>
+			<xs:documentation>
+
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ConceptType">
+				<xs:sequence>
+					<xs:element name="DateOfPublication" type="xs:dateTime" minOccurs="0"/>
+					<xs:element name="Author" type="xs:string" minOccurs="0"/>
+					<xs:element name="ISBN" type="xs:string" minOccurs="0"/>
+					<xs:element name="Language" type="xs:language" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="Publisher" type="xs:string" minOccurs="0"/>
+					<xs:element name="URI" type="xs:anyURI" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- Definition of ReferenceType -->
+	<xs:complexType name="ReferenceType">
+		<xs:attribute ref="referenceURI" use="optional"/>
+		<xs:attribute ref="GUID" use="optional"/>
+	</xs:complexType>
+
+
+	<xs:complexType name="DataTypeType">
+		<!-- dataType type : encapsulate 12006-3:2022 property's :
+        - DataType
+        - BoundaryValues
+        - DataFormat
+        - PossibleValues
+        -->
+		<xs:choice maxOccurs="unbounded">
+			<!-- 12006-3:2022 Property's "BoundaryValues" implementation - the following implementation allows max 1 value interval  -->
+			<xs:element name="MinInclusive" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						MinInclusive is the inclusive lower bound of the value for a datatype
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="xs:anySimpleType"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MinExclusive" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						MinExclusive is the exclusive lower bound of the value for a datatype
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="xs:anySimpleType"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MaxInclusive" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						MaxInclusive is the inclusive upper bound of the value for a datatype
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="xs:anySimpleType"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MaxExclusive" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						MaxExclusive is the exclusive upper bound of the value for a datatype
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="xs:anySimpleType"/>
+				</xs:complexType>
+			</xs:element>
+			<!-- end of 12006-3:2022 Property's "BoundaryValues" -->
+			<!-- 12006-3:2022 Property's DataFormat implementation  -->
+			<xs:element name="DataFormat" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						DataFormat defines constraints on the values of a datatype.
+						It restricts values to literals that conform to a specified pattern, expressed as a regular expression.
+						The interpretation of these patterns for property values may vary depending on the implementation.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+			<!-- end of 12006-3:2022 Property's DataFormat implementation  -->
+			<!-- 12006-3:2022 Property's Possible Values implementation  -->
+			<xs:element name="PossibleValues" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Enumeration constrains the value to a specified set of values
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<!-- <xs:element name="UnitRef" type="ReferenceType" minOccurs="0" /> -->
+						<xs:element name="ValueList" type="ValueListType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+				<!-- end of 12006-3:2022 Property's Possible Values implementation  -->
+			</xs:element>
+		</xs:choice>
+		<!-- 12006-3:2022 Property's Data Type implementation  -->
+		<xs:attribute name="name">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="BOOLEAN"/>
+					<xs:enumeration value="INTEGER"/>
+					<xs:enumeration value="RATIONAL"/>
+					<xs:enumeration value="REAL"/>
+					<xs:enumeration value="COMPLEX"/>
+					<xs:enumeration value="STRING"/>
+					<xs:enumeration value="DATETIME"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<!-- end of 12006-3:2022 Property's Data Type implementation  -->
+	</xs:complexType>
+
+	<xs:complexType name="ValueListType">
+		<xs:sequence>
+			<xs:element name="Value" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:anySimpleType">
+							<!-- order of a given value is mandatory in 12006-3:2022 -->
+							<xs:attribute name="order" type="xs:int" use="optional"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="language" type="xs:language" use="required"/>
+		<!-- <xs:attribute name="language" type="xs:string" use="required"/> -->
+		<!-- <xs:attribute ref="xml:lang" use="optional" /> -->
+	</xs:complexType>
+
+	<xs:simpleType name="ScaleType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="LINEAR"/>
+			<xs:enumeration value="LOGARITHMIC"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BaseType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ONE"/>
+			<xs:enumeration value="TWO"/>
+			<xs:enumeration value="E"/>
+			<xs:enumeration value="PI"/>
+			<xs:enumeration value="TEN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="GuidType">
+		<xs:annotation>
+			<xs:documentation>
+				The representation of a GUID, generally the id of an element.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:attribute name="GUID" type="GuidType">
+		<xs:annotation>
+			<xs:documentation>
+				Defines the GUID of a concept
+			</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+	<xs:attribute name="referenceURI" type="xs:anyURI">
+		<xs:annotation>
+			<xs:documentation>
+				Defines a referenceURI to identify a concept using URI
+			</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+	<xs:attribute name="about" type="xs:anyURI">
+		<xs:annotation>
+			<xs:documentation>
+				Defines the concept being described
+			</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+</xs:schema>

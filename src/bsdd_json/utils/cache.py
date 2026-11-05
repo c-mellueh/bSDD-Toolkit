@@ -26,6 +26,10 @@ class BaseCache:
     model_cls: ClassVar[type[BaseModel]]
     label: ClassVar[str]
 
+    #: Global settings shared by all caches (set via :func:`configure`).
+    #: ``cache_dir`` overrides the GUI appdata folder; ``offline`` disables remote lookups.
+    _settings: ClassVar[dict] = {"cache_dir": None, "offline": False, "configured": False}
+
     data: ClassVar[dict[str, BaseModel | None]]
     _loaded: ClassVar[bool]
 
@@ -43,6 +47,11 @@ class BaseCache:
         keeps working standalone (e.g. in tests) where ``bsdd_gui`` may be
         missing; in that case disk caching is silently skipped.
         """
+        cache_dir = BaseCache._settings["cache_dir"]
+        if cache_dir is not None:
+            return Path(cache_dir) / cls.cache_filename
+        if BaseCache._settings["configured"]:
+            return None
         try:
             from bsdd_gui import tool
 
@@ -98,6 +107,8 @@ class BaseCache:
         cls._load_cache()
         if key in cls.data:
             return cls.data[key]
+        if is_offline():
+            return None
         result = loader()
         cls.data[key] = result
         if result is not None:
@@ -114,3 +125,26 @@ class BaseCache:
                 path.unlink()
             except OSError:
                 logger.warning("Failed to delete external %s cache at %s", cls.label, path)
+
+
+def configure(*, cache_dir: str | Path | None = None, offline: bool | None = None) -> None:
+    """Configure the external-resource caches independently of ``bsdd_gui``."""
+    BaseCache._settings["configured"] = True
+    if cache_dir is not None:
+        BaseCache._settings["cache_dir"] = Path(cache_dir)
+    if offline is not None:
+        BaseCache._settings["offline"] = offline
+
+
+def is_offline() -> bool:
+    """Return True if remote bSDD lookups are disabled (standalone or GUI offline mode)."""
+    if BaseCache._settings["offline"]:
+        return True
+    if BaseCache._settings["configured"]:
+        return False
+    try:
+        from bsdd_gui import tool
+
+        return bool(tool.Project.get_offline_mode())
+    except Exception:  # noqa: BLE001 - bsdd_gui not installed / not initialised
+        return False

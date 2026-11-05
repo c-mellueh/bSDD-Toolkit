@@ -1,0 +1,23 @@
+# Example: docker compose up -d   ->  http://localhost:8000
+services:
+  bsdd-toolkit:
+    image: cmellueh/bsdd-toolkit:latest
+    # build: .            # alternatively build the image locally
+    container_name: bsdd-toolkit
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - bsdd-data:/data
+    environment:
+      # Delete dictionaries that nobody opened for this many days (0 = keep forever)
+      PROJECT_TTL_DAYS: "0"
+      # Maximum size of uploaded JSON files
+      MAX_UPLOAD_MB: "50"
+      # Set to 1 to disable lookups of external classes/properties on the bSDD API
+      OFFLINE: "0"
+    # If you put a reverse proxy (Traefik, nginx, Caddy) in front, make sure it
+    # forwards WebSocket upgrades for /api/projects/<id>/ws.
+
+volumes:
+  bsdd-data:

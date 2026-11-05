@@ -1,0 +1,18 @@
+[package]
+name = "graph-engine"
+version = "0.1.0"
+edition = "2021"
+description = "Force-directed layout (Barnes-Hut) for the bSDD Toolkit graph viewer, compiled to WebAssembly"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

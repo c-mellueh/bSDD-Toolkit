@@ -7,6 +7,7 @@ Visual editor and Python toolkit for working with buildingSMART Data Dictionary 
 This repository contains:
 - A validated data model for bSDD JSON (Pydantic v2) under `src/bsdd_json`.
 - A PySide6 GUI to create, view, and edit bSDD dictionaries under `src/bsdd_gui`.
+- A collaborative web application (FastAPI backend `src/bsdd_web`, React frontend `web/`), see [Web application](#web-application).
 
 
 ## Features
@@ -88,6 +89,100 @@ open_path           Optional path to a bSDD JSON file
 
 ### LOIN / IDS Exporter
 ![Graph View](docs/images/loin-exporter.png)
+
+
+## Web application
+
+The web version offers the same functionality as the desktop GUI in the browser:
+every dictionary you create, upload or download from bSDD gets its own **unguessable link**.
+Everybody who has the link edits the dictionary **together in real time** (live updates,
+presence, per-user undo/redo). Dictionaries are stored as plain bSDD JSON in a Docker volume.
+
+Features: class tree (drag & drop, copy/paste, grouping), property sets, class properties,
+property / class / dictionary editors with relations and allowed values, Groups of Properties,
+Level of Information Need (ISO 7817-3), exports (Excel, IDS, ISO 23386, ISO 7817-3, Revit),
+download from bSDD, fuzzy search, graph viewer, AI definitions (each user enters their own
+OpenAI key, it never reaches the server), English and German UI, and a Python shell.
+
+The web UI is organised in sections (overview with checks, classes, groups of properties,
+properties, LOIN, graph, export). Every class and property has its own URL
+(`/p/<id>/classes/<code>`, `/p/<id>/properties/<code>`) that can be shared, edits are made
+inline with a per-field merge of concurrent changes, and <kbd>Ctrl</kbd>+<kbd>K</kbd> opens a
+command palette to jump to any class, property or page.
+
+**Graph viewer:** a custom canvas renderer with a force-directed layout engine written in Rust
+and compiled to WebAssembly (`web/graph-engine`, Barnes-Hut repulsion, runs in a Web Worker).
+Drag & drop with pinning, filters per node and edge type, adding nodes by name / code / URI,
+expanding neighbours, straight / right-angle / curved edges, adjustable physics, tree, circle
+and grid layouts, creating and deleting relations directly in the graph, PNG / SVG /
+interactive HTML export, and a stand-alone window (`/p/<id>/window/graph`). The prebuilt
+`web/src/graph/engine.wasm` is rebuilt from source in the Docker build (`npm run build:wasm` locally).
+
+**Python shell without server risk:** the shell runs Python *in the visitor's browser*
+(Pyodide/WebAssembly) on a local copy of the dictionary with `bsdd_json` loaded. Nothing
+typed into it is executed on the server. With "Live" on, changes to `d` are sent after each
+command as a small, conflict-checked patch; the server validates them like every other edit.
+
+**Sharing and access:** there are no user accounts, access is per link (Share dialog):
+
+- **Edit link** `/p/<id>` – optionally protected with a password. Everybody has to enter it
+  once per browser before they can view or edit anything.
+- **Read-only link** `/v/<other id>` – can be switched on, regenerated and protected with its
+  own password. It allows browsing, searching and exporting; the server rejects every change
+  made through it, and it never reveals the edit link.
+
+Passwords are stored as salted scrypt hashes; after entering one the browser receives a signed
+token. Changing the edit password signs out everybody, changing the read-only link or its
+password only signs out viewers. Password attempts are rate limited.
+
+> Without passwords anyone with a link can open it. Use HTTPS (reverse proxy) when the app is
+> reachable over a network, otherwise passwords and tokens travel in clear text.
+
+### Run with Docker Compose
+
+```yaml
+services:
+  bsdd-toolkit:
+    image: cmellueh/bsdd-toolkit:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - bsdd-data:/data
+volumes:
+  bsdd-data:
+```
+
+`docker compose up -d` and open http://localhost:8000. See `compose.yaml` for all options.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `DATA_DIR` | `/data` | where dictionaries are stored |
+| `PORT` | `8000` | HTTP port inside the container |
+| `MAX_UPLOAD_MB` | `50` | maximum upload size |
+| `PROJECT_TTL_DAYS` | `0` | delete dictionaries not opened for N days (0 = never) |
+| `OFFLINE` | `0` | `1` disables lookups of external classes/properties on bSDD |
+| `SAVE_DELAY` | `2` | seconds after the last edit until the dictionary is written |
+| `SNAPSHOT_INTERVAL` / `MAX_SNAPSHOTS` | `600` / `20` | rolling backups in `<project>/snapshots` |
+| `SECRET_KEY` | *(generated)* | key for signing access tokens; by default a random key is created once in `<DATA_DIR>/secret.key` |
+
+The server must run as a single process (open dictionaries are held in memory); the image does this by default.
+A reverse proxy must forward WebSocket upgrades (`/api/projects/<id>/ws`).
+
+### Publish the image
+
+`.github/workflows/docker.yml` runs the tests and pushes a multi-arch image (amd64/arm64) to
+Docker Hub when a tag like `web-v0.1.0` is pushed (the plain `v*` tags belong to the desktop releases). Add the repository secrets `DOCKERHUB_USERNAME`
+and `DOCKERHUB_TOKEN`. Manually: `docker build -t <user>/bsdd-toolkit . && docker push <user>/bsdd-toolkit`.
+
+### Develop
+
+```bash
+uv venv .venv-web && VIRTUAL_ENV=.venv-web uv pip install -e src/bsdd_json -e "src/bsdd_web[dev]"
+PYTHONPATH=src DATA_DIR=./data .venv-web/bin/python -m bsdd_web --reload   # API on :8000
+cd web && npm install && npm run dev                                       # UI on :5173 (proxies /api)
+PYTHONPATH=src .venv-web/bin/python -m pytest src/bsdd_web/tests           # backend tests
+```
 
 
 ## Use the Data Model (Python)

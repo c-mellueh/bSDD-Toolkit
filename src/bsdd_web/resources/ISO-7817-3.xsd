@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Final LOIN Namespace will be specified after the review process -->
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="https://iso.org/2024/LOIN" xmlns="https://iso.org/2024/LOIN"
+    xmlns:dt="https://standards.iso.org/iso/23387/ed-2/en/"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" 
+    vc:minVersion="1.1">
+
+    <xs:import namespace="https://standards.iso.org/iso/23387/ed-2/en/" schemaLocation="https://standards.iso.org/iso/23387/ed-2/en/ISO_23387_AnnexE_XSD.xsd" />
+
+    <xs:annotation>
+		<xs:documentation>
+        Welcome to the level of information need specification! This specification allows flexible requirement definitions. For that, the level of information need specification relies on referencing through the dt:referenceType element, which can have a referenceURI and/or a GUID.
+        When referencing within the same specification/file, use GUID. 
+        When referencing to a resource elsewhere, use referenceURI. 
+        When referencing to a specific element within a separate resource, give the resource location in the referenceURI and specify the GUID of the element in the GUID.
+        Further relevant information is given in the annotations throughout the schema.
+        </xs:documentation>
+	</xs:annotation>
+
+    <xs:complexType name="PurposeType">
+        <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element name="Name" type="dt:MultiLanguageTextType" />
+                <xs:element name="Definition" type="dt:MultiLanguageTextType" minOccurs="0" />
+                <xs:element name="ReferenceDocument" type="dt:ReferenceType" minOccurs="0"
+                    maxOccurs="unbounded" />
+                <xs:element name="Description" type="dt:MultiLanguageTextType" minOccurs="0"
+                    maxOccurs="unbounded" />
+                <xs:element name="Language" type="xs:language" minOccurs="0" />
+                <xs:element name="Region" type="xs:string" minOccurs="0" />
+                <xs:element name="DictionaryRef" type="dt:ReferenceType" minOccurs="0" />
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute ref="dt:GUID" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="EMailAddressType">
+		<xs:annotation>
+		<xs:documentation>
+        The address is restricted to an e-mail address. The use of a persistent e-mail address is recommended.
+        </xs:documentation>
+	</xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[^@]+@[^\.]+\..+" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ActorType">
+        <xs:sequence>
+            <xs:element name="Role" type="dt:MultiLanguageTextType" />
+            <xs:element name="Description" type="dt:MultiLanguageTextType" minOccurs="0" />
+            <xs:element name="EMailAddress" type="EMailAddressType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="firstName" type="xs:string" use="optional" />
+        <xs:attribute name="middleName" type="xs:string" use="optional" />
+        <xs:attribute name="lastName" type="xs:string" use="optional" />
+        <xs:attribute name="affiliation" type="xs:string" use="optional" />
+    	<xs:attribute ref="dt:GUID" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="InformationDeliveryMilestoneType">
+        <xs:sequence>
+            <xs:element name="Name" type="dt:MultiLanguageTextType" />
+            <xs:element name="Description" type="dt:MultiLanguageTextType" minOccurs="0"
+                maxOccurs="unbounded" />
+            <xs:element name="ReferenceDocument" type="dt:ReferenceType" minOccurs="0"
+                maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="Date" type="xs:dateTime" use="optional" />
+    	<xs:attribute ref="dt:GUID" use="required"/>
+    </xs:complexType>
+
+     <xs:complexType name="PrerequisitesType"> 
+        <xs:annotation>
+			<xs:documentation>A level of information need specification always has one purpose and two actors, given that it is a specific transaction. Actors should consolidate requirements for different actors and different purposes in separate level of information need specifications</xs:documentation>
+		</xs:annotation>
+        <xs:sequence>
+            <xs:element name="Purpose" type="PurposeType" />
+            <xs:element name="InformationDeliveryMilestone" type="InformationDeliveryMilestoneType" />
+            <xs:element name="ProvidingActor" type="ActorType" /> 
+            <xs:element name="ReceivingActor" type="ActorType" />
+        </xs:sequence>
+     	<xs:attribute ref="dt:GUID" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SpecificationType">
+        <xs:sequence>
+            <xs:element name="Prerequisites" type="PrerequisitesType" />
+            <xs:element name="SpecificationPerObjectType" type="SpecificationPerObjectTypeType"
+                nillable="true" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="GeoReferencing" type="GeoReferencingType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required" />
+    	<xs:attribute ref="dt:GUID" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SpecificationPerObjectTypeType">
+        <xs:complexContent>
+            <xs:extension base="dt:ConceptType">
+                <xs:sequence>
+                    <xs:element name="ObjectType" type="dt:ObjectTypeType" />
+                    <xs:element name="AlphanumericalInformation" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="Property" type="dt:PropertyType" minOccurs="0"
+                                    maxOccurs="unbounded">
+                                    <xs:annotation>
+                                        <xs:documentation>single properties should not be referenced in a group of properties, e.g., attributes 'height' and 'length' from IfcWindow </xs:documentation>
+                                    </xs:annotation>
+                                </xs:element> 
+                                <xs:element name="QuantityKind" type="dt:QuantityKindType"
+                                    minOccurs="0" maxOccurs="unbounded" />
+                                <xs:element name="GroupsOfProperties" minOccurs="0">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="GroupOfProperties" type="dt:GroupOfPropertiesType" minOccurs="0" maxOccurs="unbounded" />
+                                            <xs:element name="GroupOfPropertiesRef" type="dt:ReferenceType" minOccurs="0" maxOccurs="unbounded" />
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="ReferenceDocument"
+                                    type="dt:ReferenceDocumentType" minOccurs="0"
+                                    maxOccurs="unbounded" />
+                                <xs:element name="Dimension" type="dt:DimensionType" minOccurs="0"
+                                    maxOccurs="unbounded">
+                                    <xs:annotation>
+                                        <xs:documentation>where possible, use references to existing dimensions instead of defining existing contents; if both reference and user-defined dimensions are present, an indication is needed on which one takes precedence </xs:documentation>
+                                    </xs:annotation>
+                                </xs:element>
+                                <xs:element name="Unit" type="dt:UnitType" minOccurs="0"
+                                    maxOccurs="unbounded" >
+                                    <xs:annotation>
+                                        <xs:documentation>where possible, use references to existing dimensions instead of defining existing contents; if both reference and user-defined dimensions are present, an indication is needed on which one takes precedence </xs:documentation>
+                                    </xs:annotation>
+                                </xs:element>
+                            </xs:sequence>
+                            <xs:attribute ref="dt:GUID" use="required"/>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Documentation" type="DocumentationType" minOccurs="0" />
+                    <xs:element name="GeometricalInformation" type="GeometricalInformationType"
+                        minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="FormatType">
+        <xs:sequence>
+            <xs:element name="FormatName" type="dt:MultiLanguageTextType" minOccurs="1" maxOccurs="unbounded" />
+            <xs:element name="FormatVersion" type="dt:MultiLanguageTextType" minOccurs="1" maxOccurs="unbounded" />
+            <xs:element name="FormatSpecification" type="dt:ReferenceType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RequiredDocumentType">
+        <xs:sequence>
+            <xs:element name="Name" type="dt:MultiLanguageTextType" />
+            <xs:element name="ReferenceDocument" type="dt:ReferenceType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="Description" type="dt:MultiLanguageTextType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="Format" type="FormatType" />
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" use="optional" />
+        <xs:attribute name="form" type="xs:string" use="optional" />
+        <xs:attribute name="content" type="xs:string" use="optional" />
+    	<xs:attribute ref="dt:GUID" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="DocumentationType">
+        <xs:sequence>
+            <xs:element name="Document" type="RequiredDocumentType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    	<xs:attribute ref="dt:GUID" use="required" />
+    </xs:complexType>
+
+    <!-- Elements for information need regarding the detail aspect of the geometrical information start here -->
+
+    <xs:simpleType name="ShapeAssemblyEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />
+            <xs:enumeration value="SingleObjectSingularShape" /> 
+            <xs:enumeration value="SingleObjectMultipleShapes" /> 
+            <xs:enumeration value="MultipleObjects" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ShapeRepresentationEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />
+            <xs:enumeration value="SingleBoundingPrimitive" />
+            <xs:enumeration value="OuterShellAsSingularShape" />
+            <xs:enumeration value="OuterShellAsSeparateShapes" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="InsideGeometryEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />
+            <xs:enumeration value="NoInsideGeometry" />
+            <xs:enumeration value="InsideGeometryAsPartOfShape" />
+            <xs:enumeration value="SeparateShapes" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ConnectionsEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />
+            <xs:enumeration value="NoConnections" />
+            <xs:enumeration value="ConnectionsAsPartOfShape" />
+            <xs:enumeration value="SeparateShapes" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OpeningsEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />
+            <xs:enumeration value="NoOpenings" />
+            <xs:enumeration value="OpeningsAsPartOfShape" />
+            <xs:enumeration value="SeparateShapes" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OperatingAndClearanceZonesEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />
+            <xs:enumeration value="NoZones" />
+            <xs:enumeration value="ZonesAsPartOfShape" />
+            <xs:enumeration value="SeparateShapes" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FeaturesEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />
+            <xs:enumeration value="NoFeatures" />
+            <xs:enumeration value="FeaturesAsPartOfShape" />
+            <xs:enumeration value="SeparateShapes" />
+        </xs:restriction>
+    </xs:simpleType>
+	
+    <xs:complexType name="ThresholdDimensionType">
+        <xs:sequence>
+            <xs:element name="Threshold" type="xs:double"/>
+            <xs:element name="Unit" type="dt:UnitType"/>
+            <xs:element name="Definition" type="dt:MultiLanguageTextType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ShapeInfluenceType">
+        <xs:sequence>
+            <xs:element name="InsideGeometry" type="InsideGeometryEnum" minOccurs="0" />
+            <xs:element name="Connections" type="ConnectionsEnum" minOccurs="0" />
+            <xs:element name="Openings" type="OpeningsEnum" minOccurs="0" />
+            <xs:element name="OperatingAndClearanceZones" type="OperatingAndClearanceZonesEnum" minOccurs="0" />
+            <xs:element name="Features" type="FeaturesEnum" minOccurs="0" />
+            <xs:element name="ThresholdDimension" type="ThresholdDimensionType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DetailType">
+        <xs:sequence>
+            <xs:element name="Dictionary" type="dt:ReferenceType" minOccurs="0" />
+            <xs:element name="ShapeAssembly" type="ShapeAssemblyEnum" minOccurs="0" />
+            <xs:element name="ShapeRepresentation" type="ShapeRepresentationEnum" minOccurs="0" />
+            <xs:element name="ShapeInfluence" type="ShapeInfluenceType" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Elements for information need regarding the other aspects of the geometrical information start here -->
+
+    <xs:simpleType name="DimensionalityEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />
+            <xs:enumeration value="0D" />
+            <xs:enumeration value="1D" />
+            <xs:enumeration value="2D" />
+            <xs:enumeration value="3D" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AppearanceEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequired" />  
+            <xs:enumeration value="NoAppearanceInformation" />
+            <xs:enumeration value="SymbolicByMapping" />
+            <xs:enumeration value="SingularMaterial" />
+            <xs:enumeration value="MultipleMaterials" />
+            <xs:enumeration value="ConceptualAppearance" />
+            <xs:enumeration value="RealisticAppearance" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ParametricBehaviourEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotRequested" />
+            <xs:enumeration value="Requested" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Elements for information need regarding location and reference systems start here -->
+
+    <xs:simpleType name="CoordinateReferenceSystemEnum">
+        <xs:annotation>
+			<xs:documentation>The type of coordinate reference system used in the project</xs:documentation>
+		</xs:annotation>
+        <xs:restriction base="xs:string">
+			<xs:enumeration value="NotRequired" />    <!-- When the location information is not known, the value ‘not required’ can be selected -->
+            <xs:enumeration value="ProjectedCRS" />   <!-- UTM, Gauss-Krueger, etc. -->
+            <xs:enumeration value="EngineeringCRS" /> <!-- local cartesian coordinate system -->
+            <xs:enumeration value="GeographicCRS" />  <!-- geographic CRS -->
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="CoordinateReferenceSystemType">
+        <xs:annotation>
+            <xs:documentation>Type to describe the coordinate reference system to be used by the information provider.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Type" type="CoordinateReferenceSystemEnum" minOccurs="1" maxOccurs="1" />
+            <xs:element name="Datum" type="DatumType" minOccurs="1" maxOccurs="1" />
+            <xs:element name="VerticalDatum" type="DatumType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ModelCoordinateSystemType">
+        <xs:sequence>
+            <!-- IsProjected describes whether the model coordinate system is projected / mapped / distorted or not.
+            While building CS are typically undistorted, infrastucture and city-level CS are typically distorted.
+            If IsProjected is set to true, the model CS inherits the distortion from the coordinate reference system.
+            -->
+            <xs:element name="IsProjected" type="xs:boolean"/>
+
+            <!-- the origin of the model coordinate system in the horizontal CRS -->
+            <xs:element name="FirstCoordinate" type="xs:decimal" minOccurs="1" maxOccurs="1" /> <!-- e.g. Easting, -->
+            <xs:element name="SecondCoordinate" type="xs:decimal" minOccurs="1" maxOccurs="1" /> <!-- e.g. Northing -->
+            <!-- the origin of the model coordinate system in the vertical CRS -->
+            <xs:element name="Height" type="xs:decimal" minOccurs="1" maxOccurs="1" /> <!-- e.g. height above mean sea level -->
+
+            <!-- the rotation of the model coordinate system with respect to the CRS -->
+            <xs:element name="XAxisAbscissa" type="xs:decimal" minOccurs="0" maxOccurs="1" /> <!-- relative to East coordinate axis, e.g. 1.0 -->
+            <xs:element name="XAxisOrdinate" type="xs:decimal" minOccurs="0" maxOccurs="1" />
+
+            <!-- scale of the model units to CRS units, e.g. feet (model) vs meters (crs) -->
+            <xs:element name="UnitScale" type="xs:decimal" minOccurs="0" maxOccurs="1" />
+
+            <!-- HorizontalScale describes the scale factor between model and crs, is *not* the scale between the model and reality -->
+            <xs:element name="HorizontalScale" type="xs:decimal" minOccurs="0" maxOccurs="1" />
+
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- PositiongEnum is used for the positioning of individual elements in the model -->
+	
+    <xs:simpleType name="PositioningEnum">
+        <xs:annotation>
+			<xs:documentation>Enumeration for describing different positioning options</xs:documentation>
+		</xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NotDefined" />
+            <xs:enumeration value="Absolute" /> 
+            <xs:enumeration value="Relative" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="PositioningType">
+        <xs:sequence>
+            <xs:element name="RelativeOrAbsolute" type="PositioningEnum" minOccurs="1" maxOccurs="1"/>
+            <!-- The reference object is defined by any meaningful string representation. It can be a natural language expression, a filter, XML path, or GUID.  -->
+            <xs:element name="ReferenceObject" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="DatumRegistryReference">
+        <xs:annotation>
+            <xs:documentation>Any geodetic registry following ISO 19127:2019 is valid. Common examples are EPSG for defining the datum and WKT2 (according to ISO 19162:2019)</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Name" type="dt:MultiLanguageTextType" />
+            <xs:element name="Description" type="dt:MultiLanguageTextType" minOccurs="0"
+                        maxOccurs="unbounded" />
+            <xs:element name="RegistryReference" type="dt:ReferenceType" minOccurs="0"
+                        maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DatumType">
+        <xs:annotation>
+			<xs:documentation>Datum as defined in ISO 19111; name contains a WKT2 or EPSG string, or a local project-specific name</xs:documentation>
+		</xs:annotation>
+        <xs:sequence>
+            <xs:element name="Name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Type" type="DatumRegistryReference" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="GeoReferencingType">
+        <xs:sequence>
+            <xs:element name="CoordinateReferenceSystem" type="CoordinateReferenceSystemType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="ModelCoordinateSystem" type="ModelCoordinateSystemType" minOccurs="0" maxOccurs="unbounded"/> 
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Elements for information need regarding location and reference systems end here -->
+
+    <xs:complexType name="GeometricalInformationType">
+        <xs:annotation>
+			<xs:documentation>Geometrical information to be provided by the information provider for the indicated ObjectType</xs:documentation>
+		</xs:annotation>
+        <xs:sequence>
+            <xs:element name="Detail" type="DetailType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="Dimensionality" type="DimensionalityEnum" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="Appearance" type="AppearanceEnum" minOccurs="0" />
+            <xs:element name="ParametricBehaviour" type="ParametricBehaviourEnum" minOccurs="0" />
+            <xs:element name="Location" type="PositioningType" minOccurs="0"/>
+        </xs:sequence>
+    	<xs:attribute ref="dt:GUID" use="required"/>
+        <xs:attribute name="placeholder" type="xs:boolean" default="false" />
+    </xs:complexType>
+
+    <xs:element name="LevelOfInformationNeed">
+        <xs:annotation>
+            <xs:documentation>Level of information need as defined by ISO 7817-3</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Specification" type="SpecificationType" minOccurs="1"
+                    maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

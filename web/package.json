@@ -1,0 +1,41 @@
+{
+  "name": "bsdd-toolkit-web",
+  "private": true,
+  "version": "0.1.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "preview": "vite preview",
+    "build:wasm": "cd graph-engine && (cargo build --release --target wasm32-unknown-unknown --lib 2>/dev/null || docker run --rm -u $(id -u):$(id -g) -e CARGO_HOME=/tmp/cargo -v \"$PWD\":/src -w /src rust:1.86-slim sh -c 'cargo build --release --target wasm32-unknown-unknown --lib') && cp target/wasm32-unknown-unknown/release/graph_engine.wasm ../src/graph/engine.wasm"
+  },
+  "dependencies": {
+    "@mantine/core": "7.17.8",
+    "@mantine/dates": "7.17.8",
+    "@mantine/hooks": "7.17.8",
+    "@mantine/modals": "7.17.8",
+    "@mantine/notifications": "7.17.8",
+    "@tabler/icons-react": "3.31.0",
+    "dayjs": "1.11.13",
+    "i18next": "24.2.3",
+    "react": "18.3.1",
+    "react-arborist": "3.4.3",
+    "react-dom": "18.3.1",
+    "react-i18next": "15.4.1",
+    "react-router-dom": "7.18.5",
+    "zustand": "5.0.3"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.20",
+    "@types/react-dom": "18.3.6",
+    "@vitejs/plugin-react": "4.3.4",
+    "postcss": "8.5.32",
+    "postcss-preset-mantine": "1.17.0",
+    "postcss-simple-vars": "7.0.1",
+    "typescript": "5.8.3",
+    "vite": "6.4.5",
+    "vitest": "5.1.0"
+  }
+}

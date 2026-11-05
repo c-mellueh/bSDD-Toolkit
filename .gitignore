@@ -208,3 +208,11 @@ __marimo__/
 .pre-commit-config.yaml
 .vscode*
 .claude*
+# web app
+.venv-web/
+web/node_modules/
+web/dist/
+src/bsdd_web/static/
+web/tsconfig.tsbuildinfo
+web/graph-engine/target/
+/data/
