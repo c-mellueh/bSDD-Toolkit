@@ -3,6 +3,7 @@ import { Alert, Button, Divider, Grid, Group, Modal, Radio, Select, Stack, Table
 import { Toggle } from "./Toggle";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DayField } from "./fields";
 import { api, downloadFile } from "../api";
 import { notifyError, notifyOk } from "../notify";
 import { useProject } from "../state/project";
@@ -167,7 +168,7 @@ export function ExportDialog() {
                   <TextInput label={t(label)} value={meta[k] ?? ""} onChange={(e) => setMeta({ [k]: e.currentTarget.value })} />
                 </Grid.Col>
               ))}
-              <Grid.Col span={6}><TextInput type="date" label={t("Date")} value={meta.date ?? ""} onChange={(e) => setMeta({ date: e.currentTarget.value })} /></Grid.Col>
+              <Grid.Col span={6}><DayField label={t("Date")} value={meta.date ?? ""} onChange={(v) => setMeta({ date: v ?? "" })} /></Grid.Col>
               <Grid.Col span={6}><TagsInput label={t("IFC versions")} data={["IFC2X3", "IFC4", "IFC4X3_ADD2"]} value={meta.ifc_versions ?? ["IFC4X3_ADD2"]} onChange={(v) => setMeta({ ifc_versions: v })} /></Grid.Col>
             </Grid>
           </>

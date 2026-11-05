@@ -1,18 +1,26 @@
 import { MantineProvider, createTheme, localStorageColorSchemeManager } from "@mantine/core";
+import { DatesProvider } from "@mantine/dates";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
-import { useEffect } from "react";
+import { Center, Loader } from "@mantine/core";
+import { Suspense, lazy, useEffect, type ReactNode } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Landing } from "./pages/Landing";
-import { GraphPage } from "./pages/GraphPage";
 import { ProjectLayout } from "./layout/ProjectLayout";
 import { ClassesPage } from "./pages/project/ClassesPage";
-import { ExportPage } from "./pages/project/ExportPage";
-import { GraphRoute } from "./pages/project/GraphRoute";
-import { LoinPage } from "./pages/project/LoinPage";
 import { OverviewPage } from "./pages/project/OverviewPage";
 import { PropertiesPage } from "./pages/project/PropertiesPage";
 import { useSettings } from "./state/settings";
+
+// large, rarely first-visited parts load on demand (keeps the initial download small)
+const GraphPage = lazy(() => import("./pages/GraphPage").then((m) => ({ default: m.GraphPage })));
+const GraphRoute = lazy(() => import("./pages/project/GraphRoute").then((m) => ({ default: m.GraphRoute })));
+const LoinPage = lazy(() => import("./pages/project/LoinPage").then((m) => ({ default: m.LoinPage })));
+const ExportPage = lazy(() => import("./pages/project/ExportPage").then((m) => ({ default: m.ExportPage })));
+
+function Lazy({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<Center h="100%" p="xl"><Loader size="sm" /></Center>}>{children}</Suspense>;
+}
 
 const theme = createTheme({
   primaryColor: "blue",
@@ -36,31 +44,34 @@ const colorSchemeManager = localStorageColorSchemeManager({ key: "bsdd-color-sch
 
 export function App() {
   const themeSetting = useSettings((s) => s.theme);
+  const language = useSettings((s) => s.language);
   return (
     <MantineProvider theme={theme} colorSchemeManager={colorSchemeManager} defaultColorScheme="auto" forceColorScheme={themeSetting === "auto" ? undefined : themeSetting}>
+      <DatesProvider settings={{ locale: language, firstDayOfWeek: 1 }}>
       <ModalsProvider>
         <Notifications position="bottom-right" />
         <BrowserRouter>
           <TitleReset />
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/p/:projectId/window/graph" element={<GraphPage />} />
-            <Route path="/v/:projectId/window/graph" element={<GraphPage base="/v" />} />
+            <Route path="/p/:projectId/window/graph" element={<Lazy><GraphPage /></Lazy>} />
+            <Route path="/v/:projectId/window/graph" element={<Lazy><GraphPage base="/v" /></Lazy>} />
             {(["/p", "/v"] as const).map((base) => (
             <Route key={base} path={`${base}/:projectId`} element={<ProjectLayout base={base} />}>
               <Route index element={<OverviewPage />} />
               <Route path="classes/:code?" element={<ClassesPage key="classes" mode="main" />} />
               <Route path="groups/:code?" element={<ClassesPage key="groups" mode="gop" />} />
               <Route path="properties/:code?" element={<PropertiesPage />} />
-              <Route path="loin" element={<LoinPage />} />
-              <Route path="graph" element={<GraphRoute />} />
-              <Route path="export" element={<ExportPage />} />
+              <Route path="loin" element={<Lazy><LoinPage /></Lazy>} />
+              <Route path="graph" element={<Lazy><GraphRoute /></Lazy>} />
+              <Route path="export" element={<Lazy><ExportPage /></Lazy>} />
             </Route>
             ))}
             <Route path="*" element={<Landing />} />
           </Routes>
         </BrowserRouter>
       </ModalsProvider>
+      </DatesProvider>
     </MantineProvider>
   );
 }

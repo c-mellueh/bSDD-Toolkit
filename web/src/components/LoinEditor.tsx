@@ -4,6 +4,7 @@ import { useReadOnly } from "../state/readonly";
 import { IconArrowDown, IconArrowUp, IconArrowsMaximize, IconArrowsMinimize, IconChevronDown, IconChevronRight, IconDownload, IconPencil, IconPlus, IconSearch, IconTrash, IconUpload } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DayField } from "./fields";
 import { downloadFile, readFileText } from "../api";
 import { GOP, cpName } from "../model";
 import { attempt, notifyOk } from "../notify";
@@ -410,7 +411,7 @@ function EntryList({ kind, title, items }: { kind: "purpose" | "milestone"; titl
         <Group key={x.guid} gap={4} wrap="nowrap">
           <Text size="sm" style={{ flex: 1 }} truncate>{x.name}</Text>
           {kind === "milestone" && (
-            <TextInput type="date" size="xs" value={(x.date ?? "").slice(0, 10)} onChange={(e) => attempt(() => op("loin.set_milestone_date", { guid: x.guid, date: e.currentTarget.value ? `${e.currentTarget.value}T00:00:00` : null }))} w={150} />
+            <DayField size="xs" value={x.date} onChange={(v) => attempt(() => op("loin.set_milestone_date", { guid: x.guid, date: v ? `${v}T00:00:00` : null }))} w={150} />
           )}
           <ActionIcon size="sm" variant="subtle" onClick={() => move(i, -1)} disabled={i === 0}><IconArrowUp size={14} /></ActionIcon>
           <ActionIcon size="sm" variant="subtle" onClick={() => move(i, 1)} disabled={i === items.length - 1}><IconArrowDown size={14} /></ActionIcon>

@@ -150,3 +150,62 @@ function center(pos: Pos): Pos {
   }
   return pos;
 }
+
+/**
+ * Arrange the connected parts of a layout (e.g. the trees of a forest) in rows so the whole
+ * picture roughly matches the aspect ratio of the view instead of one long strip.
+ */
+export function packComponents(pos: Pos, nodes: LayoutNode[], edges: GEdge[], aspect: number): Pos {
+  const ids = new Set(nodes.map((n) => n.id));
+  const up = new Map<string, string>();
+  const find = (x: string): string => {
+    let r = x;
+    while (up.has(r)) r = up.get(r)!;
+    if (r !== x) up.set(x, r);
+    return r;
+  };
+  for (const e of edges) {
+    if (!ids.has(e.source) || !ids.has(e.target)) continue;
+    const a = find(e.source);
+    const b = find(e.target);
+    if (a !== b) up.set(a, b);
+  }
+  const boxes = new Map<string, { ids: string[]; x0: number; y0: number; x1: number; y1: number }>();
+  for (const n of nodes) {
+    const p = pos.get(n.id);
+    if (!p) continue;
+    const r = find(n.id);
+    const b = boxes.get(r) ?? { ids: [], x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+    b.ids.push(n.id);
+    b.x0 = Math.min(b.x0, p.x - n.w / 2);
+    b.x1 = Math.max(b.x1, p.x + n.w / 2);
+    b.y0 = Math.min(b.y0, p.y - n.h / 2);
+    b.y1 = Math.max(b.y1, p.y + n.h / 2);
+    boxes.set(r, b);
+  }
+  const list = [...boxes.values()];
+  if (list.length < 2) return pos;
+  const GAP = 60;
+  const area = list.reduce((s, b) => s + (b.x1 - b.x0 + GAP) * (b.y1 - b.y0 + GAP), 0);
+  const rowWidth = Math.max(...list.map((b) => b.x1 - b.x0), Math.sqrt(area * Math.max(0.3, aspect)));
+  const out: Pos = new Map();
+  let x = 0;
+  let y = 0;
+  let rowHeight = 0;
+  for (const b of list) {
+    const w = b.x1 - b.x0;
+    const h = b.y1 - b.y0;
+    if (x > 0 && x + w > rowWidth) {
+      x = 0;
+      y += rowHeight + GAP;
+      rowHeight = 0;
+    }
+    for (const id of b.ids) {
+      const p = pos.get(id)!;
+      out.set(id, { x: p.x - b.x0 + x, y: p.y - b.y0 + y });
+    }
+    x += w + GAP;
+    rowHeight = Math.max(rowHeight, h);
+  }
+  return center(out);
+}

@@ -48,7 +48,7 @@ import {
   IconSun,
   IconTerminal2,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { api, downloadFile } from "../api";
@@ -63,7 +63,6 @@ import { PropertyEditor } from "../components/PropertyEditor";
 import { SearchDialog } from "../components/SearchDialog";
 import { SettingsDialog } from "../components/SettingsDialog";
 import { ShareDialog } from "../components/ShareDialog";
-import { ShellPanel } from "../components/ShellPanel";
 import { GOP } from "../model";
 import { attempt, notifyError } from "../notify";
 import { classSection, go, projectPath, setNavigator, type Section } from "../state/nav";
@@ -74,6 +73,8 @@ import { CommandPalette } from "./CommandPalette";
 import { useReadOnly } from "../state/readonly";
 import { PasswordScreen } from "../components/PasswordScreen";
 import { setToken } from "../state/access";
+
+const ShellPanel = lazy(() => import("../components/ShellPanel").then((m) => ({ default: m.ShellPanel })));
 
 export function ProjectLayout({ base = "/p" }: { base?: "/p" | "/v" } = {}) {
   const { projectId } = useParams();
@@ -207,7 +208,7 @@ export function ProjectLayout({ base = "/p" }: { base?: "/p" | "/v" } = {}) {
         <div className="app-content">
           <Outlet />
         </div>
-        {shell && <ShellPanel />}
+        {shell && <Suspense fallback={null}><ShellPanel /></Suspense>}
       </AppShell.Main>
 
       <ContextMenuHost />

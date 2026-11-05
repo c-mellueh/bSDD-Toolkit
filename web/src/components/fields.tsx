@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ActionIcon, Group, Loader, NumberInput, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { ActionIcon, Group, Loader, NumberInput, Textarea, Tooltip, type MantineSize } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
+import { DateInput, DateTimePicker } from "@mantine/dates";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { generateDefinition } from "../ai";
@@ -40,15 +42,33 @@ export function useResources(): Resources {
   return res;
 }
 
-/** ISO date string <-> datetime-local input. */
+/** ISO date-time string (UTC) <-> localized date-time picker. */
 export function DateField({ label, value, onChange }: { label: string; value?: string | null; onChange: (v: string | null) => void }) {
-  const local = value ? value.replace("Z", "").slice(0, 16) : "";
+  const lang = useSettings((st) => st.language);
+  // bSDD stores UTC timestamps; they are shown as they are (no time zone shift)
+  const local = value ? dayjs(value.replace("Z", "").slice(0, 19)).toDate() : null;
   return (
-    <TextInput
+    <DateTimePicker
       label={label}
-      type="datetime-local"
-      value={local}
-      onChange={(e) => onChange(e.currentTarget.value ? new Date(e.currentTarget.value + "Z").toISOString().replace(".000Z", "Z") : null)}
+      value={local && !isNaN(local.getTime()) ? local : null}
+      valueFormat={lang === "de" ? "DD.MM.YYYY HH:mm" : "YYYY-MM-DD HH:mm"}
+      clearable
+      onChange={(d) => onChange(d ? dayjs(d).format("YYYY-MM-DDTHH:mm:ss") + "Z" : null)}
+    />
+  );
+}
+
+/** Plain date "YYYY-MM-DD" <-> localized date picker. */
+export function DayField({ value, onChange, ...rest }: { value?: string | null; onChange: (v: string | null) => void; label?: string; size?: MantineSize; w?: number }) {
+  const lang = useSettings((st) => st.language);
+  const d = value ? dayjs(value.slice(0, 10)).toDate() : null;
+  return (
+    <DateInput
+      {...rest}
+      value={d && !isNaN(d.getTime()) ? d : null}
+      valueFormat={lang === "de" ? "DD.MM.YYYY" : "YYYY-MM-DD"}
+      clearable
+      onChange={(x) => onChange(x ? dayjs(x).format("YYYY-MM-DD") : null)}
     />
   );
 }

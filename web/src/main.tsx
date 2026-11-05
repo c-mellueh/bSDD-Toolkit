@@ -1,5 +1,7 @@
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/dates/styles.css";
+import "dayjs/locale/de";
 import "./styles.css";
 import "./i18n";
 import React from "react";

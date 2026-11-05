@@ -24,7 +24,7 @@ import { useTranslation } from "react-i18next";
 import { saveBlob } from "../api";
 import { divider, useContextMenu, type MenuItem } from "../components/ContextMenu";
 import { askConfirm } from "../components/dialogs";
-import { CLASS_RELATION_TYPES, PROPERTY_RELATION_TYPES } from "../model";
+import { CLASS_RELATION_TYPES, GOP, PROPERTY_RELATION_TYPES } from "../model";
 import { attempt, notifyError } from "../notify";
 import { op, useProject } from "../state/project";
 import { storageGet, storageSet } from "../state/settings";
@@ -32,7 +32,7 @@ import { openUi } from "../state/ui";
 import { GraphLibrary } from "./GraphLibrary";
 import { buildTab, htmlPage, rootClassTabs } from "./htmlExport";
 import { hasGraphDrag, readGraphDrag } from "./dnd";
-import { circleLayout, gridLayout, treeLayout } from "./layout";
+import { circleLayout, gridLayout, packComponents, treeLayout } from "./layout";
 import {
   EDGE_KINDS,
   EDGE_STYLE,
@@ -179,14 +179,25 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // initial scene: whole dictionary when it is small, otherwise the active class
+  // initial scene (nothing saved yet): small dictionaries completely; larger ones only the root
+  // classes and their direct children (no Groups of Properties – their many HasReference edges
+  // make an unreadable tangle), laid out as a tree instead of starting from random positions
+  const initialLayout = useRef(false);
   useEffect(() => {
     if (initialised.current || !doc) return;
     initialised.current = true;
     if (scene.length) return;
     const classes = doc.dictionary.Classes ?? [];
-    if (classes.length <= 400) setScene(classes.map((c) => classId(c.Code)));
-    else if (activeClass) setScene([classId(activeClass), ...expandIds(classId(activeClass))]);
+    if (classes.length <= 60) {
+      setScene(classes.map((c) => classId(c.Code)));
+      return;
+    }
+    const main = classes.filter((c) => c.ClassType !== GOP);
+    const codes = new Set(main.map((c) => c.Code));
+    const roots = new Set(main.filter((c) => !c.ParentClassCode || !codes.has(c.ParentClassCode)).map((c) => c.Code));
+    const top = main.filter((c) => roots.has(c.Code) || roots.has(c.ParentClassCode ?? ""));
+    setScene((top.length ? top : main.slice(0, 60)).map((c) => classId(c.Code)));
+    initialLayout.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc]);
 
@@ -232,6 +243,26 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       return { id: n.id, kind: n.kind, label: n.display, x: p.x, y: p.y, w: n.w, h: n.h, fixed: p.fixed };
     });
     redges.current = redgesFrom(graph.edges, indexOf);
+    if (initialLayout.current && nodes.length) {
+      // first opening of a larger dictionary: tidy tree, no physics run
+      initialLayout.current = false;
+      const lnodes = rnodes.current.map((n) => ({ id: n.id, w: n.w, h: n.h }));
+      const aspect = size.current.w && size.current.h ? size.current.w / size.current.h : 1.4;
+      const result = packComponents(treeLayout(lnodes, graph.edges, "LR"), lnodes, graph.edges, aspect);
+      for (const n of rnodes.current) {
+        const p = result.get(n.id);
+        if (!p) continue;
+        n.x = p.x;
+        n.y = p.y;
+        const stored = pos.current.get(n.id);
+        if (stored) {
+          stored.x = p.x;
+          stored.y = p.y;
+        }
+      }
+      newCount = 0;
+      fitPending.current = true;
+    }
     if (newCount > 0) pendingAlpha.current = Math.max(pendingAlpha.current ?? 0, newCount === nodes.length ? 1 : 0.5);
     if (worker.current && ready) {
       sendGraph(pendingAlpha.current);
