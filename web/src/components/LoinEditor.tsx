@@ -450,7 +450,29 @@ function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<st
   const paintRef = useRef(paint);
   paintRef.current = paint;
   const last = useRef<{ x: number; y: number } | null>(null);
-  const isOn = (k: string) => (paint?.keys.has(k) ? paint.value : active.has(k));
+  // values sent to the server but not yet confirmed: keep showing them (no flicker back)
+  const [pending, setPending] = useState<Map<string, boolean>>(new Map());
+  const isOn = (k: string) => (paint?.keys.has(k) ? paint.value : pending.has(k) ? pending.get(k)! : active.has(k));
+  const commit = async (keys: string[], value: boolean) => {
+    if (!keys.length) return;
+    setPending((p) => {
+      const n = new Map(p);
+      keys.forEach((k) => n.set(k, value));
+      return n;
+    });
+    try {
+      await set(keys, value);
+    } finally {
+      // the confirmed state has arrived (or the change failed): show the real value again
+      setPending((p) => {
+        const n = new Map(p);
+        keys.forEach((k) => {
+          if (n.get(k) === value) n.delete(k);
+        });
+        return n;
+      });
+    }
+  };
 
   useEffect(() => {
     if (!paint) return;
@@ -476,10 +498,10 @@ function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<st
     };
     const up = () => {
       const cur = paintRef.current;
-      setPaint(null);
-      if (!cur) return;
+      if (!cur) return setPaint(null);
       const changed = [...cur.keys].filter((k) => active.has(k) !== cur.value);
-      if (changed.length) void set(changed, cur.value);
+      void commit(changed, cur.value); // sets pending before the preview is dropped
+      setPaint(null);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up, { once: true });
@@ -502,7 +524,7 @@ function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<st
   const state = (keys: string[]): Tri => triOf(keys.filter(isOn).length, keys.length);
   const all = purposes.flatMap((p) => milestones.map((m) => specKey(p.guid, m.guid)));
   const allState = state(all);
-  const flip = (keys: string[]) => set(keys, state(keys) !== "on");
+  const flip = (keys: string[]) => commit(keys, state(keys) !== "on");
   return (
     <Stack gap="sm">
       <Text size="sm" c="dimmed">
@@ -562,7 +584,7 @@ function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<st
                       >
                         <Group gap={8} wrap="nowrap" justify="space-between">
                           {/* mouse/touch are handled by the cell (drag painting); keyboard (Space/Enter) toggles here */}
-                          <Check state={on ? "on" : "off"} disabled={ro} label={`${p.name} – ${m.name}`} onClick={(e) => { if (e.detail === 0) void set([k], !active.has(k)); }} />
+                          <Check state={on ? "on" : "off"} disabled={ro} label={`${p.name} – ${m.name}`} onClick={(e) => { if (e.detail === 0) void commit([k], !isOn(k)); }} />
                           <Tooltip label={t("Edit this specification")}>
                             <Badge
                               className="loin-open"
