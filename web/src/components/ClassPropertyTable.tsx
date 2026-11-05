@@ -14,6 +14,7 @@ import type { ClassProperty } from "../types";
 import { divider, useContextMenu, type MenuItem } from "./ContextMenu";
 import { askConfirm } from "./dialogs";
 import { useListSelection } from "./useListSelection";
+import { useColumnWidths } from "./useColumnWidths";
 
 type SortKey = "name" | "code" | "pset" | "type" | "unit" | "values" | "required";
 
@@ -24,6 +25,7 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
   const idx = useProject((s) => s.idx);
   const setActiveCp = useProject((s) => s.setActiveClassProperty);
   const openMenu = useContextMenu((s) => s.open);
+  const cols = useColumnWidths("class-properties");
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 } | null>(null);
   const cls = classCode ? idx.classes.get(classCode) : undefined;
   const d = doc?.dictionary;
@@ -119,9 +121,10 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
   };
 
   const header = (key: SortKey, label: string, width?: number | string) => (
-    <th style={{ width }} onClick={() => setSort((s) => (s?.key === key ? (s.dir === 1 ? { key, dir: -1 } : null) : { key, dir: 1 }))}>
+    <th data-col={key !== "values" ? key : undefined} style={{ width: cols.width(key, width) }} onClick={() => setSort((s) => (s?.key === key ? (s.dir === 1 ? { key, dir: -1 } : null) : { key, dir: 1 }))}>
       {label}
       {sort?.key === key ? (sort.dir === 1 ? " ▲" : " ▼") : ""}
+      {key !== "values" && cols.handle(key)}
     </th>
   );
 
@@ -143,7 +146,7 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
         onContextMenu={(e) => { if (cls && (e.target as HTMLElement).closest("tr") === null) openMenu(e, menu()); }}>
         {!cls && <div className="empty-hint">{t("Select a class")}</div>}
         {cls && (
-          <table className="grid-table" style={{ tableLayout: "fixed" }}>
+          <table className="grid-table" style={{ tableLayout: "fixed", minWidth: cols.total ? cols.total + 140 : undefined }}>
             <thead>
               <tr>
                 {header("name", t("Name"), "24%")}
@@ -175,9 +178,9 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
                     {r.name}
                   </td>
                   <td title={r.cp.Code}>{r.cp.Code}</td>
-                  {pset === null && <td>{r.cp.PropertySet ?? ""}</td>}
-                  <td>{r.type}</td>
-                  <td>{r.unit}</td>
+                  {pset === null && <td title={r.cp.PropertySet ?? ""}>{r.cp.PropertySet ?? ""}</td>}
+                  <td title={r.type}>{r.type}</td>
+                  <td title={r.unit}>{r.unit}</td>
                   <td title={r.values} style={r.inherited ? { opacity: 0.55, fontStyle: "italic" } : undefined}>{r.values}</td>
                   <td>{r.cp.IsRequired ? <IconCheck size={14} /> : null}</td>
                 </tr>

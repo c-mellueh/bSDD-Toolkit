@@ -86,11 +86,20 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
       return next;
     });
 
-  const codeError = !form.Code?.trim() ? t("Code must not be empty") : form.Code !== code && idx.properties.has(form.Code) ? t("Code exists already") : false;
-  const nameError = !form.Name?.trim() ? t("Name must not be empty") : false;
+  // "empty" errors only after the user touched the field (not right when a new form opens)
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const touch = (k: string) => setTouched((s) => (s[k] ? s : { ...s, [k]: true }));
+  const codeEmpty = !form.Code?.trim();
+  const nameEmpty = !form.Name?.trim();
+  const codeError = codeEmpty ? (touched.Code || touched.Name) && t("Code must not be empty") : form.Code !== code && idx.properties.has(form.Code) ? t("Code exists already") : false;
+  const nameError = nameEmpty ? touched.Name && t("Name must not be empty") : false;
+  const invalid = !!codeError || !!nameError || codeEmpty || nameEmpty;
 
   const save = async () => {
-    if (codeError || nameError) return;
+    if (invalid) {
+      setTouched({ Name: true, Code: true });
+      return;
+    }
     setBusy(true);
     const data: Record<string, any> = clean({ ...form });
     data.AllowedValues = form.AllowedValues ?? [];
@@ -120,8 +129,8 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
   const parts: Record<PropertySection, React.ReactNode> = {
     general: (
             <Grid>
-              <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Name")} value={form.Name ?? ""} onChange={(e) => setName(e.currentTarget.value)} error={nameError} data-autofocus={!inline || undefined} required /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Code")} value={form.Code ?? ""} onChange={(e) => set("Code", e.currentTarget.value)} error={codeError} required /></Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Name")} value={form.Name ?? ""} onChange={(e) => setName(e.currentTarget.value)} onBlur={() => touch("Name")} error={nameError || undefined} data-autofocus={!inline || undefined} required /></Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Code")} value={form.Code ?? ""} onChange={(e) => { touch("Code"); set("Code", e.currentTarget.value); }} onBlur={() => touch("Code")} error={codeError || undefined} required /></Grid.Col>
               <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Datatype")} data={DATA_TYPES} value={form.DataType ?? null} onChange={(v) => set("DataType", v)} clearable /></Grid.Col>
               <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Value kind")} data={PROPERTY_VALUE_KINDS} value={form.PropertyValueKind ?? null} onChange={(v) => set("PropertyValueKind", v)} clearable /></Grid.Col>
               <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Status")} data={["Preview", "Active", "Inactive"]} value={form.Status ?? null} onChange={(v) => set("Status", v)} clearable /></Grid.Col>
@@ -198,11 +207,11 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
         </Tabs>
       )}
       {readOnly ? null : inline ? (
-        <SaveBar dirty={dirty} busy={busy} invalid={!!codeError || !!nameError} onSave={save} onDiscard={reset} />
+        <SaveBar dirty={dirty} busy={busy} invalid={invalid} onSave={save} onDiscard={reset} />
       ) : (
         <Group justify="flex-end" mt="md">
           <Button variant="default" onClick={onCancel}>{t("Cancel")}</Button>
-          <Button type="submit" loading={busy} disabled={!!codeError || !!nameError}>{existing ? t("Save") : t("Create")}</Button>
+          <Button type="submit" loading={busy} disabled={invalid}>{existing ? t("Save") : t("Create")}</Button>
         </Group>
       )}
     </form>

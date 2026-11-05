@@ -7,6 +7,7 @@ import { GOP, internalCode } from "../../model";
 import { go, openClass, openProperty, type Section } from "../../state/nav";
 import { useProject } from "../../state/project";
 import { openUi } from "../../state/ui";
+import { initials } from "../../state/settings";
 
 interface Check {
   key: string;
@@ -139,7 +140,7 @@ export function OverviewPage() {
               <Stack gap={6}>
                 {users.map((u) => (
                   <Group key={u.id} gap="xs" wrap="nowrap">
-                    <Avatar size={26} radius="xl" color={u.color} style={{ border: `2px solid ${u.color}` }}>{u.name.slice(0, 2).toUpperCase()}</Avatar>
+                    <Avatar size={26} radius="xl" color={u.color} style={{ border: `2px solid ${u.color}` }}>{initials(u.name)}</Avatar>
                     <Text size="sm" truncate style={{ flex: 1 }}>{u.name}{u.id === me?.id ? ` (${t("you")})` : ""}</Text>
                     {u.role === "view" && <Badge size="xs" variant="light" color="gray">{t("viewer")}</Badge>}
                     {u.selection?.class && (

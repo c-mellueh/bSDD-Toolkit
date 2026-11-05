@@ -68,7 +68,7 @@ import { GOP } from "../model";
 import { attempt, notifyError } from "../notify";
 import { classSection, go, projectPath, setNavigator, type Section } from "../state/nav";
 import { connect, disconnect, redo, undo, useProject } from "../state/project";
-import { rememberProject, storageGet, storageSet, useSettings } from "../state/settings";
+import { initials, rememberProject, storageGet, storageSet, useSettings } from "../state/settings";
 import { openUi, useUi } from "../state/ui";
 import { CommandPalette } from "./CommandPalette";
 import { useReadOnly } from "../state/readonly";
@@ -289,7 +289,7 @@ function Header({ mobileOpen, toggleMobile }: { mobileOpen: boolean; toggleMobil
       <Avatar.Group spacing="xs" visibleFrom="md">
         {users.slice(0, 5).map((u) => (
           <Tooltip key={u.id} label={u.id === me?.id ? `${u.name} (${t("you")})` : u.name}>
-            <Avatar size={28} color={u.color} radius="xl" style={{ border: `2px solid ${u.color}` }}>{u.name.slice(0, 2).toUpperCase()}</Avatar>
+            <Avatar size={28} color={u.color} radius="xl" style={{ border: `2px solid ${u.color}` }}>{initials(u.name)}</Avatar>
           </Tooltip>
         ))}
         {users.length > 5 && <Avatar size={28} radius="xl">+{users.length - 5}</Avatar>}

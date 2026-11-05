@@ -10,6 +10,8 @@ export interface Settings {
   aiLanguage: "German" | "English";
   aiSentences: number;
   allowUnknownUri: boolean;
+  /** optional columns of the class trees */
+  treeColumns: { code: boolean; status: boolean };
 }
 
 const KEY = "bsdd-settings";
@@ -25,6 +27,7 @@ function load(): Settings {
     aiLanguage: "English",
     aiSentences: 2,
     allowUnknownUri: true,
+    treeColumns: { code: true, status: true },
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -102,4 +105,14 @@ export function clientId(): string {
   } catch {
     return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   }
+}
+
+/** Two-letter avatar label that tells users apart ("Christoph Mellüh" → "CM", "Guest 245" → "45"). */
+export function initials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return "?";
+  const num = words.find((w) => /^\d+$/.test(w));
+  if (num) return num.slice(-2);
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }

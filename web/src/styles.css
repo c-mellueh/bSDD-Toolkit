@@ -136,3 +136,15 @@ body.resizing { cursor: col-resize; user-select: none; }
 .loin-code { flex: none; max-width: 35%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--mantine-color-dimmed); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .ro-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 body[data-readonly] [data-edit] { display: none !important; }
+
+/* switched-off toggles were nearly invisible on dark backgrounds */
+[data-mantine-color-scheme="dark"] .mantine-Switch-input:not(:checked) + .mantine-Switch-track {
+  background-color: var(--mantine-color-dark-4);
+  border-color: var(--mantine-color-dark-2);
+}
+[data-mantine-color-scheme="dark"] .mantine-Switch-input:not(:checked) + .mantine-Switch-track .mantine-Switch-thumb {
+  background-color: var(--mantine-color-dark-0);
+  border-color: var(--mantine-color-dark-2);
+}
+.col-resize { position: absolute; top: 0; right: -3px; width: 7px; height: 100%; cursor: col-resize; z-index: 2; }
+.col-resize:hover, .col-resize:active { background: var(--mantine-primary-color-light); }

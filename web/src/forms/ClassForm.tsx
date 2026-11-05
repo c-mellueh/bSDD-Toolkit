@@ -93,11 +93,20 @@ export function ClassForm(props: ClassFormProps) {
     });
 
   const codeTaken = form.Code && form.Code !== code && idx.classes.has(form.Code);
-  const codeError = !form.Code?.trim() ? t("Code must not be empty") : codeTaken ? t("Code exists already") : false;
-  const nameError = !form.Name?.trim() ? t("Name must not be empty") : false;
+  // "empty" errors only after the user touched the field (not right when a new form opens)
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const touch = (k: string) => setTouched((s) => (s[k] ? s : { ...s, [k]: true }));
+  const codeEmpty = !form.Code?.trim();
+  const nameEmpty = !form.Name?.trim();
+  const codeError = codeEmpty ? (touched.Code || touched.Name) && t("Code must not be empty") : codeTaken ? t("Code exists already") : false;
+  const nameError = nameEmpty ? touched.Name && t("Name must not be empty") : false;
+  const invalid = !!codeError || !!nameError || codeEmpty || nameEmpty;
 
   const save = async () => {
-    if (codeError || nameError) return;
+    if (invalid) {
+      setTouched({ Name: true, Code: true });
+      return;
+    }
     setBusy(true);
     const data: Record<string, any> = clean({ ...form });
     let ok: string | undefined;
@@ -124,8 +133,8 @@ export function ClassForm(props: ClassFormProps) {
 
   const general = (
     <Grid>
-      <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Name")} value={form.Name ?? ""} onChange={(e) => setName(e.currentTarget.value)} error={nameError} data-autofocus={!inline || undefined} required /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Code")} value={form.Code ?? ""} onChange={(e) => set("Code", e.currentTarget.value)} error={codeError} required /></Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Name")} value={form.Name ?? ""} onChange={(e) => setName(e.currentTarget.value)} onBlur={() => touch("Name")} error={nameError || undefined} data-autofocus={!inline || undefined} required /></Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Code")} value={form.Code ?? ""} onChange={(e) => { touch("Code"); set("Code", e.currentTarget.value); }} onBlur={() => touch("Code")} error={codeError || undefined} required /></Grid.Col>
       <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Class type")} data={CLASS_TYPES} value={form.ClassType ?? "Class"} onChange={(v) => set("ClassType", v)} allowDeselect={false} /></Grid.Col>
       <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Status")} data={CLASS_STATUSES} value={form.Status ?? null} onChange={(v) => set("Status", v)} clearable /></Grid.Col>
       <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Parent class")} data={parentOptions} value={form.ParentClassCode ?? null} onChange={(v) => set("ParentClassCode", v)} searchable clearable limit={100} /></Grid.Col>
@@ -186,11 +195,11 @@ export function ClassForm(props: ClassFormProps) {
         </Tabs>
       )}
       {readOnly ? null : inline ? (
-        <SaveBar dirty={dirty} busy={busy} invalid={!!codeError || !!nameError} onSave={save} onDiscard={reset} />
+        <SaveBar dirty={dirty} busy={busy} invalid={invalid} onSave={save} onDiscard={reset} />
       ) : (
         <Group justify="flex-end" mt="md">
           <Button variant="default" onClick={onCancel}>{t("Cancel")}</Button>
-          <Button type="submit" loading={busy} disabled={!!codeError || !!nameError}>{existing ? t("Save") : t("Create")}</Button>
+          <Button type="submit" loading={busy} disabled={invalid}>{existing ? t("Save") : t("Create")}</Button>
         </Group>
       )}
     </form>

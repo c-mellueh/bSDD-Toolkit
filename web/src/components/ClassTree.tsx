@@ -1,4 +1,6 @@
-import { ActionIcon, Group, Tooltip } from "@mantine/core";
+import { ActionIcon, CloseButton, Group, Menu, TextInput, Tooltip } from "@mantine/core";
+import { normalize } from "../fuzzy";
+import { useSettings } from "../state/settings";
 import { useReadOnly } from "../state/readonly";
 import { useElementSize } from "@mantine/hooks";
 import {
@@ -7,6 +9,7 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconClipboard,
+  IconColumns,
   IconCopy,
   IconEdit,
   IconFolderPlus,
@@ -14,7 +17,7 @@ import {
   IconSearch,
   IconTrash,
 } from "@tabler/icons-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { setGraphDrag } from "../graph/dnd";
 import { classId } from "../graph/model";
@@ -49,6 +52,11 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
   const tree = useRef<TreeApi<TreeNode>>();
   const { ref, width, height } = useElementSize();
   const openMenu = useContextMenu((s) => s.open);
+  const [filter, setFilter] = useState("");
+  const filterRef = useRef<HTMLInputElement>(null);
+  const columns = useSettings((s) => s.treeColumns);
+  const setSettings = useSettings((s) => s.set);
+  const filtering = filter.trim().length > 0;
 
   const include = (c: BsddClass) => (mode === "gop" ? c.ClassType === GOP : c.ClassType !== GOP);
 
@@ -64,6 +72,15 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
     return roots.map((r) => build(r, seen));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc, idx, mode]);
+
+  const matchCount = useMemo(() => {
+    if (!filtering) return 0;
+    const q = normalize(filter.trim());
+    let n = 0;
+    const walk = (list: TreeNode[]) => list.forEach((x) => { if (normalize(x.name ?? "").includes(q) || normalize(x.id).includes(q)) n++; if (x.children) walk(x.children); });
+    walk(data);
+    return n;
+  }, [data, filter, filtering]);
 
   const presence = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -145,16 +162,10 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
     }
   };
 
-  const search = () =>
-    openUi({
-      search: {
-        kind: "class",
-        onPick: (code) => {
-          setActiveClass(code);
-          useUi.getState().set({ revealClass: { code, at: Date.now() } });
-        },
-      },
-    });
+  const search = () => {
+    filterRef.current?.focus();
+    filterRef.current?.select();
+  };
 
   const menuItems = (): MenuItem[] => [
     { label: t("New class"), icon: <IconPlus size={14} />, shortcut: "Ctrl+N", onClick: () => newClass(activeClass) },
@@ -227,8 +238,8 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
           {c.Name}
           {dots?.map((color, i) => <span key={i} className="presence-dot" style={{ background: color }} />)}
         </span>
-        <span className="cell" style={{ width: "34%", opacity: 0.8 }} title={c.Code}>{c.Code}</span>
-        <span className="cell" style={{ width: 64, opacity: 0.6, fontSize: 12 }}>{c.Status ?? ""}</span>
+        {columns.code && <span className="cell" style={{ width: "34%", opacity: 0.8 }} title={c.Code}>{c.Code}</span>}
+        {columns.status && <span className="cell" style={{ width: 64, opacity: 0.6, fontSize: 12 }}>{c.Status ?? ""}</span>}
       </div>
     );
   };
@@ -238,16 +249,43 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
       <div className="pane-header">
         <span className="pane-title" style={{ flex: 1 }}>{mode === "gop" ? t("Groups of properties") : t("Classes")}</span>
         <Group gap={2}>
-          <Tooltip label={t("Search") + " (Ctrl+F)"}><ActionIcon variant="subtle" size="sm" onClick={search}><IconSearch size={16} /></ActionIcon></Tooltip>
+          <Menu position="bottom-end" withinPortal closeOnItemClick={false}>
+            <Menu.Target>
+              <Tooltip label={t("Columns")}><ActionIcon variant="subtle" size="sm" aria-label={t("Columns")}><IconColumns size={16} /></ActionIcon></Tooltip>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Label>{t("Columns")}</Menu.Label>
+              {(["code", "status"] as const).map((k) => (
+                <Menu.Item key={k} leftSection={<span style={{ width: 14, display: "inline-block" }}>{columns[k] ? "✓" : ""}</span>} onClick={() => setSettings({ treeColumns: { ...columns, [k]: !columns[k] } })}>
+                  {k === "code" ? t("Code") : t("Status")}
+                </Menu.Item>
+              ))}
+            </Menu.Dropdown>
+          </Menu>
           <Tooltip label={t("Expand all")}><ActionIcon variant="subtle" size="sm" onClick={() => tree.current?.openAll()}><IconArrowsMaximize size={16} /></ActionIcon></Tooltip>
           <Tooltip label={t("Collapse all")}><ActionIcon variant="subtle" size="sm" onClick={() => tree.current?.closeAll()}><IconArrowsMinimize size={16} /></ActionIcon></Tooltip>
           {!ro && <Tooltip label={t("New class") + " (Ctrl+N)"}><ActionIcon variant="light" size="sm" onClick={() => newClass(activeClass && idx.classes.get(activeClass) && include(idx.classes.get(activeClass)!) ? activeClass : null)}><IconPlus size={16} /></ActionIcon></Tooltip>}
         </Group>
       </div>
+      <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--mantine-color-default-border)" }}>
+        <TextInput
+          ref={filterRef}
+          size="xs"
+          leftSection={<IconSearch size={14} />}
+          placeholder={t("Filter…") + " (Ctrl+F)"}
+          value={filter}
+          onChange={(e) => setFilter(e.currentTarget.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setFilter("");
+            if (e.key === "ArrowDown") tree.current?.focus(tree.current?.visibleNodes[0]?.id);
+          }}
+          rightSection={filter ? <CloseButton size="sm" onClick={() => setFilter("")} aria-label={t("Clear")} /> : null}
+        />
+      </div>
       <div className="row" style={{ fontSize: 11, fontWeight: 600, color: "var(--mantine-color-dimmed)", borderBottom: "1px solid var(--mantine-color-default-border)" }}>
         <span className="cell" style={{ flex: 1, paddingLeft: 24 }}>{t("Name")}</span>
-        <span className="cell" style={{ width: "34%" }}>{t("Code")}</span>
-        <span className="cell" style={{ width: 64 }}>{t("Status")}</span>
+        {columns.code && <span className="cell" style={{ width: "34%" }}>{t("Code")}</span>}
+        {columns.status && <span className="cell" style={{ width: 64 }}>{t("Status")}</span>}
       </div>
       <div
         className="pane-body"
@@ -259,10 +297,16 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
         }}
       >
         {data.length === 0 && <div className="empty-hint">{t("No classes yet. Create one with +.")}</div>}
+        {filtering && data.length > 0 && !matchCount && <div className="empty-hint">{t("No matching classes")}</div>}
         {width > 0 && height > 0 && (
           <Tree<TreeNode>
             disableDrag={ro}
-            disableDrop={ro}
+            disableDrop={ro || filtering}
+            searchTerm={filter}
+            searchMatch={(node, term) => {
+              const q = normalize(term.trim());
+              return normalize(node.data.name ?? "").includes(q) || normalize(node.data.id).includes(q);
+            }}
             ref={tree}
             data={data}
             width={width}
