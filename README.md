@@ -172,7 +172,7 @@ A reverse proxy must forward WebSocket upgrades (`/api/projects/<id>/ws`).
 ### Publish the image
 
 `.github/workflows/docker.yml` runs the tests and pushes a multi-arch image (amd64/arm64) to
-Docker Hub when a tag like `v1.0.0` is pushed. Add the repository secrets `DOCKERHUB_USERNAME`
+Docker Hub when a tag like `web-v0.1.0` is pushed (the plain `v*` tags belong to the desktop releases). Add the repository secrets `DOCKERHUB_USERNAME`
 and `DOCKERHUB_TOKEN`. Manually: `docker build -t <user>/bsdd-toolkit . && docker push <user>/bsdd-toolkit`.
 
 ### Develop
