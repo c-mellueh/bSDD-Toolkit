@@ -2,6 +2,8 @@ import { ActionIcon, Group, Tooltip } from "@mantine/core";
 import { IconCheck, IconClipboard, IconCopy, IconEdit, IconLink, IconListSearch, IconPlus, IconRefresh, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { setGraphDrag } from "../graph/dnd";
+import { classId, idForUri, propId } from "../graph/model";
 import { copyClassProperties, readClip } from "../clipboard";
 import { GOP, cpName, effectiveValues, linkedGop, resolveProperty } from "../model";
 import { attempt, notifyOk } from "../notify";
@@ -158,6 +160,12 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
                   className={sel.selected.includes(r.cp.Code) ? "selected" : ""}
                   onClick={(e) => { sel.click(r.cp.Code, e); setActiveCp(r.cp.Code); }}
                   onDoubleClick={() => edit(r.cp.Code)}
+                  draggable
+                  onDragStart={(e) => {
+                    const chosen = sel.selected.includes(r.cp.Code) ? rows.filter((x) => sel.selected.includes(x.cp.Code)) : [r];
+                    const ids = chosen.map((x) => (x.cp.PropertyCode ? propId(x.cp.PropertyCode) : x.cp.PropertyUri ? idForUri(doc!, x.cp.PropertyUri, "prop") : null));
+                    setGraphDrag(e, [...(cls ? [classId(cls.Code)] : []), ...ids.filter((x): x is string => !!x)]);
+                  }}
                   onContextMenu={(e) => { sel.ensure(r.cp.Code); openMenu(e, menu()); }}
                 >
                   <td title={r.name}>

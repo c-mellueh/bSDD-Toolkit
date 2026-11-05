@@ -15,6 +15,8 @@ import {
 } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { setGraphDrag } from "../graph/dnd";
+import { classId } from "../graph/model";
 import { Tree, type NodeApi, type NodeRendererProps, type TreeApi } from "react-arborist";
 import { copyClasses, readClip } from "../clipboard";
 import { GOP, descendants } from "../model";
@@ -200,6 +202,10 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
         style={style}
         className={`row${node.isSelected ? " selected" : ""}${node.willReceiveDrop ? " drop-target" : ""}`}
         onDoubleClick={() => openUi({ classEditor: { code: c.Code } })}
+        onDragStart={(e) => {
+          const codes = node.isSelected ? node.tree.selectedNodes.map((n) => n.id) : [c.Code];
+          setGraphDrag(e, codes.map(classId));
+        }}
         onContextMenu={(e) => {
           if (!node.isSelected) node.select();
           setActiveClass(c.Code);

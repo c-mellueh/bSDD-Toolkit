@@ -22,6 +22,7 @@ import {
 } from "@mantine/core";
 import {
   IconArrowsMaximize,
+  IconBooks,
   IconChevronLeft,
   IconChevronRight,
   IconDownload,
@@ -47,6 +48,8 @@ import { attempt, notifyError } from "../notify";
 import { op, useProject } from "../state/project";
 import { storageGet, storageSet } from "../state/settings";
 import { openUi } from "../state/ui";
+import { GraphLibrary } from "./GraphLibrary";
+import { hasGraphDrag, readGraphDrag } from "./dnd";
 import { circleLayout, gridLayout, treeLayout } from "./layout";
 import {
   EDGE_KINDS,
@@ -99,6 +102,7 @@ interface Saved {
   hiddenEdges: EdgeKind[];
   physics: Physics;
   appearance: Appearance;
+  library: boolean;
 }
 
 type Drag =
@@ -129,6 +133,8 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const [running, setRunning] = useState(false);
   const [ready, setReady] = useState(false);
   const [panel, setPanel] = useState(true);
+  const [library, setLibrary] = useState<boolean>(saved.library ?? true);
+  const [dropActive, setDropActive] = useState(false);
   const [input, setInput] = useState("");
   const [connect, setConnect] = useState<{ source: string; target: string } | null>(null);
   const [connectMode, setConnectMode] = useState(false);
@@ -341,7 +347,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     const keep = new Set(scene);
     const p: Saved["pos"] = {};
     for (const [k, v] of pos.current) if (keep.has(k)) p[k] = [Math.round(v.x), Math.round(v.y), v.fixed ? 1 : 0];
-    storageSet(storeKey, { scene, pos: p, hiddenNodes: [...hiddenNodes], hiddenEdges: [...hiddenEdges], physics, appearance } satisfies Saved);
+    storageSet(storeKey, { scene, pos: p, hiddenNodes: [...hiddenNodes], hiddenEdges: [...hiddenEdges], physics, appearance, library } satisfies Saved);
   };
   saveRef.current = save;
 
@@ -486,6 +492,40 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     }
     addIds(ids);
   };
+
+  // drag & drop from the class tree, property tables or the library panel
+  const onDragOver = (e: React.DragEvent) => {
+    if (!hasGraphDrag(e)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    if (!dropActive) setDropActive(true);
+  };
+  const onDrop = (e: React.DragEvent) => {
+    setDropActive(false);
+    if (!hasGraphDrag(e) || !doc) return;
+    e.preventDefault();
+    const ids = readGraphDrag(e).filter((id) => describeNode(doc, idx, id, labels));
+    if (!ids.length) return;
+    const p = toWorld(e);
+    const present = new Set(scene);
+    const fresh = ids.filter((id) => !present.has(id));
+    // drop point = centre of a small grid of the new nodes
+    const cols = Math.max(1, Math.ceil(Math.sqrt(fresh.length)));
+    const rows = Math.ceil(fresh.length / cols);
+    fresh.forEach((id, i) => {
+      const gx = (i % cols) - (cols - 1) / 2;
+      const gy = Math.floor(i / cols) - (rows - 1) / 2;
+      pos.current.set(id, { x: p.x + gx * 140, y: p.y + gy * 60, fixed: appearance.pinOnDrag });
+    });
+    fitPending.current = false; // keep the nodes where they were dropped
+    if (fresh.length) {
+      pendingAlpha.current = Math.max(pendingAlpha.current ?? 0, 0.3);
+      addIds(fresh);
+    }
+    setSelected(new Set(ids));
+    wrapRef.current?.focus();
+  };
+  const sceneSet = useMemo(() => new Set(scene), [scene]);
 
   const addFromInput = () => {
     if (!doc) return;
@@ -930,11 +970,28 @@ document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>{co
         >
           <ActionIcon variant="subtle"><IconHelp size={16} /></ActionIcon>
         </Tooltip>
+        <Tooltip label={t("Dictionary panel (drag classes and properties into the graph)")}>
+          <ActionIcon variant={library ? "light" : "subtle"} onClick={() => setLibrary((v) => !v)}><IconBooks size={16} /></ActionIcon>
+        </Tooltip>
         <ActionIcon variant="subtle" onClick={() => setPanel((v) => !v)}>{panel ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}</ActionIcon>
       </Group>
 
       <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
-        <div ref={wrapRef} style={{ flex: 1, position: "relative", minWidth: 0, outline: "none" }} tabIndex={0} onKeyDown={onKeyDown}>
+        {library && doc && (
+          <div style={{ width: 260, flex: "none", borderRight: "1px solid var(--mantine-color-default-border)", minHeight: 0 }}>
+            <GraphLibrary doc={doc} idx={idx} inScene={sceneSet} onAdd={(ids) => { addIds(ids); setSelected(new Set(ids)); }} />
+          </div>
+        )}
+        <div
+          ref={wrapRef}
+          style={{ flex: 1, position: "relative", minWidth: 0, outline: dropActive ? "2px dashed var(--mantine-color-blue-5)" : "none", outlineOffset: -4 }}
+          tabIndex={0}
+          onKeyDown={onKeyDown}
+          onDragOver={onDragOver}
+          onDragEnter={onDragOver}
+          onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDropActive(false); }}
+          onDrop={onDrop}
+        >
           <canvas
             ref={canvasRef}
             style={{ position: "absolute", inset: 0, touchAction: "none" }}
@@ -948,7 +1005,7 @@ document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>{co
           />
           {graph.nodes.length === 0 && (
             <Stack align="center" justify="center" style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-              <Text c="dimmed">{t("The view is empty. Add nodes with the search field or the 'Add…' menu.")}</Text>
+              <Text c="dimmed">{t("The view is empty. Drag classes or properties here, or use the search field or the 'Add…' menu.")}</Text>
             </Stack>
           )}
           {!ready && <Text size="xs" c="dimmed" style={{ position: "absolute", left: 8, bottom: 6 }}>{t("Loading physics engine…")}</Text>}

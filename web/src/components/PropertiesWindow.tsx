@@ -2,6 +2,8 @@ import { ActionIcon, Group, Modal, TextInput, Tooltip } from "@mantine/core";
 import { IconClipboard, IconCopy, IconEdit, IconPlus, IconSquarePlus, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { setGraphDrag } from "../graph/dnd";
+import { classId, propId } from "../graph/model";
 import { copyProperties, readClip } from "../clipboard";
 import { internalCode } from "../model";
 import { attempt, notifyOk } from "../notify";
@@ -91,6 +93,8 @@ export function PropertiesWindow() {
                   className={sel.selected.includes(p.Code) ? "selected" : ""}
                   onClick={(e) => { sel.click(p.Code, e); setCurrent(p.Code); }}
                   onDoubleClick={() => openUi({ propertyEditor: { code: p.Code } })}
+                  draggable
+                  onDragStart={(e) => setGraphDrag(e, (sel.selected.includes(p.Code) ? sel.selected : [p.Code]).map(propId))}
                   onContextMenu={(e) => {
                     sel.ensure(p.Code);
                     setCurrent(p.Code);
@@ -125,6 +129,8 @@ export function PropertiesWindow() {
                   key={c.Code}
                   className={classSel.selected.includes(c.Code) ? "selected" : ""}
                   onClick={(e) => classSel.click(c.Code, e)}
+                  draggable
+                  onDragStart={(e) => setGraphDrag(e, (classSel.selected.includes(c.Code) ? classSel.selected : [c.Code]).map(classId))}
                   onDoubleClick={() => {
                     useProject.getState().setActiveClass(c.Code);
                     openUi({ revealClass: { code: c.Code, at: Date.now() } });

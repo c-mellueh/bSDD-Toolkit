@@ -383,7 +383,6 @@
  "The file contains invalid data": "Die Datei enthält ungültige Daten",
  "The file is not valid JSON": "Die Datei ist kein gültiges JSON",
  "The following items will be deleted:": "Folgende Einträge werden gelöscht:",
- "The view is empty. Add nodes with the search field or the 'Add…' menu.": "Die Ansicht ist leer. Knoten über das Suchfeld oder das Menü 'Hinzufügen…' einfügen.",
  "Theme": "Design",
  "ThermodynamicTemperature": "Thermodynamische Temperatur",
  "These two node types cannot be connected.": "Diese beiden Knotentypen können nicht verbunden werden.",
@@ -430,5 +429,12 @@
  "{{n}} classes included": "{{n}} Klassen enthalten",
  "{{n}} classes pasted": "{{n}} Klassen eingefügt",
  "{{n}} properties copied": "{{n}} Merkmale kopiert",
- "{{n}} specifications imported": "{{n}} Spezifikationen importiert"
+ "{{n}} specifications imported": "{{n}} Spezifikationen importiert",
+ "Groups": "Gruppen",
+ "Nothing found": "Nichts gefunden",
+ "Drag items into the graph (or double-click). Ctrl/Shift selects several.": "Einträge in den Graphen ziehen (oder doppelklicken). Strg/Umschalt wählt mehrere aus.",
+ "in the graph": "im Graphen",
+ "{{n}} more – refine the filter": "{{n}} weitere – Filter verfeinern",
+ "Dictionary panel (drag classes and properties into the graph)": "Wörterbuch-Leiste (Klassen und Merkmale in den Graphen ziehen)",
+ "The view is empty. Drag classes or properties here, or use the search field or the 'Add…' menu.": "Die Ansicht ist leer. Klassen oder Merkmale hierher ziehen oder das Suchfeld bzw. das Menü „Hinzufügen…“ verwenden."
 }
