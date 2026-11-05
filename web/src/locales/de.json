@@ -631,5 +631,6 @@
  "{{n}} classes": "{{n}} Klassen",
  "{{n}} of {{total}} combinations ticked": "{{n}} von {{total}} Kombinationen angehakt",
  "All property sets of the dictionary": "Alle Merkmalsgruppen des Wörterbuchs",
- "Switching a property set on includes every class that has it": "Beim Einschalten einer Merkmalsgruppe werden alle Klassen aufgenommen, die sie enthalten"
+ "Switching a property set on includes every class that has it": "Beim Einschalten einer Merkmalsgruppe werden alle Klassen aufgenommen, die sie enthalten",
+ "Hold the left mouse button and drag over cells to set them all to the same value.": "Mit gedrückter linker Maustaste über Zellen ziehen, um alle auf denselben Wert zu setzen."
 }

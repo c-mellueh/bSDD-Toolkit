@@ -1,8 +1,8 @@
 import { ActionIcon, Alert, Badge, Button, FileButton, Grid, Group, Modal, Select, Stack, Switch, Table, Tabs, Text, TextInput, Tooltip } from "@mantine/core";
 import { Toggle } from "./Toggle";
 import { useReadOnly } from "../state/readonly";
-import { IconArrowDown, IconArrowUp, IconArrowsMaximize, IconArrowsMinimize, IconChevronDown, IconChevronRight, IconDownload, IconPencil, IconPlus, IconSearch, IconTrash, IconUpload } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import { IconArrowDown, IconArrowUp, IconArrowsMaximize, IconArrowsMinimize, IconCheck, IconChevronDown, IconChevronRight, IconDownload, IconMinus, IconPencil, IconPlus, IconSearch, IconTrash, IconUpload } from "@tabler/icons-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DayField } from "./fields";
 import { downloadFile, readFileText } from "../api";
@@ -419,37 +419,96 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
 
 // ------------------------------------------------------------------ purpose × milestone matrix
 
+/** Square checkmark (instead of a toggle) – "partial" shows a dash. */
+function Check({ state, disabled, onClick, label, size = 22 }: { state: Tri; disabled?: boolean; onClick?: (e: React.MouseEvent) => void; label: string; size?: number }) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={state === "on" ? true : state === "partial" ? "mixed" : false}
+      aria-label={label}
+      disabled={disabled}
+      className={`loin-check ${state}`}
+      style={{ width: size, height: size }}
+      onClick={onClick}
+    >
+      {state === "on" ? <IconCheck size={size - 6} stroke={3} /> : state === "partial" ? <IconMinus size={size - 6} stroke={3} /> : null}
+    </button>
+  );
+}
+
 function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<string>; onOpen: (purpose: string, milestone: string) => void }) {
   const { t } = useTranslation();
   const ro = useReadOnly();
   const purposes = loin.purposes ?? [];
   const milestones = loin.milestones ?? [];
   const set = (keys: string[], value: boolean) => attempt(() => op("loin.set_matrix", { keys, active: value }));
-  const state = (keys: string[]): Tri => triOf(keys.filter((k) => active.has(k)).length, keys.length);
+
+  // drag painting: pressing on a cell flips it; every cell the pointer then passes over gets that
+  // same value. Shown immediately, sent as one operation when the button is released (one undo step).
+  const [paint, setPaint] = useState<{ value: boolean; keys: Set<string> } | null>(null);
+  const paintRef = useRef(paint);
+  paintRef.current = paint;
+  const isOn = (k: string) => (paint?.keys.has(k) ? paint.value : active.has(k));
+
+  useEffect(() => {
+    if (!paint) return;
+    const move = (e: PointerEvent) => {
+      const el = (document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null)?.closest<HTMLElement>("[data-cell]");
+      const k = el?.dataset.cell;
+      const cur = paintRef.current;
+      if (k && cur && !cur.keys.has(k)) setPaint({ value: cur.value, keys: new Set(cur.keys).add(k) });
+    };
+    const up = () => {
+      const cur = paintRef.current;
+      setPaint(null);
+      if (!cur) return;
+      const changed = [...cur.keys].filter((k) => active.has(k) !== cur.value);
+      if (changed.length) void set(changed, cur.value);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up, { once: true });
+    window.addEventListener("pointercancel", up, { once: true });
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!paint, active]);
+
+  const start = (e: React.PointerEvent, k: string) => {
+    if (ro || e.button !== 0) return;
+    e.preventDefault(); // no text selection while dragging
+    setPaint({ value: !active.has(k), keys: new Set([k]) });
+  };
+
+  const state = (keys: string[]): Tri => triOf(keys.filter(isOn).length, keys.length);
   const all = purposes.flatMap((p) => milestones.map((m) => specKey(p.guid, m.guid)));
   const allState = state(all);
+  const flip = (keys: string[]) => set(keys, state(keys) !== "on");
   return (
     <Stack gap="sm">
       <Text size="sm" c="dimmed">
-        {t("Tick which purpose is required at which milestone. Only ticked combinations are offered for export – also empty ones, which are exported as specifications without classes.")}
+        {t("Tick which purpose is required at which milestone. Only ticked combinations are offered for export – also empty ones, which are exported as specifications without classes.")}{" "}
+        {!ro && t("Hold the left mouse button and drag over cells to set them all to the same value.")}
       </Text>
       <div className="loin-matrix-wrap">
-        <Table withTableBorder withColumnBorders className="loin-matrix" verticalSpacing={6}>
+        <Table withTableBorder withColumnBorders className={`loin-matrix${paint ? " painting" : ""}`} verticalSpacing={6}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>
                 <Group gap={8} wrap="nowrap" align="center">
-                  <Toggle size="xs" disabled={ro} checked={allState === "on"} indeterminate={allState === "partial"} onChange={(e) => set(all, e.currentTarget.checked)} aria-label={t("All")} />
+                  <Check state={allState} disabled={ro} onClick={() => flip(all)} label={t("All")} size={18} />
                   <Text size="xs" c="dimmed" style={{ whiteSpace: "normal", lineHeight: 1.3 }}>{t("Purpose")} ↓<br />{t("Milestone")} →</Text>
                 </Group>
               </Table.Th>
               {milestones.map((m) => {
                 const col = purposes.map((p) => specKey(p.guid, m.guid));
-                const st = state(col);
                 return (
                   <Table.Th key={m.guid}>
                     <Group gap={8} wrap="nowrap">
-                      <Toggle size="xs" disabled={ro} checked={st === "on"} indeterminate={st === "partial"} onChange={(e) => set(col, e.currentTarget.checked)} aria-label={m.name} />
+                      <Check state={state(col)} disabled={ro} onClick={() => flip(col)} label={m.name} size={18} />
                       <div style={{ minWidth: 0 }}>
                         <Text size="sm" fw={600} truncate>{m.name}</Text>
                         {m.date && <Text size="xs" c="dimmed">{m.date.slice(0, 10)}</Text>}
@@ -463,25 +522,34 @@ function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<st
           <Table.Tbody>
             {purposes.map((p) => {
               const row = milestones.map((m) => specKey(p.guid, m.guid));
-              const st = state(row);
               return (
                 <Table.Tr key={p.guid}>
                   <Table.Th>
                     <Group gap={8} wrap="nowrap">
-                      <Toggle size="xs" disabled={ro} checked={st === "on"} indeterminate={st === "partial"} onChange={(e) => set(row, e.currentTarget.checked)} aria-label={p.name} />
+                      <Check state={state(row)} disabled={ro} onClick={() => flip(row)} label={p.name} size={18} />
                       <Text size="sm" fw={600} truncate>{p.name}</Text>
                     </Group>
                   </Table.Th>
                   {milestones.map((m) => {
                     const k = specKey(p.guid, m.guid);
                     const n = loin.specs?.[k]?.classes?.length ?? 0;
-                    const on = active.has(k);
+                    const on = isOn(k);
                     return (
-                      <Table.Td key={m.guid} className={on ? "loin-cell on" : "loin-cell"}>
+                      <Table.Td
+                        key={m.guid}
+                        data-cell={k}
+                        className={`loin-cell${on ? " on" : ""}${ro ? "" : " paintable"}`}
+                        onPointerDown={(e) => {
+                          if ((e.target as HTMLElement).closest(".loin-open")) return;
+                          start(e, k);
+                        }}
+                      >
                         <Group gap={8} wrap="nowrap" justify="space-between">
-                          <Toggle size="sm" disabled={ro} checked={on} onChange={(e) => set([k], e.currentTarget.checked)} aria-label={`${p.name} – ${m.name}`} />
+                          {/* mouse/touch are handled by the cell (drag painting); keyboard (Space/Enter) toggles here */}
+                          <Check state={on ? "on" : "off"} disabled={ro} label={`${p.name} – ${m.name}`} onClick={(e) => { if (e.detail === 0) void set([k], !active.has(k)); }} />
                           <Tooltip label={t("Edit this specification")}>
                             <Badge
+                              className="loin-open"
                               size="sm"
                               variant={n ? "light" : "outline"}
                               color={n ? "blue" : "gray"}
@@ -501,7 +569,7 @@ function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<st
           </Table.Tbody>
         </Table>
       </div>
-      <Text size="xs" c="dimmed">{t("{{n}} of {{total}} combinations ticked", { n: all.filter((k) => active.has(k)).length, total: all.length })}</Text>
+      <Text size="xs" c="dimmed">{t("{{n}} of {{total}} combinations ticked", { n: all.filter(isOn).length, total: all.length })}</Text>
     </Stack>
   );
 }
