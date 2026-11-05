@@ -118,3 +118,19 @@ body.resizing { cursor: col-resize; user-select: none; }
 .rel-addbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 10px; }
 .rel-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
 .rel-type .mantine-Select-input { height: 32px; font-size: 13px; }
+
+/* ---------------------------------------------------------------- LOIN */
+.loin-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 75em) { .loin-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .loin-grid > :last-child { grid-column: 1 / -1; min-height: 320px; } }
+@media (max-width: 48em) { .loin-grid { grid-template-columns: minmax(0, 1fr); } .loin-grid > * { min-height: 320px; } }
+.loin-panel { display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--mantine-color-default-border); border-radius: var(--mantine-radius-md); background: var(--mantine-color-body); overflow: hidden; }
+.loin-panel-header { padding: 10px 12px; border-bottom: 1px solid var(--mantine-color-default-border); }
+.loin-panel-body { flex: 1; min-height: 0; overflow: auto; padding: 4px 0; }
+.loin-row { display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 10px 0 6px; cursor: pointer; user-select: none; border-left: 3px solid transparent; }
+.loin-row:hover { background: var(--mantine-color-default-hover); }
+.loin-row.active { background: var(--mantine-primary-color-light); border-left-color: var(--mantine-primary-color-filled); }
+.loin-group + .loin-group { border-top: 1px solid var(--mantine-color-default-border); }
+.loin-group-row { font-weight: 600; }
+.loin-chevron { width: 16px; flex: none; display: inline-flex; color: var(--mantine-color-dimmed); }
+.loin-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.loin-code { flex: none; max-width: 35%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--mantine-color-dimmed); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }

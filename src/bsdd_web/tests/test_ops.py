@@ -221,3 +221,20 @@ def test_dict_patch_merges_and_detects_conflicts(h):
     with pytest.raises(OpError):
         h.run("dict.patch", patch=patch, guards=guards)
     assert h.cls("Wall").Description == "UI wins"
+
+
+def test_loin_pset_view_applies_to_all_added_classes(h):
+    from bsdd_web.services.loin import spec_key
+
+    # a second class owning the same pset/property
+    h.run("cp.create", class_code="Door", data={"Code": "height", "PropertyCode": "Height", "PropertySet": "Geometry"})
+    h.run("loin.init")
+    state = h.ctx.extras.loin
+    key = spec_key(state["purposes"][0]["guid"], state["milestones"][0]["guid"])
+    h.run("loin.set_class_included", spec=key, codes=["Wall", "Door"], included=True)
+    n = h.run("loin.set_pset_properties_included", spec=key, items=[["Geometry", "height"]], included=True)
+    assert n == 2
+    assert state["specs"][key]["properties"]["Wall"] == [["Geometry", "height"]]
+    assert state["specs"][key]["properties"]["Door"] == [["Geometry", "height"]]
+    h.run("loin.set_pset_properties_included", spec=key, items=[["Geometry", "height"]], included=False)
+    assert "Wall" not in state["specs"][key]["properties"] and "Door" not in state["specs"][key]["properties"]

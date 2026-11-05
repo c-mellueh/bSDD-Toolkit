@@ -149,3 +149,12 @@ def import_xml(ctx: Ctx, xml: str) -> int:
         raise OpError("The file does not contain any specification")
     ctx.extras.loin = state
     return len(state["specs"])
+
+
+@op("loin.set_pset_properties_included")
+def set_pset_properties_included(ctx: Ctx, spec: str, items: list[list[str]], included: bool) -> int:
+    """Toggle property sets / properties across all classes of the LOIN (pset view)."""
+    try:
+        return L.set_pset_properties_included(_state(ctx), ctx.d, spec, items, included)
+    except ValueError as exc:
+        raise OpError(str(exc)) from exc

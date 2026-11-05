@@ -508,3 +508,29 @@ def parse_loin_xml(xml: bytes | str, d: BsddDictionary) -> dict[str, Any]:
         state["specs"][spec_key(pg, mg)] = spec_state
         add_classes(state, d, spec_state["classes"])
     return state
+
+
+def set_pset_properties_included(
+    state: dict[str, Any],
+    d: BsddDictionary,
+    key: str,
+    items: list[list[str]],
+    included: bool,
+) -> int:
+    """Toggle (pset, class property code) pairs in every LOIN class that owns them.
+
+    Mirrors the desktop pset tree: the view aggregates all classes added to the LOIN,
+    toggling a property set or property applies to every one of those classes.
+    Returns the number of classes touched.
+    """
+    wanted = {(p or "", c) for p, c in items}
+    added = set(state.get("added_classes", []))
+    touched = 0
+    for bsdd_class in d.Classes:
+        if bsdd_class.Code not in added:
+            continue
+        hits = [[cp.PropertySet or "", cp.Code] for cp in bsdd_class.ClassProperties if (cp.PropertySet or "", cp.Code) in wanted]
+        if hits:
+            set_properties_included(state, d, key, bsdd_class.Code, hits, included)
+            touched += 1
+    return touched

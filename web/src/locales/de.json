@@ -551,5 +551,18 @@
  "{{n}} relations": "{{n}} Beziehungen",
  "{{n}} relations added": "{{n}} Beziehungen hinzugefügt",
  "{{n}} relations copied": "{{n}} Beziehungen kopiert",
- "{{n}} skipped": "{{n}} übersprungen"
+ "{{n}} skipped": "{{n}} übersprungen",
+ "Across all classes of the LOIN": "Über alle Klassen des LOIN",
+ "Add a purpose and a milestone first.": "Zuerst einen Zweck und einen Meilenstein anlegen.",
+ "Include classes first – their property sets appear here.": "Zuerst Klassen einschließen – ihre Merkmalsgruppen erscheinen hier.",
+ "No classes yet.": "Noch keine Klassen.",
+ "Properties of the class": "Merkmale der Klasse",
+ "Properties required for this class": "Für diese Klasse benötigte Merkmale",
+ "Select a class on the left": "Links eine Klasse auswählen",
+ "This class has no properties.": "Diese Klasse hat keine Merkmale.",
+ "Which classes are required": "Welche Klassen benötigt werden",
+ "{{n}} included": "{{n}} enthalten",
+ "{{n}} of {{total}} properties selected": "{{n}} von {{total}} Merkmalen ausgewählt",
+ "{{n}} properties in {{c}} classes": "{{n}} Merkmale in {{c}} Klassen",
+ "{{n}} sets": "{{n}} Gruppen"
 }
