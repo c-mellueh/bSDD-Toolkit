@@ -282,7 +282,7 @@ def rename_property_set(ctx: Ctx, class_code: str, old: str, new: str) -> str:
     if new in pset_names(ctx, bsdd_class):
         raise OpError(f"Property set '{new}' exists already")
     for cp in bsdd_class.ClassProperties:
-        if cp.PropertySet == old:
+        if (cp.PropertySet or "") == (old or ""):
             cp.PropertySet = new
     temp = ctx.extras.temporary_psets.get(class_code, [])
     ctx.extras.temporary_psets[class_code] = [new if n == old else n for n in temp]
@@ -299,9 +299,9 @@ def delete_property_sets(ctx: Ctx, class_code: str, names: list[str]) -> None:
             bsdd_class.ClassRelations[:] = [cr for cr in bsdd_class.ClassRelations if not is_reference_to(ctx.d, cr, gop)]
     if bsdd_class.ClassType == GOP:
         # deleting the pset of a GroupOfProperties removes its properties everywhere
-        codes = [cp.Code for cp in bsdd_class.ClassProperties if cp.PropertySet in names_set]
+        codes = [cp.Code for cp in bsdd_class.ClassProperties if (cp.PropertySet or "") in names_set]
         delete_class_properties(ctx, class_code, codes)
-    bsdd_class.ClassProperties[:] = [cp for cp in bsdd_class.ClassProperties if cp.PropertySet not in names_set]
+    bsdd_class.ClassProperties[:] = [cp for cp in bsdd_class.ClassProperties if (cp.PropertySet or "") not in names_set]
     temp = ctx.extras.temporary_psets.get(class_code, [])
     ctx.extras.temporary_psets[class_code] = [n for n in temp if n not in names_set]
 

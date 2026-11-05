@@ -1,0 +1,40 @@
+{
+  "name": "bsdd-toolkit-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mantine/core": "7.17.8",
+    "@mantine/hooks": "7.17.8",
+    "@mantine/notifications": "7.17.8",
+    "@mantine/modals": "7.17.8",
+    "@tabler/icons-react": "3.31.0",
+    "cytoscape": "3.31.2",
+    "i18next": "24.2.3",
+    "react": "18.3.1",
+    "react-arborist": "3.4.3",
+    "react-dom": "18.3.1",
+    "react-i18next": "15.4.1",
+    "react-router-dom": "6.30.0",
+    "zustand": "5.0.3"
+  },
+  "devDependencies": {
+    "@types/cytoscape": "3.21.9",
+    "@types/react": "18.3.20",
+    "@types/react-dom": "18.3.6",
+    "@vitejs/plugin-react": "4.3.4",
+    "postcss": "8.5.3",
+    "postcss-preset-mantine": "1.17.0",
+    "postcss-simple-vars": "7.0.1",
+    "typescript": "5.8.3",
+    "vite": "6.2.6",
+    "vitest": "3.1.1"
+  }
+}
