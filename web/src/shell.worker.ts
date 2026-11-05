@@ -23,7 +23,10 @@ from bsdd_json import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
 from bsdd_json.utils import class_utils as cl_utils, property_utils as prop_utils, dictionary_utils as dict_utils
 from bsdd_json.utils.cache import configure as _configure
 _configure(offline=True)
-import bsdd_shell_jsonpatch as _jp
+try:
+    import bsdd_shell_jsonpatch as _jp
+except ImportError:
+    raise RuntimeError("The server is older than this page: restart / update the bSDD Toolkit server, then reload the page.") from None
 
 def _dump():
     return d.model_dump(mode="json", exclude_none=True)
@@ -51,7 +54,7 @@ async function init(dictionaryJson: string, zipUrl: string) {
   pyodide.setStderr({ batched: (s: string) => post({ type: "err", text: s }) });
   post({ type: "status", text: "Loading pydantic…" });
   await pyodide.loadPackage(["pydantic"]);
-  const buf = await (await fetch(zipUrl)).arrayBuffer();
+  const buf = await (await fetch(zipUrl, { cache: "no-store" })).arrayBuffer();
   pyodide.unpackArchive(buf, "zip", { extractDir: "/home/pyodide/pkgs" });
   ns = pyodide.globals.get("dict")();
   await pyodide.runPythonAsync(SETUP, { globals: ns });

@@ -272,7 +272,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if cached is None:
             cached = _zip_package()
             app.state.shell_zip = cached
-        return Response(cached, media_type="application/zip", headers={"Cache-Control": "public, max-age=3600"})
+        return Response(cached, media_type="application/zip", headers={"Cache-Control": "no-cache"})
 
     # ------------------------------------------------------------------ websocket
 
