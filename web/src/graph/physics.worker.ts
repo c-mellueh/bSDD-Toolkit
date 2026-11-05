@@ -21,6 +21,10 @@ let n = 0;
 let running = false;
 let alpha = 1;
 let alphaTarget = 0;
+// "play" mode: keep simulating until the user pauses (alpha never decays to zero)
+let continuous = false;
+const CONTINUOUS_ALPHA = 0.12;
+let lastSpeed = Infinity;
 let alphaDecay = 0.0228; // ~300 steps from 1 to 0.001 like d3-force
 const ALPHA_MIN = 0.002;
 const stepsPerFrame = 4;
@@ -52,13 +56,15 @@ function loop() {
   // a few steps per frame: fast, but the layout still visibly settles
   let count = 0;
   do {
-    ex.step(1, alpha);
+    lastSpeed = ex.step(1, alpha);
     alpha += (alphaTarget - alpha) * alphaDecay;
     count++;
   } while (count < stepsPerFrame && performance.now() - start < 12 && alpha > ALPHA_MIN);
   if (alpha <= ALPHA_MIN && alphaTarget <= ALPHA_MIN) running = false;
   sendPositions();
-  if (running) timer = self.setTimeout(loop, 4) as unknown as number;
+  // in play mode, idle slowly once everything has come to rest
+  const delay = continuous && lastSpeed < 0.01 ? 100 : 4;
+  if (running) timer = self.setTimeout(loop, delay) as unknown as number;
 }
 
 function startLoop() {
@@ -107,9 +113,15 @@ self.onmessage = async (ev: MessageEvent) => {
       break;
     case "start":
       alpha = Math.max(alpha, msg.alpha ?? 1);
+      if (msg.continuous) {
+        continuous = true;
+        alphaTarget = Math.max(alphaTarget, CONTINUOUS_ALPHA);
+      }
       startLoop();
       break;
     case "stop":
+      continuous = false;
+      alphaTarget = 0;
       running = false;
       sendPositions();
       break;
@@ -132,7 +144,7 @@ self.onmessage = async (ev: MessageEvent) => {
       break;
     }
     case "dragEnd":
-      alphaTarget = 0;
+      alphaTarget = continuous ? CONTINUOUS_ALPHA : 0;
       break;
     case "fixed": {
       if (!ex) return;
@@ -143,6 +155,8 @@ self.onmessage = async (ev: MessageEvent) => {
     case "positions": {
       if (!ex) return;
       view(Float32Array, ex.pos_ptr(), n * 2).set(msg.positions);
+      continuous = false;
+      alphaTarget = 0;
       running = false;
       sendPositions();
       break;

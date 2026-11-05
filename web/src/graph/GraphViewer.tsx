@@ -767,7 +767,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     else if (k === "-") zoom(1 / 1.2);
   };
 
-  const togglePhysics = () => worker.current?.postMessage({ type: running ? "stop" : "start", alpha: 0.6 });
+  const togglePhysics = () => worker.current?.postMessage({ type: running ? "stop" : "start", alpha: 0.6, continuous: true });
 
   // ------------------------------------------------------------------ export
 
