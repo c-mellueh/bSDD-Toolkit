@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ActionIcon, Autocomplete, Button, Checkbox, Grid, Group, Modal, SegmentedControl, Select, Tabs, Text, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { ActionIcon, Autocomplete, Button, Grid, Group, Modal, SegmentedControl, Select, Tabs, Text, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { Toggle } from "./Toggle";
 import { IconEdit, IconExternalLink, IconPlus } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -161,8 +162,8 @@ export function ClassPropertyEditor() {
               <Grid.Col span={4}><Select label={t("Unit")} data={[...new Set(units)]} value={form.Unit ?? null} onChange={(v) => set("Unit", v)} searchable clearable limit={100} /></Grid.Col>
               <Grid.Col span={4}><TextInput label={t("Predefined value")} value={form.PredefinedValue ?? ""} onChange={(e) => set("PredefinedValue", e.currentTarget.value)} /></Grid.Col>
               <Grid.Col span={4}><Select label={t("Property type")} data={["Property", "Dependency"]} value={form.PropertyType ?? null} onChange={(v) => set("PropertyType", v)} clearable /></Grid.Col>
-              <Grid.Col span={4}><Checkbox mt="md" label={t("Is required")} checked={!!form.IsRequired} onChange={(e) => set("IsRequired", e.currentTarget.checked)} /></Grid.Col>
-              <Grid.Col span={4}><Checkbox mt="md" label={t("Is writable")} checked={!!form.IsWritable} onChange={(e) => set("IsWritable", e.currentTarget.checked)} /></Grid.Col>
+              <Grid.Col span={4}><Toggle mt="md" label={t("Is required")} checked={!!form.IsRequired} onChange={(e) => set("IsRequired", e.currentTarget.checked)} /></Grid.Col>
+              <Grid.Col span={4}><Toggle mt="md" label={t("Is writable")} checked={!!form.IsWritable} onChange={(e) => set("IsWritable", e.currentTarget.checked)} /></Grid.Col>
               {prop && (
                 <Grid.Col span={12}>
                   <Text size="xs" c="dimmed">

@@ -1,5 +1,6 @@
 /** Editable table of allowed values (properties and class properties). */
-import { ActionIcon, Alert, Badge, Button, Checkbox, Group, Menu, Modal, Stack, Switch, Table, Text, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { ActionIcon, Alert, Badge, Button, Group, Menu, Modal, Stack, Switch, Table, Text, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { Toggle } from "./Toggle";
 import {
   IconAlertTriangle,
   IconArrowsSort,
@@ -266,7 +267,7 @@ export function AllowedValuesEditor({ values, onChange, inherited }: { values: A
           <Table.Thead>
             <Table.Tr>
               <Table.Th w={28} />
-              <Table.Th w={32}><Checkbox size="xs" radius="sm" checked={allSelected} indeterminate={!allSelected && selected.size > 0} onChange={toggleAll} aria-label={t("Select all")} /></Table.Th>
+              <Table.Th w={32}><Toggle size="xs" checked={allSelected} indeterminate={!allSelected && selected.size > 0} onChange={toggleAll} aria-label={t("Select all")} /></Table.Th>
               {cols.map((c) => <Table.Th key={c} style={c === "SortNumber" ? { width: 70 } : undefined}>{header[c]}</Table.Th>)}
               <Table.Th w={36} />
             </Table.Tr>
@@ -312,7 +313,7 @@ export function AllowedValuesEditor({ values, onChange, inherited }: { values: A
                     <IconGripVertical size={14} />
                   </span>
                 </Table.Td>
-                <Table.Td><Checkbox size="xs" radius="sm" checked={selected.has(i)} onChange={() => toggle(i)} aria-label={t("Select")} /></Table.Td>
+                <Table.Td><Toggle size="xs" checked={selected.has(i)} onChange={() => toggle(i)} aria-label={t("Select")} /></Table.Td>
                 {cols.map((c) => {
                   const err = c === "Value" || c === "Code" ? problems[i]?.[c] : null;
                   const input = (

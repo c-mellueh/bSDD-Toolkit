@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Checkbox, Grid, Group, Select, TextInput, Textarea } from "@mantine/core";
+import { Button, Grid, Group, Select, TextInput, Textarea } from "@mantine/core";
+import { Toggle } from "../components/Toggle";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DateField, useResources } from "../components/fields";
@@ -89,8 +90,8 @@ export function DictionaryForm({ inline, onDone, onCancel }: { inline?: boolean;
           <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Language")} data={languages.length ? languages : [form.LanguageIsoCode ?? "en-GB"]} value={form.LanguageIsoCode ?? null} onChange={(v) => set("LanguageIsoCode", v)} searchable error={errors.LanguageIsoCode} /></Grid.Col>
           <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Status")} data={["Preview", "Active", "Inactive"]} value={form.Status ?? null} onChange={(v) => set("Status", v)} clearable /></Grid.Col>
           <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label={t("Model version")} value={form.ModelVersion ?? ""} onChange={(e) => set("ModelVersion", e.currentTarget.value)} /></Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 6 }}><Checkbox label={t("Language only")} checked={!!form.LanguageOnly} onChange={(e) => set("LanguageOnly", e.currentTarget.checked)} /></Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 6 }}><Checkbox label={t("Use own URI")} checked={!!form.UseOwnUri} onChange={(e) => set("UseOwnUri", e.currentTarget.checked)} /></Grid.Col>
+          <Grid.Col span={{ base: 12, sm: 6 }}><Toggle label={t("Language only")} checked={!!form.LanguageOnly} onChange={(e) => set("LanguageOnly", e.currentTarget.checked)} /></Grid.Col>
+          <Grid.Col span={{ base: 12, sm: 6 }}><Toggle label={t("Use own URI")} checked={!!form.UseOwnUri} onChange={(e) => set("UseOwnUri", e.currentTarget.checked)} /></Grid.Col>
           {form.UseOwnUri && <Grid.Col span={12}><TextInput label={t("Dictionary URI")} value={form.DictionaryUri ?? ""} onChange={(e) => set("DictionaryUri", e.currentTarget.value)} error={errors.DictionaryUri} /></Grid.Col>}
           <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("License")} value={form.License ?? ""} onChange={(e) => set("License", e.currentTarget.value)} /></Grid.Col>
           <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("License URL")} value={form.LicenseUrl ?? ""} onChange={(e) => set("LicenseUrl", e.currentTarget.value)} /></Grid.Col>

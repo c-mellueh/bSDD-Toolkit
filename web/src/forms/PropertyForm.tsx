@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Checkbox, Grid, Group, MultiSelect, Select, Tabs, TagsInput, TextInput, Textarea } from "@mantine/core";
+import { Button, Grid, Group, MultiSelect, Select, Tabs, TagsInput, TextInput, Textarea } from "@mantine/core";
+import { Toggle } from "../components/Toggle";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DATA_TYPES, PROPERTY_VALUE_KINDS, clean, slugify } from "../model";
@@ -145,7 +146,7 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
               <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Max exclusive")} value={form.MaxExclusive} onChange={(v) => set("MaxExclusive", v)} /></Grid.Col>
               <Grid.Col span={{ base: 12, sm: 6 }}><TagsInput label={t("Connected property codes")} data={propCodes} value={form.ConnectedPropertyCodes ?? []} onChange={(v) => set("ConnectedPropertyCodes", v)} /></Grid.Col>
               <Grid.Col span={{ base: 12, sm: 4 }}><TagsInput label={t("Dynamic parameter property codes")} data={propCodes} value={form.DynamicParameterPropertyCodes ?? []} onChange={(v) => set("DynamicParameterPropertyCodes", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 2 }}><Checkbox mt="lg" label={t("Is dynamic")} checked={!!form.IsDynamic} onChange={(e) => set("IsDynamic", e.currentTarget.checked)} /></Grid.Col>
+              <Grid.Col span={{ base: 6, sm: 2 }}><Toggle mt="lg" label={t("Is dynamic")} checked={!!form.IsDynamic} onChange={(e) => set("IsDynamic", e.currentTarget.checked)} /></Grid.Col>
               <Grid.Col span={{ base: 12, sm: 6 }}><MultiSelect label={t("Countries of use")} data={countryData} value={form.CountriesOfUse ?? []} onChange={(v) => set("CountriesOfUse", v)} searchable clearable /></Grid.Col>
               <Grid.Col span={{ base: 6, sm: 3 }}><Select label={t("Country of origin")} data={countryData} value={form.CountryOfOrigin ?? null} onChange={(v) => set("CountryOfOrigin", v)} searchable clearable /></Grid.Col>
               <Grid.Col span={{ base: 6, sm: 3 }}><Select label={t("Creator language")} data={languageData} value={form.CreatorLanguageIsoCode ?? null} onChange={(v) => set("CreatorLanguageIsoCode", v)} searchable clearable /></Grid.Col>

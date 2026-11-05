@@ -1,4 +1,5 @@
-import { Checkbox, Group, Modal, ScrollArea, Table, TextInput } from "@mantine/core";
+import { Group, Modal, ScrollArea, Table, TextInput } from "@mantine/core";
+import { Toggle } from "./Toggle";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -63,7 +64,7 @@ export function SearchDialog() {
             else if (e.key === "Enter" && results[cursor]) pick(results[cursor].code);
           }}
         />
-        <Checkbox label={t("Strict")} checked={strict} onChange={(e) => { setStrict(e.currentTarget.checked); storageSet("bsdd-search-strict", e.currentTarget.checked); }} />
+        <Toggle label={t("Strict")} checked={strict} onChange={(e) => { setStrict(e.currentTarget.checked); storageSet("bsdd-search-strict", e.currentTarget.checked); }} />
       </Group>
       <ScrollArea h={400}>
         <Table highlightOnHover fz="sm" verticalSpacing={3}>

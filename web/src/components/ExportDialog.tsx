@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Alert, Button, Checkbox, Divider, Grid, Group, Modal, Radio, Select, Stack, Table, TagsInput, Text, TextInput } from "@mantine/core";
+import { Alert, Button, Divider, Grid, Group, Modal, Radio, Select, Stack, Table, TagsInput, Text, TextInput } from "@mantine/core";
+import { Toggle } from "./Toggle";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, downloadFile } from "../api";
@@ -119,7 +120,7 @@ export function ExportDialog() {
                       const n = loin?.specs?.[k]?.classes?.length ?? 0;
                       return (
                         <Table.Td key={k}>
-                          <Checkbox label={`${n}`} checked={specs.includes(k)} onChange={(e) => setSpecs(e.currentTarget.checked ? [...specs, k] : specs.filter((x) => x !== k))} />
+                          <Toggle label={`${n}`} checked={specs.includes(k)} onChange={(e) => setSpecs(e.currentTarget.checked ? [...specs, k] : specs.filter((x) => x !== k))} />
                         </Table.Td>
                       );
                     })}
@@ -142,7 +143,7 @@ export function ExportDialog() {
         {kind === "ids" && (
           <>
             <Divider label={t("Applicability")} />
-            <Checkbox label={t("Identify classes by bSDD classification reference")} checked={!!ids.classification} onChange={(e) => setIds({ classification: e.currentTarget.checked })} />
+            <Toggle label={t("Identify classes by bSDD classification reference")} checked={!!ids.classification} onChange={(e) => setIds({ classification: e.currentTarget.checked })} />
             {!ids.classification && (
               <Grid>
                 <Grid.Col span={5}><Select label={t("Identifying property set")} data={candidates.map((c) => c.pset).filter(Boolean)} value={ids.main_pset || null} onChange={(v) => setIds({ main_pset: v ?? "", main_property: "" })} searchable /></Grid.Col>
@@ -150,7 +151,7 @@ export function ExportDialog() {
                 <Grid.Col span={2}><Select label={t("Datatype")} data={IFC_TYPES} value={ids.datatype ?? "IFCLABEL"} onChange={(v) => setIds({ datatype: v })} /></Grid.Col>
               </Grid>
             )}
-            <Checkbox label={t("Also allow the IFC type objects (e.g. IfcWallType)")} checked={!!ids.type_objects} onChange={(e) => setIds({ type_objects: e.currentTarget.checked })} />
+            <Toggle label={t("Also allow the IFC type objects (e.g. IfcWallType)")} checked={!!ids.type_objects} onChange={(e) => setIds({ type_objects: e.currentTarget.checked })} />
             <Divider label={t("Datatype mapping")} />
             <Grid>
               {["string", "boolean", "integer", "real", "character", "time"].map((k) => (

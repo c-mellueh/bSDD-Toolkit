@@ -1,4 +1,5 @@
-import { ActionIcon, Badge, Button, Checkbox, Group, Menu, Stack, Tabs, Text, TextInput, ThemeIcon, Title, Tooltip } from "@mantine/core";
+import { ActionIcon, Badge, Button, Group, Menu, Stack, Tabs, Text, TextInput, ThemeIcon, Title, Tooltip } from "@mantine/core";
+import { Toggle } from "../../components/Toggle";
 import { useMediaQuery } from "@mantine/hooks";
 import { IconArrowLeft, IconClipboard, IconCopy, IconDots, IconLink, IconList, IconPlus, IconSearch, IconSquarePlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -274,7 +275,7 @@ function PropertyDetail({ code }: { code: string }) {
                   onDragStart={(e) => setGraphDrag(e, [classId(c.Code)])}
                   onClick={() => openClass(c.Code)}
                 >
-                  <Checkbox size="xs" checked={classSel.selected.includes(c.Code)} onClick={(e) => e.stopPropagation()} onChange={() => classSel.click(c.Code, { ctrlKey: true, metaKey: false, shiftKey: false })} />
+                  <Toggle size="xs" checked={classSel.selected.includes(c.Code)} onClick={(e) => e.stopPropagation()} onChange={() => classSel.click(c.Code, { ctrlKey: true, metaKey: false, shiftKey: false })} />
                   <Text size="sm" fw={500} truncate style={{ flex: 1 }}>{c.Name}</Text>
                   <Text size="xs" c="dimmed" className="mono">{c.Code}</Text>
                 </div>

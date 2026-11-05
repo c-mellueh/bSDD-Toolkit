@@ -1,25 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Accordion,
-  ActionIcon,
-  Autocomplete,
-  Badge,
-  Button,
-  Checkbox,
-  Divider,
-  FileButton,
-  Group,
-  Menu,
-  Modal,
-  SegmentedControl,
-  Select,
-  Slider,
-  Stack,
-  Switch,
-  Text,
-  Tooltip,
-  useComputedColorScheme,
-} from "@mantine/core";
+import { Accordion, ActionIcon, Autocomplete, Badge, Button, Divider, FileButton, Group, Menu, Modal, SegmentedControl, Select, Slider, Stack, Switch, Text, Tooltip, useComputedColorScheme } from "@mantine/core";
+import { Toggle } from "../components/Toggle";
 import {
   IconArrowsMaximize,
   IconBooks,
@@ -1042,7 +1023,7 @@ document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>{co
                 <Accordion.Panel>
                   <Stack gap={4}>
                     {NODE_KINDS.map((k) => (
-                      <Checkbox
+                      <Toggle
                         key={k}
                         checked={!hiddenNodes.has(k)}
                         onChange={(e) => setHiddenNodes((s) => { const n = new Set(s); if (e.currentTarget.checked) n.delete(k); else n.add(k); return n; })}
@@ -1061,7 +1042,7 @@ document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>{co
                   </Group>
                   <Stack gap={4}>
                     {EDGE_KINDS.map((k) => (
-                      <Checkbox
+                      <Toggle
                         key={k}
                         checked={!hiddenEdges.has(k)}
                         onChange={(e) => setHiddenEdges((s) => { const n = new Set(s); if (e.currentTarget.checked) n.delete(k); else n.add(k); return n; })}

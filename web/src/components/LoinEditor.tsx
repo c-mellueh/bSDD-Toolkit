@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Checkbox, FileButton, Grid, Group, Modal, ScrollArea, Select, Stack, Switch, Tabs, Text, TextInput, Tooltip } from "@mantine/core";
+import { ActionIcon, Button, FileButton, Grid, Group, Modal, ScrollArea, Select, Stack, Switch, Tabs, Text, TextInput, Tooltip } from "@mantine/core";
+import { Toggle } from "./Toggle";
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconChevronRight, IconDownload, IconPencil, IconPlus, IconTrash, IconUpload } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -58,7 +59,7 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
             <span style={{ width: 18, display: "inline-flex", cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); const n = new Set(open); if (isOpen) n.delete(c.Code); else n.add(c.Code); setOpen(n); }}>
               {kids.length ? (isOpen ? <IconChevronDown size={14} /> : <IconChevronRight size={14} />) : null}
             </span>
-            <Checkbox size="xs" checked={included.has(c.Code)} onChange={(e) => toggleClass(c.Code, e.currentTarget.checked)} onClick={(e) => e.stopPropagation()} disabled={!key} />
+            <Toggle size="xs" checked={included.has(c.Code)} onChange={(e) => toggleClass(c.Code, e.currentTarget.checked)} onClick={(e) => e.stopPropagation()} disabled={!key} />
             <span className="cell" style={{ flex: 1 }}>{c.Name}</span>
             <span className="cell" style={{ opacity: 0.6, fontSize: 12 }}>{c.Code}</span>
           </div>
@@ -111,14 +112,14 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
                 return (
                   <div key={ps}>
                     <div className="row" style={{ fontWeight: 600 }}>
-                      <Checkbox size="xs" checked={all} indeterminate={some && !all} onChange={(e) => toggleProps(items, e.currentTarget.checked)} mx={6} />
+                      <Toggle size="xs" checked={all} indeterminate={some && !all} onChange={(e) => toggleProps(items, e.currentTarget.checked)} mx={6} />
                       <span className="cell">{ps || t("(no property set)")}</span>
                     </div>
                     {items.map(([a, b]) => {
                       const cp = cls.ClassProperties?.find((x) => x.Code === b && (x.PropertySet ?? "") === a);
                       return (
                         <div key={b} className="row" style={{ paddingLeft: 24 }}>
-                          <Checkbox size="xs" checked={propSet.has(`${a}|${b}`)} onChange={(e) => toggleProps([[a, b]], e.currentTarget.checked)} mx={6} />
+                          <Toggle size="xs" checked={propSet.has(`${a}|${b}`)} onChange={(e) => toggleProps([[a, b]], e.currentTarget.checked)} mx={6} />
                           <span className="cell" style={{ flex: 1 }}>{cp ? cpName(idx, doc.dictionary, cp) : b}</span>
                           <span className="cell" style={{ opacity: 0.6, fontSize: 12 }}>{b}</span>
                         </div>

@@ -1,4 +1,5 @@
-import { Button, Checkbox, Group, List, ScrollArea, Stack, Text, TextInput } from "@mantine/core";
+import { Button, Group, List, ScrollArea, Stack, Text, TextInput } from "@mantine/core";
+import { Toggle } from "./Toggle";
 import { modals } from "@mantine/modals";
 import { useState } from "react";
 import i18n from "../i18n";
@@ -75,7 +76,7 @@ function DeletePrompt({ names, onDone }: { names: string[]; onDone: (v: { recurs
       <ScrollArea.Autosize mah={240}>
         <List size="sm">{names.map((n, i) => <List.Item key={i}>{n}</List.Item>)}</List>
       </ScrollArea.Autosize>
-      <Checkbox label={t("Also delete all child classes")} checked={recursive} onChange={(e) => setRecursive(e.currentTarget.checked)} />
+      <Toggle label={t("Also delete all child classes")} checked={recursive} onChange={(e) => setRecursive(e.currentTarget.checked)} />
       <Text size="xs" c="dimmed">{t("Otherwise child classes are moved to the parent of the deleted class.")}</Text>
       <Group justify="flex-end">
         <Button variant="default" onClick={() => onDone(null)}>{t("Cancel")}</Button>
