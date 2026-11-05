@@ -1,11 +1,11 @@
-import { ActionIcon, Button, Group, Text, Textarea, Tooltip } from "@mantine/core";
+import { ActionIcon, Badge, Button, Group, Switch, Text, Textarea, Tooltip } from "@mantine/core";
 import { IconCloudUpload, IconRefresh, IconTrash, IconX } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
+import { storageGet, storageSet } from "../state/settings";
 import { useUi } from "../state/ui";
-import { askConfirm } from "./dialogs";
 
 interface Line {
   kind: "in" | "out" | "err" | "result" | "info";
@@ -19,7 +19,8 @@ const HELP = `Python ${"runs in your browser"} (Pyodide). Available names:
   dict_utils  bsdd_json.utils.dictionary_utils
   BsddClass, BsddProperty, BsddClassProperty, ...
 Examples:  len(d.Classes)   [c.Name for c in cl_utils.get_root_classes(d)]
-Changes to 'd' stay local until you click "Apply to shared dictionary".`;
+With "Live" on, every change to 'd' is sent to the shared dictionary after each command
+(only the changed values; nothing is overwritten if someone else changed the same data).`;
 
 export function ShellPanel() {
   const { t } = useTranslation();
@@ -32,7 +33,14 @@ export function ShellPanel() {
   const [hPos, setHPos] = useState(-1);
   const worker = useRef<Worker | null>(null);
   const out = useRef<HTMLDivElement | null>(null);
-  const exportResolve = useRef<((json: string) => void) | null>(null);
+  const [live, setLiveState] = useState<boolean>(() => storageGet("bsdd-shell-live", true));
+  const [stale, setStale] = useState(false);
+  const [pending, setPending] = useState(false);
+  const syncing = useRef(false);
+  const setLive = (v: boolean) => {
+    setLiveState(v);
+    storageSet("bsdd-shell-live", v);
+  };
 
   const push = (l: Line) => setLines((ls) => [...ls.slice(-500), l]);
 
@@ -47,12 +55,31 @@ export function ShellPanel() {
       else if (m.type === "err") push({ kind: "err", text: m.text });
       else if (m.type === "result") push({ kind: "result", text: m.text });
       else if (m.type === "done") setBusy(false);
-      else if (m.type === "exported") exportResolve.current?.(m.json);
+      else if (m.type === "changes") void send(m.payload);
+      else if (m.type === "nochanges") push({ kind: "info", text: t("No changes to sync.") });
     };
     w.onerror = (e) => { push({ kind: "err", text: String(e.message || "Shell could not be started (is the Pyodide CDN reachable?)") }); setBusy(false); };
     w.postMessage({ type: "init", dictionary: JSON.stringify(useProject.getState().doc?.dictionary ?? {}), zipUrl: "/api/shell/bsdd_json.zip" });
     return () => w.terminate();
   }, []);
+
+  // the shared dictionary changed outside the shell → 'd' is outdated
+  useEffect(
+    () =>
+      useProject.subscribe((st, prev) => {
+        if (st.doc !== prev.doc && prev.doc && !syncing.current) setStale(true);
+      }),
+    [],
+  );
+
+  const send = async (payload: string) => {
+    syncing.current = true;
+    const n = await attempt(() => op<number>("dict.patch", JSON.parse(payload)));
+    syncing.current = false;
+    setPending(false);
+    if (n !== undefined) push({ kind: "info", text: t("✓ {{n}} changes synced to the shared dictionary", { n }) });
+    else push({ kind: "err", text: t("The changes were not applied. Reload the dictionary (↻) and run your code again.") });
+  };
 
   useEffect(() => {
     out.current?.scrollTo({ top: out.current.scrollHeight });
@@ -64,7 +91,8 @@ export function ShellPanel() {
     setHistory((h) => [...h, code]);
     setHPos(-1);
     setBusy(true);
-    worker.current?.postMessage({ type: "run", code });
+    worker.current?.postMessage({ type: "run", code, sync: live });
+    if (!live) setPending(true);
     setCode("");
   };
 
@@ -72,18 +100,11 @@ export function ShellPanel() {
     if (!doc) return;
     setBusy(true);
     worker.current?.postMessage({ type: "load", dictionary: JSON.stringify(doc.dictionary) });
+    setStale(false);
+    setPending(false);
   };
 
-  const apply = async () => {
-    const ok = await askConfirm(t("Apply changes"), t("Replace the shared dictionary with the shell's version of 'd'? Everybody will see the change. It can be undone."), t("Apply"));
-    if (!ok) return;
-    const json = await new Promise<string>((resolve) => {
-      exportResolve.current = resolve;
-      worker.current?.postMessage({ type: "export" });
-    });
-    const res = await attempt(() => op("dict.replace", { dictionary: JSON.parse(json) }).then(() => true));
-    if (res) push({ kind: "info", text: t("Changes applied to the shared dictionary.") });
-  };
+  const syncNow = () => worker.current?.postMessage({ type: "sync" });
 
   const color = (k: Line["kind"]) => (k === "err" ? "var(--mantine-color-red-6)" : k === "in" ? "var(--mantine-color-blue-6)" : k === "info" ? "var(--mantine-color-dimmed)" : undefined);
 
@@ -91,8 +112,18 @@ export function ShellPanel() {
     <div style={{ height: 300, flex: "none", borderTop: "2px solid var(--mantine-color-default-border)", display: "flex", flexDirection: "column" }}>
       <Group gap={4} px="xs" py={2} style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
         <Text size="xs" fw={600} style={{ flex: 1 }}>{t("Python shell (runs in your browser)")}</Text>
-        <Tooltip label={t("Reload dictionary from server")}><ActionIcon size="sm" variant="subtle" onClick={reload} disabled={!ready}><IconRefresh size={14} /></ActionIcon></Tooltip>
-        <Button size="compact-xs" variant="light" leftSection={<IconCloudUpload size={12} />} onClick={apply} disabled={!ready || busy}>{t("Apply to shared dictionary")}</Button>
+        {stale && (
+          <Tooltip multiline w={300} label={t("The dictionary was changed outside the shell. Reload 'd' to see these changes (variables like 'cl = d.Classes[0]' then have to be fetched again).")}>
+            <Badge color="yellow" variant="light" style={{ cursor: "pointer" }} onClick={reload}>{t("Changed elsewhere – reload")}</Badge>
+          </Tooltip>
+        )}
+        <Tooltip label={t("Reload dictionary from server")}><ActionIcon size="sm" variant={stale ? "light" : "subtle"} color={stale ? "yellow" : undefined} onClick={reload} disabled={!ready || busy}><IconRefresh size={14} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Send every change to the shared dictionary after each command")}>
+          <Switch size="xs" label={t("Live")} checked={live} onChange={(e) => setLive(e.currentTarget.checked)} />
+        </Tooltip>
+        {!live && (
+          <Button size="compact-xs" variant={pending ? "filled" : "light"} leftSection={<IconCloudUpload size={12} />} onClick={syncNow} disabled={!ready || busy}>{t("Apply to shared dictionary")}</Button>
+        )}
         <Tooltip label={t("Clear")}><ActionIcon size="sm" variant="subtle" onClick={() => setLines([])}><IconTrash size={14} /></ActionIcon></Tooltip>
         <Tooltip label={t("Close")}><ActionIcon size="sm" variant="subtle" onClick={() => useUi.getState().set({ shell: false })}><IconX size={14} /></ActionIcon></Tooltip>
       </Group>

@@ -23,6 +23,24 @@ from bsdd_json import BsddDictionary, BsddClass, BsddProperty, BsddClassProperty
 from bsdd_json.utils import class_utils as cl_utils, property_utils as prop_utils, dictionary_utils as dict_utils
 from bsdd_json.utils.cache import configure as _configure
 _configure(offline=True)
+import bsdd_shell_jsonpatch as _jp
+
+def _dump():
+    return d.model_dump(mode="json", exclude_none=True)
+
+def _changes():
+    # diff of 'd' against the state last synced with the server, plus guards for each step
+    global _base
+    new = _dump()
+    if new == _base:
+        return None
+    patch = _jp.diff(_base, new)
+    guards = []
+    for step in patch:
+        guards.append(_jp._expectation(_base, step))
+        _jp.apply(_base, [step], in_place=True)
+    _base = new
+    return json.dumps({"patch": patch, "guards": guards})
 `;
 
 async function init(dictionaryJson: string, zipUrl: string) {
@@ -43,10 +61,14 @@ async function init(dictionaryJson: string, zipUrl: string) {
 
 function load(dictionaryJson: string) {
   ns.set("_raw", dictionaryJson);
-  pyodide.runPython("d = BsddDictionary.model_validate(json.loads(_raw)); del _raw", { globals: ns });
+  pyodide.runPython("d = BsddDictionary.model_validate(json.loads(_raw)); del _raw; _base = _dump()", { globals: ns });
 }
 
-async function run(code: string) {
+function changes(): string | null {
+  return pyodide.runPython("_changes()", { globals: ns }) ?? null;
+}
+
+async function run(code: string, sync: boolean) {
   try {
     const result = await pyodide.runPythonAsync(code, { globals: ns });
     if (result !== undefined && result !== null) {
@@ -61,6 +83,14 @@ async function run(code: string) {
   } catch (e: any) {
     post({ type: "err", text: String(e.message ?? e) });
   }
+  if (sync) {
+    try {
+      const c = changes();
+      if (c) post({ type: "changes", payload: c });
+    } catch (e: any) {
+      post({ type: "err", text: `Could not compute changes: ${String(e.message ?? e)}` });
+    }
+  }
   post({ type: "done" });
 }
 
@@ -68,7 +98,11 @@ self.onmessage = async (ev: MessageEvent) => {
   const msg = ev.data;
   try {
     if (msg.type === "init") await init(msg.dictionary, msg.zipUrl);
-    else if (msg.type === "run") await run(msg.code);
+    else if (msg.type === "run") await run(msg.code, !!msg.sync);
+    else if (msg.type === "sync") {
+      const c = changes();
+      post(c ? { type: "changes", payload: c } : { type: "nochanges" });
+    }
     else if (msg.type === "load") {
       load(msg.dictionary);
       post({ type: "out", text: "Dictionary reloaded from the server.\n" });

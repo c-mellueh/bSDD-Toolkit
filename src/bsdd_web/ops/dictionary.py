@@ -109,3 +109,28 @@ def replace_dictionary(ctx: Ctx, dictionary: dict[str, Any]) -> None:
     """Replace the whole dictionary (used by the shell and re-imports)."""
     new = BsddDictionary.model_validate(dictionary)
     ctx.dictionary = new
+
+
+@op("dict.patch")
+def patch_dictionary(ctx: Ctx, patch: list[dict[str, Any]], guards: list[Any]) -> int:
+    """Apply a JSON patch computed by the in-browser shell (diff of its local copy).
+
+    Every step is guarded with the value the shell started from, so changes made by others
+    in the meantime are never overwritten silently: the patch is rejected instead.
+    """
+    from ..jsonpatch import PatchConflict, apply_guarded
+
+    if len(patch) != len(guards):
+        raise OpError("Invalid patch")
+    if not patch:
+        return 0
+    current = ctx.d.model_dump(mode="json", exclude_none=True)
+    try:
+        result = apply_guarded(current, patch, guards)
+    except PatchConflict as exc:
+        raise OpError(
+            "The dictionary was changed elsewhere in the meantime "
+            f"({exc}). Reload the dictionary in the shell and run your code again."
+        ) from exc
+    ctx.dictionary = BsddDictionary.model_validate(result)
+    return len(patch)

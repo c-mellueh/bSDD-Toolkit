@@ -184,3 +184,40 @@ def test_ifc_split():
     assert split_ifc_term("IfcElectricMotorSYNCHRONOUS") == ("IfcElectricMotor", "SYNCHRONOUS")
     assert split_ifc_term("IfcWall") == ("IfcWall", None)
     assert split_ifc_term("Something") == ("Something", None)
+
+
+def _shell_patch(base, new):
+    """What the in-browser shell sends: diff plus guards recorded against its base."""
+    import copy
+
+    from bsdd_web import jsonpatch as jp
+
+    work = copy.deepcopy(base)
+    patch = jp.diff(base, new)
+    guards = []
+    for step in patch:
+        guards.append(jp._expectation(work, step))
+        jp.apply(work, [step], in_place=True)
+    return patch, guards
+
+
+def test_dict_patch_merges_and_detects_conflicts(h):
+    base = h.d.model_dump(mode="json", exclude_none=True)
+    shell = h.d.model_copy(deep=True)
+    wall = next(c for c in shell.Classes if c.Code == "Wall")
+    wall.Description = "from shell"
+    patch, guards = _shell_patch(base, shell.model_dump(mode="json", exclude_none=True))
+    # someone else edits another class meanwhile: still applies, nothing is lost
+    h.run("class.update", code="Door", data={"Definition": "edited in UI"})
+    assert h.run("dict.patch", patch=patch, guards=guards) == len(patch)
+    assert h.cls("Wall").Description == "from shell"
+    assert h.cls("Door").Definition == "edited in UI"
+    # a concurrent change of the same value is rejected instead of overwritten
+    base = h.d.model_dump(mode="json", exclude_none=True)
+    shell = h.d.model_copy(deep=True)
+    next(c for c in shell.Classes if c.Code == "Wall").Description = "shell again"
+    patch, guards = _shell_patch(base, shell.model_dump(mode="json", exclude_none=True))
+    h.run("class.update", code="Wall", data={"Description": "UI wins"})
+    with pytest.raises(OpError):
+        h.run("dict.patch", patch=patch, guards=guards)
+    assert h.cls("Wall").Description == "UI wins"

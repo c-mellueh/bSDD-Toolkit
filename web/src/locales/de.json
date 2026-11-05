@@ -497,5 +497,12 @@
  "navigate": "navigieren",
  "open": "öffnen",
  "{{n}} more": "{{n}} weitere",
- "Group of properties": "Group of Properties"
+ "Group of properties": "Group of Properties",
+ "No changes to sync.": "Keine Änderungen zum Übertragen.",
+ "✓ {{n}} changes synced to the shared dictionary": "✓ {{n}} Änderungen ins gemeinsame Wörterbuch übertragen",
+ "The changes were not applied. Reload the dictionary (↻) and run your code again.": "Die Änderungen wurden nicht übernommen. Wörterbuch neu laden (↻) und den Code erneut ausführen.",
+ "The dictionary was changed outside the shell. Reload 'd' to see these changes (variables like 'cl = d.Classes[0]' then have to be fetched again).": "Das Wörterbuch wurde außerhalb der Konsole geändert. 'd' neu laden, um diese Änderungen zu sehen (Variablen wie 'cl = d.Classes[0]' müssen danach neu geholt werden).",
+ "Changed elsewhere – reload": "Anderswo geändert – neu laden",
+ "Send every change to the shared dictionary after each command": "Jede Änderung nach jedem Befehl ins gemeinsame Wörterbuch übertragen",
+ "Live": "Live"
 }

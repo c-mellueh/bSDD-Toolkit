@@ -427,6 +427,8 @@ def _zip_package() -> bytes:
             if rel.parts[0] == "tests":
                 continue
             zf.write(path, Path("bsdd_json") / rel)
+        # pure-Python JSON patch helpers: the shell diffs its copy and sends only the changes
+        zf.write(Path(__file__).resolve().parent / "jsonpatch.py", "bsdd_shell_jsonpatch.py")
     return buf.getvalue()
 
 
