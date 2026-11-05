@@ -132,7 +132,7 @@ class _Builder:
                 if self.sel.property_included(c, cp):
                     self.add_property(cp, group)
         # 3) parent relations between exported classes
-        for code, entry in self.groups.items():
+        for entry in self.groups.values():
             parent = entry["bsdd_class"].ParentClassCode
             if parent and parent in self.groups and entry["bsdd_class"].ClassType == "Class":
                 entry["xml"].parentGroupOfProperties = self.groups[parent]["guid"]

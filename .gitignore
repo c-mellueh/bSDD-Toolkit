@@ -213,3 +213,4 @@ __marimo__/
 web/node_modules/
 web/dist/
 src/bsdd_web/static/
+web/tsconfig.tsbuildinfo

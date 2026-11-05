@@ -78,7 +78,7 @@ def test_collaboration_undo_redo_persistence(client, settings):
     version_b = hello_b["version"]
 
     a.send_json({"type": "op", "rid": 1, "op": "class.update", "args": {"code": "Wall", "data": {"Name": "Mauer"}}})
-    patch_msg = recv_until(a, "patch")
+    recv_until(a, "patch")
     ack = recv_until(a, "ack")
     assert ack["ok"] and ack["history"]["undo"] == "class.update"
 

@@ -7,6 +7,7 @@ Visual editor and Python toolkit for working with buildingSMART Data Dictionary 
 This repository contains:
 - A validated data model for bSDD JSON (Pydantic v2) under `src/bsdd_json`.
 - A PySide6 GUI to create, view, and edit bSDD dictionaries under `src/bsdd_gui`.
+- A collaborative web application (FastAPI backend `src/bsdd_web`, React frontend `web/`), see [Web application](#web-application).
 
 
 ## Features
@@ -88,6 +89,73 @@ open_path           Optional path to a bSDD JSON file
 
 ### LOIN / IDS Exporter
 ![Graph View](docs/images/loin-exporter.png)
+
+
+## Web application
+
+The web version offers the same functionality as the desktop GUI in the browser:
+every dictionary you create, upload or download from bSDD gets its own **unguessable link**.
+Everybody who has the link edits the dictionary **together in real time** (live updates,
+presence, per-user undo/redo). Dictionaries are stored as plain bSDD JSON in a Docker volume.
+
+Features: class tree (drag & drop, copy/paste, grouping), property sets, class properties,
+property / class / dictionary editors with relations and allowed values, Groups of Properties,
+Level of Information Need (ISO 7817-3), exports (Excel, IDS, ISO 23386, ISO 7817-3, Revit),
+download from bSDD, fuzzy search, graph viewer, AI definitions (each user enters their own
+OpenAI key, it never reaches the server), English and German UI, and a Python shell.
+
+**Python shell without server risk:** the shell runs Python *in the visitor's browser*
+(Pyodide/WebAssembly) on a local copy of the dictionary with `bsdd_json` loaded. Nothing
+typed into it is executed on the server. Changes are only shared when the user clicks
+"Apply to shared dictionary"; the server then validates them like every other edit.
+
+> There is no login: anyone with a dictionary link can edit it. Keep links private and put
+> the app behind a reverse proxy / VPN if it must not be reachable publicly.
+
+### Run with Docker Compose
+
+```yaml
+services:
+  bsdd-toolkit:
+    image: cmellueh/bsdd-toolkit:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - bsdd-data:/data
+volumes:
+  bsdd-data:
+```
+
+`docker compose up -d` and open http://localhost:8000. See `compose.yaml` for all options.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `DATA_DIR` | `/data` | where dictionaries are stored |
+| `PORT` | `8000` | HTTP port inside the container |
+| `MAX_UPLOAD_MB` | `50` | maximum upload size |
+| `PROJECT_TTL_DAYS` | `0` | delete dictionaries not opened for N days (0 = never) |
+| `OFFLINE` | `0` | `1` disables lookups of external classes/properties on bSDD |
+| `SAVE_DELAY` | `2` | seconds after the last edit until the dictionary is written |
+| `SNAPSHOT_INTERVAL` / `MAX_SNAPSHOTS` | `600` / `20` | rolling backups in `<project>/snapshots` |
+
+The server must run as a single process (open dictionaries are held in memory); the image does this by default.
+A reverse proxy must forward WebSocket upgrades (`/api/projects/<id>/ws`).
+
+### Publish the image
+
+`.github/workflows/docker.yml` runs the tests and pushes a multi-arch image (amd64/arm64) to
+Docker Hub when a tag like `v1.0.0` is pushed. Add the repository secrets `DOCKERHUB_USERNAME`
+and `DOCKERHUB_TOKEN`. Manually: `docker build -t <user>/bsdd-toolkit . && docker push <user>/bsdd-toolkit`.
+
+### Develop
+
+```bash
+uv venv .venv-web && VIRTUAL_ENV=.venv-web uv pip install -e src/bsdd_json -e "src/bsdd_web[dev]"
+PYTHONPATH=src DATA_DIR=./data .venv-web/bin/python -m bsdd_web --reload   # API on :8000
+cd web && npm install && npm run dev                                       # UI on :5173 (proxies /api)
+PYTHONPATH=src .venv-web/bin/python -m pytest src/bsdd_web/tests           # backend tests
+```
 
 
 ## Use the Data Model (Python)

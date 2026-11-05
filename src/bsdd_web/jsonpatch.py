@@ -212,7 +212,7 @@ def _expectation(doc: Any, op: dict[str, Any]) -> Any:
 def apply_guarded(doc: Any, patch: Patch, guards: list[Any]) -> Any:
     """Apply ``patch`` to a copy of ``doc`` if every guard holds, else raise PatchConflict."""
     work = copy.deepcopy(doc)
-    for op, guard in zip(patch, guards):
+    for op, guard in zip(patch, guards, strict=True):
         tokens = _split(op["path"])
         if "len" in guard:
             parent = _resolve_parent(work, tokens)
