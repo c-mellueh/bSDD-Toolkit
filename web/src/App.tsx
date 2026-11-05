@@ -4,6 +4,7 @@ import { Notifications } from "@mantine/notifications";
 import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Landing } from "./pages/Landing";
+import { GraphPage } from "./pages/GraphPage";
 import { ProjectPage } from "./pages/ProjectPage";
 import { useSettings } from "./state/settings";
 
@@ -38,6 +39,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/p/:projectId" element={<ProjectPage />} />
+            <Route path="/p/:projectId/graph" element={<GraphPage />} />
             <Route path="*" element={<Landing />} />
           </Routes>
         </BrowserRouter>

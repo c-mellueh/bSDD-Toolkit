@@ -214,3 +214,5 @@ web/node_modules/
 web/dist/
 src/bsdd_web/static/
 web/tsconfig.tsbuildinfo
+web/graph-engine/target/
+/data/

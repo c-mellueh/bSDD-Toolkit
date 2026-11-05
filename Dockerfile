@@ -1,11 +1,19 @@
 # syntax=docker/dockerfile:1
 
+# ---------- graph physics engine (Rust -> WebAssembly) ----------
+FROM rust:1.86-slim AS wasm
+RUN rustup target add wasm32-unknown-unknown
+WORKDIR /engine
+COPY web/graph-engine/ ./
+RUN cargo test --release --lib && cargo build --release --target wasm32-unknown-unknown --lib
+
 # ---------- frontend ----------
 FROM node:22-alpine AS web
 WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY web/ ./
+COPY --from=wasm /engine/target/wasm32-unknown-unknown/release/graph_engine.wasm src/graph/engine.wasm
 RUN npm run build
 
 # ---------- backend ----------

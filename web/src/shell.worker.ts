@@ -82,3 +82,4 @@ self.onmessage = async (ev: MessageEvent) => {
     post({ type: "done" });
   }
 };
+export {};

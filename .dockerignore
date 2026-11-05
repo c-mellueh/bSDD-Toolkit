@@ -16,3 +16,4 @@ src/bsdd_json/tests
 docs
 data
 *.egg-info
+web/graph-engine/target

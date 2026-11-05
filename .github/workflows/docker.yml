@@ -17,6 +17,8 @@ jobs:
         run: |
           pip install ./src/bsdd_json "./src/bsdd_web[dev]"
           cd src && PYTHONPATH=. python -m pytest bsdd_web/tests -q
+      - name: Graph engine tests (Rust)
+        run: cargo test --release --manifest-path web/graph-engine/Cargo.toml
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

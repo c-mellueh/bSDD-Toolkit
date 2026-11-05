@@ -104,6 +104,14 @@ Level of Information Need (ISO 7817-3), exports (Excel, IDS, ISO 23386, ISO 7817
 download from bSDD, fuzzy search, graph viewer, AI definitions (each user enters their own
 OpenAI key, it never reaches the server), English and German UI, and a Python shell.
 
+**Graph viewer:** a custom canvas renderer with a force-directed layout engine written in Rust
+and compiled to WebAssembly (`web/graph-engine`, Barnes-Hut repulsion, runs in a Web Worker).
+Drag & drop with pinning, filters per node and edge type, adding nodes by name / code / URI,
+expanding neighbours, straight / right-angle / curved edges, adjustable physics, tree, circle
+and grid layouts, creating and deleting relations directly in the graph, PNG / SVG /
+interactive HTML export, and a stand-alone window (`/p/<id>/graph`). The prebuilt
+`web/src/graph/engine.wasm` is rebuilt from source in the Docker build (`npm run build:wasm` locally).
+
 **Python shell without server risk:** the shell runs Python *in the visitor's browser*
 (Pyodide/WebAssembly) on a local copy of the dictionary with `bsdd_json` loaded. Nothing
 typed into it is executed on the server. Changes are only shared when the user clicks
