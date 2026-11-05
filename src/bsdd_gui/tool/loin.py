@@ -888,7 +888,8 @@ class Loin(ActionTool, WidgetTool):
             spec = cls.get_or_create_spec(purpose_guid, milestone_guid)
             spec_per_obj = cls._find_spec_per_object_type(spec, bsdd_class)
             if spec_per_obj is not None:
-                cls._add_property_to_spec_per_obj(spec_per_obj, bsdd_class, bsdd_property)
+                if not cls._sync_external_pset(spec_per_obj, bsdd_class, bsdd_property.PropertySet, bucket):
+                    cls._add_property_to_spec_per_obj(spec_per_obj, bsdd_class, bsdd_property)
         else:
             if prop_key not in bucket:
                 return
@@ -897,7 +898,9 @@ class Loin(ActionTool, WidgetTool):
             spec = props.specs.get(key)
             if spec is not None:
                 spec_per_obj = cls._find_spec_per_object_type(spec, bsdd_class)
-                if spec_per_obj is not None:
+                if spec_per_obj is not None and not cls._sync_external_pset(
+                    spec_per_obj, bsdd_class, bsdd_property.PropertySet, bucket
+                ):
                     cls._remove_property_from_spec_per_obj(
                         spec_per_obj, bsdd_class, bsdd_property, remaining_in_pset
                     )
@@ -964,6 +967,76 @@ class Loin(ActionTool, WidgetTool):
             if s.__dict__.get("_bsdd_class_code") == bsdd_class.Code:
                 return s
         return None
+
+    @classmethod
+    def _ensure_groups(cls, spec_per_obj: LoinSpecificationPerObjectType) -> LoinGroupsOfProperties:
+        alpha = spec_per_obj.alphanumerical_information
+        if alpha is None:
+            alpha = LoinAlphanumericalInformation(
+                guid=uuid4(),
+                groups_of_properties=LoinGroupsOfProperties(
+                    group_of_properties=[], group_of_properties_refs=[]
+                ),
+            )
+            spec_per_obj.alphanumerical_information = alpha
+        if alpha.groups_of_properties is None:
+            alpha.groups_of_properties = LoinGroupsOfProperties(
+                group_of_properties=[], group_of_properties_refs=[]
+            )
+        return alpha.groups_of_properties
+
+    @classmethod
+    def _sync_external_pset(
+        cls,
+        spec_per_obj: LoinSpecificationPerObjectType,
+        bsdd_class: "BsddClass",
+        pset: str,
+        selected: set[tuple[str, str]],
+    ) -> bool:
+        """Rebuild the XML entry of a pset that is linked to a Group of Properties.
+
+        A GroupOfPropertiesRef means "the whole group" (it is expanded to every property
+        of the pset on import), so it is only written when all properties of the pset are
+        selected. Partial selections are written as an inline group with individual
+        HasPropertyRef entries so they survive an export/import round trip.
+
+        Returns False if the pset is not linked to a group (caller handles it).
+        """
+        bsdd_dictionary = tool.Project.get()
+        if bsdd_dictionary is None or not pset:
+            return False
+        external_group = class_utils.get_related_pset(bsdd_class, bsdd_dictionary, pset)
+        if external_group is None:
+            return False
+        groups = cls._ensure_groups(spec_per_obj)
+        uri = external_group.OwnedUri or class_utils.build_bsdd_uri(external_group, bsdd_dictionary)
+        groups.group_of_properties_refs = [
+            r for r in groups.group_of_properties_refs if not (uri and r.reference_uri == uri)
+        ]
+        groups.group_of_properties = [
+            g for g in groups.group_of_properties if g.__dict__.get("_pset") != pset
+        ]
+        pset_props = [cp for cp in bsdd_class.ClassProperties if cp.PropertySet == pset]
+        chosen = [cp for cp in pset_props if (pset, cp.Code) in selected]
+        if not chosen:
+            return True
+        if len(chosen) == len(pset_props) and uri:
+            groups.group_of_properties_refs.append(DtRef(reference_uri=uri))
+            return True
+        refs: list[DtRef] = []
+        for cp in chosen:
+            ref = cls._property_ref(cp)
+            if not any(r.reference_uri == ref.reference_uri for r in refs):
+                refs.append(ref)
+        group = IsoGroupOfProperties(
+            guid=uuid4(),
+            date_of_creation=_now(),
+            names=[DtMultiLangText(language="en", text=pset)],
+            has_property_refs=refs,
+        )
+        group.__dict__["_pset"] = pset
+        groups.group_of_properties.append(group)
+        return True
 
     @classmethod
     def _add_property_to_spec_per_obj(
