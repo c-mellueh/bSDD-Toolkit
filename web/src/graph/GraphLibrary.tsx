@@ -3,7 +3,7 @@ import { SegmentedControl, Text, TextInput } from "@mantine/core";
 import { IconChevronDown, IconChevronRight, IconSearch } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { GOP, type Indexes } from "../model";
+import { GOP, descendants, type Indexes } from "../model";
 import type { BsddClass, Doc } from "../types";
 import { setGraphDrag } from "./dnd";
 import { NODE_STYLE, classId, propId } from "./model";
@@ -65,6 +65,18 @@ export function GraphLibrary({ doc, idx, inScene, onAdd }: { doc: Doc; idx: Inde
 
   const shown = rows.slice(0, LIMIT);
 
+  // dragging a collapsed class also brings all its (sub)children, an expanded one only itself
+  const withCollapsedChildren = (ids: string[]) => {
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    const out = new Set<string>();
+    for (const id of ids) {
+      out.add(id);
+      const r = byId.get(id);
+      if (r?.hasKids && !r.open) descendants(idx, id.slice(2)).forEach((c) => out.add(classId(c)));
+    }
+    return [...out];
+  };
+
   const click = (id: string, e: React.MouseEvent) => {
     if (e.shiftKey && anchor) {
       const ids = shown.map((r) => r.id);
@@ -114,7 +126,7 @@ export function GraphLibrary({ doc, idx, inScene, onAdd }: { doc: Doc; idx: Inde
               key={r.id}
               className={`row${isSel ? " selected" : ""}`}
               draggable
-              onDragStart={(e) => setGraphDrag(e, isSel ? selected : [r.id])}
+              onDragStart={(e) => setGraphDrag(e, withCollapsedChildren(isSel ? selected : [r.id]))}
               onClick={(e) => click(r.id, e)}
               onDoubleClick={() => onAdd(isSel ? selected : [r.id])}
               title={`${r.label} (${r.sub})${present ? " – " + t("in the graph") : ""}`}

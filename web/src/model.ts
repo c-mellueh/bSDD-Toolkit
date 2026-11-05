@@ -157,11 +157,13 @@ export function ancestors(idx: Indexes, code: string): string[] {
 
 export function descendants(idx: Indexes, code: string): string[] {
   const out: string[] = [];
+  const seen = new Set<string>([code]);
   const stack = [code];
   while (stack.length) {
     const cur = stack.pop()!;
     for (const child of idx.children.get(cur) ?? []) {
-      if (!out.includes(child.Code)) {
+      if (!seen.has(child.Code)) {
+        seen.add(child.Code);
         out.push(child.Code);
         stack.push(child.Code);
       }

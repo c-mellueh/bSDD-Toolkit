@@ -203,8 +203,14 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
         className={`row${node.isSelected ? " selected" : ""}${node.willReceiveDrop ? " drop-target" : ""}`}
         onDoubleClick={() => openUi({ classEditor: { code: c.Code } })}
         onDragStart={(e) => {
-          const codes = node.isSelected ? node.tree.selectedNodes.map((n) => n.id) : [c.Code];
-          setGraphDrag(e, codes.map(classId));
+          const nodes = node.isSelected ? node.tree.selectedNodes : [node];
+          // a collapsed class brings its whole subtree into the graph, an expanded one only itself
+          const codes = new Set<string>();
+          for (const n of nodes) {
+            codes.add(n.id);
+            if (!n.isLeaf && !n.isOpen) descendants(idx, n.id).forEach((x) => codes.add(x));
+          }
+          setGraphDrag(e, [...codes].map(classId));
         }}
         onContextMenu={(e) => {
           if (!node.isSelected) node.select();
