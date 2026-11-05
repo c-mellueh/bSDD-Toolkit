@@ -148,3 +148,7 @@ body[data-readonly] [data-edit] { display: none !important; }
 }
 .col-resize { position: absolute; top: 0; right: -3px; width: 7px; height: 100%; cursor: col-resize; z-index: 2; }
 .col-resize:hover, .col-resize:active { background: var(--mantine-primary-color-light); }
+.loin-matrix-wrap { overflow-x: auto; max-width: 100%; }
+.loin-matrix { width: auto; min-width: 360px; }
+.loin-matrix th, .loin-matrix td { min-width: 170px; }
+.loin-cell.on { background: var(--mantine-primary-color-light); }

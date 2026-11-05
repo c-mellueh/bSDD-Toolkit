@@ -48,6 +48,9 @@ def default_state() -> dict[str, Any]:
         "receiving_actor": None,
         "added_classes": [],
         "specs": {},
+        # purpose × milestone combinations that are in use (exported); None = not set yet, then
+        # every combination that contains classes counts as active (behaviour before the matrix)
+        "matrix": None,
     }
 
 
@@ -61,6 +64,7 @@ def ensure_state(state: dict[str, Any]) -> dict[str, Any]:
     state.setdefault("receiving_actor", None)
     state.setdefault("added_classes", [])
     state.setdefault("specs", {})
+    state.setdefault("matrix", None)
     return state
 
 
@@ -77,6 +81,37 @@ def get_spec(state: dict[str, Any], key: str, *, create: bool = False) -> dict[s
 
 def all_spec_keys(state: dict[str, Any]) -> list[str]:
     return [spec_key(p["guid"], m["guid"]) for p in state.get("purposes", []) for m in state.get("milestones", [])]
+
+
+def active_keys(state: dict[str, Any]) -> list[str]:
+    """Combinations ticked in the purpose × milestone matrix (in purpose / milestone order)."""
+    keys = all_spec_keys(state)
+    matrix = state.get("matrix")
+    if matrix is None:
+        specs = state.get("specs", {})
+        return [k for k in keys if (specs.get(k) or {}).get("classes")]
+    chosen = set(matrix)
+    return [k for k in keys if k in chosen]
+
+
+def set_matrix(state: dict[str, Any], keys: list[str], active: bool) -> None:
+    """Tick / untick combinations of the matrix (an untouched matrix is materialised first)."""
+    valid = set(all_spec_keys(state))
+    unknown = [k for k in keys if k not in valid]
+    if unknown:
+        raise ValueError("Unknown purpose / milestone")
+    current = active_keys(state)
+    if active:
+        current += [k for k in keys if k not in current]
+    else:
+        current = [k for k in current if k not in keys]
+    state["matrix"] = [k for k in all_spec_keys(state) if k in set(current)]
+
+
+def _activate(state: dict[str, Any], key: str) -> None:
+    """Editing a combination's content puts it into use."""
+    if state.get("matrix") is not None and key not in state["matrix"]:
+        state["matrix"].append(key)
 
 
 # --------------------------------------------------------------------------- selection
@@ -180,6 +215,8 @@ def set_class_included(
     recursive: bool = False,
 ) -> None:
     spec = get_spec(state, key, create=True)
+    if included:
+        _activate(state, key)
     targets: list[str] = []
     for code in codes:
         targets.append(code)
@@ -304,7 +341,10 @@ def build_loin_xml(state: dict[str, Any], d: BsddDictionary, keys: list[str] | N
     classes = {c.Code: c for c in d.Classes}
     providing = _actor(state.get("providing_actor"), "Provider")
     receiving = _actor(state.get("receiving_actor"), "Receiver")
-    selected = set(keys) if keys is not None else None
+    # default: the combinations ticked in the matrix – also empty ones (a specification without
+    # object types is valid ISO 7817-3); without a matrix only combinations that contain classes
+    explicit = keys is not None or state.get("matrix") is not None
+    selected = set(keys if keys is not None else active_keys(state)) if explicit else None
 
     specs = []
     for purpose in state["purposes"]:
@@ -393,7 +433,7 @@ def build_loin_xml(state: dict[str, Any], d: BsddDictionary, keys: list[str] | N
                 ),
             )
     if not specs:
-        raise ValueError("No LOIN specification selected or none contains classes")
+        raise ValueError("No combination of purpose and milestone is selected")
     loin = LoinLevelOfInformationNeed(specifications=specs)
     # Same serialisation as the desktop app so files can be exchanged between both.
     return loin.to_xml(encoding="UTF-8", xml_declaration=True, exclude_none=True), len(specs)
@@ -461,6 +501,7 @@ def parse_loin_xml(xml: bytes | str, d: BsddDictionary) -> dict[str, Any]:
         "receiving_actor": None,
         "added_classes": [],
         "specs": {},
+        "matrix": [],
     }
     seen_p: set[str] = set()
     seen_m: set[str] = set()
@@ -515,6 +556,8 @@ def parse_loin_xml(xml: bytes | str, d: BsddDictionary) -> dict[str, Any]:
             if items:
                 spec_state["properties"][code] = items
         state["specs"][spec_key(pg, mg)] = spec_state
+        if spec_key(pg, mg) not in state["matrix"]:
+            state["matrix"].append(spec_key(pg, mg))
         add_classes(state, d, spec_state["classes"])
     return state
 
@@ -526,17 +569,16 @@ def set_pset_properties_included(
     items: list[list[str]],
     included: bool,
 ) -> int:
-    """Toggle (pset, class property code) pairs in every LOIN class that owns them.
+    """Toggle (pset, class property code) pairs in every class of the dictionary that owns them.
 
-    Mirrors the desktop pset tree: the view aggregates all classes added to the LOIN,
-    toggling a property set or property applies to every one of those classes.
+    The property set view lists all property sets of the dictionary; switching one on includes
+    every class that has it (Groups of Properties themselves are templates and are skipped).
     Returns the number of classes touched.
     """
     wanted = {(p or "", c) for p, c in items}
-    added = set(state.get("added_classes", []))
     touched = 0
     for bsdd_class in d.Classes:
-        if bsdd_class.Code not in added:
+        if bsdd_class.ClassType == "GroupOfProperties":
             continue
         hits = [[cp.PropertySet or "", cp.Code] for cp in bsdd_class.ClassProperties if (cp.PropertySet or "", cp.Code) in wanted]
         if hits:

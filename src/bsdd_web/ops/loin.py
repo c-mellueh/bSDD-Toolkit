@@ -72,6 +72,9 @@ def remove(ctx: Ctx, kind: str, guid: str) -> None:
     if len(state[key]) <= 1:
         raise OpError("At least one entry is required")
     state[key] = [x for x in state[key] if x["guid"] != guid]
+    if state.get("matrix") is not None:
+        valid = set(L.all_spec_keys(state))
+        state["matrix"] = [k for k in state["matrix"] if k in valid]
     L.drop_dangling(state, {c.Code for c in ctx.d.Classes})
 
 
@@ -139,6 +142,15 @@ def set_properties_included(
         raise OpError(str(exc)) from exc
 
 
+@op("loin.set_matrix")
+def set_matrix(ctx: Ctx, keys: list[str], active: bool) -> None:
+    """Tick / untick purpose × milestone combinations in the matrix."""
+    try:
+        L.set_matrix(_state(ctx), keys, active)
+    except ValueError as exc:
+        raise OpError(str(exc)) from exc
+
+
 @op("loin.import_xml")
 def import_xml(ctx: Ctx, xml: str) -> int:
     try:
@@ -153,7 +165,7 @@ def import_xml(ctx: Ctx, xml: str) -> int:
 
 @op("loin.set_pset_properties_included")
 def set_pset_properties_included(ctx: Ctx, spec: str, items: list[list[str]], included: bool) -> int:
-    """Toggle property sets / properties across all classes of the LOIN (pset view)."""
+    """Toggle property sets / properties across all classes of the dictionary (pset view)."""
     try:
         return L.set_pset_properties_included(_state(ctx), ctx.d, spec, items, included)
     except ValueError as exc:

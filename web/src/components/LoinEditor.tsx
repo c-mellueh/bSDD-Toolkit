@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Button, FileButton, Grid, Group, Modal, Select, Stack, Switch, Tabs, Text, TextInput, Tooltip } from "@mantine/core";
+import { ActionIcon, Alert, Badge, Button, FileButton, Grid, Group, Modal, Select, Stack, Switch, Table, Tabs, Text, TextInput, Tooltip } from "@mantine/core";
 import { Toggle } from "./Toggle";
 import { useReadOnly } from "../state/readonly";
 import { IconArrowDown, IconArrowUp, IconArrowsMaximize, IconArrowsMinimize, IconChevronDown, IconChevronRight, IconDownload, IconPencil, IconPlus, IconSearch, IconTrash, IconUpload } from "@tabler/icons-react";
@@ -10,10 +10,18 @@ import { GOP, cpName } from "../model";
 import { attempt, notifyOk } from "../notify";
 import { op, useProject } from "../state/project";
 import { useUi } from "../state/ui";
-import type { BsddClass, ClassProperty, LoinActor, LoinEntry, LoinSpec } from "../types";
+import type { BsddClass, ClassProperty, LoinActor, LoinEntry, LoinSpec, LoinState } from "../types";
 import { askConfirm, askText } from "./dialogs";
 
 export const specKey = (p: string, m: string) => `${p}|${m}`;
+
+/** Combinations ticked in the purpose × milestone matrix (same rule as the server). */
+export function activeKeys(loin: LoinState | undefined): string[] {
+  const keys = (loin?.purposes ?? []).flatMap((p) => (loin?.milestones ?? []).map((m) => specKey(p.guid, m.guid)));
+  if (loin?.matrix == null) return keys.filter((k) => (loin?.specs?.[k]?.classes?.length ?? 0) > 0);
+  const chosen = new Set(loin.matrix);
+  return keys.filter((k) => chosen.has(k));
+}
 
 export function LoinEditor({ inline }: { inline?: boolean } = {}) {
   const { t } = useTranslation();
@@ -27,6 +35,7 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
   const [milestone, setMilestone] = useState<string | null>(null);
   const [current, setCurrent] = useState<string | null>(null);
   const [recursive, setRecursive] = useState(true);
+  const [tab, setTab] = useState<string | null>("selection");
 
   useEffect(() => {
     if (opened && loin && !loin.purposes?.length && !ro) void op("loin.init");
@@ -38,6 +47,7 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
   const m = milestones.find((x) => x.guid === milestone)?.guid ?? milestones[0]?.guid ?? null;
   const key = p && m ? specKey(p, m) : null;
   const spec = key ? loin?.specs?.[key] : undefined;
+  const active = useMemo(() => new Set(activeKeys(loin)), [loin]);
 
   if (!opened || !doc || !loin) return null;
 
@@ -50,9 +60,10 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
 
   return (
     <Wrap inline={inline} close={close} title={t("Level of Information Need (ISO 7817-3)")}>
-      <Tabs defaultValue="selection" style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+      <Tabs value={tab} onChange={setTab} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
         <Tabs.List mb="sm">
           <Tabs.Tab value="selection">{t("Specifications")}</Tabs.Tab>
+          <Tabs.Tab value="matrix">{t("Purpose × milestone matrix")} <Badge size="xs" variant="light" color="gray" ml={4}>{active.size}</Badge></Tabs.Tab>
           <Tabs.Tab value="setup">{t("Purposes, milestones & actors")}</Tabs.Tab>
           <Group gap="xs" ml="auto">
             {!ro && <FileButton onChange={importXml} accept=".xml,application/xml">
@@ -64,9 +75,24 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
         <Tabs.Panel value="selection" style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
           <Group gap="sm" mb="sm" align="flex-end" wrap="wrap">
             <Select label={t("Purpose")} data={purposes.map((x) => ({ value: x.guid, label: x.name }))} value={p} onChange={setPurpose} allowDeselect={false} w={220} />
-            <Select label={t("Milestone")} data={milestones.map((x) => ({ value: x.guid, label: x.name }))} value={m} onChange={setMilestone} allowDeselect={false} w={220} />
+            <Select
+              label={t("Milestone")}
+              data={milestones.map((x) => ({ value: x.guid, label: p && !active.has(specKey(p, x.guid)) ? `${x.name} · ${t("not in matrix")}` : x.name }))}
+              value={m}
+              onChange={setMilestone}
+              allowDeselect={false}
+              w={260}
+            />
             <Switch label={t("Apply to child classes")} checked={recursive} onChange={(e) => setRecursive(e.currentTarget.checked)} mb={8} />
           </Group>
+          {key && !active.has(key) && (
+            <Alert color="yellow" variant="light" mb="sm" py={6}>
+              <Group justify="space-between" gap="xs">
+                <Text size="sm">{t("This combination is not ticked in the purpose × milestone matrix and is not exported. Including classes ticks it automatically.")}</Text>
+                {!ro && <Button size="compact-sm" variant="light" onClick={() => attempt(() => op("loin.set_matrix", { keys: [key], active: true }))}>{t("Tick in matrix")}</Button>}
+              </Group>
+            </Alert>
+          )}
           {key ? (
             <div className="loin-grid">
               <ClassPanel specKey={key} spec={spec} recursive={recursive} current={current} setCurrent={setCurrent} />
@@ -76,6 +102,17 @@ export function LoinEditor({ inline }: { inline?: boolean } = {}) {
           ) : (
             <Text c="dimmed">{t("Add a purpose and a milestone first.")}</Text>
           )}
+        </Tabs.Panel>
+        <Tabs.Panel value="matrix" style={{ overflow: "auto", minHeight: 0 }}>
+          <MatrixPanel
+            loin={loin}
+            active={active}
+            onOpen={(pg, mg) => {
+              setPurpose(pg);
+              setMilestone(mg);
+              setTab("selection");
+            }}
+          />
         </Tabs.Panel>
         <Tabs.Panel value="setup" style={{ overflow: "auto", minHeight: 0 }}>
           <fieldset disabled={ro} className="ro-fieldset">
@@ -304,16 +341,14 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
   const ro = useReadOnly();
   const doc = useProject((s) => s.doc)!;
   const idx = useProject((s) => s.idx);
-  const loin = doc.extras.loin;
   const [filter, setFilter] = useState("");
   const { open, toggle } = useOpenSet();
 
-  // like the desktop pset view: aggregate all classes added to the LOIN
+  // every property set of the dictionary (Groups of Properties are templates, not classes)
   const groups = useMemo(() => {
-    const added = new Set(loin.added_classes ?? []);
     const map = new Map<string, Map<string, PsetEntry>>();
     for (const c of doc.dictionary.Classes ?? []) {
-      if (!added.has(c.Code)) continue;
+      if (c.ClassType === GOP) continue;
       for (const cp of c.ClassProperties ?? []) {
         const ps = cp.PropertySet ?? "";
         if (!map.has(ps)) map.set(ps, new Map());
@@ -323,7 +358,7 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
       }
     }
     return [...map.entries()].sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }));
-  }, [doc, idx, loin.added_classes]);
+  }, [doc, idx]);
 
   const isChecked = (cls: string, ps: string, code: string) => (spec?.properties?.[cls] ?? []).some(([a, b]) => (a ?? "") === ps && b === code);
   const countEntry = (ps: string, e: PsetEntry) => e.classes.filter((c) => isChecked(c, ps, e.code)).length;
@@ -333,12 +368,12 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
   return (
     <Panel
       title={t("Property sets")}
-      subtitle={t("Across all classes of the LOIN")}
+      subtitle={<Tooltip label={t("Switching a property set on includes every class that has it")} multiline w={260}><span>{t("All property sets of the dictionary")}</span></Tooltip>}
       count={<Badge variant="light">{t("{{n}} sets", { n: groups.length })}</Badge>}
       filter={filter}
       setFilter={setFilter}
     >
-      {groups.length === 0 && <div className="empty-hint">{t("Include classes first – their property sets appear here.")}</div>}
+      {groups.length === 0 && <div className="empty-hint">{t("The dictionary has no property sets yet.")}</div>}
       {groups.map(([ps, entries]) => {
         const list = [...entries.values()].filter((e) => !f || ps.toLowerCase().includes(f) || e.name.toLowerCase().includes(f) || e.code.toLowerCase().includes(f));
         if (!list.length) return null;
@@ -379,6 +414,95 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
         );
       })}
     </Panel>
+  );
+}
+
+// ------------------------------------------------------------------ purpose × milestone matrix
+
+function MatrixPanel({ loin, active, onOpen }: { loin: LoinState; active: Set<string>; onOpen: (purpose: string, milestone: string) => void }) {
+  const { t } = useTranslation();
+  const ro = useReadOnly();
+  const purposes = loin.purposes ?? [];
+  const milestones = loin.milestones ?? [];
+  const set = (keys: string[], value: boolean) => attempt(() => op("loin.set_matrix", { keys, active: value }));
+  const state = (keys: string[]): Tri => triOf(keys.filter((k) => active.has(k)).length, keys.length);
+  const all = purposes.flatMap((p) => milestones.map((m) => specKey(p.guid, m.guid)));
+  const allState = state(all);
+  return (
+    <Stack gap="sm">
+      <Text size="sm" c="dimmed">
+        {t("Tick which purpose is required at which milestone. Only ticked combinations are offered for export – also empty ones, which are exported as specifications without classes.")}
+      </Text>
+      <div className="loin-matrix-wrap">
+        <Table withTableBorder withColumnBorders className="loin-matrix" verticalSpacing={6}>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>
+                <Group gap={8} wrap="nowrap" align="center">
+                  <Toggle size="xs" disabled={ro} checked={allState === "on"} indeterminate={allState === "partial"} onChange={(e) => set(all, e.currentTarget.checked)} aria-label={t("All")} />
+                  <Text size="xs" c="dimmed" style={{ whiteSpace: "normal", lineHeight: 1.3 }}>{t("Purpose")} ↓<br />{t("Milestone")} →</Text>
+                </Group>
+              </Table.Th>
+              {milestones.map((m) => {
+                const col = purposes.map((p) => specKey(p.guid, m.guid));
+                const st = state(col);
+                return (
+                  <Table.Th key={m.guid}>
+                    <Group gap={8} wrap="nowrap">
+                      <Toggle size="xs" disabled={ro} checked={st === "on"} indeterminate={st === "partial"} onChange={(e) => set(col, e.currentTarget.checked)} aria-label={m.name} />
+                      <div style={{ minWidth: 0 }}>
+                        <Text size="sm" fw={600} truncate>{m.name}</Text>
+                        {m.date && <Text size="xs" c="dimmed">{m.date.slice(0, 10)}</Text>}
+                      </div>
+                    </Group>
+                  </Table.Th>
+                );
+              })}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {purposes.map((p) => {
+              const row = milestones.map((m) => specKey(p.guid, m.guid));
+              const st = state(row);
+              return (
+                <Table.Tr key={p.guid}>
+                  <Table.Th>
+                    <Group gap={8} wrap="nowrap">
+                      <Toggle size="xs" disabled={ro} checked={st === "on"} indeterminate={st === "partial"} onChange={(e) => set(row, e.currentTarget.checked)} aria-label={p.name} />
+                      <Text size="sm" fw={600} truncate>{p.name}</Text>
+                    </Group>
+                  </Table.Th>
+                  {milestones.map((m) => {
+                    const k = specKey(p.guid, m.guid);
+                    const n = loin.specs?.[k]?.classes?.length ?? 0;
+                    const on = active.has(k);
+                    return (
+                      <Table.Td key={m.guid} className={on ? "loin-cell on" : "loin-cell"}>
+                        <Group gap={8} wrap="nowrap" justify="space-between">
+                          <Toggle size="sm" disabled={ro} checked={on} onChange={(e) => set([k], e.currentTarget.checked)} aria-label={`${p.name} – ${m.name}`} />
+                          <Tooltip label={t("Edit this specification")}>
+                            <Badge
+                              size="sm"
+                              variant={n ? "light" : "outline"}
+                              color={n ? "blue" : "gray"}
+                              style={{ cursor: "pointer" }}
+                              onClick={() => onOpen(p.guid, m.guid)}
+                            >
+                              {n ? t("{{n}} classes", { n }) : t("empty")}
+                            </Badge>
+                          </Tooltip>
+                        </Group>
+                      </Table.Td>
+                    );
+                  })}
+                </Table.Tr>
+              );
+            })}
+          </Table.Tbody>
+        </Table>
+      </div>
+      <Text size="xs" c="dimmed">{t("{{n}} of {{total}} combinations ticked", { n: all.filter((k) => active.has(k)).length, total: all.length })}</Text>
+    </Stack>
   );
 }
 

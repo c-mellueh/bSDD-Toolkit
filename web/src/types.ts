@@ -118,6 +118,8 @@ export interface LoinState {
   receiving_actor?: LoinActor | null;
   added_classes?: string[];
   specs?: Record<string, LoinSpec>;
+  /** ticked purpose × milestone combinations; null/undefined = not set (combinations with classes count) */
+  matrix?: string[] | null;
 }
 
 export interface Extras {

@@ -617,5 +617,19 @@
  "{{provider}} API key": "{{provider}}-API-Schlüssel",
  "xAI (Grok) API keys are not supported.": "API-Schlüssel von xAI (Grok) werden nicht unterstützt.",
  "Grok models are not supported.": "Grok-Modelle werden nicht unterstützt.",
- "Enter an API key (OpenAI, Claude or Gemini) in the settings to use the AI helper": "Für den KI-Assistenten in den Einstellungen einen API-Schlüssel (OpenAI, Claude oder Gemini) eintragen"
+ "Enter an API key (OpenAI, Claude or Gemini) in the settings to use the AI helper": "Für den KI-Assistenten in den Einstellungen einen API-Schlüssel (OpenAI, Claude oder Gemini) eintragen",
+ "Edit this specification": "Diese Spezifikation bearbeiten",
+ "No combination is ticked in the purpose × milestone matrix yet. Open Information need (LOIN) to set it up.": "In der Matrix Anwendungsfall × Meilenstein ist noch keine Kombination angehakt. Unter Informationsbedarf festlegen.",
+ "Not ticked in the purpose × milestone matrix": "In der Matrix Anwendungsfall × Meilenstein nicht angehakt",
+ "Purpose × milestone matrix": "Matrix Anwendungsfall × Meilenstein",
+ "The dictionary has no property sets yet.": "Das Wörterbuch hat noch keine Merkmalsgruppen.",
+ "This combination is not ticked in the purpose × milestone matrix and is not exported. Including classes ticks it automatically.": "Diese Kombination ist in der Matrix Anwendungsfall × Meilenstein nicht angehakt und wird nicht exportiert. Sobald Klassen aufgenommen werden, wird sie automatisch angehakt.",
+ "Tick in matrix": "In Matrix anhaken",
+ "Tick which purpose is required at which milestone. Only ticked combinations are offered for export – also empty ones, which are exported as specifications without classes.": "Festlegen, welcher Anwendungsfall zu welchem Meilenstein benötigt wird. Nur angehakte Kombinationen werden exportiert – auch leere, die als Spezifikation ohne Klassen exportiert werden.",
+ "empty": "leer",
+ "not in matrix": "nicht in Matrix",
+ "{{n}} classes": "{{n}} Klassen",
+ "{{n}} of {{total}} combinations ticked": "{{n}} von {{total}} Kombinationen angehakt",
+ "All property sets of the dictionary": "Alle Merkmalsgruppen des Wörterbuchs",
+ "Switching a property set on includes every class that has it": "Beim Einschalten einer Merkmalsgruppe werden alle Klassen aufgenommen, die sie enthalten"
 }

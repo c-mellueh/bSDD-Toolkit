@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Alert, Button, Divider, Grid, Group, Modal, Radio, Select, Stack, Table, TagsInput, Text, TextInput } from "@mantine/core";
+import { Alert, Button, Divider, Grid, Group, Modal, Radio, Select, Stack, Table, TagsInput, Text, TextInput, Tooltip } from "@mantine/core";
 import { Toggle } from "./Toggle";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,7 @@ import { notifyError, notifyOk } from "../notify";
 import { useProject } from "../state/project";
 import { storageGet, storageSet } from "../state/settings";
 import { useUi, type ExportKind } from "../state/ui";
-import { specKey } from "./LoinEditor";
+import { activeKeys, specKey } from "./LoinEditor";
 
 const TITLES: Record<ExportKind, string> = {
   excel: "Export Excel",
@@ -42,17 +42,14 @@ export function ExportDialog() {
   const [busy, setBusy] = useState(false);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
 
-  const allKeys = useMemo(
-    () => (loin?.purposes ?? []).flatMap((p) => (loin?.milestones ?? []).map((m) => specKey(p.guid, m.guid))),
-    [loin],
-  );
-  const filled = useMemo(() => allKeys.filter((k) => (loin?.specs?.[k]?.classes?.length ?? 0) > 0), [allKeys, loin]);
+  // default selection: the combinations ticked in the purpose × milestone matrix
+  const filled = useMemo(() => activeKeys(loin), [loin]);
 
   useEffect(() => {
     if (!kind) return;
     const saved = storageGet<Record<string, any>>(storeKey, {});
     setScope(kind === "iso7817" ? "loin" : saved.scope ?? (filled.length ? "loin" : "all"));
-    setSpecs(saved.specs?.filter((k: string) => allKeys.includes(k)) ?? filled);
+    setSpecs(saved.specs?.filter((k: string) => filled.includes(k)) ?? filled);
     setSettings(saved.settings ?? {});
     if (kind === "ids") {
       api(`/api/projects/${projectId}/ids/candidates`, { method: "POST", json: {} })
@@ -73,7 +70,7 @@ export function ExportDialog() {
   const run = async () => {
     setBusy(true);
     try {
-      const body = { specs: scope === "all" ? null : specs, settings, lang: settings.lang ?? (language?.startsWith("de") ? "de" : "en") };
+      const body = { specs: scope === "all" ? null : specs.filter((k) => filled.includes(k)), settings, lang: settings.lang ?? (language?.startsWith("de") ? "de" : "en") };
       storageSet(storeKey, { scope, specs, settings });
       const n = await downloadFile(`/api/projects/${projectId}/export/${kind}`, body);
       notifyOk(t("Export done ({{n}} items)", { n: n ?? 0 }));
@@ -104,7 +101,7 @@ export function ExportDialog() {
         )}
         {(scope === "loin" || kind === "iso7817") && (
           <>
-            {filled.length === 0 && <Alert color="yellow">{t("No LOIN specification contains classes yet. Open Data → Level of Information Need to select classes and properties.")}</Alert>}
+            {filled.length === 0 && <Alert color="yellow">{t("No combination is ticked in the purpose × milestone matrix yet. Open Information need (LOIN) to set it up.")}</Alert>}
             <Table withTableBorder fz="xs">
               <Table.Thead>
                 <Table.Tr>
@@ -119,9 +116,14 @@ export function ExportDialog() {
                     {(loin?.milestones ?? []).map((m) => {
                       const k = specKey(p.guid, m.guid);
                       const n = loin?.specs?.[k]?.classes?.length ?? 0;
+                      const usable = filled.includes(k);
                       return (
                         <Table.Td key={k}>
-                          <Toggle label={`${n}`} checked={specs.includes(k)} onChange={(e) => setSpecs(e.currentTarget.checked ? [...specs, k] : specs.filter((x) => x !== k))} />
+                          <Tooltip label={t("Not ticked in the purpose × milestone matrix")} disabled={usable}>
+                            <span>
+                              <Toggle label={n ? t("{{n}} classes", { n }) : t("empty")} disabled={!usable} checked={usable && specs.includes(k)} onChange={(e) => setSpecs(e.currentTarget.checked ? [...specs, k] : specs.filter((x) => x !== k))} />
+                            </span>
+                          </Tooltip>
                         </Table.Td>
                       );
                     })}
