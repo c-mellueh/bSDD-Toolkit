@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "bSDD Toolkit web application (FastAPI backend)"
 requires-python = ">=3.10"
 authors = [{ name = "Christoph Mellüh" }]
-license = { text = "MIT" }
+license = "MIT"
 dependencies = [
   "bsdd_json>=0.1.2",
   "pydantic>=2.7",
@@ -30,7 +30,7 @@ dev = ["pytest", "httpx", "ruff"]
 bsdd-web = "bsdd_web.__main__:main"
 
 [tool.setuptools]
-packages = ["bsdd_web", "bsdd_web.ops", "bsdd_web.services", "bsdd_web.api"]
+packages = ["bsdd_web", "bsdd_web.ops", "bsdd_web.services"]
 package-dir = { bsdd_web = "." }
 
 [tool.setuptools.package-data]
