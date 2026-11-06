@@ -165,6 +165,22 @@ volumes:
 | `SAVE_DELAY` | `2` | seconds after the last edit until the dictionary is written |
 | `SNAPSHOT_INTERVAL` / `MAX_SNAPSHOTS` | `600` / `20` | rolling backups in `<project>/snapshots` |
 | `SECRET_KEY` | *(generated)* | key for signing access tokens; by default a random key is created once in `<DATA_DIR>/secret.key` |
+| `PUBLIC_URL` | *(empty)* | public address of this installation, e.g. `https://bsdd.example.org`; the buildingSMART sign-in returns to `<PUBLIC_URL>/auth/bsdd/callback` (empty = the address the browser uses) |
+| `BSDD_CLIENT_ID` | *(empty)* | client ID from buildingSMART for "Sign in with buildingSMART"; empty = sign-in and full download are off |
+| `BSDD_AUTHORITY` / `BSDD_SCOPE` / `BSDD_API` | buildingSMART defaults | only needed if buildingSMART changes its sign-in or API addresses |
+
+#### Download from bSDD
+
+Without sign-in, "Download from bSDD" loads a dictionary class by class and property by property
+through the public bSDD API. Two faster ways:
+
+- **Open a downloaded file:** download the dictionary on [search.bsdd.buildingsmart.org](https://search.bsdd.buildingsmart.org)
+  ("Download", needs a buildingSMART account) and open the JSON file in the download dialog or on the start page.
+- **Sign in with buildingSMART** (optional, per installation): the complete dictionary is downloaded in one request.
+  buildingSMART must register your installation first: request a client ID from `bsdd_support@buildingsmart.org`
+  as a *single-page application* with the return URL `<PUBLIC_URL>/auth/bsdd/callback` (use the ASCII/punycode form
+  of the domain), then set `PUBLIC_URL` and `BSDD_CLIENT_ID`. The access token stays in the user's browser tab and is
+  passed to buildingSMART only for the download; the server does not store it.
 
 The server must run as a single process (open dictionaries are held in memory); the image does this by default.
 A reverse proxy must forward WebSocket upgrades (`/api/projects/<id>/ws`).

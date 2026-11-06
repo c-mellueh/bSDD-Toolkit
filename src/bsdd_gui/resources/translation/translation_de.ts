@@ -818,6 +818,16 @@
         <translation>Dateipfad:</translation>
     </message>
     <message>
+        <location filename="../../module/download/qt/Widget.ui" line="88"/>
+        <source>Already downloaded? On &lt;a href=&quot;https://search.bsdd.buildingsmart.org&quot;&gt;search.bsdd.buildingsmart.org&lt;/a&gt; you can download the complete dictionary as one JSON file (requires a buildingSMART account) and open it here.</source>
+        <translation>Bereits heruntergeladen? Auf &lt;a href=&quot;https://search.bsdd.buildingsmart.org&quot;&gt;search.bsdd.buildingsmart.org&lt;/a&gt; kann das vollständige Wörterbuch als eine JSON-Datei heruntergeladen werden (erfordert ein buildingSMART-Konto) und hier geöffnet werden.</translation>
+    </message>
+    <message>
+        <location filename="../../module/download/qt/Widget.ui" line="111"/>
+        <source>Open downloaded file…</source>
+        <translation>Heruntergeladene Datei öffnen…</translation>
+    </message>
+    <message>
         <location filename="../../module/download/qt/Widget.ui" line="48"/>
         <source>Start</source>
         <translation>Start</translation>

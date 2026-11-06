@@ -50,6 +50,61 @@ def list_dictionaries() -> list[dict[str, Any]]:
     return out
 
 
+class FullDownloadError(Exception):
+    """The complete-dictionary download failed; ``status`` is the HTTP status for our API."""
+
+    def __init__(self, message: str, status: int = 502):
+        super().__init__(message)
+        self.status = status
+
+
+def fetch_full(api: str, uri: str, token: str, timeout: float = 120) -> dict[str, Any]:
+    """Download a complete dictionary as one bSDD JSON file (needs a buildingSMART sign-in).
+
+    Uses ``/api/DictionaryDownload/bsdd/v1`` with the user's access token. The token is only
+    passed on to buildingSMART, never stored or logged.
+    """
+    import io
+    import json
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+    import zipfile
+
+    url = f"{api}/api/DictionaryDownload/bsdd/v1?" + urllib.parse.urlencode({"DictionaryUri": uri})
+    request = urllib.request.Request(
+        url,
+        headers={"Authorization": f"Bearer {token}", "Accept": "application/octet-stream", "User-Agent": "bSDD-Toolkit"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            status = response.status
+            body = response.read()
+    except urllib.error.HTTPError as exc:
+        if exc.code == 401:
+            raise FullDownloadError("The buildingSMART sign-in has expired. Please sign in again.", 401) from exc
+        if exc.code == 404:
+            raise FullDownloadError(f"No dictionary found under '{uri}'", 404) from exc
+        raise FullDownloadError(f"bSDD download failed ({exc.code})") from exc
+    except (urllib.error.URLError, TimeoutError) as exc:
+        raise FullDownloadError(f"bSDD is not reachable: {exc}") from exc
+    if status == 204 or not body:
+        raise FullDownloadError("bSDD returned no data for this dictionary")
+    if body[:2] == b"PK":  # zipped export: take the JSON file inside
+        with zipfile.ZipFile(io.BytesIO(body)) as archive:
+            name = next((n for n in archive.namelist() if n.lower().endswith(".json")), None)
+            if name is None:
+                raise FullDownloadError("The downloaded archive contains no JSON file")
+            body = archive.read(name)
+    try:
+        data = json.loads(body.decode("utf-8-sig"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise FullDownloadError("bSDD returned an unreadable file") from exc
+    if not isinstance(data, dict):
+        raise FullDownloadError("bSDD returned an unexpected file")
+    return data
+
+
 def fetch_header(client, uri: str) -> BsddDictionary:
     result = (client.get_dictionary(uri) or {}).get("dictionaries") or []
     if not result:

@@ -38,6 +38,7 @@ class Download(FieldTool, ActionTool):
         widget.btn_start.clicked.connect(lambda _, w=widget: trigger.start_download(w))
         widget.btn_cancel.clicked.connect(lambda _,w=widget: cls.cancel(w))
         widget.cb_save.toggled.connect(lambda _,v: widget.fs_save_path.setVisible(v))
+        widget.btn_open_file.clicked.connect(lambda _, w=widget: trigger.open_downloaded_file(w))
 
     @classmethod
     def get_properties(cls) -> DownloadProperties:
@@ -216,6 +217,7 @@ class Download(FieldTool, ActionTool):
         widget.le_uri.setEnabled(not state)
         widget.fs_save_path.setEnabled(not state)
         widget.cb_save.setEnabled(not state)
+        widget.btn_open_file.setEnabled(not state)
         widget.adjustSize()
 
 

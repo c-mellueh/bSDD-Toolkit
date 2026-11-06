@@ -6,6 +6,7 @@ import { Center, Loader } from "@mantine/core";
 import { Suspense, lazy, useEffect, type ReactNode } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Landing } from "./pages/Landing";
+import { BsddCallback } from "./pages/BsddCallback";
 import { ProjectLayout } from "./layout/ProjectLayout";
 import { ClassesPage } from "./pages/project/ClassesPage";
 import { OverviewPage } from "./pages/project/OverviewPage";
@@ -54,6 +55,7 @@ export function App() {
           <TitleReset />
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/auth/bsdd/callback" element={<BsddCallback />} />
             <Route path="/p/:projectId/window/graph" element={<Lazy><GraphPage /></Lazy>} />
             <Route path="/v/:projectId/window/graph" element={<Lazy><GraphPage base="/v" /></Lazy>} />
             {(["/p", "/v"] as const).map((base) => (

@@ -273,3 +273,87 @@ def test_connected_clients_are_disconnected_when_access_changes(client):
     client.post(f"/api/projects/{pid}/access", json={"edit_password": "geheim1"})
     assert recv_until(session, "access_changed")["type"] == "access_changed"
     ws.__exit__(None, None, None)
+
+
+def _website_export():
+    data = sample_data()
+    data["Classes"][1]["ClassProperties"][0]["Code"] = None  # like the bSDD website export
+    data["Classes"][0]["ReplacedObjectCodes"] = [None]
+    return data
+
+
+def test_config_without_bsdd_login(client):
+    assert client.get("/api/config").json()["bsdd_login"] is None
+    r = client.post("/api/download/full", json={"uri": "https://identifier.buildingsmart.org/uri/a/b/1"})
+    assert r.status_code == 404
+
+
+def test_full_download_with_bsdd_login(settings, monkeypatch):
+    from bsdd_web.services import download as download_service
+
+    settings.bsdd_client_id = "client-123"
+    settings.public_url = "https://bsdd.mellüh.de/"
+    seen = {}
+
+    def fake_fetch(api, uri, token, timeout=120):
+        seen.update(api=api, uri=uri, token=token)
+        if token == "expired":
+            raise download_service.FullDownloadError("expired", 401)
+        return _website_export()
+
+    monkeypatch.setattr(download_service, "fetch_full", fake_fetch)
+    with TestClient(create_app(settings)) as c:
+        cfg = c.get("/api/config").json()["bsdd_login"]
+        assert cfg["client_id"] == "client-123"
+        # the umlaut domain is given in its ASCII (IDNA) form
+        assert cfg["redirect_uri"] == "https://bsdd.xn--mellh-nva.de/auth/bsdd/callback"
+        uri = "https://identifier.buildingsmart.org/uri/org/dict/1.0"
+        assert c.post("/api/download/full", json={"uri": uri}).status_code == 401  # no token
+        assert c.post("/api/download/full", json={"uri": uri}, headers={"X-Bsdd-Token": "expired"}).status_code == 401
+        r = c.post("/api/download/full", json={"uri": uri}, headers={"X-Bsdd-Token": "tok"})
+        assert r.status_code == 201, r.text
+        assert seen == {"api": "https://api.bsdd.buildingsmart.org", "uri": uri, "token": "tok"}
+        d = c.get(f"/api/projects/{r.json()['id']}/dictionary.json").json()
+        assert d["Classes"][1]["ClassProperties"][0]["Code"] == "Height"
+        # the token is not kept anywhere in the project
+        assert "tok" not in json.dumps(c.get(f"/api/projects/{r.json()['id']}/project.json").json())
+
+
+def test_fetch_full_reads_json_and_zip(monkeypatch):
+    import io
+    import zipfile
+
+    from bsdd_web.services import download as download_service
+
+    payload = json.dumps(sample_data()).encode()
+    zipped = io.BytesIO()
+    with zipfile.ZipFile(zipped, "w") as z:
+        z.writestr("dict.json", payload)
+
+    class Resp:
+        def __init__(self, body):
+            self.body, self.status = body, 200
+
+        def read(self):
+            return self.body
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    captured = {}
+
+    def fake_urlopen(req, timeout):
+        captured["auth"] = req.get_header("Authorization")
+        captured["url"] = req.full_url
+        return Resp(bodies.pop(0))
+
+    bodies = [payload, zipped.getvalue()]
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    for _ in range(2):
+        data = download_service.fetch_full("https://api.example", "https://identifier.buildingsmart.org/uri/a/b/1", "T")
+        assert data["DictionaryCode"] == sample_data()["DictionaryCode"]
+    assert captured["auth"] == "Bearer T"
+    assert "DictionaryUri=https%3A%2F%2Fidentifier.buildingsmart.org" in captured["url"]

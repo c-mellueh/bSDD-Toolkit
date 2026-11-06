@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.1
+## Created by: Qt User Interface Compiler version 6.11.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -12,9 +12,11 @@ from PySide6.QtCore import (
     QCoreApplication,
     QMetaObject,
     QSize,
+    Qt,
 )
 from PySide6.QtWidgets import (
     QFormLayout,
+    QFrame,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -111,6 +113,36 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.wd_progressbars, 1, 0, 1, 2)
 
+        self.line_file = QFrame(Form)
+        self.line_file.setObjectName("line_file")
+        self.line_file.setFrameShape(QFrame.Shape.HLine)
+        self.line_file.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.gridLayout.addWidget(self.line_file, 6, 0, 1, 2)
+
+        self.lb_file_hint = QLabel(Form)
+        self.lb_file_hint.setObjectName("lb_file_hint")
+        self.lb_file_hint.setWordWrap(True)
+        self.lb_file_hint.setOpenExternalLinks(True)
+        self.lb_file_hint.setTextFormat(Qt.TextFormat.RichText)
+
+        self.gridLayout.addWidget(self.lb_file_hint, 7, 0, 1, 2)
+
+        self.horizontalLayout_file = QHBoxLayout()
+        self.horizontalLayout_file.setObjectName("horizontalLayout_file")
+        self.spacer_file = QSpacerItem(
+            0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
+
+        self.horizontalLayout_file.addItem(self.spacer_file)
+
+        self.btn_open_file = QPushButton(Form)
+        self.btn_open_file.setObjectName("btn_open_file")
+
+        self.horizontalLayout_file.addWidget(self.btn_open_file)
+
+        self.gridLayout.addLayout(self.horizontalLayout_file, 8, 0, 1, 2)
+
         self.retranslateUi(Form)
 
         QMetaObject.connectSlotsByName(Form)
@@ -126,5 +158,15 @@ class Ui_Form(object):
         self.cb_save.setText("")
         self.lb_classes.setText(QCoreApplication.translate("Form", "TextLabel", None))
         self.lb_properties.setText(QCoreApplication.translate("Form", "TextLabel", None))
+        self.lb_file_hint.setText(
+            QCoreApplication.translate(
+                "Form",
+                'Already downloaded? On <a href="https://search.bsdd.buildingsmart.org">search.bsdd.buildingsmart.org</a> you can download the complete dictionary as one JSON file (requires a buildingSMART account) and open it here.',
+                None,
+            )
+        )
+        self.btn_open_file.setText(
+            QCoreApplication.translate("Form", "Open downloaded file\u2026", None)
+        )
 
     # retranslateUi

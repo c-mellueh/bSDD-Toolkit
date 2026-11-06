@@ -16,6 +16,11 @@ services:
       MAX_UPLOAD_MB: "50"
       # Set to 1 to disable lookups of external classes/properties on the bSDD API
       OFFLINE: "0"
+      # Optional "Sign in with buildingSMART" for downloading complete dictionaries in one step.
+      # Request a client ID (single-page application) from bsdd_support@buildingsmart.org with the
+      # return URL <PUBLIC_URL>/auth/bsdd/callback. Leave BSDD_CLIENT_ID empty to switch it off.
+      PUBLIC_URL: ""          # e.g. https://bsdd.example.org
+      BSDD_CLIENT_ID: ""
     # If you put a reverse proxy (Traefik, nginx, Caddy) in front, make sure it
     # forwards WebSocket upgrades for /api/projects/<id>/ws.
 

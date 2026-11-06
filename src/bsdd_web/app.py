@@ -64,6 +64,11 @@ class DownloadBody(BaseModel):
     uri: str
 
 
+class FullDownloadBody(BaseModel):
+    uri: str
+    sloppy: bool = False
+
+
 def default_dictionary(header: dict[str, Any] | None = None) -> BsddDictionary:
     data = {
         "OrganizationCode": "default",
@@ -155,7 +160,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.get("/api/config")
     async def config() -> dict[str, Any]:
-        return {"version": __version__, "max_upload_mb": settings.max_upload_mb, "offline": settings.offline}
+        """Settings the browser needs (no secrets)."""
+        login = None
+        if settings.bsdd_client_id:
+            login = {
+                "client_id": settings.bsdd_client_id,
+                "authority": settings.bsdd_authority,
+                "scope": settings.bsdd_scope,
+                "redirect_uri": settings.bsdd_redirect_uri,
+            }
+        return {
+            "version": __version__,
+            "max_upload_mb": settings.max_upload_mb,
+            "offline": settings.offline,
+            "bsdd_login": login,
+        }
 
     # ------------------------------------------------------------------ projects
 
@@ -337,6 +356,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(502, f"bSDD is not reachable: {exc}") from exc
         cache.update(time=time.time(), data=data)
         return {"dictionaries": data}
+
+    @app.post("/api/download/full")
+    async def download_full(body: FullDownloadBody, request: Request) -> JSONResponse:
+        """Complete dictionary in one request, with the user's buildingSMART access token."""
+        if not settings.bsdd_client_id:
+            raise HTTPException(404, "Sign-in with buildingSMART is not configured on this server")
+        token = request.headers.get("X-Bsdd-Token", "").strip()
+        if not token:
+            raise HTTPException(401, "Please sign in with buildingSMART first")
+        try:
+            data = await asyncio.to_thread(download_service.fetch_full, settings.bsdd_api, body.uri, token)
+        except download_service.FullDownloadError as exc:
+            raise HTTPException(exc.status, str(exc)) from exc
+        try:
+            dictionary = await asyncio.to_thread(BsddDictionary.from_data, data, sloppy=body.sloppy)
+        except ValidationError as exc:
+            return JSONResponse(
+                {"detail": format_validation_error(exc), "can_sloppy": not body.sloppy, "error_count": exc.error_count()},
+                status_code=422,
+            )
+        project = await asyncio.to_thread(store.create, dictionary, None, f"bsdd:{body.uri}")
+        return JSONResponse({"id": project.id, "meta": project.meta}, status_code=201)
 
     @app.post("/api/download")
     async def start_download(body: DownloadBody) -> dict[str, Any]:
