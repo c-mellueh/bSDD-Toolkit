@@ -156,3 +156,9 @@ def download_dictionary(widget: ui.DownloadWidget, download_widget: Type[tool.Do
 
     download_widget.get_all_classes(widget, bsdd_uri, bsdd_dictionary)
     download_widget.get_all_properties(widget, bsdd_uri)
+
+
+def open_downloaded_file(widget: ui.DownloadWidget, project: Type[tool.Project]):
+    """Open a dictionary JSON downloaded from the bSDD website (same as File > Open)."""
+    widget.close()
+    project.request_open(None)

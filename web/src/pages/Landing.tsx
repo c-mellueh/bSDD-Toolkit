@@ -1,11 +1,12 @@
 import { ActionIcon, Anchor, Badge, Button, Card, Container, FileButton, Grid, Group, Modal, SegmentedControl, Select, SimpleGrid, Stack, Text, TextInput, Title, Tooltip } from "@mantine/core";
-import { modals } from "@mantine/modals";
 import { IconCloudDownload, IconFilePlus, IconFileUpload, IconPackageImport, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { ApiError, api, readFileText } from "../api";
+import { takeReopenFlag } from "../bsddAuth";
+import { api } from "../api";
 import { DownloadDialog } from "../components/DownloadDialog";
+import { useDictionaryUpload } from "../components/useDictionaryUpload";
 import { LanguageSelect } from "../components/LanguageSelect";
 import { notifyError } from "../notify";
 import { forgetProject, rememberProject, storageGet, useSettings, type RecentProject } from "../state/settings";
@@ -15,47 +16,14 @@ export function Landing() {
   const navigate = useNavigate();
   const [recent, setRecent] = useState(() => storageGet<RecentProject[]>("bsdd-recent", []));
   const [newOpen, setNewOpen] = useState(false);
-  const [downloadOpen, setDownloadOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(takeReopenFlag);
 
   const open = (id: string, name: string, base: "/p" | "/v" = "/p") => {
     rememberProject(id, name, base);
     navigate(`${base}/${id}`);
   };
 
-  const upload = async (file: File | null, sloppy = false, text?: string) => {
-    if (!file) return;
-    setBusy(true);
-    try {
-      const content = text ?? (await readFileText(file));
-      let data: Record<string, unknown>;
-      try {
-        data = JSON.parse(content);
-      } catch {
-        throw new Error(t("The file is not valid JSON"));
-      }
-      // project export (dictionary + editor data) or plain bSDD JSON
-      const body = "dictionary" in data && "extras" in data ? { dictionary: data.dictionary, extras: data.extras, sloppy } : { dictionary: data, sloppy };
-      const res = await api<{ id: string; meta: { name: string } }>("/api/projects", { method: "POST", json: body });
-      open(res.id, res.meta.name ?? file.name);
-    } catch (e) {
-      if (e instanceof ApiError && e.status === 422 && e.body?.can_sloppy) {
-        modals.openConfirmModal({
-          title: t("The file contains invalid data"),
-          children: (
-            <Stack gap="xs">
-              <Text size="sm">{e.message}</Text>
-              <Text size="sm">{t("Do you want to load it anyway? Invalid parts will be removed.")}</Text>
-            </Stack>
-          ),
-          labels: { confirm: t("Load anyway"), cancel: t("Cancel") },
-          onConfirm: () => upload(file, true, text),
-        });
-      } else notifyError(e);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const { upload, busy } = useDictionaryUpload();
 
   return (
     <div style={{ height: "100%", overflow: "auto" }}>

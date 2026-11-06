@@ -73,6 +73,7 @@ import { CommandPalette } from "./CommandPalette";
 import { useReadOnly } from "../state/readonly";
 import { PasswordScreen } from "../components/PasswordScreen";
 import { setToken } from "../state/access";
+import { takeReopenFlag } from "../bsddAuth";
 
 const ShellPanel = lazy(() => import("../components/ShellPanel").then((m) => ({ default: m.ShellPanel })));
 
@@ -87,7 +88,7 @@ export function ProjectLayout({ base = "/p" }: { base?: "/p" | "/v" } = {}) {
   const shell = useUi((s) => s.shell);
   const [mobileOpen, mobile] = useDisclosure(false);
   const [collapsed, setCollapsed] = useState(() => storageGet("bsdd-nav-collapsed", false));
-  const [downloadOpen, setDownloadOpen] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(takeReopenFlag);
 
   const role = useProject((s) => s.role);
   useEffect(() => {

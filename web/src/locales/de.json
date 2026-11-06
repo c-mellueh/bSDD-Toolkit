@@ -632,5 +632,21 @@
  "{{n}} of {{total}} combinations ticked": "{{n}} von {{total}} Kombinationen angehakt",
  "All property sets of the dictionary": "Alle Merkmalsgruppen des Wörterbuchs",
  "Switching a property set on includes every class that has it": "Beim Einschalten einer Merkmalsgruppe werden alle Klassen aufgenommen, die sie enthalten",
- "Hold the left mouse button and drag over cells to set them all to the same value.": "Mit gedrückter linker Maustaste über Zellen ziehen, um alle auf denselben Wert zu setzen."
+ "Hold the left mouse button and drag over cells to set them all to the same value.": "Mit gedrückter linker Maustaste über Zellen ziehen, um alle auf denselben Wert zu setzen.",
+ "Choose the downloaded JSON file here.": "Die heruntergeladene JSON-Datei hier auswählen.",
+ "Completing sign-in…": "Anmeldung wird abgeschlossen…",
+ "Downloading the complete dictionary…": "Vollständiges Wörterbuch wird heruntergeladen…",
+ "Full download": "Vollständiger Download",
+ "Open a file downloaded from bSDD": "Eine von bSDD heruntergeladene Datei öffnen",
+ "Open bSDD JSON file…": "bSDD-JSON-Datei öffnen…",
+ "Open the dictionary on": "Das Wörterbuch auf",
+ "and click “Download” (requires a buildingSMART account).": "öffnen und auf „Download“ klicken (erfordert ein buildingSMART-Konto).",
+ "Sign in with buildingSMART": "Mit buildingSMART anmelden",
+ "Sign in with your buildingSMART account to download the complete dictionary in one step.": "Mit dem buildingSMART-Konto anmelden, um das vollständige Wörterbuch in einem Schritt herunterzuladen.",
+ "Sign out": "Abmelden",
+ "Sign-in with buildingSMART": "Anmeldung bei buildingSMART",
+ "Signed in as {{name}}": "Angemeldet als {{name}}",
+ "Signed in with buildingSMART": "Bei buildingSMART angemeldet",
+ "buildingSMART user": "buildingSMART-Nutzer",
+ "or": "oder"
 }

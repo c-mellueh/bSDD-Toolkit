@@ -39,4 +39,8 @@ def start_download(widget: ui.DownloadWidget):
     core.download_dictionary(widget, tool.Download)
 
 
+def open_downloaded_file(widget: ui.DownloadWidget):
+    core.open_downloaded_file(widget, tool.Project)
+
+
 ### Module Specific Triggers
