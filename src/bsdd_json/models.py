@@ -61,8 +61,24 @@ def _prune_error_path(data, loc):
                 return
 
 
+def _get(data: dict, key: str):
+    """Value of a PascalCase key, also accepting the lowerCamel alias."""
+    return data.get(key, data.get(_lower_first(key)))
+
+
 class CaseInsensitiveModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True, alias_generator=_lower_first)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _drop_null_list_items(cls, data):
+        """Read ``[null]`` (as exported by the bSDD website for empty lists) as an empty list.
+
+        ``null`` entries are removed from every list value, so ``[null]`` becomes ``[]``.
+        """
+        if isinstance(data, dict) and any(isinstance(v, list) and None in v for v in data.values()):
+            return {k: [x for x in v if x is not None] if isinstance(v, list) else v for k, v in data.items()}
+        return data
 
 
 class BsddDictionary(CaseInsensitiveModel):
@@ -141,6 +157,40 @@ class BsddDictionary(CaseInsensitiveModel):
 
 
 class BsddClass(CaseInsensitiveModel):
+    @model_validator(mode="before")
+    @classmethod
+    def _fill_missing_class_property_codes(cls, data):
+        """Give class properties without a Code (bSDD website exports) one derived from the property.
+
+        Uses PropertyCode, otherwise the last segment of PropertyUri; if that code is already used in
+        the class, the property set name is prefixed (and a number appended if still not unique).
+        """
+        if not isinstance(data, dict):
+            return data
+        key = "ClassProperties" if "ClassProperties" in data else "classProperties"
+        items = data.get(key)
+        if not isinstance(items, list) or not any(isinstance(cp, dict) and not _get(cp, "Code") for cp in items):
+            return data
+        used = {_get(cp, "Code") for cp in items if isinstance(cp, dict) and _get(cp, "Code")}
+        fixed = []
+        for item in items:
+            if isinstance(item, dict) and not _get(item, "Code"):
+                uri = _get(item, "PropertyUri") or ""
+                base = _get(item, "PropertyCode") or uri.rstrip("/").rsplit("/", 1)[-1]
+                if base:
+                    code = base
+                    if code in used and _get(item, "PropertySet"):
+                        code = f"{_get(item, 'PropertySet')}_{base}"
+                    n = 2
+                    while code in used:
+                        code = f"{base}_{n}"
+                        n += 1
+                    used.add(code)
+                    fixed.append({**{k: v for k, v in item.items() if k not in ("Code", "code")}, "Code": code})
+                    continue
+            fixed.append(item)
+        return {**data, key: fixed}
+
     Code: str
     Name: str
     ClassType: CLASS_TYPE = "Class"

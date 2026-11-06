@@ -1117,3 +1117,67 @@ class TestGetDictionaryFromProperty:
     def test_returns_none_for_orphan_class_property(self):
         cp = BsddClassProperty(Code="CP1", PropertyCode="P1")
         assert prop_utils.get_dictionary_from_property(cp) is None
+
+
+def _bsdd_website_export() -> dict:
+    """Shape of a dictionary exported from the bSDD website: [null] for empty lists, Code null."""
+    return {
+        "OrganizationCode": "org",
+        "DictionaryCode": "dict",
+        "DictionaryVersion": "0.1",
+        "LanguageIsoCode": "EN",
+        "LanguageOnly": False,
+        "UseOwnUri": False,
+        "Classes": [
+            {
+                "Code": "Building",
+                "Name": "Building",
+                "ReplacedObjectCodes": [None],
+                "ReplacingObjectCodes": [None],
+                "SubdivisionsOfUse": [None],
+                "ClassProperties": [
+                    {"Code": None, "PropertyCode": "height", "PropertySet": "Geometry"},
+                    {"Code": None, "PropertyCode": "height", "PropertySet": "Other"},
+                    {"Code": None, "PropertyUri": "https://identifier.buildingsmart.org/uri/x/y/1.0/prop/width"},
+                    {"Code": "kept", "PropertyCode": "depth"},
+                ],
+            },
+        ],
+        "Properties": [
+            {
+                "Code": "height",
+                "Name": "Height",
+                "Units": [None],
+                "ReplacedObjectCodes": [None],
+                "ReplacingObjectCodes": [None],
+                "SubdivisionsOfUse": [None],
+            },
+        ],
+    }
+
+
+def test_null_list_items_are_read_as_empty_lists():
+    d = BsddDictionary.from_data(_bsdd_website_export())
+    c, p = d.Classes[0], d.Properties[0]
+    assert c.ReplacedObjectCodes == []
+    assert c.ReplacingObjectCodes == []
+    assert c.SubdivisionsOfUse == []
+    assert p.Units == []
+    assert p.ReplacedObjectCodes == []
+    assert p.SubdivisionsOfUse == []
+
+
+def test_missing_class_property_codes_are_derived():
+    d = BsddDictionary.from_data(_bsdd_website_export())
+    codes = [cp.Code for cp in d.Classes[0].ClassProperties]
+    # PropertyCode, then pset-prefixed when taken, last URI segment, existing codes untouched
+    assert codes == ["height", "Other_height", "width", "kept"]
+
+
+def test_lowercamel_keys_are_handled_too():
+    raw = _bsdd_website_export()
+    cls = raw["Classes"][0]
+    cls["classProperties"] = [{"code": None, "propertyCode": "height"}]
+    del cls["ClassProperties"]
+    d = BsddDictionary.from_data(raw)
+    assert [cp.Code for cp in d.Classes[0].ClassProperties] == ["height"]
