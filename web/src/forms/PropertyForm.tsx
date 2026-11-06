@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Grid, Group, MultiSelect, Select, Tabs, TagsInput, TextInput, Textarea } from "@mantine/core";
+import { Badge, Button, Grid, Group, MultiSelect, Select, SimpleGrid, Stack, Tabs, TagsInput, Text, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { Toggle } from "../components/Toggle";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,12 +9,19 @@ import { op, useProject } from "../state/project";
 import { useReadOnly } from "../state/readonly";
 import type { AllowedValue, BsddProperty, PropertyRelation } from "../types";
 import { SaveBar, changedKeys, mergeRemote, same, snap } from "./SaveBar";
-import { AiTextarea, AllowedValuesEditor, DateField, OptionalNumber, RelationsEditor, useResources } from "../components/fields";
+import { CommonDetailCards, DetailCard, DetailGrid, DetailRow, rangePreview } from "./DetailSections";
+import { IconAtom2, IconLink, IconRuler2 } from "@tabler/icons-react";
+import { AiTextarea, AllowedValuesEditor, OptionalNumber, RelationsEditor, useResources } from "../components/fields";
 
 const DIMENSIONS = [
   "DimensionLength", "DimensionMass", "DimensionTime", "DimensionElectricCurrent", "DimensionThermodynamicTemperature",
   "DimensionAmountOfSubstance", "DimensionLuminousIntensity",
-];
+] as const;
+/** ISO 80000 symbols of the base quantities */
+const DIMENSION_SYMBOL: Record<(typeof DIMENSIONS)[number], string> = {
+  DimensionLength: "L", DimensionMass: "M", DimensionTime: "T", DimensionElectricCurrent: "I",
+  DimensionThermodynamicTemperature: "Θ", DimensionAmountOfSubstance: "N", DimensionLuminousIntensity: "J",
+};
 const EDITABLE = [
   "Code", "Name", "Definition", "Description", "DataType", "Units", "Example", "ActivationDateUtc", "ConnectedPropertyCodes",
   "CountriesOfUse", "CountryOfOrigin", "CreatorLanguageIsoCode", "DeActivationDateUtc", "DeprecationExplanation", "Dimension",
@@ -24,7 +31,7 @@ const EDITABLE = [
   "VersionNumber", "VisualRepresentationUri", "AllowedValues",
 ];
 
-export type PropertySection = "general" | "values" | "details" | "dimension" | "relations";
+export type PropertySection = "general" | "values" | "details" | "relations";
 
 export interface PropertyFormProps {
   code?: string;
@@ -122,7 +129,7 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
   };
 
   const countryData = res.countries.map((c) => ({ value: c.Code, label: `${c.Name} (${c.Code})` }));
-  const languageData = [...new Set(res.languages.map((l) => l.IsoCode))];
+  const languageData = [...new Set(res.languages.map((l) => l.IsoCode))].map((c) => ({ value: c, label: `${res.languages.find((l) => l.IsoCode === c)?.Name} (${c})` }));
   const unitData = [...new Set([...res.units.map((u) => u.Code), ...(form.Units ?? [])])];
   const propCodes = (doc.dictionary.Properties ?? []).map((p) => p.Code);
 
@@ -147,43 +154,82 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
             <AllowedValuesEditor values={(form.AllowedValues ?? []) as AllowedValue[]} onChange={(v) => set("AllowedValues", v)} />
     ),
     details: (
-            <Grid>
-              <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label={t("Physical quantity")} value={form.PhysicalQuantity ?? ""} onChange={(e) => set("PhysicalQuantity", e.currentTarget.value)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label={t("Text format")} value={form.TextFormat ?? ""} onChange={(e) => set("TextFormat", e.currentTarget.value)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label={t("Pattern (regex)")} value={form.Pattern ?? ""} onChange={(e) => set("Pattern", e.currentTarget.value)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Min inclusive")} value={form.MinInclusive} onChange={(v) => set("MinInclusive", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Min exclusive")} value={form.MinExclusive} onChange={(v) => set("MinExclusive", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Max inclusive")} value={form.MaxInclusive} onChange={(v) => set("MaxInclusive", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Max exclusive")} value={form.MaxExclusive} onChange={(v) => set("MaxExclusive", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}><TagsInput label={t("Connected property codes")} data={propCodes} value={form.ConnectedPropertyCodes ?? []} onChange={(v) => set("ConnectedPropertyCodes", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 4 }}><TagsInput label={t("Dynamic parameter property codes")} data={propCodes} value={form.DynamicParameterPropertyCodes ?? []} onChange={(v) => set("DynamicParameterPropertyCodes", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 2 }}><Toggle mt="lg" label={t("Is dynamic")} checked={!!form.IsDynamic} onChange={(e) => set("IsDynamic", e.currentTarget.checked)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}><MultiSelect label={t("Countries of use")} data={countryData} value={form.CountriesOfUse ?? []} onChange={(v) => set("CountriesOfUse", v)} searchable clearable /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><Select label={t("Country of origin")} data={countryData} value={form.CountryOfOrigin ?? null} onChange={(v) => set("CountryOfOrigin", v)} searchable clearable /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><Select label={t("Creator language")} data={languageData} value={form.CreatorLanguageIsoCode ?? null} onChange={(v) => set("CreatorLanguageIsoCode", v)} searchable clearable /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 4 }}><Select label={t("Document reference")} data={[...new Map(res.referenceDocuments.filter((r) => r.Title).map((r) => [r.Title!, { value: r.Title!, label: `${r.Title} – ${r.Name}` }])).values()]} value={form.DocumentReference ?? null} onChange={(v) => set("DocumentReference", v)} searchable clearable limit={100} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label="UID" value={form.Uid ?? ""} onChange={(e) => set("Uid", e.currentTarget.value)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label={t("Owned URI")} value={form.OwnedUri ?? ""} onChange={(e) => set("OwnedUri", e.currentTarget.value)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}><TagsInput label={t("Subdivisions of use")} value={form.SubdivisionsOfUse ?? []} onChange={(v) => set("SubdivisionsOfUse", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Visual representation URI")} value={form.VisualRepresentationUri ?? ""} onChange={(e) => set("VisualRepresentationUri", e.currentTarget.value)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}><TagsInput label={t("Replaced object codes")} value={form.ReplacedObjectCodes ?? []} onChange={(v) => set("ReplacedObjectCodes", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}><TagsInput label={t("Replacing object codes")} value={form.ReplacingObjectCodes ?? []} onChange={(v) => set("ReplacingObjectCodes", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Version number")} value={form.VersionNumber} onChange={(v) => set("VersionNumber", v)} integer /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><DateField label={t("Version date")} value={form.VersionDateUtc} onChange={(v) => set("VersionDateUtc", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Revision number")} value={form.RevisionNumber} onChange={(v) => set("RevisionNumber", v)} integer /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><DateField label={t("Revision date")} value={form.RevisionDateUtc} onChange={(v) => set("RevisionDateUtc", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><DateField label={t("Activation date")} value={form.ActivationDateUtc} onChange={(v) => set("ActivationDateUtc", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 3 }}><DateField label={t("Deactivation date")} value={form.DeActivationDateUtc} onChange={(v) => set("DeActivationDateUtc", v)} /></Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Deprecation explanation")} value={form.DeprecationExplanation ?? ""} onChange={(e) => set("DeprecationExplanation", e.currentTarget.value)} /></Grid.Col>
-            </Grid>
-    ),
-    dimension: (
-            <Grid>
-              <Grid.Col span={12}><TextInput label={t("Dimension")} description={t("ISO 80000 dimension, e.g. '1 0 0 0 0 0 0'")} value={form.Dimension ?? ""} onChange={(e) => set("Dimension", e.currentTarget.value)} /></Grid.Col>
-              {DIMENSIONS.map((k) => (
-                <Grid.Col span={{ base: 6, sm: 3 }} key={k}><OptionalNumber label={t(k.replace("Dimension", ""))} value={form[k]} onChange={(v) => set(k, v)} integer /></Grid.Col>
-              ))}
-            </Grid>
+            <DetailGrid>
+              <DetailCard
+                icon={<IconRuler2 size={18} />}
+                color="indigo"
+                title={t("Value constraints")}
+                hint={t("Which values are valid for this property")}
+                values={[form.PhysicalQuantity, form.TextFormat, form.Pattern, form.MinInclusive, form.MinExclusive, form.MaxInclusive, form.MaxExclusive]}
+              >
+                <Stack gap="xs">
+                  <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
+                    <TextInput label={t("Physical quantity")} placeholder={t("e.g. length")} value={form.PhysicalQuantity ?? ""} onChange={(e) => set("PhysicalQuantity", e.currentTarget.value)} />
+                    <TextInput label={t("Text format")} placeholder="UTF-8" value={form.TextFormat ?? ""} onChange={(e) => set("TextFormat", e.currentTarget.value)} />
+                  </SimpleGrid>
+                  <TextInput label={t("Pattern (regex)")} classNames={{ input: "mono" }} placeholder="^[A-Z]{2}[0-9]+$" value={form.Pattern ?? ""} onChange={(e) => set("Pattern", e.currentTarget.value)} />
+                  <DetailRow label={t("Minimum")}>
+                    <OptionalNumber label={t("inclusive (≥)")} value={form.MinInclusive} onChange={(v) => set("MinInclusive", v)} />
+                    <OptionalNumber label={t("exclusive (>)")} value={form.MinExclusive} onChange={(v) => set("MinExclusive", v)} />
+                  </DetailRow>
+                  <DetailRow label={t("Maximum")}>
+                    <OptionalNumber label={t("inclusive (≤)")} value={form.MaxInclusive} onChange={(v) => set("MaxInclusive", v)} />
+                    <OptionalNumber label={t("exclusive (<)")} value={form.MaxExclusive} onChange={(v) => set("MaxExclusive", v)} />
+                  </DetailRow>
+                  {rangePreview(form) && (
+                    <Group gap={6}>
+                      <Text size="xs" c="dimmed">{t("Allowed range")}:</Text>
+                      <Badge variant="light" color="indigo" className="mono" tt="none">{rangePreview(form)}</Badge>
+                    </Group>
+                  )}
+                </Stack>
+              </DetailCard>
+
+              <DetailCard
+                icon={<IconLink size={18} />}
+                color="cyan"
+                title={t("Linked properties")}
+                hint={t("Properties that belong together or that this property depends on")}
+                values={[form.ConnectedPropertyCodes, form.IsDynamic || undefined, form.DynamicParameterPropertyCodes]}
+              >
+                <Stack gap="xs">
+                  <TagsInput label={t("Connected property codes")} data={propCodes} value={form.ConnectedPropertyCodes ?? []} onChange={(v) => set("ConnectedPropertyCodes", v)} />
+                  <Toggle label={t("Is dynamic")} description={t("The value is calculated from other properties")} checked={!!form.IsDynamic} onChange={(e) => set("IsDynamic", e.currentTarget.checked)} />
+                  {(form.IsDynamic || (form.DynamicParameterPropertyCodes ?? []).length > 0) && (
+                    <TagsInput label={t("Dynamic parameter property codes")} data={propCodes} value={form.DynamicParameterPropertyCodes ?? []} onChange={(v) => set("DynamicParameterPropertyCodes", v)} />
+                  )}
+                </Stack>
+              </DetailCard>
+
+              <DetailCard
+                icon={<IconAtom2 size={18} />}
+                color="pink"
+                title={t("Dimension")}
+                hint={t("ISO 80000 dimension: exponents of the base quantities")}
+                values={[form.Dimension, ...DIMENSIONS.map((k) => form[k])]}
+              >
+                <Stack gap="xs">
+                  <TextInput label={t("Dimension")} classNames={{ input: "mono" }} placeholder="1 0 0 0 0 0 0" value={form.Dimension ?? ""} onChange={(e) => set("Dimension", e.currentTarget.value)} />
+                  <div className="dimension-grid">
+                    {DIMENSIONS.map((k) => (
+                      <Tooltip key={k} label={t(k.replace("Dimension", ""))}>
+                        <div>
+                          <OptionalNumber label={DIMENSION_SYMBOL[k]} value={form[k]} onChange={(v) => set(k, v)} integer hideControls />
+                        </div>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </Stack>
+              </DetailCard>
+
+              <CommonDetailCards
+                form={form}
+                set={set}
+                countryData={countryData}
+                languageData={languageData}
+                documentReference={<Select label={t("Document reference")} data={[...new Map(res.referenceDocuments.filter((r) => r.Title).map((r) => [r.Title!, { value: r.Title!, label: `${r.Title} – ${r.Name}` }])).values()]} value={form.DocumentReference ?? null} onChange={(v) => set("DocumentReference", v)} searchable clearable limit={100} />}
+              />
+            </DetailGrid>
     ),
     relations: (
             <RelationsEditor kind="property" relations={relations} onChange={(r) => setRelations(r as PropertyRelation[])} selfCode={code} />
@@ -200,7 +246,6 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
             <Tabs.Tab value="general">{t("General")}</Tabs.Tab>
             <Tabs.Tab value="values">{t("Allowed values")} ({(form.AllowedValues ?? []).length})</Tabs.Tab>
             <Tabs.Tab value="details">{t("Details")}</Tabs.Tab>
-            <Tabs.Tab value="dimension">{t("Dimension")}</Tabs.Tab>
             <Tabs.Tab value="relations">{t("Relations")} ({relations.length})</Tabs.Tab>
           </Tabs.List>
           {(Object.keys(parts) as PropertySection[]).map((k) => <Tabs.Panel key={k} value={k}><fieldset disabled={readOnly} className="ro-fieldset">{parts[k]}</fieldset></Tabs.Panel>)}

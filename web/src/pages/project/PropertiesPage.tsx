@@ -209,7 +209,6 @@ function PropertyDetail({ code }: { code: string }) {
     ["general", t("General")],
     ["values", t("Allowed values")],
     ["details", t("Details")],
-    ["dimension", t("Dimension")],
     ["relations", t("Relations")],
   ];
 
