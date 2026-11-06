@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Grid, Group, MultiSelect, Select, Tabs, TagsInput, TextInput, Textarea } from "@mantine/core";
+import { Button, Grid, Group, Select, Tabs, TagsInput, TextInput, Textarea } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AiTextarea, DateField, OptionalNumber, RelationsEditor, useResources } from "../components/fields";
+import { AiTextarea, RelationsEditor, useResources } from "../components/fields";
 import { CLASS_STATUSES, CLASS_TYPES, clean, slugify } from "../model";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
 import { useReadOnly } from "../state/readonly";
 import type { BsddClass, ClassRelation } from "../types";
 import { SaveBar, changedKeys, mergeRemote, same, snap } from "./SaveBar";
+import { CommonDetailCards, DetailGrid } from "./DetailSections";
 
 const EDITABLE = [
   "Code", "Name", "ClassType", "Definition", "Description", "ParentClassCode", "RelatedIfcEntityNamesList", "Synonyms", "Status",
@@ -155,26 +156,15 @@ export function ClassForm(props: ClassFormProps) {
     </Grid>
   );
   const details = (
-    <Grid>
-      <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label={t("Reference code")} value={form.ReferenceCode ?? ""} onChange={(e) => set("ReferenceCode", e.currentTarget.value)} /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label="UID" value={form.Uid ?? ""} onChange={(e) => set("Uid", e.currentTarget.value)} /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 4 }}><TextInput label={t("Document reference")} value={form.DocumentReference ?? ""} onChange={(e) => set("DocumentReference", e.currentTarget.value)} /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><MultiSelect label={t("Countries of use")} data={countryData} value={form.CountriesOfUse ?? []} onChange={(v) => set("CountriesOfUse", v)} searchable clearable /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><Select label={t("Country of origin")} data={countryData} value={form.CountryOfOrigin ?? null} onChange={(v) => set("CountryOfOrigin", v)} searchable clearable /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><Select label={t("Creator language")} data={languageData} value={form.CreatorLanguageIsoCode ?? null} onChange={(v) => set("CreatorLanguageIsoCode", v)} searchable clearable /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><TagsInput label={t("Subdivisions of use")} value={form.SubdivisionsOfUse ?? []} onChange={(v) => set("SubdivisionsOfUse", v)} /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Owned URI")} value={form.OwnedUri ?? ""} onChange={(e) => set("OwnedUri", e.currentTarget.value)} /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Visual representation URI")} value={form.VisualRepresentationUri ?? ""} onChange={(e) => set("VisualRepresentationUri", e.currentTarget.value)} /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><TagsInput label={t("Replaced object codes")} value={form.ReplacedObjectCodes ?? []} onChange={(v) => set("ReplacedObjectCodes", v)} /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><TagsInput label={t("Replacing object codes")} value={form.ReplacingObjectCodes ?? []} onChange={(v) => set("ReplacingObjectCodes", v)} /></Grid.Col>
-      <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Version number")} value={form.VersionNumber} onChange={(v) => set("VersionNumber", v)} integer /></Grid.Col>
-      <Grid.Col span={{ base: 6, sm: 3 }}><DateField label={t("Version date")} value={form.VersionDateUtc} onChange={(v) => set("VersionDateUtc", v)} /></Grid.Col>
-      <Grid.Col span={{ base: 6, sm: 3 }}><OptionalNumber label={t("Revision number")} value={form.RevisionNumber} onChange={(v) => set("RevisionNumber", v)} integer /></Grid.Col>
-      <Grid.Col span={{ base: 6, sm: 3 }}><DateField label={t("Revision date")} value={form.RevisionDateUtc} onChange={(v) => set("RevisionDateUtc", v)} /></Grid.Col>
-      <Grid.Col span={{ base: 6, sm: 3 }}><DateField label={t("Activation date")} value={form.ActivationDateUtc} onChange={(v) => set("ActivationDateUtc", v)} /></Grid.Col>
-      <Grid.Col span={{ base: 6, sm: 3 }}><DateField label={t("Deactivation date")} value={form.DeActivationDateUtc} onChange={(v) => set("DeActivationDateUtc", v)} /></Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6 }}><TextInput label={t("Deprecation explanation")} value={form.DeprecationExplanation ?? ""} onChange={(e) => set("DeprecationExplanation", e.currentTarget.value)} /></Grid.Col>
-    </Grid>
+    <DetailGrid>
+      <CommonDetailCards
+        form={form}
+        set={set}
+        countryData={countryData}
+        languageData={languageData}
+        documentReference={<TextInput label={t("Document reference")} value={form.DocumentReference ?? ""} onChange={(e) => set("DocumentReference", e.currentTarget.value)} />}
+      />
+    </DetailGrid>
   );
   const rel = <RelationsEditor kind="class" relations={relations} onChange={(r) => setRelations(r as ClassRelation[])} selfCode={code} />;
 

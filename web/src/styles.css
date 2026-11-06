@@ -160,3 +160,14 @@ body[data-readonly] [data-edit] { display: none !important; }
 .loin-cell.paintable { cursor: pointer; user-select: none; touch-action: none; }
 .loin-cell.paintable:hover { outline: 2px solid var(--mantine-primary-color-light); outline-offset: -2px; }
 .loin-matrix.painting { cursor: crosshair; }
+
+/* Details tab: themed cards */
+.detail-grid { columns: 2 400px; column-gap: 14px; }
+.detail-card { background: var(--mantine-color-body); break-inside: avoid; margin-bottom: 14px; }
+.detail-row { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: end; }
+.detail-row-label { padding-bottom: 8px; color: var(--mantine-color-dimmed); }
+.detail-row-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-width: 0; }
+@media (max-width: 30em) { .detail-row { grid-template-columns: 1fr; gap: 2px; } .detail-row-label { padding-bottom: 0; } }
+.dimension-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.dimension-grid .mantine-InputWrapper-label { font-family: "Times New Roman", serif; font-style: italic; font-size: 15px; }
+@media (max-width: 30em) { .dimension-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

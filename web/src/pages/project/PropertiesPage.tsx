@@ -19,6 +19,7 @@ import { attempt, notifyOk } from "../../notify";
 import { go, openClass } from "../../state/nav";
 import { op, useProject } from "../../state/project";
 import { openUi } from "../../state/ui";
+import { editClassPopup, useClicks } from "../../components/popupEdit";
 
 export function PropertiesPage() {
   const { code: rawCode } = useParams();
@@ -161,6 +162,7 @@ let lastPropTab = "general";
 
 function PropertyDetail({ code }: { code: string }) {
   const { t } = useTranslation();
+  const clicks = useClicks();
   const doc = useProject((s) => s.doc);
   const idx = useProject((s) => s.idx);
   const narrow = useMediaQuery("(max-width: 48em)");
@@ -209,7 +211,6 @@ function PropertyDetail({ code }: { code: string }) {
     ["general", t("General")],
     ["values", t("Allowed values")],
     ["details", t("Details")],
-    ["dimension", t("Dimension")],
     ["relations", t("Relations")],
   ];
 
@@ -273,7 +274,7 @@ function PropertyDetail({ code }: { code: string }) {
                   className={`list-card${classSel.selected.includes(c.Code) ? " selected" : ""}`}
                   draggable
                   onDragStart={(e) => setGraphDrag(e, [classId(c.Code)])}
-                  onClick={() => openClass(c.Code)}
+                  {...clicks(() => openClass(c.Code), () => editClassPopup(c.Code))}
                 >
                   <Toggle size="xs" checked={classSel.selected.includes(c.Code)} onClick={(e) => e.stopPropagation()} onChange={() => classSel.click(c.Code, { ctrlKey: true, metaKey: false, shiftKey: false })} />
                   <Text size="sm" fw={500} truncate style={{ flex: 1 }}>{c.Name}</Text>
