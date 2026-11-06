@@ -16,6 +16,7 @@ import { attempt, notifyOk } from "../../notify";
 import { go, openClass } from "../../state/nav";
 import { op, useProject } from "../../state/project";
 import { openUi } from "../../state/ui";
+import { editClassPopup, useClicks } from "../../components/popupEdit";
 
 export function ClassesPage({ mode }: { mode: "main" | "gop" }) {
   const { code: rawCode } = useParams();
@@ -74,6 +75,7 @@ const lastTab: Record<string, string> = {};
 
 function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
   const { t } = useTranslation();
+  const clicks = useClicks();
   const idx = useProject((s) => s.idx);
   const activePset = useProject((s) => s.activePset);
   const [tab, setTab] = useState<string>(lastTab[mode] ?? "properties");
@@ -202,7 +204,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
               {children.length === 0 && <Text c="dimmed" size="sm">{t("No subclasses")}</Text>}
               <Stack gap={4}>
                 {children.map((c) => (
-                  <div key={c.Code} className="list-card" onClick={() => openClass(c.Code)}>
+                  <div key={c.Code} className="list-card" {...clicks(() => openClass(c.Code), () => editClassPopup(c.Code))}>
                     <Text size="sm" fw={500} truncate style={{ flex: 1 }}>{c.Name}</Text>
                     <Text size="xs" c="dimmed" className="mono">{c.Code}</Text>
                     <Badge size="xs" variant="light" color="gray">{(c.ClassProperties ?? []).length}</Badge>

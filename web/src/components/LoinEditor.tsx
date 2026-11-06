@@ -12,6 +12,7 @@ import { op, useProject } from "../state/project";
 import { useUi } from "../state/ui";
 import type { BsddClass, ClassProperty, LoinActor, LoinEntry, LoinSpec, LoinState } from "../types";
 import { askConfirm, askText } from "./dialogs";
+import { editClassPopup, editClassPropertyPopup, editPropertyPopup } from "./popupEdit";
 
 export const specKey = (p: string, m: string) => `${p}|${m}`;
 
@@ -228,7 +229,7 @@ function ClassPanel({ specKey: key, spec, recursive, current, setCurrent }: { sp
         const nAll = (c.ClassProperties ?? []).length;
         return (
           <div key={c.Code}>
-            <div className={`loin-row${current === c.Code ? " active" : ""}`} style={{ paddingLeft: 6 + depth * 16 }} onClick={() => setCurrent(c.Code)}>
+            <div className={`loin-row${current === c.Code ? " active" : ""}`} style={{ paddingLeft: 6 + depth * 16 }} onClick={() => setCurrent(c.Code)} onDoubleClick={() => editClassPopup(c.Code)}>
               <Chevron open={isOpen} show={kids.length > 0} onClick={() => toggle(c.Code)} />
               <span onClick={(e) => e.stopPropagation()}><Toggle size="xs" disabled={ro} checked={included.has(c.Code)} onChange={(e) => setIncluded(c.Code, e.currentTarget.checked)} /></span>
               <span className="loin-name">{c.Name}</span>
@@ -314,7 +315,7 @@ function ClassPropsPanel({ specKey: key, spec, classCode }: { specKey: string; s
               </div>
               {isOpen &&
                 cps.map((cp) => (
-                  <div key={cp.Code} className="loin-row" style={{ paddingLeft: 28 }}>
+                  <div key={cp.Code} className="loin-row" style={{ paddingLeft: 28 }} onDoubleClick={() => classCode && editClassPropertyPopup(classCode, cp.Code)}>
                     <span className="loin-chevron" />
                     <Toggle size="xs" disabled={ro} checked={checked.has(`${ps}|${cp.Code}`)} onChange={(e) => setProps([[ps, cp.Code]], e.currentTarget.checked)} />
                     <span className="loin-name">{cpName(idx, doc.dictionary, cp)}</span>
@@ -363,6 +364,13 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
   const isChecked = (cls: string, ps: string, code: string) => (spec?.properties?.[cls] ?? []).some(([a, b]) => (a ?? "") === ps && b === code);
   const countEntry = (ps: string, e: PsetEntry) => e.classes.filter((c) => isChecked(c, ps, e.code)).length;
   const set = (items: [string, string][], value: boolean) => attempt(() => op("loin.set_pset_properties_included", { spec: key, items, included: value }));
+  // double click: the property behind the entry (or the class property if it refers to an external URI)
+  const openPsetEntry = (ps: string, e: PsetEntry) => {
+    const cls = idx.classes.get(e.classes[0] ?? "");
+    const cp = cls?.ClassProperties?.find((x) => x.Code === e.code && (x.PropertySet ?? "") === ps);
+    if (cp?.PropertyCode && idx.properties.has(cp.PropertyCode)) editPropertyPopup(cp.PropertyCode);
+    else if (cls && cp) editClassPropertyPopup(cls.Code, cp.Code);
+  };
   const f = filter.trim().toLowerCase();
 
   return (
@@ -399,7 +407,7 @@ function PsetPanel({ specKey: key, spec }: { specKey: string; spec?: LoinSpec })
                 const n = countEntry(ps, e);
                 const est = triOf(n, e.classes.length);
                 return (
-                  <div key={e.code} className="loin-row" style={{ paddingLeft: 28 }}>
+                  <div key={e.code} className="loin-row" style={{ paddingLeft: 28 }} onDoubleClick={() => openPsetEntry(ps, e)}>
                     <span className="loin-chevron" />
                     <Toggle size="xs" disabled={ro} checked={est === "on"} indeterminate={est === "partial"} onChange={(ev) => set([[ps, e.code]], ev.currentTarget.checked)} />
                     <span className="loin-name">{e.name}</span>
