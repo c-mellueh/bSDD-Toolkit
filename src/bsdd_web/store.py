@@ -203,6 +203,8 @@ class Project:
     # ------------------------------------------------------------------ persistence
 
     def write_to_disk(self, settings: Settings) -> None:
+        if getattr(self, "deleted", False):
+            return  # never bring a deleted project back
         self.root.mkdir(parents=True, exist_ok=True)
         doc = self.doc
         _atomic_write(self.root / "dictionary.json", _json_bytes(doc["dictionary"]))
@@ -222,10 +224,57 @@ class Project:
             if src.exists():
                 shutil.copy2(src, snap_dir / f"{stamp}_{name}")
         self.last_snapshot = time.time()
+        self.prune_snapshots(settings)
+
+    def prune_snapshots(self, settings: Settings) -> None:
+        snap_dir = self.root / "snapshots"
         files = sorted(snap_dir.glob("*_dictionary.json"))
         for old in files[: -settings.max_snapshots]:
             old.unlink(missing_ok=True)
             (snap_dir / old.name.replace("_dictionary.json", "_extras.json")).unlink(missing_ok=True)
+
+
+SNAPSHOT_RE = re.compile(r"^\d{8}-\d{6}$")
+
+
+def list_snapshots(root: Path) -> list[dict[str, Any]]:
+    """Saved versions of a project, newest first: id (timestamp), time and size counters."""
+    out = []
+    for path in sorted((root / "snapshots").glob("*_dictionary.json"), reverse=True):
+        stamp = path.name.removesuffix("_dictionary.json")
+        if not SNAPSHOT_RE.match(stamp):
+            continue
+        try:
+            with path.open(encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        out.append(
+            {
+                "id": stamp,
+                "time": time.mktime(time.strptime(stamp, "%Y%m%d-%H%M%S")),
+                "classes": len(data.get("Classes") or []),
+                "properties": len(data.get("Properties") or []),
+                "version": data.get("DictionaryVersion"),
+            },
+        )
+    return out
+
+
+def read_snapshot(root: Path, stamp: str) -> dict[str, Any]:
+    if not SNAPSHOT_RE.match(stamp):
+        raise KeyError(stamp)
+    path = root / "snapshots" / f"{stamp}_dictionary.json"
+    if not path.exists():
+        raise KeyError(stamp)
+    with path.open(encoding="utf-8") as f:
+        dictionary = json.load(f)
+    extras: dict[str, Any] = {}
+    extras_path = root / "snapshots" / f"{stamp}_extras.json"
+    if extras_path.exists():
+        with extras_path.open(encoding="utf-8") as f:
+            extras = json.load(f)
+    return {"dictionary": dictionary, "extras": extras}
 
 
 class ProjectStore:
@@ -304,6 +353,16 @@ class ProjectStore:
             self._view_index.pop(old, None)
         if new:
             self._view_index[new] = pid
+
+    def delete(self, project: Project) -> None:
+        """Remove a project from memory and disk for good."""
+        project.deleted = True
+        self.projects.pop(project.id, None)
+        if self._view_index:
+            for view_id, pid in list(self._view_index.items()):
+                if pid == project.id:
+                    self._view_index.pop(view_id, None)
+        shutil.rmtree(project.root, ignore_errors=True)
 
     async def get(self, pid: str) -> Project:
         if pid in self.projects:

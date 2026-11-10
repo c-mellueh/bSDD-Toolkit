@@ -36,6 +36,7 @@ import {
   IconEye,
   IconLock,
   IconFileExport,
+  IconHistory,
   IconHome,
   IconLayoutDashboard,
   IconList,
@@ -47,6 +48,7 @@ import {
   IconStack2,
   IconSun,
   IconTerminal2,
+  IconTrash,
 } from "@tabler/icons-react";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -64,10 +66,14 @@ import { SearchDialog } from "../components/SearchDialog";
 import { SettingsDialog } from "../components/SettingsDialog";
 import { ShareDialog } from "../components/ShareDialog";
 import { GOP } from "../model";
-import { attempt, notifyError } from "../notify";
+import { attempt, notifyError, notifyOk } from "../notify";
+import i18n from "../i18n";
+import { forgetUnsaved } from "../state/unsaved";
+import { VersionsDialog } from "../components/VersionsDialog";
+import { askText } from "../components/dialogs";
 import { classSection, go, projectPath, setNavigator, type Section } from "../state/nav";
 import { connect, disconnect, redo, undo, useProject } from "../state/project";
-import { initials, rememberProject, storageGet, storageSet, useSettings } from "../state/settings";
+import { forgetProject, initials, rememberProject, storageGet, storageSet, useSettings } from "../state/settings";
 import { openUi, useUi } from "../state/ui";
 import { CommandPalette } from "./CommandPalette";
 import { useReadOnly } from "../state/readonly";
@@ -221,6 +227,7 @@ export function ProjectLayout({ base = "/p" }: { base?: "/p" | "/v" } = {}) {
       <SearchDialog />
       <SettingsDialog />
       <ShareDialog />
+      <VersionsDialog />
       <CommandPalette />
       <DownloadDialog opened={downloadOpen} onClose={() => setDownloadOpen(false)} />
     </AppShell>
@@ -405,6 +412,29 @@ function Navigation({ collapsed, onToggle, onDownload }: { collapsed: boolean; o
   );
 }
 
+/** Delete the open dictionary for everybody – after typing its name to confirm. */
+async function deleteDictionary(navigate: (to: string) => void) {
+  const { projectId, doc } = useProject.getState();
+  if (!projectId || !doc) return;
+  const t = i18n.t.bind(i18n);
+  const name = doc.dictionary.DictionaryName || doc.dictionary.DictionaryCode;
+  const typed = await askText(
+    t("Delete dictionary"),
+    t("This deletes “{{name}}” with all saved versions for everybody and cannot be undone. Type the dictionary name to confirm.", { name }),
+  );
+  if (typed === null) return;
+  if (typed.trim() !== name.trim()) {
+    notifyError(new Error(t("The name does not match. Nothing was deleted.")));
+    return;
+  }
+  const ok = await attempt(() => api(`/api/projects/${projectId}`, { method: "DELETE" }).then(() => true));
+  if (!ok) return;
+  forgetUnsaved("page");
+  forgetProject(projectId);
+  notifyOk(t("Dictionary deleted"));
+  navigate("/");
+}
+
 function FileMenu({ download, duplicate, onDownload }: { download: (p: string) => void; duplicate: () => void; onDownload: () => void }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -413,9 +443,12 @@ function FileMenu({ download, duplicate, onDownload }: { download: (p: string) =
       <Menu.Item leftSection={<IconDownload size={14} />} rightSection={<Text size="xs" c="dimmed">Ctrl+S</Text>} onClick={() => download("dictionary.json")}>{t("Save as bSDD JSON")}</Menu.Item>
       <Menu.Item leftSection={<IconDownload size={14} />} onClick={() => download("project.json")}>{t("Save project file (incl. LOIN)")}</Menu.Item>
       <Menu.Item data-edit leftSection={<IconCopy size={14} />} onClick={duplicate}>{t("Duplicate dictionary")}</Menu.Item>
+      <Menu.Item data-edit leftSection={<IconHistory size={14} />} onClick={() => openUi({ versions: true })}>{t("Version history")}</Menu.Item>
       <Menu.Divider />
       <Menu.Item leftSection={<IconHome size={14} />} onClick={() => navigate("/")}>{t("New / open…")}</Menu.Item>
       <Menu.Item leftSection={<IconCloudDownload size={14} />} onClick={onDownload}>{t("Download from bSDD")}</Menu.Item>
+      <Menu.Divider data-edit />
+      <Menu.Item data-edit color="red" leftSection={<IconTrash size={14} />} onClick={() => void deleteDictionary(navigate)}>{t("Delete dictionary…")}</Menu.Item>
     </Menu.Dropdown>
   );
 }
