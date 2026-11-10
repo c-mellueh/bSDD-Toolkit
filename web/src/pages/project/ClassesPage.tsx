@@ -17,6 +17,7 @@ import { go, openClass } from "../../state/nav";
 import { op, useProject } from "../../state/project";
 import { openUi } from "../../state/ui";
 import { editClassPopup, useClicks } from "../../components/popupEdit";
+import { onNavigationCancelled } from "../../components/UnsavedGuard";
 
 export function ClassesPage({ mode }: { mode: "main" | "gop" }) {
   const { code: rawCode } = useParams();
@@ -32,6 +33,17 @@ export function ClassesPage({ mode }: { mode: "main" | "gop" }) {
       openUi({ revealClass: { code, at: Date.now() } });
     }
   }, [code]);
+  // the user chose to stay on a page with unsaved edits: put the tree selection back
+  useEffect(
+    () =>
+      onNavigationCancelled(() => {
+        if (codeRef.current && useProject.getState().activeClass !== codeRef.current) {
+          useProject.getState().setActiveClass(codeRef.current);
+          openUi({ revealClass: { code: codeRef.current, at: Date.now() } });
+        }
+      }),
+    [],
+  );
   // store → URL (tree clicks, newly created classes)
   useEffect(
     () =>

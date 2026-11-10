@@ -681,5 +681,11 @@
  "exclusive (>)": "exklusiv (>)",
  "inclusive (≤)": "inklusiv (≤)",
  "inclusive (≥)": "inklusiv (≥)",
- "{{n}} of {{total}} fields filled": "{{n}} von {{total}} Feldern ausgefüllt"
+ "{{n}} of {{total}} fields filled": "{{n}} von {{total}} Feldern ausgefüllt",
+ "Discard changes?": "Änderungen verwerfen?",
+ "Your changes have not been saved yet.": "Die Änderungen wurden noch nicht gespeichert.",
+ "This page has unsaved changes. If you leave it, they are lost.": "Diese Seite enthält ungespeicherte Änderungen. Beim Verlassen gehen sie verloren.",
+ "Stay": "Bleiben",
+ "Page not found": "Seite nicht gefunden",
+ "This address does not exist in the bSDD Toolkit.": "Diese Adresse gibt es im bSDD Toolkit nicht."
 }

@@ -10,6 +10,7 @@ import { useReadOnly } from "../state/readonly";
 import type { BsddClass, ClassRelation } from "../types";
 import { SaveBar, changedKeys, mergeRemote, same, snap } from "./SaveBar";
 import { CommonDetailCards, DetailGrid } from "./DetailSections";
+import { useUnsaved } from "../state/unsaved";
 
 const EDITABLE = [
   "Code", "Name", "ClassType", "Definition", "Description", "ParentClassCode", "RelatedIfcEntityNamesList", "Synonyms", "Status",
@@ -55,6 +56,7 @@ export function ClassForm(props: ClassFormProps) {
   const [busy, setBusy] = useState(false);
   const dirty = snap(form, relations) !== snap(base.form, base.relations);
   const dirtyRef = useRef(dirty);
+  const releaseUnsaved = useUnsaved(dirty && !readOnly, inline ? "page" : "popup");
   dirtyRef.current = dirty;
 
   const reset = () => {
@@ -125,6 +127,7 @@ export function ClassForm(props: ClassFormProps) {
     if (ok) {
       // the store update arrives with the server patch; treat the saved state as clean
       setBase({ form, relations });
+      releaseUnsaved();
       onDone?.(ok);
     }
   };

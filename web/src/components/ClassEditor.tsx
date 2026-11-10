@@ -4,6 +4,7 @@ import { ClassForm } from "../forms/ClassForm";
 import { useProject } from "../state/project";
 import { useUi } from "../state/ui";
 import type { BsddClass } from "../types";
+import { closePopup } from "./UnsavedGuard";
 
 /** Modal for creating classes (and editing them from the graph / context menus). */
 export function ClassEditor() {
@@ -15,13 +16,13 @@ export function ClassEditor() {
   const close = () => useUi.getState().set({ classEditor: null });
   const existing = target.code ? idx.classes.get(target.code) : undefined;
   return (
-    <Modal opened onClose={close} title={existing ? t("Edit class: {{name}}", { name: existing.Name }) : t("New class")} size="xl">
+    <Modal opened onClose={() => closePopup(close)} title={existing ? t("Edit class: {{name}}", { name: existing.Name }) : t("New class")} size="xl">
       <ClassForm
         key={target.code ?? `new-${target.parentCode ?? ""}`}
         code={target.code}
         parentCode={target.parentCode}
         classType={target.classType}
-        onCancel={close}
+        onCancel={() => closePopup(close)}
         onDone={(code) => {
           setActiveClass(code);
           close();

@@ -12,6 +12,7 @@ import { SaveBar, changedKeys, mergeRemote, same, snap } from "./SaveBar";
 import { CommonDetailCards, DetailCard, DetailGrid, DetailRow, rangePreview } from "./DetailSections";
 import { IconAtom2, IconLink, IconRuler2 } from "@tabler/icons-react";
 import { AiTextarea, AllowedValuesEditor, OptionalNumber, RelationsEditor, useResources } from "../components/fields";
+import { useUnsaved } from "../state/unsaved";
 
 const DIMENSIONS = [
   "DimensionLength", "DimensionMass", "DimensionTime", "DimensionElectricCurrent", "DimensionThermodynamicTemperature",
@@ -64,6 +65,7 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
   const [busy, setBusy] = useState(false);
   const dirty = snap(form, relations) !== snap(base.form, base.relations);
   const dirtyRef = useRef(dirty);
+  const releaseUnsaved = useUnsaved(dirty && !readOnly, inline ? "page" : "popup");
   dirtyRef.current = dirty;
   const reset = () => {
     const i = initial(existing);
@@ -124,6 +126,7 @@ export function PropertyForm({ code, section, inline, onDone, onCancel }: Proper
     setBusy(false);
     if (ok) {
       setBase({ form, relations });
+      releaseUnsaved();
       onDone?.(ok, !existing);
     }
   };
