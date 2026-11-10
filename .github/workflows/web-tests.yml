@@ -1,0 +1,44 @@
+name: Web app tests
+
+# Backend tests, graph engine tests, frontend build and browser tests (Playwright).
+# Runs on pull requests that touch the web app and is reused by the Docker release workflow.
+on:
+  pull_request:
+    paths: ["web/**", "src/bsdd_web/**", "src/bsdd_json/**", ".github/workflows/web-tests.yml"]
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Backend tests
+        run: |
+          pip install ./src/bsdd_json "./src/bsdd_web[dev]"
+          cd src && PYTHONPATH=. python -m pytest bsdd_web/tests -q
+      - name: Graph engine tests (Rust)
+        run: cargo test --release --manifest-path web/graph-engine/Cargo.toml
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Frontend build
+        working-directory: web
+        run: npm ci && npm run build
+      - name: Browser tests (Playwright)
+        working-directory: web
+        run: |
+          npx playwright install --with-deps chromium
+          npm run e2e
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report
+          path: |
+            web/playwright-report
+            web/test-results
+          retention-days: 7

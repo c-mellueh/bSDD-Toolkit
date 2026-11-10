@@ -710,5 +710,9 @@
  "You have unsaved edits in a form. Restoring a version replaces the dictionary; save or discard your edits first.": "In einem Formular gibt es ungespeicherte Änderungen. Beim Wiederherstellen wird das Wörterbuch ersetzt; die Änderungen vorher speichern oder verwerfen.",
  "Move up": "Nach oben",
  "Move down": "Nach unten",
- "Menu": "Menü"
+ "Menu": "Menü",
+ "Something went wrong": "Etwas ist schiefgelaufen",
+ "This part of the page could not be displayed. Your dictionary is not affected – changes already saved are safe.": "Dieser Teil der Seite konnte nicht angezeigt werden. Das Wörterbuch ist nicht betroffen – bereits gespeicherte Änderungen sind sicher.",
+ "Try again": "Erneut versuchen",
+ "Reload page": "Seite neu laden"
 }

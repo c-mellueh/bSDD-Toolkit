@@ -17,3 +17,6 @@ docs
 data
 *.egg-info
 web/graph-engine/target
+web/.e2e-data
+web/test-results
+web/playwright-report

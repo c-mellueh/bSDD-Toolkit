@@ -70,6 +70,7 @@ import { attempt, notifyError, notifyOk } from "../notify";
 import i18n from "../i18n";
 import { forgetUnsaved } from "../state/unsaved";
 import { VersionsDialog } from "../components/VersionsDialog";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 import { askText } from "../components/dialogs";
 import { classSection, go, projectPath, setNavigator, type Section } from "../state/nav";
 import { connect, disconnect, redo, undo, useProject } from "../state/project";
@@ -213,7 +214,9 @@ export function ProjectLayout({ base = "/p" }: { base?: "/p" | "/v" } = {}) {
       </AppShell.Navbar>
       <AppShell.Main className="app-main">
         <div className="app-content">
-          <Outlet />
+          <ErrorBoundary resetKey={location.pathname}>
+            <Outlet />
+          </ErrorBoundary>
         </div>
         {shell && <Suspense fallback={null}><ShellPanel /></Suspense>}
       </AppShell.Main>

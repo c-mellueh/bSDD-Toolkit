@@ -7,24 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-      - name: Backend tests
-        run: |
-          pip install ./src/bsdd_json "./src/bsdd_web[dev]"
-          cd src && PYTHONPATH=. python -m pytest bsdd_web/tests -q
-      - name: Graph engine tests (Rust)
-        run: cargo test --release --manifest-path web/graph-engine/Cargo.toml
-      - uses: actions/setup-node@v5
-        with:
-          node-version: "22"
-      - name: Frontend build
-        working-directory: web
-        run: npm ci && npm run build
+    uses: ./.github/workflows/web-tests.yml
 
   docker:
     needs: test

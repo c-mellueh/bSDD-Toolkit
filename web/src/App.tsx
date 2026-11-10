@@ -7,6 +7,7 @@ import { Suspense, lazy, useEffect, type ReactNode } from "react";
 import { Outlet, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import { UnsavedGuard } from "./components/UnsavedGuard";
 import { NotFound } from "./pages/NotFound";
+import { RouteCrash } from "./components/ErrorBoundary";
 import { Landing } from "./pages/Landing";
 import { BsddCallback } from "./pages/BsddCallback";
 import { ProjectLayout } from "./layout/ProjectLayout";
@@ -57,7 +58,7 @@ function Root() {
 // data router: needed for useBlocker (warning before leaving a page with unsaved edits)
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<Root />}>
+    <Route element={<Root />} errorElement={<RouteCrash />}>
       <Route path="/" element={<Landing />} />
       <Route path="/auth/bsdd/callback" element={<BsddCallback />} />
       <Route path="/p/:projectId/window/graph" element={<Lazy><GraphPage /></Lazy>} />

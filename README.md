@@ -198,6 +198,7 @@ uv venv .venv-web && VIRTUAL_ENV=.venv-web uv pip install -e src/bsdd_json -e "s
 PYTHONPATH=src DATA_DIR=./data .venv-web/bin/python -m bsdd_web --reload   # API on :8000
 cd web && npm install && npm run dev                                       # UI on :5173 (proxies /api)
 PYTHONPATH=src .venv-web/bin/python -m pytest src/bsdd_web/tests           # backend tests
+cd web && npm run build && E2E_PYTHON=../.venv-web/bin/python npm run e2e  # browser tests (Playwright; once: npx playwright install chromium)
 ```
 
 

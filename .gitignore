@@ -216,3 +216,6 @@ src/bsdd_web/static/
 web/tsconfig.tsbuildinfo
 web/graph-engine/target/
 /data/
+web/.e2e-data/
+web/test-results/
+web/playwright-report/
