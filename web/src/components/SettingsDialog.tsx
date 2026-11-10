@@ -23,6 +23,21 @@ export function SettingsDialog() {
         </Group>
         <TextInput label={t("Separator for pasting allowed values")} description={t("Use \\n for line breaks")} value={s.pasteSeparator === "\n" ? "\\n" : s.pasteSeparator} onChange={(e) => s.set({ pasteSeparator: e.currentTarget.value === "\\n" ? "\n" : e.currentTarget.value })} />
         <Switch label={t("Allow relations to unknown URIs")} checked={s.allowUnknownUri} onChange={(e) => s.set({ allowUnknownUri: e.currentTarget.checked })} />
+        <Divider label={t("Predefined property sets")} />
+        <TextInput
+          label={t("Code prefix for predefined property sets")}
+          description={t("Put in front of the code of new Groups of Properties, e.g. “Pset_” gives “Pset_Geometry”.")}
+          placeholder="Pset_"
+          value={s.gopPrefix}
+          onChange={(e) => s.set({ gopPrefix: e.currentTarget.value.replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 30) })}
+          className="mono"
+        />
+        <Switch
+          label={t("Create a predefined property set automatically")}
+          description={t("When you add a property set to a class and no Group of Properties has that name, one is created and linked.")}
+          checked={s.autoCreateGop}
+          onChange={(e) => s.set({ autoCreateGop: e.currentTarget.checked })}
+        />
         <Divider label={t("AI helper")} />
         <Select
           label={t("AI provider")}

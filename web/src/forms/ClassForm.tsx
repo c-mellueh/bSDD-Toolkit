@@ -3,7 +3,8 @@ import { Button, Grid, Group, Select, Tabs, TagsInput, TextInput, Textarea } fro
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AiTextarea, RelationsEditor, useResources } from "../components/fields";
-import { CLASS_STATUSES, CLASS_TYPES, clean, slugify } from "../model";
+import { CLASS_STATUSES, CLASS_TYPES, GOP, clean, slugify } from "../model";
+import { useSettings } from "../state/settings";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
 import { useReadOnly } from "../state/readonly";
@@ -91,7 +92,9 @@ export function ClassForm(props: ClassFormProps) {
   const setName = (name: string) =>
     setForm((f) => {
       const next: Record<string, any> = { ...f, Name: name };
-      if (!existing && (!f.Code || f.Code === slugify(f.Name ?? ""))) next.Code = slugify(name);
+      // new Groups of Properties get the prefix from the settings (e.g. "Pset_Fire-Safety")
+      const codeFor = (n: string) => (n && f.ClassType === GOP ? useSettings.getState().gopPrefix : "") + slugify(n);
+      if (!existing && (!f.Code || f.Code === codeFor(f.Name ?? "") || f.Code === slugify(f.Name ?? ""))) next.Code = codeFor(name);
       return next;
     });
 

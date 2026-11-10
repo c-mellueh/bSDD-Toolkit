@@ -714,5 +714,10 @@
  "Something went wrong": "Etwas ist schiefgelaufen",
  "This part of the page could not be displayed. Your dictionary is not affected – changes already saved are safe.": "Dieser Teil der Seite konnte nicht angezeigt werden. Das Wörterbuch ist nicht betroffen – bereits gespeicherte Änderungen sind sicher.",
  "Try again": "Erneut versuchen",
- "Reload page": "Seite neu laden"
+ "Reload page": "Seite neu laden",
+ "Predefined property sets": "Vordefinierte Merkmalsgruppen",
+ "Code prefix for predefined property sets": "Code-Präfix für vordefinierte Merkmalsgruppen",
+ "Put in front of the code of new Groups of Properties, e.g. “Pset_” gives “Pset_Geometry”.": "Wird dem Code neuer Merkmalssätze vorangestellt, z. B. ergibt „Pset_“ den Code „Pset_Geometrie“.",
+ "Create a predefined property set automatically": "Vordefinierte Merkmalsgruppe automatisch anlegen",
+ "When you add a property set to a class and no Group of Properties has that name, one is created and linked.": "Wird einer Klasse eine Merkmalsgruppe hinzugefügt und es gibt keinen Merkmalssatz mit diesem Namen, wird einer angelegt und verknüpft."
 }

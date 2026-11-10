@@ -24,6 +24,10 @@ export interface Settings {
   allowUnknownUri: boolean;
   /** optional columns of the class trees */
   treeColumns: { code: boolean; status: boolean };
+  /** prefix for the code of new predefined property sets (Groups of Properties), e.g. "Pset_" */
+  gopPrefix: string;
+  /** creating a property set in a class also creates a Group of Properties if none has that name */
+  autoCreateGop: boolean;
 }
 
 const KEY = "bsdd-settings";
@@ -41,6 +45,8 @@ function load(): Settings {
     aiSentences: 2,
     allowUnknownUri: true,
     treeColumns: { code: true, status: true },
+    gopPrefix: "Pset_",
+    autoCreateGop: false,
   };
   try {
     const raw = localStorage.getItem(KEY);

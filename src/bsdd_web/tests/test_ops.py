@@ -338,3 +338,33 @@ def test_loin_matrix_controls_export_including_empty_combinations(h):
     h.run("loin.set_matrix", keys=active_keys(state), active=False)
     with pytest.raises(ValueError):
         build_loin_xml(state, h.d)
+
+
+def test_pset_create_can_auto_create_a_group_of_properties(h):
+    # off (default): only a temporary property set, no new class
+    n = len(h.d.Classes)
+    assert h.run("pset.create", class_code="Wall", name="Acoustics") == "Acoustics"
+    assert len(h.d.Classes) == n
+
+    # on: a GroupOfProperties with prefix + name is created and linked
+    assert h.run("pset.create", class_code="Wall", name="Fire Safety", auto_gop=True, gop_prefix="Pset_") == "Fire Safety"
+    gop = h.cls("Pset_Fire-Safety")
+    assert gop is not None
+    assert (gop.ClassType, gop.Name) == ("GroupOfProperties", "Fire Safety")
+    wall = h.cls("Wall")
+    assert any(cr.RelationType == "HasReference" and cr.RelatedClassUri.endswith("/Pset_Fire-Safety") for cr in wall.ClassRelations)
+    assert "Fire Safety" in h.ctx.extras.temporary_psets["Wall"]
+
+    # the same name in another class links the existing group instead of creating a second one
+    n = len(h.d.Classes)
+    h.run("pset.create", class_code="Door", name="Fire Safety", auto_gop=True, gop_prefix="Pset_")
+    assert len(h.d.Classes) == n
+
+    # an existing group is found by name (no duplicate), a bad prefix is rejected
+    h.run("pset.create", class_code="Door", name="Pset_Fire", auto_gop=True, gop_prefix="X_")
+    assert len(h.d.Classes) == n
+    with pytest.raises(OpError):
+        h.run("pset.create", class_code="Door", name="Other", auto_gop=True, gop_prefix="bad prefix/")
+    # property sets inside a GroupOfProperties never create another group
+    h.run("pset.create", class_code="Pset_Fire", name="Inner", auto_gop=True, gop_prefix="Pset_")
+    assert len(h.d.Classes) == n
