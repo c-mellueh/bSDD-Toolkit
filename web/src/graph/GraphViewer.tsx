@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Accordion, ActionIcon, Autocomplete, Badge, Button, Divider, FileButton, Group, Menu, Modal, SegmentedControl, Select, Slider, Stack, Switch, Text, Tooltip, useComputedColorScheme } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { Toggle } from "../components/Toggle";
 import {
   IconArrowsMaximize,
@@ -116,6 +117,18 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const [ready, setReady] = useState(false);
   const [panel, setPanel] = useState(true);
   const [library, setLibrary] = useState<boolean>(saved.library ?? true);
+  // phones: the side panels would leave no room for the graph – start closed, open as overlays
+  const narrow = useMediaQuery("(max-width: 48em)") ?? false;
+  useEffect(() => {
+    if (narrow) {
+      setPanel(false);
+      setLibrary(false);
+    }
+  }, [narrow]);
+  const overlay = (side: "left" | "right"): React.CSSProperties =>
+    narrow
+      ? { position: "absolute", top: 0, bottom: 0, [side]: 0, zIndex: 5, width: "min(86vw, 320px)", background: "var(--mantine-color-body)", boxShadow: "var(--mantine-shadow-lg)" }
+      : {};
   const [dropActive, setDropActive] = useState(false);
   const [input, setInput] = useState("");
   const [connect, setConnect] = useState<{ source: string; target: string } | null>(null);
@@ -902,7 +915,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
-      <Group gap={6} p={6} wrap="nowrap" style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
+      <Group gap={6} p={6} wrap="nowrap" className="graph-toolbar" style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
         <Autocomplete
           placeholder={t("Add node: name, code or URI…")}
           data={addOptions}
@@ -911,7 +924,8 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           onOptionSubmit={(v) => { addIds([v]); setSelected(new Set([v])); setTimeout(() => setInput(""), 0); }}
           onKeyDown={(e) => e.key === "Enter" && addFromInput()}
           limit={40}
-          w={300}
+          w={narrow ? 170 : 300}
+          style={{ flex: "none" }}
           comboboxProps={{ zIndex: 1000 }}
         />
         <Tooltip label={t("Add")}><ActionIcon variant="light" onClick={addFromInput}><IconPlus size={16} /></ActionIcon></Tooltip>
@@ -975,14 +989,14 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           <ActionIcon variant="subtle"><IconHelp size={16} /></ActionIcon>
         </Tooltip>
         <Tooltip label={t("Dictionary panel (drag classes and properties into the graph)")}>
-          <ActionIcon variant={library ? "light" : "subtle"} onClick={() => setLibrary((v) => !v)}><IconBooks size={16} /></ActionIcon>
+          <ActionIcon variant={library ? "light" : "subtle"} aria-label={t("Dictionary panel")} onClick={() => { setLibrary((v) => !v); if (narrow) setPanel(false); }}><IconBooks size={16} /></ActionIcon>
         </Tooltip>
-        <ActionIcon variant="subtle" onClick={() => setPanel((v) => !v)}>{panel ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}</ActionIcon>
+        <ActionIcon variant={narrow && panel ? "light" : "subtle"} aria-label={t("Display settings")} onClick={() => { setPanel((v) => !v); if (narrow) setLibrary(false); }}>{panel ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}</ActionIcon>
       </Group>
 
-      <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+      <div style={{ flex: 1, display: "flex", minHeight: 0, position: "relative" }}>
         {library && doc && (
-          <div style={{ width: 260, flex: "none", borderRight: "1px solid var(--mantine-color-default-border)", minHeight: 0 }}>
+          <div style={{ width: 260, flex: "none", borderRight: "1px solid var(--mantine-color-default-border)", minHeight: 0, ...overlay("left") }}>
             <GraphLibrary doc={doc} idx={idx} inScene={sceneSet} onAdd={(ids) => { addIds(ids); setSelected(new Set(ids)); }} />
           </div>
         )}
@@ -999,7 +1013,14 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           <canvas
             ref={canvasRef}
             style={{ position: "absolute", inset: 0, touchAction: "none" }}
-            onPointerDown={onPointerDown}
+            onPointerDown={(e) => {
+              if (narrow && (panel || library)) {
+                // tapping the graph closes an open overlay panel
+                setPanel(false);
+                setLibrary(false);
+              }
+              onPointerDown(e);
+            }}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
             onPointerLeave={() => { if (!drag.current && hover.current !== null) { hover.current = null; requestDraw(); } }}
@@ -1017,7 +1038,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
         </div>
 
         {panel && (
-          <div style={{ width: 290, flex: "none", borderLeft: "1px solid var(--mantine-color-default-border)", overflow: "auto" }}>
+          <div style={{ width: 290, flex: "none", borderLeft: "1px solid var(--mantine-color-default-border)", overflow: "auto", ...overlay("right") }}>
             {(selectedNode || selEdge) && (
               <Stack gap={4} p="sm" style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
                 {selectedNode && (

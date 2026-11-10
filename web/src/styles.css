@@ -171,3 +171,5 @@ body[data-readonly] [data-edit] { display: none !important; }
 .dimension-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .dimension-grid .mantine-InputWrapper-label { font-family: "Times New Roman", serif; font-style: italic; font-size: 15px; }
 @media (max-width: 30em) { .dimension-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.graph-toolbar { overflow-x: auto; scrollbar-width: none; }
+.graph-toolbar > * { flex: none; }
