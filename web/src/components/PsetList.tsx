@@ -101,7 +101,7 @@ export function PsetList() {
             onKeyDown={(e) => e.key === "Enter" && create()}
           />
           <Tooltip label={t("Add property set (names of Groups of Properties are linked)")}>
-            <ActionIcon variant="light" onClick={create}><IconPlus size={16} /></ActionIcon>
+            <ActionIcon aria-label={t("Add property set (names of Groups of Properties are linked)")} variant="light" onClick={create}><IconPlus size={16} /></ActionIcon>
           </Tooltip>
         </Group>
       )}

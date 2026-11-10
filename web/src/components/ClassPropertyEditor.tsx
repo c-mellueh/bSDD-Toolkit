@@ -154,13 +154,13 @@ export function ClassPropertyEditor() {
                     }} style={{ flex: 1 }} error={refError} />
                   )}
                   {refMode === "code" && prop && (
-                    <Tooltip label={t("Edit property")}><ActionIcon variant="light" mb={2} onClick={() => openUi({ propertyEditor: { code: prop.Code } })}><IconEdit size={16} /></ActionIcon></Tooltip>
+                    <Tooltip label={t("Edit property")}><ActionIcon aria-label={t("Edit property")} variant="light" mb={2} onClick={() => openUi({ propertyEditor: { code: prop.Code } })}><IconEdit size={16} /></ActionIcon></Tooltip>
                   )}
                   {refMode === "code" && (
-                    <Tooltip label={t("Create new property")}><ActionIcon variant="light" mb={2} onClick={createProperty}><IconPlus size={16} /></ActionIcon></Tooltip>
+                    <Tooltip label={t("Create new property")}><ActionIcon aria-label={t("Create new property")} variant="light" mb={2} onClick={createProperty}><IconPlus size={16} /></ActionIcon></Tooltip>
                   )}
                   {refMode === "uri" && isUri(form.PropertyUri) && (
-                    <Tooltip label={t("Open in browser")}><ActionIcon variant="light" mb={2} component="a" href={form.PropertyUri} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
+                    <Tooltip label={t("Open in browser")}><ActionIcon aria-label={t("Open in browser")} variant="light" mb={2} component="a" href={form.PropertyUri} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
                   )}
                 </Group>
               </Grid.Col>

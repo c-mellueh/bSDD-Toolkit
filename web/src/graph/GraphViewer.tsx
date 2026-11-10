@@ -928,7 +928,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           style={{ flex: "none" }}
           comboboxProps={{ zIndex: 1000 }}
         />
-        <Tooltip label={t("Add")}><ActionIcon variant="light" onClick={addFromInput}><IconPlus size={16} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Add")}><ActionIcon aria-label={t("Add")} variant="light" onClick={addFromInput}><IconPlus size={16} /></ActionIcon></Tooltip>
         <Menu shadow="md" zIndex={1000}>
           <Menu.Target><Button variant="default">{t("Add…")}</Button></Menu.Target>
           <Menu.Dropdown>
@@ -941,13 +941,13 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
             <Menu.Item disabled={!selected.size} onClick={() => [...selected].forEach((id) => expand(id))}>{t("Neighbours of the selection")}</Menu.Item>
           </Menu.Dropdown>
         </Menu>
-        <Tooltip label={t("Hide selected nodes")}><ActionIcon variant="default" disabled={!selected.size} onClick={() => removeIds([...selected])}><IconEraser size={16} /></ActionIcon></Tooltip>
-        <Tooltip label={t("Clear view")}><ActionIcon variant="default" onClick={() => { setScene([]); setSelected(new Set()); }}><IconTrash size={16} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Hide selected nodes")}><ActionIcon aria-label={t("Hide selected nodes")} variant="default" disabled={!selected.size} onClick={() => removeIds([...selected])}><IconEraser size={16} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Clear view")}><ActionIcon aria-label={t("Clear view")} variant="default" onClick={() => { setScene([]); setSelected(new Set()); }}><IconTrash size={16} /></ActionIcon></Tooltip>
         <Divider orientation="vertical" />
         <Tooltip label={running ? t("Pause physics (Space)") : t("Run physics (Space)")}>
-          <ActionIcon variant={running ? "filled" : "default"} onClick={togglePhysics}>{running ? <IconPlayerPause size={16} /> : <IconPlayerPlay size={16} />}</ActionIcon>
+          <ActionIcon aria-label={running ? t("Pause physics (Space)") : t("Run physics (Space)")} variant={running ? "filled" : "default"} onClick={togglePhysics}>{running ? <IconPlayerPause size={16} /> : <IconPlayerPlay size={16} />}</ActionIcon>
         </Tooltip>
-        <Tooltip label={t("Reheat (shake up the layout)")}><ActionIcon variant="default" onClick={() => worker.current?.postMessage({ type: "start", alpha: 1 })}><IconRefresh size={16} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Reheat (shake up the layout)")}><ActionIcon aria-label={t("Reheat (shake up the layout)")} variant="default" onClick={() => worker.current?.postMessage({ type: "start", alpha: 1 })}><IconRefresh size={16} /></ActionIcon></Tooltip>
         <Menu shadow="md" zIndex={1000}>
           <Menu.Target><Button variant="default" leftSection={<IconLayoutGrid size={14} />}>{t("Layout")}</Button></Menu.Target>
           <Menu.Dropdown>
@@ -963,11 +963,11 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
         </Tooltip>
         <div style={{ flex: 1 }} />
         <Badge variant="light">{graph.nodes.length} {t("nodes")} · {graph.edges.length} {t("edges")}</Badge>
-        <Tooltip label={t("Zoom in")}><ActionIcon variant="default" onClick={() => zoom(1.25)}><IconZoomIn size={16} /></ActionIcon></Tooltip>
-        <Tooltip label={t("Zoom out")}><ActionIcon variant="default" onClick={() => zoom(0.8)}><IconZoomOut size={16} /></ActionIcon></Tooltip>
-        <Tooltip label={t("Fit view (F)")}><ActionIcon variant="default" onClick={fit}><IconArrowsMaximize size={16} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Zoom in")}><ActionIcon aria-label={t("Zoom in")} variant="default" onClick={() => zoom(1.25)}><IconZoomIn size={16} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Zoom out")}><ActionIcon aria-label={t("Zoom out")} variant="default" onClick={() => zoom(0.8)}><IconZoomOut size={16} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Fit view (F)")}><ActionIcon aria-label={t("Fit view (F)")} variant="default" onClick={fit}><IconArrowsMaximize size={16} /></ActionIcon></Tooltip>
         <Menu shadow="md" zIndex={1000}>
-          <Menu.Target><ActionIcon variant="default"><IconDownload size={16} /></ActionIcon></Menu.Target>
+          <Menu.Target><ActionIcon variant="default" aria-label={t("Export")}><IconDownload size={16} /></ActionIcon></Menu.Target>
           <Menu.Dropdown>
             <Menu.Item onClick={exportPng}>PNG</Menu.Item>
             <Menu.Item onClick={exportSvg}>SVG</Menu.Item>
@@ -979,14 +979,14 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           </Menu.Dropdown>
         </Menu>
         {!standalone && (
-          <Tooltip label={t("Open in a new window")}><ActionIcon variant="default" component="a" href={`${useProject.getState().base}/${projectId}/window/graph`} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
+          <Tooltip label={t("Open in a new window")}><ActionIcon aria-label={t("Open in a new window")} variant="default" component="a" href={`${useProject.getState().base}/${projectId}/window/graph`} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
         )}
         <Tooltip
           multiline
           w={320}
           label={t("Drag nodes to move (they get pinned). Drag the background to pan, wheel to zoom, Shift+drag to box-select. Alt+drag (or Connect) from node to node creates a relation. Right-click for more. Del hides nodes / deletes the selected relation, Space toggles physics, F fits the view.")}
         >
-          <ActionIcon variant="subtle"><IconHelp size={16} /></ActionIcon>
+          <ActionIcon aria-label={t("Drag nodes to move (they get pinned). Drag the background to pan, wheel to zoom, Shift+drag to box-select. Alt+drag (or Connect) from node to node creates a relation. Right-click for more. Del hides nodes / deletes the selected relation, Space toggles physics, F fits the view.")} variant="subtle"><IconHelp size={16} /></ActionIcon>
         </Tooltip>
         <Tooltip label={t("Dictionary panel (drag classes and properties into the graph)")}>
           <ActionIcon variant={library ? "light" : "subtle"} aria-label={t("Dictionary panel")} onClick={() => { setLibrary((v) => !v); if (narrow) setPanel(false); }}><IconBooks size={16} /></ActionIcon>

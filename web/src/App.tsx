@@ -32,9 +32,9 @@ const theme = createTheme({
   components: {
     TextInput: { defaultProps: { size: "sm" } },
     Textarea: { defaultProps: { size: "sm" } },
-    Select: { defaultProps: { size: "sm" } },
-    MultiSelect: { defaultProps: { size: "sm" } },
-    TagsInput: { defaultProps: { size: "sm" } },
+    Select: { defaultProps: { size: "sm", clearButtonProps: { "aria-label": "Clear" } } },
+    MultiSelect: { defaultProps: { size: "sm", clearButtonProps: { "aria-label": "Clear" } } },
+    TagsInput: { defaultProps: { size: "sm", clearButtonProps: { "aria-label": "Clear" } } },
     NumberInput: { defaultProps: { size: "sm" } },
     Autocomplete: { defaultProps: { size: "sm" } },
     Checkbox: { defaultProps: { size: "sm" } },

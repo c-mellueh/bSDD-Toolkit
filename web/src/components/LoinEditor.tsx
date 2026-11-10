@@ -252,8 +252,8 @@ function ClassPanel({ specKey: key, spec, recursive, current, setCurrent }: { sp
       count={<Badge variant="light">{t("{{n}} included", { n: included.size })}</Badge>}
       actions={
         <>
-          <Tooltip label={t("Expand all")}><ActionIcon size="sm" variant="subtle" onClick={() => setOpen(new Set(classes.map((c) => c.Code)))}><IconArrowsMaximize size={14} /></ActionIcon></Tooltip>
-          <Tooltip label={t("Collapse all")}><ActionIcon size="sm" variant="subtle" onClick={() => setOpen(new Set())}><IconArrowsMinimize size={14} /></ActionIcon></Tooltip>
+          <Tooltip label={t("Expand all")}><ActionIcon aria-label={t("Expand all")} size="sm" variant="subtle" onClick={() => setOpen(new Set(classes.map((c) => c.Code)))}><IconArrowsMaximize size={14} /></ActionIcon></Tooltip>
+          <Tooltip label={t("Collapse all")}><ActionIcon aria-label={t("Collapse all")} size="sm" variant="subtle" onClick={() => setOpen(new Set())}><IconArrowsMinimize size={14} /></ActionIcon></Tooltip>
         </>
       }
       filter={filter}
@@ -644,19 +644,19 @@ function EntryList({ kind, title, items }: { kind: "purpose" | "milestone"; titl
   };
   return (
     <Stack gap={4}>
-      <Group justify="space-between"><Text fw={600}>{title}</Text><ActionIcon variant="light" onClick={add}><IconPlus size={16} /></ActionIcon></Group>
+      <Group justify="space-between"><Text fw={600}>{title}</Text><ActionIcon variant="light" aria-label={t("Add")} onClick={add}><IconPlus size={16} /></ActionIcon></Group>
       {items.map((x, i) => (
         <Group key={x.guid} gap={4} wrap="nowrap">
           <Text size="sm" style={{ flex: 1 }} truncate>{x.name}</Text>
           {kind === "milestone" && (
             <DayField size="xs" value={x.date} onChange={(v) => attempt(() => op("loin.set_milestone_date", { guid: x.guid, date: v ? `${v}T00:00:00` : null }))} w={150} />
           )}
-          <ActionIcon size="sm" variant="subtle" onClick={() => move(i, -1)} disabled={i === 0}><IconArrowUp size={14} /></ActionIcon>
-          <ActionIcon size="sm" variant="subtle" onClick={() => move(i, 1)} disabled={i === items.length - 1}><IconArrowDown size={14} /></ActionIcon>
+          <ActionIcon size="sm" variant="subtle" aria-label={t("Move up")} onClick={() => move(i, -1)} disabled={i === 0}><IconArrowUp size={14} /></ActionIcon>
+          <ActionIcon size="sm" variant="subtle" aria-label={t("Move down")} onClick={() => move(i, 1)} disabled={i === items.length - 1}><IconArrowDown size={14} /></ActionIcon>
           <Tooltip label={t("Rename")}>
-            <ActionIcon size="sm" variant="subtle" onClick={async () => { const n = await askText(t("Rename"), t("Name"), x.name); if (n) await attempt(() => op("loin.rename", { kind, guid: x.guid, name: n })); }}><IconPencil size={14} /></ActionIcon>
+            <ActionIcon aria-label={t("Rename")} size="sm" variant="subtle" onClick={async () => { const n = await askText(t("Rename"), t("Name"), x.name); if (n) await attempt(() => op("loin.rename", { kind, guid: x.guid, name: n })); }}><IconPencil size={14} /></ActionIcon>
           </Tooltip>
-          <ActionIcon size="sm" variant="subtle" color="red" disabled={items.length <= 1} onClick={async () => { if (await askConfirm(t("Delete"), t("Delete '{{name}}' and its specifications?", { name: x.name }), t("Delete"), true)) await attempt(() => op("loin.remove", { kind, guid: x.guid })); }}><IconTrash size={14} /></ActionIcon>
+          <ActionIcon size="sm" variant="subtle" color="red" aria-label={t("Delete")} disabled={items.length <= 1} onClick={async () => { if (await askConfirm(t("Delete"), t("Delete '{{name}}' and its specifications?", { name: x.name }), t("Delete"), true)) await attempt(() => op("loin.remove", { kind, guid: x.guid })); }}><IconTrash size={14} /></ActionIcon>
         </Group>
       ))}
     </Stack>

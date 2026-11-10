@@ -252,7 +252,7 @@ function Header({ mobileOpen, toggleMobile }: { mobileOpen: boolean; toggleMobil
 
   return (
     <Group h="100%" px="sm" gap="xs" wrap="nowrap">
-      <Burger opened={mobileOpen} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
+      <Burger aria-label={t("Menu")} opened={mobileOpen} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
       <UnstyledButton onClick={() => navigate("/")} visibleFrom="xs" aria-label={t("Start page")}>
         <Group gap={8} wrap="nowrap">
           <img src="/favicon.svg" width={26} height={26} alt="" />

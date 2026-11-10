@@ -707,5 +707,8 @@
  "Version history": "Versionsverlauf",
  "Version saved": "Version gespeichert",
  "While the dictionary is edited, a version is saved automatically from time to time. The newest {{n}} versions are kept.": "Während der Bearbeitung wird von Zeit zu Zeit automatisch eine Version gespeichert. Die neuesten {{n}} Versionen bleiben erhalten.",
- "You have unsaved edits in a form. Restoring a version replaces the dictionary; save or discard your edits first.": "In einem Formular gibt es ungespeicherte Änderungen. Beim Wiederherstellen wird das Wörterbuch ersetzt; die Änderungen vorher speichern oder verwerfen."
+ "You have unsaved edits in a form. Restoring a version replaces the dictionary; save or discard your edits first.": "In einem Formular gibt es ungespeicherte Änderungen. Beim Wiederherstellen wird das Wörterbuch ersetzt; die Änderungen vorher speichern oder verwerfen.",
+ "Move up": "Nach oben",
+ "Move down": "Nach unten",
+ "Menu": "Menü"
 }
