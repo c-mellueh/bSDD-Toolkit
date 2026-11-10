@@ -12,12 +12,14 @@ import { useProject } from "../state/project";
 import { storageGet, storageSet, useSettings } from "../state/settings";
 import type { ClassRelation, PropertyRelation } from "../types";
 import { Toggle } from "./Toggle";
+import { editClassPopup, editPropertyPopup, useClicks } from "./popupEdit";
 
 type AnyRelation = ClassRelation | PropertyRelation;
 type Status = "internal" | "external" | "unknown";
 
 export function RelationsEditor({ kind, relations, onChange, selfCode }: { kind: "class" | "property"; relations: AnyRelation[]; onChange: (r: AnyRelation[]) => void; selfCode?: string }) {
   const { t } = useTranslation();
+  const clicks = useClicks();
   const doc = useProject((s) => s.doc);
   const idx = useProject((s) => s.idx);
   const allowUnknown = useSettings((s) => s.allowUnknownUri);
@@ -314,7 +316,7 @@ export function RelationsEditor({ kind, relations, onChange, selfCode }: { kind:
                   <Table.Td>
                     <Group gap={6} wrap="nowrap" px={8} style={{ minWidth: 0 }}>
                       {status === "internal" && code ? (
-                        <Anchor size="sm" truncate onClick={() => (kind === "class" ? openClass(code) : openProperty(code))}>{nameOf(r, code)}</Anchor>
+                        <Anchor size="sm" truncate {...clicks(() => (kind === "class" ? openClass(code) : openProperty(code)), () => (kind === "class" ? editClassPopup(code) : editPropertyPopup(code)))}>{nameOf(r, code)}</Anchor>
                       ) : status === "external" ? (
                         <>
                           <IconWorld size={14} style={{ flex: "none", opacity: 0.6 }} />

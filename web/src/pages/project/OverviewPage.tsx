@@ -8,6 +8,7 @@ import { go, openClass, openProperty, type Section } from "../../state/nav";
 import { useProject } from "../../state/project";
 import { openUi } from "../../state/ui";
 import { initials } from "../../state/settings";
+import { editClassPopup, editPropertyPopup, useClicks } from "../../components/popupEdit";
 
 interface Check {
   key: string;
@@ -17,6 +18,7 @@ interface Check {
 
 export function OverviewPage() {
   const { t } = useTranslation();
+  const clicks = useClicks();
   const doc = useProject((s) => s.doc);
   const projectId = useProject((s) => s.projectId);
   const users = useProject((s) => s.users);
@@ -168,7 +170,7 @@ export function OverviewPage() {
                     <Accordion.Panel>
                       <Stack gap={2}>
                         {c.items.slice(0, 50).map((it, i) => (
-                          <Anchor key={`${it.code}-${i}`} size="sm" onClick={() => (it.kind === "class" ? openClass(it.code) : openProperty(it.code))} truncate>
+                          <Anchor key={`${it.code}-${i}`} size="sm" {...clicks(() => (it.kind === "class" ? openClass(it.code) : openProperty(it.code)), () => (it.kind === "class" ? editClassPopup(it.code) : editPropertyPopup(it.code)))} truncate>
                             {it.name} <Text span size="xs" c="dimmed" className="mono">{it.code}</Text>
                           </Anchor>
                         ))}

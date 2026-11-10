@@ -73,10 +73,11 @@ export function DayField({ value, onChange, ...rest }: { value?: string | null; 
   );
 }
 
-export function OptionalNumber({ label, value, onChange, integer }: { label: string; value?: number | null; onChange: (v: number | null) => void; integer?: boolean }) {
+export function OptionalNumber({ label, value, onChange, integer, hideControls }: { label: string; value?: number | null; onChange: (v: number | null) => void; integer?: boolean; hideControls?: boolean }) {
   return (
     <NumberInput
       label={label}
+      hideControls={hideControls}
       value={value ?? ""}
       allowDecimal={!integer}
       onChange={(v) => onChange(v === "" || v === undefined ? null : Number(v))}

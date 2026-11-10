@@ -214,7 +214,6 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
         ref={dragHandle}
         style={style}
         className={`row${node.isSelected ? " selected" : ""}${node.willReceiveDrop ? " drop-target" : ""}`}
-        onDoubleClick={() => openUi({ classEditor: { code: c.Code } })}
         onDragStart={(e) => {
           const nodes = node.isSelected ? node.tree.selectedNodes : [node];
           // a collapsed class brings its whole subtree into the graph, an expanded one only itself
