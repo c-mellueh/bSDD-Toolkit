@@ -1,10 +1,10 @@
 import { ActionIcon, Autocomplete, Group, Tooltip } from "@mantine/core";
 import { useReadOnly } from "../state/readonly";
-import { IconClipboard, IconCopy, IconEdit, IconLink, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconClipboard, IconCopy, IconEdit, IconLink, IconLock, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { copyPsets, readClip } from "../clipboard";
-import { GOP, linkedGop, psetsOfClass } from "../model";
+import { GOP, cpKey, inheritanceParent, inheritedKeys, linkedGop, psetsOfClass } from "../model";
 import { attempt, notifyOk } from "../notify";
 import { op, useProject } from "../state/project";
 import { divider, useContextMenu } from "./ContextMenu";
@@ -33,6 +33,11 @@ export function PsetList() {
 
   if (!doc) return null;
 
+  // strict inheritance: property sets with inherited class properties can't be renamed/deleted here
+  const fromParent = cls ? inheritedKeys(idx, doc, cls) : new Set<string>();
+  const lockedPsets = new Set((cls?.ClassProperties ?? []).filter((cp) => fromParent.has(cpKey(doc.dictionary, cp))).map((cp) => cp.PropertySet ?? ""));
+  const parentName = cls ? inheritanceParent(idx, doc, cls)?.Name : undefined;
+  const lockedLabel = t("Contains class properties inherited from {{name}} (strict inheritance)", { name: parentName });
   const counts = new Map<string, number>();
   for (const cp of cls?.ClassProperties ?? []) counts.set(cp.PropertySet ?? "", (counts.get(cp.PropertySet ?? "") ?? 0) + 1);
 
@@ -119,20 +124,21 @@ export function PsetList() {
                 key={name || "∅"}
                 className={`row${isSel ? " selected" : ""}`}
                 onClick={(e) => { sel.click(name, e); setActivePset(name); }}
-                onDoubleClick={() => rename(name)}
+                onDoubleClick={() => !lockedPsets.has(name) && rename(name)}
                 onContextMenu={(e) => {
                   sel.ensure(name);
                   setActivePset(name);
                   openMenu(e, [
-                    { label: t("Rename"), icon: <IconEdit size={14} />, shortcut: "F2", onClick: () => rename(name) },
+                    { label: t("Rename"), icon: <IconEdit size={14} />, shortcut: "F2", onClick: () => rename(name), disabled: lockedPsets.has(name) },
                     { label: t("Copy"), icon: <IconCopy size={14} />, shortcut: "Ctrl+C", onClick: copy },
                     { label: t("Paste"), icon: <IconClipboard size={14} />, shortcut: "Ctrl+V", onClick: paste, disabled: !readClip("bsdd-psets") },
                     divider,
-                    { label: t("Delete"), icon: <IconTrash size={14} />, color: "red", shortcut: "Del", onClick: remove },
+                    { label: t("Delete"), icon: <IconTrash size={14} />, color: "red", shortcut: "Del", onClick: remove, disabled: lockedPsets.has(name) },
                   ]);
                 }}
               >
                 <span className="cell" style={{ flex: 1 }}>{name || <i>{t("(no property set)")}</i>}</span>
+                {lockedPsets.has(name) && <Tooltip label={lockedLabel}><IconLock size={14} aria-label={lockedLabel} style={{ opacity: 0.7 }} /></Tooltip>}
                 {linked && <Tooltip label={t("Linked to Group of Properties")}><IconLink size={14} style={{ opacity: 0.7 }} /></Tooltip>}
                 <span className="cell" style={{ opacity: 0.5, fontSize: 12 }}>{counts.get(name) ?? 0}</span>
               </div>

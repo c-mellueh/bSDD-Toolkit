@@ -35,6 +35,7 @@ interface UiState {
   settings: boolean;
   share: boolean;
   versions: boolean;
+  projectSettings: boolean;
   palette: boolean;
   revealClass: { code: string; at: number } | null;
   set: (patch: Partial<UiState>) => void;
@@ -55,6 +56,7 @@ export const useUi = create<UiState>((set) => ({
   settings: false,
   share: false,
   versions: false,
+  projectSettings: false,
   palette: false,
   revealClass: null,
   set: (patch) => set(patch),

@@ -223,3 +223,46 @@ export function clean<T extends Record<string, unknown>>(data: T): T {
   }
   return out as T;
 }
+
+// --------------------------------------------------------------- strict inheritance
+
+/** Identity of a class property for inheritance: property set + referenced property. */
+export function cpKey(d: Dictionary, cp: ClassProperty): string {
+  const code = cp.PropertyCode || internalCode(d, cp.PropertyUri, "prop");
+  const ref = code ? `code:${code}` : `uri:${(cp.PropertyUri ?? "").trim().replace(/\/+$/, "").toLowerCase()}`;
+  return `${cp.PropertySet ?? ""}\u0000${ref}`;
+}
+
+/** The parent class that passes on its class properties (strict inheritance only). */
+export function inheritanceParent(idx: Indexes, doc: Doc, cls: BsddClass): BsddClass | undefined {
+  if (!doc.extras?.strict_inheritance || cls.ClassType === GOP || !cls.ParentClassCode) return undefined;
+  const parent = idx.classes.get(cls.ParentClassCode);
+  return parent && parent.ClassType !== GOP ? parent : undefined;
+}
+
+/** Keys of the class properties ``cls`` inherits (empty without strict inheritance). */
+export function inheritedKeys(idx: Indexes, doc: Doc, cls: BsddClass): Set<string> {
+  const parent = inheritanceParent(idx, doc, cls);
+  return new Set((parent?.ClassProperties ?? []).map((cp) => cpKey(doc.dictionary, cp)));
+}
+
+/** How many class properties switching strict inheritance on would add. */
+export function missingInherited(idx: Indexes, doc: Doc): number {
+  const d = doc.dictionary;
+  const have = new Map<string, Set<string>>();
+  for (const c of d.Classes ?? []) have.set(c.Code, new Set((c.ClassProperties ?? []).map((cp) => cpKey(d, cp))));
+  const effective = (code: string) => have.get(code)!;
+  let added = 0;
+  const visit = (parent: BsddClass, seen: Set<string>) => {
+    for (const child of idx.children.get(parent.Code) ?? []) {
+      if (child.ClassType === GOP || parent.ClassType === GOP || seen.has(child.Code)) continue;
+      seen.add(child.Code);
+      const mine = effective(child.Code);
+      for (const k of effective(parent.Code)) if (!mine.has(k)) { mine.add(k); added++; }
+      visit(child, seen);
+    }
+  };
+  const seen = new Set<string>();
+  for (const root of idx.children.get(null) ?? []) visit(root, seen);
+  return added;
+}

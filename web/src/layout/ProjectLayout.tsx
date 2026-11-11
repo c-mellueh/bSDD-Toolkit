@@ -37,6 +37,7 @@ import {
   IconLock,
   IconFileExport,
   IconHistory,
+  IconAdjustments,
   IconHome,
   IconLayoutDashboard,
   IconList,
@@ -70,6 +71,7 @@ import { attempt, notifyError, notifyOk } from "../notify";
 import i18n from "../i18n";
 import { forgetUnsaved } from "../state/unsaved";
 import { VersionsDialog } from "../components/VersionsDialog";
+import { ProjectSettingsDialog } from "../components/ProjectSettingsDialog";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { askText } from "../components/dialogs";
 import { classSection, go, projectPath, setNavigator, type Section } from "../state/nav";
@@ -231,6 +233,7 @@ export function ProjectLayout({ base = "/p" }: { base?: "/p" | "/v" } = {}) {
       <SettingsDialog />
       <ShareDialog />
       <VersionsDialog />
+      <ProjectSettingsDialog />
       <CommandPalette />
       <DownloadDialog opened={downloadOpen} onClose={() => setDownloadOpen(false)} />
     </AppShell>
@@ -447,6 +450,7 @@ function FileMenu({ download, duplicate, onDownload }: { download: (p: string) =
       <Menu.Item leftSection={<IconDownload size={14} />} onClick={() => download("project.json")}>{t("Save project file (incl. LOIN)")}</Menu.Item>
       <Menu.Item data-edit leftSection={<IconCopy size={14} />} onClick={duplicate}>{t("Duplicate dictionary")}</Menu.Item>
       <Menu.Item data-edit leftSection={<IconHistory size={14} />} onClick={() => openUi({ versions: true })}>{t("Version history")}</Menu.Item>
+      <Menu.Item leftSection={<IconAdjustments size={14} />} onClick={() => openUi({ projectSettings: true })}>{t("Project settings")}</Menu.Item>
       <Menu.Divider />
       <Menu.Item leftSection={<IconHome size={14} />} onClick={() => navigate("/")}>{t("New / open…")}</Menu.Item>
       <Menu.Item leftSection={<IconCloudDownload size={14} />} onClick={onDownload}>{t("Download from bSDD")}</Menu.Item>

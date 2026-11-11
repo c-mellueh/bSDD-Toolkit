@@ -126,6 +126,8 @@ export interface Extras {
   temporary_psets: Record<string, string[]>;
   loin: LoinState;
   export_settings: Record<string, any>;
+  /** every child class has all class properties of its parent */
+  strict_inheritance?: boolean;
 }
 
 export interface Doc {
