@@ -36,7 +36,9 @@ def view_created(view: ui.PsetTableView):
 
 
 def new_property_set_requested(bsdd_class: BsddClass):
-    core.create_new_property_set(bsdd_class, tool.PropertySetTableView, tool.Util, tool.Project)
+    core.create_new_property_set(
+        bsdd_class, tool.PropertySetTableView, tool.Util, tool.Project, tool.GroupOfProperties
+    )
 
 
 def context_menu_requested(view: ui.PsetTableView, pos):

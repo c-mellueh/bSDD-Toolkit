@@ -9,6 +9,7 @@ const t = (s: string, o?: Record<string, unknown>) => i18n.t(s, o);
 export function askConfirm(title: string, message: string, confirmLabel = t("OK"), danger = false): Promise<boolean> {
   return new Promise((resolve) => {
     modals.openConfirmModal({
+      zIndex: 1000, // above editor popups
       title,
       children: <Text size="sm">{message}</Text>,
       labels: { confirm: confirmLabel, cancel: t("Cancel") },
@@ -30,6 +31,7 @@ export function askText(title: string, label: string, initial = ""): Promise<str
       modals.closeAll();
     };
     modals.open({
+      zIndex: 1000,
       title,
       onClose: () => finish(null),
       children: <TextPrompt label={label} initial={initial} onDone={finish} />,
@@ -64,7 +66,8 @@ export function askDeleteClasses(names: string[]): Promise<{ recursive: boolean 
       resolve(v);
       modals.closeAll();
     };
-    modals.open({ title: t("Delete classes"), onClose: () => finish(null), children: <DeletePrompt names={names} onDone={finish} /> });
+    modals.open({
+      zIndex: 1000, title: t("Delete classes"), onClose: () => finish(null), children: <DeletePrompt names={names} onDone={finish} /> });
   });
 }
 

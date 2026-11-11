@@ -357,3 +357,56 @@ def test_fetch_full_reads_json_and_zip(monkeypatch):
         assert data["DictionaryCode"] == sample_data()["DictionaryCode"]
     assert captured["auth"] == "Bearer T"
     assert "DictionaryUri=https%3A%2F%2Fidentifier.buildingsmart.org" in captured["url"]
+
+
+def test_versions_restore_and_delete(client, settings):
+    pid = create(client)
+    ws, s, hello = connect(client, pid, "client-a", "Alice")
+    doc = hello["doc"]
+
+    # save a version, then change the dictionary and the editor data
+    r = client.post(f"/api/projects/{pid}/snapshots")
+    assert r.status_code == 200
+    (snap,) = r.json()["snapshots"]
+    assert snap["classes"] == len(doc["dictionary"]["Classes"])
+
+    s.send_json({"type": "op", "rid": 1, "op": "class.delete", "args": {"codes": ["Door"], "recursive": False}})
+    recv_until(s, "ack")
+    s.send_json({"type": "op", "rid": 2, "op": "loin.init", "args": {}})
+    recv_until(s, "ack")
+    codes = [c["Code"] for c in client.get(f"/api/projects/{pid}/dictionary.json").json()["Classes"]]
+    assert "Door" not in codes
+
+    # restore through the normal op pipeline: undoable, broadcast to everybody
+    saved = client.get(f"/api/projects/{pid}/snapshots/{snap['id']}").json()
+    s.send_json({"type": "op", "rid": 3, "op": "project.restore", "args": saved})
+    assert recv_until(s, "ack")["ok"]
+    restored = client.get(f"/api/projects/{pid}/project.json").json()
+    assert "Door" in [c["Code"] for c in restored["dictionary"]["Classes"]]
+    assert not restored["extras"].get("loin")  # editor data is restored too
+    s.send_json({"type": "undo", "rid": 4})
+    assert recv_until(s, "ack")["ok"]
+    assert "Door" not in [c["Code"] for c in client.get(f"/api/projects/{pid}/dictionary.json").json()["Classes"]]
+
+    assert client.get(f"/api/projects/{pid}/snapshots/20000101-000000").status_code == 404
+    assert client.get(f"/api/projects/{pid}/snapshots/..%2Fmeta").status_code in (404, 422)
+
+    # delete: gone from memory and disk, and a pending save does not bring it back
+    assert client.delete(f"/api/projects/{pid}").status_code == 200
+    assert client.get(f"/api/projects/{pid}").status_code == 404
+    assert not (settings.projects_dir / pid).exists()
+    ws.__exit__(None, None, None)
+    import time
+
+    time.sleep(0.3)  # longer than save_delay
+    assert not (settings.projects_dir / pid).exists()
+
+
+def test_viewers_cannot_delete_or_restore(client):
+    pid = create(client)
+    r = client.post(f"/api/projects/{pid}/access", json={"view_enabled": True})
+    view_id = r.json()["view_id"]
+    assert client.delete(f"/api/projects/{view_id}").status_code == 403
+    assert client.get(f"/api/projects/{view_id}/snapshots").status_code == 403
+    assert client.post(f"/api/projects/{view_id}/snapshots").status_code == 403
+    assert client.get(f"/api/projects/{pid}").status_code == 200

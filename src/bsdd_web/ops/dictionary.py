@@ -111,6 +111,18 @@ def replace_dictionary(ctx: Ctx, dictionary: dict[str, Any]) -> None:
     ctx.dictionary = new
 
 
+@op("project.restore")
+def restore_project(ctx: Ctx, dictionary: dict[str, Any], extras: dict[str, Any] | None = None) -> None:
+    """Replace dictionary and editor data with a saved version (one undoable step)."""
+    from . import Extras
+
+    new = BsddDictionary.model_validate(dictionary)
+    new_extras = Extras.model_validate(extras or {})
+    ctx.dictionary = new
+    for name in Extras.model_fields:
+        setattr(ctx.extras, name, getattr(new_extras, name))
+
+
 @op("dict.patch")
 def patch_dictionary(ctx: Ctx, patch: list[dict[str, Any]], guards: list[Any]) -> int:
     """Apply a JSON patch computed by the in-browser shell (diff of its local copy).

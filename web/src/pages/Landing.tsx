@@ -76,7 +76,7 @@ export function Landing() {
                   <Group gap="xs" wrap="nowrap">
                     <Badge variant="light" color="gray">{new Date(p.opened).toLocaleString()}</Badge>
                     <Tooltip label={t("Remove from list (the dictionary itself is kept)")}>
-                      <ActionIcon variant="subtle" color="gray" onClick={() => { forgetProject(p.id); setRecent(storageGet("bsdd-recent", [])); }}>
+                      <ActionIcon aria-label={t("Remove from list (the dictionary itself is kept)")} variant="subtle" color="gray" onClick={() => { forgetProject(p.id); setRecent(storageGet("bsdd-recent", [])); }}>
                         <IconTrash size={16} />
                       </ActionIcon>
                     </Tooltip>

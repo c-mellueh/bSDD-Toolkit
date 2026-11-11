@@ -85,8 +85,14 @@ class ClassEditorWidget(DialogTool):
     @classmethod
     def update_code(cls, widget: ui.ClassEditor, new_value: str):
         old_value = cls.get_properties().old_name_value
-        if widget.le_code.text() == dict_utils.slugify(old_value):
-            widget.le_code.setText(dict_utils.slugify(new_value))
+        prefix = ""
+        if widget.cb_class_type.currentText() == "GroupOfProperties":
+            from bsdd_gui.tool import GroupOfProperties
+
+            prefix = GroupOfProperties.get_prefix()
+        code = widget.le_code.text()
+        if code in (dict_utils.slugify(old_value), prefix + dict_utils.slugify(old_value)):
+            widget.le_code.setText(prefix + dict_utils.slugify(new_value))
         cls.get_properties().old_name_value = new_value
 
     @classmethod

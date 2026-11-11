@@ -53,6 +53,7 @@ export function DateField({ label, value, onChange }: { label: string; value?: s
       value={local && !isNaN(local.getTime()) ? local : null}
       valueFormat={lang === "de" ? "DD.MM.YYYY HH:mm" : "YYYY-MM-DD HH:mm"}
       clearable
+      clearButtonProps={{ "aria-label": "Clear" }}
       onChange={(d) => onChange(d ? dayjs(d).format("YYYY-MM-DDTHH:mm:ss") + "Z" : null)}
     />
   );
@@ -113,7 +114,7 @@ export function AiTextarea(props: {
         <Group gap={4} component="span">
           {props.label}
           <Tooltip label={hasKey ? t("Generate definition with AI") : t("Enter an API key (OpenAI, Claude or Gemini) in the settings to use the AI helper")}>
-            <ActionIcon size="xs" variant="subtle" onClick={generate} disabled={!hasKey || busy} component="span">
+            <ActionIcon aria-label={hasKey ? t("Generate definition with AI") : t("Enter an API key (OpenAI, Claude or Gemini) in the settings to use the AI helper")} size="xs" variant="subtle" onClick={generate} disabled={!hasKey || busy} component="span">
               {busy ? <Loader size={10} /> : <IconSparkles size={12} />}
             </ActionIcon>
           </Tooltip>

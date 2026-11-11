@@ -343,3 +343,90 @@ def add_context_menu_to_prop_view(
         True,
         icon=qta.icon("mdi6.sync"),
     )
+
+
+# Settings: code prefix and automatic creation
+
+
+def add_settings(func, settings_widget: Type[tool.SettingsWidget]):
+    from bsdd_gui.module.group_of_properties import ui
+
+    settings_widget.add_page_to_toolbox(ui.SettingsWidget, "pageGeneral", func)
+
+
+def load_settings(widget: ui.SettingsWidget, group_of_properties: Type[tool.GroupOfProperties]):
+    widget.le_prefix.setText(group_of_properties.get_prefix())
+    widget.cb_auto_create.setChecked(group_of_properties.is_auto_create())
+    widget.le_prefix.setToolTip(
+        QCoreApplication.translate(
+            "GroupsOfProperties",
+            "Code of new predefined property sets = prefix + name. "
+            "Letters, digits and _ - . only.",
+        )
+    )
+    group_of_properties.set_settings_widget(widget)
+
+
+def settings_accepted(
+    group_of_properties: Type[tool.GroupOfProperties],
+    project: Type[tool.Project],
+    main_window: Type[tool.MainWindowWidget],
+    gop_view: Type[tool.GopClassView],
+    popups: Type[tool.Popups],
+):
+    widget = group_of_properties.get_settings_widget()
+    if not widget:
+        return
+    group_of_properties.set_settings_widget(None)
+    group_of_properties.set_auto_create(widget.cb_auto_create.isChecked())
+    old = group_of_properties.get_prefix()
+    new = widget.le_prefix.text().strip()
+    if not group_of_properties.is_prefix_valid(new):
+        message = QCoreApplication.translate(
+            "GroupsOfProperties",
+            "The prefix may only contain letters, digits and _ - . (max. 30 characters).",
+        )
+        popups.create_warning_popup(message, text_title=message)
+        return
+    if new == old:
+        return
+    group_of_properties.set_prefix(new)
+    offer_prefix_rename(old, new, group_of_properties, project, main_window, gop_view, popups)
+
+
+def offer_prefix_rename(
+    old: str,
+    new: str,
+    group_of_properties: Type[tool.GroupOfProperties],
+    project: Type[tool.Project],
+    main_window: Type[tool.MainWindowWidget],
+    gop_view: Type[tool.GopClassView],
+    popups: Type[tool.Popups],
+):
+    bsdd_dictionary = project.get()
+    if bsdd_dictionary is None:
+        return
+    targets = group_of_properties.get_classes_with_prefix(old, bsdd_dictionary)
+    if not targets:
+        return
+    example = targets[0].Code
+    text = QCoreApplication.translate(
+        "GroupsOfProperties",
+        "{} predefined property sets use the old prefix '{}'.\n"
+        "Rename their codes to the new prefix '{}'?\n\nExample: {} → {}",
+    ).format(len(targets), old, new, example, new + example[len(old) :])
+    title = QCoreApplication.translate("GroupsOfProperties", "Rename predefined property sets?")
+    if not popups.request_yes_no(title, text):
+        return
+    try:
+        count = group_of_properties.rename_prefix(old, new, bsdd_dictionary)
+    except ValueError as error:
+        message = QCoreApplication.translate(
+            "GroupsOfProperties", "Nothing was renamed, these codes exist already: {}"
+        ).format(error)
+        popups.create_warning_popup(message, text_title=message)
+        return
+    logging.info(f"Renamed {count} predefined property sets from '{old}' to '{new}'")
+    gop_view.signals.model_refresh_requested.emit()
+    main_window.signals.update_pset_combobox_requested.emit()
+    project.signals.data_changed.emit("Classes", bsdd_dictionary.Classes)

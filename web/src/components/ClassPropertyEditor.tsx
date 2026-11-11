@@ -11,6 +11,8 @@ import { useReadOnly } from "../state/readonly";
 import { openUi, useUi } from "../state/ui";
 import type { AllowedValue } from "../types";
 import { AllowedValuesEditor, OptionalNumber, useResources } from "./fields";
+import { useUnsaved } from "../state/unsaved";
+import { closePopup } from "./UnsavedGuard";
 
 const EDITABLE = [
   "Code", "PropertyCode", "PropertyUri", "Description", "PropertySet", "Unit", "PredefinedValue", "IsRequired", "IsWritable",
@@ -28,6 +30,7 @@ export function ClassPropertyEditor() {
   const [form, setForm] = useState<Record<string, any>>({});
   const [refMode, setRefMode] = useState<"code" | "uri">("code");
   const [busy, setBusy] = useState(false);
+  const [initial, setInitial] = useState("");
   const cls = target ? idx.classes.get(target.classCode) : undefined;
   const existing = target?.code ? cls?.ClassProperties?.find((cp) => cp.Code === target.code) : undefined;
 
@@ -38,14 +41,18 @@ export function ClassPropertyEditor() {
       for (const k of EDITABLE) f[k] = (existing as any)[k] ?? null;
       f.AllowedValues = existing.AllowedValues ?? [];
       setForm(f);
+      setInitial(JSON.stringify(f));
       setRefMode(existing.PropertyUri ? "uri" : "code");
     } else {
-      setForm({ Code: "", PropertyCode: "", PropertySet: cls.ClassType === GOP ? cls.Name : target.pset ?? "", IsRequired: true, AllowedValues: [] });
+      const f = { Code: "", PropertyCode: "", PropertySet: cls.ClassType === GOP ? cls.Name : target.pset ?? "", IsRequired: true, AllowedValues: [] };
+      setForm(f);
+      setInitial(JSON.stringify(f));
       setRefMode("code");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target]);
 
+  const releaseUnsaved = useUnsaved(!!target && !readOnly && !!initial && JSON.stringify(form) !== initial, "popup");
   const propOptions = useMemo(() => (doc?.dictionary.Properties ?? []).map((p) => ({ value: p.Code, label: `${p.Name} (${p.Code})` })), [doc]);
   if (!target || !cls || !doc) return null;
   const d = doc.dictionary;
@@ -98,7 +105,10 @@ export function ClassPropertyEditor() {
       ok = await attempt(() => op<string>("cp.create", { class_code: cls.Code, data }));
     }
     setBusy(false);
-    if (ok) close();
+    if (ok) {
+      releaseUnsaved();
+      close();
+    }
   };
 
   const createProperty = () =>
@@ -112,7 +122,7 @@ export function ClassPropertyEditor() {
     });
 
   return (
-    <Modal opened onClose={close} title={existing ? t("Edit class property: {{code}}", { code: existing.Code }) : t("New class property in {{cls}}", { cls: cls.Name })} size="xl">
+    <Modal opened onClose={() => closePopup(close)} title={existing ? t("Edit class property: {{code}}", { code: existing.Code }) : t("New class property in {{cls}}", { cls: cls.Name })} size="xl">
       <form onSubmit={(e) => { e.preventDefault(); if (!readOnly) void save(); }}>
         <Tabs defaultValue="general" keepMounted={false}>
           <Tabs.List mb="sm">
@@ -144,13 +154,13 @@ export function ClassPropertyEditor() {
                     }} style={{ flex: 1 }} error={refError} />
                   )}
                   {refMode === "code" && prop && (
-                    <Tooltip label={t("Edit property")}><ActionIcon variant="light" mb={2} onClick={() => openUi({ propertyEditor: { code: prop.Code } })}><IconEdit size={16} /></ActionIcon></Tooltip>
+                    <Tooltip label={t("Edit property")}><ActionIcon aria-label={t("Edit property")} variant="light" mb={2} onClick={() => openUi({ propertyEditor: { code: prop.Code } })}><IconEdit size={16} /></ActionIcon></Tooltip>
                   )}
                   {refMode === "code" && (
-                    <Tooltip label={t("Create new property")}><ActionIcon variant="light" mb={2} onClick={createProperty}><IconPlus size={16} /></ActionIcon></Tooltip>
+                    <Tooltip label={t("Create new property")}><ActionIcon aria-label={t("Create new property")} variant="light" mb={2} onClick={createProperty}><IconPlus size={16} /></ActionIcon></Tooltip>
                   )}
                   {refMode === "uri" && isUri(form.PropertyUri) && (
-                    <Tooltip label={t("Open in browser")}><ActionIcon variant="light" mb={2} component="a" href={form.PropertyUri} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
+                    <Tooltip label={t("Open in browser")}><ActionIcon aria-label={t("Open in browser")} variant="light" mb={2} component="a" href={form.PropertyUri} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
                   )}
                 </Group>
               </Grid.Col>
@@ -192,7 +202,7 @@ export function ClassPropertyEditor() {
           </fieldset></Tabs.Panel>
         </Tabs>
         <Group justify="flex-end" mt="md" hidden={readOnly}>
-          <Button variant="default" onClick={close}>{t("Cancel")}</Button>
+          <Button variant="default" onClick={() => closePopup(close)}>{t("Cancel")}</Button>
           <Button type="submit" loading={busy} disabled={!!refError || !!codeError}>{existing ? t("Save") : t("Create")}</Button>
         </Group>
       </form>

@@ -1,7 +1,7 @@
 {
   "name": "bsdd-toolkit-web",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,8 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "preview": "vite preview",
-    "build:wasm": "cd graph-engine && (cargo build --release --target wasm32-unknown-unknown --lib 2>/dev/null || docker run --rm -u $(id -u):$(id -g) -e CARGO_HOME=/tmp/cargo -v \"$PWD\":/src -w /src rust:1.86-slim sh -c 'cargo build --release --target wasm32-unknown-unknown --lib') && cp target/wasm32-unknown-unknown/release/graph_engine.wasm ../src/graph/engine.wasm"
+    "build:wasm": "cd graph-engine && (cargo build --release --target wasm32-unknown-unknown --lib 2>/dev/null || docker run --rm -u $(id -u):$(id -g) -e CARGO_HOME=/tmp/cargo -v \"$PWD\":/src -w /src rust:1.86-slim sh -c 'cargo build --release --target wasm32-unknown-unknown --lib') && cp target/wasm32-unknown-unknown/release/graph_engine.wasm ../src/graph/engine.wasm",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.4.0",
@@ -30,6 +31,7 @@
     "zustand": "5.0.3"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@types/react": "18.3.20",
     "@types/react-dom": "18.3.6",
     "@vitejs/plugin-react": "4.3.4",

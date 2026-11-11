@@ -236,6 +236,7 @@ def create_new_property_set(
     property_set_table: Type[tool.PropertySetTableView],
     util: Type[tool.Util],
     project: Type[tool.Project],
+    group_of_properties: Type[tool.GroupOfProperties],
 ):
     if not bsdd_class:
         return
@@ -244,6 +245,19 @@ def create_new_property_set(
     is_predefined = property_set_table.is_pset_predefined(pset_name, project.get())
     is_existing = property_set_table.is_pset_existing(pset_name, bsdd_class)
     existings_psets = property_set_table.get_pset_names_with_temporary(bsdd_class)
+
+    if (
+        not is_predefined
+        and not is_existing
+        and pset_name.strip()
+        and group_of_properties.is_auto_create()
+    ):
+        # Setting "create predefined property set": add a GroupOfProperties with this name
+        # and connect the new property set to it.
+        group_of_properties.create_group_of_properties(
+            pset_name, group_of_properties.get_prefix(), project.get()
+        )
+        is_predefined = True
 
     if is_predefined:
         # if connected Pset is allready existing add the pset under a new name and dont connect it

@@ -3,13 +3,15 @@ import { Button, Grid, Group, Select, Tabs, TagsInput, TextInput, Textarea } fro
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AiTextarea, RelationsEditor, useResources } from "../components/fields";
-import { CLASS_STATUSES, CLASS_TYPES, clean, slugify } from "../model";
+import { CLASS_STATUSES, CLASS_TYPES, GOP, clean, slugify } from "../model";
+import { useSettings } from "../state/settings";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
 import { useReadOnly } from "../state/readonly";
 import type { BsddClass, ClassRelation } from "../types";
 import { SaveBar, changedKeys, mergeRemote, same, snap } from "./SaveBar";
 import { CommonDetailCards, DetailGrid } from "./DetailSections";
+import { useUnsaved } from "../state/unsaved";
 
 const EDITABLE = [
   "Code", "Name", "ClassType", "Definition", "Description", "ParentClassCode", "RelatedIfcEntityNamesList", "Synonyms", "Status",
@@ -55,6 +57,7 @@ export function ClassForm(props: ClassFormProps) {
   const [busy, setBusy] = useState(false);
   const dirty = snap(form, relations) !== snap(base.form, base.relations);
   const dirtyRef = useRef(dirty);
+  const releaseUnsaved = useUnsaved(dirty && !readOnly, inline ? "page" : "popup");
   dirtyRef.current = dirty;
 
   const reset = () => {
@@ -89,7 +92,9 @@ export function ClassForm(props: ClassFormProps) {
   const setName = (name: string) =>
     setForm((f) => {
       const next: Record<string, any> = { ...f, Name: name };
-      if (!existing && (!f.Code || f.Code === slugify(f.Name ?? ""))) next.Code = slugify(name);
+      // new Groups of Properties get the prefix from the settings (e.g. "Pset_Fire-Safety")
+      const codeFor = (n: string) => (n && f.ClassType === GOP ? useSettings.getState().gopPrefix : "") + slugify(n);
+      if (!existing && (!f.Code || f.Code === codeFor(f.Name ?? "") || f.Code === slugify(f.Name ?? ""))) next.Code = codeFor(name);
       return next;
     });
 
@@ -125,6 +130,7 @@ export function ClassForm(props: ClassFormProps) {
     if (ok) {
       // the store update arrives with the server patch; treat the saved state as clean
       setBase({ form, relations });
+      releaseUnsaved();
       onDone?.(ok);
     }
   };

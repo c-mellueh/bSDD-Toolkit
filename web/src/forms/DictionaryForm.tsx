@@ -9,6 +9,7 @@ import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
 import { useReadOnly } from "../state/readonly";
 import { SaveBar, changedKeys, mergeRemote, snap } from "./SaveBar";
+import { useUnsaved } from "../state/unsaved";
 
 const FIELDS = [
   "OrganizationCode", "DictionaryCode", "DictionaryName", "DictionaryVersion", "LanguageIsoCode", "LanguageOnly", "UseOwnUri", "DictionaryUri",
@@ -32,6 +33,7 @@ export function DictionaryForm({ inline, onDone, onCancel }: { inline?: boolean;
   const [busy, setBusy] = useState(false);
   const dirty = snap(form) !== snap(base);
   const dirtyRef = useRef(dirty);
+  const releaseUnsaved = useUnsaved(dirty, inline ? "page" : "popup");
   dirtyRef.current = dirty;
   const reset = () => {
     const f = fromDoc();
@@ -69,6 +71,7 @@ export function DictionaryForm({ inline, onDone, onCancel }: { inline?: boolean;
     for (const k of changedKeys(FIELDS, data, clean({ ...base }))) changed[k] = data[k];
     if (!Object.keys(changed).length) {
       setBase(form);
+      releaseUnsaved();
       return onDone?.();
     }
     setBusy(true);
@@ -76,6 +79,7 @@ export function DictionaryForm({ inline, onDone, onCancel }: { inline?: boolean;
     setBusy(false);
     if (ok) {
       setBase(form);
+      releaseUnsaved();
       onDone?.();
     }
   };

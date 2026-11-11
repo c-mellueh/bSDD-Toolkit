@@ -27,7 +27,7 @@ from .config import Settings, settings as default_settings
 from .ops import Extras, OpError, format_validation_error
 from .services import download as download_service
 from .services import ifc as ifc_service
-from .store import ClientInfo, Project, ProjectStore, _atomic_write, _json_bytes
+from .store import ClientInfo, Project, ProjectStore, _atomic_write, _json_bytes, list_snapshots, read_snapshot
 
 logger = logging.getLogger("bsdd_web")
 
@@ -276,6 +276,40 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         data = json.dumps(project.doc, ensure_ascii=False).encode("utf-8")
         d = project.dictionary
         return Response(data, media_type="application/json", headers=_disposition(f"{d.DictionaryCode}_{d.DictionaryVersion}.project.json"))
+
+    # ------------------------------------------------------------------ versions / delete
+
+    @app.get("/api/projects/{pid}/snapshots")
+    async def snapshots(pid: str, request: Request) -> dict[str, Any]:
+        project, _ = await project_for(pid, request, edit=True)
+        return {"snapshots": await asyncio.to_thread(list_snapshots, project.root), "max": settings.max_snapshots}
+
+    @app.post("/api/projects/{pid}/snapshots")
+    async def create_snapshot(pid: str, request: Request) -> dict[str, Any]:
+        """Save the current state as a version right now."""
+        project, _ = await project_for(pid, request, edit=True)
+        async with project.lock:
+            await asyncio.to_thread(project.write_to_disk, settings)
+            await asyncio.to_thread(project.snapshot, settings)
+        return {"snapshots": await asyncio.to_thread(list_snapshots, project.root), "max": settings.max_snapshots}
+
+    @app.get("/api/projects/{pid}/snapshots/{stamp}")
+    async def snapshot(pid: str, stamp: str, request: Request) -> dict[str, Any]:
+        project, _ = await project_for(pid, request, edit=True)
+        try:
+            return await asyncio.to_thread(read_snapshot, project.root, stamp)
+        except KeyError as exc:
+            raise HTTPException(404, "This version does not exist (anymore)") from exc
+
+    @app.delete("/api/projects/{pid}")
+    async def delete_project(pid: str, request: Request) -> dict[str, Any]:
+        """Delete a dictionary for good (needs edit access, i.e. the edit password if one is set)."""
+        project, _ = await project_for(pid, request, edit=True)
+        async with project.lock:
+            await asyncio.to_thread(store.delete, project)
+        for conn in list(project.connections):
+            conn["queue"].put_nowait({"type": "access_changed"})  # clients reconnect and get "not found"
+        return {"deleted": True}
 
     @app.post("/api/projects/{pid}/duplicate")
     async def duplicate(pid: str, request: Request) -> dict[str, Any]:

@@ -137,8 +137,8 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
         </span>
         {cls && !ro && (
           <Group gap={2}>
-            <Tooltip label={t("Add existing property…")}><ActionIcon variant="subtle" size="sm" onClick={addExisting}><IconListSearch size={16} /></ActionIcon></Tooltip>
-            <Tooltip label={t("New class property") + " (Ctrl+N)"}><ActionIcon variant="light" size="sm" onClick={newCp}><IconPlus size={16} /></ActionIcon></Tooltip>
+            <Tooltip label={t("Add existing property…")}><ActionIcon aria-label={t("Add existing property…")} variant="subtle" size="sm" onClick={addExisting}><IconListSearch size={16} /></ActionIcon></Tooltip>
+            <Tooltip label={t("New class property") + " (Ctrl+N)"}><ActionIcon aria-label={t("New class property") + " (Ctrl+N)"} variant="light" size="sm" onClick={newCp}><IconPlus size={16} /></ActionIcon></Tooltip>
           </Group>
         )}
       </div>

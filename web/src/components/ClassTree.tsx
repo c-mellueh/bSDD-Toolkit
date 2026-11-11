@@ -261,9 +261,9 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
               ))}
             </Menu.Dropdown>
           </Menu>
-          <Tooltip label={t("Expand all")}><ActionIcon variant="subtle" size="sm" onClick={() => tree.current?.openAll()}><IconArrowsMaximize size={16} /></ActionIcon></Tooltip>
-          <Tooltip label={t("Collapse all")}><ActionIcon variant="subtle" size="sm" onClick={() => tree.current?.closeAll()}><IconArrowsMinimize size={16} /></ActionIcon></Tooltip>
-          {!ro && <Tooltip label={t("New class") + " (Ctrl+N)"}><ActionIcon variant="light" size="sm" onClick={() => newClass(activeClass && idx.classes.get(activeClass) && include(idx.classes.get(activeClass)!) ? activeClass : null)}><IconPlus size={16} /></ActionIcon></Tooltip>}
+          <Tooltip label={t("Expand all")}><ActionIcon aria-label={t("Expand all")} variant="subtle" size="sm" onClick={() => tree.current?.openAll()}><IconArrowsMaximize size={16} /></ActionIcon></Tooltip>
+          <Tooltip label={t("Collapse all")}><ActionIcon aria-label={t("Collapse all")} variant="subtle" size="sm" onClick={() => tree.current?.closeAll()}><IconArrowsMinimize size={16} /></ActionIcon></Tooltip>
+          {!ro && <Tooltip label={t("New class") + " (Ctrl+N)"}><ActionIcon aria-label={t("New class") + " (Ctrl+N)"} variant="light" size="sm" onClick={() => newClass(activeClass && idx.classes.get(activeClass) && include(idx.classes.get(activeClass)!) ? activeClass : null)}><IconPlus size={16} /></ActionIcon></Tooltip>}
         </Group>
       </div>
       <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--mantine-color-default-border)" }}>
@@ -316,6 +316,7 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
             disableEdit
             disableMultiSelection={false}
             selection={activeClass ?? undefined}
+            selectionFollowsFocus // arrow keys show the class right away
             onActivate={(node) => setActiveClass(node.id)}
             onSelect={(nodes) => {
               setSelectedClasses(nodes.map((n) => n.id));

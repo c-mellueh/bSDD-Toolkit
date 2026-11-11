@@ -5,12 +5,14 @@ from __future__ import annotations
 from typing import Any
 
 from bsdd_json import BsddClass, BsddClassProperty, BsddClassRelation, BsddProperty
+from bsdd_json.utils import dictionary_utils as dict_utils
 
 from . import Ctx, OpError, op
 from .helpers import (
     GOP,
     add_temporary_pset,
     attach_property,
+    class_index,
     class_uri,
     classes_referencing,
     get_class,
@@ -239,14 +241,20 @@ def remove_property_from_classes(ctx: Ctx, property_code: str, class_codes: list
 
 
 @op("pset.create")
-def create_property_set(ctx: Ctx, class_code: str, name: str) -> str:
-    """Create a property set; if a GroupOfProperties with this name exists, link it."""
+def create_property_set(ctx: Ctx, class_code: str, name: str, auto_gop: bool = False, gop_prefix: str = "") -> str:
+    """Create a property set; if a GroupOfProperties with this name exists, link it.
+
+    With ``auto_gop`` a missing GroupOfProperties is created first (code = ``gop_prefix`` + name)
+    and linked, so every new property set starts as a predefined, reusable one.
+    """
     bsdd_class = get_class(ctx.d, class_code)
     name = (name or "").strip()
     if not name:
         raise OpError("Name must not be empty")
     existing = pset_names(ctx, bsdd_class)
     gop = gop_by_name(ctx.d, name)
+    if gop is None and auto_gop and bsdd_class.ClassType != GOP and name not in existing:
+        gop = _create_gop(ctx, name, gop_prefix)
     if gop is not None and gop is not bsdd_class and name not in existing:
         _link_gop(ctx, bsdd_class, gop)
         if name not in pset_names(ctx, bsdd_class):
@@ -255,6 +263,19 @@ def create_property_set(ctx: Ctx, class_code: str, name: str) -> str:
     name = unique_code(name, existing)
     add_temporary_pset(ctx, bsdd_class.Code, name)
     return name
+
+
+def _create_gop(ctx: Ctx, name: str, prefix: str) -> BsddClass:
+    """New, empty GroupOfProperties named ``name`` with the code ``prefix`` + slug of the name."""
+    d = ctx.d
+    prefix = (prefix or "").strip()
+    if len(prefix) > 30 or not all(ch.isalnum() or ch in "_-." for ch in prefix):
+        raise OpError("The prefix may only contain letters, digits, '_', '-' and '.' (max. 30 characters)")
+    code = unique_code(f"{prefix}{dict_utils.slugify(name)}", class_index(d))
+    gop = BsddClass.model_validate({"Code": code, "Name": name, "ClassType": GOP})
+    gop._set_parent(d)
+    d.Classes.append(gop)
+    return gop
 
 
 def _link_gop(ctx: Ctx, bsdd_class: BsddClass, gop: BsddClass) -> None:
@@ -332,6 +353,39 @@ def paste_property_sets(ctx: Ctx, class_code: str, payload: dict[str, Any]) -> l
 
 
 # ----------------------------------------------------------------- GoP actions
+
+
+@op("gop.rename_prefix")
+def rename_gop_prefix(ctx: Ctx, old: str, new: str) -> int:
+    """Replace the code prefix of all Groups of Properties (``old`` -> ``new``).
+
+    Uses the normal class update, so relations and URIs that point to the groups follow.
+    Groups whose code does not start with ``old`` are left alone. Returns the number renamed.
+    """
+    from .classes import update_class
+
+    old, new = (old or "").strip(), (new or "").strip()
+    for prefix in (old, new):
+        if len(prefix) > 30 or not all(ch.isalnum() or ch in "_-." for ch in prefix):
+            raise OpError("The prefix may only contain letters, digits, '_', '-' and '.' (max. 30 characters)")
+    if old == new:
+        return 0
+    renames: list[tuple[str, str]] = []
+    taken = set(class_index(ctx.d))
+    for c in ctx.d.Classes:
+        if c.ClassType != GOP or not c.Code.startswith(old) or (not old and new and c.Code.startswith(new)):
+            continue
+        target = new + c.Code[len(old) :]
+        if not target:
+            raise OpError(f"'{c.Code}' would get an empty code")
+        if target in taken:
+            raise OpError(f"Cannot rename '{c.Code}': the code '{target}' is already used")
+        taken.discard(c.Code)
+        taken.add(target)
+        renames.append((c.Code, target))
+    for code, target in renames:
+        update_class(ctx, code, {"Code": target})
+    return len(renames)
 
 
 @op("gop.sync_allowed_values")

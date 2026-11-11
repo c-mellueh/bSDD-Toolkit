@@ -9,7 +9,10 @@ from bsdd_gui.presets.tool_presets import (
     FieldSignals,
 )
 from bsdd_json.utils import property_utils as prop_utils
-from bsdd_gui.module.group_of_properties import trigger, models, views, ui
+from bsdd_json.utils import class_utils as cl_utils
+from bsdd_json.utils import dictionary_utils as dict_utils
+from bsdd_json.utils import build_unique_code
+from bsdd_gui.module.group_of_properties import trigger, models, views, ui, constants
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal, QCoreApplication
 from .class_tree_view import ClassTreeView as CTV
@@ -146,6 +149,116 @@ class GroupOfProperties(FieldTool, ActionTool):
         relating_properties = prop_utils.get_relating_properties(gop_property, bsdd_dictionary)
         for prop in relating_properties:
             prop.Code = new_code
+
+    # Settings: code prefix and automatic creation
+
+    @classmethod
+    def get_prefix(cls) -> str:
+        from bsdd_gui.tool import Appdata
+
+        prefix = Appdata.get_string_setting(
+            constants.APPDATA_SECTION, constants.OPTION_PREFIX, constants.DEFAULT_PREFIX
+        )
+        return prefix if cls.is_prefix_valid(prefix) else constants.DEFAULT_PREFIX
+
+    @classmethod
+    def set_prefix(cls, prefix: str) -> None:
+        from bsdd_gui.tool import Appdata
+
+        Appdata.set_setting(constants.APPDATA_SECTION, constants.OPTION_PREFIX, prefix)
+
+    @classmethod
+    def is_auto_create(cls) -> bool:
+        from bsdd_gui.tool import Appdata
+
+        return Appdata.get_bool_setting(
+            constants.APPDATA_SECTION, constants.OPTION_AUTO_CREATE, default=False
+        )
+
+    @classmethod
+    def set_auto_create(cls, value: bool) -> None:
+        from bsdd_gui.tool import Appdata
+
+        Appdata.set_setting(constants.APPDATA_SECTION, constants.OPTION_AUTO_CREATE, value)
+
+    @classmethod
+    def is_prefix_valid(cls, prefix: str) -> bool:
+        return len(prefix) <= constants.PREFIX_MAX_LENGTH and all(
+            ch.isalnum() or ch in "_-." for ch in prefix
+        )
+
+    @classmethod
+    def set_settings_widget(cls, widget: ui.SettingsWidget):
+        cls.get_properties().settings_widget = widget
+
+    @classmethod
+    def get_settings_widget(cls) -> ui.SettingsWidget | None:
+        return cls.get_properties().settings_widget
+
+    @classmethod
+    def build_code(cls, name: str, prefix: str, bsdd_dictionary: BsddDictionary) -> str:
+        existing = [c.Code for c in bsdd_dictionary.Classes]
+        return build_unique_code(f"{prefix}{dict_utils.slugify(name)}", existing)
+
+    @classmethod
+    def create_group_of_properties(
+        cls, name: str, prefix: str, bsdd_dictionary: BsddDictionary
+    ) -> BsddClass:
+        """Create a GroupOfProperties class called ``name`` and add it to the dictionary."""
+        gop = BsddClass(
+            Code=cls.build_code(name, prefix, bsdd_dictionary),
+            Name=name,
+            ClassType="GroupOfProperties",
+        )
+        if GopClassView.get_model(bsdd_dictionary) is not None:
+            GopClassView.add_class_to_dictionary(gop, bsdd_dictionary)  # emits item_added
+        else:
+            from bsdd_gui.tool import Project
+
+            bsdd_dictionary.Classes.append(gop)
+            gop._set_parent(bsdd_dictionary)
+            Project.signals.class_added.emit(gop)
+        return gop
+
+    @classmethod
+    def get_classes_with_prefix(cls, prefix: str, bsdd_dictionary: BsddDictionary):
+        if not prefix:
+            return []
+        return [
+            c
+            for c in bsdd_dictionary.Classes
+            if c.ClassType == "GroupOfProperties" and c.Code.startswith(prefix)
+        ]
+
+    @classmethod
+    def rename_prefix(cls, old: str, new: str, bsdd_dictionary: BsddDictionary) -> int:
+        """Replace the code prefix ``old`` by ``new`` on all GroupOfProperties.
+
+        Relations pointing to the renamed classes follow. Raises ValueError (and changes nothing)
+        if a new code is already taken.
+        """
+        if not old or old == new:
+            return 0
+        targets = cls.get_classes_with_prefix(old, bsdd_dictionary)
+        renames = {c.Code: new + c.Code[len(old) :] for c in targets}
+        others = {c.Code for c in bsdd_dictionary.Classes} - set(renames)
+        clashes = sorted(code for code in renames.values() if code in others)
+        if clashes:
+            raise ValueError(", ".join(clashes))
+        old_uris = {c.Code: cl_utils.build_bsdd_uri(c, bsdd_dictionary) for c in targets}
+        # two steps so swapped codes don't collide halfway
+        for c in targets:
+            cl_utils.set_code(c, f"\0{c.Code}")
+        uri_map = {}
+        for c in targets:
+            old_code = c.Code[1:]
+            cl_utils.set_code(c, renames[old_code])
+            uri_map[old_uris[old_code]] = cl_utils.build_bsdd_uri(c, bsdd_dictionary)
+        for bsdd_class in bsdd_dictionary.Classes:
+            for relation in bsdd_class.ClassRelations:
+                if relation.RelatedClassUri in uri_map:
+                    relation.RelatedClassUri = uri_map[relation.RelatedClassUri]
+        return len(targets)
 
 
 class ClassViewSignals(CTS):

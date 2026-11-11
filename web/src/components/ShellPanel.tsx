@@ -119,7 +119,7 @@ export function ShellPanel() {
             <Badge color="yellow" variant="light" style={{ cursor: "pointer" }} onClick={reload}>{t("Changed elsewhere – reload")}</Badge>
           </Tooltip>
         )}
-        <Tooltip label={t("Reload dictionary from server")}><ActionIcon size="sm" variant={stale ? "light" : "subtle"} color={stale ? "yellow" : undefined} onClick={reload} disabled={!ready || busy}><IconRefresh size={14} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Reload dictionary from server")}><ActionIcon aria-label={t("Reload dictionary from server")} size="sm" variant={stale ? "light" : "subtle"} color={stale ? "yellow" : undefined} onClick={reload} disabled={!ready || busy}><IconRefresh size={14} /></ActionIcon></Tooltip>
         {readOnly ? (
           <Tooltip label={t("Read-only link: changes to 'd' stay in this browser and are never sent.")} multiline w={260}>
             <Badge size="sm" variant="light" color="gray">{t("Local only")}</Badge>
@@ -132,8 +132,8 @@ export function ShellPanel() {
         {!live && !readOnly && (
           <Button size="compact-xs" variant={pending ? "filled" : "light"} leftSection={<IconCloudUpload size={12} />} onClick={syncNow} disabled={!ready || busy}>{t("Apply to shared dictionary")}</Button>
         )}
-        <Tooltip label={t("Clear")}><ActionIcon size="sm" variant="subtle" onClick={() => setLines([])}><IconTrash size={14} /></ActionIcon></Tooltip>
-        <Tooltip label={t("Close")}><ActionIcon size="sm" variant="subtle" onClick={() => useUi.getState().set({ shell: false })}><IconX size={14} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Clear")}><ActionIcon aria-label={t("Clear")} size="sm" variant="subtle" onClick={() => setLines([])}><IconTrash size={14} /></ActionIcon></Tooltip>
+        <Tooltip label={t("Close")}><ActionIcon aria-label={t("Close")} size="sm" variant="subtle" onClick={() => useUi.getState().set({ shell: false })}><IconX size={14} /></ActionIcon></Tooltip>
       </Group>
       <div ref={out} className="shell-output" style={{ flex: 1, overflow: "auto", padding: "4px 8px" }}>
         {lines.map((l, i) => (

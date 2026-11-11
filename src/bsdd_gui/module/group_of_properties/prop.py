@@ -9,6 +9,7 @@ class GroupOfPropertiesProperties(ActionsProperties, FieldProperties):
         super().__init__()
         self.active_class = None
         self.active_class_property = None
+        self.settings_widget = None
 
 
 class GopClassViewProperties(ClassTreeViewProperties):

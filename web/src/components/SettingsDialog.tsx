@@ -4,16 +4,53 @@ import { renameMe } from "../state/project";
 import { forbiddenAi } from "../ai";
 import { AI_PROVIDERS, useSettings, type AiProvider } from "../state/settings";
 import { useUi } from "../state/ui";
+import { useRef } from "react";
+import i18n from "../i18n";
+import { GOP } from "../model";
+import { attempt, notifyOk } from "../notify";
+import { op, useProject } from "../state/project";
+import { askConfirm } from "./dialogs";
+
+/** After the prefix changed: offer to rename the existing Groups of Properties to the new prefix. */
+async function offerPrefixRename(before: string, after: string) {
+  const { doc, role } = useProject.getState();
+  if (before === after || !doc || role !== "edit") return;
+  const codes = (doc.dictionary.Classes ?? [])
+    .filter((c) => c.ClassType === GOP && c.Code.startsWith(before) && !(before === "" && after && c.Code.startsWith(after)))
+    .map((c) => c.Code);
+  if (!codes.length) return;
+  const t = i18n.t.bind(i18n);
+  const example = `${codes[0]} → ${after}${codes[0].slice(before.length)}`;
+  const ok = await askConfirm(
+    t("Rename existing predefined property sets?"),
+    t("{{n}} Groups of Properties in this dictionary use the prefix “{{before}}”. Change their codes to “{{after}}” (e.g. {{example}})? This changes the dictionary for everybody and can be undone with Ctrl+Z.", { n: codes.length, before: before || t("(none)"), after: after || t("(none)"), example }),
+    t("Rename {{n}}", { n: codes.length }),
+  );
+  if (!ok) return;
+  const n = await attempt(() => op<number>("gop.rename_prefix", { old: before, new: after }));
+  if (n !== undefined) notifyOk(t("{{n}} Groups of Properties renamed", { n }));
+}
 
 export function SettingsDialog() {
   const { t } = useTranslation();
   const opened = useUi((s) => s.settings);
   const s = useSettings();
+  const prefixBefore = useRef(s.gopPrefix);
+  // ask once per change, whether the field loses focus or the dialog is closed (Escape)
+  const checkPrefix = () => {
+    const before = prefixBefore.current;
+    prefixBefore.current = s.gopPrefix;
+    void offerPrefixRename(before, s.gopPrefix);
+  };
+  const close = () => {
+    checkPrefix();
+    useUi.getState().set({ settings: false });
+  };
   if (!opened) return null;
   const provider = AI_PROVIDERS.find((p) => p.value === s.aiProvider) ?? AI_PROVIDERS[0];
   const blocked = forbiddenAi(s.aiKeys[s.aiProvider] ?? "", s.aiModels[s.aiProvider] ?? "");
   return (
-    <Modal opened onClose={() => useUi.getState().set({ settings: false })} title={t("Settings")} size="md">
+    <Modal opened onClose={close} title={t("Settings")} size="md">
       <Stack>
         <Text size="xs" c="dimmed">{t("Settings are stored in this browser only.")}</Text>
         <TextInput label={t("Your name (shown to collaborators)")} value={s.userName} onChange={(e) => s.set({ userName: e.currentTarget.value })} onBlur={() => renameMe(s.userName)} />
@@ -23,6 +60,23 @@ export function SettingsDialog() {
         </Group>
         <TextInput label={t("Separator for pasting allowed values")} description={t("Use \\n for line breaks")} value={s.pasteSeparator === "\n" ? "\\n" : s.pasteSeparator} onChange={(e) => s.set({ pasteSeparator: e.currentTarget.value === "\\n" ? "\n" : e.currentTarget.value })} />
         <Switch label={t("Allow relations to unknown URIs")} checked={s.allowUnknownUri} onChange={(e) => s.set({ allowUnknownUri: e.currentTarget.checked })} />
+        <Divider label={t("Predefined property sets")} />
+        <TextInput
+          label={t("Code prefix for predefined property sets")}
+          description={t("Put in front of the code of new Groups of Properties, e.g. “EPset_” gives “EPset_Geometry”.")}
+          placeholder="EPset_"
+          value={s.gopPrefix}
+          onFocus={() => (prefixBefore.current = s.gopPrefix)}
+          onBlur={checkPrefix}
+          onChange={(e) => s.set({ gopPrefix: e.currentTarget.value.replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 30) })}
+          className="mono"
+        />
+        <Switch
+          label={t("Create a predefined property set automatically")}
+          description={t("When you add a property set to a class and no Group of Properties has that name, one is created and linked.")}
+          checked={s.autoCreateGop}
+          onChange={(e) => s.set({ autoCreateGop: e.currentTarget.checked })}
+        />
         <Divider label={t("AI helper")} />
         <Select
           label={t("AI provider")}
@@ -49,7 +103,7 @@ export function SettingsDialog() {
           <Select label={t("Output language")} data={[{ value: "English", label: "English" }, { value: "German", label: "Deutsch" }]} value={s.aiLanguage} onChange={(v) => v && s.set({ aiLanguage: v as "English" | "German" })} allowDeselect={false} />
           <NumberInput label={t("Sentences")} min={1} max={10} value={s.aiSentences} onChange={(v) => s.set({ aiSentences: Number(v) || 2 })} />
         </Group>
-        <Group justify="flex-end"><Button onClick={() => useUi.getState().set({ settings: false })}>{t("Close")}</Button></Group>
+        <Group justify="flex-end"><Button onClick={close}>{t("Close")}</Button></Group>
       </Stack>
     </Modal>
   );

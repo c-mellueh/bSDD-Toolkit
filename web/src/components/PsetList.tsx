@@ -10,6 +10,7 @@ import { op, useProject } from "../state/project";
 import { divider, useContextMenu } from "./ContextMenu";
 import { askConfirm, askText } from "./dialogs";
 import { useListSelection } from "./useListSelection";
+import { useSettings } from "../state/settings";
 
 export function PsetList() {
   const { t } = useTranslation();
@@ -38,7 +39,7 @@ export function PsetList() {
   const create = async () => {
     if (!cls) return;
     const name = newName.trim() || t("New PropertySet");
-    const created = await attempt(() => op<string>("pset.create", { class_code: cls.Code, name }));
+    const created = await attempt(() => op<string>("pset.create", { class_code: cls.Code, name, auto_gop: useSettings.getState().autoCreateGop, gop_prefix: useSettings.getState().gopPrefix }));
     if (created) {
       setActivePset(created);
       setNewName("");
@@ -101,7 +102,7 @@ export function PsetList() {
             onKeyDown={(e) => e.key === "Enter" && create()}
           />
           <Tooltip label={t("Add property set (names of Groups of Properties are linked)")}>
-            <ActionIcon variant="light" onClick={create}><IconPlus size={16} /></ActionIcon>
+            <ActionIcon aria-label={t("Add property set (names of Groups of Properties are linked)")} variant="light" onClick={create}><IconPlus size={16} /></ActionIcon>
           </Tooltip>
         </Group>
       )}
