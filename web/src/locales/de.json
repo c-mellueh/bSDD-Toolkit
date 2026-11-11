@@ -749,5 +749,10 @@
  "hidden": "ausgeblendet",
  "Move {{name}} up": "{{name}} nach oben",
  "Move {{name}} down": "{{name}} nach unten",
- "Default order": "Standardreihenfolge"
+ "Default order": "Standardreihenfolge",
+ "Materials": "Materialien",
+ "New material": "Neues Material",
+ "All materials": "Alle Materialien",
+ "Select a material on the left to see its properties and details, or create a new one.": "Wähle links ein Material, um seine Merkmale und Details zu sehen, oder lege ein neues an.",
+ "Material": "Material"
 }

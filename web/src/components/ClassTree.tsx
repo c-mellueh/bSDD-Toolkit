@@ -23,7 +23,7 @@ import { setGraphDrag } from "../graph/dnd";
 import { classId } from "../graph/model";
 import { Tree, type NodeApi, type NodeRendererProps, type TreeApi } from "react-arborist";
 import { copyClasses, readClip } from "../clipboard";
-import { GOP, descendants, gopPropertyUsage } from "../model";
+import { MODE_CLASS_TYPE, classMode, descendants, gopPropertyUsage, type ClassMode } from "../model";
 import { attempt, notifyOk } from "../notify";
 import { op, useProject } from "../state/project";
 import { openUi, useUi } from "../state/ui";
@@ -38,7 +38,7 @@ interface TreeNode {
   children?: TreeNode[];
 }
 
-export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
+export function ClassTree({ mode = "main" }: { mode?: ClassMode }) {
   const { t } = useTranslation();
   const ro = useReadOnly();
   const doc = useProject((s) => s.doc);
@@ -58,7 +58,7 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
   const setSettings = useSettings((s) => s.set);
   const filtering = filter.trim().length > 0;
 
-  const include = (c: BsddClass) => (mode === "gop" ? c.ClassType === GOP : c.ClassType !== GOP);
+  const include = (c: BsddClass) => classMode(c) === mode;
 
   const data = useMemo<TreeNode[]>(() => {
     if (!doc) return [];
@@ -108,7 +108,8 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
     return ids.length ? ids : activeClass ? [activeClass] : [];
   };
 
-  const newClass = (parent: string | null) => openUi({ classEditor: { parentCode: parent, classType: mode === "gop" ? GOP : "Class" } });
+  const newLabel = mode === "material" ? t("New material") : mode === "gop" ? t("New group of properties") : t("New class");
+  const newClass = (parent: string | null) => openUi({ classEditor: { parentCode: parent, classType: MODE_CLASS_TYPE[mode] } });
 
   const copy = (withChildren?: boolean) => {
     if (!doc) return;
@@ -172,7 +173,7 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
   };
 
   const menuItems = (): MenuItem[] => [
-    { label: t("New class"), icon: <IconPlus size={14} />, shortcut: "Ctrl+N", onClick: () => newClass(activeClass) },
+    { label: newLabel, icon: <IconPlus size={14} />, shortcut: "Ctrl+N", onClick: () => newClass(activeClass) },
     { label: t("Edit"), icon: <IconEdit size={14} />, onClick: () => activeClass && openUi({ classEditor: { code: activeClass } }), disabled: !activeClass },
     divider,
     { label: t("Copy"), icon: <IconCopy size={14} />, shortcut: "Ctrl+C", onClick: () => copy() },
@@ -250,7 +251,7 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
   return (
     <div className="pane" style={{ height: "100%" }}>
       <div className="pane-header">
-        <span className="pane-title" style={{ flex: 1 }}>{mode === "gop" ? t("Groups of properties") : t("Classes")}</span>
+        <span className="pane-title" style={{ flex: 1 }}>{mode === "gop" ? t("Groups of properties") : mode === "material" ? t("Materials") : t("Classes")}</span>
         <Group gap={2}>
           <Menu position="bottom-end" withinPortal closeOnItemClick={false}>
             <Menu.Target>
@@ -267,7 +268,7 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
           </Menu>
           <Tooltip label={t("Expand all")}><ActionIcon aria-label={t("Expand all")} variant="subtle" size="sm" onClick={() => tree.current?.openAll()}><IconArrowsMaximize size={16} /></ActionIcon></Tooltip>
           <Tooltip label={t("Collapse all")}><ActionIcon aria-label={t("Collapse all")} variant="subtle" size="sm" onClick={() => tree.current?.closeAll()}><IconArrowsMinimize size={16} /></ActionIcon></Tooltip>
-          {!ro && <Tooltip label={t("New class") + " (Ctrl+N)"}><ActionIcon aria-label={t("New class") + " (Ctrl+N)"} variant="light" size="sm" onClick={() => newClass(activeClass && idx.classes.get(activeClass) && include(idx.classes.get(activeClass)!) ? activeClass : null)}><IconPlus size={16} /></ActionIcon></Tooltip>}
+          {!ro && <Tooltip label={newLabel + " (Ctrl+N)"}><ActionIcon aria-label={newLabel + " (Ctrl+N)"} variant="light" size="sm" onClick={() => newClass(activeClass && idx.classes.get(activeClass) && include(idx.classes.get(activeClass)!) ? activeClass : null)}><IconPlus size={16} /></ActionIcon></Tooltip>}
         </Group>
       </div>
       <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--mantine-color-default-border)" }}>
@@ -296,7 +297,7 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
         tabIndex={-1}
         onKeyDown={onKeyDown}
         onContextMenu={(e) => {
-          if (e.target === e.currentTarget) openMenu(e, [{ label: t("New class"), onClick: () => newClass(null) }, { label: t("Paste"), onClick: paste, disabled: !readClip("bsdd-classes") }]);
+          if (e.target === e.currentTarget) openMenu(e, [{ label: newLabel, onClick: () => newClass(null) }, { label: t("Paste"), onClick: paste, disabled: !readClip("bsdd-classes") }]);
         }}
       >
         {data.length === 0 && <div className="empty-hint">{t("No classes yet. Create one with +.")}</div>}

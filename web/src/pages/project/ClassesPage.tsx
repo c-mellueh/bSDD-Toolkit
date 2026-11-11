@@ -1,6 +1,6 @@
 import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Group, Menu, Stack, Tabs, Text, ThemeIcon, Title, Tooltip } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { IconArrowLeft, IconBinaryTree2, IconDots, IconLink, IconPencil, IconPlus, IconStack2, IconTrash } from "@tabler/icons-react";
+import { IconArrowLeft, IconBinaryTree2, IconBox, IconDots, IconLink, IconPencil, IconPlus, IconStack2, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import type { BsddClass } from "../../types";
 import { useTranslation } from "react-i18next";
@@ -11,18 +11,18 @@ import { askDeleteClasses } from "../../components/dialogs";
 import { PsetList } from "../../components/PsetList";
 import { ClassForm } from "../../forms/ClassForm";
 import { Split } from "../../layout/Split";
-import { GOP, ancestors, descendants, gopPropertyUsage } from "../../model";
+import { GOP, MATERIAL, MODE_CLASS_TYPE, ancestors, classMode, descendants, gopPropertyUsage, type ClassMode } from "../../model";
 import { attempt, notifyOk } from "../../notify";
-import { go, openClass } from "../../state/nav";
+import { MODE_SECTION, go, openClass } from "../../state/nav";
 import { op, useProject } from "../../state/project";
 import { openUi } from "../../state/ui";
 import { editClassPopup, useClicks } from "../../components/popupEdit";
 import { onNavigationCancelled } from "../../components/UnsavedGuard";
 
-export function ClassesPage({ mode }: { mode: "main" | "gop" }) {
+export function ClassesPage({ mode }: { mode: ClassMode }) {
   const { code: rawCode } = useParams();
   const code = rawCode ? decodeURIComponent(rawCode) : null;
-  const section = mode === "gop" ? "groups" : "classes";
+  const section = MODE_SECTION[mode];
   const codeRef = useRef(code);
   codeRef.current = code;
 
@@ -50,7 +50,7 @@ export function ClassesPage({ mode }: { mode: "main" | "gop" }) {
       useProject.subscribe((s, prev) => {
         if (s.activeClass === prev.activeClass || !s.activeClass || s.activeClass === codeRef.current) return;
         const cls = s.idx.classes.get(s.activeClass);
-        const target = cls?.ClassType === GOP ? "groups" : "classes";
+        const target = MODE_SECTION[classMode(cls)];
         go(target, s.activeClass, target === section && !!codeRef.current);
       }),
     [section],
@@ -63,9 +63,21 @@ export function ClassesPage({ mode }: { mode: "main" | "gop" }) {
   );
 }
 
-function EmptyDetail({ mode }: { mode: "main" | "gop" }) {
+function EmptyDetail({ mode }: { mode: ClassMode }) {
   const { t } = useTranslation();
   const gop = mode === "gop";
+  if (mode === "material") {
+    return (
+      <Stack align="center" justify="center" h="100%" gap="sm" p="xl">
+        <ThemeIcon size={56} radius="xl" variant="light"><IconBox size={30} /></ThemeIcon>
+        <Title order={4}>{t("Materials")}</Title>
+        <Text c="dimmed" ta="center" maw={420}>{t("Select a material on the left to see its properties and details, or create a new one.")}</Text>
+        <Button data-edit leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: null, classType: MATERIAL } })}>
+          {t("New material")}
+        </Button>
+      </Stack>
+    );
+  }
   return (
     <Stack align="center" justify="center" h="100%" gap="sm" p="xl">
       <ThemeIcon size={56} radius="xl" variant="light">{gop ? <IconStack2 size={30} /> : <IconBinaryTree2 size={30} />}</ThemeIcon>
@@ -85,7 +97,7 @@ function EmptyDetail({ mode }: { mode: "main" | "gop" }) {
 // the selected tab is kept while browsing from class to class
 const lastTab: Record<string, string> = {};
 
-function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
+function ClassDetail({ code, mode }: { code: string; mode: ClassMode }) {
   const { t } = useTranslation();
   const clicks = useClicks();
   const idx = useProject((s) => s.idx);
@@ -98,7 +110,8 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
   };
   const narrow = useMediaQuery("(max-width: 48em)");
   const cls = idx.classes.get(code);
-  const section = mode === "gop" ? "groups" : "classes";
+  const section = MODE_SECTION[mode];
+  const childType = MODE_CLASS_TYPE[mode];
   // follow renames done by other users: same name and parent, new code
   const last = useRef<BsddClass | undefined>(cls);
   if (cls) last.current = cls;
@@ -106,7 +119,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
     ? [...idx.classes.values()].find((c) => c.Name === last.current!.Name && (c.ParentClassCode ?? null) === (last.current!.ParentClassCode ?? null))?.Code
     : undefined;
   useEffect(() => {
-    if (renamedTo) go(renamedTo && idx.classes.get(renamedTo)?.ClassType === GOP ? "groups" : "classes", renamedTo, true);
+    if (renamedTo) go(MODE_SECTION[classMode(idx.classes.get(renamedTo))], renamedTo, true);
   }, [renamedTo, idx]);
 
   if (!cls) {
@@ -147,7 +160,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
       <div className="detail-header">
         {narrow && (
           <Button variant="subtle" size="compact-sm" leftSection={<IconArrowLeft size={14} />} onClick={() => go(section)} mb={4}>
-            {gop ? t("Groups of properties") : t("Classes")}
+            {gop ? t("Groups of properties") : mode === "material" ? t("Materials") : t("Classes")}
           </Button>
         )}
         {path.length > 0 && (
@@ -175,7 +188,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
           <Group gap={6} wrap="nowrap">
             {!gop && (
               <Tooltip label={t("New subclass")}>
-                <Button data-edit variant="default" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })} visibleFrom="md">
+                <Button data-edit variant="default" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: childType } })} visibleFrom="md">
                   {t("Subclass")}
                 </Button>
               </Tooltip>
@@ -183,7 +196,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
             <Menu position="bottom-end" shadow="md">
               <Menu.Target><ActionIcon variant="default" size="lg" aria-label={t("More")}><IconDots size={16} /></ActionIcon></Menu.Target>
               <Menu.Dropdown>
-                {!gop && <Menu.Item data-edit leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })}>{t("New subclass")}</Menu.Item>}
+                {!gop && <Menu.Item data-edit leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: childType } })}>{t("New subclass")}</Menu.Item>}
                 <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => openUi({ classEditor: { code } })}>{t("Edit in dialog")}</Menu.Item>
                 <Menu.Item leftSection={<IconLink size={14} />} onClick={copyLink}>{t("Copy link to this class")}</Menu.Item>
                 <Menu.Divider />
@@ -228,7 +241,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
                   </div>
                 ))}
               </Stack>
-              <Button data-edit mt="md" variant="light" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: "Class" } })}>{t("New subclass")}</Button>
+              <Button data-edit mt="md" variant="light" leftSection={<IconPlus size={14} />} onClick={() => openUi({ classEditor: { parentCode: code, classType: childType } })}>{t("New subclass")}</Button>
             </div>
           </Tabs.Panel>
         )}

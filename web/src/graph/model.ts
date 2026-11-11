@@ -1,8 +1,8 @@
 /** Graph model derived from the dictionary: node / edge types, ids and neighbourhoods. */
-import { GOP, internalCode, isUri, resolveProperty, type Indexes } from "../model";
+import { GOP, MATERIAL, internalCode, isUri, resolveProperty, type Indexes } from "../model";
 import type { Doc } from "../types";
 
-export const NODE_KINDS = ["Class", "GroupOfProperties", "Property", "ExternalClass", "ExternalProperty", "IfcReference"] as const;
+export const NODE_KINDS = ["Class", "GroupOfProperties", "Material", "Property", "ExternalClass", "ExternalProperty", "IfcReference"] as const;
 export type NodeKind = (typeof NODE_KINDS)[number];
 
 export const EDGE_KINDS = [
@@ -24,6 +24,7 @@ export type EdgeKind = (typeof EDGE_KINDS)[number];
 export const NODE_STYLE: Record<NodeKind, { color: string; shape: "round" | "rect" | "pill" | "hex"; dashed?: boolean }> = {
   Class: { color: "#d9480f", shape: "round" },
   GroupOfProperties: { color: "#7048e8", shape: "rect" },
+  Material: { color: "#0c8599", shape: "round" },
   Property: { color: "#1c7ed6", shape: "pill" },
   ExternalClass: { color: "#e8590c", shape: "round", dashed: true },
   ExternalProperty: { color: "#4dabf7", shape: "pill", dashed: true },
@@ -109,7 +110,7 @@ export function describeNode(doc: Doc, idx: Indexes, id: string, labels?: Map<st
     if (!c) return null;
     return {
       id,
-      kind: c.ClassType === GOP ? "GroupOfProperties" : "Class",
+      kind: c.ClassType === GOP ? "GroupOfProperties" : c.ClassType === MATERIAL ? "Material" : "Class",
       label: c.Name,
       code: c.Code,
       info: { Code: c.Code, Type: c.ClassType ?? "Class", Definition: c.Definition ?? "", Status: c.Status ?? "" },

@@ -27,7 +27,7 @@ import { useTranslation } from "react-i18next";
 import { saveBlob } from "../api";
 import { divider, useContextMenu, type MenuItem } from "../components/ContextMenu";
 import { askConfirm } from "../components/dialogs";
-import { CLASS_RELATION_TYPES, GOP, PROPERTY_RELATION_TYPES } from "../model";
+import { CLASS_RELATION_TYPES, GOP, MATERIAL, PROPERTY_RELATION_TYPES } from "../model";
 import { attempt, notifyError } from "../notify";
 import { op, useProject } from "../state/project";
 import { storageGet, storageSet } from "../state/settings";
@@ -219,7 +219,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       setScene(classes.map((c) => classId(c.Code)));
       return;
     }
-    const main = classes.filter((c) => c.ClassType !== GOP);
+    const main = classes.filter((c) => c.ClassType !== GOP && c.ClassType !== MATERIAL);
     const codes = new Set(main.map((c) => c.Code));
     const roots = new Set(main.filter((c) => !c.ParentClassCode || !codes.has(c.ParentClassCode)).map((c) => c.Code));
     const top = main.filter((c) => roots.has(c.Code) || roots.has(c.ParentClassCode ?? ""));
@@ -976,8 +976,9 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           <Menu.Dropdown>
             <Menu.Item disabled={!activeClass} onClick={() => activeClass && addIds([classId(activeClass)])}>{t("Active class")}</Menu.Item>
             <Menu.Item disabled={!selectedClasses.length} onClick={() => addIds(selectedClasses.map(classId))}>{t("Classes selected in the tree")}</Menu.Item>
-            <Menu.Item onClick={() => addIds((doc?.dictionary.Classes ?? []).filter((c) => c.ClassType !== "GroupOfProperties").map((c) => classId(c.Code)), true)}>{t("All classes")}</Menu.Item>
+            <Menu.Item onClick={() => addIds((doc?.dictionary.Classes ?? []).filter((c) => c.ClassType !== GOP && c.ClassType !== MATERIAL).map((c) => classId(c.Code)), true)}>{t("All classes")}</Menu.Item>
             <Menu.Item onClick={() => addIds((doc?.dictionary.Classes ?? []).filter((c) => c.ClassType === "GroupOfProperties").map((c) => classId(c.Code)), true)}>{t("All groups of properties")}</Menu.Item>
+            <Menu.Item onClick={() => addIds((doc?.dictionary.Classes ?? []).filter((c) => c.ClassType === MATERIAL).map((c) => classId(c.Code)), true)}>{t("All materials")}</Menu.Item>
             <Menu.Item onClick={() => addIds((doc?.dictionary.Properties ?? []).map((p) => propId(p.Code)), true)}>{t("All properties")}</Menu.Item>
             <Menu.Divider />
             <Menu.Item disabled={!selected.size} onClick={() => [...selected].forEach((id) => expand(id))}>{t("Neighbours of the selection")}</Menu.Item>

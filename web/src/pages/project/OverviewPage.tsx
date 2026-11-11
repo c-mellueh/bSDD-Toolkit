@@ -1,9 +1,9 @@
 import { Accordion, Anchor, Avatar, Badge, Button, Card, CopyButton, Group, SimpleGrid, Stack, Text, TextInput, ThemeIcon, Title, Tooltip } from "@mantine/core";
-import { IconAlertTriangle, IconBinaryTree2, IconCheck, IconCircleCheck, IconCopy, IconEye, IconFileExport, IconLink, IconList, IconListDetails, IconLock, IconLockOpen, IconPlus, IconStack2 } from "@tabler/icons-react";
+import { IconAlertTriangle, IconBinaryTree2, IconBox, IconCheck, IconCircleCheck, IconCopy, IconEye, IconFileExport, IconLink, IconList, IconListDetails, IconLock, IconLockOpen, IconPlus, IconStack2 } from "@tabler/icons-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DictionaryForm } from "../../forms/DictionaryForm";
-import { GOP, internalCode } from "../../model";
+import { GOP, MATERIAL, internalCode } from "../../model";
 import { go, openClass, openProperty, type Section } from "../../state/nav";
 import { useProject } from "../../state/project";
 import { openUi } from "../../state/ui";
@@ -28,13 +28,14 @@ export function OverviewPage() {
   const stats = useMemo(() => {
     const classes = d.Classes ?? [];
     const gops = classes.filter((c) => c.ClassType === GOP);
+    const materials = classes.filter((c) => c.ClassType === MATERIAL).length;
     const cps = classes.reduce((n, c) => n + (c.ClassProperties ?? []).length, 0);
     const rels = classes.reduce((n, c) => n + (c.ClassRelations ?? []).length, 0) + (d.Properties ?? []).reduce((n, p) => n + (p.PropertyRelations ?? []).length, 0);
-    return { classes: classes.length - gops.length, gops: gops.length, props: (d.Properties ?? []).length, cps, rels };
+    return { classes: classes.length - gops.length - materials, gops: gops.length, materials, props: (d.Properties ?? []).length, cps, rels };
   }, [d]);
 
   const checks = useMemo<Check[]>(() => {
-    const classes = (d.Classes ?? []).filter((c) => c.ClassType !== GOP);
+    const classes = (d.Classes ?? []).filter((c) => c.ClassType !== GOP && c.ClassType !== MATERIAL);
     const props = d.Properties ?? [];
     const used = new Set<string>();
     const dangling: Check["items"] = [];
@@ -97,6 +98,7 @@ export function OverviewPage() {
         <SimpleGrid cols={{ base: 2, sm: 3, lg: 5 }} spacing="md" mb="lg">
           {stat(t("Classes"), stats.classes, <IconBinaryTree2 size={24} />, "orange", "classes")}
           {stat(t("Groups of properties"), stats.gops, <IconStack2 size={24} />, "violet", "groups")}
+          {stats.materials > 0 && stat(t("Materials"), stats.materials, <IconBox size={24} />, "grape", "materials")}
           {stat(t("Properties"), stats.props, <IconList size={24} />, "blue", "properties")}
           {stat(t("Class properties"), stats.cps, <IconListDetails size={24} />, "cyan", "classes")}
           {stat(t("Relations"), stats.rels, <IconLink size={24} />, "pink", "graph")}

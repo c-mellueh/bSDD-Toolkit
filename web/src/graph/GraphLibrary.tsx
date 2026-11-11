@@ -1,14 +1,16 @@
-/** Side panel listing the dictionary's classes / groups of properties / properties; items can be dragged into the graph. */
+/** Side panel listing the dictionary's classes / groups of properties / materials / properties; items can be dragged into the graph. */
 import { SegmentedControl, Text, TextInput } from "@mantine/core";
 import { IconChevronDown, IconChevronRight, IconSearch } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { GOP, descendants, type Indexes } from "../model";
+import { classMode, descendants, type ClassMode, type Indexes } from "../model";
 import type { BsddClass, Doc } from "../types";
 import { setGraphDrag } from "./dnd";
 import { NODE_STYLE, classId, propId } from "./model";
 
-type Tab = "classes" | "gop" | "props";
+type Tab = "classes" | "gop" | "material" | "props";
+const TAB_MODE: Record<Exclude<Tab, "props">, ClassMode> = { classes: "main", gop: "gop", material: "material" };
+const TAB_KIND = { classes: "Class", gop: "GroupOfProperties", material: "Material" } as const;
 interface Row {
   id: string;
   label: string;
@@ -41,9 +43,8 @@ export function GraphLibrary({ doc, idx, inScene, onAdd }: { doc: Doc; idx: Inde
       for (const p of props) if (!q || matches(q, p.Name, p.Code)) out.push({ id: propId(p.Code), label: p.Name || p.Code, sub: p.Code, depth: 0, color: NODE_STYLE.Property.color });
       return out;
     }
-    const gop = tab === "gop";
-    const include = (c: BsddClass) => (c.ClassType === GOP) === gop;
-    const color = gop ? NODE_STYLE.GroupOfProperties.color : NODE_STYLE.Class.color;
+    const include = (c: BsddClass) => classMode(c) === TAB_MODE[tab];
+    const color = NODE_STYLE[TAB_KIND[tab]].color;
     if (q) {
       const list = (doc.dictionary.Classes ?? []).filter((c) => include(c) && matches(q, c.Name, c.Code));
       list.sort((a, b) => (a.Name ?? "").localeCompare(b.Name ?? "", undefined, { numeric: true }));
@@ -51,7 +52,7 @@ export function GraphLibrary({ doc, idx, inScene, onAdd }: { doc: Doc; idx: Inde
       return out;
     }
     // hierarchy
-    const roots = (doc.dictionary.Classes ?? []).filter((c) => include(c) && (!c.ParentClassCode || !idx.classes.has(c.ParentClassCode)));
+    const roots = (doc.dictionary.Classes ?? []).filter((c) => include(c) && (!c.ParentClassCode || !idx.classes.has(c.ParentClassCode) || !include(idx.classes.get(c.ParentClassCode)!)));
     const walk = (c: BsddClass, depth: number) => {
       if (out.length > LIMIT * 4) return;
       const kids = (idx.children.get(c.Code) ?? []).filter(include);
@@ -110,6 +111,7 @@ export function GraphLibrary({ doc, idx, inScene, onAdd }: { doc: Doc; idx: Inde
           data={[
             { value: "classes", label: t("Classes") },
             { value: "gop", label: t("Groups") },
+            { value: "material", label: t("Materials") },
             { value: "props", label: t("Properties") },
           ]}
         />

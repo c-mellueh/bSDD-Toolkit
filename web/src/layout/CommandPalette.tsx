@@ -14,11 +14,12 @@ import {
   IconShare,
   IconStack2,
   IconTerminal2,
+  IconBox,
 } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { rowScore } from "../fuzzy";
-import { GOP } from "../model";
+import { GOP, MATERIAL } from "../model";
 import { go, openClass, openProperty } from "../state/nav";
 import { useProject } from "../state/project";
 import { openUi, useUi } from "../state/ui";
@@ -60,11 +61,13 @@ export function CommandPalette() {
       a("go-overview", t("Overview"), <IconLayoutDashboard size={16} />, () => go("")),
       a("go-classes", t("Classes"), <IconBinaryTree2 size={16} />, () => go("classes")),
       a("go-groups", t("Groups of properties"), <IconStack2 size={16} />, () => go("groups")),
+      a("go-materials", t("Materials"), <IconBox size={16} />, () => go("materials")),
       a("go-properties", t("Properties"), <IconList size={16} />, () => go("properties")),
       a("go-loin", t("Level of Information Need"), <IconListCheck size={16} />, () => go("loin")),
       a("go-graph", t("Graph viewer"), <IconChartDots3 size={16} />, () => go("graph")),
       a("go-export", t("Export"), <IconFileExport size={16} />, () => go("export")),
       a("new-class", t("New class"), <IconPlus size={16} />, () => openUi({ classEditor: { parentCode: null, classType: "Class" } })),
+      a("new-material", t("New material"), <IconPlus size={16} />, () => openUi({ classEditor: { parentCode: null, classType: MATERIAL } })),
       a("new-property", t("New property"), <IconPlus size={16} />, () => openUi({ propertyEditor: {} })),
       a("shell", t("Python shell"), <IconTerminal2 size={16} />, () => openUi({ shell: !useUi.getState().shell })),
       a("share", t("Share"), <IconShare size={16} />, () => openUi({ share: true })),
@@ -76,13 +79,14 @@ export function CommandPalette() {
     const out: Item[] = [];
     for (const c of doc.dictionary.Classes ?? []) {
       const gop = c.ClassType === GOP;
+      const material = c.ClassType === MATERIAL;
       out.push({
         key: `c:${c.Code}`,
         kind: gop ? "group" : "class",
         label: c.Name || c.Code,
         sub: c.Code,
         cells: [c.Code, c.Name ?? "", c.ClassType ?? "Class"],
-        icon: gop ? <IconStack2 size={16} /> : <IconBinaryTree2 size={16} />,
+        icon: gop ? <IconStack2 size={16} /> : material ? <IconBox size={16} /> : <IconBinaryTree2 size={16} />,
         run: () => openClass(c.Code),
       });
     }
