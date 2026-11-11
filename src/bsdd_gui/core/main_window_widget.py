@@ -117,7 +117,7 @@ def close_event(
 ):
     bsdd_dict = project.get()
     last_save = project.get_last_save()
-    if bsdd_dict != last_save:
+    if bsdd_dict != last_save or project.settings_changed_since_save():
         reply = popups.request_save_before_exit()
         if reply is None:
             # Dont Close Window

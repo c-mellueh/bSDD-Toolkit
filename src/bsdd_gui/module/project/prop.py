@@ -16,3 +16,6 @@ class ProjectProperties(ActionsProperties):
         self.offline_mode = False
         self.last_save: BsddDictionary = None
         self.recent_menu: QMenu | None = None
+        #: project settings (saved in the sidecar file next to the project JSON)
+        self.settings: dict = {}
+        self.last_saved_settings: dict = {}

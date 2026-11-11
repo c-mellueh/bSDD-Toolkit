@@ -39,3 +39,4 @@ from .excel import Excel as Excel
 from .loin import Loin as Loin, PPClassView as PPClassView, PPPropertyView as PPPropertyView
 from .iso_export import IsoExport as IsoExport
 from .revit_export import RevitExport as RevitExport
+from .inheritance import Inheritance as Inheritance
