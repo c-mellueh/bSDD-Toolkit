@@ -46,20 +46,24 @@ export function normalizeTreeOrder(order: readonly string[] | undefined): EdgeKi
 }
 
 /**
- * Tidy tree. The tree is built from the edges of ``order[0]`` first; nodes that are not placed
- * under a parent by it are placed by ``order[1]``, and so on (each node gets one parent).
+ * Tidy tree. The trees are built from the edges of ``order[0]`` first; nodes that are not part of
+ * those trees (neither as parent nor as child) are placed by ``order[1]``, and so on. A node keeps
+ * the place it got from an earlier edge type, and gets at most one parent.
  */
 export function treeLayout(nodes: LayoutNode[], edges: GEdge[], direction: "TB" | "LR", order: readonly EdgeKind[] = TREE_EDGE_KINDS): Pos {
   const ids = new Set(nodes.map((n) => n.id));
   const size = new Map(nodes.map((n) => [n.id, n]));
   const parent = new Map<string, string>();
+  // nodes that are part of the tree of an earlier edge type (as parent or child) stay where they are
+  const placed = new Set<string>();
   for (const kind of order) {
     if (!(kind in HIERARCHY)) continue;
     const childIsSource = HIERARCHY[kind];
+    const placedNow: string[] = [];
     for (const e of edges) {
       if (e.kind !== kind || !ids.has(e.source) || !ids.has(e.target)) continue;
       const [child, par] = childIsSource ? [e.source, e.target] : [e.target, e.source];
-      if (parent.has(child) || child === par) continue;
+      if (parent.has(child) || placed.has(child) || child === par) continue;
       // avoid cycles
       let cur: string | undefined = par;
       let cycle = false;
@@ -70,8 +74,12 @@ export function treeLayout(nodes: LayoutNode[], edges: GEdge[], direction: "TB" 
         }
         cur = parent.get(cur);
       }
-      if (!cycle) parent.set(child, par);
+      if (!cycle) {
+        parent.set(child, par);
+        placedNow.push(child, par);
+      }
     }
+    for (const id of placedNow) placed.add(id);
   }
   const children = new Map<string, string[]>();
   for (const n of nodes) {

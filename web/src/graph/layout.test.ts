@@ -67,6 +67,15 @@ describe("tree layout order", () => {
     expect(levels(order)["p:FireRating"]).toBe(2);
   });
 
+  it("a node that is already in the tree of an earlier edge type is not moved", () => {
+    // the group of properties heads its own tree (with its property) and is not moved under Wall
+    const order = normalizeTreeOrder(["GopProperty", "ParentClassCode", "HasReference"]);
+    const l = levels(order, ["ClassProperty"]);
+    expect(l["c:EPset_Fire"]).toBe(0);
+    expect(l["p:FireRating"]).toBe(1);
+    expect(l["c:Wall"]).toBe(1);
+  });
+
   it("completes saved orders with unknown and new kinds", () => {
     const order = normalizeTreeOrder(["HasReference", "Bogus", "HasReference"]);
     expect(order[0]).toBe("HasReference");

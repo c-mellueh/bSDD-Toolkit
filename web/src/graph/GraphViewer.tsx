@@ -598,7 +598,10 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     requestDraw();
   };
 
+  // the last tree layout is applied again when the tree order changes
+  const lastTree = useRef<"tree-tb" | "tree-lr" | null>(null);
   const applyLayout = (kind: "tree-tb" | "tree-lr" | "circle" | "grid") => {
+    lastTree.current = kind === "tree-tb" || kind === "tree-lr" ? kind : null;
     const nodes = rnodes.current;
     const lnodes = nodes.map((n) => ({ id: n.id, w: n.w, h: n.h }));
     const result = kind === "tree-tb" ? treeLayout(lnodes, graph.edges, "TB", treeOrder) : kind === "tree-lr" ? treeLayout(lnodes, graph.edges, "LR", treeOrder) : kind === "circle" ? circleLayout(lnodes) : gridLayout(lnodes);
@@ -906,6 +909,17 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       notifyError(e);
     }
   };
+
+  const applyRef = useRef(applyLayout);
+  applyRef.current = applyLayout;
+  const firstOrder = useRef(true);
+  useEffect(() => {
+    if (firstOrder.current) {
+      firstOrder.current = false;
+      return;
+    }
+    if (lastTree.current) applyRef.current(lastTree.current);
+  }, [treeOrder]);
 
   // ------------------------------------------------------------------ UI
 
