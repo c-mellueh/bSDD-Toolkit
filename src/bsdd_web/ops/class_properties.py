@@ -355,6 +355,39 @@ def paste_property_sets(ctx: Ctx, class_code: str, payload: dict[str, Any]) -> l
 # ----------------------------------------------------------------- GoP actions
 
 
+@op("gop.rename_prefix")
+def rename_gop_prefix(ctx: Ctx, old: str, new: str) -> int:
+    """Replace the code prefix of all Groups of Properties (``old`` -> ``new``).
+
+    Uses the normal class update, so relations and URIs that point to the groups follow.
+    Groups whose code does not start with ``old`` are left alone. Returns the number renamed.
+    """
+    from .classes import update_class
+
+    old, new = (old or "").strip(), (new or "").strip()
+    for prefix in (old, new):
+        if len(prefix) > 30 or not all(ch.isalnum() or ch in "_-." for ch in prefix):
+            raise OpError("The prefix may only contain letters, digits, '_', '-' and '.' (max. 30 characters)")
+    if old == new:
+        return 0
+    renames: list[tuple[str, str]] = []
+    taken = set(class_index(ctx.d))
+    for c in ctx.d.Classes:
+        if c.ClassType != GOP or not c.Code.startswith(old) or (not old and new and c.Code.startswith(new)):
+            continue
+        target = new + c.Code[len(old) :]
+        if not target:
+            raise OpError(f"'{c.Code}' would get an empty code")
+        if target in taken:
+            raise OpError(f"Cannot rename '{c.Code}': the code '{target}' is already used")
+        taken.discard(c.Code)
+        taken.add(target)
+        renames.append((c.Code, target))
+    for code, target in renames:
+        update_class(ctx, code, {"Code": target})
+    return len(renames)
+
+
 @op("gop.sync_allowed_values")
 def sync_allowed_values(ctx: Ctx, class_code: str, codes: list[str]) -> int:
     gop = get_class(ctx.d, class_code)

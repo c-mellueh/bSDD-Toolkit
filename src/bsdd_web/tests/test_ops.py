@@ -368,3 +368,21 @@ def test_pset_create_can_auto_create_a_group_of_properties(h):
     # property sets inside a GroupOfProperties never create another group
     h.run("pset.create", class_code="Pset_Fire", name="Inner", auto_gop=True, gop_prefix="Pset_")
     assert len(h.d.Classes) == n
+
+
+def test_gop_rename_prefix(h):
+    h.run("pset.create", class_code="Wall", name="Pset_Fire")  # links the existing group
+    h.run("pset.create", class_code="Door", name="Acoustics", auto_gop=True, gop_prefix="Pset_")
+    assert h.run("gop.rename_prefix", old="Pset_", new="EPset_") == 2
+    codes = {c.Code for c in h.d.Classes if c.ClassType == "GroupOfProperties"}
+    assert codes == {"EPset_Fire", "EPset_Acoustics"}
+    # names stay, references follow the new codes
+    assert h.cls("EPset_Fire").Name == "Pset_Fire"
+    assert any(cr.RelatedClassUri.endswith("/EPset_Fire") for cr in h.cls("Wall").ClassRelations)
+    assert any(cr.RelatedClassUri.endswith("/EPset_Acoustics") for cr in h.cls("Door").ClassRelations)
+    # nothing matches the old prefix any more; a clash is refused without changing anything
+    assert h.run("gop.rename_prefix", old="Pset_", new="X_") == 0
+    h.run("class.create", data={"Code": "Y_Fire", "Name": "Other", "ClassType": "GroupOfProperties"})
+    with pytest.raises(OpError):
+        h.run("gop.rename_prefix", old="EPset_", new="Y_")
+    assert h.cls("EPset_Fire") is not None and h.cls("EPset_Acoustics") is not None

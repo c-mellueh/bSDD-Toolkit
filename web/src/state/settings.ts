@@ -45,7 +45,7 @@ function load(): Settings {
     aiSentences: 2,
     allowUnknownUri: true,
     treeColumns: { code: true, status: true },
-    gopPrefix: "Pset_",
+    gopPrefix: "EPset_",
     autoCreateGop: false,
   };
   try {

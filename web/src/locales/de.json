@@ -717,7 +717,12 @@
  "Reload page": "Seite neu laden",
  "Predefined property sets": "Vordefinierte Merkmalsgruppen",
  "Code prefix for predefined property sets": "Code-Präfix für vordefinierte Merkmalsgruppen",
- "Put in front of the code of new Groups of Properties, e.g. “Pset_” gives “Pset_Geometry”.": "Wird dem Code neuer Merkmalssätze vorangestellt, z. B. ergibt „Pset_“ den Code „Pset_Geometrie“.",
  "Create a predefined property set automatically": "Vordefinierte Merkmalsgruppe automatisch anlegen",
- "When you add a property set to a class and no Group of Properties has that name, one is created and linked.": "Wird einer Klasse eine Merkmalsgruppe hinzugefügt und es gibt keinen Merkmalssatz mit diesem Namen, wird einer angelegt und verknüpft."
+ "When you add a property set to a class and no Group of Properties has that name, one is created and linked.": "Wird einer Klasse eine Merkmalsgruppe hinzugefügt und es gibt keinen Merkmalssatz mit diesem Namen, wird einer angelegt und verknüpft.",
+ "Put in front of the code of new Groups of Properties, e.g. “EPset_” gives “EPset_Geometry”.": "Wird dem Code neuer Merkmalssätze vorangestellt, z. B. ergibt „EPset_“ den Code „EPset_Geometrie“.",
+ "Rename existing predefined property sets?": "Vorhandene vordefinierte Merkmalsgruppen umbenennen?",
+ "{{n}} Groups of Properties in this dictionary use the prefix “{{before}}”. Change their codes to “{{after}}” (e.g. {{example}})? This changes the dictionary for everybody and can be undone with Ctrl+Z.": "{{n}} Merkmalssätze in diesem Wörterbuch verwenden das Präfix „{{before}}“. Ihre Codes auf „{{after}}“ ändern (z. B. {{example}})? Das ändert das Wörterbuch für alle und lässt sich mit Strg+Z rückgängig machen.",
+ "Rename {{n}}": "{{n}} umbenennen",
+ "{{n}} Groups of Properties renamed": "{{n}} Merkmalssätze umbenannt",
+ "(none)": "(keins)"
 }
