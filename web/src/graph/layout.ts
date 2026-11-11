@@ -17,23 +17,53 @@ const HIERARCHY: Partial<Record<EdgeKind, boolean>> = {
   IsParentOf: false, // parent -> child
   HasPart: false,
   ClassProperty: false,
+  GopProperty: false,
   IfcReference: false,
   HasMaterial: false,
   HasReference: false,
 };
 
-export function treeLayout(nodes: LayoutNode[], edges: GEdge[], direction: "TB" | "LR"): Pos {
+/** Edge kinds that can build the tree, in the default order (stronger hierarchy first). */
+export const TREE_EDGE_KINDS: EdgeKind[] = [
+  "ParentClassCode",
+  "IsChildOf",
+  "IsParentOf",
+  "IsPartOf",
+  "HasPart",
+  "ClassProperty",
+  "GopProperty",
+  "HasMaterial",
+  "IfcReference",
+  "HasReference",
+];
+
+/** A saved order completed with kinds it does not know yet (e.g. after an update). */
+export function normalizeTreeOrder(order: readonly string[] | undefined): EdgeKind[] {
+  const known = (order ?? []).filter((k): k is EdgeKind => (TREE_EDGE_KINDS as string[]).includes(k));
+  const out = [...new Set(known)];
+  for (const k of TREE_EDGE_KINDS) if (!out.includes(k)) out.push(k);
+  return out;
+}
+
+/**
+ * Tidy tree. The trees are built from the edges of ``order[0]`` first; nodes that are not part of
+ * those trees (neither as parent nor as child) are placed by ``order[1]``, and so on. A node keeps
+ * the place it got from an earlier edge type, and gets at most one parent.
+ */
+export function treeLayout(nodes: LayoutNode[], edges: GEdge[], direction: "TB" | "LR", order: readonly EdgeKind[] = TREE_EDGE_KINDS): Pos {
   const ids = new Set(nodes.map((n) => n.id));
   const size = new Map(nodes.map((n) => [n.id, n]));
   const parent = new Map<string, string>();
-  // stronger hierarchy edges first
-  const order: EdgeKind[] = ["ParentClassCode", "IsChildOf", "IsParentOf", "IsPartOf", "HasPart", "ClassProperty", "HasMaterial", "IfcReference", "HasReference"];
+  // nodes that are part of the tree of an earlier edge type (as parent or child) stay where they are
+  const placed = new Set<string>();
   for (const kind of order) {
+    if (!(kind in HIERARCHY)) continue;
     const childIsSource = HIERARCHY[kind];
+    const placedNow: string[] = [];
     for (const e of edges) {
       if (e.kind !== kind || !ids.has(e.source) || !ids.has(e.target)) continue;
       const [child, par] = childIsSource ? [e.source, e.target] : [e.target, e.source];
-      if (parent.has(child) || child === par) continue;
+      if (parent.has(child) || placed.has(child) || child === par) continue;
       // avoid cycles
       let cur: string | undefined = par;
       let cycle = false;
@@ -44,8 +74,12 @@ export function treeLayout(nodes: LayoutNode[], edges: GEdge[], direction: "TB" 
         }
         cur = parent.get(cur);
       }
-      if (!cycle) parent.set(child, par);
+      if (!cycle) {
+        parent.set(child, par);
+        placedNow.push(child, par);
+      }
     }
+    for (const id of placedNow) placed.add(id);
   }
   const children = new Map<string, string[]>();
   for (const n of nodes) {

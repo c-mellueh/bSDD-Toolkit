@@ -1,13 +1,14 @@
 /** Graph model derived from the dictionary: node / edge types, ids and neighbourhoods. */
-import { GOP, internalCode, isUri, resolveProperty, type Indexes } from "../model";
+import { GOP, MATERIAL, internalCode, isUri, resolveProperty, type Indexes } from "../model";
 import type { Doc } from "../types";
 
-export const NODE_KINDS = ["Class", "GroupOfProperties", "Property", "ExternalClass", "ExternalProperty", "IfcReference"] as const;
+export const NODE_KINDS = ["Class", "GroupOfProperties", "Material", "Property", "ExternalClass", "ExternalProperty", "IfcReference"] as const;
 export type NodeKind = (typeof NODE_KINDS)[number];
 
 export const EDGE_KINDS = [
   "ParentClassCode",
   "ClassProperty",
+  "GopProperty",
   "IfcReference",
   "HasMaterial",
   "HasReference",
@@ -23,6 +24,7 @@ export type EdgeKind = (typeof EDGE_KINDS)[number];
 export const NODE_STYLE: Record<NodeKind, { color: string; shape: "round" | "rect" | "pill" | "hex"; dashed?: boolean }> = {
   Class: { color: "#d9480f", shape: "round" },
   GroupOfProperties: { color: "#7048e8", shape: "rect" },
+  Material: { color: "#0c8599", shape: "round" },
   Property: { color: "#1c7ed6", shape: "pill" },
   ExternalClass: { color: "#e8590c", shape: "round", dashed: true },
   ExternalProperty: { color: "#4dabf7", shape: "pill", dashed: true },
@@ -32,6 +34,7 @@ export const NODE_STYLE: Record<NodeKind, { color: string; shape: "round" | "rec
 export const EDGE_STYLE: Record<EdgeKind, { color: string; dash: number[]; width: number }> = {
   ParentClassCode: { color: "#0ca678", dash: [2, 4], width: 1.6 },
   ClassProperty: { color: "#868e96", dash: [8, 3, 2, 3], width: 1.2 },
+  GopProperty: { color: "#9775fa", dash: [8, 3, 2, 3], width: 1.2 },
   IfcReference: { color: "#40c057", dash: [6, 4], width: 1.2 },
   HasMaterial: { color: "#f08c00", dash: [], width: 1.6 },
   HasReference: { color: "#7950f2", dash: [], width: 1.6 },
@@ -42,6 +45,9 @@ export const EDGE_STYLE: Record<EdgeKind, { color: string; dash: number[]; width
   HasPart: { color: "#5c940d", dash: [], width: 1.6 },
   IsPartOf: { color: "#82c91e", dash: [5, 3], width: 1.6 },
 };
+
+/** Display name of an edge kind (untranslated i18n key). */
+export const edgeKindLabel = (k: EdgeKind) => (k === "GopProperty" ? "ClassProperty (group of properties)" : k === "ClassProperty" ? "ClassProperty (class)" : k);
 
 export type EdgeRef =
   | { type: "parent"; child: string }
@@ -104,7 +110,7 @@ export function describeNode(doc: Doc, idx: Indexes, id: string, labels?: Map<st
     if (!c) return null;
     return {
       id,
-      kind: c.ClassType === GOP ? "GroupOfProperties" : "Class",
+      kind: c.ClassType === GOP ? "GroupOfProperties" : c.ClassType === MATERIAL ? "Material" : "Class",
       label: c.Name,
       code: c.Code,
       info: { Code: c.Code, Type: c.ClassType ?? "Class", Definition: c.Definition ?? "", Status: c.Status ?? "" },
@@ -143,7 +149,7 @@ export function edgesBetween(doc: Doc, idx: Indexes, ids: Set<string>): GEdge[] 
         const p = resolveProperty(idx, d, cp);
         const target = p ? propId(p.Code) : cp.PropertyUri ? `xp:${cp.PropertyUri}` : null;
         if (!target || !ids.has(target)) continue;
-        edges.push({ id: `cp:${c.Code}:${cp.Code}`, source: id, target, kind: "ClassProperty", label: cp.PropertySet ?? "", ref: { type: "classProperty", owner: c.Code, cpCode: cp.Code } });
+        edges.push({ id: `cp:${c.Code}:${cp.Code}`, source: id, target, kind: c.ClassType === GOP ? "GopProperty" : "ClassProperty", label: cp.PropertySet ?? "", ref: { type: "classProperty", owner: c.Code, cpCode: cp.Code } });
       }
       for (const name of c.RelatedIfcEntityNamesList ?? []) {
         const target = `ifc:${name}`;

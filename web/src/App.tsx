@@ -68,6 +68,7 @@ const router = createBrowserRouter(
           <Route index element={<OverviewPage />} />
           <Route path="classes/:code?" element={<ClassesPage key="classes" mode="main" />} />
           <Route path="groups/:code?" element={<ClassesPage key="groups" mode="gop" />} />
+          <Route path="materials/:code?" element={<ClassesPage key="materials" mode="material" />} />
           <Route path="properties/:code?" element={<PropertiesPage />} />
           <Route path="loin" element={<Lazy><LoinPage /></Lazy>} />
           <Route path="graph" element={<Lazy><GraphRoute /></Lazy>} />

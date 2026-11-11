@@ -9,7 +9,7 @@
 import { GOP, classUri, cpName, descendants, propertyUri, resolveProperty, type Indexes } from "../model";
 import type { Doc } from "../types";
 import { treeLayout } from "./layout";
-import { EDGE_STYLE, NODE_STYLE, describeNode, edgesBetween, type EdgeKind, type GNode, type NodeKind } from "./model";
+import { EDGE_STYLE, NODE_STYLE, describeNode, edgeKindLabel, edgesBetween, type EdgeKind, type GNode, type NodeKind } from "./model";
 import { nodeSize, redgesFrom, toSvg, type DrawOptions, type RNode } from "./renderer";
 
 export interface HtmlTab {
@@ -34,7 +34,7 @@ const latest = (doc: Doc, uri: string) => (doc.dictionary.DictionaryVersion ? ur
 function nodeInfo(doc: Doc, idx: Indexes, n: GNode): NodeInfo {
   const d = doc.dictionary;
   const base = { name: n.label, kind: n.kind, code: n.code ?? "", definition: "", url: null as string | null, rows: [] as string[][] };
-  if (n.kind === "Class" || n.kind === "GroupOfProperties") {
+  if (n.kind === "Class" || n.kind === "GroupOfProperties" || n.kind === "Material") {
     const c = idx.classes.get(n.code ?? "");
     if (!c) return base;
     const rows = (c.ClassProperties ?? [])
@@ -101,7 +101,7 @@ function legend(kinds: HtmlTab["kinds"]): string {
   const e = kinds.edges
     .map((k) => {
       const st = EDGE_STYLE[k];
-      return `<div class="lg-row"><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="${st.color}" stroke-width="2" stroke-dasharray="${st.dash.join(" ")}"/></svg>${esc(k)}</div>`;
+      return `<div class="lg-row"><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="${st.color}" stroke-width="2" stroke-dasharray="${st.dash.join(" ")}"/></svg>${esc(edgeKindLabel(k))}</div>`;
     })
     .join("");
   return `<div class="lg-title">Node types</div>${n}${e ? `<div class="lg-title">Relationship types</div>${e}` : ""}`;
@@ -214,7 +214,7 @@ ${sections}
       name.textContent=d.name;kind.textContent=d.kind;kind.hidden=false;code.textContent=d.code||'';
       if(d.definition){text.textContent=d.definition;text.classList.remove('empty')}else{text.textContent='No definition available.';text.classList.add('empty')}
       if(d.url){link.href=d.url;link.hidden=false}else link.hidden=true;
-      if(d.kind!=='Class'&&d.kind!=='GroupOfProperties'){ptitle.textContent='Class properties';empty('Select a class to view its properties.');return}
+      if(d.kind!=='Class'&&d.kind!=='GroupOfProperties'&&d.kind!=='Material'){ptitle.textContent='Class properties';empty('Select a class to view its properties.');return}
       ptitle.textContent='Class properties – '+d.name;
       if(!d.rows.length){empty('This class has no properties.');return}
       tbody.innerHTML='';d.rows.forEach(function(row){var tr=document.createElement('tr');row.forEach(function(c){var td=document.createElement('td');td.textContent=c||'';tr.appendChild(td)});tbody.appendChild(tr)});

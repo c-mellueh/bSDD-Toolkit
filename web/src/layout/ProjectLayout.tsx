@@ -50,6 +50,7 @@ import {
   IconSun,
   IconTerminal2,
   IconTrash,
+  IconBox,
 } from "@tabler/icons-react";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -66,7 +67,7 @@ import { PropertyEditor } from "../components/PropertyEditor";
 import { SearchDialog } from "../components/SearchDialog";
 import { SettingsDialog } from "../components/SettingsDialog";
 import { ShareDialog } from "../components/ShareDialog";
-import { GOP } from "../model";
+import { GOP, MATERIAL } from "../model";
 import { attempt, notifyError, notifyOk } from "../notify";
 import i18n from "../i18n";
 import { forgetUnsaved } from "../state/unsaved";
@@ -348,14 +349,16 @@ function Navigation({ collapsed, onToggle, onDownload }: { collapsed: boolean; o
   const shell = useUi((s) => s.shell);
   const classes = d.Classes ?? [];
   const nGop = classes.filter((c) => c.ClassType === GOP).length;
+  const nMaterial = classes.filter((c) => c.ClassType === MATERIAL).length;
   const linkBase = useProject((s) => s.base);
   const base = `${linkBase}/${projectId}`;
   const section = location.pathname.slice(base.length).split("/")[1] ?? "";
 
   const items: { key: Section; label: string; icon: React.ReactNode; count?: number }[] = [
     { key: "", label: t("Overview"), icon: <IconLayoutDashboard size={18} /> },
-    { key: "classes", label: t("Classes"), icon: <IconBinaryTree2 size={18} />, count: classes.length - nGop },
+    { key: "classes", label: t("Classes"), icon: <IconBinaryTree2 size={18} />, count: classes.length - nGop - nMaterial },
     { key: "groups", label: t("Groups of properties"), icon: <IconStack2 size={18} />, count: nGop },
+    { key: "materials", label: t("Materials"), icon: <IconBox size={18} />, count: nMaterial },
     { key: "properties", label: t("Properties"), icon: <IconList size={18} />, count: (d.Properties ?? []).length },
     { key: "loin", label: t("Information need (LOIN)"), icon: <IconListCheck size={18} /> },
     { key: "graph", label: t("Graph viewer"), icon: <IconChartDots3 size={18} /> },

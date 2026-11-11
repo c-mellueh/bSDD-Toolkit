@@ -5,8 +5,10 @@ import { Toggle } from "../components/Toggle";
 import {
   IconArrowsMaximize,
   IconBooks,
+  IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
+  IconChevronUp,
   IconDownload,
   IconEraser,
   IconExternalLink,
@@ -25,7 +27,7 @@ import { useTranslation } from "react-i18next";
 import { saveBlob } from "../api";
 import { divider, useContextMenu, type MenuItem } from "../components/ContextMenu";
 import { askConfirm } from "../components/dialogs";
-import { CLASS_RELATION_TYPES, GOP, PROPERTY_RELATION_TYPES } from "../model";
+import { CLASS_RELATION_TYPES, GOP, MATERIAL, PROPERTY_RELATION_TYPES } from "../model";
 import { attempt, notifyError } from "../notify";
 import { op, useProject } from "../state/project";
 import { storageGet, storageSet } from "../state/settings";
@@ -33,9 +35,10 @@ import { openUi } from "../state/ui";
 import { GraphLibrary } from "./GraphLibrary";
 import { buildTab, htmlPage, rootClassTabs } from "./htmlExport";
 import { hasGraphDrag, readGraphDrag } from "./dnd";
-import { circleLayout, gridLayout, packComponents, treeLayout } from "./layout";
+import { circleLayout, gridLayout, normalizeTreeOrder, packComponents, TREE_EDGE_KINDS, treeLayout } from "./layout";
 import {
   EDGE_KINDS,
+  edgeKindLabel,
   EDGE_STYLE,
   NODE_KINDS,
   NODE_STYLE,
@@ -78,11 +81,19 @@ interface Appearance {
 
 const DEFAULT_APPEARANCE: Appearance = { routing: "straight", labels: true, edgeLabels: false, arrows: true, pinOnDrag: true, physicsOnDrag: true };
 
+const LIBRARY_WIDTH_KEY = "bsdd-graph-library-width";
+const LIBRARY_DEFAULT = 260;
+const LIBRARY_MIN = 180;
+const LIBRARY_MAX = 700;
+const clampLibrary = (w: number) => Math.round(Math.max(LIBRARY_MIN, Math.min(LIBRARY_MAX, Math.min(window.innerWidth * 0.6, Number(w) || LIBRARY_DEFAULT))));
+
 interface Saved {
   scene: string[];
   pos: Record<string, [number, number, number]>; // x, y, fixed
   hiddenNodes: NodeKind[];
   hiddenEdges: EdgeKind[];
+  /** edge kinds in the order the tree layout uses them */
+  treeOrder: EdgeKind[];
   physics: Physics;
   appearance: Appearance;
   library: boolean;
@@ -109,6 +120,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const [scene, setScene] = useState<string[]>(saved.scene ?? []);
   const [hiddenNodes, setHiddenNodes] = useState<Set<NodeKind>>(new Set(saved.hiddenNodes ?? []));
   const [hiddenEdges, setHiddenEdges] = useState<Set<EdgeKind>>(new Set(saved.hiddenEdges ?? []));
+  const [treeOrder, setTreeOrder] = useState<EdgeKind[]>(normalizeTreeOrder(saved.treeOrder));
   const [physics, setPhysics] = useState<Physics>({ ...DEFAULT_PHYSICS, ...(saved.physics ?? {}) });
   const [appearance, setAppearance] = useState<Appearance>({ ...DEFAULT_APPEARANCE, ...(saved.appearance ?? {}) });
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -117,6 +129,32 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const [ready, setReady] = useState(false);
   const [panel, setPanel] = useState(true);
   const [library, setLibrary] = useState<boolean>(saved.library ?? true);
+  // width of the dictionary panel (per browser, all projects)
+  const [libraryWidth, setLibraryWidth] = useState<number>(() => clampLibrary(storageGet(LIBRARY_WIDTH_KEY, LIBRARY_DEFAULT)));
+  const libraryDrag = useRef<{ start: number; initial: number } | null>(null);
+  const resizeLibrary = (w: number) => {
+    const v = clampLibrary(w);
+    setLibraryWidth(v);
+    storageSet(LIBRARY_WIDTH_KEY, v);
+  };
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      if (libraryDrag.current) setLibraryWidth(clampLibrary(libraryDrag.current.initial + e.clientX - libraryDrag.current.start));
+    };
+    const up = (e: PointerEvent) => {
+      if (!libraryDrag.current) return;
+      resizeLibrary(libraryDrag.current.initial + e.clientX - libraryDrag.current.start);
+      libraryDrag.current = null;
+      document.body.classList.remove("resizing");
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // phones: the side panels would leave no room for the graph – start closed, open as overlays
   const narrow = useMediaQuery("(max-width: 48em)") ?? false;
   useEffect(() => {
@@ -149,6 +187,12 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const fitPending = useRef(true);
   const initialised = useRef(false);
   const pendingAlpha = useRef<number | undefined>(undefined);
+  /** nodes added since the graph was last sent to the physics worker */
+  const pendingNew = useRef(new Set<string>());
+  /** physics in play mode (not paused) */
+  const playing = useRef(false);
+  /** nodes of the current settle run (the only ones that may move while paused) */
+  const settling = useRef(new Set<string>());
 
   // ------------------------------------------------------------------ derived graph
 
@@ -196,6 +240,8 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   // classes and their direct children (no Groups of Properties – their many HasReference edges
   // make an unreadable tangle), laid out as a tree instead of starting from random positions
   const initialLayout = useRef(false);
+  const treeOrderRef = useRef(treeOrder);
+  treeOrderRef.current = treeOrder;
   useEffect(() => {
     if (initialised.current || !doc) return;
     initialised.current = true;
@@ -205,7 +251,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       setScene(classes.map((c) => classId(c.Code)));
       return;
     }
-    const main = classes.filter((c) => c.ClassType !== GOP);
+    const main = classes.filter((c) => c.ClassType !== GOP && c.ClassType !== MATERIAL);
     const codes = new Set(main.map((c) => c.Code));
     const roots = new Set(main.filter((c) => !c.ParentClassCode || !codes.has(c.ParentClassCode)).map((c) => c.Code));
     const top = main.filter((c) => roots.has(c.Code) || roots.has(c.ParentClassCode ?? ""));
@@ -243,6 +289,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     let newCount = 0;
     for (const n of nodes) {
       if (placed.has(n.id)) continue;
+      pendingNew.current.add(n.id);
       const anchor = (neighbourOf.get(n.id) ?? []).map((id) => placed.get(id)).find(Boolean);
       const a = Math.random() * Math.PI * 2;
       const r = anchor ? 60 + Math.random() * 60 : 40 + Math.sqrt(nodes.length) * 20 * Math.random();
@@ -261,7 +308,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       initialLayout.current = false;
       const lnodes = rnodes.current.map((n) => ({ id: n.id, w: n.w, h: n.h }));
       const aspect = size.current.w && size.current.h ? size.current.w / size.current.h : 1.4;
-      const result = packComponents(treeLayout(lnodes, graph.edges, "LR"), lnodes, graph.edges, aspect);
+      const result = packComponents(treeLayout(lnodes, graph.edges, "LR", treeOrderRef.current), lnodes, graph.edges, aspect);
       for (const n of rnodes.current) {
         const p = result.get(n.id);
         if (!p) continue;
@@ -274,12 +321,14 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
         }
       }
       newCount = 0;
+      pendingNew.current.clear();
       fitPending.current = true;
     }
     if (newCount > 0) pendingAlpha.current = Math.max(pendingAlpha.current ?? 0, newCount === nodes.length ? 1 : 0.5);
     if (worker.current && ready) {
       sendGraph(pendingAlpha.current);
       pendingAlpha.current = undefined;
+      pendingNew.current.clear();
     }
     requestDraw();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -312,10 +361,17 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     edges.forEach((e, k) => {
       edgeArr[2 * k] = e.s;
       edgeArr[2 * k + 1] = e.t;
-      rest[k] = e.kind === "ClassProperty" ? 0.7 : 1;
+      rest[k] = e.kind === "ClassProperty" || e.kind === "GopProperty" ? 0.7 : 1;
       strength[k] = e.kind === "ParentClassCode" ? 1.5 : 1 / Math.max(1, Math.min(degree[e.s], degree[e.t]) * 0.5);
     });
-    worker.current!.postMessage({ type: "graph", n, m, positions, fixed, mass, radius, edges: edgeArr, rest, strength, alpha }, [positions.buffer, fixed.buffer, mass.buffer, radius.buffer, edgeArr.buffer, rest.buffer, strength.buffer]);
+    // paused: only the new nodes settle, the others keep their place
+    // (also while an earlier settle run is still going)
+    let moveOnly: number[] | undefined;
+    if (!playing.current && (alpha !== undefined || settling.current.size)) {
+      for (const id of pendingNew.current) settling.current.add(id);
+      moveOnly = nodes.flatMap((nd, i) => (settling.current.has(nd.id) ? [i] : []));
+    }
+    worker.current!.postMessage({ type: "graph", n, m, positions, fixed, mass, radius, edges: edgeArr, rest, strength, alpha, moveOnly }, [positions.buffer, fixed.buffer, mass.buffer, radius.buffer, edgeArr.buffer, rest.buffer, strength.buffer]);
   };
 
   // ------------------------------------------------------------------ worker
@@ -343,6 +399,8 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           }
         }
         setRunning(m.running);
+        playing.current = !!m.continuous;
+        if (!m.running || playing.current) settling.current.clear();
         if (fitPending.current) {
           fit();
           if (m.running) fitPending.current = true;
@@ -373,7 +431,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     const keep = new Set(scene);
     const p: Saved["pos"] = {};
     for (const [k, v] of pos.current) if (keep.has(k)) p[k] = [Math.round(v.x), Math.round(v.y), v.fixed ? 1 : 0];
-    storageSet(storeKey, { scene, pos: p, hiddenNodes: [...hiddenNodes], hiddenEdges: [...hiddenEdges], physics, appearance, library } satisfies Saved);
+    storageSet(storeKey, { scene, pos: p, hiddenNodes: [...hiddenNodes], hiddenEdges: [...hiddenEdges], treeOrder, physics, appearance, library } satisfies Saved);
   };
   saveRef.current = save;
 
@@ -539,6 +597,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     const cols = Math.max(1, Math.ceil(Math.sqrt(fresh.length)));
     const rows = Math.ceil(fresh.length / cols);
     fresh.forEach((id, i) => {
+      pendingNew.current.add(id);
       const gx = (i % cols) - (cols - 1) / 2;
       const gy = Math.floor(i / cols) - (rows - 1) / 2;
       pos.current.set(id, { x: p.x + gx * 140, y: p.y + gy * 60, fixed: appearance.pinOnDrag });
@@ -590,10 +649,13 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     requestDraw();
   };
 
+  // the last tree layout is applied again when the tree order changes
+  const lastTree = useRef<"tree-tb" | "tree-lr" | null>(null);
   const applyLayout = (kind: "tree-tb" | "tree-lr" | "circle" | "grid") => {
+    lastTree.current = kind === "tree-tb" || kind === "tree-lr" ? kind : null;
     const nodes = rnodes.current;
     const lnodes = nodes.map((n) => ({ id: n.id, w: n.w, h: n.h }));
-    const result = kind === "tree-tb" ? treeLayout(lnodes, graph.edges, "TB") : kind === "tree-lr" ? treeLayout(lnodes, graph.edges, "LR") : kind === "circle" ? circleLayout(lnodes) : gridLayout(lnodes);
+    const result = kind === "tree-tb" ? treeLayout(lnodes, graph.edges, "TB", treeOrder) : kind === "tree-lr" ? treeLayout(lnodes, graph.edges, "LR", treeOrder) : kind === "circle" ? circleLayout(lnodes) : gridLayout(lnodes);
     const positions = new Float32Array(nodes.length * 2);
     nodes.forEach((n, i) => {
       const p = result.get(n.id) ?? { x: n.x, y: n.y };
@@ -890,6 +952,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       setScene(data.scene);
       if (data.hiddenNodes) setHiddenNodes(new Set(data.hiddenNodes));
       if (data.hiddenEdges) setHiddenEdges(new Set(data.hiddenEdges));
+      if (data.treeOrder) setTreeOrder(normalizeTreeOrder(data.treeOrder));
       if (data.physics) setPhysics({ ...DEFAULT_PHYSICS, ...data.physics });
       if (data.appearance) setAppearance({ ...DEFAULT_APPEARANCE, ...data.appearance });
       fitPending.current = true;
@@ -897,6 +960,17 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       notifyError(e);
     }
   };
+
+  const applyRef = useRef(applyLayout);
+  applyRef.current = applyLayout;
+  const firstOrder = useRef(true);
+  useEffect(() => {
+    if (firstOrder.current) {
+      firstOrder.current = false;
+      return;
+    }
+    if (lastTree.current) applyRef.current(lastTree.current);
+  }, [treeOrder]);
 
   // ------------------------------------------------------------------ UI
 
@@ -934,8 +1008,9 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           <Menu.Dropdown>
             <Menu.Item disabled={!activeClass} onClick={() => activeClass && addIds([classId(activeClass)])}>{t("Active class")}</Menu.Item>
             <Menu.Item disabled={!selectedClasses.length} onClick={() => addIds(selectedClasses.map(classId))}>{t("Classes selected in the tree")}</Menu.Item>
-            <Menu.Item onClick={() => addIds((doc?.dictionary.Classes ?? []).filter((c) => c.ClassType !== "GroupOfProperties").map((c) => classId(c.Code)), true)}>{t("All classes")}</Menu.Item>
+            <Menu.Item onClick={() => addIds((doc?.dictionary.Classes ?? []).filter((c) => c.ClassType !== GOP && c.ClassType !== MATERIAL).map((c) => classId(c.Code)), true)}>{t("All classes")}</Menu.Item>
             <Menu.Item onClick={() => addIds((doc?.dictionary.Classes ?? []).filter((c) => c.ClassType === "GroupOfProperties").map((c) => classId(c.Code)), true)}>{t("All groups of properties")}</Menu.Item>
+            <Menu.Item onClick={() => addIds((doc?.dictionary.Classes ?? []).filter((c) => c.ClassType === MATERIAL).map((c) => classId(c.Code)), true)}>{t("All materials")}</Menu.Item>
             <Menu.Item onClick={() => addIds((doc?.dictionary.Properties ?? []).map((p) => propId(p.Code)), true)}>{t("All properties")}</Menu.Item>
             <Menu.Divider />
             <Menu.Item disabled={!selected.size} onClick={() => [...selected].forEach((id) => expand(id))}>{t("Neighbours of the selection")}</Menu.Item>
@@ -996,9 +1071,34 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
 
       <div style={{ flex: 1, display: "flex", minHeight: 0, position: "relative" }}>
         {library && doc && (
-          <div style={{ width: 260, flex: "none", borderRight: "1px solid var(--mantine-color-default-border)", minHeight: 0, ...overlay("left") }}>
+          <div style={{ width: libraryWidth, flex: "none", borderRight: "1px solid var(--mantine-color-default-border)", minHeight: 0, ...overlay("left") }}>
             <GraphLibrary doc={doc} idx={idx} inScene={sceneSet} onAdd={(ids) => { addIds(ids); setSelected(new Set(ids)); }} />
           </div>
+        )}
+        {library && doc && !narrow && (
+          <div
+            className="split-handle"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={t("Resize dictionary panel")}
+            aria-valuenow={libraryWidth}
+            aria-valuemin={LIBRARY_MIN}
+            aria-valuemax={LIBRARY_MAX}
+            tabIndex={0}
+            title={t("Drag to resize, double-click to reset")}
+            onPointerDown={(e) => {
+              libraryDrag.current = { start: e.clientX, initial: libraryWidth };
+              document.body.classList.add("resizing");
+              e.preventDefault();
+            }}
+            onDoubleClick={() => resizeLibrary(LIBRARY_DEFAULT)}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                e.preventDefault();
+                resizeLibrary(libraryWidth + (e.key === "ArrowRight" ? 20 : -20));
+              }
+            }}
+          />
         )}
         <div
           ref={wrapRef}
@@ -1061,7 +1161,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
                 )}
               </Stack>
             )}
-            <Accordion multiple defaultValue={["nodes", "edges", "physics", "appearance"]} variant="contained" radius={0}>
+            <Accordion multiple defaultValue={["nodes", "edges", "tree", "physics", "appearance"]} variant="contained" radius={0}>
               <Accordion.Item value="nodes">
                 <Accordion.Control><Text size="sm" fw={600}>{t("Node types")}</Text></Accordion.Control>
                 <Accordion.Panel>
@@ -1093,12 +1193,45 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
                         label={
                           <Group gap={6} wrap="nowrap">
                             <svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke={EDGE_STYLE[k].color} strokeWidth="2" strokeDasharray={EDGE_STYLE[k].dash.join(" ")} /></svg>
-                            {t(k)} <Text span size="xs" c="dimmed">{edgeCounts.get(k) ?? 0}</Text>
+                            {t(edgeKindLabel(k))} <Text span size="xs" c="dimmed">{edgeCounts.get(k) ?? 0}</Text>
                           </Group>
                         }
                       />
                     ))}
                   </Stack>
+                </Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="tree">
+                <Accordion.Control><Text size="sm" fw={600}>{t("Tree layout order")}</Text></Accordion.Control>
+                <Accordion.Panel>
+                  <Text size="xs" c="dimmed" mb={6}>
+                    {t("The tree layouts first build a tree from the first edge type. Nodes it does not place under a parent are placed by the second edge type, and so on. Hidden edge types are skipped.")}
+                  </Text>
+                  <Stack gap={2} aria-label={t("Tree layout order")}>
+                    {treeOrder.map((k, i) => {
+                      const move = (by: number) =>
+                        setTreeOrder((o) => {
+                          const n = [...o];
+                          [n[i], n[i + by]] = [n[i + by], n[i]];
+                          return n;
+                        });
+                      const hidden = hiddenEdges.has(k);
+                      return (
+                        <Group key={k} gap={4} wrap="nowrap" data-tree-kind={k} style={{ opacity: hidden ? 0.45 : 1 }}>
+                          <Text size="xs" c="dimmed" w={16} ta="right">{i + 1}.</Text>
+                          <svg width="20" height="8" style={{ flex: "none" }}><line x1="0" y1="4" x2="20" y2="4" stroke={EDGE_STYLE[k].color} strokeWidth="2" strokeDasharray={EDGE_STYLE[k].dash.join(" ")} /></svg>
+                          <Text size="xs" style={{ flex: 1, minWidth: 0 }} truncate title={t(edgeKindLabel(k))}>{t(edgeKindLabel(k))}{hidden ? ` (${t("hidden")})` : ""}</Text>
+                          <ActionIcon size="xs" variant="subtle" disabled={i === 0} aria-label={t("Move {{name}} up", { name: t(edgeKindLabel(k)) })} onClick={() => move(-1)}><IconChevronUp size={12} /></ActionIcon>
+                          <ActionIcon size="xs" variant="subtle" disabled={i === treeOrder.length - 1} aria-label={t("Move {{name}} down", { name: t(edgeKindLabel(k)) })} onClick={() => move(1)}><IconChevronDown size={12} /></ActionIcon>
+                        </Group>
+                      );
+                    })}
+                  </Stack>
+                  <Group gap={4} mt={6}>
+                    <Button size="compact-xs" variant="light" onClick={() => applyLayout("tree-tb")}>{t("Tree (top → bottom)")}</Button>
+                    <Button size="compact-xs" variant="light" onClick={() => applyLayout("tree-lr")}>{t("Tree (left → right)")}</Button>
+                    <Button size="compact-xs" variant="subtle" onClick={() => setTreeOrder([...TREE_EDGE_KINDS])}>{t("Default order")}</Button>
+                  </Group>
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="physics">

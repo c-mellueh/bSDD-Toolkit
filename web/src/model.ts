@@ -1,6 +1,14 @@
 import type { BsddClass, BsddProperty, ClassProperty, Dictionary, Doc } from "./types";
 
 export const GOP = "GroupOfProperties";
+export const MATERIAL = "Material";
+
+/** Which tree / page a class is shown in: classes, groups of properties or materials. */
+export type ClassMode = "main" | "gop" | "material";
+export const classMode = (c?: { ClassType?: string | null } | null): ClassMode =>
+  c?.ClassType === GOP ? "gop" : c?.ClassType === MATERIAL ? "material" : "main";
+/** ClassType of new classes created in a tree of the given mode. */
+export const MODE_CLASS_TYPE: Record<ClassMode, string> = { main: "Class", gop: GOP, material: MATERIAL };
 export const CLASS_TYPES = ["Class", "GroupOfProperties", "AlternativeUse", "Material", "ReferenceDocument", "ComposedProperty"];
 export const CLASS_STATUSES = ["Preview", "Active", "Inactive"];
 export const DATA_TYPES = ["Boolean", "Character", "Integer", "Real", "String", "Time"];

@@ -741,5 +741,20 @@
  "Inherited from {{name}} (strict inheritance)": "Geerbt von {{name}} (strikte Vererbung)",
  "Inherited from {{name}} (strict inheritance): remove it in the parent class.": "Geerbt von {{name}} (strikte Vererbung): in der Elternklasse entfernen.",
  "Inherited from {{name}} (strict inheritance). Property and property set can only be changed in the parent class; the values here can be adjusted.": "Geerbt von {{name}} (strikte Vererbung). Merkmal und Merkmalssatz können nur in der Elternklasse geändert werden; die Werte hier können angepasst werden.",
- "Contains class properties inherited from {{name}} (strict inheritance)": "Enthält von {{name}} geerbte Klassenmerkmale (strikte Vererbung)"
+ "Contains class properties inherited from {{name}} (strict inheritance)": "Enthält von {{name}} geerbte Klassenmerkmale (strikte Vererbung)",
+ "ClassProperty (class)": "Klassenmerkmal (Klasse)",
+ "ClassProperty (group of properties)": "Klassenmerkmal (Merkmalsgruppe)",
+ "Tree layout order": "Reihenfolge im Baum-Layout",
+ "The tree layouts first build a tree from the first edge type. Nodes it does not place under a parent are placed by the second edge type, and so on. Hidden edge types are skipped.": "Die Baum-Layouts bilden zuerst einen Baum aus dem ersten Kantentyp. Knoten, die dadurch keinem Elternknoten zugeordnet werden, ordnet der zweite Kantentyp zu, und so weiter. Ausgeblendete Kantentypen werden übersprungen.",
+ "hidden": "ausgeblendet",
+ "Move {{name}} up": "{{name}} nach oben",
+ "Move {{name}} down": "{{name}} nach unten",
+ "Default order": "Standardreihenfolge",
+ "Materials": "Materialien",
+ "New material": "Neues Material",
+ "All materials": "Alle Materialien",
+ "Select a material on the left to see its properties and details, or create a new one.": "Wähle links ein Material, um seine Merkmale und Details zu sehen, oder lege ein neues an.",
+ "Material": "Material",
+ "Resize dictionary panel": "Größe des Wörterbuch-Bereichs ändern",
+ "Drag to resize, double-click to reset": "Ziehen zum Ändern der Größe, Doppelklick setzt zurück"
 }
