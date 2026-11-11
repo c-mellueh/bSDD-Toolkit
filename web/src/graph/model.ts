@@ -8,6 +8,7 @@ export type NodeKind = (typeof NODE_KINDS)[number];
 export const EDGE_KINDS = [
   "ParentClassCode",
   "ClassProperty",
+  "GopProperty",
   "IfcReference",
   "HasMaterial",
   "HasReference",
@@ -32,6 +33,7 @@ export const NODE_STYLE: Record<NodeKind, { color: string; shape: "round" | "rec
 export const EDGE_STYLE: Record<EdgeKind, { color: string; dash: number[]; width: number }> = {
   ParentClassCode: { color: "#0ca678", dash: [2, 4], width: 1.6 },
   ClassProperty: { color: "#868e96", dash: [8, 3, 2, 3], width: 1.2 },
+  GopProperty: { color: "#9775fa", dash: [8, 3, 2, 3], width: 1.2 },
   IfcReference: { color: "#40c057", dash: [6, 4], width: 1.2 },
   HasMaterial: { color: "#f08c00", dash: [], width: 1.6 },
   HasReference: { color: "#7950f2", dash: [], width: 1.6 },
@@ -42,6 +44,9 @@ export const EDGE_STYLE: Record<EdgeKind, { color: string; dash: number[]; width
   HasPart: { color: "#5c940d", dash: [], width: 1.6 },
   IsPartOf: { color: "#82c91e", dash: [5, 3], width: 1.6 },
 };
+
+/** Display name of an edge kind (untranslated i18n key). */
+export const edgeKindLabel = (k: EdgeKind) => (k === "GopProperty" ? "ClassProperty (group of properties)" : k === "ClassProperty" ? "ClassProperty (class)" : k);
 
 export type EdgeRef =
   | { type: "parent"; child: string }
@@ -143,7 +148,7 @@ export function edgesBetween(doc: Doc, idx: Indexes, ids: Set<string>): GEdge[] 
         const p = resolveProperty(idx, d, cp);
         const target = p ? propId(p.Code) : cp.PropertyUri ? `xp:${cp.PropertyUri}` : null;
         if (!target || !ids.has(target)) continue;
-        edges.push({ id: `cp:${c.Code}:${cp.Code}`, source: id, target, kind: "ClassProperty", label: cp.PropertySet ?? "", ref: { type: "classProperty", owner: c.Code, cpCode: cp.Code } });
+        edges.push({ id: `cp:${c.Code}:${cp.Code}`, source: id, target, kind: c.ClassType === GOP ? "GopProperty" : "ClassProperty", label: cp.PropertySet ?? "", ref: { type: "classProperty", owner: c.Code, cpCode: cp.Code } });
       }
       for (const name of c.RelatedIfcEntityNamesList ?? []) {
         const target = `ifc:${name}`;

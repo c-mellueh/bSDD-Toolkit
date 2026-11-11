@@ -17,18 +17,44 @@ const HIERARCHY: Partial<Record<EdgeKind, boolean>> = {
   IsParentOf: false, // parent -> child
   HasPart: false,
   ClassProperty: false,
+  GopProperty: false,
   IfcReference: false,
   HasMaterial: false,
   HasReference: false,
 };
 
-export function treeLayout(nodes: LayoutNode[], edges: GEdge[], direction: "TB" | "LR"): Pos {
+/** Edge kinds that can build the tree, in the default order (stronger hierarchy first). */
+export const TREE_EDGE_KINDS: EdgeKind[] = [
+  "ParentClassCode",
+  "IsChildOf",
+  "IsParentOf",
+  "IsPartOf",
+  "HasPart",
+  "ClassProperty",
+  "GopProperty",
+  "HasMaterial",
+  "IfcReference",
+  "HasReference",
+];
+
+/** A saved order completed with kinds it does not know yet (e.g. after an update). */
+export function normalizeTreeOrder(order: readonly string[] | undefined): EdgeKind[] {
+  const known = (order ?? []).filter((k): k is EdgeKind => (TREE_EDGE_KINDS as string[]).includes(k));
+  const out = [...new Set(known)];
+  for (const k of TREE_EDGE_KINDS) if (!out.includes(k)) out.push(k);
+  return out;
+}
+
+/**
+ * Tidy tree. The tree is built from the edges of ``order[0]`` first; nodes that are not placed
+ * under a parent by it are placed by ``order[1]``, and so on (each node gets one parent).
+ */
+export function treeLayout(nodes: LayoutNode[], edges: GEdge[], direction: "TB" | "LR", order: readonly EdgeKind[] = TREE_EDGE_KINDS): Pos {
   const ids = new Set(nodes.map((n) => n.id));
   const size = new Map(nodes.map((n) => [n.id, n]));
   const parent = new Map<string, string>();
-  // stronger hierarchy edges first
-  const order: EdgeKind[] = ["ParentClassCode", "IsChildOf", "IsParentOf", "IsPartOf", "HasPart", "ClassProperty", "HasMaterial", "IfcReference", "HasReference"];
   for (const kind of order) {
+    if (!(kind in HIERARCHY)) continue;
     const childIsSource = HIERARCHY[kind];
     for (const e of edges) {
       if (e.kind !== kind || !ids.has(e.source) || !ids.has(e.target)) continue;

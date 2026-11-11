@@ -5,8 +5,10 @@ import { Toggle } from "../components/Toggle";
 import {
   IconArrowsMaximize,
   IconBooks,
+  IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
+  IconChevronUp,
   IconDownload,
   IconEraser,
   IconExternalLink,
@@ -33,9 +35,10 @@ import { openUi } from "../state/ui";
 import { GraphLibrary } from "./GraphLibrary";
 import { buildTab, htmlPage, rootClassTabs } from "./htmlExport";
 import { hasGraphDrag, readGraphDrag } from "./dnd";
-import { circleLayout, gridLayout, packComponents, treeLayout } from "./layout";
+import { circleLayout, gridLayout, normalizeTreeOrder, packComponents, TREE_EDGE_KINDS, treeLayout } from "./layout";
 import {
   EDGE_KINDS,
+  edgeKindLabel,
   EDGE_STYLE,
   NODE_KINDS,
   NODE_STYLE,
@@ -83,6 +86,8 @@ interface Saved {
   pos: Record<string, [number, number, number]>; // x, y, fixed
   hiddenNodes: NodeKind[];
   hiddenEdges: EdgeKind[];
+  /** edge kinds in the order the tree layout uses them */
+  treeOrder: EdgeKind[];
   physics: Physics;
   appearance: Appearance;
   library: boolean;
@@ -109,6 +114,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const [scene, setScene] = useState<string[]>(saved.scene ?? []);
   const [hiddenNodes, setHiddenNodes] = useState<Set<NodeKind>>(new Set(saved.hiddenNodes ?? []));
   const [hiddenEdges, setHiddenEdges] = useState<Set<EdgeKind>>(new Set(saved.hiddenEdges ?? []));
+  const [treeOrder, setTreeOrder] = useState<EdgeKind[]>(normalizeTreeOrder(saved.treeOrder));
   const [physics, setPhysics] = useState<Physics>({ ...DEFAULT_PHYSICS, ...(saved.physics ?? {}) });
   const [appearance, setAppearance] = useState<Appearance>({ ...DEFAULT_APPEARANCE, ...(saved.appearance ?? {}) });
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -196,6 +202,8 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   // classes and their direct children (no Groups of Properties – their many HasReference edges
   // make an unreadable tangle), laid out as a tree instead of starting from random positions
   const initialLayout = useRef(false);
+  const treeOrderRef = useRef(treeOrder);
+  treeOrderRef.current = treeOrder;
   useEffect(() => {
     if (initialised.current || !doc) return;
     initialised.current = true;
@@ -261,7 +269,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       initialLayout.current = false;
       const lnodes = rnodes.current.map((n) => ({ id: n.id, w: n.w, h: n.h }));
       const aspect = size.current.w && size.current.h ? size.current.w / size.current.h : 1.4;
-      const result = packComponents(treeLayout(lnodes, graph.edges, "LR"), lnodes, graph.edges, aspect);
+      const result = packComponents(treeLayout(lnodes, graph.edges, "LR", treeOrderRef.current), lnodes, graph.edges, aspect);
       for (const n of rnodes.current) {
         const p = result.get(n.id);
         if (!p) continue;
@@ -312,7 +320,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     edges.forEach((e, k) => {
       edgeArr[2 * k] = e.s;
       edgeArr[2 * k + 1] = e.t;
-      rest[k] = e.kind === "ClassProperty" ? 0.7 : 1;
+      rest[k] = e.kind === "ClassProperty" || e.kind === "GopProperty" ? 0.7 : 1;
       strength[k] = e.kind === "ParentClassCode" ? 1.5 : 1 / Math.max(1, Math.min(degree[e.s], degree[e.t]) * 0.5);
     });
     worker.current!.postMessage({ type: "graph", n, m, positions, fixed, mass, radius, edges: edgeArr, rest, strength, alpha }, [positions.buffer, fixed.buffer, mass.buffer, radius.buffer, edgeArr.buffer, rest.buffer, strength.buffer]);
@@ -373,7 +381,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     const keep = new Set(scene);
     const p: Saved["pos"] = {};
     for (const [k, v] of pos.current) if (keep.has(k)) p[k] = [Math.round(v.x), Math.round(v.y), v.fixed ? 1 : 0];
-    storageSet(storeKey, { scene, pos: p, hiddenNodes: [...hiddenNodes], hiddenEdges: [...hiddenEdges], physics, appearance, library } satisfies Saved);
+    storageSet(storeKey, { scene, pos: p, hiddenNodes: [...hiddenNodes], hiddenEdges: [...hiddenEdges], treeOrder, physics, appearance, library } satisfies Saved);
   };
   saveRef.current = save;
 
@@ -593,7 +601,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const applyLayout = (kind: "tree-tb" | "tree-lr" | "circle" | "grid") => {
     const nodes = rnodes.current;
     const lnodes = nodes.map((n) => ({ id: n.id, w: n.w, h: n.h }));
-    const result = kind === "tree-tb" ? treeLayout(lnodes, graph.edges, "TB") : kind === "tree-lr" ? treeLayout(lnodes, graph.edges, "LR") : kind === "circle" ? circleLayout(lnodes) : gridLayout(lnodes);
+    const result = kind === "tree-tb" ? treeLayout(lnodes, graph.edges, "TB", treeOrder) : kind === "tree-lr" ? treeLayout(lnodes, graph.edges, "LR", treeOrder) : kind === "circle" ? circleLayout(lnodes) : gridLayout(lnodes);
     const positions = new Float32Array(nodes.length * 2);
     nodes.forEach((n, i) => {
       const p = result.get(n.id) ?? { x: n.x, y: n.y };
@@ -890,6 +898,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       setScene(data.scene);
       if (data.hiddenNodes) setHiddenNodes(new Set(data.hiddenNodes));
       if (data.hiddenEdges) setHiddenEdges(new Set(data.hiddenEdges));
+      if (data.treeOrder) setTreeOrder(normalizeTreeOrder(data.treeOrder));
       if (data.physics) setPhysics({ ...DEFAULT_PHYSICS, ...data.physics });
       if (data.appearance) setAppearance({ ...DEFAULT_APPEARANCE, ...data.appearance });
       fitPending.current = true;
@@ -1061,7 +1070,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
                 )}
               </Stack>
             )}
-            <Accordion multiple defaultValue={["nodes", "edges", "physics", "appearance"]} variant="contained" radius={0}>
+            <Accordion multiple defaultValue={["nodes", "edges", "tree", "physics", "appearance"]} variant="contained" radius={0}>
               <Accordion.Item value="nodes">
                 <Accordion.Control><Text size="sm" fw={600}>{t("Node types")}</Text></Accordion.Control>
                 <Accordion.Panel>
@@ -1093,12 +1102,45 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
                         label={
                           <Group gap={6} wrap="nowrap">
                             <svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke={EDGE_STYLE[k].color} strokeWidth="2" strokeDasharray={EDGE_STYLE[k].dash.join(" ")} /></svg>
-                            {t(k)} <Text span size="xs" c="dimmed">{edgeCounts.get(k) ?? 0}</Text>
+                            {t(edgeKindLabel(k))} <Text span size="xs" c="dimmed">{edgeCounts.get(k) ?? 0}</Text>
                           </Group>
                         }
                       />
                     ))}
                   </Stack>
+                </Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="tree">
+                <Accordion.Control><Text size="sm" fw={600}>{t("Tree layout order")}</Text></Accordion.Control>
+                <Accordion.Panel>
+                  <Text size="xs" c="dimmed" mb={6}>
+                    {t("The tree layouts first build a tree from the first edge type. Nodes it does not place under a parent are placed by the second edge type, and so on. Hidden edge types are skipped.")}
+                  </Text>
+                  <Stack gap={2} aria-label={t("Tree layout order")}>
+                    {treeOrder.map((k, i) => {
+                      const move = (by: number) =>
+                        setTreeOrder((o) => {
+                          const n = [...o];
+                          [n[i], n[i + by]] = [n[i + by], n[i]];
+                          return n;
+                        });
+                      const hidden = hiddenEdges.has(k);
+                      return (
+                        <Group key={k} gap={4} wrap="nowrap" data-tree-kind={k} style={{ opacity: hidden ? 0.45 : 1 }}>
+                          <Text size="xs" c="dimmed" w={16} ta="right">{i + 1}.</Text>
+                          <svg width="20" height="8" style={{ flex: "none" }}><line x1="0" y1="4" x2="20" y2="4" stroke={EDGE_STYLE[k].color} strokeWidth="2" strokeDasharray={EDGE_STYLE[k].dash.join(" ")} /></svg>
+                          <Text size="xs" style={{ flex: 1, minWidth: 0 }} truncate title={t(edgeKindLabel(k))}>{t(edgeKindLabel(k))}{hidden ? ` (${t("hidden")})` : ""}</Text>
+                          <ActionIcon size="xs" variant="subtle" disabled={i === 0} aria-label={t("Move {{name}} up", { name: t(edgeKindLabel(k)) })} onClick={() => move(-1)}><IconChevronUp size={12} /></ActionIcon>
+                          <ActionIcon size="xs" variant="subtle" disabled={i === treeOrder.length - 1} aria-label={t("Move {{name}} down", { name: t(edgeKindLabel(k)) })} onClick={() => move(1)}><IconChevronDown size={12} /></ActionIcon>
+                        </Group>
+                      );
+                    })}
+                  </Stack>
+                  <Group gap={4} mt={6}>
+                    <Button size="compact-xs" variant="light" onClick={() => applyLayout("tree-tb")}>{t("Tree (top → bottom)")}</Button>
+                    <Button size="compact-xs" variant="light" onClick={() => applyLayout("tree-lr")}>{t("Tree (left → right)")}</Button>
+                    <Button size="compact-xs" variant="subtle" onClick={() => setTreeOrder([...TREE_EDGE_KINDS])}>{t("Default order")}</Button>
+                  </Group>
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="physics">

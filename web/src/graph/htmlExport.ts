@@ -9,7 +9,7 @@
 import { GOP, classUri, cpName, descendants, propertyUri, resolveProperty, type Indexes } from "../model";
 import type { Doc } from "../types";
 import { treeLayout } from "./layout";
-import { EDGE_STYLE, NODE_STYLE, describeNode, edgesBetween, type EdgeKind, type GNode, type NodeKind } from "./model";
+import { EDGE_STYLE, NODE_STYLE, describeNode, edgeKindLabel, edgesBetween, type EdgeKind, type GNode, type NodeKind } from "./model";
 import { nodeSize, redgesFrom, toSvg, type DrawOptions, type RNode } from "./renderer";
 
 export interface HtmlTab {
@@ -101,7 +101,7 @@ function legend(kinds: HtmlTab["kinds"]): string {
   const e = kinds.edges
     .map((k) => {
       const st = EDGE_STYLE[k];
-      return `<div class="lg-row"><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="${st.color}" stroke-width="2" stroke-dasharray="${st.dash.join(" ")}"/></svg>${esc(k)}</div>`;
+      return `<div class="lg-row"><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="${st.color}" stroke-width="2" stroke-dasharray="${st.dash.join(" ")}"/></svg>${esc(edgeKindLabel(k))}</div>`;
     })
     .join("");
   return `<div class="lg-title">Node types</div>${n}${e ? `<div class="lg-title">Relationship types</div>${e}` : ""}`;
