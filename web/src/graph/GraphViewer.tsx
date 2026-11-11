@@ -81,6 +81,12 @@ interface Appearance {
 
 const DEFAULT_APPEARANCE: Appearance = { routing: "straight", labels: true, edgeLabels: false, arrows: true, pinOnDrag: true, physicsOnDrag: true };
 
+const LIBRARY_WIDTH_KEY = "bsdd-graph-library-width";
+const LIBRARY_DEFAULT = 260;
+const LIBRARY_MIN = 180;
+const LIBRARY_MAX = 700;
+const clampLibrary = (w: number) => Math.round(Math.max(LIBRARY_MIN, Math.min(LIBRARY_MAX, Math.min(window.innerWidth * 0.6, Number(w) || LIBRARY_DEFAULT))));
+
 interface Saved {
   scene: string[];
   pos: Record<string, [number, number, number]>; // x, y, fixed
@@ -123,6 +129,32 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const [ready, setReady] = useState(false);
   const [panel, setPanel] = useState(true);
   const [library, setLibrary] = useState<boolean>(saved.library ?? true);
+  // width of the dictionary panel (per browser, all projects)
+  const [libraryWidth, setLibraryWidth] = useState<number>(() => clampLibrary(storageGet(LIBRARY_WIDTH_KEY, LIBRARY_DEFAULT)));
+  const libraryDrag = useRef<{ start: number; initial: number } | null>(null);
+  const resizeLibrary = (w: number) => {
+    const v = clampLibrary(w);
+    setLibraryWidth(v);
+    storageSet(LIBRARY_WIDTH_KEY, v);
+  };
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      if (libraryDrag.current) setLibraryWidth(clampLibrary(libraryDrag.current.initial + e.clientX - libraryDrag.current.start));
+    };
+    const up = (e: PointerEvent) => {
+      if (!libraryDrag.current) return;
+      resizeLibrary(libraryDrag.current.initial + e.clientX - libraryDrag.current.start);
+      libraryDrag.current = null;
+      document.body.classList.remove("resizing");
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // phones: the side panels would leave no room for the graph – start closed, open as overlays
   const narrow = useMediaQuery("(max-width: 48em)") ?? false;
   useEffect(() => {
@@ -1039,9 +1071,34 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
 
       <div style={{ flex: 1, display: "flex", minHeight: 0, position: "relative" }}>
         {library && doc && (
-          <div style={{ width: 260, flex: "none", borderRight: "1px solid var(--mantine-color-default-border)", minHeight: 0, ...overlay("left") }}>
+          <div style={{ width: libraryWidth, flex: "none", borderRight: "1px solid var(--mantine-color-default-border)", minHeight: 0, ...overlay("left") }}>
             <GraphLibrary doc={doc} idx={idx} inScene={sceneSet} onAdd={(ids) => { addIds(ids); setSelected(new Set(ids)); }} />
           </div>
+        )}
+        {library && doc && !narrow && (
+          <div
+            className="split-handle"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={t("Resize dictionary panel")}
+            aria-valuenow={libraryWidth}
+            aria-valuemin={LIBRARY_MIN}
+            aria-valuemax={LIBRARY_MAX}
+            tabIndex={0}
+            title={t("Drag to resize, double-click to reset")}
+            onPointerDown={(e) => {
+              libraryDrag.current = { start: e.clientX, initial: libraryWidth };
+              document.body.classList.add("resizing");
+              e.preventDefault();
+            }}
+            onDoubleClick={() => resizeLibrary(LIBRARY_DEFAULT)}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                e.preventDefault();
+                resizeLibrary(libraryWidth + (e.key === "ArrowRight" ? 20 : -20));
+              }
+            }}
+          />
         )}
         <div
           ref={wrapRef}

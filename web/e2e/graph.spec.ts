@@ -76,3 +76,28 @@ test("graph: with physics paused, adding or dropping nodes does not move the oth
     expect([q.x, q.y], p.id).toEqual([p.x, p.y]);
   }
 });
+
+test("graph: the dictionary panel can be resized and keeps its width", async ({ page, request }) => {
+  const id = await createProject(request);
+  await page.goto(`/p/${id}/graph`);
+  const handle = page.getByRole("separator", { name: "Resize dictionary panel" });
+  const panelWidth = () => handle.evaluate((el) => el.previousElementSibling!.getBoundingClientRect().width);
+  const canvasWidth = async () => (await page.locator("canvas").boundingBox())!.width;
+  await expect.poll(panelWidth).toBe(260);
+  const before = await canvasWidth();
+  const box = (await handle.boundingBox())!;
+  await page.mouse.move(box.x + 2, box.y + 100);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 152, box.y + 100, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(panelWidth).toBe(410);
+  await expect.poll(canvasWidth).toBeLessThan(before - 100); // the graph gets narrower
+
+  await page.reload();
+  await expect.poll(panelWidth).toBe(410);
+  await handle.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect.poll(panelWidth).toBe(390);
+  await handle.dblclick();
+  await expect.poll(panelWidth).toBe(260);
+});
