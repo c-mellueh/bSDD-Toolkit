@@ -37,3 +37,42 @@ test("graph: class properties of classes and of groups of properties are separat
   await expect(page.locator("[data-tree-kind]").first()).toHaveAttribute("data-tree-kind", "ParentClassCode");
   await page.getByRole("button", { name: "Tree (top → bottom)" }).click();
 });
+
+type Pt = { id: string; x: number; y: number };
+const positions = (page: import("@playwright/test").Page) =>
+  page.evaluate(() => (window as unknown as { __bsddGraph: { nodes: () => Pt[] } }).__bsddGraph.nodes().map((n) => ({ id: n.id, x: n.x, y: n.y })));
+
+test("graph: with physics paused, adding or dropping nodes does not move the other nodes", async ({ page, request }) => {
+  const id = await createProject(request);
+  await page.goto(`/p/${id}/graph`);
+  await expect(page.getByRole("button", { name: "Run physics (Space)" })).toBeVisible(); // paused
+  // wait until the first layout has come to rest
+  let before: Pt[] = [];
+  await expect(async () => {
+    const a = await positions(page);
+    await page.waitForTimeout(400);
+    before = await positions(page);
+    expect(a.length).toBeGreaterThan(0);
+    expect(before).toEqual(a);
+  }).toPass();
+
+  // drop a property from the dictionary panel onto the graph
+  const box = (await page.locator("canvas").boundingBox())!;
+  await page.evaluate(({ x, y }) => {
+    const dt = new DataTransfer();
+    dt.setData("application/x-bsdd-graph-nodes", JSON.stringify(["p:FireRating"]));
+    const target = document.elementFromPoint(x, y)!;
+    for (const type of ["dragenter", "dragover", "drop"]) target.dispatchEvent(new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: dt, clientX: x, clientY: y }));
+  }, { x: box.x + box.width - 60, y: box.y + 60 });
+  // and add more nodes through the menu
+  await page.getByRole("button", { name: "Add…" }).click();
+  await page.getByRole("menuitem", { name: "All groups of properties" }).click();
+  await page.waitForTimeout(1500);
+
+  const after = await positions(page);
+  expect(after.map((n) => n.id)).toEqual(expect.arrayContaining(["p:FireRating", "c:Pset_Fire"]));
+  for (const p of before) {
+    const q = after.find((n) => n.id === p.id)!;
+    expect([q.x, q.y], p.id).toEqual([p.x, p.y]);
+  }
+});

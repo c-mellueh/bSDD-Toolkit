@@ -155,6 +155,12 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
   const fitPending = useRef(true);
   const initialised = useRef(false);
   const pendingAlpha = useRef<number | undefined>(undefined);
+  /** nodes added since the graph was last sent to the physics worker */
+  const pendingNew = useRef(new Set<string>());
+  /** physics in play mode (not paused) */
+  const playing = useRef(false);
+  /** nodes of the current settle run (the only ones that may move while paused) */
+  const settling = useRef(new Set<string>());
 
   // ------------------------------------------------------------------ derived graph
 
@@ -251,6 +257,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     let newCount = 0;
     for (const n of nodes) {
       if (placed.has(n.id)) continue;
+      pendingNew.current.add(n.id);
       const anchor = (neighbourOf.get(n.id) ?? []).map((id) => placed.get(id)).find(Boolean);
       const a = Math.random() * Math.PI * 2;
       const r = anchor ? 60 + Math.random() * 60 : 40 + Math.sqrt(nodes.length) * 20 * Math.random();
@@ -282,12 +289,14 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
         }
       }
       newCount = 0;
+      pendingNew.current.clear();
       fitPending.current = true;
     }
     if (newCount > 0) pendingAlpha.current = Math.max(pendingAlpha.current ?? 0, newCount === nodes.length ? 1 : 0.5);
     if (worker.current && ready) {
       sendGraph(pendingAlpha.current);
       pendingAlpha.current = undefined;
+      pendingNew.current.clear();
     }
     requestDraw();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -323,7 +332,14 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
       rest[k] = e.kind === "ClassProperty" || e.kind === "GopProperty" ? 0.7 : 1;
       strength[k] = e.kind === "ParentClassCode" ? 1.5 : 1 / Math.max(1, Math.min(degree[e.s], degree[e.t]) * 0.5);
     });
-    worker.current!.postMessage({ type: "graph", n, m, positions, fixed, mass, radius, edges: edgeArr, rest, strength, alpha }, [positions.buffer, fixed.buffer, mass.buffer, radius.buffer, edgeArr.buffer, rest.buffer, strength.buffer]);
+    // paused: only the new nodes settle, the others keep their place
+    // (also while an earlier settle run is still going)
+    let moveOnly: number[] | undefined;
+    if (!playing.current && (alpha !== undefined || settling.current.size)) {
+      for (const id of pendingNew.current) settling.current.add(id);
+      moveOnly = nodes.flatMap((nd, i) => (settling.current.has(nd.id) ? [i] : []));
+    }
+    worker.current!.postMessage({ type: "graph", n, m, positions, fixed, mass, radius, edges: edgeArr, rest, strength, alpha, moveOnly }, [positions.buffer, fixed.buffer, mass.buffer, radius.buffer, edgeArr.buffer, rest.buffer, strength.buffer]);
   };
 
   // ------------------------------------------------------------------ worker
@@ -351,6 +367,8 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
           }
         }
         setRunning(m.running);
+        playing.current = !!m.continuous;
+        if (!m.running || playing.current) settling.current.clear();
         if (fitPending.current) {
           fit();
           if (m.running) fitPending.current = true;
@@ -547,6 +565,7 @@ export function GraphViewer({ projectId, standalone }: { projectId: string; stan
     const cols = Math.max(1, Math.ceil(Math.sqrt(fresh.length)));
     const rows = Math.ceil(fresh.length / cols);
     fresh.forEach((id, i) => {
+      pendingNew.current.add(id);
       const gx = (i % cols) - (cols - 1) / 2;
       const gy = Math.floor(i / cols) - (rows - 1) / 2;
       pos.current.set(id, { x: p.x + gx * 140, y: p.y + gy * 60, fixed: appearance.pinOnDrag });

@@ -29,6 +29,8 @@ let alphaDecay = 0.0228; // ~300 steps from 1 to 0.001 like d3-force
 const ALPHA_MIN = 0.002;
 const stepsPerFrame = 4;
 let timer: number | undefined;
+// "settle" run: only some nodes may move, the others are fixed until the run ends
+let settleRestore: Uint8Array | null = null;
 let params = { repulsion: 1200, springLength: 90, springK: 0.04, gravity: 0.02, damping: 0.6, theta: 0.8, maxSpeed: 60, collision: 1 };
 
 const post = (msg: any, transfer?: Transferable[]) => (self as unknown as Worker).postMessage(msg, transfer ?? []);
@@ -42,10 +44,17 @@ function applyParams() {
   ex.set_params(params.repulsion, params.springLength, params.springK, params.gravity, params.damping, params.theta, params.maxSpeed, params.collision);
 }
 
+/** Give back the fixed flags the nodes had before a settle run. */
+function endSettle() {
+  if (!settleRestore || !ex) return;
+  if (settleRestore.length === n) view(Uint8Array, ex.fixed_ptr(), n).set(settleRestore);
+  settleRestore = null;
+}
+
 function sendPositions() {
   if (!ex) return;
   const copy = view(Float32Array, ex.pos_ptr(), n * 2).slice();
-  post({ type: "positions", positions: copy, alpha, running }, [copy.buffer]);
+  post({ type: "positions", positions: copy, alpha, running, continuous }, [copy.buffer]);
 }
 
 function loop() {
@@ -60,7 +69,10 @@ function loop() {
     alpha += (alphaTarget - alpha) * alphaDecay;
     count++;
   } while (count < stepsPerFrame && performance.now() - start < 12 && alpha > ALPHA_MIN);
-  if (alpha <= ALPHA_MIN && alphaTarget <= ALPHA_MIN) running = false;
+  if (alpha <= ALPHA_MIN && alphaTarget <= ALPHA_MIN) {
+    running = false;
+    endSettle();
+  }
   sendPositions();
   // in play mode, idle slowly once everything has come to rest
   const delay = continuous && lastSpeed < 0.01 ? 100 : 4;
@@ -96,6 +108,14 @@ self.onmessage = async (ev: MessageEvent) => {
       view(Uint32Array, ex.edges_ptr(), m * 2).set(msg.edges);
       view(Float32Array, ex.rest_ptr(), m).set(msg.rest);
       view(Float32Array, ex.strength_ptr(), m).set(msg.strength);
+      settleRestore = null;
+      if (msg.moveOnly && (msg.alpha !== undefined || running)) {
+        // physics is paused: let only the new nodes settle, everything else stays where it is
+        const fixed = view(Uint8Array, ex.fixed_ptr(), n);
+        settleRestore = fixed.slice();
+        const free = new Set<number>(msg.moveOnly as number[]);
+        for (let i = 0; i < n; i++) if (!free.has(i)) fixed[i] = 1;
+      }
       if (msg.alpha !== undefined) {
         alpha = Math.max(alpha, msg.alpha);
         startLoop();
@@ -112,6 +132,7 @@ self.onmessage = async (ev: MessageEvent) => {
       }
       break;
     case "start":
+      endSettle();
       alpha = Math.max(alpha, msg.alpha ?? 1);
       if (msg.continuous) {
         continuous = true;
@@ -120,6 +141,7 @@ self.onmessage = async (ev: MessageEvent) => {
       startLoop();
       break;
     case "stop":
+      endSettle();
       continuous = false;
       alphaTarget = 0;
       running = false;
@@ -128,6 +150,7 @@ self.onmessage = async (ev: MessageEvent) => {
     case "drag": {
       // move nodes (pinned while dragging) and keep the simulation warm
       if (!ex) return;
+      endSettle();
       const pos = view(Float32Array, ex.pos_ptr(), n * 2);
       const fixed = view(Uint8Array, ex.fixed_ptr(), n);
       for (const [i, x, y] of msg.items as [number, number, number][]) {
@@ -148,12 +171,14 @@ self.onmessage = async (ev: MessageEvent) => {
       break;
     case "fixed": {
       if (!ex) return;
+      endSettle();
       const fixed = view(Uint8Array, ex.fixed_ptr(), n);
       for (const i of msg.indices as number[]) if (i < n) fixed[i] = msg.value ? 1 : 0;
       break;
     }
     case "positions": {
       if (!ex) return;
+      endSettle();
       view(Float32Array, ex.pos_ptr(), n * 2).set(msg.positions);
       continuous = false;
       alphaTarget = 0;
