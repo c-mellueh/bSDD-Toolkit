@@ -37,6 +37,8 @@ body { overflow: hidden; }
 .search-button:hover { background: var(--mantine-color-default-hover); }
 .nav-collapsed { justify-content: center; }
 .nav-collapsed .mantine-NavLink-section[data-position="left"] { margin-inline-end: 0; }
+/* the (empty) label area would push the icon to the left */
+.nav-collapsed .mantine-NavLink-body { display: none; }
 .mantine-NavLink-root { border-radius: var(--mantine-radius-md); }
 
 /* ---------------------------------------------------------------- pages */
