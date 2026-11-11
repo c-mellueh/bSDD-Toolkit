@@ -31,14 +31,12 @@ jobs:
       - name: Browser tests (Playwright)
         working-directory: web
         run: |
-          # the Ubuntu package mirrors are sometimes unreachable: retry, then fall back to the
-          # browser alone (the runner image already has most of the libraries it needs)
-          for i in 1 2 3; do
-            npx playwright install --with-deps chromium && break
-            echo "Installing the browser dependencies failed (attempt $i), retrying in 30 s"
-            sleep 30
-            [ "$i" = 3 ] && npx playwright install chromium
-          done
+          # Avoid the Ubuntu package mirrors (often unreachable from the runners): the runner image
+          # already has the libraries the browser needs. Install them only if it does not start.
+          npx playwright install chromium
+          if ! node -e "require('playwright').chromium.launch().then(b => b.close())"; then
+            for i in 1 2 3; do npx playwright install-deps chromium && break; sleep 30; done
+          fi
           npm run e2e
       - name: Upload Playwright report
         if: failure()
