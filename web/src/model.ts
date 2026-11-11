@@ -118,6 +118,29 @@ export function resolveProperty(idx: Indexes, d: Dictionary, cp: ClassProperty):
   return undefined;
 }
 
+/** Properties of this dictionary used by the groups of properties among ``codes`` (classes about to
+ * be deleted), and how many of the remaining classes also use them. */
+export function gopPropertyUsage(idx: Indexes, d: Dictionary, codes: string[]): { names: string[]; otherClasses: number } {
+  const deleting = new Set(codes);
+  const props = new Map<string, string>();
+  for (const code of codes) {
+    const c = idx.classes.get(code);
+    if (c?.ClassType !== GOP) continue;
+    for (const cp of c.ClassProperties ?? []) {
+      const p = resolveProperty(idx, d, cp);
+      if (p) props.set(p.Code, p.Name || p.Code);
+    }
+  }
+  let otherClasses = 0;
+  if (props.size) {
+    for (const c of d.Classes ?? []) {
+      if (deleting.has(c.Code)) continue;
+      if ((c.ClassProperties ?? []).some((cp) => props.has(resolveProperty(idx, d, cp)?.Code ?? ""))) otherClasses++;
+    }
+  }
+  return { names: [...props.values()].sort((a, b) => a.localeCompare(b)), otherClasses };
+}
+
 export function cpName(idx: Indexes, d: Dictionary, cp: ClassProperty): string {
   const p = resolveProperty(idx, d, cp);
   if (p) return p.Name;

@@ -124,8 +124,24 @@ def _rename_gop_psets(ctx: Ctx, gop: BsddClass, old_name: str, new_name: str) ->
         ctx.extras.temporary_psets[c.Code] = [new_name if n == old_name else n for n in temp]
 
 
+def gop_property_codes(d, gops) -> set[str]:
+    """Codes of this dictionary's properties used by the given groups of properties."""
+    props = property_index(d)
+    out: set[str] = set()
+    for gop in gops:
+        if gop.ClassType != GOP:
+            continue
+        for cp in gop.ClassProperties:
+            code = cp.PropertyCode or internal_code(d, cp.PropertyUri, "prop")
+            if code in props:
+                out.add(code)
+    return out
+
+
 @op("class.delete")
-def delete_classes(ctx: Ctx, codes: list[str], recursive: bool = False) -> list[str]:
+def delete_classes(ctx: Ctx, codes: list[str], recursive: bool = False, delete_properties: bool = False) -> list[str]:
+    """Delete classes. ``delete_properties``: also delete the dictionary's properties used by
+    deleted groups of properties (everywhere they are used)."""
     d = ctx.d
     index = class_index(d)
     to_delete: set[str] = set()
@@ -137,6 +153,7 @@ def delete_classes(ctx: Ctx, codes: list[str], recursive: bool = False) -> list[
             to_delete |= descendants(d, code)
     if not to_delete:
         return []
+    prop_codes = gop_property_codes(d, [index[c] for c in to_delete]) if delete_properties else set()
     deleted_uris = {code: class_uri(d, index[code]) for code in to_delete}
 
     # re-parent surviving children to the nearest surviving ancestor
@@ -160,6 +177,10 @@ def delete_classes(ctx: Ctx, codes: list[str], recursive: bool = False) -> list[
         ]
     for code in to_delete:
         ctx.extras.temporary_psets.pop(code, None)
+    if prop_codes:
+        from .properties import delete_properties as delete_props
+
+        delete_props(ctx, sorted(prop_codes))
     return sorted(to_delete)
 
 

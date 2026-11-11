@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
+from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary, BsddProperty
 import bsdd_gui
 from bsdd_gui.presets.tool_presets import (
     FieldTool,
@@ -149,6 +149,47 @@ class GroupOfProperties(FieldTool, ActionTool):
         relating_properties = prop_utils.get_relating_properties(gop_property, bsdd_dictionary)
         for prop in relating_properties:
             prop.Code = new_code
+
+    # Deleting groups of properties
+
+    @classmethod
+    def get_internal_properties(
+        cls, bsdd_classes: list[BsddClass], bsdd_dictionary: BsddDictionary, recursive=False
+    ) -> list[BsddProperty]:
+        """This dictionary's properties used by the groups of properties among ``bsdd_classes``
+        (and their children if ``recursive``)."""
+        classes = list(bsdd_classes)
+        if recursive:
+            stack = list(classes)
+            while stack:
+                for child in cl_utils.get_children(stack.pop(), bsdd_dictionary):
+                    if child not in classes:
+                        classes.append(child)
+                        stack.append(child)
+        own = {id(p) for p in bsdd_dictionary.Properties}
+        result: list[BsddProperty] = []
+        for bsdd_class in classes:
+            if bsdd_class.ClassType != "GroupOfProperties":
+                continue
+            for cp in bsdd_class.ClassProperties:
+                prop = prop_utils.get_property_by_class_property(cp, bsdd_dictionary)
+                if prop is not None and id(prop) in own and prop not in result:
+                    result.append(prop)
+        return result
+
+    @classmethod
+    def count_other_classes_using(
+        cls, bsdd_properties: list[BsddProperty], excluded: list[BsddClass], bsdd_dictionary
+    ) -> int:
+        codes = {p.Code for p in bsdd_properties}
+        excluded_ids = {id(c) for c in excluded}
+        return sum(
+            1
+            for c in bsdd_dictionary.Classes
+            if id(c) not in excluded_ids
+            and c.ClassType != "GroupOfProperties"
+            and any(cp.PropertyCode in codes for cp in c.ClassProperties)
+        )
 
     # Settings: code prefix and automatic creation
 

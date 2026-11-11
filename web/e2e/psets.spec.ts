@@ -50,3 +50,32 @@ test("settings: prefix and automatic creation of predefined property sets", asyn
   await dialog.getByLabel(/^Name/).fill("Thermal");
   await expect(dialog.getByLabel(/^Code/)).toHaveValue("Y_Thermal");
 });
+
+test("deleting a predefined property set asks about its properties", async ({ page, request }) => {
+  const id = await createProject(request);
+  const props = async () => (await dictionaryOf(request, id)).Properties.map((p: any) => p.Code);
+  const deleteDialog = page.getByRole("dialog").filter({ hasText: "The following items will be deleted:" });
+
+  // normal class: no question about properties
+  await openClass(page, id, "Door");
+  await page.getByRole("button", { name: "More" }).click();
+  await page.getByRole("menuitem", { name: "Delete" }).click();
+  await expect(deleteDialog).toBeVisible();
+  await expect(deleteDialog.getByText(/properties of the predefined property set/)).toHaveCount(0);
+  await deleteDialog.getByRole("button", { name: "Cancel" }).click();
+
+  // group of properties: offered, off by default
+  await page.goto(`/p/${id}/groups/Pset_Fire`);
+  await expect(page.locator(".detail-header")).toBeVisible();
+  await page.getByRole("button", { name: "More" }).click();
+  await page.getByRole("menuitem", { name: "Delete" }).click();
+  const toggle = deleteDialog.getByRole("switch", { name: "Also delete the 1 properties of the predefined property set" });
+  await expect(toggle).not.toBeChecked();
+  await expect(deleteDialog.getByText("Fire rating")).toBeVisible();
+  await toggle.evaluate((el: HTMLElement) => el.click());
+  await deleteDialog.getByRole("button", { name: "Delete" }).click();
+
+  await expect.poll(props).not.toContain("FireRating");
+  expect(await props()).toEqual(expect.arrayContaining(["Height", "Material"]));
+  expect((await dictionaryOf(request, id)).Classes.map((c: any) => c.Code)).not.toContain("Pset_Fire");
+});

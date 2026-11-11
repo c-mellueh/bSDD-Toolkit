@@ -2721,4 +2721,26 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
         <translation>Exportiere nach Revit</translation>
     </message>
 </context>
+<context>
+    <name>ClassTree</name>
+    <message>
+        <location filename="../../core/class_tree_view.py"/>
+        <source>Also delete the {} properties of the predefined property set?
+
+{}</source>
+        <translation>Auch die {} Merkmale der Merkmalsgruppe löschen?
+
+{}</translation>
+    </message>
+    <message>
+        <location filename="../../core/class_tree_view.py"/>
+        <source>They are also used in {} other classes and will be removed there too.</source>
+        <translation>Sie werden auch in {} anderen Klassen verwendet und dort ebenfalls entfernt.</translation>
+    </message>
+    <message>
+        <location filename="../../core/class_tree_view.py"/>
+        <source>Delete properties?</source>
+        <translation>Merkmale löschen?</translation>
+    </message>
+</context>
 </TS>

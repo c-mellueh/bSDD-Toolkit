@@ -724,5 +724,8 @@
  "{{n}} Groups of Properties in this dictionary use the prefix “{{before}}”. Change their codes to “{{after}}” (e.g. {{example}})? This changes the dictionary for everybody and can be undone with Ctrl+Z.": "{{n}} Merkmalssätze in diesem Wörterbuch verwenden das Präfix „{{before}}“. Ihre Codes auf „{{after}}“ ändern (z. B. {{example}})? Das ändert das Wörterbuch für alle und lässt sich mit Strg+Z rückgängig machen.",
  "Rename {{n}}": "{{n}} umbenennen",
  "{{n}} Groups of Properties renamed": "{{n}} Merkmalssätze umbenannt",
- "(none)": "(keins)"
+ "(none)": "(keins)",
+ "Also delete the {{n}} properties of the predefined property set": "Auch die {{n}} Merkmale der vordefinierten Merkmalsgruppe löschen",
+ "and {{n}} more": "und {{n}} weitere",
+ "They are also used in {{n}} other classes and will be removed there too.": "Sie werden auch in {{n}} anderen Klassen verwendet und dort ebenfalls entfernt."
 }

@@ -163,3 +163,36 @@ class TestRenamePrefix:
             GroupOfProperties.rename_prefix("EPset_", "X_", dictionary)
         assert gop.Code == "EPset_Fire"
         assert rel.RelatedClassUri == before
+
+
+class TestInternalProperties:
+    def _setup(self, dictionary):
+        from bsdd_json.models import BsddProperty
+
+        fire = BsddProperty(Code="FireRating", Name="Fire rating", DataType="String")
+        height = BsddProperty(Code="Height", Name="Height", DataType="Real")
+        for p in (fire, height):
+            dictionary.Properties.append(p)
+            p._set_parent(dictionary)
+        gop = BsddClass(Code="EPset_Fire", Name="Fire", ClassType="GroupOfProperties")
+        wall = BsddClass(Code="Wall", Name="Wall")
+        for c in (gop, wall):
+            dictionary.Classes.append(c)
+            c._set_parent(dictionary)
+        for owner in (gop, wall):
+            cp = BsddClassProperty(Code="rating", PropertyCode="FireRating", PropertySet="Fire")
+            owner.ClassProperties.append(cp)
+            cp._set_parent(owner)
+        ext = BsddClassProperty(Code="ext", PropertyUri="https://example.org/prop/x", PropertySet="Fire")
+        gop.ClassProperties.append(ext)
+        ext._set_parent(gop)
+        return gop, wall, fire
+
+    def test_only_own_properties_of_gops(self, dictionary):
+        gop, wall, fire = self._setup(dictionary)
+        assert GroupOfProperties.get_internal_properties([gop], dictionary) == [fire]
+        assert GroupOfProperties.get_internal_properties([wall], dictionary) == []
+
+    def test_other_classes_using(self, dictionary):
+        gop, wall, fire = self._setup(dictionary)
+        assert GroupOfProperties.count_other_classes_using([fire], [gop], dictionary) == 1
