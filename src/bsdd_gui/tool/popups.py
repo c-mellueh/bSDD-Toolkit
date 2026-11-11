@@ -77,6 +77,17 @@ class Popups:
         msg_box.exec()
 
     @classmethod
+    def request_yes_no(cls, title: str, text: str) -> bool:
+        msg_box = QMessageBox(QApplication.activeWindow())
+        msg_box.setWindowTitle(title)
+        msg_box.setText(text)
+        msg_box.setIcon(QMessageBox.Icon.Question)
+        msg_box.setWindowIcon(get_icon())
+        msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        msg_box.setDefaultButton(QMessageBox.StandardButton.Yes)
+        return msg_box.exec() == QMessageBox.StandardButton.Yes
+
+    @classmethod
     def get_open_path(cls, file_format: str, window, path=None, title=None) -> str:
         return cls._get_path(file_format, window, path, False, title)
 

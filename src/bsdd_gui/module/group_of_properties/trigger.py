@@ -25,6 +25,17 @@ def connect():
         tool.Project,
     )
 
+    def settings_accepted():
+        core.settings_accepted(
+            tool.GroupOfProperties,
+            tool.Project,
+            tool.MainWindowWidget,
+            tool.GopClassView,
+            tool.Popups,
+        )
+
+    core.add_settings(settings_accepted, tool.SettingsWidget)
+
 
 def retranslate_ui():
     core.retranslate_ui(tool.GroupOfProperties, tool.MainWindowWidget)
@@ -115,3 +126,7 @@ def remove_class_property_from_linked(bsdd_class_property: BsddClassProperty):
         tool.PropertySetTableView,
         tool.ClassPropertyTableView,
     )
+
+
+def settings_created(widget):
+    core.load_settings(widget, tool.GroupOfProperties)

@@ -745,6 +745,16 @@
 <context>
     <name>Form</name>
     <message>
+        <location filename="../../module/group_of_properties/qt/Settings.ui"/>
+        <source>Code prefix of predefined property sets</source>
+        <translation>Code-Präfix von Merkmalsgruppen</translation>
+    </message>
+    <message>
+        <location filename="../../module/group_of_properties/qt/Settings.ui"/>
+        <source>Create predefined property set for new property sets</source>
+        <translation>Für neue Merkmalssätze automatisch eine Merkmalsgruppe anlegen</translation>
+    </message>
+    <message>
         <location filename="../../module/ai_helper/qt/Settings.ui" line="14"/>
         <location filename="../../module/download/qt/Widget.ui" line="20"/>
         <location filename="../../module/excel/qt/Widget.ui" line="14"/>
@@ -1299,6 +1309,37 @@ Das Bearbeiten von Parent-Class-Code-Beziehungen wird derzeit noch nicht unterst
 </context>
 <context>
     <name>GroupsOfProperties</name>
+    <message>
+        <location filename="../../core/group_of_properties.py"/>
+        <source>Code of new predefined property sets = prefix + name. Letters, digits and _ - . only.</source>
+        <translation>Code neuer Merkmalsgruppen = Präfix + Name. Nur Buchstaben, Ziffern und _ - .</translation>
+    </message>
+    <message>
+        <location filename="../../core/group_of_properties.py"/>
+        <source>The prefix may only contain letters, digits and _ - . (max. 30 characters).</source>
+        <translation>Das Präfix darf nur Buchstaben, Ziffern und _ - . enthalten (max. 30 Zeichen).</translation>
+    </message>
+    <message>
+        <location filename="../../core/group_of_properties.py"/>
+        <source>{} predefined property sets use the old prefix '{}'.
+Rename their codes to the new prefix '{}'?
+
+Example: {} → {}</source>
+        <translation>{} Merkmalsgruppen verwenden das alte Präfix '{}'.
+Ihre Codes auf das neue Präfix '{}' umbenennen?
+
+Beispiel: {} → {}</translation>
+    </message>
+    <message>
+        <location filename="../../core/group_of_properties.py"/>
+        <source>Rename predefined property sets?</source>
+        <translation>Merkmalsgruppen umbenennen?</translation>
+    </message>
+    <message>
+        <location filename="../../core/group_of_properties.py"/>
+        <source>Nothing was renamed, these codes exist already: {}</source>
+        <translation>Es wurde nichts umbenannt, diese Codes existieren bereits: {}</translation>
+    </message>
     <message>
         <location filename="../../core/group_of_properties.py" line="41"/>
         <source>Groups of Properties</source>
