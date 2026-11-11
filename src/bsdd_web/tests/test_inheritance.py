@@ -102,3 +102,33 @@ def test_groups_of_properties_take_no_part(strict):
     h.run("class.create", data={"Name": "Sub", "ParentClassCode": "Pset_Fire", "ClassType": "GroupOfProperties"})
     sub = next(c for c in h.d.Classes if c.Name == "Sub")
     assert sub.ClassProperties == []
+
+
+def test_predefined_pset_link_is_inherited(strict):
+    h = strict
+    h.run("pset.create", class_code="Wall", name="Pset_Fire")
+    links = lambda code: [cr.RelatedClassName for cr in h.cls(code).ClassRelations if cr.RelationType == "HasReference"]
+    assert links("Wall") == ["Pset_Fire"]
+    assert links("InnerWall") == ["Pset_Fire"]
+    assert ("Pset_Fire", "FireRating") in keys(h, "InnerWall")
+    # new child gets the link too
+    code = h.run("class.create", data={"Name": "Curtain Wall", "ParentClassCode": "Wall"})
+    assert links(code) == ["Pset_Fire"]
+    # cannot be removed in the child
+    with pytest.raises(OpError, match="inherited"):
+        h.run("pset.delete", class_code="InnerWall", names=["Pset_Fire"])
+
+
+def test_predefined_pset_link_removed_with_parent(strict):
+    h = strict
+    h.run("pset.create", class_code="Wall", name="Pset_Fire")
+    h.run("pset.delete", class_code="Wall", names=["Pset_Fire"])
+    assert not [cr for cr in h.cls("InnerWall").ClassRelations if cr.RelationType == "HasReference"]
+    assert ("Pset_Fire", "FireRating") not in keys(h, "InnerWall")
+
+
+def test_enabling_adds_existing_links(h):
+    h.run("pset.create", class_code="Wall", name="Pset_Fire")
+    assert not h.cls("InnerWall").ClassRelations
+    h.run("inheritance.set_strict", enabled=True)
+    assert [cr.RelatedClassName for cr in h.cls("InnerWall").ClassRelations] == ["Pset_Fire"]

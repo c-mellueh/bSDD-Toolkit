@@ -9,17 +9,20 @@ but not remove them or change their key. When strict inheritance is on, after ev
    descendants that still had the parent's old value),
 2. an operation that removes an inherited class property from a child is refused,
 3. missing inherited class properties are added to the children.
+
+Links to Groups of Properties (HasReference relations, "predefined property sets") are inherited
+the same way: a child has every such link of its parent and cannot remove it.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-from bsdd_json import BsddClass, BsddClassProperty, BsddDictionary
+from bsdd_json import BsddClass, BsddClassProperty, BsddClassRelation, BsddDictionary
 from bsdd_json.utils import dictionary_utils as dict_utils
 
 from . import Ctx, OpError, op
-from .helpers import GOP, class_index, internal_code, merged, new_class_property, unique_code
+from .helpers import GOP, class_index, class_uri, internal_code, is_reference_to, merged, new_class_property, unique_code
 
 KEY_FIELDS = ("PropertySet", "PropertyCode", "PropertyUri")
 
@@ -74,9 +77,24 @@ def _top_down(d: BsddDictionary) -> list[tuple[BsddClass, BsddClass]]:
     return out
 
 
-def snapshot(d: BsddDictionary) -> dict[str, tuple[str | None, dict[Key, dict[str, Any]]]]:
+def gop_links(d: BsddDictionary, c: BsddClass, gops: list[BsddClass] | None = None) -> set[str]:
+    """Codes of the Groups of Properties ``c`` is linked to (HasReference)."""
+    if gops is None:
+        gops = [g for g in d.Classes if g.ClassType == GOP]
+    return {g.Code for g in gops if g is not c and any(is_reference_to(d, cr, g) for cr in c.ClassRelations)}
+
+
+Snapshot = dict[str, tuple[str | None, dict[Key, dict[str, Any]], set[str]]]
+
+
+def snapshot(d: BsddDictionary) -> Snapshot:
+    gops = [g for g in d.Classes if g.ClassType == GOP]
     return {
-        c.Code: (c.ParentClassCode, {cp_key(d, cp): cp.model_dump(mode="json") for cp in c.ClassProperties})
+        c.Code: (
+            c.ParentClassCode,
+            {cp_key(d, cp): cp.model_dump(mode="json") for cp in c.ClassProperties},
+            gop_links(d, c, gops),
+        )
         for c in d.Classes
     }
 
@@ -91,8 +109,10 @@ def inherited_from(ctx: Ctx, c: BsddClass, cp: BsddClassProperty) -> BsddClass |
     return parent if any(cp_key(ctx.d, x) == key for x in parent.ClassProperties) else None
 
 
-def propagate_and_guard(ctx: Ctx, before: dict[str, tuple[str | None, dict[Key, dict[str, Any]]]]) -> None:
+def propagate_and_guard(ctx: Ctx, before: Snapshot) -> None:
     d = ctx.d
+    index = class_index(d)
+    gops = [g for g in d.Classes if g.ClassType == GOP]
     for child, parent in _top_down(d):
         b_child = before.get(child.Code)
         b_parent = before.get(parent.Code)
@@ -127,6 +147,20 @@ def propagate_and_guard(ctx: Ctx, before: dict[str, tuple[str | None, dict[Key, 
             else:
                 child.ClassProperties.remove(target)
 
+        # links to Groups of Properties: removed in the parent -> removed in the child
+        parent_links = gop_links(d, parent, gops)
+        for code in b_parent[2] - parent_links:
+            gop = index.get(code)
+            if gop is not None:
+                child.ClassRelations[:] = [cr for cr in child.ClassRelations if not is_reference_to(d, cr, gop)]
+        child_links = gop_links(d, child, gops)
+        for code in (b_child[2] - child_links) & parent_links & b_parent[2]:
+            name = index[code].Name if code in index else code
+            raise OpError(
+                f"The link to the predefined property set '{name}' is inherited from '{parent.Name}' "
+                "(strict inheritance) and can only be removed in the parent class"
+            )
+
         # an inherited class property must not disappear from the child
         child_keys = {cp_key(d, cp) for cp in child.ClassProperties}
         for key, old in b_child[1].items():
@@ -147,7 +181,15 @@ def complete(ctx: Ctx) -> int:
     """Add missing inherited class properties to all children. Returns the number added."""
     d = ctx.d
     added = 0
+    gops = [g for g in d.Classes if g.ClassType == GOP]
+    index = class_index(d)
     for child, parent in _top_down(d):
+        # links to Groups of Properties
+        for code in gop_links(d, parent, gops) - gop_links(d, child, gops):
+            gop = index[code]
+            rel = BsddClassRelation(RelationType="HasReference", RelatedClassUri=class_uri(d, gop), RelatedClassName=gop.Name)
+            rel._set_parent(child)
+            child.ClassRelations.append(rel)
         have = {cp_key(d, cp) for cp in child.ClassProperties}
         codes = [cp.Code for cp in child.ClassProperties]
         for cp in parent.ClassProperties:
