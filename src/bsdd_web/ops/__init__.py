@@ -29,6 +29,8 @@ class Extras(BaseModel):
     loin: dict[str, Any] = Field(default_factory=dict)
     #: remembered settings of export dialogs, keyed by exporter name
     export_settings: dict[str, Any] = Field(default_factory=dict)
+    #: every child class has all class properties of its parent (see ops.inheritance)
+    strict_inheritance: bool = False
 
 
 @dataclass
@@ -65,8 +67,17 @@ def run(ctx: Ctx, name: str, args: dict[str, Any] | None) -> Any:
     fn = REGISTRY.get(name)
     if fn is None:
         raise OpError(f"Unknown operation '{name}'")
+    from . import inheritance
+
+    before = None
+    if ctx.extras.strict_inheritance and name not in inheritance.WHOLESALE_OPS:
+        before = inheritance.snapshot(ctx.dictionary)
     try:
         result = fn(ctx, **(args or {}))
+        if ctx.extras.strict_inheritance:
+            if before is not None:
+                inheritance.propagate_and_guard(ctx, before)
+            inheritance.complete(ctx)
     except ValidationError as exc:
         raise OpError(format_validation_error(exc)) from exc
     except TypeError as exc:
@@ -86,3 +97,4 @@ from . import class_properties as _class_properties  # noqa: E402,F401
 from . import dictionary as _dictionary  # noqa: E402,F401
 from . import properties as _properties  # noqa: E402,F401
 from . import loin as _loin  # noqa: E402,F401
+from . import inheritance as _inheritance  # noqa: E402,F401

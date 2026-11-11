@@ -49,6 +49,42 @@ def test_delete_recursive(h):
     assert {c.Code for c in h.d.Classes} == {"Pset_Fire"}
 
 
+def test_delete_gop_keeps_properties_by_default(h):
+    h.run("class.delete", codes=["Pset_Fire"])
+    assert h.cls("Pset_Fire") is None
+    assert h.prop("FireRating") is not None
+
+
+def test_delete_gop_with_properties(h):
+    h.cls("Wall").ClassProperties.append(
+        type(h.cls("Pset_Fire").ClassProperties[0]).model_validate(
+            {"Code": "rating", "PropertyCode": "FireRating", "PropertySet": "Pset_Fire"}
+        )
+    )
+    h.run("class.delete", codes=["Pset_Fire"], delete_properties=True)
+    assert h.prop("FireRating") is None
+    assert h.prop("Height") is not None
+    assert all(cp.PropertyCode != "FireRating" for cp in h.cls("Wall").ClassProperties)
+
+
+def test_delete_gop_keeps_properties_used_in_other_psets(h):
+    from bsdd_json import BsddClass
+
+    h.d.Classes.append(BsddClass.model_validate({
+        "Code": "Pset_Other", "Name": "Pset_Other", "ClassType": "GroupOfProperties",
+        "ClassProperties": [{"Code": "rating", "PropertyCode": "FireRating", "PropertySet": "Pset_Other"}],
+    }))
+    h.run("class.delete", codes=["Pset_Fire"], delete_properties=True)
+    assert h.prop("FireRating") is not None
+    assert h.cls("Pset_Other").ClassProperties[0].PropertyCode == "FireRating"
+
+
+def test_delete_properties_flag_ignores_normal_classes(h):
+    # Building's subtree has class properties, but only groups of properties count
+    h.run("class.delete", codes=["Building"], recursive=True, delete_properties=True)
+    assert {p.Code for p in h.d.Properties} == {"Height", "Material", "FireRating"}
+
+
 def test_group(h):
     code = h.run("class.group", codes=["Wall", "Door", "InnerWall"], name="Elements")
     assert h.cls(code).ParentClassCode == "Building"

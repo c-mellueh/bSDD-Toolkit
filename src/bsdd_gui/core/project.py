@@ -219,7 +219,7 @@ def open_project(
         file_lock.unlock_file()
         raise
     if proj is not None:
-        project.register_project(proj)
+        project.register_project(proj, project.read_settings(path))
         if appdata is not None:
             appdata.add_path(RECENT_PATHS, path)
     else:
@@ -263,6 +263,10 @@ def save_project(path: str, project: Type[tool.Project], appdata: Type[tool.Appd
     bsdd_dictionary = project.get()
     with open(path, "w") as file:
         json.dump(bsdd_dictionary.model_dump(mode="json", exclude_none=True), file)
+    try:
+        project.write_settings(path)
+    except OSError as error:
+        logging.warning(f"Could not save project settings: {error}")
     appdata.set_path(OPEN_PATH, path)
     appdata.set_path(SAVE_PATH, path)
     appdata.add_path(RECENT_PATHS, path)

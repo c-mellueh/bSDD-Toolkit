@@ -724,5 +724,22 @@
  "{{n}} Groups of Properties in this dictionary use the prefix “{{before}}”. Change their codes to “{{after}}” (e.g. {{example}})? This changes the dictionary for everybody and can be undone with Ctrl+Z.": "{{n}} Merkmalssätze in diesem Wörterbuch verwenden das Präfix „{{before}}“. Ihre Codes auf „{{after}}“ ändern (z. B. {{example}})? Das ändert das Wörterbuch für alle und lässt sich mit Strg+Z rückgängig machen.",
  "Rename {{n}}": "{{n}} umbenennen",
  "{{n}} Groups of Properties renamed": "{{n}} Merkmalssätze umbenannt",
- "(none)": "(keins)"
+ "(none)": "(keins)",
+ "Also delete the {{n}} properties of the predefined property set": "Auch die {{n}} Merkmale der vordefinierten Merkmalsgruppe löschen",
+ "and {{n}} more": "und {{n}} weitere",
+ "They are also used in {{n}} other classes and will be removed there too.": "Sie werden auch in {{n}} anderen Klassen verwendet und dort ebenfalls entfernt.",
+ "Kept because they are also used in other property sets:": "Bleiben erhalten, weil sie auch in anderen Merkmalsgruppen verwendet werden:",
+ "Project settings": "Projekteinstellungen",
+ "These settings are saved with the dictionary and apply to everyone working on it.": "Diese Einstellungen werden mit dem Datenkatalog gespeichert und gelten für alle, die daran arbeiten.",
+ "Strict inheritance": "Strikte Vererbung",
+ "Every child class has all class properties of its parent class. In child classes only the values of inherited class properties can be changed (allowed values, unit, required …); they cannot be removed or moved to another property set.": "Jede Unterklasse hat alle Klassenmerkmale ihrer Elternklasse. In Unterklassen können nur die Werte geerbter Klassenmerkmale geändert werden (erlaubte Werte, Einheit, Pflicht …); sie können nicht entfernt oder in einen anderen Merkmalssatz verschoben werden.",
+ "Class properties added to, changed in or removed from a parent class are passed on to all its child classes. Values a child class changed itself are kept.": "Klassenmerkmale, die in einer Elternklasse hinzugefügt, geändert oder entfernt werden, werden an alle Unterklassen weitergegeben. Werte, die eine Unterklasse selbst geändert hat, bleiben erhalten.",
+ "Switch on strict inheritance?": "Strikte Vererbung einschalten?",
+ "{{n}} class properties are missing in child classes and will be added from their parent classes.": "{{n}} Klassenmerkmale fehlen in Unterklassen und werden aus ihren Elternklassen ergänzt.",
+ "Switch on": "Einschalten",
+ "{{n}} inherited class properties added": "{{n}} geerbte Klassenmerkmale ergänzt",
+ "Inherited from {{name}} (strict inheritance)": "Geerbt von {{name}} (strikte Vererbung)",
+ "Inherited from {{name}} (strict inheritance): remove it in the parent class.": "Geerbt von {{name}} (strikte Vererbung): in der Elternklasse entfernen.",
+ "Inherited from {{name}} (strict inheritance). Property and property set can only be changed in the parent class; the values here can be adjusted.": "Geerbt von {{name}} (strikte Vererbung). Merkmal und Merkmalssatz können nur in der Elternklasse geändert werden; die Werte hier können angepasst werden.",
+ "Contains class properties inherited from {{name}} (strict inheritance)": "Enthält von {{name}} geerbte Klassenmerkmale (strikte Vererbung)"
 }

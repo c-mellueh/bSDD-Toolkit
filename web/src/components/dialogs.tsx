@@ -57,22 +57,35 @@ function TextPrompt({ label, initial, onDone }: { label: string; initial: string
   );
 }
 
-export function askDeleteClasses(names: string[]): Promise<{ recursive: boolean } | null> {
+export interface DeleteClassesResult {
+  recursive: boolean;
+  /** also delete the properties used by deleted groups of properties */
+  deleteProperties: boolean;
+}
+
+/** ``propertyUsage(recursive)``: properties used by the groups of properties that would be deleted. */
+export type PropertyUsage = (recursive: boolean) => { names: string[]; kept: string[]; otherClasses: number };
+
+export function askDeleteClasses(names: string[], propertyUsage?: PropertyUsage): Promise<DeleteClassesResult | null> {
   return new Promise((resolve) => {
     let done = false;
-    const finish = (v: { recursive: boolean } | null) => {
+    const finish = (v: DeleteClassesResult | null) => {
       if (done) return;
       done = true;
       resolve(v);
       modals.closeAll();
     };
     modals.open({
-      zIndex: 1000, title: t("Delete classes"), onClose: () => finish(null), children: <DeletePrompt names={names} onDone={finish} /> });
+      zIndex: 1000, title: t("Delete classes"), onClose: () => finish(null), children: <DeletePrompt names={names} propertyUsage={propertyUsage} onDone={finish} /> });
   });
 }
 
-function DeletePrompt({ names, onDone }: { names: string[]; onDone: (v: { recursive: boolean } | null) => void }) {
+function DeletePrompt({ names, propertyUsage, onDone }: { names: string[]; propertyUsage?: PropertyUsage; onDone: (v: DeleteClassesResult | null) => void }) {
   const [recursive, setRecursive] = useState(false);
+  const [deleteProperties, setDeleteProperties] = useState(false);
+  const usage = propertyUsage?.(recursive);
+  const nProps = usage?.names.length ?? 0;
+  const shown = usage?.names.slice(0, 8).join(", ") ?? "";
   return (
     <Stack>
       <Text size="sm">{t("The following items will be deleted:")}</Text>
@@ -81,9 +94,31 @@ function DeletePrompt({ names, onDone }: { names: string[]; onDone: (v: { recurs
       </ScrollArea.Autosize>
       <Toggle label={t("Also delete all child classes")} checked={recursive} onChange={(e) => setRecursive(e.currentTarget.checked)} />
       <Text size="xs" c="dimmed">{t("Otherwise child classes are moved to the parent of the deleted class.")}</Text>
+      {nProps > 0 && (
+        <>
+          <Toggle
+            label={t("Also delete the {{n}} properties of the predefined property set", { n: nProps })}
+            checked={deleteProperties}
+            onChange={(e) => setDeleteProperties(e.currentTarget.checked)}
+          />
+          <Text size="xs" c="dimmed">
+            {shown}
+            {nProps > 8 ? ` ${t("and {{n}} more", { n: nProps - 8 })}` : ""}
+          </Text>
+          {usage!.kept.length > 0 && (
+            <Text size="xs" c="dimmed">
+              {t("Kept because they are also used in other property sets:")} {usage!.kept.slice(0, 8).join(", ")}
+              {usage!.kept.length > 8 ? ` ${t("and {{n}} more", { n: usage!.kept.length - 8 })}` : ""}
+            </Text>
+          )}
+          {deleteProperties && usage!.otherClasses > 0 && (
+            <Text size="xs" c="red">{t("They are also used in {{n}} other classes and will be removed there too.", { n: usage!.otherClasses })}</Text>
+          )}
+        </>
+      )}
       <Group justify="flex-end">
         <Button variant="default" onClick={() => onDone(null)}>{t("Cancel")}</Button>
-        <Button color="red" onClick={() => onDone({ recursive })} data-autofocus>{t("Delete")}</Button>
+        <Button color="red" onClick={() => onDone({ recursive, deleteProperties: nProps > 0 && deleteProperties })} data-autofocus>{t("Delete")}</Button>
       </Group>
     </Stack>
   );

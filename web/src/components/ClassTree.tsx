@@ -23,7 +23,7 @@ import { setGraphDrag } from "../graph/dnd";
 import { classId } from "../graph/model";
 import { Tree, type NodeApi, type NodeRendererProps, type TreeApi } from "react-arborist";
 import { copyClasses, readClip } from "../clipboard";
-import { GOP, descendants } from "../model";
+import { GOP, descendants, gopPropertyUsage } from "../model";
 import { attempt, notifyOk } from "../notify";
 import { op, useProject } from "../state/project";
 import { openUi, useUi } from "../state/ui";
@@ -134,9 +134,13 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
     const codes = selectedCodes();
     if (!codes.length) return;
     const names = codes.map((c) => idx.classes.get(c)?.Name ?? c);
-    const result = await askDeleteClasses(names);
+    const result = await askDeleteClasses(names, (recursive) => {
+      const all = new Set(codes);
+      if (recursive) for (const c of codes) descendants(idx, c).forEach((d) => all.add(d));
+      return doc ? gopPropertyUsage(idx, doc.dictionary, [...all]) : { names: [], kept: [], otherClasses: 0 };
+    });
     if (!result) return;
-    await attempt(() => op("class.delete", { codes, recursive: result.recursive }));
+    await attempt(() => op("class.delete", { codes, recursive: result.recursive, delete_properties: result.deleteProperties }));
     if (codes.includes(activeClass ?? "")) setActiveClass(null);
   };
 

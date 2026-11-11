@@ -77,14 +77,15 @@ class Popups:
         msg_box.exec()
 
     @classmethod
-    def request_yes_no(cls, title: str, text: str) -> bool:
+    def request_yes_no(cls, title: str, text: str, default_yes: bool = True) -> bool:
         msg_box = QMessageBox(QApplication.activeWindow())
         msg_box.setWindowTitle(title)
         msg_box.setText(text)
         msg_box.setIcon(QMessageBox.Icon.Question)
         msg_box.setWindowIcon(get_icon())
         msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        msg_box.setDefaultButton(QMessageBox.StandardButton.Yes)
+        default = QMessageBox.StandardButton.Yes if default_yes else QMessageBox.StandardButton.No
+        msg_box.setDefaultButton(default)
         return msg_box.exec() == QMessageBox.StandardButton.Yes
 
     @classmethod

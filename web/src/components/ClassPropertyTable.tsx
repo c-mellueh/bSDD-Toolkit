@@ -1,13 +1,13 @@
 import { ActionIcon, Group, Tooltip } from "@mantine/core";
 import { useReadOnly } from "../state/readonly";
-import { IconCheck, IconClipboard, IconCopy, IconEdit, IconLink, IconListSearch, IconPlus, IconRefresh, IconTrash } from "@tabler/icons-react";
+import { IconCheck, IconClipboard, IconCopy, IconEdit, IconLink, IconListSearch, IconLock, IconPlus, IconRefresh, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { setGraphDrag } from "../graph/dnd";
 import { classId, idForUri, propId } from "../graph/model";
 import { copyClassProperties, readClip } from "../clipboard";
-import { GOP, cpName, effectiveValues, linkedGop, resolveProperty } from "../model";
-import { attempt, notifyOk } from "../notify";
+import { GOP, cpKey, cpName, effectiveValues, inheritanceParent, inheritedKeys, linkedGop, resolveProperty } from "../model";
+import { attempt, notifyError, notifyOk } from "../notify";
 import { op, useProject } from "../state/project";
 import { openUi } from "../state/ui";
 import type { ClassProperty } from "../types";
@@ -32,6 +32,7 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
 
   const rows = useMemo(() => {
     if (!cls || !d) return [];
+    const fromParent = inheritedKeys(idx, doc!, cls);
     const list = (cls.ClassProperties ?? []).filter((cp) => pset === null || (cp.PropertySet ?? "") === pset);
     const mapped = list.map((cp) => {
       const prop = resolveProperty(idx, d, cp);
@@ -44,6 +45,7 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
         values: values.map((v) => v.Value).join("; "),
         inherited: inherited && values.length > 0,
         linked: !!(cp.PropertySet && cls.ClassType !== GOP && linkedGop(idx, d, cls, cp.PropertySet)),
+        fromParent: fromParent.has(cpKey(d, cp)),
       };
     });
     if (sort) {
@@ -52,19 +54,25 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
       mapped.sort((a, b) => key(a).localeCompare(key(b)) * sort.dir);
     }
     return mapped;
-  }, [cls, d, idx, pset, sort]);
+  }, [cls, d, doc, idx, pset, sort]);
 
   const keys = rows.map((r) => r.cp.Code);
   const sel = useListSelection(keys);
 
   if (!doc || !d) return null;
 
+  const parentName = cls ? inheritanceParent(idx, doc, cls)?.Name : undefined;
+  const lockedSelected = rows.some((r) => r.fromParent && sel.selected.includes(r.cp.Code));
   const selected = (): ClassProperty[] => rows.filter((r) => sel.selected.includes(r.cp.Code)).map((r) => r.cp);
   const newCp = () => cls && openUi({ cpEditor: { classCode: cls.Code, pset: pset ?? undefined } });
   const edit = (code: string) => cls && openUi({ cpEditor: { classCode: cls.Code, code } });
   const remove = async () => {
     const cps = selected();
     if (!cls || !cps.length) return;
+    if (lockedSelected) {
+      notifyError(t("Inherited from {{name}} (strict inheritance): remove it in the parent class.", { name: parentName }));
+      return;
+    }
     const ok = await askConfirm(t("Delete class properties"), t("Delete {{n}} class properties?", { n: cps.length }), t("Delete"), true);
     if (ok) await attempt(() => op("cp.delete", { class_code: cls.Code, codes: cps.map((c) => c.Code) }));
   };
@@ -104,7 +112,7 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
       { label: t("Paste"), icon: <IconClipboard size={14} />, shortcut: "Ctrl+V", onClick: paste, disabled: !readClip("bsdd-class-properties") },
     ];
     if (cls?.ClassType === GOP) items.push(divider, { label: t("Sync allowed values"), icon: <IconRefresh size={14} />, onClick: syncValues, disabled: !sel.selected.length });
-    items.push(divider, { label: t("Delete"), icon: <IconTrash size={14} />, color: "red", shortcut: "Del", onClick: remove, disabled: !sel.selected.length });
+    items.push(divider, { label: t("Delete"), icon: <IconTrash size={14} />, color: "red", shortcut: "Del", onClick: remove, disabled: !sel.selected.length || lockedSelected });
     return items;
   };
 
@@ -174,6 +182,11 @@ export function ClassPropertyTable({ classCode, pset, title }: { classCode: stri
                   onContextMenu={(e) => { sel.ensure(r.cp.Code); openMenu(e, menu()); }}
                 >
                   <td title={r.name}>
+                    {r.fromParent && (
+                      <Tooltip label={t("Inherited from {{name}} (strict inheritance)", { name: parentName })}>
+                        <IconLock size={12} aria-label={t("Inherited from {{name}} (strict inheritance)", { name: parentName })} style={{ marginRight: 4, opacity: 0.6 }} />
+                      </Tooltip>
+                    )}
                     {r.linked && <IconLink size={12} style={{ marginRight: 4, opacity: 0.6 }} />}
                     {r.name}
                   </td>

@@ -89,7 +89,7 @@ def perform_undo(
     if not undo.can_undo():
         return
     current = undo.serialize(project.get())
-    _restore(undo.pop_undo(current), undo, project, main_window, class_tree, pset_table)
+    restore_state(undo.pop_undo(current), undo, project, main_window, class_tree, pset_table)
 
 
 def perform_redo(
@@ -107,10 +107,10 @@ def perform_redo(
     if not undo.can_redo():
         return
     current = undo.serialize(project.get())
-    _restore(undo.pop_redo(current), undo, project, main_window, class_tree, pset_table)
+    restore_state(undo.pop_redo(current), undo, project, main_window, class_tree, pset_table)
 
 
-def _restore(
+def restore_state(
     state: str,
     undo: Type[tool.Undo],
     project: Type[tool.Project],

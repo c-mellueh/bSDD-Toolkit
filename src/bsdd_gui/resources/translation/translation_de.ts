@@ -2721,4 +2721,69 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
         <translation>Exportiere nach Revit</translation>
     </message>
 </context>
+<context>
+    <name>ClassTree</name>
+    <message>
+        <location filename="../../core/class_tree_view.py"/>
+        <source>Kept because they are also used in other property sets: {}</source>
+        <translation>Bleiben erhalten, weil sie auch in anderen Merkmalsgruppen verwendet werden: {}</translation>
+    </message>
+    <message>
+        <location filename="../../core/class_tree_view.py"/>
+        <source>Also delete the {} properties of the predefined property set?
+
+{}</source>
+        <translation>Auch die {} Merkmale der Merkmalsgruppe löschen?
+
+{}</translation>
+    </message>
+    <message>
+        <location filename="../../core/class_tree_view.py"/>
+        <source>They are also used in {} other classes and will be removed there too.</source>
+        <translation>Sie werden auch in {} anderen Klassen verwendet und dort ebenfalls entfernt.</translation>
+    </message>
+    <message>
+        <location filename="../../core/class_tree_view.py"/>
+        <source>Delete properties?</source>
+        <translation>Merkmale löschen?</translation>
+    </message>
+</context>
+<context>
+    <name>Inheritance</name>
+    <message>
+        <location filename="../../core/inheritance.py"/>
+        <source>Project Settings</source>
+        <translation>Projekteinstellungen</translation>
+    </message>
+    <message>
+        <location filename="../../core/inheritance.py"/>
+        <source>Strict inheritance</source>
+        <translation>Strikte Vererbung</translation>
+    </message>
+    <message>
+        <location filename="../../core/inheritance.py"/>
+        <source>The change was undone, it would remove inherited data:</source>
+        <translation>Die Änderung wurde rückgängig gemacht, sie würde geerbte Daten entfernen:</translation>
+    </message>
+    <message>
+        <location filename="../../core/inheritance.py"/>
+        <source>Switch on strict inheritance?</source>
+        <translation>Strikte Vererbung einschalten?</translation>
+    </message>
+    <message>
+        <location filename="../../core/inheritance.py"/>
+        <source>{} class properties are missing in child classes and will be added from their parent classes.</source>
+        <translation>In Unterklassen fehlen {} Klassenmerkmale. Sie werden aus den Elternklassen ergänzt.</translation>
+    </message>
+    <message>
+        <location filename="../../module/inheritance/ui.py"/>
+        <source>These settings are saved in a file next to the project file (&lt;name&gt;.bsdd-toolkit.json) and apply to everyone working on it.</source>
+        <translation>Diese Einstellungen werden in einer Datei neben der Projektdatei gespeichert (&lt;Name&gt;.bsdd-toolkit.json) und gelten für alle, die daran arbeiten.</translation>
+    </message>
+    <message>
+        <location filename="../../module/inheritance/ui.py"/>
+        <source>Every child class has all class properties and predefined property sets of its parent class. In child classes only the values of inherited class properties can be changed (allowed values, unit, required …); they cannot be removed or moved to another property set. Changes in a parent class are passed on to all its child classes; values a child class changed itself are kept.</source>
+        <translation>Jede Unterklasse hat alle Klassenmerkmale und Merkmalsgruppen ihrer Elternklasse. In Unterklassen können nur die Werte geerbter Klassenmerkmale geändert werden (erlaubte Werte, Einheit, Pflicht …); sie können nicht entfernt oder in einen anderen Merkmalssatz verschoben werden. Änderungen in einer Elternklasse werden an alle Unterklassen weitergegeben; Werte, die eine Unterklasse selbst geändert hat, bleiben erhalten.</translation>
+    </message>
+</context>
 </TS>

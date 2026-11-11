@@ -196,6 +196,8 @@ def delete_selection(
     class_tree: Type[tool.ClassTreeView],
     popups: Type[tool.Popups],
     project: Type[tool.Project],
+    group_of_properties: Type[tool.GroupOfProperties],
+    property_table: Type[tool.PropertyTableWidget],
 ):
 
     selected_classes = class_tree.get_selected(view)
@@ -204,11 +206,44 @@ def delete_selection(
     )
     if not delete_request:
         return
+    bsdd_dictionary = project.get()
+
+    # Groups of properties: offer to delete the dictionary's properties they use as well
+    properties_to_delete = []
+    gop_properties, kept = group_of_properties.get_internal_properties(
+        selected_classes, bsdd_dictionary, recursive_deletion
+    )
+    if gop_properties:
+        names = sorted(p.Name or p.Code for p in gop_properties)
+        shown = ", ".join(names[:10]) + (" …" if len(names) > 10 else "")
+        text = QCoreApplication.translate(
+            "ClassTree",
+            "Also delete the {} properties of the predefined property set?\n\n{}",
+        ).format(len(names), shown)
+        others = group_of_properties.count_other_classes_using(
+            gop_properties, selected_classes, bsdd_dictionary
+        )
+        if kept:
+            kept_names = sorted(p.Name or p.Code for p in kept)
+            text += "\n\n" + QCoreApplication.translate(
+                "ClassTree", "Kept because they are also used in other property sets: {}"
+            ).format(", ".join(kept_names[:10]) + (" …" if len(kept_names) > 10 else ""))
+        if others:
+            text += "\n\n" + QCoreApplication.translate(
+                "ClassTree",
+                "They are also used in {} other classes and will be removed there too.",
+            ).format(others)
+        title = QCoreApplication.translate("ClassTree", "Delete properties?")
+        if popups.request_yes_no(title, text, default_yes=False):
+            properties_to_delete = gop_properties
+
     for bsdd_class in selected_classes:
         if recursive_deletion:
-            class_tree.delete_class_with_children(bsdd_class, project.get())
+            class_tree.delete_class_with_children(bsdd_class, bsdd_dictionary)
         else:
-            class_tree.delete_class(bsdd_class, project.get())
+            class_tree.delete_class(bsdd_class, bsdd_dictionary)
+    if properties_to_delete:
+        property_table.delete_properties(properties_to_delete, bsdd_dictionary)
 
 
 def group_selection(

@@ -1,7 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import json
+import logging
 import os
 import bsdd_gui
+from bsdd_gui.module.project.constants import DEFAULT_SETTINGS, SETTINGS_SUFFIX
 from bsdd_gui.presets.tool_presets import ActionTool
 from bsdd_json import (
     BsddDictionary,
@@ -73,10 +76,67 @@ class Project(ActionTool):
         return super().connect_internal_signals()
 
     @classmethod
-    def register_project(cls, bsdd_dictionary: BsddDictionary):
-        cls.get_properties().project_dictionary = bsdd_dictionary
+    def register_project(cls, bsdd_dictionary: BsddDictionary, settings: dict | None = None):
+        prop = cls.get_properties()
+        prop.project_dictionary = bsdd_dictionary
+        prop.settings = dict(settings or {})
+        prop.last_saved_settings = dict(prop.settings)
         cls.set_last_save(bsdd_dictionary)
         bsdd_gui.on_new_project()
+
+    # Project settings (sidecar file next to the project JSON)
+    @classmethod
+    def get_settings_path(cls, path: str) -> str:
+        """'<dir>/<name>.json' -> '<dir>/<name>.bsdd-toolkit.json'"""
+        base = path[: -len(".json")] if path.lower().endswith(".json") else path
+        return base + SETTINGS_SUFFIX
+
+    @classmethod
+    def read_settings(cls, path: str) -> dict:
+        """Read the settings stored next to the project file (empty if there are none)."""
+        settings_path = cls.get_settings_path(path)
+        if not os.path.exists(settings_path):
+            return {}
+        try:
+            with open(settings_path, encoding="utf-8") as file:
+                data = json.load(file)
+        except (OSError, ValueError) as error:
+            logging.warning(f"Could not read project settings '{settings_path}': {error}")
+            return {}
+        if not isinstance(data, dict):
+            logging.warning(f"Ignoring project settings '{settings_path}': not a JSON object")
+            return {}
+        return {k: v for k, v in data.items() if k in DEFAULT_SETTINGS}
+
+    @classmethod
+    def write_settings(cls, path: str) -> None:
+        """Write the settings next to the project file. Nothing is written for default settings
+        unless the file exists already."""
+        settings_path = cls.get_settings_path(path)
+        prop = cls.get_properties()
+        data = {**DEFAULT_SETTINGS, **prop.settings}
+        if data == DEFAULT_SETTINGS and not os.path.exists(settings_path):
+            prop.last_saved_settings = dict(prop.settings)
+            return
+        with open(settings_path, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=2)
+        prop.last_saved_settings = dict(prop.settings)
+
+    @classmethod
+    def get_setting(cls, name: str):
+        return cls.get_properties().settings.get(name, DEFAULT_SETTINGS.get(name))
+
+    @classmethod
+    def set_setting(cls, name: str, value) -> None:
+        cls.get_properties().settings[name] = value
+
+    @classmethod
+    def settings_changed_since_save(cls) -> bool:
+        prop = cls.get_properties()
+        return {**DEFAULT_SETTINGS, **prop.settings} != {
+            **DEFAULT_SETTINGS,
+            **prop.last_saved_settings,
+        }
 
     @classmethod
     def load_project(cls, path: os.PathLike, sloppy=False):

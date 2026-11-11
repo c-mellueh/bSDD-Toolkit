@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ActionIcon, Autocomplete, Button, Grid, Group, Modal, SegmentedControl, Select, Tabs, Text, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { ActionIcon, Alert, Autocomplete, Button, Grid, Group, Modal, SegmentedControl, Select, Tabs, Text, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { Toggle } from "./Toggle";
-import { IconEdit, IconExternalLink, IconPlus } from "@tabler/icons-react";
+import { IconEdit, IconExternalLink, IconLock, IconPlus } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { GOP, clean, codeFromUri, internalCode, isUri, psetsOfClass, uniqueCode } from "../model";
+import { GOP, clean, codeFromUri, cpKey, inheritanceParent, inheritedKeys, internalCode, isUri, psetsOfClass, uniqueCode } from "../model";
 import { attempt } from "../notify";
 import { op, useProject } from "../state/project";
 import { useReadOnly } from "../state/readonly";
@@ -58,6 +58,8 @@ export function ClassPropertyEditor() {
   const d = doc.dictionary;
 
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
+  /** strict inheritance: the parent this class property comes from (its key cannot change) */
+  const lockedBy = existing && inheritedKeys(idx, doc, cls).has(cpKey(d, existing)) ? inheritanceParent(idx, doc, cls) : undefined;
   const prop =
     refMode === "code" ? idx.properties.get(form.PropertyCode ?? "") : form.PropertyUri ? idx.properties.get(internalCode(d, form.PropertyUri, "prop") ?? "") : undefined;
   const siblingCodes = (cls.ClassProperties ?? []).map((c) => c.Code).filter((c) => c !== existing?.Code);
@@ -131,8 +133,14 @@ export function ClassPropertyEditor() {
             <Tabs.Tab value="constraints">{t("Constraints")}</Tabs.Tab>
           </Tabs.List>
           <Tabs.Panel value="general"><fieldset disabled={readOnly} className="ro-fieldset">
+            {lockedBy && (
+              <Alert variant="light" color="gray" icon={<IconLock size={16} />} mb="sm">
+                {t("Inherited from {{name}} (strict inheritance). Property and property set can only be changed in the parent class; the values here can be adjusted.", { name: lockedBy.Name })}
+              </Alert>
+            )}
             <Grid>
               <Grid.Col span={12}>
+                <fieldset disabled={!!lockedBy} className="ro-fieldset">
                 <Group gap="xs" align="flex-end" wrap="nowrap">
                   <SegmentedControl size="xs" value={refMode} onChange={(v) => setRefMode(v as "code" | "uri")} data={[{ value: "code", label: t("Dictionary property") }, { value: "uri", label: t("External URI") }]} />
                   {refMode === "code" ? (
@@ -163,10 +171,11 @@ export function ClassPropertyEditor() {
                     <Tooltip label={t("Open in browser")}><ActionIcon aria-label={t("Open in browser")} variant="light" mb={2} component="a" href={form.PropertyUri} target="_blank"><IconExternalLink size={16} /></ActionIcon></Tooltip>
                   )}
                 </Group>
+                </fieldset>
               </Grid.Col>
               <Grid.Col span={6}><TextInput label={t("Code")} value={form.Code ?? ""} onChange={(e) => set("Code", e.currentTarget.value)} error={codeError} required /></Grid.Col>
               <Grid.Col span={6}>
-                <Autocomplete label={t("Property set")} data={psetsOfClass(doc, cls).filter(Boolean)} value={form.PropertySet ?? ""} onChange={(v) => set("PropertySet", v)} disabled={cls.ClassType === GOP} />
+                <Autocomplete label={t("Property set")} data={psetsOfClass(doc, cls).filter(Boolean)} value={form.PropertySet ?? ""} onChange={(v) => set("PropertySet", v)} disabled={cls.ClassType === GOP || !!lockedBy} />
               </Grid.Col>
               <Grid.Col span={12}>
                 <Textarea label={t("Description")} value={form.Description ?? ""} onChange={(e) => set("Description", e.currentTarget.value)} placeholder={prop?.Description || prop?.Definition || ""} autosize minRows={2} maxRows={6} />

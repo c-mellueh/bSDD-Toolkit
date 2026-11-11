@@ -38,7 +38,14 @@ def context_menu_requested(view: ui.ClassView, pos):
 
 
 def delete_selection(view: ui.ClassView, view_tool: tool.ClassTreeView | tool.GopClassView):
-    core.delete_selection(view, view_tool, tool.Popups, tool.Project)
+    core.delete_selection(
+        view,
+        view_tool,
+        tool.Popups,
+        tool.Project,
+        tool.GroupOfProperties,
+        tool.PropertyTableWidget,
+    )
 
 
 def group_selection(view: ui.ClassView, view_tool: tool.ClassTreeView | tool.GopClassView):

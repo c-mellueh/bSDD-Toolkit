@@ -11,7 +11,7 @@ import { askDeleteClasses } from "../../components/dialogs";
 import { PsetList } from "../../components/PsetList";
 import { ClassForm } from "../../forms/ClassForm";
 import { Split } from "../../layout/Split";
-import { GOP, ancestors } from "../../model";
+import { GOP, ancestors, descendants, gopPropertyUsage } from "../../model";
 import { attempt, notifyOk } from "../../notify";
 import { go, openClass } from "../../state/nav";
 import { op, useProject } from "../../state/project";
@@ -124,9 +124,14 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
   const nRel = (cls.ClassRelations ?? []).length;
 
   const remove = async () => {
-    const result = await askDeleteClasses([cls.Name]);
+    const d = useProject.getState().doc?.dictionary;
+    const result = await askDeleteClasses([cls.Name], (recursive) =>
+      d ? gopPropertyUsage(idx, d, recursive ? [code, ...descendants(idx, code)] : [code]) : { names: [], kept: [], otherClasses: 0 },
+    );
     if (!result) return;
-    const ok = await attempt(() => op("class.delete", { codes: [code], recursive: result.recursive }).then(() => true));
+    const ok = await attempt(() =>
+      op("class.delete", { codes: [code], recursive: result.recursive, delete_properties: result.deleteProperties }).then(() => true),
+    );
     if (ok) {
       useProject.getState().setActiveClass(null);
       go(section, cls.ParentClassCode && idx.classes.has(cls.ParentClassCode) ? cls.ParentClassCode : null, true);

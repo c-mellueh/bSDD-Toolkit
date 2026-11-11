@@ -77,6 +77,25 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         cls.signals.item_added.emit(bsdd_property)
 
     @classmethod
+    def delete_properties(cls, bsdd_properties: list[BsddProperty], bsdd_dictionary):
+        """Delete properties and their class properties, keeping open tables in sync."""
+        affected_models = [
+            m
+            for m in cls.get_models()
+            if m.bsdd_dictionary == bsdd_dictionary and isinstance(m, models.PropertyTableModel)
+        ]
+        for bsdd_property in bsdd_properties:
+            for model in affected_models:
+                row = model.get_row_for_data(bsdd_property)
+                model.beginRemoveRows(QModelIndex(), row, row)
+            removed_properties = prop_utils.delete_property(bsdd_property, bsdd_dictionary)
+            for cp in removed_properties:
+                cls.signals.item_removed.emit(cp)
+            cls.signals.item_removed.emit(bsdd_property)
+            for model in affected_models:
+                model.endRemoveRows()
+
+    @classmethod
     def delete_selection(cls, view: views.ClassTable | views.PropertyTable):
 
         selected_elements = cls.get_selected(view)
@@ -86,19 +105,7 @@ class PropertyTableWidget(ItemViewTool, ActionTool, WidgetTool):
         affected_models = [m for m in cls.get_models() if m.bsdd_dictionary == bsdd_dictionary]
 
         if isinstance(selected_elements[0], BsddProperty):
-            affected_models = [
-                m for m in affected_models if isinstance(m, models.PropertyTableModel)
-            ]
-            for bsdd_property in selected_elements:
-                for model in affected_models:
-                    row = model.get_row_for_data(bsdd_property)
-                    model.beginRemoveRows(QModelIndex(), row, row)
-                removed_properties = prop_utils.delete_property(bsdd_property)
-                for cp in removed_properties:
-                    cls.signals.item_removed.emit(cp)
-                cls.signals.item_removed.emit(bsdd_property)
-                for model in affected_models:
-                    model.endRemoveRows()
+            cls.delete_properties(selected_elements, bsdd_dictionary)
 
         elif isinstance(selected_elements[0], BsddClass):
             affected_models = [m for m in affected_models if isinstance(m, models.ClassTableModel)]

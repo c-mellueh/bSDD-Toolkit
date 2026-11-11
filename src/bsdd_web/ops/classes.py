@@ -124,8 +124,31 @@ def _rename_gop_psets(ctx: Ctx, gop: BsddClass, old_name: str, new_name: str) ->
         ctx.extras.temporary_psets[c.Code] = [new_name if n == old_name else n for n in temp]
 
 
+def gop_property_codes(d, deleting: list[BsddClass]) -> set[str]:
+    """Codes of this dictionary's properties used by the groups of properties among ``deleting``,
+    except those that are also used in another property set (e.g. "Type" in several EPsets)."""
+    props = property_index(d)
+    gops = [c for c in deleting if c.ClassType == GOP]
+    pset_names = {g.Name for g in gops}
+    deleting_codes = {c.Code for c in deleting}
+
+    def code_of(cp):
+        return cp.PropertyCode or internal_code(d, cp.PropertyUri, "prop")
+
+    out = {code for g in gops for cp in g.ClassProperties if (code := code_of(cp)) in props}
+    for c in d.Classes:
+        if c.Code in deleting_codes:
+            continue
+        for cp in c.ClassProperties:
+            if cp.PropertySet not in pset_names:
+                out.discard(code_of(cp))
+    return out
+
+
 @op("class.delete")
-def delete_classes(ctx: Ctx, codes: list[str], recursive: bool = False) -> list[str]:
+def delete_classes(ctx: Ctx, codes: list[str], recursive: bool = False, delete_properties: bool = False) -> list[str]:
+    """Delete classes. ``delete_properties``: also delete the dictionary's properties used by
+    deleted groups of properties (everywhere they are used)."""
     d = ctx.d
     index = class_index(d)
     to_delete: set[str] = set()
@@ -137,6 +160,7 @@ def delete_classes(ctx: Ctx, codes: list[str], recursive: bool = False) -> list[
             to_delete |= descendants(d, code)
     if not to_delete:
         return []
+    prop_codes = gop_property_codes(d, [index[c] for c in to_delete]) if delete_properties else set()
     deleted_uris = {code: class_uri(d, index[code]) for code in to_delete}
 
     # re-parent surviving children to the nearest surviving ancestor
@@ -160,6 +184,10 @@ def delete_classes(ctx: Ctx, codes: list[str], recursive: bool = False) -> list[
         ]
     for code in to_delete:
         ctx.extras.temporary_psets.pop(code, None)
+    if prop_codes:
+        from .properties import delete_properties as delete_props
+
+        delete_props(ctx, sorted(prop_codes))
     return sorted(to_delete)
 
 

@@ -118,6 +118,47 @@ export function resolveProperty(idx: Indexes, d: Dictionary, cp: ClassProperty):
   return undefined;
 }
 
+/** Properties of this dictionary used by the groups of properties among ``codes`` (classes about to
+ * be deleted). ``names``: would be deleted; ``kept``: also used in another property set, so they stay;
+ * ``otherClasses``: remaining classes that use the ones to delete (in this property set). */
+export function gopPropertyUsage(idx: Indexes, d: Dictionary, codes: string[]): { names: string[]; kept: string[]; otherClasses: number } {
+  const deleting = new Set(codes);
+  const props = new Map<string, string>();
+  const psetNames = new Set<string>();
+  for (const code of codes) {
+    const c = idx.classes.get(code);
+    if (c?.ClassType !== GOP) continue;
+    psetNames.add(c.Name);
+    for (const cp of c.ClassProperties ?? []) {
+      const p = resolveProperty(idx, d, cp);
+      if (p) props.set(p.Code, p.Name || p.Code);
+    }
+  }
+  const kept = new Map<string, string>();
+  if (props.size) {
+    for (const c of d.Classes ?? []) {
+      if (deleting.has(c.Code)) continue;
+      for (const cp of c.ClassProperties ?? []) {
+        if (psetNames.has(cp.PropertySet ?? "")) continue;
+        const code = resolveProperty(idx, d, cp)?.Code;
+        if (code && props.has(code)) {
+          kept.set(code, props.get(code)!);
+          props.delete(code);
+        }
+      }
+    }
+  }
+  let otherClasses = 0;
+  if (props.size) {
+    for (const c of d.Classes ?? []) {
+      if (deleting.has(c.Code)) continue;
+      if ((c.ClassProperties ?? []).some((cp) => props.has(resolveProperty(idx, d, cp)?.Code ?? ""))) otherClasses++;
+    }
+  }
+  const sorted = (m: Map<string, string>) => [...m.values()].sort((a, b) => a.localeCompare(b));
+  return { names: sorted(props), kept: sorted(kept), otherClasses };
+}
+
 export function cpName(idx: Indexes, d: Dictionary, cp: ClassProperty): string {
   const p = resolveProperty(idx, d, cp);
   if (p) return p.Name;
@@ -181,4 +222,47 @@ export function clean<T extends Record<string, unknown>>(data: T): T {
     else out[k] = v;
   }
   return out as T;
+}
+
+// --------------------------------------------------------------- strict inheritance
+
+/** Identity of a class property for inheritance: property set + referenced property. */
+export function cpKey(d: Dictionary, cp: ClassProperty): string {
+  const code = cp.PropertyCode || internalCode(d, cp.PropertyUri, "prop");
+  const ref = code ? `code:${code}` : `uri:${(cp.PropertyUri ?? "").trim().replace(/\/+$/, "").toLowerCase()}`;
+  return `${cp.PropertySet ?? ""}\u0000${ref}`;
+}
+
+/** The parent class that passes on its class properties (strict inheritance only). */
+export function inheritanceParent(idx: Indexes, doc: Doc, cls: BsddClass): BsddClass | undefined {
+  if (!doc.extras?.strict_inheritance || cls.ClassType === GOP || !cls.ParentClassCode) return undefined;
+  const parent = idx.classes.get(cls.ParentClassCode);
+  return parent && parent.ClassType !== GOP ? parent : undefined;
+}
+
+/** Keys of the class properties ``cls`` inherits (empty without strict inheritance). */
+export function inheritedKeys(idx: Indexes, doc: Doc, cls: BsddClass): Set<string> {
+  const parent = inheritanceParent(idx, doc, cls);
+  return new Set((parent?.ClassProperties ?? []).map((cp) => cpKey(doc.dictionary, cp)));
+}
+
+/** How many class properties switching strict inheritance on would add. */
+export function missingInherited(idx: Indexes, doc: Doc): number {
+  const d = doc.dictionary;
+  const have = new Map<string, Set<string>>();
+  for (const c of d.Classes ?? []) have.set(c.Code, new Set((c.ClassProperties ?? []).map((cp) => cpKey(d, cp))));
+  const effective = (code: string) => have.get(code)!;
+  let added = 0;
+  const visit = (parent: BsddClass, seen: Set<string>) => {
+    for (const child of idx.children.get(parent.Code) ?? []) {
+      if (child.ClassType === GOP || parent.ClassType === GOP || seen.has(child.Code)) continue;
+      seen.add(child.Code);
+      const mine = effective(child.Code);
+      for (const k of effective(parent.Code)) if (!mine.has(k)) { mine.add(k); added++; }
+      visit(child, seen);
+    }
+  };
+  const seen = new Set<string>();
+  for (const root of idx.children.get(null) ?? []) visit(root, seen);
+  return added;
 }
