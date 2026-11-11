@@ -31,7 +31,14 @@ jobs:
       - name: Browser tests (Playwright)
         working-directory: web
         run: |
-          npx playwright install --with-deps chromium
+          # the Ubuntu package mirrors are sometimes unreachable: retry, then fall back to the
+          # browser alone (the runner image already has most of the libraries it needs)
+          for i in 1 2 3; do
+            npx playwright install --with-deps chromium && break
+            echo "Installing the browser dependencies failed (attempt $i), retrying in 30 s"
+            sleep 30
+            [ "$i" = 3 ] && npx playwright install chromium
+          done
           npm run e2e
       - name: Upload Playwright report
         if: failure()
