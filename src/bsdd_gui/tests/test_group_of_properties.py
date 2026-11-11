@@ -190,8 +190,18 @@ class TestInternalProperties:
 
     def test_only_own_properties_of_gops(self, dictionary):
         gop, wall, fire = self._setup(dictionary)
-        assert GroupOfProperties.get_internal_properties([gop], dictionary) == [fire]
-        assert GroupOfProperties.get_internal_properties([wall], dictionary) == []
+        assert GroupOfProperties.get_internal_properties([gop], dictionary) == ([fire], [])
+        assert GroupOfProperties.get_internal_properties([wall], dictionary) == ([], [])
+
+    def test_keeps_properties_used_in_other_psets(self, dictionary):
+        gop, wall, fire = self._setup(dictionary)
+        other = BsddClass(Code="EPset_Other", Name="Other", ClassType="GroupOfProperties")
+        dictionary.Classes.append(other)
+        other._set_parent(dictionary)
+        cp = BsddClassProperty(Code="rating", PropertyCode="FireRating", PropertySet="Other")
+        other.ClassProperties.append(cp)
+        cp._set_parent(other)
+        assert GroupOfProperties.get_internal_properties([gop], dictionary) == ([], [fire])
 
     def test_other_classes_using(self, dictionary):
         gop, wall, fire = self._setup(dictionary)

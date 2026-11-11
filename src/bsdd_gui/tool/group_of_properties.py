@@ -155,9 +155,10 @@ class GroupOfProperties(FieldTool, ActionTool):
     @classmethod
     def get_internal_properties(
         cls, bsdd_classes: list[BsddClass], bsdd_dictionary: BsddDictionary, recursive=False
-    ) -> list[BsddProperty]:
+    ) -> tuple[list[BsddProperty], list[BsddProperty]]:
         """This dictionary's properties used by the groups of properties among ``bsdd_classes``
-        (and their children if ``recursive``)."""
+        (and their children if ``recursive``): (to delete, kept because they are also used in
+        another property set)."""
         classes = list(bsdd_classes)
         if recursive:
             stack = list(classes)
@@ -167,15 +168,28 @@ class GroupOfProperties(FieldTool, ActionTool):
                         classes.append(child)
                         stack.append(child)
         own = {id(p) for p in bsdd_dictionary.Properties}
+        gops = [c for c in classes if c.ClassType == "GroupOfProperties"]
+        pset_names = {g.Name for g in gops}
         result: list[BsddProperty] = []
-        for bsdd_class in classes:
-            if bsdd_class.ClassType != "GroupOfProperties":
-                continue
+        for bsdd_class in gops:
             for cp in bsdd_class.ClassProperties:
                 prop = prop_utils.get_property_by_class_property(cp, bsdd_dictionary)
                 if prop is not None and id(prop) in own and prop not in result:
                     result.append(prop)
-        return result
+        # keep properties that are also used in another property set (e.g. "Type" in several EPsets)
+        deleting = {id(c) for c in classes}
+        kept: list[BsddProperty] = []
+        for bsdd_class in bsdd_dictionary.Classes:
+            if id(bsdd_class) in deleting:
+                continue
+            for cp in bsdd_class.ClassProperties:
+                if cp.PropertySet in pset_names:
+                    continue
+                prop = prop_utils.get_property_by_class_property(cp, bsdd_dictionary)
+                if prop in result:
+                    result.remove(prop)
+                    kept.append(prop)
+        return result, kept
 
     @classmethod
     def count_other_classes_using(

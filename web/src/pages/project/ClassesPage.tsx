@@ -126,7 +126,7 @@ function ClassDetail({ code, mode }: { code: string; mode: "main" | "gop" }) {
   const remove = async () => {
     const d = useProject.getState().doc?.dictionary;
     const result = await askDeleteClasses([cls.Name], (recursive) =>
-      d ? gopPropertyUsage(idx, d, recursive ? [code, ...descendants(idx, code)] : [code]) : { names: [], otherClasses: 0 },
+      d ? gopPropertyUsage(idx, d, recursive ? [code, ...descendants(idx, code)] : [code]) : { names: [], kept: [], otherClasses: 0 },
     );
     if (!result) return;
     const ok = await attempt(() =>

@@ -124,17 +124,24 @@ def _rename_gop_psets(ctx: Ctx, gop: BsddClass, old_name: str, new_name: str) ->
         ctx.extras.temporary_psets[c.Code] = [new_name if n == old_name else n for n in temp]
 
 
-def gop_property_codes(d, gops) -> set[str]:
-    """Codes of this dictionary's properties used by the given groups of properties."""
+def gop_property_codes(d, deleting: list[BsddClass]) -> set[str]:
+    """Codes of this dictionary's properties used by the groups of properties among ``deleting``,
+    except those that are also used in another property set (e.g. "Type" in several EPsets)."""
     props = property_index(d)
-    out: set[str] = set()
-    for gop in gops:
-        if gop.ClassType != GOP:
+    gops = [c for c in deleting if c.ClassType == GOP]
+    pset_names = {g.Name for g in gops}
+    deleting_codes = {c.Code for c in deleting}
+
+    def code_of(cp):
+        return cp.PropertyCode or internal_code(d, cp.PropertyUri, "prop")
+
+    out = {code for g in gops for cp in g.ClassProperties if (code := code_of(cp)) in props}
+    for c in d.Classes:
+        if c.Code in deleting_codes:
             continue
-        for cp in gop.ClassProperties:
-            code = cp.PropertyCode or internal_code(d, cp.PropertyUri, "prop")
-            if code in props:
-                out.add(code)
+        for cp in c.ClassProperties:
+            if cp.PropertySet not in pset_names:
+                out.discard(code_of(cp))
     return out
 
 

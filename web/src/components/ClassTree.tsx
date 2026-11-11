@@ -137,7 +137,7 @@ export function ClassTree({ mode = "main" }: { mode?: "main" | "gop" }) {
     const result = await askDeleteClasses(names, (recursive) => {
       const all = new Set(codes);
       if (recursive) for (const c of codes) descendants(idx, c).forEach((d) => all.add(d));
-      return doc ? gopPropertyUsage(idx, doc.dictionary, [...all]) : { names: [], otherClasses: 0 };
+      return doc ? gopPropertyUsage(idx, doc.dictionary, [...all]) : { names: [], kept: [], otherClasses: 0 };
     });
     if (!result) return;
     await attempt(() => op("class.delete", { codes, recursive: result.recursive, delete_properties: result.deleteProperties }));

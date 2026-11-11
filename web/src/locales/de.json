@@ -727,5 +727,6 @@
  "(none)": "(keins)",
  "Also delete the {{n}} properties of the predefined property set": "Auch die {{n}} Merkmale der vordefinierten Merkmalsgruppe löschen",
  "and {{n}} more": "und {{n}} weitere",
- "They are also used in {{n}} other classes and will be removed there too.": "Sie werden auch in {{n}} anderen Klassen verwendet und dort ebenfalls entfernt."
+ "They are also used in {{n}} other classes and will be removed there too.": "Sie werden auch in {{n}} anderen Klassen verwendet und dort ebenfalls entfernt.",
+ "Kept because they are also used in other property sets:": "Bleiben erhalten, weil sie auch in anderen Merkmalsgruppen verwendet werden:"
 }

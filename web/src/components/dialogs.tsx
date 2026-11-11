@@ -64,7 +64,7 @@ export interface DeleteClassesResult {
 }
 
 /** ``propertyUsage(recursive)``: properties used by the groups of properties that would be deleted. */
-export type PropertyUsage = (recursive: boolean) => { names: string[]; otherClasses: number };
+export type PropertyUsage = (recursive: boolean) => { names: string[]; kept: string[]; otherClasses: number };
 
 export function askDeleteClasses(names: string[], propertyUsage?: PropertyUsage): Promise<DeleteClassesResult | null> {
   return new Promise((resolve) => {
@@ -105,6 +105,12 @@ function DeletePrompt({ names, propertyUsage, onDone }: { names: string[]; prope
             {shown}
             {nProps > 8 ? ` ${t("and {{n}} more", { n: nProps - 8 })}` : ""}
           </Text>
+          {usage!.kept.length > 0 && (
+            <Text size="xs" c="dimmed">
+              {t("Kept because they are also used in other property sets:")} {usage!.kept.slice(0, 8).join(", ")}
+              {usage!.kept.length > 8 ? ` ${t("and {{n}} more", { n: usage!.kept.length - 8 })}` : ""}
+            </Text>
+          )}
           {deleteProperties && usage!.otherClasses > 0 && (
             <Text size="xs" c="red">{t("They are also used in {{n}} other classes and will be removed there too.", { n: usage!.otherClasses })}</Text>
           )}

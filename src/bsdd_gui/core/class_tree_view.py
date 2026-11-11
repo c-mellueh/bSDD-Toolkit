@@ -210,7 +210,7 @@ def delete_selection(
 
     # Groups of properties: offer to delete the dictionary's properties they use as well
     properties_to_delete = []
-    gop_properties = group_of_properties.get_internal_properties(
+    gop_properties, kept = group_of_properties.get_internal_properties(
         selected_classes, bsdd_dictionary, recursive_deletion
     )
     if gop_properties:
@@ -223,6 +223,11 @@ def delete_selection(
         others = group_of_properties.count_other_classes_using(
             gop_properties, selected_classes, bsdd_dictionary
         )
+        if kept:
+            kept_names = sorted(p.Name or p.Code for p in kept)
+            text += "\n\n" + QCoreApplication.translate(
+                "ClassTree", "Kept because they are also used in other property sets: {}"
+            ).format(", ".join(kept_names[:10]) + (" …" if len(kept_names) > 10 else ""))
         if others:
             text += "\n\n" + QCoreApplication.translate(
                 "ClassTree",

@@ -119,16 +119,33 @@ export function resolveProperty(idx: Indexes, d: Dictionary, cp: ClassProperty):
 }
 
 /** Properties of this dictionary used by the groups of properties among ``codes`` (classes about to
- * be deleted), and how many of the remaining classes also use them. */
-export function gopPropertyUsage(idx: Indexes, d: Dictionary, codes: string[]): { names: string[]; otherClasses: number } {
+ * be deleted). ``names``: would be deleted; ``kept``: also used in another property set, so they stay;
+ * ``otherClasses``: remaining classes that use the ones to delete (in this property set). */
+export function gopPropertyUsage(idx: Indexes, d: Dictionary, codes: string[]): { names: string[]; kept: string[]; otherClasses: number } {
   const deleting = new Set(codes);
   const props = new Map<string, string>();
+  const psetNames = new Set<string>();
   for (const code of codes) {
     const c = idx.classes.get(code);
     if (c?.ClassType !== GOP) continue;
+    psetNames.add(c.Name);
     for (const cp of c.ClassProperties ?? []) {
       const p = resolveProperty(idx, d, cp);
       if (p) props.set(p.Code, p.Name || p.Code);
+    }
+  }
+  const kept = new Map<string, string>();
+  if (props.size) {
+    for (const c of d.Classes ?? []) {
+      if (deleting.has(c.Code)) continue;
+      for (const cp of c.ClassProperties ?? []) {
+        if (psetNames.has(cp.PropertySet ?? "")) continue;
+        const code = resolveProperty(idx, d, cp)?.Code;
+        if (code && props.has(code)) {
+          kept.set(code, props.get(code)!);
+          props.delete(code);
+        }
+      }
     }
   }
   let otherClasses = 0;
@@ -138,7 +155,8 @@ export function gopPropertyUsage(idx: Indexes, d: Dictionary, codes: string[]): 
       if ((c.ClassProperties ?? []).some((cp) => props.has(resolveProperty(idx, d, cp)?.Code ?? ""))) otherClasses++;
     }
   }
-  return { names: [...props.values()].sort((a, b) => a.localeCompare(b)), otherClasses };
+  const sorted = (m: Map<string, string>) => [...m.values()].sort((a, b) => a.localeCompare(b));
+  return { names: sorted(props), kept: sorted(kept), otherClasses };
 }
 
 export function cpName(idx: Indexes, d: Dictionary, cp: ClassProperty): string {

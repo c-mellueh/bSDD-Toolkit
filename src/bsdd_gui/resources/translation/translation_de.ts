@@ -2725,6 +2725,11 @@ ein Merkmal einer anderen Bibliothek handelt.</translation>
     <name>ClassTree</name>
     <message>
         <location filename="../../core/class_tree_view.py"/>
+        <source>Kept because they are also used in other property sets: {}</source>
+        <translation>Bleiben erhalten, weil sie auch in anderen Merkmalsgruppen verwendet werden: {}</translation>
+    </message>
+    <message>
+        <location filename="../../core/class_tree_view.py"/>
         <source>Also delete the {} properties of the predefined property set?
 
 {}</source>

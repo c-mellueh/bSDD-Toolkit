@@ -67,6 +67,18 @@ def test_delete_gop_with_properties(h):
     assert all(cp.PropertyCode != "FireRating" for cp in h.cls("Wall").ClassProperties)
 
 
+def test_delete_gop_keeps_properties_used_in_other_psets(h):
+    from bsdd_json import BsddClass
+
+    h.d.Classes.append(BsddClass.model_validate({
+        "Code": "Pset_Other", "Name": "Pset_Other", "ClassType": "GroupOfProperties",
+        "ClassProperties": [{"Code": "rating", "PropertyCode": "FireRating", "PropertySet": "Pset_Other"}],
+    }))
+    h.run("class.delete", codes=["Pset_Fire"], delete_properties=True)
+    assert h.prop("FireRating") is not None
+    assert h.cls("Pset_Other").ClassProperties[0].PropertyCode == "FireRating"
+
+
 def test_delete_properties_flag_ignores_normal_classes(h):
     # Building's subtree has class properties, but only groups of properties count
     h.run("class.delete", codes=["Building"], recursive=True, delete_properties=True)
