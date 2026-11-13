@@ -756,5 +756,7 @@
  "Select a material on the left to see its properties and details, or create a new one.": "Wähle links ein Material, um seine Merkmale und Details zu sehen, oder lege ein neues an.",
  "Material": "Material",
  "Resize dictionary panel": "Größe des Wörterbuch-Bereichs ändern",
- "Drag to resize, double-click to reset": "Ziehen zum Ändern der Größe, Doppelklick setzt zurück"
+ "Drag to resize, double-click to reset": "Ziehen zum Ändern der Größe, Doppelklick setzt zurück",
+ "Choose the combinations to export. Hold the left mouse button and drag over cells to set them all to the same value.": "Wähle die zu exportierenden Kombinationen. Mit gedrückter linker Maustaste über Zellen ziehen, um alle auf denselben Wert zu setzen.",
+ "{{n}} of {{total}} combinations selected": "{{n}} von {{total}} Kombinationen ausgewählt"
 }

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { createProject, failOnPageErrors } from "./helpers";
+import { createProject, failOnPageErrors, sampleDictionary } from "./helpers";
 
 test.beforeEach(({ page }) => failOnPageErrors(page));
 
@@ -54,4 +54,40 @@ test("property set tree lists all property sets and includes their classes", asy
   await psets.locator(".loin-group-row", { hasText: "Geometry" }).getByRole("switch").evaluate((el: HTMLElement) => el.click());
   // both classes that have the "Geometry" set are now included
   await expect(page.locator(".loin-panel").first().getByText("2 included", { exact: false })).toBeVisible();
+});
+
+test("export dialog: the purpose × milestone matrix selects what is exported; the dialog fits the matrix", async ({ page, request }) => {
+  const purposes = ["P1", "P2", "P3"].map((name, i) => ({ guid: `p${i}`, name }));
+  const milestones = ["Design", "Tender", "Construction", "Handover", "Operation"].map((name, i) => ({ guid: `m${i}`, name, date: null }));
+  const k = (p: number, m: number) => `p${p}|m${m}`;
+  const loin = {
+    purposes,
+    milestones,
+    specs: { [k(0, 0)]: { guid: "s1", classes: ["Wall"], properties: {} }, [k(1, 2)]: { guid: "s2", classes: ["Wall", "Door"], properties: {} } },
+    matrix: [k(0, 0), k(0, 1), k(1, 2), k(2, 4)],
+  };
+  const res = await request.post("/api/projects", { data: { dictionary: sampleDictionary(), extras: { loin } } });
+  const id = (await res.json()).id;
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await page.goto(`/p/${id}/export`);
+  await page.getByRole("button", { name: "Configure & export" }).first().click(); // Excel
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Level of Information Need selection").check();
+
+  // same matrix as in the LOIN editor; combinations not ticked there cannot be chosen
+  await expect(dialog.locator("td[data-cell]")).toHaveCount(4);
+  await expect(dialog.locator("td.unavailable")).toHaveCount(11);
+  await expect(dialog.getByText("4 of 4 combinations selected")).toBeVisible();
+  await dialog.getByRole("checkbox", { name: "P1 – Design" }).press("Space");
+  await expect(dialog.getByText("3 of 4 combinations selected")).toBeVisible();
+  // row checkbox: all usable cells of P1
+  await dialog.getByRole("checkbox", { name: "P1", exact: true }).click();
+  await expect(dialog.getByText("4 of 4 combinations selected")).toBeVisible();
+
+  // the dialog is as wide as the matrix needs (wider than the old fixed size, less than the window)
+  const dialogBox = (await dialog.boundingBox())!;
+  const tableBox = (await dialog.locator("table.loin-matrix").boundingBox())!;
+  expect(dialogBox.width).toBeGreaterThan(tableBox.width);
+  expect(dialogBox.width).toBeLessThan(tableBox.width + 120);
+  expect(dialogBox.width).toBeLessThan(1600);
 });
