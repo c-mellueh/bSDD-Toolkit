@@ -77,6 +77,13 @@ export function SettingsDialog() {
           checked={s.autoCreateGop}
           onChange={(e) => s.set({ autoCreateGop: e.currentTarget.checked })}
         />
+        <Divider label={t("Export")} />
+        <Switch
+          label={t("Same selection in all exports")}
+          description={t("The scope and the purpose × milestone combinations chosen in one export (e.g. Excel) are used in all other exports (IDS, ISO, Revit) too.")}
+          checked={s.syncExportSelection}
+          onChange={(e) => s.set({ syncExportSelection: e.currentTarget.checked })}
+        />
         <Divider label={t("AI helper")} />
         <Select
           label={t("AI provider")}

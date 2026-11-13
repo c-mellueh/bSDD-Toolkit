@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Alert, Button, Divider, Grid, Group, Modal, Radio, Select, Stack, Table, TagsInput, Text, TextInput, Tooltip } from "@mantine/core";
+import { Alert, Badge, Button, Divider, Grid, Group, Modal, Radio, Select, Stack, TagsInput, Text, TextInput } from "@mantine/core";
 import { Toggle } from "./Toggle";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DayField } from "./fields";
 import { api, downloadFile } from "../api";
 import { notifyError, notifyOk } from "../notify";
 import { useProject } from "../state/project";
-import { storageGet, storageSet } from "../state/settings";
+import { storageGet, storageSet, useSettings } from "../state/settings";
 import { useUi, type ExportKind } from "../state/ui";
-import { activeKeys, specKey } from "./LoinEditor";
+import { activeKeys } from "./LoinEditor";
+import { LoinMatrix } from "./LoinMatrix";
 
 const TITLES: Record<ExportKind, string> = {
   excel: "Export Excel",
@@ -36,6 +37,10 @@ export function ExportDialog() {
   const loin = useProject((s) => s.doc?.extras.loin);
   const language = useProject((s) => s.doc?.dictionary.LanguageIsoCode);
   const storeKey = `bsdd-export-${projectId}-${kind}`;
+  // selection shared by all exporters (when "Same selection in all exports" is on)
+  const sharedKey = `bsdd-export-${projectId}-selection`;
+  const sync = useSettings((s) => s.syncExportSelection);
+  const loaded = useRef<string | null>(null);
   const [scope, setScope] = useState<"all" | "loin">("all");
   const [specs, setSpecs] = useState<string[]>([]);
   const [settings, setSettings] = useState<Record<string, any>>({});
@@ -48,9 +53,13 @@ export function ExportDialog() {
   useEffect(() => {
     if (!kind) return;
     const saved = storageGet<Record<string, any>>(storeKey, {});
-    setScope(kind === "iso7817" ? "loin" : saved.scope ?? (filled.length ? "loin" : "all"));
-    setSpecs(saved.specs?.filter((k: string) => filled.includes(k)) ?? filled);
+    const selection = (sync && storageGet<Record<string, any> | null>(sharedKey, null)) || saved;
+    const initialScope = kind === "iso7817" ? "loin" : selection.scope ?? (filled.length ? "loin" : "all");
+    const initialSpecs = selection.specs?.filter((k: string) => filled.includes(k)) ?? filled;
+    setScope(initialScope);
+    setSpecs(initialSpecs);
     setSettings(saved.settings ?? {});
+    loaded.current = JSON.stringify([initialScope, initialSpecs]);
     if (kind === "ids") {
       api(`/api/projects/${projectId}/ids/candidates`, { method: "POST", json: {} })
         .then((r) => {
@@ -65,6 +74,16 @@ export function ExportDialog() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kind]);
 
+  // remember the selection right away (not only on export), shared with the other exporters
+  useEffect(() => {
+    const current = JSON.stringify([scope, specs]);
+    if (!kind || loaded.current === null || current === loaded.current) return; // nothing changed by the user
+    loaded.current = current;
+    storageSet(storeKey, { ...storageGet<Record<string, any>>(storeKey, {}), ...(kind === "iso7817" ? {} : { scope }), specs });
+    if (sync) storageSet(sharedKey, { ...storageGet<Record<string, any>>(sharedKey, {}), ...(kind === "iso7817" ? {} : { scope }), specs });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope, specs]);
+
   if (!kind || !projectId) return null;
 
   const run = async () => {
@@ -72,6 +91,7 @@ export function ExportDialog() {
     try {
       const body = { specs: scope === "all" ? null : specs.filter((k) => filled.includes(k)), settings, lang: settings.lang ?? (language?.startsWith("de") ? "de" : "en") };
       storageSet(storeKey, { scope, specs, settings });
+      if (sync) storageSet(sharedKey, { ...storageGet<Record<string, any>>(sharedKey, {}), ...(kind === "iso7817" ? {} : { scope }), specs });
       const n = await downloadFile(`/api/projects/${projectId}/export/${kind}`, body);
       notifyOk(t("Export done ({{n}} items)", { n: n ?? 0 }));
       close();
@@ -89,8 +109,9 @@ export function ExportDialog() {
   const mainPset = candidates.find((c) => c.pset === ids.main_pset);
 
   return (
-    <Modal opened onClose={close} title={t(TITLES[kind])} size={kind === "ids" ? "xl" : "lg"}>
-      <Stack>
+    // the dialog grows with the matrix (up to the window width) instead of having a fixed width
+    <Modal opened onClose={close} title={t(TITLES[kind])} size="auto" styles={{ content: { minWidth: `min(${kind === "ids" ? 880 : 520}px, 95vw)`, maxWidth: "95vw" } }}>
+      <Stack className="export-fit">
         {kind !== "iso7817" && (
           <Radio.Group value={scope} onChange={(v) => setScope(v as "all" | "loin")} label={t("Scope")}>
             <Group mt={4}>
@@ -102,35 +123,22 @@ export function ExportDialog() {
         {(scope === "loin" || kind === "iso7817") && (
           <>
             {filled.length === 0 && <Alert color="yellow">{t("No combination is ticked in the purpose × milestone matrix yet. Open Information need (LOIN) to set it up.")}</Alert>}
-            <Table withTableBorder fz="xs">
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t("Purpose")} / {t("Milestone")}</Table.Th>
-                  {(loin?.milestones ?? []).map((m) => <Table.Th key={m.guid}>{m.name}</Table.Th>)}
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {(loin?.purposes ?? []).map((p) => (
-                  <Table.Tr key={p.guid}>
-                    <Table.Td>{p.name}</Table.Td>
-                    {(loin?.milestones ?? []).map((m) => {
-                      const k = specKey(p.guid, m.guid);
-                      const n = loin?.specs?.[k]?.classes?.length ?? 0;
-                      const usable = filled.includes(k);
-                      return (
-                        <Table.Td key={k}>
-                          <Tooltip label={t("Not ticked in the purpose × milestone matrix")} disabled={usable}>
-                            <span>
-                              <Toggle label={n ? t("{{n}} classes", { n }) : t("empty")} disabled={!usable} checked={usable && specs.includes(k)} onChange={(e) => setSpecs(e.currentTarget.checked ? [...specs, k] : specs.filter((x) => x !== k))} />
-                            </span>
-                          </Tooltip>
-                        </Table.Td>
-                      );
-                    })}
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
+            {loin && (loin.purposes ?? []).length > 0 && (loin.milestones ?? []).length > 0 && (
+              <>
+                <Text size="sm" c="dimmed">{t("Choose the combinations to export. Hold the left mouse button and drag over cells to set them all to the same value.")}</Text>
+                <LoinMatrix
+                  loin={loin}
+                  isOn={(k) => specs.includes(k)}
+                  onChange={(keys, value) => setSpecs((cur) => (value ? [...new Set([...cur, ...keys])] : cur.filter((k) => !keys.includes(k))))}
+                  unavailable={(k) => (filled.includes(k) ? undefined : t("Not ticked in the purpose × milestone matrix"))}
+                  extra={(k) => {
+                    const n = loin.specs?.[k]?.classes?.length ?? 0;
+                    return <Badge size="sm" variant={n ? "light" : "outline"} color={n ? "blue" : "gray"}>{n ? t("{{n}} classes", { n }) : t("empty")}</Badge>;
+                  }}
+                />
+                <Text size="xs" c="dimmed">{t("{{n}} of {{total}} combinations selected", { n: specs.filter((k) => filled.includes(k)).length, total: filled.length })}</Text>
+              </>
+            )}
           </>
         )}
 

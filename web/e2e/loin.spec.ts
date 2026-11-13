@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { createProject, failOnPageErrors } from "./helpers";
+import { createProject, failOnPageErrors, sampleDictionary } from "./helpers";
 
 test.beforeEach(({ page }) => failOnPageErrors(page));
 
@@ -36,6 +36,8 @@ test("purpose × milestone matrix: click, drag, export of empty combinations", a
   // a single click toggles one cell off again
   await page.mouse.click(first.x + 20, first.y + first.height / 2);
   await expect(page.getByText("2 of 6 combinations ticked")).toBeVisible();
+  // the cell shows the new value at once; wait until the server has it too before exporting
+  await expect.poll(async () => (await (await request.get(`/api/projects/${id}/project.json`)).json()).extras.loin?.matrix?.length ?? 0).toBe(2);
 
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export XML" }).click();
@@ -54,4 +56,84 @@ test("property set tree lists all property sets and includes their classes", asy
   await psets.locator(".loin-group-row", { hasText: "Geometry" }).getByRole("switch").evaluate((el: HTMLElement) => el.click());
   // both classes that have the "Geometry" set are now included
   await expect(page.locator(".loin-panel").first().getByText("2 included", { exact: false })).toBeVisible();
+});
+
+test("export dialog: the purpose × milestone matrix selects what is exported; the dialog fits the matrix", async ({ page, request }) => {
+  const purposes = ["P1", "P2", "P3"].map((name, i) => ({ guid: `p${i}`, name }));
+  const milestones = ["Design", "Tender", "Construction", "Handover", "Operation"].map((name, i) => ({ guid: `m${i}`, name, date: null }));
+  const k = (p: number, m: number) => `p${p}|m${m}`;
+  const loin = {
+    purposes,
+    milestones,
+    specs: { [k(0, 0)]: { guid: "s1", classes: ["Wall"], properties: {} }, [k(1, 2)]: { guid: "s2", classes: ["Wall", "Door"], properties: {} } },
+    matrix: [k(0, 0), k(0, 1), k(1, 2), k(2, 4)],
+  };
+  const res = await request.post("/api/projects", { data: { dictionary: sampleDictionary(), extras: { loin } } });
+  const id = (await res.json()).id;
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await page.goto(`/p/${id}/export`);
+  await page.getByRole("button", { name: "Configure & export" }).first().click(); // Excel
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Level of Information Need selection").check();
+
+  // same matrix as in the LOIN editor; combinations not ticked there cannot be chosen
+  await expect(dialog.locator("td[data-cell]")).toHaveCount(4);
+  await expect(dialog.locator("td.unavailable")).toHaveCount(11);
+  await expect(dialog.getByText("4 of 4 combinations selected")).toBeVisible();
+  await dialog.getByRole("checkbox", { name: "P1 – Design" }).press("Space");
+  await expect(dialog.getByText("3 of 4 combinations selected")).toBeVisible();
+  // row checkbox: all usable cells of P1
+  await dialog.getByRole("checkbox", { name: "P1", exact: true }).click();
+  await expect(dialog.getByText("4 of 4 combinations selected")).toBeVisible();
+
+  // the dialog is as wide as the matrix needs (wider than the old fixed size, less than the window)
+  const dialogBox = (await dialog.boundingBox())!;
+  const tableBox = (await dialog.locator("table.loin-matrix").boundingBox())!;
+  expect(dialogBox.width).toBeGreaterThan(tableBox.width);
+  expect(dialogBox.width).toBeLessThan(tableBox.width + 120);
+  expect(dialogBox.width).toBeLessThan(1600);
+});
+
+test("export dialogs share the selection; can be switched off in the settings", async ({ page, request }) => {
+  const purposes = [{ guid: "p0", name: "P1" }];
+  const milestones = ["Design", "Tender", "Handover"].map((name, i) => ({ guid: `m${i}`, name, date: null }));
+  const loin = { purposes, milestones, specs: {}, matrix: ["p0|m0", "p0|m1", "p0|m2"] };
+  const id = (await (await request.post("/api/projects", { data: { dictionary: sampleDictionary(), extras: { loin } } })).json()).id;
+  await page.goto(`/p/${id}/export`);
+  const open = async (n: number) => {
+    await page.getByRole("button", { name: "Configure & export" }).nth(n).click(); // 0 = Excel, 1 = IDS
+    return page.getByRole("dialog");
+  };
+  const cell = (dialog: import("@playwright/test").Locator, name: string) => dialog.getByRole("checkbox", { name: `P1 – ${name}` });
+
+  // change the selection in Excel and cancel – IDS shows the same selection
+  let dialog = await open(0);
+  await dialog.getByLabel("Level of Information Need selection").check();
+  await cell(dialog, "Tender").press("Space");
+  await expect(dialog.getByText("2 of 3 combinations selected")).toBeVisible();
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  dialog = await open(1);
+  await expect(dialog.getByLabel("Level of Information Need selection")).toBeChecked();
+  await expect(cell(dialog, "Tender")).toHaveAttribute("aria-checked", "false");
+  await expect(dialog.getByText("2 of 3 combinations selected")).toBeVisible();
+  // and back: a change in IDS shows up in Excel
+  await cell(dialog, "Handover").press("Space");
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  dialog = await open(0);
+  await expect(dialog.getByText("1 of 3 combinations selected")).toBeVisible();
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+
+  // switched off: every export has its own selection (Excel: Design + Handover, IDS: Design)
+  await page.getByRole("button", { name: "Settings" }).click();
+  const settings = page.getByRole("dialog");
+  await settings.getByRole("switch", { name: "Same selection in all exports" }).evaluate((el: HTMLElement) => el.click());
+  await page.keyboard.press("Escape");
+  dialog = await open(0);
+  await expect(dialog.getByText("2 of 3 combinations selected")).toBeVisible();
+  await cell(dialog, "Design").press("Space");
+  await expect(dialog.getByText("1 of 3 combinations selected")).toBeVisible();
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  dialog = await open(1);
+  await expect(cell(dialog, "Design")).toHaveAttribute("aria-checked", "true");
+  await expect(cell(dialog, "Handover")).toHaveAttribute("aria-checked", "false");
 });

@@ -162,6 +162,11 @@ body[data-readonly] [data-edit] { display: none !important; }
 .loin-cell.paintable { cursor: pointer; user-select: none; touch-action: none; }
 .loin-cell.paintable:hover { outline: 2px solid var(--mantine-primary-color-light); outline-offset: -2px; }
 .loin-matrix.painting { cursor: crosshair; }
+/* export dialogs: only the matrix decides the width of the dialog, the rest fills it */
+.export-fit > *:not(.loin-matrix-wrap) { contain: inline-size; }
+/* not ticked in the LOIN matrix: cannot be chosen (export dialogs) */
+.loin-cell.unavailable { background: var(--mantine-color-default-hover); }
+.loin-cell.unavailable > * { opacity: 0.4; }
 
 /* Details tab: themed cards */
 .detail-grid { columns: 2 400px; column-gap: 14px; }
