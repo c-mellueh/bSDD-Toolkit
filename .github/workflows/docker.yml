@@ -1,19 +1,62 @@
 name: Docker image
 
+# A new image is only published after a pull request into main has been merged.
+# The version comes from src/bsdd_web/__init__.py: if the tag web-v<version> does not exist yet,
+# the image is built and pushed (<version>, <major.minor>, latest) and the tag is created.
+# Merges that do not raise the version publish nothing. "Run workflow" (manual) rebuilds the
+# current version of main even if its tag already exists.
 on:
-  push:
-    tags: ["web-v*"]  # separate from the desktop release tags (v*)
+  pull_request:
+    types: [closed]
+    branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
+  version:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      minor: ${{ steps.v.outputs.minor }}
+      publish: ${{ steps.v.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || github.ref }}
+          fetch-depth: 0
+      - id: v
+        run: |
+          version=$(sed -nE 's/^__version__ = "([0-9]+\.[0-9]+\.[0-9]+)"/\1/p' src/bsdd_web/__init__.py)
+          if [ -z "$version" ]; then echo "::error::No version in src/bsdd_web/__init__.py"; exit 1; fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "minor=${version%.*}" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/web-v$version" >/dev/null && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "web-v$version already exists - nothing to publish (raise the version to release)."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Publishing $version"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
   test:
+    needs: version
+    if: needs.version.outputs.publish == 'true'
     uses: ./.github/workflows/web-tests.yml
 
   docker:
-    needs: test
+    needs: [version, test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # create the release tag
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || github.ref }}
       - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v4
@@ -25,8 +68,8 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/bsdd-toolkit
           tags: |
-            type=match,pattern=web-v(\d+\.\d+\.\d+),group=1
-            type=match,pattern=web-v(\d+\.\d+),group=1
+            type=raw,value=${{ needs.version.outputs.version }}
+            type=raw,value=${{ needs.version.outputs.minor }}
             type=raw,value=latest
       - uses: docker/build-push-action@v7
         with:
@@ -37,3 +80,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Create tag web-v${{ env.VERSION }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/web-v$VERSION" >/dev/null; then
+            echo "Tag web-v$VERSION already exists"
+          else
+            git tag "web-v$VERSION"
+            git push origin "web-v$VERSION"
+          fi
