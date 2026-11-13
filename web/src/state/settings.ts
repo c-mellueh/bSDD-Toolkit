@@ -28,6 +28,8 @@ export interface Settings {
   gopPrefix: string;
   /** creating a property set in a class also creates a Group of Properties if none has that name */
   autoCreateGop: boolean;
+  /** all export dialogs share the selection (scope and purpose × milestone combinations) */
+  syncExportSelection: boolean;
 }
 
 const KEY = "bsdd-settings";
@@ -47,6 +49,7 @@ function load(): Settings {
     treeColumns: { code: true, status: true },
     gopPrefix: "EPset_",
     autoCreateGop: false,
+    syncExportSelection: true,
   };
   try {
     const raw = localStorage.getItem(KEY);

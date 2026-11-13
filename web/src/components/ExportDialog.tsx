@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Alert, Badge, Button, Divider, Grid, Group, Modal, Radio, Select, Stack, TagsInput, Text, TextInput } from "@mantine/core";
 import { Toggle } from "./Toggle";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DayField } from "./fields";
 import { api, downloadFile } from "../api";
 import { notifyError, notifyOk } from "../notify";
 import { useProject } from "../state/project";
-import { storageGet, storageSet } from "../state/settings";
+import { storageGet, storageSet, useSettings } from "../state/settings";
 import { useUi, type ExportKind } from "../state/ui";
 import { activeKeys } from "./LoinEditor";
 import { LoinMatrix } from "./LoinMatrix";
@@ -37,6 +37,10 @@ export function ExportDialog() {
   const loin = useProject((s) => s.doc?.extras.loin);
   const language = useProject((s) => s.doc?.dictionary.LanguageIsoCode);
   const storeKey = `bsdd-export-${projectId}-${kind}`;
+  // selection shared by all exporters (when "Same selection in all exports" is on)
+  const sharedKey = `bsdd-export-${projectId}-selection`;
+  const sync = useSettings((s) => s.syncExportSelection);
+  const loaded = useRef<string | null>(null);
   const [scope, setScope] = useState<"all" | "loin">("all");
   const [specs, setSpecs] = useState<string[]>([]);
   const [settings, setSettings] = useState<Record<string, any>>({});
@@ -49,9 +53,13 @@ export function ExportDialog() {
   useEffect(() => {
     if (!kind) return;
     const saved = storageGet<Record<string, any>>(storeKey, {});
-    setScope(kind === "iso7817" ? "loin" : saved.scope ?? (filled.length ? "loin" : "all"));
-    setSpecs(saved.specs?.filter((k: string) => filled.includes(k)) ?? filled);
+    const selection = (sync && storageGet<Record<string, any> | null>(sharedKey, null)) || saved;
+    const initialScope = kind === "iso7817" ? "loin" : selection.scope ?? (filled.length ? "loin" : "all");
+    const initialSpecs = selection.specs?.filter((k: string) => filled.includes(k)) ?? filled;
+    setScope(initialScope);
+    setSpecs(initialSpecs);
     setSettings(saved.settings ?? {});
+    loaded.current = JSON.stringify([initialScope, initialSpecs]);
     if (kind === "ids") {
       api(`/api/projects/${projectId}/ids/candidates`, { method: "POST", json: {} })
         .then((r) => {
@@ -66,6 +74,16 @@ export function ExportDialog() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kind]);
 
+  // remember the selection right away (not only on export), shared with the other exporters
+  useEffect(() => {
+    const current = JSON.stringify([scope, specs]);
+    if (!kind || loaded.current === null || current === loaded.current) return; // nothing changed by the user
+    loaded.current = current;
+    storageSet(storeKey, { ...storageGet<Record<string, any>>(storeKey, {}), ...(kind === "iso7817" ? {} : { scope }), specs });
+    if (sync) storageSet(sharedKey, { ...storageGet<Record<string, any>>(sharedKey, {}), ...(kind === "iso7817" ? {} : { scope }), specs });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope, specs]);
+
   if (!kind || !projectId) return null;
 
   const run = async () => {
@@ -73,6 +91,7 @@ export function ExportDialog() {
     try {
       const body = { specs: scope === "all" ? null : specs.filter((k) => filled.includes(k)), settings, lang: settings.lang ?? (language?.startsWith("de") ? "de" : "en") };
       storageSet(storeKey, { scope, specs, settings });
+      if (sync) storageSet(sharedKey, { ...storageGet<Record<string, any>>(sharedKey, {}), ...(kind === "iso7817" ? {} : { scope }), specs });
       const n = await downloadFile(`/api/projects/${projectId}/export/${kind}`, body);
       notifyOk(t("Export done ({{n}} items)", { n: n ?? 0 }));
       close();

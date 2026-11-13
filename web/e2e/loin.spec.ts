@@ -36,6 +36,8 @@ test("purpose × milestone matrix: click, drag, export of empty combinations", a
   // a single click toggles one cell off again
   await page.mouse.click(first.x + 20, first.y + first.height / 2);
   await expect(page.getByText("2 of 6 combinations ticked")).toBeVisible();
+  // the cell shows the new value at once; wait until the server has it too before exporting
+  await expect.poll(async () => (await (await request.get(`/api/projects/${id}/project.json`)).json()).extras.loin?.matrix?.length ?? 0).toBe(2);
 
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export XML" }).click();
@@ -90,4 +92,48 @@ test("export dialog: the purpose × milestone matrix selects what is exported; t
   expect(dialogBox.width).toBeGreaterThan(tableBox.width);
   expect(dialogBox.width).toBeLessThan(tableBox.width + 120);
   expect(dialogBox.width).toBeLessThan(1600);
+});
+
+test("export dialogs share the selection; can be switched off in the settings", async ({ page, request }) => {
+  const purposes = [{ guid: "p0", name: "P1" }];
+  const milestones = ["Design", "Tender", "Handover"].map((name, i) => ({ guid: `m${i}`, name, date: null }));
+  const loin = { purposes, milestones, specs: {}, matrix: ["p0|m0", "p0|m1", "p0|m2"] };
+  const id = (await (await request.post("/api/projects", { data: { dictionary: sampleDictionary(), extras: { loin } } })).json()).id;
+  await page.goto(`/p/${id}/export`);
+  const open = async (n: number) => {
+    await page.getByRole("button", { name: "Configure & export" }).nth(n).click(); // 0 = Excel, 1 = IDS
+    return page.getByRole("dialog");
+  };
+  const cell = (dialog: import("@playwright/test").Locator, name: string) => dialog.getByRole("checkbox", { name: `P1 – ${name}` });
+
+  // change the selection in Excel and cancel – IDS shows the same selection
+  let dialog = await open(0);
+  await dialog.getByLabel("Level of Information Need selection").check();
+  await cell(dialog, "Tender").press("Space");
+  await expect(dialog.getByText("2 of 3 combinations selected")).toBeVisible();
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  dialog = await open(1);
+  await expect(dialog.getByLabel("Level of Information Need selection")).toBeChecked();
+  await expect(cell(dialog, "Tender")).toHaveAttribute("aria-checked", "false");
+  await expect(dialog.getByText("2 of 3 combinations selected")).toBeVisible();
+  // and back: a change in IDS shows up in Excel
+  await cell(dialog, "Handover").press("Space");
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  dialog = await open(0);
+  await expect(dialog.getByText("1 of 3 combinations selected")).toBeVisible();
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+
+  // switched off: every export has its own selection (Excel: Design + Handover, IDS: Design)
+  await page.getByRole("button", { name: "Settings" }).click();
+  const settings = page.getByRole("dialog");
+  await settings.getByRole("switch", { name: "Same selection in all exports" }).evaluate((el: HTMLElement) => el.click());
+  await page.keyboard.press("Escape");
+  dialog = await open(0);
+  await expect(dialog.getByText("2 of 3 combinations selected")).toBeVisible();
+  await cell(dialog, "Design").press("Space");
+  await expect(dialog.getByText("1 of 3 combinations selected")).toBeVisible();
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  dialog = await open(1);
+  await expect(cell(dialog, "Design")).toHaveAttribute("aria-checked", "true");
+  await expect(cell(dialog, "Handover")).toHaveAttribute("aria-checked", "false");
 });
