@@ -180,3 +180,14 @@ body[data-readonly] [data-edit] { display: none !important; }
 @media (max-width: 30em) { .dimension-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .graph-toolbar { overflow-x: auto; scrollbar-width: none; }
 .graph-toolbar > * { flex: none; }
+
+/* cookie notice: bottom of the window, above the content (notifications sit higher) */
+.cookie-notice {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  max-width: 640px;
+  margin-inline: auto;
+  z-index: 300;
+}

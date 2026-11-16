@@ -6,6 +6,7 @@ import { Center, Loader } from "@mantine/core";
 import { Suspense, lazy, useEffect, type ReactNode } from "react";
 import { Outlet, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import { UnsavedGuard } from "./components/UnsavedGuard";
+import { CookieNotice } from "./components/CookieNotice";
 import { NotFound } from "./pages/NotFound";
 import { RouteCrash } from "./components/ErrorBoundary";
 import { Landing } from "./pages/Landing";
@@ -44,13 +45,14 @@ const theme = createTheme({
   },
 });
 
-/** Shell around every page: resets the title and guards unsaved edits. */
+/** Shell around every page: resets the title, guards unsaved edits, shows the cookie notice. */
 function Root() {
   return (
     <>
       <TitleReset />
       <UnsavedGuard />
       <Outlet />
+      <CookieNotice />
     </>
   );
 }
