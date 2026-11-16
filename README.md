@@ -140,23 +140,23 @@ password only signs out viewers. Password attempts are rate limited.
 
 ### Run with Docker Compose
 
-```yaml
-services:
-  bsdd-toolkit:
-    image: cmellueh/bsdd-toolkit:latest
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    volumes:
-      - bsdd-data:/data
-volumes:
-  bsdd-data:
+Download [`compose.yaml`](compose.yaml) and the settings template [`.env.example`](.env.example) into an empty folder:
+
+```bash
+curl -O https://raw.githubusercontent.com/c-mellueh/bSDD-Toolkit/main/compose.yaml
+curl -o .env https://raw.githubusercontent.com/c-mellueh/bSDD-Toolkit/main/.env.example
 ```
 
-`docker compose up -d` and open http://localhost:8000. See `compose.yaml` for all options.
+Adjust `.env` (port, image version, imprint details, ...), then run `docker compose up -d` and open
+http://localhost:8000. Without a `.env` file the defaults are used. Dictionaries are stored in the
+Docker volume `bsdd-data`. Update with `docker compose pull && docker compose up -d`.
+
+Settings (all optional, in `.env`):
 
 | Variable | Default | Meaning |
 |---|---|---|
+| `BSDD_TOOLKIT_TAG` | `latest` | image version used by `compose.yaml`, e.g. `0.2` or `0.2.2` |
+| `HOST_PORT` | `8000` | port on the host used by `compose.yaml` |
 | `DATA_DIR` | `/data` | where dictionaries are stored |
 | `PORT` | `8000` | HTTP port inside the container |
 | `MAX_UPLOAD_MB` | `50` | maximum upload size |
@@ -190,9 +190,11 @@ A reverse proxy must forward WebSocket upgrades (`/api/projects/<id>/ws`).
 
 ### Publish the image
 
-`.github/workflows/docker.yml` runs the tests and pushes a multi-arch image (amd64/arm64) to
-Docker Hub when a tag like `web-v0.1.0` is pushed (the plain `v*` tags belong to the desktop releases). Add the repository secrets `DOCKERHUB_USERNAME`
-and `DOCKERHUB_TOKEN`. Manually: `docker build -t <user>/bsdd-toolkit . && docker push <user>/bsdd-toolkit`.
+`.github/workflows/docker.yml` publishes a multi-arch image (amd64/arm64) to Docker Hub after a pull
+request into `main` has been merged: if the version in `src/bsdd_web/__init__.py` has no tag
+`web-v<version>` yet, it runs the tests, pushes `<version>`, `<major.minor>` and `latest` and creates the tag.
+Merges without a new version publish nothing. Add the repository secrets `DOCKERHUB_USERNAME` and
+`DOCKERHUB_TOKEN`. Manually: `docker build -t <user>/bsdd-toolkit . && docker push <user>/bsdd-toolkit`.
 
 ### Develop
 
