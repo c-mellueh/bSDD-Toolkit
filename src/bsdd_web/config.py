@@ -5,6 +5,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 
+def _text_env(name: str) -> str:
+    """Text from the environment; ``\\n`` in the value starts a new line (for compose files)."""
+    return os.environ.get(name, "").replace("\\n", "\n").strip()
+
+
 def _int_env(name: str, default: int) -> int:
     try:
         return int(os.environ.get(name, default))
@@ -43,11 +48,36 @@ class Settings:
         default_factory=lambda: os.environ.get("BSDD_SCOPE", "https://buildingSMARTservices.onmicrosoft.com/bsddapi/read"),
     )
     bsdd_api: str = field(default_factory=lambda: os.environ.get("BSDD_API", "https://api.bsdd.buildingsmart.org").rstrip("/"))
+    #: operator of this installation, shown in the imprint and the privacy policy
+    #: (empty name = the pages say that the operator has not entered the details yet)
+    operator_name: str = field(default_factory=lambda: _text_env("OPERATOR_NAME"))
+    operator_address: str = field(default_factory=lambda: _text_env("OPERATOR_ADDRESS"))
+    operator_email: str = field(default_factory=lambda: _text_env("OPERATOR_EMAIL"))
+    operator_phone: str = field(default_factory=lambda: _text_env("OPERATOR_PHONE"))
+    #: additional text for the imprint (e.g. VAT ID, person responsible for the content)
+    imprint_extra: str = field(default_factory=lambda: _text_env("IMPRINT_EXTRA"))
+    #: additional text for the privacy policy (e.g. hosting provider, CDN or proxy in front)
+    privacy_extra: str = field(default_factory=lambda: _text_env("PRIVACY_EXTRA"))
     static_dir: Path = field(
         default_factory=lambda: Path(
             os.environ.get("STATIC_DIR", str(Path(__file__).parent / "static")),
         ),
     )
+
+    def legal(self) -> dict[str, object]:
+        """Operator details and facts for the imprint and the privacy policy (all public)."""
+        return {
+            "name": self.operator_name,
+            "address": self.operator_address,
+            "email": self.operator_email,
+            "phone": self.operator_phone,
+            "imprint_extra": self.imprint_extra,
+            "privacy_extra": self.privacy_extra,
+            "project_ttl_days": self.project_ttl_days,
+            "max_snapshots": self.max_snapshots,
+            "bsdd_login": bool(self.bsdd_client_id),
+            "offline": self.offline,
+        }
 
     @property
     def projects_dir(self) -> Path:

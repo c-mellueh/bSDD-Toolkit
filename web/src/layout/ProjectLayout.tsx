@@ -66,6 +66,7 @@ import { LanguageSelect } from "../components/LanguageSelect";
 import { PropertyEditor } from "../components/PropertyEditor";
 import { SearchDialog } from "../components/SearchDialog";
 import { SettingsDialog } from "../components/SettingsDialog";
+import { LegalLinks } from "../pages/Legal";
 import { ShareDialog } from "../components/ShareDialog";
 import { GOP, MATERIAL } from "../model";
 import { attempt, notifyError, notifyOk } from "../notify";
@@ -416,6 +417,11 @@ function Navigation({ collapsed, onToggle, onDownload }: { collapsed: boolean; o
         )}
         {link(t("Start page"), <IconHome size={18} />, false, () => navigate("/"))}
         {link(collapsed ? t("Expand sidebar") : t("Collapse sidebar"), collapsed ? <IconChevronsRight size={18} /> : <IconChevronsLeft size={18} />, false, onToggle)}
+        {!collapsed && (
+          <Group justify="center" pt={4}>
+            <LegalLinks />
+          </Group>
+        )}
       </Stack>
     </Stack>
   );

@@ -7,6 +7,8 @@ import { Anchor, Button, Collapse, Group, List, Paper, Text } from "@mantine/cor
 import { IconCookie } from "@tabler/icons-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { PRIVACY_PATH } from "../pages/Legal";
 import { storageGet, storageSet } from "../state/settings";
 
 export const COOKIE_NOTICE_KEY = "bsdd-cookie-notice";
@@ -44,6 +46,9 @@ export function CookieNotice() {
               <List.Item>{t("Session storage (cleared when the tab is closed): an ID of this tab for live collaboration and, after signing in to buildingSMART, the sign-in for downloading.")}</List.Item>
               <List.Item>{t("The Python shell loads its runtime from cdn.jsdelivr.net when you open it. The AI helper sends your text directly from the browser to OpenAI with your own key.")}</List.Item>
             </List>
+            <Anchor component={Link} to={PRIVACY_PATH} size="xs" mt={6} display="inline-block">
+              {t("Privacy policy")}
+            </Anchor>
           </Collapse>
         </div>
         <Button size="xs" onClick={close} style={{ flex: "none" }}>

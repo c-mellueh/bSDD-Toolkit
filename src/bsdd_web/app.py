@@ -174,6 +174,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "max_upload_mb": settings.max_upload_mb,
             "offline": settings.offline,
             "bsdd_login": login,
+            "legal": settings.legal(),
         }
 
     # ------------------------------------------------------------------ projects

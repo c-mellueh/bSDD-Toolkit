@@ -168,6 +168,9 @@ volumes:
 | `PUBLIC_URL` | *(empty)* | public address of this installation, e.g. `https://bsdd.example.org`; the buildingSMART sign-in returns to `<PUBLIC_URL>/auth/bsdd/callback` (empty = the address the browser uses) |
 | `BSDD_CLIENT_ID` | *(empty)* | client ID from buildingSMART for "Sign in with buildingSMART"; empty = sign-in and full download are off |
 | `BSDD_AUTHORITY` / `BSDD_SCOPE` / `BSDD_API` | buildingSMART defaults | only needed if buildingSMART changes its sign-in or API addresses |
+| `OPERATOR_NAME` | *(empty)* | operator of the installation, shown in the imprint (`/imprint`) and the privacy policy (`/privacy`); empty = both pages say that the details are missing |
+| `OPERATOR_ADDRESS` / `OPERATOR_EMAIL` / `OPERATOR_PHONE` | *(empty)* | postal address (`\n` starts a new line), contact email and phone for both pages |
+| `IMPRINT_EXTRA` / `PRIVACY_EXTRA` | *(empty)* | additional text, e.g. VAT ID or person responsible for the content (imprint), hosting provider, CDN or proxy in front and log retention (privacy policy) |
 
 #### Download from bSDD
 

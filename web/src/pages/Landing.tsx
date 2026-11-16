@@ -1,3 +1,4 @@
+import { LegalLinks } from "./Legal";
 import { ActionIcon, Anchor, Badge, Button, Card, Container, FileButton, Grid, Group, Modal, SegmentedControl, Select, SimpleGrid, Stack, Text, TextInput, Title, Tooltip } from "@mantine/core";
 import { IconCloudDownload, IconFilePlus, IconFileUpload, IconPackageImport, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
@@ -86,6 +87,9 @@ export function Landing() {
             ))}
           </Stack>
         )}
+        <Group justify="center" mt={48}>
+          <LegalLinks />
+        </Group>
       </Container>
       <NewDictionaryModal opened={newOpen} onClose={() => setNewOpen(false)} onCreated={open} />
       <DownloadDialog opened={downloadOpen} onClose={() => setDownloadOpen(false)} />

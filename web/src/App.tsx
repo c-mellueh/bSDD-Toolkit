@@ -10,6 +10,7 @@ import { CookieNotice } from "./components/CookieNotice";
 import { NotFound } from "./pages/NotFound";
 import { RouteCrash } from "./components/ErrorBoundary";
 import { Landing } from "./pages/Landing";
+import { ImprintPage, PrivacyPage } from "./pages/Legal";
 import { BsddCallback } from "./pages/BsddCallback";
 import { ProjectLayout } from "./layout/ProjectLayout";
 import { ClassesPage } from "./pages/project/ClassesPage";
@@ -63,6 +64,10 @@ const router = createBrowserRouter(
     <Route element={<Root />} errorElement={<RouteCrash />}>
       <Route path="/" element={<Landing />} />
       <Route path="/auth/bsdd/callback" element={<BsddCallback />} />
+      <Route path="/imprint" element={<ImprintPage />} />
+      <Route path="/impressum" element={<ImprintPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/datenschutz" element={<PrivacyPage />} />
       <Route path="/p/:projectId/window/graph" element={<Lazy><GraphPage /></Lazy>} />
       <Route path="/v/:projectId/window/graph" element={<Lazy><GraphPage base="/v" /></Lazy>} />
       {(["/p", "/v"] as const).map((base) => (

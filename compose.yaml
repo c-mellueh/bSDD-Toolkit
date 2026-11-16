@@ -21,6 +21,14 @@ services:
       # return URL <PUBLIC_URL>/auth/bsdd/callback. Leave BSDD_CLIENT_ID empty to switch it off.
       PUBLIC_URL: ""          # e.g. https://bsdd.example.org
       BSDD_CLIENT_ID: ""
+      # Imprint (/imprint) and privacy policy (/privacy). Public installations in Germany need
+      # both. "\n" in a value starts a new line.
+      OPERATOR_NAME: ""       # e.g. Erika Mustermann
+      OPERATOR_ADDRESS: ""    # e.g. Musterweg 1\n12345 Musterstadt
+      OPERATOR_EMAIL: ""
+      OPERATOR_PHONE: ""
+      IMPRINT_EXTRA: ""       # e.g. VAT ID, person responsible for the content
+      PRIVACY_EXTRA: ""       # e.g. hosting provider, CDN/proxy in front, how long logs are kept
     # If you put a reverse proxy (Traefik, nginx, Caddy) in front, make sure it
     # forwards WebSocket upgrades for /api/projects/<id>/ws.
 

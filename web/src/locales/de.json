@@ -766,5 +766,7 @@
  "Less": "Weniger",
  "Local storage of this browser: settings (theme, language, layout), recent dictionaries, access keys of shared dictionaries, export selections, your OpenAI key if you enter one, and the in-app clipboard. It stays on this device and can be deleted in the browser settings.": "Lokaler Speicher dieses Browsers: Einstellungen (Design, Sprache, Layout), zuletzt geöffnete Wörterbücher, Zugangsschlüssel geteilter Wörterbücher, Export-Auswahlen, Ihr OpenAI-Schlüssel, falls Sie ihn eingeben, und die Zwischenablage der Anwendung. Er bleibt auf diesem Gerät und kann in den Browser-Einstellungen gelöscht werden.",
  "Session storage (cleared when the tab is closed): an ID of this tab for live collaboration and, after signing in to buildingSMART, the sign-in for downloading.": "Sitzungsspeicher (wird beim Schließen des Tabs gelöscht): eine Kennung dieses Tabs für die gemeinsame Bearbeitung und, nach der Anmeldung bei buildingSMART, die Anmeldung für den Download.",
- "The Python shell loads its runtime from cdn.jsdelivr.net when you open it. The AI helper sends your text directly from the browser to OpenAI with your own key.": "Die Python-Shell lädt ihre Laufzeitumgebung beim Öffnen von cdn.jsdelivr.net. Der KI-Assistent sendet Ihren Text mit Ihrem eigenen Schlüssel direkt aus dem Browser an OpenAI."
+ "The Python shell loads its runtime from cdn.jsdelivr.net when you open it. The AI helper sends your text directly from the browser to OpenAI with your own key.": "Die Python-Shell lädt ihre Laufzeitumgebung beim Öffnen von cdn.jsdelivr.net. Der KI-Assistent sendet Ihren Text mit Ihrem eigenen Schlüssel direkt aus dem Browser an OpenAI.",
+ "Imprint": "Impressum",
+ "Privacy policy": "Datenschutzerklärung"
 }
