@@ -17,6 +17,8 @@ export default defineConfig({
     viewport: { width: 1440, height: 900 },
     locale: "en-US",
     trace: "retain-on-failure",
+    // the cookie notice is acknowledged (it would cover buttons) – cookie-notice.spec.ts tests it
+    storageState: { cookies: [], origins: [{ origin: `http://127.0.0.1:${PORT}`, localStorage: [{ name: "bsdd-cookie-notice", value: "true" }] }] },
   },
   webServer: {
     command: `${process.env.E2E_PYTHON ?? "python"} -m bsdd_web --host 127.0.0.1 --port ${PORT}`,

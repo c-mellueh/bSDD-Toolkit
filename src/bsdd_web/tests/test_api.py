@@ -410,3 +410,18 @@ def test_viewers_cannot_delete_or_restore(client):
     assert client.get(f"/api/projects/{view_id}/snapshots").status_code == 403
     assert client.post(f"/api/projects/{view_id}/snapshots").status_code == 403
     assert client.get(f"/api/projects/{pid}").status_code == 200
+
+
+def test_config_legal_details(settings, monkeypatch):
+    from bsdd_web.config import Settings
+
+    monkeypatch.setenv("OPERATOR_NAME", "Erika Muster")
+    monkeypatch.setenv("OPERATOR_ADDRESS", r"Musterweg 1\n12345 Musterstadt")
+    assert Settings().operator_address == "Musterweg 1\n12345 Musterstadt"  # "\n" in compose files
+    settings.operator_name = "Erika Muster"
+    settings.project_ttl_days = 30
+    with TestClient(create_app(settings)) as c:
+        legal = c.get("/api/config").json()["legal"]
+    assert legal["name"] == "Erika Muster"
+    assert legal["project_ttl_days"] == 30
+    assert legal["bsdd_login"] is False

@@ -760,5 +760,13 @@
  "Choose the combinations to export. Hold the left mouse button and drag over cells to set them all to the same value.": "Wähle die zu exportierenden Kombinationen. Mit gedrückter linker Maustaste über Zellen ziehen, um alle auf denselben Wert zu setzen.",
  "{{n}} of {{total}} combinations selected": "{{n}} von {{total}} Kombinationen ausgewählt",
  "Same selection in all exports": "Gleiche Auswahl in allen Exporten",
- "The scope and the purpose × milestone combinations chosen in one export (e.g. Excel) are used in all other exports (IDS, ISO, Revit) too.": "Umfang und Kombinationen aus Anwendungsfall × Meilenstein, die in einem Export (z. B. Excel) gewählt werden, gelten auch für alle anderen Exporte (IDS, ISO, Revit)."
+ "The scope and the purpose × milestone combinations chosen in one export (e.g. Excel) are used in all other exports (IDS, ISO, Revit) too.": "Umfang und Kombinationen aus Anwendungsfall × Meilenstein, die in einem Export (z. B. Excel) gewählt werden, gelten auch für alle anderen Exporte (IDS, ISO, Revit).",
+ "Cookie notice": "Hinweis zu Cookies",
+ "This app uses no cookies and no tracking. It only stores what it needs to work (settings, recent dictionaries, access keys) in your browser.": "Diese Anwendung verwendet keine Cookies und kein Tracking. Sie speichert nur, was sie zum Funktionieren braucht (Einstellungen, zuletzt geöffnete Wörterbücher, Zugangsschlüssel), in Ihrem Browser.",
+ "Less": "Weniger",
+ "Local storage of this browser: settings (theme, language, layout), recent dictionaries, access keys of shared dictionaries, export selections, your OpenAI key if you enter one, and the in-app clipboard. It stays on this device and can be deleted in the browser settings.": "Lokaler Speicher dieses Browsers: Einstellungen (Design, Sprache, Layout), zuletzt geöffnete Wörterbücher, Zugangsschlüssel geteilter Wörterbücher, Export-Auswahlen, Ihr OpenAI-Schlüssel, falls Sie ihn eingeben, und die Zwischenablage der Anwendung. Er bleibt auf diesem Gerät und kann in den Browser-Einstellungen gelöscht werden.",
+ "Session storage (cleared when the tab is closed): an ID of this tab for live collaboration and, after signing in to buildingSMART, the sign-in for downloading.": "Sitzungsspeicher (wird beim Schließen des Tabs gelöscht): eine Kennung dieses Tabs für die gemeinsame Bearbeitung und, nach der Anmeldung bei buildingSMART, die Anmeldung für den Download.",
+ "The Python shell loads its runtime from cdn.jsdelivr.net when you open it. The AI helper sends your text directly from the browser to OpenAI with your own key.": "Die Python-Shell lädt ihre Laufzeitumgebung beim Öffnen von cdn.jsdelivr.net. Der KI-Assistent sendet Ihren Text mit Ihrem eigenen Schlüssel direkt aus dem Browser an OpenAI.",
+ "Imprint": "Impressum",
+ "Privacy policy": "Datenschutzerklärung"
 }
